@@ -39,44 +39,71 @@ class airnow:
         self.ftp.login(self.username,self.password)
 
     def convert_dates_tofnames(self):
+        self.datestr = []
         for i in self.dates:
             self.datestr.append(i.strftime('%Y%m%d%H.dat'))
 
-    def retrieve_hourly_files(self):
+    def retrieve_hourly_files(self,cleanup=True):
         from numpy import array
         self.openftp()
         self.convert_dates_tofnames()
         nlst = self.retrieve_hourly_filelist()
-        print nlst
-        print self.datestr
         index1,index2 = search_listinlist(array(nlst),array(self.datestr))
-        
-        if index1.shape< 1:
+        if index1.shape[0]< 1:
             self.ftp.cwd('Archive')
             year = self.dates[0].strftime('%Y')
             self.ftp.cwd(year)
             nlst = self.ftp.nlst('*')
             index1,index2 = search_listinlist(array(nlst),array(self.datestr))
             if index1.shape[0] <1:
-                print 'AirNow does not have hourly data at this time.  Please try again'
+                print 'The dates you have entered are not found in the AirNow FTP Server'
+                print 'Please enter valid dates'
             else:
-                self.ftp_to_pandas(nlst[index1])
+                self.download_rawfiles(array(nlst)[index1])
+                self.ftp_to_pandas(array(nlst)[index1])
         else:
-            print index1
+            self.download_rawfiles(array(nlst)[index1])
             self.ftp_to_pandas(array(nlst)[index1])
+        self.ftp.close()
 
+        if cleanup:
+            self.cleanup_directory(array(nlst)[index1])
+
+
+    def download_single_rawfile(self,fname):
+        localfile = open(fname,'wb')
+        print 'Retriving file: ' + self.url +self.ftp.pwd() + '/' + fname
+        self.ftp.retrbinary('RETR ' + fname,localfile.write,1024)
+        localfile.close()
+
+
+    def download_rawfiles(self,flist):
+        if flist.shape[0] <2:
+            self.download_single_rawfile(flist[0])
+        else:
+            for i in flist:
+                self.download_single_rawfile(i)
+    
+    def cleanup_directory(self,flist):
+        import os
+        for i in flist:
+            path = os.path.join(os.getcwd(),i)
+            os.remove(path)
 
     def ftp_to_pandas(self,flist):
         first =True
         for i in flist:
-            fname = 'ftp://'+self.username+':'+self.password+'@'+self.url+self.ftp.pwd()+i
-            dft = pd.read_csv(fname,delimiter='|',header=None,infer_datetime_format=True)
+            dft = pd.read_csv(i,delimiter='|',header=None,infer_datetime_format=True)
             cols = ['date','time','SCS','Site','utcoffset','Species','Units','Obs','Source']
             dft.columns=cols
             if first:
                 self.output = dft.copy()
+                first = False
             else:
-                self.output = self.output.append(dft)
+                self.output = pd.concat([self.output,dft])
 
     def write_to_hdf(self,filename='testoutput.hdf'):
         self.output.to_hdf(fname,'df',format='table')
+
+    def write_to_csv(self,filename='testoutput.csv'):
+        self.output.to_csv(fname)
