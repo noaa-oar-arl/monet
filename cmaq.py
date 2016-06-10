@@ -27,6 +27,7 @@ class cmaq:
         self.cdfobj = None
         self.gridobj = None
         self.fname = None
+        self.dates = None
 
     def get_single_var(self, param):
         return self.cdfobj.variables[param][:]
@@ -38,7 +39,7 @@ class cmaq:
         date = []
         for i, j in zip(tflag1, tflag2):
             date.append(datetime.strptime(i + j, '%Y%j%H'))
-
+        self.dates = array(date)
         return array(date)
 
     def load_single_cmaq_run(self):
