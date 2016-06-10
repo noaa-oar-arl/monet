@@ -20,7 +20,7 @@ class verify:
 
         print 'Getting CMAQ values'
         cmaq = self.cmaq.get_surface_cmaqvar(param='pm25')
-        self.cmaq.get_cmaq_dates(self.cmaq.cdfobj)
+        self.cmaq.get_cmaq_dates()
         self.cmaq.dates, index = unique(self.cmaq.dates, return_index=True)
         self.aqs.load_aqs_daily_pm25_data(self.cmaq.dates)
         cmaq = cmaq[index, :, :]
@@ -46,7 +46,7 @@ class verify:
                                             pick='cmaq_grids/basemap-cmaq_conus.p')
                 # cr.improve_spatial_scatter(improve, m, i.strftime('%Y-%m-%d'), 'Arithmetic Mean', vmin=vmin, vmax=vmax)
 
-        data.to_hdf('2015_interpolated_data.hdf', 'df', format='table')
+        data.to_hdf(self.cmaq.dates[0].strftime('%Y')+'_interpolated_data.hdf', 'df', format='table')
 
     def compare_aqs_hourly(self, param='O3', statecompare=True, spatial=True, scatter=False, time=False):
         lat = self.self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
@@ -197,6 +197,62 @@ class verify:
             new = new.append(newt)
         return new
 
+    def interp_to_aqs_sites_daily_pm25(cmaqvar,aqs,gridobj,dates):
+        from scipy.interpolate import griddata
+        from datetime import timedelta,datetime
+        from numpy import unique
+        lat = gridobj.variables['LAT'][0,0,:,:].squeeze()
+        lon = gridobj.variables['LON'][0,0,:,:].squeeze()
+        con = (aqs.Latitude.values > lat.min()) & (aqs.Latitude.values < lat.max()) & (aqs.Longitude.values > lon.min()) & (aqs.Longitude.values < lon.max())
+        #    aqs = aqs[aqs['SCS'] == 720610005]
+        aqsn = aqs[con]
+        dt = []
+        for i in aqsn.utcoffset.values:
+            dt.append(timedelta(hours=i))
+        aqsn['utc timedelta'] = array(dt)
+        aqsn['datetime'] = aqsn['datetime_local'] + dt
+        aqsnlat = aqsn.Latitude.values
+        scs,index =unique(aqsn.SCS.values,return_index=True)
+        ln = aqsn.Longitude.values[index]
+        ll = aqsn.Latitude.values[index]
+        utctimedelta = aqsn['utc timedelta'].values[index]
+        print scs.shape,ln.shape
+        cmaq = pd.DataFrame(griddata((lon.flatten(),lat.flatten()),cmaqvar[0,:,:].flatten(),(ln,ll),method='nearest'),columns=['cmaq'])
+        cmaq['SCS'],cmaq['utc timedelta'] = scs,utctimedelta
+        #cmaq['SCS'] = scs
+        arr = array([datetime(2000,1,1) + timedelta(hours=k) for k in range(ll.shape[0])])
+        arr[:] = dates[0]
+        print 'Interpolating values to AQS Surface Sites for PM25 24H, Date : ', dates[0].strftime('%B %d %Y   %H utc')
+        cmaq.index = arr #+ utctimedelta
+        for i,j in enumerate(dates[1:]):
+            print 'Interpolating values to AQS Surface Sites for PM25 24H, Date : ', j.strftime('%B %d %Y   %H utc')
+            cmaq2 = pd.DataFrame(griddata((lon.flatten(),lat.flatten()),cmaqvar[i,:,:].flatten(),(ln,ll),method='nearest'),columns=['cmaq'])
+            cmaq2['SCS'],cmaq2['utc timedelta'] = scs,utctimedelta
+            #cmaq2['SCS'] = scs
+            arr = array([datetime(2000,1,1) + timedelta(hours=k) for k in range(ll.shape[0])])
+            arr[:] = j
+            cmaq2.index = arr
+            cmaq = pd.concat([cmaq,cmaq2])
+            
+        scs,index =unique(aqsn.SCS.values,return_index=True)
+        i = scs[0]
+        cmaqr = cmaq[cmaq.SCS == i]
+        cmaqr = cmaqr.resample('24H').mean()
+        cmaqr['datetime_local'] = cmaqr.index
+        aqsnr = aqsn[aqsn.SCS == i]
+        new = pd.merge(cmaqr,aqsnr,on='datetime_local',how='right')
+        for i in scs[1:]:
+            cmaqr = cmaq[cmaq.SCS == i]
+            cmaqr = cmaqr.resample('24H').mean()
+            cmaqr['datetime_local'] = cmaqr.index
+            aqsnr = aqsn[aqsn.SCS == i]
+            new = new.append(pd.merge(cmaqr,aqsnr,on='datetime_local'))
+            
+        new = new.reset_index()
+        new['SCS'] = new['SCS_x']
+        new = new[['cmaq','SCS','datetime_local','State Code','Latitude','Longitude','Observation Percent','Arithmetic Mean','1st Max Value','1st Max Hour','AQI','State Name','Local Site Name','County Code','Site Num','utcoffset','datetime']]
+        return new
+    
     def aqs_state_comparison(self, statecompare=True, spatial=True, scatter=False, time=False, tit=''):
         import matplotlib.pyplot as plt
         import seaborn as sns

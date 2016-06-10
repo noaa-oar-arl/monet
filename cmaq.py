@@ -2,7 +2,7 @@
 from netCDF4 import Dataset, MFDataset
 from numpy import array, zeros
 from tools import search_listinlist
-
+from gc import collect
 
 class cmaq:
     def __init__(self):
@@ -65,7 +65,9 @@ class cmaq:
         cmaqvars, temp = search_listinlist(keys, self.dust_total)
         var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
         for i in cmaqvars[1:]:
+            print 'Retrieving PM DUST: '+keys[i]
             var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
+            collect()
         return var
 
     def get_surface_dust_pm25(self):
@@ -73,7 +75,9 @@ class cmaq:
         cmaqvars, temp = search_listinlist(keys, self.dust_pm25)
         var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
         for i in cmaqvars[1:]:
+            print 'Retrieving PM25 DUST: '+keys[i]
             var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
+            collect()
         return var
 
     def get_surface_pm25(self):
@@ -81,9 +85,11 @@ class cmaq:
         keys = array(self.cdfobj.variables.keys())
         vars = concatenate([self.aitken,self.accumulation])
         cmaqvars, temp = search_listinlist(keys, vars)
-        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
+        var = self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze()
         for i in cmaqvars[1:]:
+            print 'Retrieving PM25: '+keys[i] 
             var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
+            collect()
         return var
 
     def get_surface_pm10(self):
@@ -93,21 +99,24 @@ class cmaq:
         cmaqvars, temp = search_listinlist(keys, vars)
         var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
         for i in cmaqvars[1:]:
+            print 'Retrieving PM10: '+keys[i] 
             var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
+            collect()
         return var
 
     def get_surface_cmaqvar(self,param='O3'):
         lvl = 0.
         param = param.upper()
         if param == 'PM25':
-            var = self.get_surface_pm25(self.cdfobj)
+            var = self.get_surface_pm25()
         elif param == 'PM10':
-            var = self.get_surface_pm10(self.cdfobj)
+            var = self.get_surface_pm10()
         elif param == 'PM25_DUST':
-            var = self.get_surface_dust_pm25(self.cdfobj)
+            var = self.get_surface_dust_pm25()
         elif param == 'PM10_DUST':
-            var = self.get_surface_dust_total(self.cdfobj)
+            var = self.get_surface_dust_total()
         else:
+            print 'Retrieving: '+ param
             var = self.cdfobj.variables[param][:, 0, :, :].squeeze()
         return var
 

@@ -22,7 +22,7 @@ class aqs:
                              '1st_Max Hour', 'AQI', 'Method_Code', 'Method_Name',
                              'Local_Site_Name', 'Address', 'State_Name', 'County_Name',
                              'City_Name', 'CBSA_Name', 'Date_of_Last_Change']
-        self.datadir = '~/Downloads'
+        self.datadir = '.'
         self.aqsdf = None
 
     def retrieve_aqs_hourly_pm25_data(self, dates):
@@ -30,9 +30,9 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'hourly_88101_' + year + '.zip'
-        filename = wget.download(url)
+        filename = wget.download(url); print 'Retrieving ' + url 
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                     'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
         df.columns = self.renamedhcols
@@ -46,9 +46,9 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'hourly_44201_' + year + '.zip'
-        filename = wget.download(url)
+        filename = wget.download(url); print 'Retrieving ' + url 
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                     'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
         df.columns = self.renamedhcols
@@ -62,9 +62,9 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'hourly_81102_' + year + '.zip'
-        filename = wget.download(url)
+        filename = wget.download(url); print 'Retrieving ' + url 
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                     'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
         df.columns = self.renamedhcols
@@ -78,9 +78,9 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'hourly_42401_' + year + '.zip'
-        filename = wget.download(url)
+        filename = wget.download(url); print 'Retrieving ' + url 
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                     'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
         df.columns = self.renamedhcols
@@ -94,9 +94,9 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'hourly_42602_' + year + '.zip'
-        filename = wget.download(url)
+        filename = wget.download(url); print 'Retrieving ' + url 
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                     'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
         df.columns = self.renamedhcols
@@ -110,9 +110,9 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'hourly_42101_' + year + '.zip'
-        filename = wget.download(url)
+        filename = wget.download(url); print 'Retrieving ' + url 
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                     'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
         df.columns = self.renamedhcols
@@ -126,13 +126,15 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42101_' + year + '.zip'
-        filename = wget.download(url)
+        filename = wget.download(url); print 'Retrieving ' + url 
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime_local': ["Date Local"]},
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
+        utc = self.tzutc(df.Longitude.values,df.Latitude.values,df.datetime_local.values)
+        df['datetime'],df['utcoffset'] = utc[0],utc[1]
         df.to_hdf(self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf', 'df', format='table')
         self.aqsdf = df.copy()
 
@@ -141,13 +143,15 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_44201_' + year + '.zip'
-        filename = wget.download(url)
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime_local': ["Date Local"]},
+        filename = wget.download(url); print 'Retrieving ' + url 
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
+        utc = self.tzutc(df.Longitude.values,df.Latitude.values,df.datetime_local.values)
+        df['datetime'],df['utcoffset'] = utc[0],utc[1]
         df.to_hdf(self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf', 'df', format='table')
         self.aqsdf = df.copy()
 
@@ -156,13 +160,15 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_81102_' + year + '.zip'
-        filename = wget.download(url)
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime_local': ["Date Local"]},
+        filename = wget.download(url); print 'Retrieving ' + url 
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
+        utc = self.tzutc(df.Longitude.values,df.Latitude.values,df.datetime_local.values)
+        df['datetime'],df['utcoffset'] = utc[0],utc[1]
         df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf', 'df', format='table')
         self.aqsdf = df.copy()
 
@@ -171,13 +177,15 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42401_' + year + '.zip'
-        filename = wget.download(url)
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime_local': ["Date Local"]},
+        filename = wget.download(url); print 'Retrieving ' + url 
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
+        utc = self.tzutc(df.Longitude.values,df.Latitude.values,df.datetime_local.values)
+        df['datetime'],df['utcoffset'] = utc[0],utc[1]
         df.to_hdf(self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf', 'df', format='table')
         self.aqsdf = df.copy()
 
@@ -186,13 +194,15 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42602_' + year + '.zip'
-        filename = wget.download(url)
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime_local': ["Date Local"]},
+        filename = wget.download(url); print 'Retrieving ' + url 
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
+        utc = self.tzutc(df.Longitude.values,df.Latitude.values,df.datetime_local.values)
+        df['datetime'],df['utcoffset'] = utc[0],utc[1]
         df.to_hdf(self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf', 'df', format='table')
         self.aqsdf = df.copy()
 
@@ -201,18 +211,20 @@ class aqs:
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_88101_' + year + '.zip'
-        filename = wget.download(url)
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='gzip', parse_dates={'datetime_local': ["Date Local"]},
+        filename = wget.download(url); print 'Retrieving ' + url 
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
+        utc = self.tzutc(df.Longitude.values,df.Latitude.values,df.datetime_local.values)
+        df['datetime'],df['utcoffset'] = utc[0],utc[1]
         df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf', 'df', format='table')
         self.aqsdf = df.copy()
 
     def load_aqs_pm25_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + 'AQS_HOURLY_PM_25_88101_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -220,7 +232,7 @@ class aqs:
         return aqs
 
     def load_aqs_ozone_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + + '/' + 'AQS_HOURLY_OZONE_44201_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -228,7 +240,7 @@ class aqs:
         return aqs
 
     def load_aqs_pm10_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + self.datadir + '/' + 'AQS_HOURLY_PM_10_81102_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -236,7 +248,7 @@ class aqs:
         return aqs
 
     def load_aqs_so2_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + self.datadir + '/' + 'AQS_HOURLY_SO2_42401_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -244,7 +256,7 @@ class aqs:
         return aqs
 
     def load_aqs_no2_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -252,7 +264,7 @@ class aqs:
         return aqs
 
     def load_aqs_co_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -260,7 +272,7 @@ class aqs:
         return aqs
 
     def load_aqs_daily_pm25_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -268,7 +280,7 @@ class aqs:
         return aqs
 
     def load_aqs_daily_ozone_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -276,7 +288,7 @@ class aqs:
         return aqs
 
     def load_aqs_daily_pm10_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -284,7 +296,7 @@ class aqs:
         return aqs
 
     def load_aqs_daily_so2_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -292,7 +304,7 @@ class aqs:
         return aqs
 
     def load_aqs_daily_no2_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -300,9 +312,26 @@ class aqs:
         return aqs
 
     def load_aqs_daily_co_data(self, dates):
-        year = dates[0].strftime('%Y_')
+        year = dates[0].strftime('%Y')
         aqs = pd.read_hdf(self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf')
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
         return aqs
+
+    def tzutc(self,lon,lat,dates):
+        from tzwhere import tzwhere
+        import pytz
+        tz = tzwhere.tzwhere(forceTZ=True,shapely=True)
+        a = dates.astype('M8[s]').astype('O')
+        local,offset = [],[]
+        for i,j,d in zip(lon,lat,a):
+            l = tz.tzNameAt(j, i,forceTZ=True)
+            timezone = pytz.timezone(l)
+            n = d.replace(tzinfo=pytz.UTC)
+            r = d.replace(tzinfo=timezone)
+            rdst = timezone.normalize(r)
+            local.append(n - n.astimezone(timezone).utcoffset())
+            offset.append((rdst.utcoffset() + rdst.dst()).total_seconds()//3600)
+        return array(local),array(offset)
+                                                                            
