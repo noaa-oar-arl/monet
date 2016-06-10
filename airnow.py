@@ -20,8 +20,8 @@ def search_listinlist(array1, array2):
 class airnow:
     def __init__(self):
         from datetime import datetime
-        self.username='Barry.Baker'
-        self.password='p00pST!ck123'
+        self.username='enter_username'
+        self.password='enter password'
         self.url ='ftp.airnowgateway.org'
         self.dates = [datetime.strptime('2016-06-06 12:00:00','%Y-%m-%d %H:%M:%S'),datetime.strptime('2016-06-06 13:00:00','%Y-%m-%d %H:%M:%S')]
         self.datestr = []
