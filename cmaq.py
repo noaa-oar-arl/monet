@@ -40,10 +40,10 @@ class cmaq:
         for i, j in zip(tflag1, tflag2):
             date.append(datetime.strptime(i + j, '%Y%j%H'))
         self.dates = array(date)
-        return array(date)
+
 
     def load_single_cmaq_run(self):
-        self.cdfobj = Dataset(self.fname)
+        self.cdfobj = Dataset(self.fname[0])
 
     def load_multi_cmaq_runs(self):
         self.cdfobj = MFDataset(self.fname)
@@ -58,6 +58,7 @@ class cmaq:
         if self.fname.shape[0] > 1:
             self.load_multi_cmaq_runs()
         else:
+
             self.load_single_cmaq_run()
 
     def get_surface_dust_total(self):

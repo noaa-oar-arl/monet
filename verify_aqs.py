@@ -212,7 +212,6 @@ def interp_to_aqs_sites_daily_pm25(cmaqvar, aqs, gridobj, dates):
     for i in aqsn.utcoffset.values:
         dt.append(timedelta(hours=i))
     aqsn['utc timedelta'] = array(dt)
-    aqsn['datetime'] = aqsn['datetime_local'] + dt
     aqsnlat = aqsn.Latitude.values
     scs, index = unique(aqsn.SCS.values, return_index=True)
     ln = aqsn.Longitude.values[index]
@@ -224,10 +223,10 @@ def interp_to_aqs_sites_daily_pm25(cmaqvar, aqs, gridobj, dates):
         columns=['cmaq'])
     cmaq['SCS'], cmaq['utc timedelta'] = scs, utctimedelta
     # cmaq['SCS'] = scs
-    arr = array([datetime(2000, 1, 1) + timedelta(hours=k) for k in range(ll.shape[0])])
-    arr[:] = dates[0]
+    arr = array([datetime(2000, 1, 1) + timedelta(hours=utctimedelta[k]) for k in range(ll.shape[0])])
+    arr[:] = dates[0] + timedelta(hours=k)
     print 'Interpolating values to AQS Surface Sites for PM25 24H, Date : ', dates[0].strftime('%B %d %Y   %H utc')
-    cmaq.index = arr  # + utctimedelta
+    cmaq['datetime_local'] = arr  # + utctimedelta
     for i, j in enumerate(dates[1:]):
         print 'Interpolating values to AQS Surface Sites for PM25 24H, Date : ', j.strftime('%B %d %Y   %H utc')
         cmaq2 = pd.DataFrame(
