@@ -143,7 +143,111 @@ class cmaq:
             lat0 = self.gridobj.YCENT
             lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
-            m = Basemap(resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1, llcrnrlat=lat.min(),
-                        urcrnrlat=lat.max(), llcrnrlon=lon.min(), urcrnrlon=lon.max(), rsphere=6371200.,
+            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+                        llcrnrlat=lat[0, 0],
+                        urcrnrlat=lat[-1, -1], llcrnrlon=lon[0, 0], urcrnrlon=lon[-1, -1], rsphere=6371200.,
+                        area_thresh=100000.)
+        return m
+
+    def load_pacific_coast_basemap(self, path):
+        def load_conus_basemap(self, path):
+
+            from six.moves import cPickle as pickle
+        from mpl_toolkits.basemap import Basemap
+        import os
+        fname = path + '/basemap-cmaq_conus.p'
+        if os.path.isfile(fname):
+            pickle.load(open(path, 'rb'))
+        else:
+            lat1 = self.gridobj.P_ALP
+            lat2 = self.gridobj.P_BET
+            lon1 = self.gridobj.P_GAM
+            lon0 = self.gridobj.XCENT
+            lat0 = self.gridobj.YCENT
+            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
+            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
+            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+                        llcrnrlat=29., urcrnrlat=53., llcrnrlon=-125., urcrnrlon=-116., rsphere=6371200.,
+                        area_thresh=100000.)
+        return m
+
+    def load_rockies_basemap(self, path):
+        from six.moves import cPickle as pickle
+        from mpl_toolkits.basemap import Basemap
+        import os
+        fname = path + '/basemap-cmaq_conus.p'
+        if os.path.isfile(fname):
+            pickle.load(open(path, 'rb'))
+        else:
+            lat1 = self.gridobj.P_ALP
+            lat2 = self.gridobj.P_BET
+            lon1 = self.gridobj.P_GAM
+            lon0 = self.gridobj.XCENT
+            lat0 = self.gridobj.YCENT
+            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
+            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
+            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+                        llcrnrlat=29., urcrnrlat=52., llcrnrlon=-116., urcrnrlon=-91., rsphere=6371200.,
+                        area_thresh=100000.)
+        return m
+
+
+    def load_south_central_basemap(self, path):
+        from six.moves import cPickle as pickle
+        from mpl_toolkits.basemap import Basemap
+        import os
+        fname = path + '/basemap-cmaq_conus.p'
+        if os.path.isfile(fname):
+            pickle.load(open(path, 'rb'))
+        else:
+            lat1 = self.gridobj.P_ALP
+            lat2 = self.gridobj.P_BET
+            lon1 = self.gridobj.P_GAM
+            lon0 = self.gridobj.XCENT
+            lat0 = self.gridobj.YCENT
+            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
+            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
+            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+                        llcrnrlat=25., urcrnrlat=37.5, llcrnrlon=-108, urcrnrlon=-86., rsphere=6371200.,
+                        area_thresh=100000.)
+        return m
+
+    def load_northeast_basemap(self, path):
+        from six.moves import cPickle as pickle
+        from mpl_toolkits.basemap import Basemap
+        import os
+        fname = path + '/basemap-cmaq_conus.p'
+        if os.path.isfile(fname):
+            pickle.load(open(path, 'rb'))
+        else:
+            lat1 = self.gridobj.P_ALP
+            lat2 = self.gridobj.P_BET
+            lon1 = self.gridobj.P_GAM
+            lon0 = self.gridobj.XCENT
+            lat0 = self.gridobj.YCENT
+            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
+            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
+            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+                        llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
+                        area_thresh=100000.)
+        return m
+
+    def load_southeast_basemap(self, path):
+        from six.moves import cPickle as pickle
+        from mpl_toolkits.basemap import Basemap
+        import os
+        fname = path + '/basemap-cmaq_conus.p'
+        if os.path.isfile(fname):
+            pickle.load(open(path, 'rb'))
+        else:
+            lat1 = self.gridobj.P_ALP
+            lat2 = self.gridobj.P_BET
+            lon1 = self.gridobj.P_GAM
+            lon0 = self.gridobj.XCENT
+            lat0 = self.gridobj.YCENT
+            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
+            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
+            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+                        llcrnrlat=25., urcrnrlat=39, llcrnrlon=-93., urcrnrlon=-70., rsphere=6371200.,
                         area_thresh=100000.)
         return m

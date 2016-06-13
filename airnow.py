@@ -8,8 +8,8 @@ from numpy import array
 class airnow:
     def __init__(self):
 
-        self.username = 'username'
-        self.password = 'password'
+        self.username = 'Barry.Baker'
+        self.password = 'p00pST!ck123'
         self.url = 'ftp.airnowgateway.org'
         self.dates = [datetime.strptime('2016-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
                       datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]

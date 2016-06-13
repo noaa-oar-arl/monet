@@ -2,11 +2,11 @@
 from airnow import airnow
 from cmaq import cmaq
 from aqs import aqs
-from scipy.interpolate import griddata
-from numpy import empty, ceil, unique
+from numpy import array, ceil, unique
 import pandas as pd
 import mystats
 import plots
+import matplotlib.pyplot as plt
 
 
 class verify:
@@ -14,6 +14,19 @@ class verify:
         self.airnow = airnow()
         self.cmaq = cmaq()
         self.aqs = aqs()
+        self.se_states = array(
+                ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
+                 'Virginia', 'West Virginia'], dtype='|S14')
+        self.ne_states = array(['Connecticut', 'Delaware', 'District Of Columbia', 'Maine', 'Maryland', 'Massachusetts',
+                                'New Hampshire', 'New Jersey', 'New York', 'Pennsylvania', 'Rhode Island', 'Vermont'],
+                               dtype='|S20')
+        self.nc_states = array(
+                ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan', 'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
+                dtype='|S9')
+        self.sc_states = array(['Arkansas', 'Louisiana', 'Oklahoma', 'Texas'], dtype='|S9')
+        self.r_states = array(['Arizona', 'Colorado', 'Idaho', 'Kansas', 'Montana', 'Nebraska', 'Nevada', 'New Mexico',
+                               'North Dakota', 'South Dakota', 'Utah', 'Wyoming'], dtype='|S12')
+        self.p_states = array(['California', 'Oregon', 'Washington'], dtype='|S10')
 
     def compare_aqs_24h_pm25(self, statecompare=True, spatial=False, scatter=False, time=False, firstday=True):
         lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
@@ -41,16 +54,16 @@ class verify:
             # this will loop over each date and create the spatial plot with comparisons to observational data overlayed
             vmin = 1.
             vmax = ceil(data['Obs_value'].median() + data['Obs_value'].std())
+            m = self.cmaq.load_conus_basemap('')
             for index, i in enumerate(self.cmaq.dates):
                 cmaqvar = cmaq[index, :, :].squeeze()
-                # m, c = plots.make_spatial_plot(self.cmaq.cdfobj, self.cmaq.gridobj, self.cmaq.dates[index], vmin=vmin,
-                #                            vmax=vmax,
-                #                            pick='cmaq_grids/basemap-cmaq_conus.p')
-                # plots.improve_spatial_scatter(improve, m, i.strftime('%Y-%m-%d'), 'Obs_value', vmin=vmin, vmax=vmax)
+                c = plots.make_spatial_plot(cmaqvar, self.cmaq.gridobj, self.cmaq.dates[index], m)
+                plots.aqs_spatial_scatter(self.aqs.aqsdf, m, i.strftime('%Y-%m-%d %H:%M:%S'))
 
         data.to_hdf(self.cmaq.dates[0].strftime('%Y') + '_interpolated_data.hdf', 'df', format='table')
 
-    def compare_aqs_hourly(self, param='O3', statecompare=True, spatial=True, scatter=False, time=False, convert=True):
+    def compare_aqs_hourly(self, param='O3', statecompare=True, spatial=True, scatter=False, time=False, convert=True,
+                           region=True):
         lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
         lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
 
@@ -60,7 +73,7 @@ class verify:
         self.cmaq.get_cmaq_dates()
 
         try:
-            aqs = self.choose_aqs_data(param=param)
+            aqs = self.choose_aqs_data(param=param, dates=self.cmaq.dates)
         except ValueError, e:
             return
 
@@ -85,8 +98,14 @@ class verify:
             m = self.cmaq.load_conus_basemap('')
             for index, i in enumerate(self.cmaq.dates):
                 cmaqvar = cmaq[index, :, :].squeeze()
-                c = plots.make_spatial_plot(cmaqvar, self.cmaq.gridobj, self.cmaq.dates[index], m, vmin=vmin, vmax=vmax)
-                plots.aqs_spatial_scatter(self.aqs.aqsdf, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin, vmax=vmax)
+                c = plots.make_spatial_plot(cmaqvar, self.cmaq.gridobj, self.cmaq.dates[index], m)
+                plots.aqs_spatial_scatter(self.aqs.aqsdf, m, i.strftime('%Y-%m-%d %H:%M:%S'))
+
+        if time:
+            plt.figure(figsize=(12, 6))
+            title = str(i) + '  ' + str(self.aqs.aqsdf['cmaq'].count()) + ' Measurements ' + str(
+                    unique(self.aqs.aqsdf.SCS.values).shape[0]) + ' Sites'
+            plots.plot_timeseries(self.aqs.aqsdf, domain_ave=True, title=title)
 
     def aqs_state_comparison(self, df, statecompare=True, spatial=True, scatter=False, time=False, tit=''):
         import matplotlib.pyplot as plt
@@ -289,7 +308,7 @@ class verify:
         lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
 
         con = (self.aqs.aqsdf.datetime == dates[0]) & (self.aqs.aqsdf.Latitude.values > lat.min()) & (
-        self.aqs.aqsdf.Latitude.values < lat.max()) & (
+            self.aqs.aqsdf.Latitude.values < lat.max()) & (
                   self.aqs.aqsdf.Longitude.values > lon.min()) & (self.aqs.aqsdf.Longitude.values < lon.max())
         new = self.aqs.aqsdf[con]
         cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[0, :, :].flatten(),
@@ -298,8 +317,9 @@ class verify:
                                 index=new.index)
         new = new.join(cmaq_val)
         for i, j in enumerate(dates[1:]):
+            print 'Interpolating values to AQS Surface Sites for O3, Date : ', j.strftime('%B %d %Y   %H utc')
             con = (self.aqs.aqsdf.datetime == j) & (self.aqs.aqsdf.Latitude.values > lat.min()) & (
-            self.aqs.aqsdf.Latitude.values < lat.max()) & (
+                self.aqs.aqsdf.Latitude.values < lat.max()) & (
                       self.aqs.aqsdf.Longitude.values > lon.min()) & (self.aqs.aqsdf.Longitude.values < lon.max())
             newt = self.aqs.aqsdf[con]
             cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i, :, :].flatten(),
@@ -308,6 +328,22 @@ class verify:
             newt = newt.join(cmaq_val)
             new = new.append(newt)
         return new
+
+    def region_compare(self,cmaqvar,df,spatial=True):
+        """
+        :param cmaqvar: cmaq varaible [t,x,y]
+        :param df: interpolated values for all sites in AQS
+        :return:
+        """
+        if spatial:
+            #plot pacific states
+            m = self.cmaq.load_pacific_coast_basemap('')
+            for index, i in enumerate(self.cmaq.dates):
+                cmaqvar = cmaq[index, :, :].squeeze()
+                c = plots.make_spatial_plot(cmaqvar, self.cmaq.gridobj, self.cmaq.dates[index], m)
+                plots.aqs_spatial_scatter(df, m, i.strftime('%Y-%m-%d %H:%M:%S'))
+            #plot rockies
+
 
     def interp_to_aqs_sites_daily_pm25(self, cmaqvar):
         from scipy.interpolate import griddata
@@ -408,20 +444,20 @@ class verify:
             self.aqs.aqsdf.Longitude.values > lon.min()) & (self.aqs.aqsdf.Longitude.values < lon.max()))
         self.aqs.aqsdf = self.aqs.aqsdf[con].copy()
 
-    def choose_aqs_data(self, param='O3'):
+    def choose_aqs_data(self, param='O3', dates=None):
         param = param.upper()
         if param == 'O3':
-            aqs = self.aqs.load_aqs_ozone_data(self.cmaq.dates)
+            aqs = self.aqs.load_aqs_ozone_data(dates)
         elif param == 'SO2':
-            aqs = self.aqs.load_aqs_so2_data(self.cmaq.dates)
+            aqs = self.aqs.load_aqs_so2_data(dates)
         elif param == 'NO2':
-            aqs = self.aqs.load_aqs_no2_data(self.cmaq.dates)
+            aqs = self.aqs.load_aqs_no2_data(dates)
         elif param == 'PM25':
-            aqs = self.aqs.load_aqs_pm25_data(self.cmaq.dates)
+            aqs = self.aqs.load_aqs_pm25_data(dates)
         elif param == 'PM10':
-            aqs = self.aqs.load_aqs_pm10_data(self.cmaq.dates)
+            aqs = self.aqs.load_aqs_pm10_data(dates)
         elif param == 'CO':
-            aqs = self.aqs.load_aqs_co_data(self.cmaq.dates)
+            aqs = self.aqs.load_aqs_co_data(dates)
         else:
             raise ValueError('Sorry but there is no data available for that in the AQS Data Mart')
         return aqs
