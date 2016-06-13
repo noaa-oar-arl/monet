@@ -44,7 +44,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_PM_25_88101_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_PM_25_88101_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_PM_25_88101_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_hourly_ozone_data(self, dates):
@@ -64,7 +64,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_OZONE_44201_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_OZONE_44201_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_OZONE_44201_' + year + '.hdf', 'df', format='fixed')
 
         self.aqsdf = df.copy()
 
@@ -85,7 +85,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_PM_10_81102_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_PM_10_81102_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_PM_10_81102_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_hourly_so2_data(self, dates):
@@ -105,7 +105,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_SO2_42401_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_SO2_42401_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_SO2_42401_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_hourly_no2_data(self, dates):
@@ -125,7 +125,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_hourly_co_data(self, dates):
@@ -145,7 +145,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_daily_co_data(self, dates):
@@ -165,7 +165,7 @@ class aqs:
         utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
         df['datetime'], df['utcoffset'] = utc[0], utc[1]
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_daily_ozone_data(self, dates):
@@ -185,7 +185,7 @@ class aqs:
         utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
         df['datetime'], df['utcoffset'] = utc[0], utc[1]
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_daily_pm10_data(self, dates):
@@ -205,7 +205,7 @@ class aqs:
         utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
         df['datetime'], df['utcoffset'] = utc[0], utc[1]
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_daily_so2_data(self, dates):
@@ -225,7 +225,7 @@ class aqs:
         utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
         df['datetime'], df['utcoffset'] = utc[0], utc[1]
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_daily_no2_data(self, dates):
@@ -245,7 +245,7 @@ class aqs:
         utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
         df['datetime'], df['utcoffset'] = utc[0], utc[1]
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def retrieve_aqs_daily_pm25_data(self, dates):
@@ -265,7 +265,7 @@ class aqs:
         utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
         df['datetime'], df['utcoffset'] = utc[0], utc[1]
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf', 'df', format='table')
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
 
     def load_aqs_pm25_data(self, dates):
@@ -284,7 +284,6 @@ class aqs:
 
     def load_aqs_ozone_data(self, dates):
         year = dates[0].strftime('%Y')
-        print year
         fname = self.datadir + '/' + 'AQS_HOURLY_OZONE_44201_' + year + '.hdf'
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)

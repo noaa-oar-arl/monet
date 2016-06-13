@@ -4,6 +4,7 @@ from numpy import array, zeros
 from tools import search_listinlist
 from gc import collect
 
+
 class cmaq:
     def __init__(self):
         self.objtype = 'CMAQ'
@@ -41,7 +42,6 @@ class cmaq:
             date.append(datetime.strptime(i + j, '%Y%j%H'))
         self.dates = array(date)
 
-
     def load_single_cmaq_run(self):
         self.cdfobj = Dataset(self.fname[0])
 
@@ -66,7 +66,7 @@ class cmaq:
         cmaqvars, temp = search_listinlist(keys, self.dust_total)
         var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
         for i in cmaqvars[1:]:
-            print 'Retrieving PM DUST: '+keys[i]
+            print 'Getting CMAQ PM DUST: ' + keys[i]
             var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
             collect()
         return var
@@ -76,7 +76,7 @@ class cmaq:
         cmaqvars, temp = search_listinlist(keys, self.dust_pm25)
         var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
         for i in cmaqvars[1:]:
-            print 'Retrieving PM25 DUST: '+keys[i]
+            print 'Getting CMAQ PM25 DUST: ' + keys[i]
             var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
             collect()
         return var
@@ -84,11 +84,11 @@ class cmaq:
     def get_surface_pm25(self):
         from numpy import concatenate
         keys = array(self.cdfobj.variables.keys())
-        vars = concatenate([self.aitken,self.accumulation])
+        vars = concatenate([self.aitken, self.accumulation])
         cmaqvars, temp = search_listinlist(keys, vars)
         var = self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze()
         for i in cmaqvars[1:]:
-            print 'Retrieving PM25: '+keys[i] 
+            print 'Getting CMAQ PM25: ' + keys[i]
             var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
             collect()
         return var
@@ -96,16 +96,16 @@ class cmaq:
     def get_surface_pm10(self):
         from numpy import concatenate
         keys = array(self.cdfobj.variables.keys())
-        vars = concatenate([self.aitken,self.accumulation,self.coarse])
+        vars = concatenate([self.aitken, self.accumulation, self.coarse])
         cmaqvars, temp = search_listinlist(keys, vars)
         var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
         for i in cmaqvars[1:]:
-            print 'Retrieving PM10: '+keys[i] 
+            print 'Getting CMAQ PM10: ' + keys[i]
             var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
             collect()
         return var
 
-    def get_surface_cmaqvar(self,param='O3'):
+    def get_surface_cmaqvar(self, param='O3'):
         lvl = 0.
         param = param.upper()
         if param == 'PM25':
@@ -117,9 +117,33 @@ class cmaq:
         elif param == 'PM10_DUST':
             var = self.get_surface_dust_total()
         else:
-            print 'Retrieving: '+ param
-            var = self.cdfobj.variables[param][:, 0, :, :].squeeze()
+            print 'Getting CMAQ Variable: ' + param
+            if 'ppmV' in self.cdfobj.variables[param].units:
+                fact = 1000.
+            else:
+                fact = 1.
+            var = self.cdfobj.variables[param][:, 0, :, :].squeeze() * fact
         return var
 
-    def set_gridcro2d(self,filename=''):
+    def set_gridcro2d(self, filename=''):
         self.gridobj = Dataset(filename)
+
+    def load_conus_basemap(self, path):
+        from six.moves import cPickle as pickle
+        from mpl_toolkits.basemap import Basemap
+        import os
+        fname = path + '/basemap-cmaq_conus.p'
+        if os.path.isfile(fname):
+            pickle.load(open(path, 'rb'))
+        else:
+            lat1 = self.gridobj.P_ALP
+            lat2 = self.gridobj.P_BET
+            lon1 = self.gridobj.P_GAM
+            lon0 = self.gridobj.XCENT
+            lat0 = self.gridobj.YCENT
+            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
+            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
+            m = Basemap(resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1, llcrnrlat=lat.min(),
+                        urcrnrlat=lat.max(), llcrnrlon=lon.min(), urcrnrlon=lon.max(), rsphere=6371200.,
+                        area_thresh=100000.)
+        return m

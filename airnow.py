@@ -45,7 +45,8 @@ class airnow:
                 self.download_single_rawfile(i)
 
     def retrive_hourly_files(self):
-        nlst = self.retrieve_hourly_filelist(self)
+        self.openftp()
+        nlst = self.retrieve_hourly_filelist()
         index1, index2 = search_listinlist(array(nlst), array(self.datestr))
         if index1.shape < 1:
             self.ftp.cwd('Archive')
@@ -80,5 +81,4 @@ class airnow:
             string = i + ' ' + j
             dt.append(datetime.strptime(string,'%y/%d/%m %H:%M'))
         return array(dt)
-
 
