@@ -37,13 +37,18 @@ class verify:
         self.cmaq.get_cmaq_dates()
         self.cmaq.dates, index = unique(self.cmaq.dates, return_index=True)
         self.aqs.load_aqs_daily_pm25_data(self.cmaq.dates)
-        self.ensure_values_indomain()
-        cmaq = cmaq[index, :, :]
 
+        cmaq = cmaq[index, :, :]
         print 'Interpolating values to AQS Surface Sites for 24H Mean PM25, Date : ', self.cmaq.dates[0].strftime(
                 '%B %d %Y   %H utc')
         data = self.interp_to_aqs_sites_daily_pm25(cmaq)
+        lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
+        lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
 
+        con = ((data.Latitude.values > lat.min()) & (data.Latitude.values < lat.max()) & (
+            data.Longitude.values > lon.min()) & (data.Longitude.values < lon.max()))
+        data = data[con].copy()
+                        
         if statecompare:
             # If Scatter == True then it will create scatter plots for each state and all sites within it
             # IF Time    == True then it will create average time series plots for each state
@@ -58,7 +63,7 @@ class verify:
             for index, i in enumerate(self.cmaq.dates):
                 cmaqvar = cmaq[index, :, :].squeeze()
                 c = plots.make_spatial_plot(cmaqvar, self.cmaq.gridobj, self.cmaq.dates[index], m)
-                plots.aqs_spatial_scatter(self.aqs.aqsdf, m, i.strftime('%Y-%m-%d %H:%M:%S'))
+                plots.aqs_spatial_scatter(data, m, i.strftime('%Y-%m-%d %H:%M:%S'))
 
         data.to_hdf(self.cmaq.dates[0].strftime('%Y') + '_interpolated_data.hdf', 'df', format='table')
 
@@ -76,7 +81,8 @@ class verify:
             aqs = self.choose_aqs_data(param=param, dates=self.cmaq.dates)
         except ValueError, e:
             return
-
+        self.ensure_values_indomain()
+        
         if convert:
             self.aqs.aqsdf.Obs_value *= 1000.
 
@@ -85,6 +91,13 @@ class verify:
                 '%B %d %Y   %H utc')
         data = self.interp_to_aqs_sites(cmaq)
 
+        lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
+        lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
+
+        con = ((self.aqs.aqsdf.Latitude.values > lat.min()) & (self.aqs.aqsdf.Latitude.values < lat.max()) & (
+            self.aqs.aqsdf.Longitude.values > lon.min()) & (self.aqs.aqsdf.Longitude.values < lon.max()))
+        data = data[con].copy()
+        
         if statecompare:
             ### If Scatter == True then it will create scatter plots for each state and all sites within it
             # IF Time    == True then it will create average time series plots for each state
@@ -112,6 +125,7 @@ class verify:
         import seaborn as sns
         sns.set_style('whitegrid')
         first = True
+        
         for k, i in enumerate(self.aqs.aqsdf['State_Name'].unique()):
             temp = df[self.aqs.aqsdf['State_Name'] == i]
 
@@ -209,6 +223,7 @@ class verify:
         import seaborn as sns
 
         sns.set_style('whitegrid')
+        
         first = True
         for k, i in enumerate(df['State_Name'].unique()):
             temp = df[df['State_Name'] == i]
