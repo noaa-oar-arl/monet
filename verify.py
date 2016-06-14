@@ -65,7 +65,7 @@ class verify:
                 c = plots.make_spatial_plot(cmaqvar, self.cmaq.gridobj, self.cmaq.dates[index], m)
                 plots.aqs_spatial_scatter(data, m, i.strftime('%Y-%m-%d %H:%M:%S'))
 
-        data.to_hdf(self.cmaq.dates[0].strftime('%Y') + '_interpolated_data.hdf', 'df', format='table')
+        data.to_hdf(self.cmaq.dates[0].strftime('%Y') + '_interpolated_data.hdf', 'df', format='fixed')
 
     def compare_aqs_hourly(self, param='O3', statecompare=True, spatial=True, scatter=False, time=False, convert=True,
                            region=True):
