@@ -1,8 +1,9 @@
 # this is a class to deal with aqs data
+import os
+from datetime import datetime
+
 import pandas as pd
 from numpy import array, arange
-from datetime import datetime
-import os
 
 
 class aqs:

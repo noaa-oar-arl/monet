@@ -1,17 +1,16 @@
 # verify is the main application.
-from airnow import airnow
-from cmaq import cmaq
-from aqs import aqs
-from numpy import array, ceil, unique
+import matplotlib.pyplot as plt
 import pandas as pd
+from numpy import array, ceil, unique
+
 import mystats
 import plots
-import matplotlib.pyplot as plt
+from aqs import aqs
+from cmaq import cmaq
 
 
 class verify:
     def __init__(self):
-        self.airnow = airnow()
         self.cmaq = cmaq()
         self.aqs = aqs()
         self.se_states = array(
@@ -362,7 +361,7 @@ class verify:
 
     def interp_to_aqs_sites_daily_pm25(self, cmaqvar):
         from scipy.interpolate import griddata
-        from datetime import timedelta, datetime
+        from datetime import timedelta
         from numpy import unique, array
         lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
         lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
@@ -427,7 +426,6 @@ class verify:
         return new
 
     def check_cmaq_units(self, param='O3'):
-        from numpy import concatenate, array
         if (param == 'PM25') | (param == 'PM10'):
             fac = 1.
         else:
