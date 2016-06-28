@@ -169,7 +169,7 @@ class airnow:
         return df
 
     def get_region(self):
-        sn = self.df.State_Name.str.values
+        sn = self.df.State_Name.values
         sr = []
         for i in sn:
             if i in self.se_states:
