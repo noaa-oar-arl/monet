@@ -6,6 +6,8 @@ from numpy import array, zeros
 
 from tools import search_listinlist
 
+import cPickle as pickle
+
 
 class cmaq:
     def __init__(self):
@@ -176,7 +178,7 @@ class cmaq:
             m = Basemap(projection='laea', resolution='h', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=lat[0, 0],
                         urcrnrlat=lat[-1, -1], llcrnrlon=lon[0, 0], urcrnrlon=lon[-1, -1], rsphere=6371200.,
-                        area_thresh=1.)
+                        area_thresh=100.)
         return m
 
     def load_pacific_coast_basemap(self, path):
@@ -199,7 +201,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=29., urcrnrlat=53., llcrnrlon=-125., urcrnrlon=-116., rsphere=6371200.,
-                        area_thresh=100000.)
+                        area_thresh=100.)
         return m
 
     def load_rockies_basemap(self, path):
@@ -219,7 +221,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=29., urcrnrlat=52., llcrnrlon=-116., urcrnrlon=-91., rsphere=6371200.,
-                        area_thresh=100000.)
+                        area_thresh=100.)
         return m
 
     def load_south_central_basemap(self, path):
@@ -239,7 +241,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=25., urcrnrlat=37.5, llcrnrlon=-108, urcrnrlon=-86., rsphere=6371200.,
-                        area_thresh=100000.)
+                        area_thresh=100.)
         return m
 
     def load_northeast_basemap(self, path):
@@ -259,7 +261,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
-                        area_thresh=100000.)
+                        area_thresh=100.)
         return m
 
     def load_north_central_basemap(self, path):
@@ -279,7 +281,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
-                        area_thresh=100000.)
+                        area_thresh=100.)
         return m
 
     def load_southeast_basemap(self, path):
@@ -299,7 +301,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=25., urcrnrlat=39, llcrnrlon=-93., urcrnrlon=-70., rsphere=6371200.,
-                        area_thresh=100000.)
+                        area_thresh=10.)
         return m
 
     def choose_map(self,path,region):

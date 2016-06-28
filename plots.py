@@ -147,15 +147,8 @@ def airnow_timeseries(df, title=''):
     g = df.groupby('Species')
     f, ax = plt.subplots(3, 1, figsize=(15, 8), sharex=True)
     ax[0].plot(g.get_group('NOX').resample('H').mean().dropna().Obs, color='darkslategrey', label='Obs NOx', marker='o')
-    ax[0].plot(g.get_group('NOX').resample('H').mean().dropna().CMAQ, color='chocolate', label='CMAQ NOx')
+    ax[0].plot(g.get_group('NOX').resample('H').mean().dropna().CMAQ, color='darkorange', label='CMAQ NOx')
     ax[0].legend(loc=9)
-    #ax1 = ax[0].twinx()
-    ####################################################################################################################
-    #ax1.plot(g.get_group('NOY').resample('H').mean().dropna().Obs, color='dimgrey', label='Obs NOy', marker='o',
-    #         ls='-.')
-    #ax1.plot(g.get_group('NOY').resample('H').mean().dropna().CMAQ, color='tomato', label='CMAQ NOy')
-    #ax1.set_ylabel('NOy', color='tomato')
-    #ax1.legend(loc=1)
     ####################################################################################################################
     ax[1].plot(g.get_group('OZONE').resample('H').mean().dropna().Obs, color='darkslategrey', label='Obs', marker='o')
     ax[1].plot(g.get_group('OZONE').resample('H').mean().dropna().CMAQ, color='cornflowerblue', label='CMAQ Ozone',
@@ -173,7 +166,7 @@ def airnow_timeseries(df, title=''):
     ax[2].plot(dt, mbnox, color='cornflowerblue')
     ax3.plot(dt, rmses, color='cornflowerblue', ls='--')
     ####################################################################################################################
-    ax[0].set_ylabel('NOx (pbb)', color='chocolate')
+    ax[0].set_ylabel('NOx (pbb)', color='darkorange')
     ax[1].set_ylabel('Ozone (pbb)', color='cornflowerblue')
     ax[2].set_ylabel('Bias (Solid)')
     ax3.set_ylabel('RMSE (Dashed)')

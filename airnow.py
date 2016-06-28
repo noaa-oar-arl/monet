@@ -32,6 +32,7 @@ class airnow:
                                'ND', 'SD', 'UT', 'WY'], dtype='|S12')
         self.p_states = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.objtype = 'AirNow'
+        self.filelist = None
 
     def retrieve_hourly_filelist(self):
         self.ftp.cwd('HourlyData')
@@ -80,14 +81,15 @@ class airnow:
             else:
                 print 'Files Found!!!!!!!!! Downloading'
                 self.download_rawfiles(array(nlst)[array(index1)])
+                self.filelist = array[index1]
         else:
             self.download_rawfiles(array(nlst)[array(index1)])
 
-    def aggragate_files(self, fname='',output=''):
+    def aggragate_files(self,output='',path=''):
         from glob import glob
         from numpy import sort
         from datetime import datetime
-        fnames = sort(array(glob(fname)))
+        fnames = sort(self.filelist)
         ff = []
         if fnames.shape[0] < 2:
             print 'Loading ' + fnames[0]
@@ -97,7 +99,6 @@ class airnow:
             dft.columns = cols
             self.df = dft.copy()
         else:
-            first = True
             for i in fnames:
                 print 'Aggregating: ' + i
                 dft = pd.read_csv(i, delimiter='|', header=None, parse_dates=[[0, 1]], infer_datetime_format=True,
@@ -111,13 +112,13 @@ class airnow:
         self.df = pd.concat(ff)
         self.calc_datetime()
         print '    Adding in Meta-data'
-        self.get_station_locations(path='monitoring_site_locations.dat')
+        self.get_station_locations(path=path)
         self.get_region()
         self.df = self.df.drop_duplicates()
         if output == '':
             output = 'AIRNOW.hdf'
         print 'Outputing data to: ' + output
-        self.df.to_hdf(fname, 'df', format='fixed')
+        self.df.to_hdf(output, 'df', format='fixed')
 
     def calc_datetime(self):
         # takes in an array of string dates and converts to numpy array of datetime objects
@@ -148,8 +149,27 @@ class airnow:
                      'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
         self.df = pd.merge(self.df, f, on='SCS', how='left')
 
+    def get_station_locations_remerge(self, df, path=''):
+        import os
+        from glob import glob
+
+        if os.path.isfile(path):
+            fname = path
+        else:
+            self.openftp()
+            self.ftp.cwd('Locations')
+            self.download_single_rawfile(fname='monitoring_site_locations.dat')
+            fname = glob('monitoring_site_locations.dat')
+        colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+        f = pd.read_csv(fname, delimiter='|', header=None, usecols=colsinuse)
+        f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
+                     'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
+                     'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
+        df = pd.merge(df, f.drop(['Latitude','Longitude'],axis=1), on='SCS', how='left')
+        return df
+
     def get_region(self):
-        sn = self.df.State_Name.values
+        sn = self.df.State_Name.str.values
         sr = []
         for i in sn:
             if i in self.se_states:
