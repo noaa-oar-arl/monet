@@ -69,6 +69,7 @@ class airnow:
         self.convert_dates_tofnames()
         index1, index2 = search_listinlist(array(nlst), array(self.datestr))
         if index1.shape[0] < 1:
+            print 'Files May be in Archive....'
             self.ftp.cwd('Archive')
             year = self.dates[0].strftime('%Y')
             self.ftp.cwd(year)
@@ -77,12 +78,12 @@ class airnow:
             if index1.shape[0] < 1:
                 print 'AirNow does not have hourly data at this time. Please try again'
             else:
+                print 'Files Found!!!!!!!!! Downloading'
                 self.download_rawfiles(array(nlst)[array(index1)])
-
         else:
             self.download_rawfiles(array(nlst)[array(index1)])
 
-    def aggragate_files(self, fname=''):
+    def aggragate_files(self, fname='',output=''):
         from glob import glob
         from numpy import sort
         from datetime import datetime
@@ -109,10 +110,14 @@ class airnow:
 
         self.df = pd.concat(ff)
         self.calc_datetime()
+        print '    Adding in Meta-data'
         self.get_station_locations(path='monitoring_site_locations.dat')
         self.get_region()
         self.df = self.df.drop_duplicates()
-        self.df.to_hdf('AIRNOW_.hdf', 'df', format='fixed')
+        if output == '':
+            output = 'AIRNOW.hdf'
+        print 'Outputing data to: ' + output
+        self.df.to_hdf(fname, 'df', format='fixed')
 
     def calc_datetime(self):
         # takes in an array of string dates and converts to numpy array of datetime objects
