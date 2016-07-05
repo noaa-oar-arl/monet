@@ -37,7 +37,7 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename=''):
 def normval(vmin, vmax, cmap):
     from numpy import arange
     from matplotlib.colors import BoundaryNorm
-    bounds = arange(vmin, vmax+5., 5.)
+    bounds = arange(vmin, vmax + 5., 5.)
     norm = BoundaryNorm(boundaries=bounds, ncolors=cmap.N)
     return norm
 
@@ -64,6 +64,7 @@ def airnow_spatial_scatter(df, m, date, savename=''):
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
+
 def airnow_8hr_spatial_scatter(df, m, date, savename=''):
     fig = plt.figure(figsize=(12, 6), frameon=False)
     m.drawcoastlines(linewidth=.3)
@@ -77,7 +78,7 @@ def airnow_8hr_spatial_scatter(df, m, date, savename=''):
     norm = normval(-40, 40., cmap)
     ss = (new.Obs - new.CMAQ).abs()
     colors = new.Obs - new.CMAQ
-    m.scatter(x, y, s=ss,c=colors, norm=norm, cmap=cmap)
+    m.scatter(x, y, s=ss, c=colors, norm=norm, cmap=cmap)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
@@ -138,6 +139,162 @@ def plot_allsites_timeseries(dataframe, ylabel='PM10 Concentration', savename=''
     plot_timeseries(dataframe, siteave=True, ylabel=ylabel, savename=savename)
 
 
+def airnow_timeseries_param(df, title=''):
+    import matplotlib.dates as mdates
+    from numpy import sqrt, linspace
+    sns.set_style('ticks')
+
+    df.index = df.datetime
+    f = plt.figure(figsize=(12,7))
+
+    species = df.Species.unique().astype('|S8')[0]
+    units = df.Units.unique().astype('|S8')[0]
+    obs = df.Obs.resample('H').mean()
+    obserr = df.Obs.resample('H').std()
+    cmaq = df.CMAQ.resample('H').mean()
+    cmaqerr = df.CMAQ.resample('H').std()
+    plt.plot(obs, color='darkslategrey')
+    plt.plot(cmaq, color='dodgerblue')
+    plt.legend(loc='best')
+
+    plt.fill_between(df.datetime.unique(), obs - obserr, obs + obserr, alpha=.2, color='darkslategrey')
+    plt.fill_between(df.datetime.unique(), cmaq - cmaqerr, cmaq + cmaqerr, alpha=.2, color='dodgerblue')
+
+    ax = plt.gca().axes
+    ax.set_xlabel('UTC Time (mm/dd HH)')
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
+    #plt.xticks(rotation=15)
+    plt.title(title)
+    ylabel = species +  ' (' + units + ')'
+    plt.gca().axes.set_ylabel( ylabel )
+    airnow_footer_text(df)
+    plt.tight_layout()
+
+
+def airnow_timeseries_error_param(df, title=''):
+    import matplotlib.dates as mdates
+    from numpy import sqrt, linspace
+    sns.set_style('ticks')
+
+    df.index = df.datetime
+    plt.figure(figsize=(12,7))
+
+    species = df.Species.unique().astype('|S8')[0]
+    units = df.Units.unique().astype('|S8')[0]
+
+    mb = (df.CMAQ - df.Obs).resample('H').mean()
+    rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample('H').mean()
+
+    a = plt.plot(mb, label ='Mean Bias',color='cornflowerblue')
+    ax = plt.gca().axes
+    ax2 = ax.twinx()
+    ax2.plot(rmse,)
+    b = plt.plot(rmse, label='RMSE',color='tomato')
+    lns = a + b
+    labs = [l.get_label() for l in lns]
+    plt.legend(lns,labs,loc='best')
+
+    ax.set_xlabel('UTC Time (mm/dd HH)')
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
+    plt.title(title)
+    ylabel = species +  ' (' + units + ')'
+    ax.set_ylabel('MB ' + ylabel )
+    ax2.set_ylabel('RMSE ' + ylabel)
+    airnow_footer_text(df)
+    plt.tight_layout()
+
+
+def airnow_kdeplots_param(df, title=''):
+    from scipy.stats import scoreatpercentile as score
+    sns.set_style('ticks')
+
+    maxval1 = score(df.CMAQ.values, per=99.5)
+    maxval2 = score(df.Obs.values, per=99.5)
+    maxval = max([maxval1, maxval2])
+    plt.figure(figsize=(10, 7))
+
+    sns.kdeplot(df.Obs, color='darkslategrey')
+    sns.kdeplot(df.CMAQ, color='dodgerblue')
+    sns.despine()
+
+    plt.xlim([0, maxval])
+    plt.xlabel(df.Species.unique()[0] + '  (' + df.Units.unique()[0] + ')')
+    plt.title(title)
+    plt.gca().axes.set_ylabel('P(' + df.Species.unique()[0] + ')')
+    airnow_footer_text(df)
+    plt.tight_layout()
+
+
+def airnow_diffpdfs_param(df, title=''):
+    from scipy.stats import scoreatpercentile as score
+    sns.set_style('ticks')
+
+    maxval = score(df.CMAQ.values - df.Obs.values,per=99.9)
+    minval = score(df.CMAQ.values - df.Obs.values,per=.1)
+    plt.figure(figsize=(10, 7))
+
+    sns.kdeplot(df.CMAQ.values - df.Obs.values, color='darkslategrey')
+    sns.despine()
+    plt.xlim([minval, maxval])
+    plt.xlabel(df.Species.unique()[0] + ' Difference (' + df.Units.unique()[0] + ')')
+    plt.title(title)
+    plt.gca().axes.set_ylabel('P( Model - Obs )')
+    airnow_footer_text(df)
+    plt.tight_layout()
+
+
+def airnow_scatter_param(df, title=''):
+    from numpy import max, arange, linspace
+    from scipy.stats import scoreatpercentile as score
+    from scipy.stats import linregress
+    sns.set_style('ticks')
+
+    species, units = df.Species.unique()[0], df.Units.unique()[0]
+
+    maxval1 = score(df.CMAQ.values, per=99.5)
+    maxval2 = score(df.Obs.values, per=99.5)
+    maxval = max([maxval1, maxval2])
+    plt.figure(figsize=(10, 7))
+
+    plt.scatter(df.Obs, df.CMAQ, c='cornflowerblue', marker='o', edgecolors='w', alpha=.3)
+    x = arange(0, maxval+1)
+    if maxval <= 10.:
+        x = linspace(0, maxval, 25)
+    plt.plot(x, x, '--', color='slategrey')
+
+    tt = linregress(df.Obs.values, df.CMAQ.values)
+    plt.plot(x, tt[0] * x + tt[1], color='tomato')
+
+    plt.xlim([0, maxval])
+    plt.ylim([0, maxval])
+    plt.xlabel('Obs ' + species + ' (' + units + ')' )
+    plt.title(title)
+    plt.gca().axes.set_ylabel('Model ' + species + ' (' + units + ')')
+    airnow_footer_text(df)
+    plt.tight_layout()
+
+def airnow_diffscatter_param(df, title=''):
+    from scipy.stats import scoreatpercentile as score
+    sns.set_style('ticks')
+    df = df.dropna()
+    species, units = df.Species.unique()[0], df.Units.unique()[0]
+    maxval = score(df.Obs.values,per=99.9)
+    minvaly = score(df.CMAQ.values - df.Obs.values,per=.1)
+    maxvaly = score(df.CMAQ.values - df.Obs.values,per=99.9)
+    plt.figure(figsize=(10, 7))
+
+    plt.scatter(df.Obs, df.CMAQ - df.Obs, c='cornflowerblue', marker='o', edgecolors='w', alpha=.3)
+    plt.plot((0,maxval),(0,0),'--',color='darkslategrey')
+
+    plt.xlim([0,maxval])
+    plt.ylim([minvaly,maxvaly])
+    plt.xlabel('Obs ' + species + ' (' + units + ')' )
+    plt.title(title)
+    plt.gca().axes.set_ylabel('Model - Obs ' + species + ' (' + units + ')')
+    airnow_footer_text(df)
+    plt.tight_layout()
+
+
 def airnow_timeseries(df, title=''):
     # this is the average for N sites if more than one site exists
     from numpy import sqrt, linspace
@@ -160,7 +317,7 @@ def airnow_timeseries(df, title=''):
     dt = g.get_group('NOX').resample('H').mean().index
     ax[2].plot(dt, mbnox, color='darkorange')
     ax3 = ax[2].twinx()
-    ax3.plot(dt,rmses, color='darkorange', ls='--')
+    ax3.plot(dt, rmses, color='darkorange', ls='--')
     mbnox = (g.get_group('OZONE').CMAQ - g.get_group('OZONE').Obs).resample('H').mean()
     rmses = sqrt((g.get_group('OZONE').Obs - g.get_group('OZONE').CMAQ) ** 2).resample('H').mean()
     ax[2].plot(dt, mbnox, color='cornflowerblue')
@@ -257,9 +414,9 @@ def airnow_kdeplots(df):
         nmb = NMB(g.Obs.values, g.CMAQ.values)
         nme = NME(g.Obs.values, g.CMAQ.values)
         mb = MB(g.Obs.values, g.CMAQ.values)
-        airnow_footer_text(g,nmb,nme,mb,tt[2])
+        airnow_footer_text(g)
         plt.xlim([0, maxval])
-        plt.xlabel(n+'  (' + g.Units.unique()[0] + ')')
+        plt.xlabel(n + '  (' + g.Units.unique()[0] + ')')
         plt.ylabel('P(' + n + ')')
         plt.tight_layout()
 
@@ -292,7 +449,7 @@ def airnow_scatter(df):
         plt.xlim([0, maxval])
         plt.ylim([0, maxval])
         ax = plt.gca().axes
-        airnow_footer_text(g,nmb,nme,mb,tt[2])
+        airnow_footer_text(g)
         sns.despine()
         plt.xlabel('Obs')
         plt.ylabel('CMAQ')
@@ -300,15 +457,18 @@ def airnow_scatter(df):
         plt.tight_layout()
 
 
-
-def airnow_footer_text(df,nmb,nme,mb,r2):
+def airnow_footer_text(df):
     from numpy import unique
-    plt.figtext(.03,.04,df.datetime.min().strftime('START DATE: %Y-%m-%d %H UTC'),fontsize=11,family='monospace')
-    plt.figtext(.03,.02,df.datetime.max().strftime('END DATE  : %Y-%m-%d %H UTC'),fontsize=11,family='monospace')
-    plt.figtext(0.8,.02,'R2 = %.3f'%r2,fontsize=11,family='monospace')
-    plt.figtext(0.9,.02,'NME = %.1f'%nme,fontsize=11,family='monospace')
-    plt.figtext(0.8,.04,'MB = %.1f'%mb,fontsize=11,family='monospace')
-    plt.figtext(0.9,.04,'NMB = %.1f'%nmb,fontsize=11,family='monospace')
-    plt.figtext(.3,.04,'SITES: '+str(unique(df.SCS.values).shape[0]),fontsize=11,family='monospace')
-    plt.figtext(.3,.02,'MEASUREMENTS: '+str(df.SCS.count()),fontsize=11,family='monospace')
-
+    from mystats import NMB, NME, MB, d1
+    nmb = NMB(df.Obs.values, df.CMAQ.values)
+    nme = NME(df.Obs.values, df.CMAQ.values)
+    mb = MB(df.Obs.values, df.CMAQ.values)
+    d1ioa = d1(df.Obs.values, df.CMAQ.values)
+    plt.figtext(.03, .04, df.datetime.min().strftime('START DATE: %Y-%m-%d %H UTC'), fontsize=11, family='monospace')
+    plt.figtext(.03, .02, df.datetime.max().strftime('END DATE  : %Y-%m-%d %H UTC'), fontsize=11, family='monospace')
+    plt.figtext(0.8, .02, 'd1 = %.3f' % d1ioa, fontsize=11, family='monospace')
+    plt.figtext(0.9, .02, 'NME = %.1f' % nme, fontsize=11, family='monospace')
+    plt.figtext(0.8, .04, 'MB = %.1f' % mb, fontsize=11, family='monospace')
+    plt.figtext(0.9, .04, 'NMB = %.1f' % nmb, fontsize=11, family='monospace')
+    plt.figtext(.3, .04, 'SITES: ' + str(unique(df.SCS.values).shape[0]), fontsize=11, family='monospace')
+    plt.figtext(.3, .02, 'MEASUREMENTS: ' + str(df.SCS.count()), fontsize=11, family='monospace')

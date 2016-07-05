@@ -47,7 +47,7 @@ class verify_airnow:
         # get the CMAQ dates
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
-        self.cmaq.get_cmaq_dates()
+        self.cmaq.get_dates()
         print 'Simulation Start Date: ', self.cmaq.dates[0].strftime('%Y-%m-%d %H:%M')
         print 'Simulation End   Date: ', self.cmaq.dates[-1].strftime('%Y-%m-%d %H:%M')
         print '==============================================================='
@@ -84,12 +84,15 @@ class verify_airnow:
                 dfnoy = self.interp_to_airnow(cmaq, dfnoy)
                 self.cmaqnoy = cmaq
             elif i == 'SO2':
-                print 'Interpolating SO2'
-                dfso2 = g.get_group(i)
-                fac = self.check_cmaq_units(param='SO2', airnow_param=i)
-                cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
-                dfso2 = self.interp_to_airnow(cmaq, dfso2)
-                self.cmaqso2 = cmaq
+                if 'SO2' not in self.cmaq.cdfobj.variables.keys():
+                    pass
+                else:
+                    print 'Interpolating SO2'
+                    dfso2 = g.get_group(i)
+                    fac = self.check_cmaq_units(param='SO2', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
+                    dfso2 = self.interp_to_airnow(cmaq, dfso2)
+                    self.cmaqso2 = cmaq
             elif i == 'NOX':
                 print 'Interpolating NOX:'
                 dfnox = g.get_group(i)
@@ -100,17 +103,20 @@ class verify_airnow:
 
         dfs = [dfo3, dfpm25, dfco, dfso2, dfnox, dfnoy]
         self.df = pd.concat(dfs)
-        print 'Calculating Daily 8 Hr Max Ozone:'
+        print 'Calculating Daily 8 Hr Max Ozone....\n'
         self.df8hr = self.calc_airnow_8hr_max_calc()
-        print 'Ready to Compare!!!!!!!!!!!!!'
-        print 'Available Functions:'
-        print '    compare_domain_df(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
-        print '    compare_region_df(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
+        print 'Ready to Compare!!!!!!!!!!!!!\n'
+        print 'Available Functions:\n'
+        print '    compare_domain_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
+        print '    compare_region_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
         print '    airnow_spatial(df, param=\'OZONE\', path='', region='', date=\'YYYY-MM-DD HH:MM:SS\')'
         print '    airnow_spatial_8hr(df, path=\'cmaq-basemap-conus.p\', region=\'northeast\', date=\'YYYY-MM-DD\')'
+        print '    compare_param(param=\'OZONE\', city=\'\', region=\'\', timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
+        print 'Species available to compare:'
+        print '    OZONE, PM2.5, PM10, CO, SO2, NOx, NOy'
 
+    def compare_domain_all(self, timeseries=False, scatter=False, bargraph=True, pdfs=False):
 
-    def compare_domain_df(self, timeseries=False, scatter=False, bargraph=True, pdfs=False, spatial=False):
         from numpy import NaN
         df = self.df.copy()[['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units']]
         df[df < -990] = NaN
@@ -123,7 +129,7 @@ class verify_airnow:
         if pdfs:
             plots.airnow_kdeplots(df)
 
-    def compare_region_df(self, timeseries=False, scatter=False, bargraph=True, pdfs=False,region='all'):
+    def compare_region_all(self, timeseries=False, scatter=False, bargraph=True, pdfs=False, region='all'):
         from numpy import NaN
         region = region.upper()
         df = self.df.copy()[['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units']]
@@ -151,6 +157,42 @@ class verify_airnow:
                 plots.airnow_domain_bar(df2)
             if pdfs:
                 plots.airnow_kdeplots(df2)
+
+    def compare_param(self, param='OZONE', city='', region='', timeseries=False, scatter=False, pdfs=False,
+                      diffscatter=False, diffpdfs=False,timeseries_error=False):
+        from numpy import NaN
+        df = self.df.copy()[[
+            'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
+            'Longitude']]
+        df[df < -990] = NaN
+        g = df.groupby('Species')
+        new = g.get_group(param)
+        if city != '':
+            names = df.MSA_Name.dropna().unique()
+            for i in names:
+                if city.upper() in i.upper():
+                    name = i
+            df2 = new[new['MSA_Name'] == name]
+            title = name
+        elif region != '':
+            df2 = new[new['Region'].str.upper() == region].copy()
+            title = region
+        else:
+            df2 = new
+            name = 'Entire Domain'
+            title = 'Domain'
+        if timeseries:
+            plots.airnow_timeseries_param(df2, title=title)
+        if scatter:
+            plots.airnow_scatter_param(df2, title=title)
+        if pdfs:
+            plots.airnow_kdeplots_param(df2, title=title)
+        if diffscatter:
+            plots.airnow_diffscatter_param(df2, title=title)
+        if diffpdfs:
+            plots.airnow_diffpdfs_param(df2, title=title)
+        if timeseries_error:
+            plots.airnow_timeseries_error_param(df2, title=title)
 
     def compare_metro_area(self, city='Philadelphia', param='OZONE', date='', timeseries=False, scatter=False,
                            bargraph=False, pdfs=False, spatial=False, path=''):
@@ -190,8 +232,9 @@ class verify_airnow:
             else:
                 self.airnow_spatial(df2, param=param, path=path, date=date, xlim=x, ylim=y)
 
+
     def compare_metro_area_8hr(self, city='Philadelphia', param='OZONE', date='', timeseries=False, scatter=False,
-                           bargraph=False, pdfs=False, spatial=False, path=''):
+                               bargraph=False, pdfs=False, spatial=False, path=''):
         from numpy import NaN, unique
         from tools import search_listinlist
         df = self.df8hr.copy()[
@@ -227,7 +270,6 @@ class verify_airnow:
             else:
                 self.airnow_spatial(df2, param=param, path=path, date=date, xlim=x, ylim=y)
 
-
     def airnow_spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[]):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
@@ -254,7 +296,8 @@ class verify_airnow:
         m = self.cmaq.choose_map(path, region)
         if date == '':
             for index, i in enumerate(self.cmaq.dates):
-                c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m)
+                c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
+                                            m)
                 plots.airnow_spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'))
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
                 if len(xlim) > 1:
@@ -267,11 +310,11 @@ class verify_airnow:
             plots.airnow_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
             c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
             if len(xlim) > 1:
-                plt.xlim([min(xlim), max(xlim)]);
+                plt.xlim([min(xlim), max(xlim)])
                 plt.ylim([min(ylim), max(ylim)])
 
     def airnow_spatial_8hr(self, path='', region='', date='', xlim=[], ylim=[]):
-        if not isinstance(self.df8hr,pd.DataFrame):
+        if not isinstance(self.df8hr, pd.DataFrame):
             print '    Calculating 8 Hr Max Ozone '
             self.df8hr = self.calc_airnow_8hr_max_calc()
         print '    Creating Map'
@@ -356,17 +399,17 @@ class verify_airnow:
             self.airnow.df.Longitude.values > lon.min()) & (self.airnow.df.Longitude.values < lon.max()))
         self.airnow.df = self.airnow.df[con].copy()
 
-    def calc_airnow_8hr_max_calc(self,path=''):
+    def calc_airnow_8hr_max_calc(self, path=''):
         r = self.df.groupby('Species').get_group('OZONE')
         r.index = r.datetime_local
         g = r.groupby('SCS')['Obs', 'CMAQ', 'Latitude', 'Longitude']
         m = g.rolling(8, center=True, win_type='boxcar').mean()
         q = m.reset_index(level=0)
-        #q.index = self.df.groupby('Species').get_group('OZONE').datetime_local
+        # q.index = self.df.groupby('Species').get_group('OZONE').datetime_local
         k = q.groupby('SCS').resample('1D').max()
         kk = k.reset_index(level=1)
         kkk = kk.reset_index(drop='SCS').dropna()
         if path == '':
             path = 'monitoring_site_locations.dat'
-        kkk = self.airnow.get_station_locations_remerge(kkk,path=path)
+        kkk = self.airnow.get_station_locations_remerge(kkk, path=path)
         return kkk

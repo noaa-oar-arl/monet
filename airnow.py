@@ -85,7 +85,7 @@ class airnow:
         else:
             self.download_rawfiles(array(nlst)[array(index1)])
 
-    def aggragate_files(self,output='',path=''):
+    def aggragate_files(self, output='', path=''):
         from glob import glob
         from numpy import sort
         from datetime import datetime
@@ -165,11 +165,11 @@ class airnow:
         f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
                      'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
                      'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
-        df = pd.merge(df, f.drop(['Latitude','Longitude'],axis=1), on='SCS', how='left')
+        df = pd.merge(df, f.drop(['Latitude', 'Longitude'], axis=1), on='SCS', how='left')
         return df
 
     def get_region(self):
-        sn = self.df.State_Name.values
+        sn = self.df.State_Name.str.values
         sr = []
         for i in sn:
             if i in self.se_states:

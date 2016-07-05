@@ -29,25 +29,36 @@ class cmaq:
                  'ATOL1J', 'ATOL2J', 'ATOL3J', 'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J', 'A25J', 'AORGAJ',
                  'AORGPAJ', 'AORGBJ'])
         self.coarse = array(['ACLK', 'ACORS', 'AH2OK', 'ANH4K', 'ANO3K', 'ASEACAT', 'ASO4K', 'ASOIL'])
-        self.noy_gas = array(['NO','NO2','NO3','N2O5','HONO','HNO3','PAN','PANX','PNA','NTR','CRON','CRN2','CRNO','CRPX','OPAN'])
+        self.noy_gas = array(
+                ['NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO',
+                 'CRPX', 'OPAN'])
 
         self.cdfobj = None
         self.gridobj = None
         self.fname = None
         self.dates = None
-        self.keys=None
+        self.keys = None
+        self.indexdates = None
 
     def get_single_var(self, param):
         return self.cdfobj.variables[param][:]
 
-    def get_cmaq_dates(self):
+    def get_dates(self):
         from datetime import datetime
+        from pandas import DataFrame
+        from numpy import concatenate, arange, shape
         tflag1 = array(self.cdfobj.variables['TFLAG'][:, 0, 0], dtype='|S7')
         tflag2 = array(self.cdfobj.variables['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
         date = []
         for i, j in zip(tflag1, tflag2):
             date.append(datetime.strptime(i + j, '%Y%j%H'))
         self.dates = array(date)
+        r = DataFrame(date, columns=['dates'])
+        if r.dates.count() > len(r.dates.unique()):
+            print 'here'
+            self.indexdates = concatenate([arange(24), r.dates[r.dates.duplicated()].index.values])
+        else:
+            self.indexdates = arange(len(date))
 
     def load_single_cmaq_run(self):
         self.cdfobj = Dataset(self.fname[0])
@@ -74,66 +85,69 @@ class cmaq:
     def get_surface_dust_total(self):
         keys = self.keys
         cmaqvars, temp = search_listinlist(keys, self.dust_total)
-        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
+        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
         for i in cmaqvars[:]:
             print '   Getting CMAQ PM DUST: ' + keys[i]
-            var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
+            var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
             collect()
         return var
 
     def get_surface_noy(self):
         keys = self.keys
-        cmaqvars, temp = search_listinlist(keys, self.noy_gas)
-        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
-        for i in cmaqvars[:]:
-            print '   Getting CMAQ NOy: ' + keys[i]
-            if i == 'N2O5':
-                var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()*2.
-            else:
-                var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
-
-            collect()
+        if 'NOY' in keys:
+            var = self.cdfobj.variables['NOY'][:][:, 0, :, :]
+        else:
+            cmaqvars, temp = search_listinlist(keys, self.noy_gas)
+            var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ NOy: ' + keys[i]
+                var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
         return var
 
     def get_surface_nox(self):
         print '   Getting CMAQ NOx:  NO'
-        var = self.cdfobj.variables['NO'][:,0,:,:].squeeze()
+        var = self.cdfobj.variables['NO'][:, 0, :, :].squeeze()
         print '   Getting CMAQ NOx:  NO2'
-        var += self.cdfobj.variables['NO2'][:, 0, :, :].squeeze()
+        var += self.cdfobj.variables['NO2'][self.indexdates, 0, :, :].squeeze()
         collect()
         return var
 
     def get_surface_dust_pm25(self):
         keys = self.keys
         cmaqvars, temp = search_listinlist(keys, self.dust_pm25)
-        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
+        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
         for i in cmaqvars[:]:
             print '   Getting CMAQ PM25 DUST: ' + keys[i]
-            var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
+            var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
             collect()
         return var
 
     def get_surface_pm25(self):
         from numpy import concatenate
         keys = self.keys
-        vars = concatenate([self.aitken, self.accumulation])
-        cmaqvars, temp = search_listinlist(keys, vars)
-        var = self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze()
-        for i in cmaqvars[:]:
-            print '   Getting CMAQ PM25: ' + keys[i]
-            var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
-            collect()
+        allvars = concatenate([self.aitken, self.accumulation])
+        if 'PM25_TOT' in keys:
+            print 'Getting CMAQ PM25: PM25_TOT'
+            var = self.cdfobj.variables['PM25_TOT'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze()
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ PM25: ' + keys[i]
+                var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
         return var
 
     def get_surface_pm10(self):
         from numpy import concatenate
         keys = self.keys
-        vars = concatenate([self.aitken, self.accumulation, self.coarse])
-        cmaqvars, temp = search_listinlist(keys, vars)
-        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][:, 0, :, :].squeeze().shape)
+        allvars = concatenate([self.aitken, self.accumulation, self.coarse])
+        cmaqvars, temp = search_listinlist(keys, allvars)
+        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
         for i in cmaqvars[:]:
             print '   Getting CMAQ PM10: ' + keys[i]
-            var += self.cdfobj.variables[keys[i]][:, 0, :, :].squeeze()
+            var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
             collect()
         return var
 
@@ -154,7 +168,7 @@ class cmaq:
             var = self.get_surface_noy()
         else:
             print '   Getting CMAQ Variable: ' + param
-            var = self.cdfobj.variables[param][:, 0, :, :].squeeze()
+            var = self.cdfobj.variables[param][self.indexdates, 0, :, :].squeeze()
         return var
 
     def set_gridcro2d(self, filename=''):
@@ -178,7 +192,7 @@ class cmaq:
             m = Basemap(projection='laea', resolution='h', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=lat[0, 0],
                         urcrnrlat=lat[-1, -1], llcrnrlon=lon[0, 0], urcrnrlon=lon[-1, -1], rsphere=6371200.,
-                        area_thresh=100.)
+                        area_thresh=50.)
         return m
 
     def load_pacific_coast_basemap(self, path):
@@ -201,7 +215,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=29., urcrnrlat=53., llcrnrlon=-125., urcrnrlon=-116., rsphere=6371200.,
-                        area_thresh=100.)
+                        area_thresh=50.)
         return m
 
     def load_rockies_basemap(self, path):
@@ -221,7 +235,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=29., urcrnrlat=52., llcrnrlon=-116., urcrnrlon=-91., rsphere=6371200.,
-                        area_thresh=100.)
+                        area_thresh=50.)
         return m
 
     def load_south_central_basemap(self, path):
@@ -241,7 +255,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=25., urcrnrlat=37.5, llcrnrlon=-108, urcrnrlon=-86., rsphere=6371200.,
-                        area_thresh=100.)
+                        area_thresh=50.)
         return m
 
     def load_northeast_basemap(self, path):
@@ -261,7 +275,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
-                        area_thresh=100.)
+                        area_thresh=50.)
         return m
 
     def load_north_central_basemap(self, path):
@@ -281,7 +295,7 @@ class cmaq:
             lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
-                        area_thresh=100.)
+                        area_thresh=50.)
         return m
 
     def load_southeast_basemap(self, path):
@@ -304,19 +318,19 @@ class cmaq:
                         area_thresh=10.)
         return m
 
-    def choose_map(self,path,region):
+    def choose_map(self, path, region):
         region = region.upper()
-        if region=='NORTHEAST':
+        if region == 'NORTHEAST':
             m = self.load_northeast_basemap(path)
-        elif region=='SOUTHEAST':
+        elif region == 'SOUTHEAST':
             m = self.load_southeast_basemap(path)
-        elif region=='SOUTH CENTRAL':
+        elif region == 'SOUTH CENTRAL':
             m = self.load_south_central_basemap(path)
-        elif region=='ROCKIES':
+        elif region == 'ROCKIES':
             m = self.load_rockies_basemap(path)
-        elif region=='PACIFIC':
+        elif region == 'PACIFIC':
             m = self.load_pacific_coast_basemap(path)
-        elif region=='NORTH CENTRAL':
+        elif region == 'NORTH CENTRAL':
             m = self.load_north_central_basemap(path)
         else:
             m = self.load_conus_basemap(path)
