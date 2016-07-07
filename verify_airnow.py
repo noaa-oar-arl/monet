@@ -363,7 +363,7 @@ class verify_airnow:
             print '   Interpolating values to AirNow, Date : ', j.strftime('%B %d %Y   %H utc')
             con = df.datetime == j
             newt = df[con]
-            cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[i+1], :, :].flatten(),
+            cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i+1, :, :].flatten(),
                                              (newt.Longitude.values, newt.Latitude.values), method='nearest'),
                                     columns=['CMAQ'], index=newt.index)
             newt = newt.join(cmaq_val)
