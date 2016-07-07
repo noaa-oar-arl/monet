@@ -54,6 +54,7 @@ class verify_airnow:
         self.ensure_values_indomain()
         comparelist = ['OZONE', 'PM2.5', 'NOX', 'CO', 'SO2', 'NOY']
         g = self.airnow.df.groupby('Species')
+        dfs = []
         for i in comparelist:
             if i == 'OZONE':
                 print 'Interpolating Ozone:'
@@ -62,6 +63,7 @@ class verify_airnow:
                 cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
                 self.cmaqo3 = cmaq
                 dfo3 = self.interp_to_airnow(cmaq, dfo3)
+                dfs.append(dfo3)
             elif i == 'PM2.5':
                 print 'Interpolating PM2.5:'
                 dfpm25 = g.get_group(i)
@@ -69,23 +71,30 @@ class verify_airnow:
                 cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
                 dfpm25 = self.interp_to_airnow(cmaq, dfpm25)
                 self.cmaqpm25 = cmaq
+                dfs.append(dfpm25)
             elif i == 'CO':
-                print 'Interpolating CO:'
-                dfco = g.get_group(i)
-                fac = self.check_cmaq_units(param='CO', airnow_param=i)
-                cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
-                dfco = self.interp_to_airnow(cmaq, dfco)
-                self.cmaqco = cmaq
+                if 'CO' not in self.cmaq.cdfobj.variables.keys():
+                    pass
+                else:
+                    print 'Interpolating CO:'
+                    dfco = g.get_group(i)
+                    fac = self.check_cmaq_units(param='CO', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
+                    dfco = self.interp_to_airnow(cmaq, dfco)
+                    self.cmaqco = cmaq
             elif i == 'NOY':
-                print 'Interpolating NOY:'
-                dfnoy = g.get_group(i)
-                fac = self.check_cmaq_units(param='NOY', airnow_param=i)
-                cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
-                dfnoy = self.interp_to_airnow(cmaq, dfnoy)
-                self.cmaqnoy = cmaq
+                if 'NOY' not in self.cmaq.cdfobj.variables.keys():
+                    pass
+                else:
+                    print 'Interpolating NOY:'
+                    dfnoy = g.get_group(i)
+                    fac = self.check_cmaq_units(param='NOY', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
+                    dfnoy = self.interp_to_airnow(cmaq, dfnoy)
+                    self.cmaqnoy = cmaq
+                    dfs.append(dfnoy)
             elif i == 'SO2':
                 if 'SO2' not in self.cmaq.cdfobj.variables.keys():
-                    dfso2 = pd.DataFrame()
                     pass
                 else:
                     print 'Interpolating SO2'
@@ -94,15 +103,19 @@ class verify_airnow:
                     cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
                     dfso2 = self.interp_to_airnow(cmaq, dfso2)
                     self.cmaqso2 = cmaq
+                    dfs.append(dfso2)
             elif i == 'NOX':
-                print 'Interpolating NOX:'
-                dfnox = g.get_group(i)
-                fac = self.check_cmaq_units(param='NOX', airnow_param=i)
-                cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
-                dfnox = self.interp_to_airnow(cmaq, dfnox)
-                self.cmaqnox = cmaq
+                if ('NO' not in self.cmaq.cdfobj.variables.keys()) | ('NO2' not in self.cmaq.cdfobj.variables.keys()):
+                    pass
+                else:
+                    print 'Interpolating NOX:'
+                    dfnox = g.get_group(i)
+                    fac = self.check_cmaq_units(param='NOX', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
+                    dfnox = self.interp_to_airnow(cmaq, dfnox)
+                    self.cmaqnox = cmaq
+                    dfs.append(dfnox)
 
-        dfs = [dfo3, dfpm25, dfco, dfso2, dfnox, dfnoy]
         self.df = pd.concat(dfs)
         print 'Calculating Daily 8 Hr Max Ozone....\n'
         self.df8hr = self.calc_airnow_8hr_max_calc()
