@@ -85,6 +85,7 @@ class verify_airnow:
                 self.cmaqnoy = cmaq
             elif i == 'SO2':
                 if 'SO2' not in self.cmaq.cdfobj.variables.keys():
+                    dfso2 = pd.DataFrame()
                     pass
                 else:
                     print 'Interpolating SO2'
@@ -172,10 +173,11 @@ class verify_airnow:
             for i in names:
                 if city.upper() in i.upper():
                     name = i
-            df2 = new[new['MSA_Name'] == name]
+                    print name
+            df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
             title = name
         elif region != '':
-            df2 = new[new['Region'].str.upper() == region].copy()
+            df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
             title = region
         else:
             df2 = new
@@ -323,8 +325,8 @@ class verify_airnow:
             for index, i in enumerate(self.df8hr.datetime_local.unique()):
                 plots.airnow_8hr_spatial_scatter(self.df8hr, m, i.strftime('%Y-%m-%d'))
                 c = plt.colorbar()
-                c.set_label('8Hr Ozone Bias ( pbbV )')
-                plt.title(i.strftime('%Y-%m-%d'))
+                c.set_label('8Hr Ozone Bias (pbbV)')
+                plt.title(i.strftime('%Y-%m-%d') + ' Obs - CMAQ')
                 plt.tight_layout()
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
@@ -332,8 +334,8 @@ class verify_airnow:
         else:
             plots.airnow_8hr_spatial_scatter(self.df8hr, m, date=date)
             c = plt.colorbar()
-            c.set_label('8Hr Ozone Bias ( pbbV )')
-            plt.title(date)
+            c.set_label('8Hr Ozone Bias (pbbV)')
+            plt.title(date + ' Obs - CMAQ')
             plt.tight_layout()
 
     @staticmethod

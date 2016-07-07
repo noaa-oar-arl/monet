@@ -114,7 +114,7 @@ class airnow:
         print '    Adding in Meta-data'
         self.get_station_locations(path=path)
         self.get_region()
-        self.df = self.df.drop_duplicates()
+        self.df = self.df.copy().drop_duplicates()
         if output == '':
             output = 'AIRNOW.hdf'
         print 'Outputing data to: ' + output
@@ -169,7 +169,7 @@ class airnow:
         return df
 
     def get_region(self):
-        sn = self.df.State_Name.str.values
+        sn = self.df.State_Name.values
         sr = []
         for i in sn:
             if i in self.se_states:

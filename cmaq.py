@@ -46,14 +46,14 @@ class cmaq:
     def get_dates(self):
         from datetime import datetime
         from pandas import DataFrame
-        from numpy import concatenate, arange, shape
+        from numpy import concatenate, arange, shape,sort
         tflag1 = array(self.cdfobj.variables['TFLAG'][:, 0, 0], dtype='|S7')
         tflag2 = array(self.cdfobj.variables['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
         date = []
         for i, j in zip(tflag1, tflag2):
             date.append(datetime.strptime(i + j, '%Y%j%H'))
         self.dates = array(date)
-        r = DataFrame(date, columns=['dates'])
+        r = DataFrame(self.dates, columns=['dates'])
         if r.dates.count() > len(r.dates.unique()):
             print 'here'
             self.indexdates = concatenate([arange(24), r.dates[r.dates.duplicated()].index.values])
@@ -72,7 +72,8 @@ class cmaq:
         #       file='this_is_my_file.ncf'
         #       file='this_is_my_files*.ncf'
         from glob import glob
-        self.fname = array(glob(file))
+        from numpy import sort
+        self.fname = sort(array(glob(file)))
         if self.fname.shape[0] > 1:
             self.load_multi_cmaq_runs()
         else:
