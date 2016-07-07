@@ -81,7 +81,7 @@ class airnow:
             else:
                 print 'Files Found!!!!!!!!! Downloading'
                 self.download_rawfiles(array(nlst)[array(index1)])
-                self.filelist = array[index1]
+                self.filelist = array([index1])
         else:
             self.download_rawfiles(array(nlst)[array(index1)])
 
