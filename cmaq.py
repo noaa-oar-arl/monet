@@ -55,7 +55,6 @@ class cmaq:
         self.dates = array(date)
         r = DataFrame(self.dates, columns=['dates'])
         if r.dates.count() > len(r.dates.unique()):
-            print 'here'
             self.indexdates = concatenate([arange(24), r.dates[r.dates.duplicated()].index.values])
         else:
             self.indexdates = arange(len(date))
