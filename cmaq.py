@@ -336,3 +336,19 @@ class cmaq:
         else:
             m = self.load_conus_basemap(path)
         return m
+        
+    def interp_var2d(self,lons,lats,var):
+        from pandas import DataFrame,concat
+        from scipy.interpolate import griddata
+        lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
+        lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
+        a = griddata((lon.flatten(),lat.flatten()),var[0,:,:,].squeeze(),(lons,lats),method='nearest',rescale=True)
+        dates = [self.dates[0] for i in range(len(lons))]
+        df = DataFrame(array([a,lons,lats,dates]).T,columns=['CMAQ','Longitude','Latitude','datetime'])
+        for i in range(len(self.dates)):
+            a = griddata((lon.flatten(),lat.flatten()),var[i,:,:,].squeeze(),(lons,lats),method='nearest',rescale=True)
+            dates = [self.dates[i] for j in range(len(lons))]
+            df2 = DataFrame(array([a,lons,lats,dates]).T,columns=['CMAQ','Longitude','Latitude','datetime'])
+            df = concat([df.copy(),df2],ignore_index=True)
+
+        return df
