@@ -82,6 +82,7 @@ class verify_airnow:
                     cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
                     dfco = self.interp_to_airnow(cmaq, dfco)
                     self.cmaqco = cmaq
+                    dfs.append(dfco)
             elif i == 'NOY':
                 if 'NOY' not in self.cmaq.cdfobj.variables.keys():
                     pass
