@@ -213,6 +213,30 @@ class aqs:
         df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_NONOXNOY_' + year + '.hdf', 'df', format='fixed')
         return df
 
+    def retrieve_aqs_hourly_voc_data(self, dates):
+        import wget
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'hourly_VOC_' + year + '.zip'
+        print 'Downloading Hourly VOC: ' + url
+        filename = wget.download(url)
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renamedhcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        df.drop('Qualifier', axis=1, inplace=True)
+        df = self.get_species(df)
+        df = self.get_region(df)
+        df = df.copy()[self.savecols]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_VOC_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_VOC_' + year + '.hdf', 'df', format='fixed')
+        return df
+
     def retrieve_aqs_hourly_SPEC_data(self, dates):
         import wget
         i = dates[0]
@@ -377,6 +401,19 @@ class aqs:
         aqs.index = arange(aqs.index.shape[0])
         return aqs
 
+    def load_aqs_voc_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_HOURLY_VOC_' + year + '.hdf'
+        if os.path.isfile(fname):
+            print "File Found, Loading: " + fname
+            aqs = pd.read_hdf(fname)
+        else:
+            aqs = self.retrieve_aqs_hourly_pm25_data(dates)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+
     def load_aqs_ozone_data(self, dates):
         year = dates[0].strftime('%Y')
         fname = self.datadir + '/' + 'AQS_HOURLY_OZONE_44201_' + year + '.hdf'
@@ -477,6 +514,7 @@ class aqs:
         dfs.append(self.load_aqs_SPEC_data(dates))
         dfs.append(self.load_aqs_no2_data(dates))
         dfs.append(self.load_aqs_so2_data(dates))
+        dfs.append(self.load_aqs_voc_data(dates))
         dfs.append(self.load_aqs_nonoxnoy_data(dates))
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).copy().drop_duplicates()

@@ -165,6 +165,17 @@ class verify_aqs:
                     dfnox = self.interp_to_aqs(cmaq, dfnox)
                     self.cmaqpno3 = cmaq
                     dfs.append(dfnox)
+            elif i == 'ISOPRENE':
+                if ('ISOP' not in self.cmaq.cdfobj.variables.keys()):
+                    pass
+                else:
+                    print 'Interpolating Isoprene:'
+                    dfnox = g.get_group(i)
+                    fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
+                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    self.cmaqpno3 = cmaq
+                    dfs.append(dfnox)
 
         self.df = pd.concat(dfs)
         print 'Calculating Daily 8 Hr Max Ozone....\n'
