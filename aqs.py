@@ -479,7 +479,7 @@ class aqs:
         dfs.append(self.load_aqs_so2_data(dates))
         dfs.append(self.load_aqs_nonoxnoy_data(dates))
         self.df = pd.concat(dfs, ignore_index=True)
-        self.df = self.change_units(self.df).copy()
+        self.df = self.change_units(self.df).copy().drop_duplicates()
 
     def load_aqs_daily_pm25_data(self, dates):
         from datetime import timedelta

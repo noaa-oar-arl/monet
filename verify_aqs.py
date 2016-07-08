@@ -87,6 +87,7 @@ class verify_aqs:
                     self.cmaqco = cmaq
                     dfs.append(dfco)
             elif i == 'NOY':
+                #con = ('NOY' not in self.cmaq.cdfobj.variables.keys()) |
                 if 'NOY' not in self.cmaq.cdfobj.variables.keys():
                     pass
                 else:
@@ -95,8 +96,6 @@ class verify_aqs:
                     fac = self.check_cmaq_units(param='NOY', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
                     dfnoy = self.interp_to_aqs(cmaq, dfnoy)
-                    dfnoy.Obs,dfnoy.CMAQ = dfnoy.Obs*1000.,dfnoy.CMAQ*1000.
-                    dfnoy.Units = 'PPB'
                     self.cmaqnoy = cmaq
 
                     dfs.append(dfnoy)
@@ -109,9 +108,7 @@ class verify_aqs:
                     fac = self.check_cmaq_units(param='SO2', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
                     dfso2 = self.interp_to_aqs(cmaq, dfso2)
-                    dfso2.Obs,dfso2.CMAQ = dfso2.Obs*1000.,dfso2.CMAQ*1000.
                     self.cmaqso2 = cmaq
-                    dfso2.Units = 'PPB'
                     dfs.append(dfso2)
             elif i == 'NOX':
                 if ('NO' not in self.cmaq.cdfobj.variables.keys()) | ('NO2' not in self.cmaq.cdfobj.variables.keys()):
@@ -121,9 +118,7 @@ class verify_aqs:
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOX', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
-                    dfno = self.interp_to_aqs(cmaq, dfnox)
-                    dfno.Obs,dfno.CMAQ = dfno.Obs*1000.,dfno.CMAQ*1000.
-                    dfno.Units = 'PPB'
+                    dfnox = self.interp_to_aqs(cmaq, dfnox)
                     self.cmaqno = cmaq
                     dfs.append(dfnox)
             elif i == 'NO':
@@ -135,8 +130,6 @@ class verify_aqs:
                     fac = self.check_cmaq_units(param='NO', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
                     dfno = self.interp_to_aqs(cmaq, dfno)
-                    dfno.Obs,dfno.CMAQ = dfno.Obs*1000.,dfno.CMAQ*1000.
-                    dfno.Units = 'PPB'
                     self.cmaqno = cmaq
                     dfs.append(dfno)
             elif i == 'NO2':
@@ -148,8 +141,6 @@ class verify_aqs:
                     fac = self.check_cmaq_units(param='NO2', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
                     dfno2 = self.interp_to_aqs(cmaq, dfno2)
-                    dfno2.Obs,dfno2.CMAQ = dfno2.Obs*1000.,dfno2.CMAQ*1000.
-                    dfno2.Units = 'PPB'
                     self.cmaqno2 = cmaq
                     dfs.append(dfno2)
             elif i == 'PM2.5_SO4':
@@ -176,17 +167,23 @@ class verify_aqs:
                     dfs.append(dfnox)
 
         self.df = pd.concat(dfs)
-        #print 'Calculating Daily 8 Hr Max Ozone....\n'
-        #self.df8hr = self.calc_aqs_8hr_max_calc()
+        print 'Calculating Daily 8 Hr Max Ozone....\n'
+        self.df8hr = self.calc_aqs_8hr_max_calc()
+        self.print_info()
+
+    def print_info(self):
         print 'Ready to Compare!!!!!!!!!!!!!\n'
         print 'Available Functions:\n'
         print '    compare_domain_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
         print '    compare_region_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
         print '    aqs_spatial(df, param=\'OZONE\', path='', region='', date=\'YYYY-MM-DD HH:MM:SS\')'
         print '    aqs_spatial_8hr(df, path=\'cmaq-basemap-conus.p\', region=\'northeast\', date=\'YYYY-MM-DD\')'
-        print '    compare_param(param=\'OZONE\', city=\'\', region=\'\', timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
+        print '    compare_param(param=\'OZONE\', region=\'\', timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
         print 'Species available to compare:'
         print '    ', self.df.Species.unique()
+        print ''
+        print 'Defined EPA Regions:'
+        print '    ', self.df.Region.unique()
 
     def compare_domain_all(self, timeseries=False, scatter=False, bargraph=True, pdfs=False):
 
@@ -427,8 +424,10 @@ class verify_aqs:
         self.aqs.df = self.aqs.df[con].copy()
 
     def calc_aqs_8hr_max_calc(self, path=''):
+        from numpy import unique
         r = self.df.groupby('Species').get_group('OZONE')
         r.index = r.datetime_local
+        vals,index = unique(r.SCS.values, return_index=True)
         g = r.groupby('SCS')['Obs', 'CMAQ', 'Latitude', 'Longitude']
         m = g.rolling(8, center=True, win_type='boxcar').mean()
         q = m.reset_index(level=0)
@@ -436,7 +435,14 @@ class verify_aqs:
         k = q.groupby('SCS').resample('1D').max()
         kk = k.reset_index(level=1)
         kkk = kk.reset_index(drop='SCS').dropna()
-        if path == '':
-            path = 'monitoring_site_locations.dat'
-        # kkk = self.airnow.get_station_locations_remerge(kkk, path=path)
+        kkk['Parameter_Name']= 'Ozone'
+        kkk['Region'] = ''
+        kkk['Species'] = 'OZONE'
+        kkk['State_Name'] = ''
+        kkk['Units'] = 'PPB'
+        for i,j in enumerate(vals):
+            kkk.loc[kkk.SCS == j,'Region'] = r.Region.values[index[i]]
+            kkk.loc[kkk.SCS == j,'State_Name'] = r.State_Name.values[index[i]]
+            kkk.loc[kkk.SCS == j,'County_Name'] = r.County_Name.values[index[i]]
+
         return kkk

@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import seaborn as sns
 
 sns.set_context('poster')
@@ -141,11 +141,10 @@ def plot_allsites_timeseries(dataframe, ylabel='PM10 Concentration', savename=''
 
 def airnow_timeseries_param(df, title=''):
     import matplotlib.dates as mdates
-    from numpy import sqrt, linspace
     sns.set_style('ticks')
 
     df.index = df.datetime
-    f = plt.figure(figsize=(12,7))
+    f = plt.figure(figsize=(12, 7))
 
     species = df.Species.unique().astype('|S8')[0]
     units = df.Units.unique().astype('|S8')[0]
@@ -163,11 +162,12 @@ def airnow_timeseries_param(df, title=''):
     ax = plt.gca().axes
     ax.set_xlabel('UTC Time (mm/dd HH)')
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
-    #plt.xticks(rotation=15)
-    #plt.title(title)
-    ylabel = species +  ' (' + units + ')'
-    plt.gca().axes.set_ylabel( ylabel )
-    #airnow_footer_text(df)
+    plt.xticks(rotation=15)
+    plt.title(title)
+    plt.gca().set_ylim(bottom=0)
+    ylabel = species + ' (' + units + ')'
+    plt.gca().axes.set_ylabel(ylabel)
+    airnow_footer_text(df)
     plt.tight_layout()
 
     return f
@@ -175,11 +175,11 @@ def airnow_timeseries_param(df, title=''):
 
 def airnow_timeseries_error_param(df, title=''):
     import matplotlib.dates as mdates
-    from numpy import sqrt, linspace
+    from numpy import sqrt
     sns.set_style('ticks')
 
     df.index = df.datetime
-    plt.figure(figsize=(12,7))
+    plt.figure(figsize=(12, 7))
 
     species = df.Species.unique().astype('|S8')[0]
     units = df.Units.unique().astype('|S8')[0]
@@ -187,21 +187,21 @@ def airnow_timeseries_error_param(df, title=''):
     mb = (df.CMAQ - df.Obs).resample('H').mean()
     rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample('H').mean()
 
-    a = plt.plot(mb, label ='Mean Bias',color='cornflowerblue')
+    a = plt.plot(mb, label='Mean Bias', color='cornflowerblue')
     ax = plt.gca().axes
     ax2 = ax.twinx()
-    ax2.plot(rmse,)
-    b = plt.plot(rmse, label='RMSE',color='tomato')
+    ax2.plot(rmse, )
+    b = plt.plot(rmse, label='RMSE', color='tomato')
     lns = a + b
     labs = [l.get_label() for l in lns]
-    plt.legend(lns,labs,loc='best')
+    plt.legend(lns, labs, loc='best')
 
     ax.set_xlabel('UTC Time (mm/dd HH)')
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
     plt.title(title)
-    ylabel = species +  ' (' + units + ')'
-    ax.set_ylabel('MB ' + ylabel ,color='cornflowerblue')
-    ax2.set_ylabel('RMSE ' + ylabel,color='tomato')
+    ylabel = species + ' (' + units + ')'
+    ax.set_ylabel('MB ' + ylabel, color='cornflowerblue')
+    ax2.set_ylabel('RMSE ' + ylabel, color='tomato')
     airnow_footer_text(df)
     plt.tight_layout()
 
@@ -231,8 +231,8 @@ def airnow_diffpdfs_param(df, title=''):
     from scipy.stats import scoreatpercentile as score
     sns.set_style('ticks')
 
-    maxval = score(df.CMAQ.values - df.Obs.values,per=99.9)
-    minval = score(df.CMAQ.values - df.Obs.values,per=.1)
+    maxval = score(df.CMAQ.values - df.Obs.values, per=99.9)
+    minval = score(df.CMAQ.values - df.Obs.values, per=.1)
     plt.figure(figsize=(10, 7))
 
     sns.kdeplot(df.CMAQ.values - df.Obs.values, color='darkslategrey')
@@ -259,7 +259,7 @@ def airnow_scatter_param(df, title=''):
     plt.figure(figsize=(10, 7))
 
     plt.scatter(df.Obs, df.CMAQ, c='cornflowerblue', marker='o', edgecolors='w', alpha=.3)
-    x = arange(0, maxval+1)
+    x = arange(0, maxval + 1)
     if maxval <= 10.:
         x = linspace(0, maxval, 25)
     plt.plot(x, x, '--', color='slategrey')
@@ -269,28 +269,29 @@ def airnow_scatter_param(df, title=''):
 
     plt.xlim([0, maxval])
     plt.ylim([0, maxval])
-    plt.xlabel('Obs ' + species + ' (' + units + ')' )
+    plt.xlabel('Obs ' + species + ' (' + units + ')')
     plt.title(title)
     plt.gca().axes.set_ylabel('Model ' + species + ' (' + units + ')')
     airnow_footer_text(df)
     plt.tight_layout()
+
 
 def airnow_diffscatter_param(df, title=''):
     from scipy.stats import scoreatpercentile as score
     sns.set_style('ticks')
     df = df.dropna()
     species, units = df.Species.unique()[0], df.Units.unique()[0]
-    maxval = score(df.Obs.values,per=99.9)
-    minvaly = score(df.CMAQ.values - df.Obs.values,per=.1)
-    maxvaly = score(df.CMAQ.values - df.Obs.values,per=99.9)
+    maxval = score(df.Obs.values, per=99.9)
+    minvaly = score(df.CMAQ.values - df.Obs.values, per=.1)
+    maxvaly = score(df.CMAQ.values - df.Obs.values, per=99.9)
     plt.figure(figsize=(10, 7))
 
     plt.scatter(df.Obs, df.CMAQ - df.Obs, c='cornflowerblue', marker='o', edgecolors='w', alpha=.3)
-    plt.plot((0,maxval),(0,0),'--',color='darkslategrey')
+    plt.plot((0, maxval), (0, 0), '--', color='darkslategrey')
 
-    plt.xlim([0,maxval])
-    plt.ylim([minvaly,maxvaly])
-    plt.xlabel('Obs ' + species + ' (' + units + ')' )
+    plt.xlim([0, maxval])
+    plt.ylim([minvaly, maxvaly])
+    plt.xlabel('Obs ' + species + ' (' + units + ')')
     plt.title(title)
     plt.gca().axes.set_ylabel('Model - Obs ' + species + ' (' + units + ')')
     airnow_footer_text(df)
