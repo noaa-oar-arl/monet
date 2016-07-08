@@ -164,11 +164,13 @@ def airnow_timeseries_param(df, title=''):
     ax.set_xlabel('UTC Time (mm/dd HH)')
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
     #plt.xticks(rotation=15)
-    plt.title(title)
+    #plt.title(title)
     ylabel = species +  ' (' + units + ')'
     plt.gca().axes.set_ylabel( ylabel )
-    airnow_footer_text(df)
+    #airnow_footer_text(df)
     plt.tight_layout()
+
+    return f
 
 
 def airnow_timeseries_error_param(df, title=''):
@@ -198,8 +200,8 @@ def airnow_timeseries_error_param(df, title=''):
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
     plt.title(title)
     ylabel = species +  ' (' + units + ')'
-    ax.set_ylabel('MB ' + ylabel )
-    ax2.set_ylabel('RMSE ' + ylabel)
+    ax.set_ylabel('MB ' + ylabel ,color='cornflowerblue')
+    ax2.set_ylabel('RMSE ' + ylabel,color='tomato')
     airnow_footer_text(df)
     plt.tight_layout()
 
