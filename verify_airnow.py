@@ -415,7 +415,7 @@ class verify_airnow:
             self.airnow.df.Longitude.values > lon.min()) & (self.airnow.df.Longitude.values < lon.max()))
         self.airnow.df = self.airnow.df[con].copy()
 
-    def calc_airnow_8hr_max_calc(self, path=''):
+    def calc_airnow_8hr_max_calc(self):
         r = self.df.groupby('Species').get_group('OZONE')
         r.index = r.datetime_local
         g = r.groupby('SCS')['Obs', 'CMAQ', 'Latitude', 'Longitude']
@@ -427,5 +427,5 @@ class verify_airnow:
         kkk = kk.reset_index(drop='SCS').dropna()
         if path == '':
             path = 'monitoring_site_locations.dat'
-        kkk = self.airnow.get_station_locations_remerge(kkk, path=path)
+        kkk = self.airnow.get_station_locations_remerge(kkk)
         return kkk

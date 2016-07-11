@@ -5,6 +5,7 @@ import pandas as pd
 from numpy import array
 
 from tools import search_listinlist
+import os
 
 
 class airnow:
@@ -33,6 +34,7 @@ class airnow:
         self.p_states = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.objtype = 'AirNow'
         self.filelist = None
+        self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
 
     def retrieve_hourly_filelist(self):
         self.ftp.cwd('HourlyData')
@@ -53,16 +55,20 @@ class airnow:
         self.ftp.retrbinary('RETR ' + fname, localfile.write, 1024)
         localfile.close()
 
-    def download_rawfiles(self, flist):
+    def download_rawfiles(self, flist,path='.'):
+        import os
         if flist.shape[0] < 2:
             print 'Downloading: ' + flist[0]
             self.download_single_rawfile(flist[0])
         else:
             for i in flist:
-                print 'Downloading: ' + i
-                self.download_single_rawfile(i)
+                if os.path.exists(path + '/' + i) == False:
+                    print 'Downloading: ' + i
+                    self.download_single_rawfile(i)
+                else:
+                    print 'File Found in Path: ' + i
 
-    def download_hourly_files(self):
+    def download_hourly_files(self,path='.'):
         print 'Connecting to FTP: ' + self.url
         self.openftp()
         print 'Retrieving Hourly file list'
@@ -80,12 +86,14 @@ class airnow:
                 print 'AirNow does not have hourly data at this time. Please try again'
             else:
                 print 'Files Found!!!!!!!!! Downloading'
-                self.download_rawfiles(array(nlst)[array(index1)])
+                self.download_rawfiles(array(nlst)[array(index1)],path=path)
                 self.filelist = array([index1])
         else:
-            self.download_rawfiles(array(nlst)[array(index1)])
+            self.download_rawfiles(array(nlst)[array(index1)],path=path)
 
-    def aggragate_files(self, output='', path=''):
+        self.ftp.close()
+
+    def aggragate_files(self, output=''):
         from glob import glob
         from numpy import sort
         from datetime import datetime
@@ -112,7 +120,7 @@ class airnow:
         self.df = pd.concat(ff)
         self.calc_datetime()
         print '    Adding in Meta-data'
-        self.get_station_locations(path=path)
+        self.get_station_locations()
         self.get_region()
         self.df = self.df.copy().drop_duplicates()
         if output == '':
@@ -131,12 +139,13 @@ class airnow:
         dates = pd.date_range(start=begin, end=end, freq='H').values.astype('M8[s]').astype('O')
         self.dates = dates
 
-    def get_station_locations(self, path=''):
+    def get_station_locations(self):
         import os
         from glob import glob
 
-        if os.path.isfile(path):
-            fname = path
+        if os.path.isfile(self.monitor_file)==True:
+            print 'here'
+            fname = self.monitor_file
         else:
             self.openftp()
             self.ftp.cwd('Locations')
@@ -149,12 +158,13 @@ class airnow:
                      'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
         self.df = pd.merge(self.df, f, on='SCS', how='left')
 
-    def get_station_locations_remerge(self, df, path=''):
+    def get_station_locations_remerge(self, df):
         import os
         from glob import glob
 
-        if os.path.isfile(path):
-            fname = path
+        if os.path.isfile(self.monitor_file)==True:
+            print '    Monitor Station Meta-Data Found' 
+            fname = self.monitor_file
         else:
             self.openftp()
             self.ftp.cwd('Locations')

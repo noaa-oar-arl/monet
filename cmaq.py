@@ -14,16 +14,16 @@ class cmaq:
         self.objtype = 'CMAQ'
         self.dust_pm25 = array(
                 ['ASO4J', 'ANO3J', 'ACLJ', 'ANH4J', 'ANAJ', 'ACAJ', 'AMGJ', 'AKJ', 'APOCJ', 'APNCOMJ', 'AECJ', 'AFEJ',
-                 'AALJ', 'ASIJ', 'ATIJ', 'AMNJ', 'AH2OJ', 'AOTHRJ'])
+                 'AALJ', 'ASIJ', 'ATIJ', 'AMNJ',  'AOTHRJ'])
         self.dust_total = array(
                 ['ASO4J', 'ASO4K', 'ANO3J', 'ANO3K', 'ACLJ', 'ACLK', 'ANH4J', 'ANAJ', 'ACAJ', 'AMGJ', 'AKJ', 'APOCJ',
-                 'APNCOMJ', 'AECJ', 'AFEJ', 'AALJ', 'ASIJ', 'ATIJ', 'AMNJ', 'AH2OJ', 'AOTHRJ', 'ASOIL'])
-        self.aitken = array(['ACLI', 'AECI', 'AH2OI', 'ANAI', 'ANH4I',
+                 'APNCOMJ', 'AECJ', 'AFEJ', 'AALJ', 'ASIJ', 'ATIJ', 'AMNJ',  'AOTHRJ', 'ASOIL'])
+        self.aitken = array(['ACLI', 'AECI',  'ANAI', 'ANH4I',
                              'ANO3I', 'AOTHRI', 'APNCOMI', 'APOCI',
                              'ASO4I', 'A25I', 'AORGAI', 'AORGPAI',
                              'AORGBI'])
         self.accumulation = array(
-                ['AALJ', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'ACAJ', 'ACLJ', 'AECJ', 'AFEJ', 'AH2OJ',
+                ['AALJ', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'ACAJ', 'ACLJ', 'AECJ', 'AFEJ', 
                  'AISO1J', 'AISO2J', 'AISO3J', 'AKJ', 'AMGJ', 'AMNJ', 'ANAJ', 'ANH4J', 'ANO3J', 'AOLGAJ', 'AOLGBJ',
                  'AORGCJ', 'AOTHRJ', 'APAH1J', 'APAH2J', 'APAH3J', 'APNCOMJ', 'APOCJ', 'ASIJ', 'ASO4J', 'ASQTJ', 'ATIJ',
                  'ATOL1J', 'ATOL2J', 'ATOL3J', 'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J', 'A25J', 'AORGAJ',
@@ -95,7 +95,7 @@ class cmaq:
     def get_surface_noy(self):
         keys = self.keys
         if 'NOY' in keys:
-            var = self.cdfobj.variables['NOY'][:][:, 0, :, :]
+            var = self.cdfobj.variables['NOY'][:][self.indexdates, 0, :, :]
         else:
             cmaqvars, temp = search_listinlist(keys, self.noy_gas)
             var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
@@ -107,7 +107,7 @@ class cmaq:
 
     def get_surface_nox(self):
         print '   Getting CMAQ NOx:  NO'
-        var = self.cdfobj.variables['NO'][:, 0, :, :].squeeze()
+        var = self.cdfobj.variables['NO'][self.indexdates, 0, :, :].squeeze()
         print '   Getting CMAQ NOx:  NO2'
         var += self.cdfobj.variables['NO2'][self.indexdates, 0, :, :].squeeze()
         collect()
