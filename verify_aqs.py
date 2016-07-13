@@ -207,6 +207,7 @@ class verify_aqs:
         self.df = pd.concat(dfs)
         print 'Calculating Daily 8 Hr Max Ozone....\n'
         self.df8hr = self.calc_aqs_8hr_max_calc()
+        self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_info()
 
     def print_info(self):
@@ -266,7 +267,7 @@ class verify_aqs:
             if pdfs:
                 plots.airnow_kdeplots(df2)
 
-    def compare_param(self, param='OZONE', city='', region='', timeseries=False, scatter=False, pdfs=False,
+    def compare_param(self, param='OZONE', site='', city='', region='', timeseries=False, scatter=False, pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
                       label=None, footer=True):
         from numpy import NaN
@@ -276,7 +277,10 @@ class verify_aqs:
         df[df < -990] = NaN
         g = df.groupby('Species')
         new = g.get_group(param)
-        if city != '':
+        if site != '':
+            if site in new.SCS.unique():
+                df2 = new.loc[new.SCS == site]
+        elif city != '':
             names = df.MSA_Name.dropna().unique()
             for i in names:
                 if city.upper() in i.upper():

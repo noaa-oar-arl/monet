@@ -670,7 +670,8 @@ class aqs:
                     df.loc[con, 'Species'] = 'DP'
         return df
 
-    def change_units(self, df):
+    @staticmethod
+    def change_units(df):
         units = df.Units.unique()
         for i in units:
             con = df.Units == i
@@ -688,7 +689,7 @@ class aqs:
                 df.loc[con, 'Obs'] *= 0.51444
                 df.loc[con, 'Units'] = 'M/S'
             if i == 'Degrees Fahrenheit':
-                df.loc[con, 'Obs'] *= (df.loc[con, 'Obs'] + 459.67) * 5. / 9.
+                df.loc[con, 'Obs'] = (df.loc[con, 'Obs'] + 459.67) * 5. / 9.
                 df.loc[con, 'Units'] = 'K'
             if i == 'Percent relative humidity':
                 df.loc[con, 'Units'] = '%'
