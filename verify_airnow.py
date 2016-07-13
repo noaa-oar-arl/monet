@@ -1,9 +1,10 @@
 # verify is the main application.
+from datetime import datetime
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from numpy import array, where
-from datetime import datetime
 
 import mystats
 import plots
@@ -50,9 +51,11 @@ class verify_airnow:
         self.cmaq.get_dates()
         print 'Simulation Start Date: ', self.cmaq.dates[0].strftime('%Y-%m-%d %H:%M')
         print 'Simulation End   Date: ', self.cmaq.dates[-1].strftime('%Y-%m-%d %H:%M')
-        print '==============================================================='
+        print '===============================================================\n'
+        if self.cmaq.metcro2d is None:
+            print 'METCRO2D file not loaded.  To include MET variables please load self.cmaq.open_metcro2d(\'filename\')\n'
         self.ensure_values_indomain()
-        comparelist = ['OZONE', 'PM2.5', 'NOX', 'CO', 'SO2', 'NOY']
+        comparelist = self.airnow.df.Species.unique()
         g = self.airnow.df.groupby('Species')
         dfs = []
         for i in comparelist:
@@ -72,8 +75,16 @@ class verify_airnow:
                 dfpm25 = self.interp_to_airnow(cmaq, dfpm25)
                 self.cmaqpm25 = cmaq
                 dfs.append(dfpm25)
+            elif i == 'PM10':
+                print 'Interpolating PM10:'
+                dfpm = g.get_group(i)
+                fac = self.check_cmaq_units(param='PM10', airnow_param=i)
+                cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
+                dfpm = self.interp_to_airnow(cmaq, dfpm)
+                self.cmaqpm25 = cmaq
+                dfs.append(dfpm)
             elif i == 'CO':
-                if 'CO' not in self.cmaq.cdfobj.variables.keys():
+                if 'CO' not in self.cmaq.keys:
                     pass
                 else:
                     print 'Interpolating CO:'
@@ -84,7 +95,7 @@ class verify_airnow:
                     self.cmaqco = cmaq
                     dfs.append(dfco)
             elif i == 'NOY':
-                if 'NOY' not in self.cmaq.cdfobj.variables.keys():
+                if 'NOY' not in self.cmaq.keys:
                     pass
                 else:
                     print 'Interpolating NOY:'
@@ -94,8 +105,30 @@ class verify_airnow:
                     dfnoy = self.interp_to_airnow(cmaq, dfnoy)
                     self.cmaqnoy = cmaq
                     dfs.append(dfnoy)
+            elif i == 'NO':
+                if 'NO' not in self.cmaq.keys:
+                    pass
+                else:
+                    print 'Interpolating NO:'
+                    dfnoy = g.get_group(i)
+                    fac = self.check_cmaq_units(param='NO', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
+                    dfnoy = self.interp_to_airnow(cmaq, dfnoy)
+                    self.cmaqnoy = cmaq
+                    dfs.append(dfnoy)
+            elif i == 'NO2':
+                if 'NO2' not in self.cmaq.keys:
+                    pass
+                else:
+                    print 'Interpolating NO2:'
+                    dfnoy = g.get_group(i)
+                    fac = self.check_cmaq_units(param='NO2', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
+                    dfnoy = self.interp_to_airnow(cmaq, dfnoy)
+                    self.cmaqnoy = cmaq
+                    dfs.append(dfnoy)
             elif i == 'SO2':
-                if 'SO2' not in self.cmaq.cdfobj.variables.keys():
+                if 'SO2' not in self.cmaq.keys:
                     pass
                 else:
                     print 'Interpolating SO2'
@@ -106,7 +139,7 @@ class verify_airnow:
                     self.cmaqso2 = cmaq
                     dfs.append(dfso2)
             elif i == 'NOX':
-                if ('NO' not in self.cmaq.cdfobj.variables.keys()) | ('NO2' not in self.cmaq.cdfobj.variables.keys()):
+                if ('NO' not in self.cmaq.keys) & ('NO2' not in self.cmaq.keys):
                     pass
                 else:
                     print 'Interpolating NOX:'
@@ -116,11 +149,41 @@ class verify_airnow:
                     dfnox = self.interp_to_airnow(cmaq, dfnox)
                     self.cmaqnox = cmaq
                     dfs.append(dfnox)
+            elif i == 'WD':
+                if (self.cmaq.metcro2d is None) | ('WDIR10' not in self.cmaq.metcrokeys):
+                    pass
+                else:
+                    print 'Interpolating Wind Direction:'
+                    dfmet = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
+                    dfmet = self.interp_to_airnow(cmaq, dfmet)
+                    dfs.append(dfmet)
+            elif i == 'WS':
+                if (self.cmaq.metcro2d is None) | ('WSPD10' not in self.cmaq.metcrokeys):
+                    pass
+                else:
+                    print 'Interpolating Wind Speed:'
+                    dfmet = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
+                    dfmet = self.interp_to_airnow(cmaq, dfmet)
+                    dfs.append(dfmet)
+            elif i == 'TEMP':
+                if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
+                    pass
+                else:
+                    print 'Interpolating 2 Meter Temperature:'
+                    dfmet = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
+                    dfmet = self.interp_to_airnow(cmaq, dfmet)
+                    dfmet.Obs += 273.15
+                    dfs.append(dfmet)
 
         self.df = pd.concat(dfs)
         print 'Calculating Daily 8 Hr Max Ozone....\n'
         self.df8hr = self.calc_airnow_8hr_max_calc()
-        print 'Ready to Compare!!!!!!!!!!!!!\n'
+        self.print_available()
+
+    def print_available(self):
         print 'Available Functions:\n'
         print '    compare_domain_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
         print '    compare_region_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
@@ -128,7 +191,7 @@ class verify_airnow:
         print '    airnow_spatial_8hr(df, path=\'cmaq-basemap-conus.p\', region=\'northeast\', date=\'YYYY-MM-DD\')'
         print '    compare_param(param=\'OZONE\', city=\'\', region=\'\', timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
         print 'Species available to compare:'
-        print '    OZONE, PM2.5, PM10, CO, SO2, NOx, NOy'
+        print '    ', self.df.Species.unique()
 
     def compare_domain_all(self, timeseries=False, scatter=False, bargraph=True, pdfs=False):
 
@@ -174,7 +237,8 @@ class verify_airnow:
                 plots.airnow_kdeplots(df2)
 
     def compare_param(self, param='OZONE', city='', region='', timeseries=False, scatter=False, pdfs=False,
-                      diffscatter=False, diffpdfs=False,timeseries_error=False):
+                      diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
+                      label=None, footer=True):
         from numpy import NaN
         df = self.df.copy()[[
             'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
@@ -195,20 +259,21 @@ class verify_airnow:
             title = region
         else:
             df2 = new
-            name = 'Entire Domain'
             title = 'Domain'
         if timeseries:
-            plots.airnow_timeseries_param(df2, title=title)
+            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
         if scatter:
-            plots.airnow_scatter_param(df2, title=title)
+            plots.airnow_scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
         if pdfs:
-            plots.airnow_kdeplots_param(df2, title=title)
+            plots.airnow_kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
         if diffscatter:
             plots.airnow_diffscatter_param(df2, title=title)
         if diffpdfs:
-            plots.airnow_diffpdfs_param(df2, title=title)
-        if timeseries_error:
-            plots.airnow_timeseries_error_param(df2, title=title)
+            plots.airnow_diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
+        if timeseries_rmse:
+            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
+        if timeseries_mb:
+            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
     def compare_metro_area(self, city='Philadelphia', param='OZONE', date='', timeseries=False, scatter=False,
                            bargraph=False, pdfs=False, spatial=False, path=''):
@@ -247,7 +312,6 @@ class verify_airnow:
                 self.airnow_spatial(df2, param=param, path=path, xlim=x, ylim=y)
             else:
                 self.airnow_spatial(df2, param=param, path=path, date=date, xlim=x, ylim=y)
-
 
     def compare_metro_area_8hr(self, city='Philadelphia', param='OZONE', date='', timeseries=False, scatter=False,
                                bargraph=False, pdfs=False, spatial=False, path=''):
@@ -368,18 +432,46 @@ class verify_airnow:
 
         con = df.datetime == self.cmaq.dates[self.cmaq.indexdates][0]
         new = df[con]
-        print '   Interpolating values to AirNow, Date : ', self.cmaq.dates[self.cmaq.indexdates][0].strftime('%B %d %Y   %H utc')
-        cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
-                                         (new.Longitude.values, new.Latitude.values), method='nearest'),
-                                columns=['CMAQ'], index=new.index)
+        print '   Interpolating values to AirNow, Date : ', self.cmaq.dates[self.cmaq.indexdates][0].strftime(
+                '%B %d %Y   %H utc')
+        cmaq_val = pd.DataFrame(
+                griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
+                         (new.Longitude.values, new.Latitude.values), method='nearest'),
+                columns=['CMAQ'], index=new.index)
         new = new.join(cmaq_val)
         for i, j in enumerate(self.cmaq.dates[self.cmaq.indexdates][1:]):
             print '   Interpolating values to AirNow, Date : ', j.strftime('%B %d %Y   %H utc')
             con = df.datetime == j
             newt = df[con]
-            cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i+1, :, :].flatten(),
+            cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i + 1, :, :].flatten(),
                                              (newt.Longitude.values, newt.Latitude.values), method='nearest'),
                                     columns=['CMAQ'], index=newt.index)
+            newt = newt.join(cmaq_val)
+            new = new.append(newt)
+        return new
+
+    def interp_to_airnow_unknown(self, cmaqvar, df, varname):
+        from scipy.interpolate import griddata
+        dates = self.cmaq.dates[self.cmaq.indexdates]
+        lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
+        lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
+
+        con = df.datetime == self.cmaq.dates[self.cmaq.indexdates][0]
+        new = df[con]
+        print '   Interpolating values to AirNow, Date : ', self.cmaq.dates[self.cmaq.indexdates][0].strftime(
+                '%B %d %Y   %H utc')
+        cmaq_val = pd.DataFrame(
+                griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
+                         (new.Longitude.values, new.Latitude.values), method='nearest'),
+                columns=[varname], index=new.index)
+        new = new.join(cmaq_val)
+        for i, j in enumerate(self.cmaq.dates[self.cmaq.indexdates][1:]):
+            print '   Interpolating values to AirNow, Date : ', j.strftime('%B %d %Y   %H utc')
+            con = df.datetime == j
+            newt = df[con]
+            cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i + 1, :, :].flatten(),
+                                             (newt.Longitude.values, newt.Latitude.values), method='nearest'),
+                                    columns=[varname], index=newt.index)
             newt = newt.join(cmaq_val)
             new = new.append(newt)
         return new
@@ -425,7 +517,5 @@ class verify_airnow:
         k = q.groupby('SCS').resample('1D').max()
         kk = k.reset_index(level=1)
         kkk = kk.reset_index(drop='SCS').dropna()
-        if path == '':
-            path = 'monitoring_site_locations.dat'
         kkk = self.airnow.get_station_locations_remerge(kkk)
         return kkk

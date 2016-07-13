@@ -76,7 +76,7 @@ class verify_aqs:
                 self.cmaqpm25 = cmaq
                 dfs.append(dfpm25)
             elif i == 'CO':
-                if 'CO' not in self.cmaq.cdfobj.variables.keys():
+                if 'CO' not in self.cmaq.keys:
                     pass
                 else:
                     print 'Interpolating CO:'
@@ -87,8 +87,8 @@ class verify_aqs:
                     self.cmaqco = cmaq
                     dfs.append(dfco)
             elif i == 'NOY':
-                #con = ('NOY' not in self.cmaq.cdfobj.variables.keys()) |
-                if 'NOY' not in self.cmaq.cdfobj.variables.keys():
+                #con = ('NOY' not in self.cmaq.keys()) |
+                if 'NOY' not in self.cmaq.keys:
                     pass
                 else:
                     print 'Interpolating NOY:'
@@ -100,7 +100,7 @@ class verify_aqs:
 
                     dfs.append(dfnoy)
             elif i == 'SO2':
-                if 'SO2' not in self.cmaq.cdfobj.variables.keys():
+                if 'SO2' not in self.cmaq.keys:
                     pass
                 else:
                     print 'Interpolating SO2'
@@ -111,7 +111,7 @@ class verify_aqs:
                     self.cmaqso2 = cmaq
                     dfs.append(dfso2)
             elif i == 'NOX':
-                if ('NO' not in self.cmaq.cdfobj.variables.keys()) | ('NO2' not in self.cmaq.cdfobj.variables.keys()):
+                if ('NO' not in self.cmaq.keys) | ('NO2' not in self.cmaq.keys):
                     pass
                 else:
                     print 'Interpolating NOX:'
@@ -122,7 +122,7 @@ class verify_aqs:
                     self.cmaqno = cmaq
                     dfs.append(dfnox)
             elif i == 'NO':
-                if ('NO' not in self.cmaq.cdfobj.variables.keys()):
+                if ('NO' not in self.cmaq.keys):
                     pass
                 else:
                     print 'Interpolating NO:'
@@ -133,7 +133,7 @@ class verify_aqs:
                     self.cmaqno = cmaq
                     dfs.append(dfno)
             elif i == 'NO2':
-                if ('NO2' not in self.cmaq.cdfobj.variables.keys()):
+                if ('NO2' not in self.cmaq.keys):
                     pass
                 else:
                     print 'Interpolating NO2:'
@@ -144,7 +144,7 @@ class verify_aqs:
                     self.cmaqno2 = cmaq
                     dfs.append(dfno2)
             elif i == 'PM2.5_SO4':
-                if ('PM25_SO4' not in self.cmaq.cdfobj.variables.keys()):
+                if ('PM25_SO4' not in self.cmaq.keys):
                     pass
                 else:
                     print 'Interpolating PSO4:'
@@ -155,7 +155,7 @@ class verify_aqs:
                     self.cmaqpso4 = cmaq
                     dfs.append(dfnox)
             elif i == 'PM2.5_NO3':
-                if ('PM25_NO3' not in self.cmaq.cdfobj.variables.keys()):
+                if ('PM25_NO3' not in self.cmaq.keys):
                     pass
                 else:
                     print 'Interpolating PNO3:'
@@ -166,7 +166,7 @@ class verify_aqs:
                     self.cmaqpno3 = cmaq
                     dfs.append(dfnox)
             elif i == 'ISOPRENE':
-                if ('ISOP' not in self.cmaq.cdfobj.variables.keys()):
+                if ('ISOP' not in self.cmaq.keys):
                     pass
                 else:
                     print 'Interpolating Isoprene:'
@@ -175,6 +175,33 @@ class verify_aqs:
                     cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
                     dfnox = self.interp_to_aqs(cmaq, dfnox)
                     self.cmaqpno3 = cmaq
+                    dfs.append(dfnox)
+            elif i == 'WS':
+                if ('WS' not in self.cmaq.metcrokeys):
+                    pass
+                else:
+                    print 'Interpolating Isoprene:'
+                    dfnox = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
+                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfs.append(dfnox)
+            elif i == 'TEMP':
+                if ('TEMP2' not in self.cmaq.metcrokeys):
+                    pass
+                else:
+                    print 'Interpolating Isoprene:'
+                    dfnox = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
+                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfs.append(dfnox)
+            elif i == 'WD':
+                if ('WDIR10' not in self.cmaq.metcrokeys):
+                    pass
+                else:
+                    print 'Interpolating Isoprene:'
+                    dfnox = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
+                    dfnox = self.interp_to_aqs(cmaq, dfnox)
                     dfs.append(dfnox)
 
         self.df = pd.concat(dfs)
@@ -240,33 +267,44 @@ class verify_aqs:
                 plots.airnow_kdeplots(df2)
 
     def compare_param(self, param='OZONE', city='', region='', timeseries=False, scatter=False, pdfs=False,
-                      diffscatter=False, diffpdfs=False, timeseries_error=False):
+                      diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
+                      label=None, footer=True):
         from numpy import NaN
         df = self.df.copy()[[
-            'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units', 'Latitude',
+            'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
             'Longitude']]
         df[df < -990] = NaN
         g = df.groupby('Species')
         new = g.get_group(param)
-        if region != '':
-            df2 = new[new['Region'].str.upper() == region.upper()].copy()
+        if city != '':
+            names = df.MSA_Name.dropna().unique()
+            for i in names:
+                if city.upper() in i.upper():
+                    name = i
+                    print name
+            df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
+            title = name
+        elif region != '':
+            df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
             title = region
         else:
             df2 = new
-            name = 'Entire Domain'
             title = 'Domain'
         if timeseries:
-            f = plots.airnow_timeseries_param(df2, title=title)
+            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
         if scatter:
-            plots.airnow_scatter_param(df2, title=title)
+            plots.airnow_scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
         if pdfs:
-            plots.airnow_kdeplots_param(df2, title=title)
+            plots.airnow_kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
         if diffscatter:
             plots.airnow_diffscatter_param(df2, title=title)
         if diffpdfs:
-            plots.airnow_diffpdfs_param(df2, title=title)
-        if timeseries_error:
-            plots.airnow_timeseries_error_param(df2, title=title)
+            plots.airnow_diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
+        if timeseries_rmse:
+            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
+        if timeseries_mb:
+            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
+
 
     def compare_metro_area_8hr(self, city='Philadelphia', param='OZONE', date='', timeseries=False, scatter=False,
                                bargraph=False, pdfs=False, spatial=False, path=''):
@@ -434,7 +472,7 @@ class verify_aqs:
             self.aqs.df.Longitude.values > lon.min()) & (self.aqs.df.Longitude.values < lon.max()))
         self.aqs.df = self.aqs.df[con].copy()
 
-    def calc_aqs_8hr_max_calc(self, path=''):
+    def calc_aqs_8hr_max_calc(self):
         from numpy import unique
         r = self.df.groupby('Species').get_group('OZONE')
         r.index = r.datetime_local

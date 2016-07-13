@@ -1,11 +1,11 @@
 # this is written to retrive airnow data concatenate and add to pandas array for usage
+import os
 from datetime import datetime, timedelta
 
 import pandas as pd
 from numpy import array
 
 from tools import search_listinlist
-import os
 
 
 class airnow:
@@ -35,10 +35,11 @@ class airnow:
         self.objtype = 'AirNow'
         self.filelist = None
         self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
+        self.monitor_df = None
 
     def retrieve_hourly_filelist(self):
         self.ftp.cwd('HourlyData')
-        nlst = self.ftp.nlst('*')[1:]
+        nlst = self.ftp.nlst('2*')
         return nlst
 
     def openftp(self):
@@ -47,6 +48,7 @@ class airnow:
         self.ftp.login(self.username, self.password)
 
     def convert_dates_tofnames(self):
+        self.datestr = []
         for i in self.dates:
             self.datestr.append(i.strftime('%Y%m%d%H.dat'))
 
@@ -55,7 +57,7 @@ class airnow:
         self.ftp.retrbinary('RETR ' + fname, localfile.write, 1024)
         localfile.close()
 
-    def download_rawfiles(self, flist,path='.'):
+    def download_rawfiles(self, flist, path='.'):
         import os
         if flist.shape[0] < 2:
             print 'Downloading: ' + flist[0]
@@ -68,33 +70,47 @@ class airnow:
                 else:
                     print 'File Found in Path: ' + i
 
-    def download_hourly_files(self,path='.'):
+    def download_hourly_files(self, path='.'):
+        from numpy import empty,where
         print 'Connecting to FTP: ' + self.url
         self.openftp()
         print 'Retrieving Hourly file list'
         nlst = self.retrieve_hourly_filelist()
         self.convert_dates_tofnames()
+        cwd = 'HourlyData'
         index1, index2 = search_listinlist(array(nlst), array(self.datestr))
-        if index1.shape[0] < 1:
-            print 'Files May be in Archive....'
-            self.ftp.cwd('Archive')
+        inarchive = empty(array(self.datestr).shape[0])
+        inarchive[:] = True
+        inarchive[index2] = False
+        index = where(inarchive)[0]
+
+        #download archive files first
+        if index.shape[0] > 0:
             year = self.dates[0].strftime('%Y')
-            self.ftp.cwd(year)
-            nlst = self.ftp.nlst('*')
-            index1, index2 = search_listinlist(array(nlst), array(self.datestr))
-            if index1.shape[0] < 1:
-                print 'AirNow does not have hourly data at this time. Please try again'
-            else:
-                print 'Files Found!!!!!!!!! Downloading'
-                self.download_rawfiles(array(nlst)[array(index1)],path=path)
-                self.filelist = array([index1])
-        else:
-            self.download_rawfiles(array(nlst)[array(index1)],path=path)
+            self.ftp.cwd('/HourlyData/Archive/'+year)
+            for i in array(self.datestr)[index]:
+                if os.path.exists(path + '/' + i) == False:
+                    print 'Downloading from Archive: ', i
+                    self.download_single_rawfile(i)
+                else:
+                    print 'File found: ', i
+
+        #now downlad all in the Current HourlyData
+        index = where(inarchive==False)[0]
+        if index.shape[0] > 0:
+            year = self.dates[0].strftime('%Y')
+            self.ftp.cwd('/HourlyData')
+            for i in array(self.datestr)[index]:
+                if os.path.exists(path + '/' + i) == False:
+                    print 'Downloading from HourlyData: ' + i
+                    self.download_single_rawfile(i)
+                else:
+                    print 'File found: ', i
+        self.filelist = self.datestr
 
         self.ftp.close()
 
     def aggragate_files(self, output=''):
-        from glob import glob
         from numpy import sort
         from datetime import datetime
         fnames = sort(self.filelist)
@@ -140,43 +156,29 @@ class airnow:
         self.dates = dates
 
     def get_station_locations(self):
-        import os
-        from glob import glob
-
-        if os.path.isfile(self.monitor_file)==True:
-            print 'here'
-            fname = self.monitor_file
-        else:
-            self.openftp()
-            self.ftp.cwd('Locations')
-            self.download_single_rawfile(fname='monitoring_site_locations.dat')
-            fname = glob('monitoring_site_locations.dat')
-        colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-        f = pd.read_csv(fname, delimiter='|', header=None, usecols=colsinuse)
-        f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
-                     'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
-                     'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
-        self.df = pd.merge(self.df, f, on='SCS', how='left')
+        self.read_monitor_file()
+        self.df = pd.merge(self.df, self.monitor_df, on='SCS', how='left')
 
     def get_station_locations_remerge(self, df):
-        import os
-        from glob import glob
+        df = pd.merge(df, self.monitor_df.drop(['Latitude', 'Longitude'], axis=1), on='SCS', how='left')
+        return df
 
-        if os.path.isfile(self.monitor_file)==True:
-            print '    Monitor Station Meta-Data Found' 
+    def read_monitor_file(self):
+        from glob import glob
+        if os.path.isfile(self.monitor_file) == True:
+            print '    Monitor Station Meta-Data Found: Compiling Dataset'
             fname = self.monitor_file
         else:
             self.openftp()
             self.ftp.cwd('Locations')
             self.download_single_rawfile(fname='monitoring_site_locations.dat')
-            fname = glob('monitoring_site_locations.dat')
+            fname = glob('monitoring_site_locations.dat')[0]
         colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
         f = pd.read_csv(fname, delimiter='|', header=None, usecols=colsinuse)
         f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
                      'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
                      'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
-        df = pd.merge(df, f.drop(['Latitude', 'Longitude'], axis=1), on='SCS', how='left')
-        return df
+        self.monitor_df = f.copy()
 
     def get_region(self):
         sn = self.df.State_Name.values

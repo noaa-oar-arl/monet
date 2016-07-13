@@ -41,6 +41,8 @@ class aqs:
         self.p_states = array(['California', 'Oregon', 'Washington'], dtype='|S10')
         self.datadir = '.'
         self.df = None
+        self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
+        self.monitor_df = None
 
     def retrieve_aqs_hourly_pm25_data(self, dates):
         import wget
@@ -217,8 +219,8 @@ class aqs:
         import wget
         i = dates[0]
         year = i.strftime('%Y')
-        url = self.baseurl + 'hourly_VOC_' + year + '.zip'
-        print 'Downloading Hourly VOC: ' + url
+        url = self.baseurl + 'hourly_VOCS_' + year + '.zip'
+        print 'Downloading Hourly VOCs: ' + url
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
@@ -237,7 +239,7 @@ class aqs:
         df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_VOC_' + year + '.hdf', 'df', format='fixed')
         return df
 
-    def retrieve_aqs_hourly_SPEC_data(self, dates):
+    def retrieve_aqs_hourly_spec_data(self, dates):
         import wget
         i = dates[0]
         year = i.strftime('%Y')
@@ -261,131 +263,77 @@ class aqs:
         df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_SPEC_' + year + '.hdf', 'df', format='fixed')
         return df
 
-    def retrieve_aqs_daily_co_data(self, dates):
+    def retrieve_aqs_hourly_wind_data(self, dates):
         import wget
         i = dates[0]
         year = i.strftime('%Y')
-        url = self.baseurl + 'daily_42101_' + year + '.zip'
-        print 'Downloading: ' + url
-        filename = wget.download(url);
+        url = self.baseurl + 'hourly_WIND_' + year + '.zip'
+        print 'Downloading AQS WIND: ' + url
+        filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+                                                                   'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
-        df.columns = self.renameddcols
+        df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf', 'df', format='fixed')
-        self.aqsdf = df.copy()
+        df.drop('Qualifier', axis=1, inplace=True)
+        df = self.get_species(df)
+        df = self.get_region(df)
+        df = df.copy()[self.savecols]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_WIND_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_WIND_' + year + '.hdf', 'df', format='fixed')
+        return df
 
-    def retrieve_aqs_daily_ozone_data(self, dates):
+    def retrieve_aqs_hourly_temp_data(self, dates):
         import wget
         i = dates[0]
         year = i.strftime('%Y')
-        url = self.baseurl + 'daily_44201_' + year + '.zip'
-        print 'Downloading: ' + url
-        filename = wget.download(url);
+        url = self.baseurl + 'hourly_TEMP_' + year + '.zip'
+        print 'Downloading AQS TEMP: ' + url
+        filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+                                                                   'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
-        df.columns = self.renameddcols
+        df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf', 'df', format='fixed')
-        self.aqsdf = df.copy()
+        df.drop('Qualifier', axis=1, inplace=True)
+        df = self.get_species(df)
+        df = self.get_region(df)
+        df = df.copy()[self.savecols]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf', 'df', format='fixed')
+        return df
 
-    def retrieve_aqs_daily_pm10_data(self, dates):
+    def retrieve_aqs_hourly_rhdp_data(self, dates):
         import wget
         i = dates[0]
         year = i.strftime('%Y')
-        url = self.baseurl + 'daily_81102_' + year + '.zip'
-        print 'Downloading: ' + url
-        filename = wget.download(url);
+        url = self.baseurl + 'hourly_RH_DP_' + year + '.zip'
+        print 'Downloading AQS RH and DP: ' + url
+        filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+                                                                   'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
-        df.columns = self.renameddcols
+        df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf', 'df', format='fixed')
-        self.aqsdf = df.copy()
-
-    def retrieve_aqs_daily_so2_data(self, dates):
-        import wget
-        i = dates[0]
-        year = i.strftime('%Y')
-        url = self.baseurl + 'daily_42401_' + year + '.zip'
-        print 'Downloading: ' + url
-        filename = wget.download(url);
-        print ''
-        print 'Unpacking: ' + url
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
-                         date_parser=dateparse)
-        df.columns = self.renameddcols
-        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
-                          dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf', 'df', format='fixed')
-        self.aqsdf = df.copy()
-
-    def retrieve_aqs_daily_no2_data(self, dates):
-        import wget
-        i = dates[0]
-        year = i.strftime('%Y')
-        url = self.baseurl + 'daily_42602_' + year + '.zip'
-        print 'Downloading: ' + url
-        filename = wget.download(url);
-        print ''
-        print 'Unpacking: ' + url
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
-                         date_parser=dateparse)
-        df.columns = self.renameddcols
-        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
-                          dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf', 'df', format='fixed')
-        self.aqsdf = df.copy()
-
-    def retrieve_aqs_daily_pm25_data(self, dates):
-        import wget
-        i = dates[0]
-        year = i.strftime('%Y')
-        url = self.baseurl + 'daily_88101_' + year + '.zip'
-        print 'Downloading: ' + url
-        filename = wget.download(url);
-        print ''
-        print 'Unpacking: ' + url
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
-                         date_parser=dateparse)
-        df.columns = self.renameddcols
-        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
-                          dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf'
-        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf', 'df', format='fixed')
-        self.aqsdf = df.copy()
+        df.drop('Qualifier', axis=1, inplace=True)
+        df = self.get_species(df)
+        df = self.get_region(df)
+        df = df.copy()[self.savecols]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_RHDP_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_HOURLY_RHDP_' + year + '.hdf', 'df', format='fixed')
+        return df
 
     def load_aqs_pm25_data(self, dates):
         year = dates[0].strftime('%Y')
@@ -408,7 +356,7 @@ class aqs:
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
         else:
-            aqs = self.retrieve_aqs_hourly_pm25_data(dates)
+            aqs = self.retrieve_aqs_hourly_voc_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -479,14 +427,53 @@ class aqs:
         aqs.index = arange(aqs.index.shape[0])
         return aqs
 
-    def load_aqs_SPEC_data(self, dates):
+    def load_aqs_spec_data(self, dates):
         year = dates[0].strftime('%Y')
         fname = self.datadir + '/' + 'AQS_HOURLY_SPEC_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
         else:
-            aqs = self.retrieve_aqs_hourly_SPEC_data(dates)
+            aqs = self.retrieve_aqs_hourly_spec_data(dates)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+
+    def load_aqs_wind_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_HOURLY_WIND_' + year + '.hdf'
+        if os.path.isfile(fname):
+            print "File Found, Loading: " + fname
+            aqs = pd.read_hdf(fname)
+        else:
+            aqs = self.retrieve_aqs_hourly_wind_data(dates)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+
+    def load_aqs_temp_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf'
+        if os.path.isfile(fname):
+            print "File Found, Loading: " + fname
+            aqs = pd.read_hdf(fname)
+        else:
+            aqs = self.retrieve_aqs_hourly_temp_data(dates)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+
+    def load_aqs_rhdp_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_HOURLY_RHDP_' + year + '.hdf'
+        if os.path.isfile(fname):
+            print "File Found, Loading: " + fname
+            aqs = pd.read_hdf(fname)
+        else:
+            aqs = self.retrieve_aqs_hourly_rhdp_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -506,18 +493,13 @@ class aqs:
         return aqs
 
     def load_all_hourly_data(self, dates):
-        dfs = []
-        dfs.append(self.load_aqs_co_data(dates))
-        dfs.append(self.load_aqs_pm10_data(dates))
-        dfs.append(self.load_aqs_ozone_data(dates))
-        dfs.append(self.load_aqs_pm25_data(dates))
-        dfs.append(self.load_aqs_SPEC_data(dates))
-        dfs.append(self.load_aqs_no2_data(dates))
-        dfs.append(self.load_aqs_so2_data(dates))
-        dfs.append(self.load_aqs_voc_data(dates))
-        dfs.append(self.load_aqs_nonoxnoy_data(dates))
+        dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
+               self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
+               self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
+               self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates)]
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).copy().drop_duplicates()
+        self.add_metro_metadata()
 
     def load_aqs_daily_pm25_data(self, dates):
         from datetime import timedelta
@@ -653,6 +635,8 @@ class aqs:
                 df['Species'] = pd.Series(['NO2' for i in df.Parameter_Code], index=df.index)
             if pc == 42101:
                 df['Species'] = pd.Series(['CO' for i in df.Parameter_Code], index=df.index)
+            if pc == 62101:
+                df['Species'] = pd.Series(['TEMP' for i in df.Parameter_Code], index=df.index)
         else:
             df['Species'] = ''
             for i in pc:
@@ -675,6 +659,14 @@ class aqs:
                     df.loc[con, 'Species'] = 'NO'
                 if i == 42603:
                     df.loc[con, 'Species'] = 'NOX'
+                if i == 61103:
+                    df.loc[con, 'Species'] = 'WS'
+                if i == 61104:
+                    df.loc[con, 'Species'] = 'WD'
+                if i == 62201:
+                    df.loc[con, 'Species'] = 'RH'
+                if i == 62103:
+                    df.loc[con, 'Species'] = 'DP'
         return df
 
     def change_units(self, df):
@@ -691,4 +683,189 @@ class aqs:
                 df.loc[con, 'Units'] = 'C'
             if i == 'Micrograms/cubic meter (LC)':
                 df.loc[con, 'Units'] = 'UG/M3'
+            if i == 'Knots':
+                df.loc[con, 'Obs'] *= 0.51444
+                df.loc[con, 'Units'] = 'M/S'
+            if i == 'Degrees Fahrenheit':
+                df.loc[con, 'Obs'] *= (df.loc[con,'Obs'] + 459.67) * 5./9.
+                df.loc[con, 'Units'] = 'K'
+            if i == 'Percent relative humidity':
+                df.loc[con, 'Units'] = '%'
         return df
+
+    def read_monitor_file(self):
+        if os.path.isfile(self.monitor_file):
+            fname = self.monitor_file
+            colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+            f = pd.read_csv(fname, delimiter='|', header=None, usecols=colsinuse)
+            f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
+                         'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
+                         'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
+            self.monitor_df = f.copy()
+        else:
+            print '   Monitor File not found.  Meta-Data city names not added'
+            f = None
+
+        return f
+
+    def add_metro_metadata(self):
+        from numpy import NaN
+        if os.path.isfile(self.monitor_file):
+            print '    Monitor Station Meta-Data Found: Compiling Dataset'
+            self.read_monitor_file()
+            dfs = self.monitor_df[['SCS', 'MSA_Name']]
+            for i in self.df.SCS.unique():
+                con = self.df.SCS == i
+                if dfs.loc[dfs.SCS.values.astype('int32') == i]['MSA_Name'].count() > 0:
+                    self.df.loc[con, 'MSA_Name'] = dfs.loc[dfs.SCS.values.astype('int32') == i]['MSA_Name'].unique()
+                else:
+                    self.df.loc[con, 'MSA_Name'] = NaN
+
+            self.df = pd.merge(self.df, dfs, on='SCS', how='left')
+
+    def retrieve_aqs_daily_co_data(self, dates):
+        import wget
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_42101_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url)
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
+        df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf', 'df', format='fixed')
+        self.aqsdf = df.copy()
+
+    def retrieve_aqs_daily_ozone_data(self, dates):
+        import wget
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_44201_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
+        df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf', 'df', format='fixed')
+        self.aqsdf = df.copy()
+
+    def retrieve_aqs_daily_pm10_data(self, dates):
+        import wget
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_81102_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
+        df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf', 'df', format='fixed')
+        self.aqsdf = df.copy()
+
+    def retrieve_aqs_daily_so2_data(self, dates):
+        import wget
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_42401_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
+        df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf', 'df', format='fixed')
+        self.aqsdf = df.copy()
+
+    def retrieve_aqs_daily_so2_data(self, dates):
+        import wget
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_42401_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
+        df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf', 'df', format='fixed')
+        self.aqsdf = df.copy()
+
+    def retrieve_aqs_daily_no2_data(self, dates):
+        import wget
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_42602_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
+        df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf', 'df', format='fixed')
+        self.aqsdf = df.copy()
+
+    def retrieve_aqs_daily_pm25_data(self, dates):
+        import wget
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_88101_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
+        df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf'
+        df.to_hdf(self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf', 'df', format='fixed')
+        self.aqsdf = df.copy()

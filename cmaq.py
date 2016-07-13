@@ -1,4 +1,5 @@
 # This file is to deal with CMAQ code - try to make it general for cmaq 4.7.1 --> 5.1
+import cPickle as pickle
 from gc import collect
 
 from netCDF4 import Dataset, MFDataset
@@ -6,24 +7,22 @@ from numpy import array, zeros
 
 from tools import search_listinlist
 
-import cPickle as pickle
-
 
 class cmaq:
     def __init__(self):
         self.objtype = 'CMAQ'
         self.dust_pm25 = array(
                 ['ASO4J', 'ANO3J', 'ACLJ', 'ANH4J', 'ANAJ', 'ACAJ', 'AMGJ', 'AKJ', 'APOCJ', 'APNCOMJ', 'AECJ', 'AFEJ',
-                 'AALJ', 'ASIJ', 'ATIJ', 'AMNJ',  'AOTHRJ'])
+                 'AALJ', 'ASIJ', 'ATIJ', 'AMNJ', 'AOTHRJ'])
         self.dust_total = array(
                 ['ASO4J', 'ASO4K', 'ANO3J', 'ANO3K', 'ACLJ', 'ACLK', 'ANH4J', 'ANAJ', 'ACAJ', 'AMGJ', 'AKJ', 'APOCJ',
-                 'APNCOMJ', 'AECJ', 'AFEJ', 'AALJ', 'ASIJ', 'ATIJ', 'AMNJ',  'AOTHRJ', 'ASOIL'])
-        self.aitken = array(['ACLI', 'AECI',  'ANAI', 'ANH4I',
+                 'APNCOMJ', 'AECJ', 'AFEJ', 'AALJ', 'ASIJ', 'ATIJ', 'AMNJ', 'AOTHRJ', 'ASOIL'])
+        self.aitken = array(['ACLI', 'AECI', 'ANAI', 'ANH4I',
                              'ANO3I', 'AOTHRI', 'APNCOMI', 'APOCI',
                              'ASO4I', 'A25I', 'AORGAI', 'AORGPAI',
                              'AORGBI'])
         self.accumulation = array(
-                ['AALJ', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'ACAJ', 'ACLJ', 'AECJ', 'AFEJ', 
+                ['AALJ', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'ACAJ', 'ACLJ', 'AECJ', 'AFEJ',
                  'AISO1J', 'AISO2J', 'AISO3J', 'AKJ', 'AMGJ', 'AMNJ', 'ANAJ', 'ANH4J', 'ANO3J', 'AOLGAJ', 'AOLGBJ',
                  'AORGCJ', 'AOTHRJ', 'APAH1J', 'APAH2J', 'APAH3J', 'APNCOMJ', 'APOCJ', 'ASIJ', 'ASO4J', 'ASQTJ', 'ATIJ',
                  'ATOL1J', 'ATOL2J', 'ATOL3J', 'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J', 'A25J', 'AORGAJ',
@@ -33,22 +32,23 @@ class cmaq:
                 ['NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO',
                  'CRPX', 'OPAN'])
 
-        self.cdfobj = None
+        self.concobj = None
+        self.metcro2d = None
         self.gridobj = None
         self.fname = None
         self.dates = None
         self.keys = None
+        self.metcrokeys = None
         self.indexdates = None
-
-    def get_single_var(self, param):
-        return self.cdfobj.variables[param][:]
+        self.latitude = None
+        self.longitude = None
 
     def get_dates(self):
         from datetime import datetime
         from pandas import DataFrame
-        from numpy import concatenate, arange, shape,sort
-        tflag1 = array(self.cdfobj.variables['TFLAG'][:, 0, 0], dtype='|S7')
-        tflag2 = array(self.cdfobj.variables['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
+        from numpy import concatenate, arange
+        tflag1 = array(self.concobj.variables['TFLAG'][:, 0, 0], dtype='|S7')
+        tflag2 = array(self.concobj.variables['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
         date = []
         for i, j in zip(tflag1, tflag2):
             date.append(datetime.strptime(i + j, '%Y%j%H'))
@@ -60,12 +60,15 @@ class cmaq:
             self.indexdates = arange(len(date))
 
     def load_single_cmaq_run(self):
-        self.cdfobj = Dataset(self.fname[0])
+        self.concobj = Dataset(self.fname[0])
+
+    def load_multi_metcro2d_cmaq_runs(self):
+        self.metcro2d = MFDataset(self.fname)
 
     def load_multi_cmaq_runs(self):
-        self.cdfobj = MFDataset(self.fname)
+        self.concobj = MFDataset(self.fname)
 
-    def open_cmaq(self, file=''):
+    def open_cmaq(self, file):
         # file can be a single file or many files
         # example:
         #       file='this_is_my_file.ncf'
@@ -77,49 +80,56 @@ class cmaq:
             self.load_multi_cmaq_runs()
         else:
             self.load_single_cmaq_run()
-        self.get_keys()
+        self.keys = self.get_keys(self.concobj)
 
-    def get_keys(self):
-        self.keys = array(self.cdfobj.variables.keys()).astype('|S10')
+    def open_metcro2d(self,file):
+        from glob import glob
+        from numpy import sort
+        self.fname = sort(array(glob(file)))
+        self.load_multi_metcro2d_cmaq_runs()
+        self.metcrokeys = self.get_keys(self.metcro2d)
+
+    def get_keys(self, cdfobj):
+        return array(cdfobj.variables.keys()).astype('|S10')
 
     def get_surface_dust_total(self):
         keys = self.keys
         cmaqvars, temp = search_listinlist(keys, self.dust_total)
-        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+        var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
         for i in cmaqvars[:]:
             print '   Getting CMAQ PM DUST: ' + keys[i]
-            var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+            var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
             collect()
         return var
 
     def get_surface_noy(self):
         keys = self.keys
         if 'NOY' in keys:
-            var = self.cdfobj.variables['NOY'][:][self.indexdates, 0, :, :]
+            var = self.concobj.variables['NOY'][:][self.indexdates, 0, :, :]
         else:
             cmaqvars, temp = search_listinlist(keys, self.noy_gas)
-            var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
             for i in cmaqvars[:]:
                 print '   Getting CMAQ NOy: ' + keys[i]
-                var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
                 collect()
         return var
 
     def get_surface_nox(self):
         print '   Getting CMAQ NOx:  NO'
-        var = self.cdfobj.variables['NO'][self.indexdates, 0, :, :].squeeze()
+        var = self.concobj.variables['NO'][self.indexdates, 0, :, :].squeeze()
         print '   Getting CMAQ NOx:  NO2'
-        var += self.cdfobj.variables['NO2'][self.indexdates, 0, :, :].squeeze()
+        var += self.concobj.variables['NO2'][self.indexdates, 0, :, :].squeeze()
         collect()
         return var
 
     def get_surface_dust_pm25(self):
         keys = self.keys
         cmaqvars, temp = search_listinlist(keys, self.dust_pm25)
-        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+        var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
         for i in cmaqvars[:]:
             print '   Getting CMAQ PM25 DUST: ' + keys[i]
-            var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+            var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
             collect()
         return var
 
@@ -129,13 +139,13 @@ class cmaq:
         allvars = concatenate([self.aitken, self.accumulation])
         if 'PM25_TOT' in keys:
             print 'Getting CMAQ PM25: PM25_TOT'
-            var = self.cdfobj.variables['PM25_TOT'][self.indexdates, 0, :, :].squeeze()
+            var = self.concobj.variables['PM25_TOT'][self.indexdates, 0, :, :].squeeze()
         else:
             cmaqvars, temp = search_listinlist(keys, allvars)
-            var = self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze()
+            var = self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze()
             for i in cmaqvars[:]:
                 print '   Getting CMAQ PM25: ' + keys[i]
-                var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
                 collect()
         return var
 
@@ -143,12 +153,16 @@ class cmaq:
         from numpy import concatenate
         keys = self.keys
         allvars = concatenate([self.aitken, self.accumulation, self.coarse])
-        cmaqvars, temp = search_listinlist(keys, allvars)
-        var = zeros(self.cdfobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
-        for i in cmaqvars[:]:
-            print '   Getting CMAQ PM10: ' + keys[i]
-            var += self.cdfobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
-            collect()
+        var = None
+        if 'PMC_TOT' in keys:
+            var = self.concobj.variables['PMC_TOT'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ PM10: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
         return var
 
     def get_surface_cmaqvar(self, param='O3'):
@@ -168,14 +182,23 @@ class cmaq:
             var = self.get_surface_noy()
         else:
             print '   Getting CMAQ Variable: ' + param
-            var = self.cdfobj.variables[param][self.indexdates, 0, :, :].squeeze()
+            var = self.concobj.variables[param][self.indexdates, 0, :, :].squeeze()
+        return var
+
+    def get_metcro2d_cmaqvar(self, param='O3'):
+        lvl = 0.
+        param = param.upper()
+        print '   Getting CMAQ Variable: ' + param
+        var = self.metcro2d.variables[param][self.indexdates, 0, :, :].squeeze()
         return var
 
     def set_gridcro2d(self, filename=''):
         self.gridobj = Dataset(filename)
+        self.latitude = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
+        self.longitude = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
 
     def load_conus_basemap(self, path):
-        from six.moves import cPickle as pickle
+        import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
         import os
         if os.path.isfile(path):
@@ -187,19 +210,15 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
-            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='h', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
-                        llcrnrlat=lat[0, 0],
-                        urcrnrlat=lat[-1, -1], llcrnrlon=lon[0, 0], urcrnrlon=lon[-1, -1], rsphere=6371200.,
+                        llcrnrlat=self.latitude[0, 0], urcrnrlat=self.latitude[-1, -1], llcrnrlon=self.longitude[0, 0],
+                        urcrnrlon=self.longitude[-1, -1], rsphere=6371200.,
                         area_thresh=50.)
+
         return m
 
+
     def load_pacific_coast_basemap(self, path):
-        def load_conus_basemap(self, path):
-
-            pass
-
         from mpl_toolkits.basemap import Basemap
         import os
         fname = path + '/basemap-cmaq_pacific.p'
@@ -211,15 +230,14 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
-            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=29., urcrnrlat=53., llcrnrlon=-125., urcrnrlon=-116., rsphere=6371200.,
                         area_thresh=50.)
         return m
 
+
     def load_rockies_basemap(self, path):
-        from six.moves import cPickle as pickle
+        import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
         import os
         fname = path + '/basemap-cmaq_rockies.p'
@@ -231,15 +249,14 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
-            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=29., urcrnrlat=52., llcrnrlon=-116., urcrnrlon=-91., rsphere=6371200.,
                         area_thresh=50.)
         return m
 
+
     def load_south_central_basemap(self, path):
-        from six.moves import cPickle as pickle
+        import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
         import os
         fname = path + '/basemap-cmaq_southcentral.p'
@@ -251,15 +268,16 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
-            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
+            lat = self.latitude
+            lon = self.longitude
             m = Basemap(projection='laea', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=25., urcrnrlat=37.5, llcrnrlon=-108, urcrnrlon=-86., rsphere=6371200.,
                         area_thresh=50.)
         return m
 
+
     def load_northeast_basemap(self, path):
-        from six.moves import cPickle as pickle
+        import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
         import os
         fname = path + '/basemap-cmaq_northeast.p'
@@ -271,15 +289,14 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
-            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
                         area_thresh=50.)
         return m
+
 
     def load_north_central_basemap(self, path):
-        from six.moves import cPickle as pickle
+        import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
         import os
         fname = path + '/basemap-cmaq_northeast.p'
@@ -291,15 +308,14 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
-            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
                         area_thresh=50.)
         return m
 
+
     def load_southeast_basemap(self, path):
-        from six.moves import cPickle as pickle
+        import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
         import os
         fname = path + '/basemap-cmaq_southeast.p'
@@ -311,12 +327,11 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
-            lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
             m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=25., urcrnrlat=39, llcrnrlon=-93., urcrnrlon=-70., rsphere=6371200.,
                         area_thresh=10.)
         return m
+
 
     def choose_map(self, path, region):
         region = region.upper()
@@ -335,19 +350,6 @@ class cmaq:
         else:
             m = self.load_conus_basemap(path)
         return m
-        
-    def interp_var2d(self,lons,lats,var):
-        from pandas import DataFrame,concat
-        from scipy.interpolate import griddata
-        lat = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
-        lon = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
-        a = griddata((lon.flatten(),lat.flatten()),var[0,:,:,].squeeze(),(lons,lats),method='nearest',rescale=True)
-        dates = [self.dates[0] for i in range(len(lons))]
-        df = DataFrame(array([a,lons,lats,dates]).T,columns=['CMAQ','Longitude','Latitude','datetime'])
-        for i in range(len(self.dates)):
-            a = griddata((lon.flatten(),lat.flatten()),var[i,:,:,].squeeze(),(lons,lats),method='nearest',rescale=True)
-            dates = [self.dates[i] for j in range(len(lons))]
-            df2 = DataFrame(array([a,lons,lats,dates]).T,columns=['CMAQ','Longitude','Latitude','datetime'])
-            df = concat([df.copy(),df2],ignore_index=True)
 
-        return df
+
+
