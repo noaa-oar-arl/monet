@@ -177,7 +177,7 @@ class verify_aqs:
                     self.cmaqpno3 = cmaq
                     dfs.append(dfnox)
             elif i == 'WS':
-                if ('WSPD10' not in self.cmaq.metcrokeys):
+                if (self.cmaq.metcro2d is None) | ('WSPD10' not in self.cmaq.metcrokeys):
                     pass
                 else:
                     print 'Interpolating WS:'
@@ -186,7 +186,7 @@ class verify_aqs:
                     dfnox = self.interp_to_aqs(cmaq, dfnox)
                     dfs.append(dfnox)
             elif i == 'TEMP':
-                if ('TEMP2' not in self.cmaq.metcrokeys):
+                if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
                     pass
                 else:
                     print 'Interpolating TEMP:'
@@ -195,7 +195,7 @@ class verify_aqs:
                     dfnox = self.interp_to_aqs(cmaq, dfnox)
                     dfs.append(dfnox)
             elif i == 'WD':
-                if ('WDIR10' not in self.cmaq.metcrokeys):
+                if (self.cmaq.metcro2d is None) | ('WDIR10' not in self.cmaq.metcrokeys):
                     pass
                 else:
                     print 'Interpolating WD:'
