@@ -177,10 +177,10 @@ class verify_aqs:
                     self.cmaqpno3 = cmaq
                     dfs.append(dfnox)
             elif i == 'WS':
-                if ('WS' not in self.cmaq.metcrokeys):
+                if ('WSPD10' not in self.cmaq.metcrokeys):
                     pass
                 else:
-                    print 'Interpolating Isoprene:'
+                    print 'Interpolating WS:'
                     dfnox = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
                     dfnox = self.interp_to_aqs(cmaq, dfnox)
@@ -189,7 +189,7 @@ class verify_aqs:
                 if ('TEMP2' not in self.cmaq.metcrokeys):
                     pass
                 else:
-                    print 'Interpolating Isoprene:'
+                    print 'Interpolating TEMP:'
                     dfnox = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
                     dfnox = self.interp_to_aqs(cmaq, dfnox)
@@ -198,7 +198,7 @@ class verify_aqs:
                 if ('WDIR10' not in self.cmaq.metcrokeys):
                     pass
                 else:
-                    print 'Interpolating Isoprene:'
+                    print 'Interpolating WD:'
                     dfnox = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
                     dfnox = self.interp_to_aqs(cmaq, dfnox)

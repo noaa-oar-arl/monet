@@ -499,6 +499,7 @@ class aqs:
                self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates)]
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).copy().drop_duplicates()
+
         self.add_metro_metadata()
 
     def load_aqs_daily_pm25_data(self, dates):
@@ -687,7 +688,7 @@ class aqs:
                 df.loc[con, 'Obs'] *= 0.51444
                 df.loc[con, 'Units'] = 'M/S'
             if i == 'Degrees Fahrenheit':
-                df.loc[con, 'Obs'] *= (df.loc[con,'Obs'] + 459.67) * 5./9.
+                df.loc[con, 'Obs'] *= (df.loc[con, 'Obs'] + 459.67) * 5. / 9.
                 df.loc[con, 'Units'] = 'K'
             if i == 'Percent relative humidity':
                 df.loc[con, 'Units'] = '%'
@@ -706,8 +707,6 @@ class aqs:
             print '   Monitor File not found.  Meta-Data city names not added'
             f = None
 
-        return f
-
     def add_metro_metadata(self):
         from numpy import NaN
         if os.path.isfile(self.monitor_file):
@@ -722,6 +721,8 @@ class aqs:
                     self.df.loc[con, 'MSA_Name'] = NaN
 
             self.df = pd.merge(self.df, dfs, on='SCS', how='left')
+            self.df.drop('MSA_Name_y', axis=1, inplace=True)
+            self.df.rename(columns={'MSA_Name_x': 'MSA_Name'}, inplace=True)
 
     def retrieve_aqs_daily_co_data(self, dates):
         import wget
