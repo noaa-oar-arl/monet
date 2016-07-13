@@ -82,7 +82,7 @@ class cmaq:
             self.load_single_cmaq_run()
         self.keys = self.get_keys(self.concobj)
 
-    def open_metcro2d(self,file):
+    def open_metcro2d(self, file):
         from glob import glob
         from numpy import sort
         self.fname = sort(array(glob(file)))
@@ -165,6 +165,126 @@ class cmaq:
                 collect()
         return var
 
+    def get_surface_clf(self):
+        keys = self.keys
+        allvars = array(['ACLI', 'ACLJ'])
+        var = None
+        if 'PM25_CL' in keys:
+            var = self.concobj.variables['PM25_CL'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
+        return var
+
+    def get_surface_naf(self):
+        keys = self.keys
+        allvars = array(['ANAI', 'ANAJ'])
+        var = None
+        if 'PM25_NA' in keys:
+            var = self.concobj.variables['PM25_NA'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
+        return var
+
+    def get_surface_mgf(self):
+        keys = self.keys
+        allvars = array(['AMGI', 'AMGJ'])
+        var = None
+        if 'PM25_MG' in keys:
+            var = self.concobj.variables['PM25_MG'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
+        return var
+
+    def get_surface_kf(self):
+        keys = self.keys
+        allvars = array(['AKI', 'AKJ'])
+        var = None
+        if 'PM25_K' in keys:
+            var = self.concobj.variables['PM25_K'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
+        return var
+
+    def get_surface_caf(self):
+        keys = self.keys
+        allvars = array(['ACAI', 'ACAJ'])
+        var = None
+        if 'PM25_CA' in keys:
+            var = self.concobj.variables['PM25_CA'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
+        return var
+
+    def get_surface_so4f(self):
+        keys = self.keys
+        allvars = array(['ASO4I', 'ASO4J'])
+        var = None
+        if 'PM25_SO4' in keys:
+            var = self.concobj.variables['PM25_SO4'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
+        return var
+
+    def get_surface_nh4f(self):
+        keys = self.keys
+        allvars = array(['ANH4I', 'ANH4J'])
+        var = None
+        if 'PM25_NH4' in keys:
+            var = self.concobj.variables['PM25_NH4'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
+        return var
+
+    def get_surface_no3f(self):
+        keys = self.keys
+        allvars = array(['ANO3I', 'ANO3J'])
+        var = None
+        if 'PM25_NO3' in keys:
+            var = self.concobj.variables['PM25_NO3'][self.indexdates, 0, :, :].squeeze()
+        else:
+            cmaqvars, temp = search_listinlist(keys, allvars)
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
+        return var
+
     def get_surface_cmaqvar(self, param='O3'):
         lvl = 0.
         param = param.upper()
@@ -180,6 +300,22 @@ class cmaq:
             var = self.get_surface_nox()
         elif param == 'NOY':
             var = self.get_surface_noy()
+        elif param == 'CLf':
+            var = self.get_surface_clf()
+        elif param == 'NAf':
+            var = self.get_surface_naf()
+        elif param == 'MGf':
+            var = self.get_surface_mgf()
+        elif param == 'Kf':
+            var = self.get_surface_kf()
+        elif param == 'CAf':
+            var = self.get_surface_caf()
+        elif param == 'SO4f':
+            var = self.get_surface_so4f()
+        elif param == 'NH4f':
+            var = self.get_surface_nh4f()
+        elif param == 'NO3f':
+            var = self.get_surface_no3f()
         else:
             print '   Getting CMAQ Variable: ' + param
             var = self.concobj.variables[param][self.indexdates, 0, :, :].squeeze()
@@ -217,7 +353,6 @@ class cmaq:
 
         return m
 
-
     def load_pacific_coast_basemap(self, path):
         from mpl_toolkits.basemap import Basemap
         import os
@@ -234,7 +369,6 @@ class cmaq:
                         llcrnrlat=29., urcrnrlat=53., llcrnrlon=-125., urcrnrlon=-116., rsphere=6371200.,
                         area_thresh=50.)
         return m
-
 
     def load_rockies_basemap(self, path):
         import cPickle as pickle
@@ -253,7 +387,6 @@ class cmaq:
                         llcrnrlat=29., urcrnrlat=52., llcrnrlon=-116., urcrnrlon=-91., rsphere=6371200.,
                         area_thresh=50.)
         return m
-
 
     def load_south_central_basemap(self, path):
         import cPickle as pickle
@@ -275,7 +408,6 @@ class cmaq:
                         area_thresh=50.)
         return m
 
-
     def load_northeast_basemap(self, path):
         import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
@@ -293,7 +425,6 @@ class cmaq:
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
                         area_thresh=50.)
         return m
-
 
     def load_north_central_basemap(self, path):
         import cPickle as pickle
@@ -313,7 +444,6 @@ class cmaq:
                         area_thresh=50.)
         return m
 
-
     def load_southeast_basemap(self, path):
         import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
@@ -332,7 +462,6 @@ class cmaq:
                         area_thresh=10.)
         return m
 
-
     def choose_map(self, path, region):
         region = region.upper()
         if region == 'NORTHEAST':
@@ -350,6 +479,3 @@ class cmaq:
         else:
             m = self.load_conus_basemap(path)
         return m
-
-
-

@@ -27,12 +27,12 @@ class improve:
         from StringIO import StringIO
         with open(fname, 'rb') as f:
             data = f.read().split('\n\n')
-        df = pd.read_csv(StringIO(data[-2]), delimeter=',', parse_dates=[2], inter_datetime_format=True)
+        df = pd.read_csv(StringIO(data[-2]), delimiter=',', parse_dates=[2], infer_datetime_format=True,na_values=-999)
         df.rename(columns={'EPACode': 'SCS'}, inplace=True)
         obs = pd.Series(dtype=df['Vf:Value'].dtype)
         lat = pd.Series(dtype=df.Latitude.dtype)
         lon = pd.Series(dtype=df.Longitude.dtype)
-        date = pd.Series(dtype=df.date.dtype)
+        date = pd.Series(dtype=df.Date.dtype)
         sitecode = pd.Series(dtype=df.SiteCode.dtype)
         scs = pd.Series(dtype=df.SCS.dtype)
         units = pd.Series(dtype=df['Vf:Unit'].dtype)
@@ -45,18 +45,20 @@ class improve:
                 obs = obs.append(df[i]).reset_index(drop=True)
                 lat = lat.append(df.Latitude).reset_index(drop=True)
                 lon = lon.append(df.Longitude).reset_index(drop=True)
-                date = date.append(df.date).reset_index(drop=True)
+                date = date.append(df.Date).reset_index(drop=True)
                 sitecode = sitecode.append(df.SiteCode).reset_index(drop=True)
                 scs = scs.append(df.SCS).reset_index(drop=True)
                 units = units.append(df[r[0] + ':Unit']).reset_index(drop=True)
                 state = state.append(df.State).reset_index(drop=True)
-                species = species.append(r[0]).reset_index(drop=True)
+                species = species.append(pd.Series([r[0] for i in range(df.Latitude.count())])).reset_index(drop=True)
                 sitename = sitename.append(df.SiteName).reset_index(drop=True)
         self.df = pd.concat([obs, lat, lon, date, sitecode, scs, units, state, species, sitename], axis=1,
                             keys=['Obs', 'Latitude', 'Longitude', 'datetime', 'Site_Code', 'SCS', 'Units', 'State_Name',
                                   'Species', 'Site_Name'])
         self.get_region()
         self.df = self.df.copy().drop_duplicates()
+        df.loc['Species' == 'MT'] = 'PM10'
+        df.loc['Species' == 'MF'] = 'PM2.5'
         if output == '':
             output = 'IMPROVE.hdf'
         print 'Outputing data to: ' + output

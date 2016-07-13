@@ -259,7 +259,6 @@ def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True
 
 def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True):
     import matplotlib.dates as mdates
-    from numpy import sqrt
     sns.set_style('ticks')
     df.index = df.datetime
     if fig == None:
