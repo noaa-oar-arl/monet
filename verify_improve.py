@@ -2,16 +2,13 @@
 from datetime import datetime
 
 import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
+from pandas import DataFrame,concat
 from numpy import array, where
 
 import mystats
 import plots
 from cmaq import cmaq
 from improve import improve
-
-sns.set_style('whitegrid')
 
 
 class verify_improve:
@@ -38,11 +35,6 @@ class verify_improve:
         self.df8hr = None
 
     def combine(self):
-        # get the lats and lons for CMAQ
-        lat = self.cmaq.latitude
-        lon = self.cmaq.longitude
-
-        # get the CMAQ dates
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
         self.cmaq.get_dates()
@@ -161,7 +153,7 @@ class verify_improve:
                 else:
                     pass
 
-        self.df = pd.concat(dfs)
+        self.df = concat(dfs)
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_available()
 
@@ -186,10 +178,10 @@ class verify_improve:
             if epasite in new.SCS.unique():
                 df2 = new.loc[new.SCS == epasite]
         elif improvesite != '':
-            if improvesite in new.SCS.unique():
-                df2 = new.loc[new.SCS == improvesite]
+            if improvesite in new.Site_Code.unique():
+                df2 = new.loc[new.Site_Code == improvesite]
         elif state != '':
-            names = df.MSA_Name.dropna().unique()
+            names = df.State_Name.dropna().unique()
             for i in names:
                 if state.upper() in i.upper():
                     name = i
@@ -277,7 +269,7 @@ class verify_improve:
         new = df[con]
         print '   Interpolating values to AirNow, Date : ', self.cmaq.dates[self.cmaq.indexdates][0].strftime(
                 '%B %d %Y   %H utc')
-        cmaq_val = pd.DataFrame(
+        cmaq_val = DataFrame(
                 griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
                          (new.Longitude.values, new.Latitude.values), method='nearest'),
                 columns=['CMAQ'], index=new.index)
@@ -286,7 +278,7 @@ class verify_improve:
             print '   Interpolating values to AirNow, Date : ', j.strftime('%B %d %Y   %H utc')
             con = df.datetime == j
             newt = df[con]
-            cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i + 1, :, :].flatten(),
+            cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i + 1, :, :].flatten(),
                                              (newt.Longitude.values, newt.Latitude.values), method='nearest'),
                                     columns=['CMAQ'], index=newt.index)
             newt = newt.join(cmaq_val)
@@ -303,7 +295,7 @@ class verify_improve:
         new = df[con]
         print '   Interpolating values to AirNow, Date : ', self.cmaq.dates[self.cmaq.indexdates][0].strftime(
                 '%B %d %Y   %H utc')
-        cmaq_val = pd.DataFrame(
+        cmaq_val = DataFrame(
                 griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
                          (new.Longitude.values, new.Latitude.values), method='nearest'),
                 columns=[varname], index=new.index)
@@ -312,7 +304,7 @@ class verify_improve:
             print '   Interpolating values to AirNow, Date : ', j.strftime('%B %d %Y %H utc')
             con = df.datetime == j
             newt = df[con]
-            cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i + 1, :, :].flatten(),
+            cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i + 1, :, :].flatten(),
                                              (newt.Longitude.values, newt.Latitude.values), method='nearest'),
                                     columns=[varname], index=newt.index)
             newt = newt.join(cmaq_val)

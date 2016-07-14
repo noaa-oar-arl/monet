@@ -2,16 +2,13 @@
 from datetime import datetime
 
 import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
 from numpy import array, where
+from pandas import DataFrame, concat
 
 import mystats
 import plots
 from aqs import aqs
 from cmaq import cmaq
-
-sns.set_style('whitegrid')
 
 
 class verify_aqs:
@@ -41,10 +38,6 @@ class verify_aqs:
         self.df8hr = None
 
     def combine(self):
-        # get the lats and lons for CMAQ
-        lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
-        lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
-
         # get the CMAQ dates
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
@@ -64,7 +57,7 @@ class verify_aqs:
                 cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
                 self.cmaqo3 = cmaq
                 dfo3 = self.interp_to_aqs(cmaq, dfo3)
-                dfo3.Obs,dfo3.CMAQ = dfo3.Obs*1000.,dfo3.CMAQ*1000.
+                dfo3.Obs, dfo3.CMAQ = dfo3.Obs * 1000., dfo3.CMAQ * 1000.
                 dfo3.Units = 'PPB'
                 dfs.append(dfo3)
             elif i == 'PM2.5':
@@ -87,7 +80,7 @@ class verify_aqs:
                     self.cmaqco = cmaq
                     dfs.append(dfco)
             elif i == 'NOY':
-                #con = ('NOY' not in self.cmaq.keys()) |
+                # con = ('NOY' not in self.cmaq.keys()) |
                 if 'NOY' not in self.cmaq.keys:
                     pass
                 else:
@@ -204,9 +197,15 @@ class verify_aqs:
                     dfnox = self.interp_to_aqs(cmaq, dfnox)
                     dfs.append(dfnox)
 
-        self.df = pd.concat(dfs)
-        print 'Calculating Daily 8 Hr Max Ozone....\n'
-        self.df8hr = self.calc_aqs_8hr_max_calc()
+        self.df = concat(dfs)
+        if self.airnow.monitor_df is None:
+            print '\n=========================================================================================='
+            print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
+            print 'run: \'df = calc_aqs_8hr_max_calc()\''
+            print '==========================================================================================\n'
+        else:
+            print 'Calculating Daily 8 Hr Max Ozone....\n'
+            self.df8hr = self.calc_aqs_8hr_max_calc()
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_info()
 
@@ -309,7 +308,6 @@ class verify_aqs:
         if timeseries_mb:
             plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
-
     def compare_metro_area_8hr(self, city='Philadelphia', param='OZONE', date='', timeseries=False, scatter=False,
                                bargraph=False, pdfs=False, spatial=False, path=''):
         from numpy import NaN, unique
@@ -391,7 +389,7 @@ class verify_aqs:
                 plt.ylim([min(ylim), max(ylim)])
 
     def aqs_spatial_8hr(self, path='', region='', date='', xlim=[], ylim=[]):
-        if not isinstance(self.df8hr, pd.DataFrame):
+        if not isinstance(self.df8hr, DataFrame):
             print '    Calculating 8 Hr Max Ozone '
             self.df8hr = self.calc_aqs_8hr_max_calc()
         print '    Creating Map'
@@ -430,17 +428,43 @@ class verify_aqs:
         con = df.datetime == dates[0]
         new = df[con]
         print '   Interpolating values to AQS, Date : ', dates[0].strftime('%B %d %Y %H utc')
-        cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[0, :, :].flatten(),
-                                         (new.Longitude.values, new.Latitude.values), method='nearest'),
-                                columns=['CMAQ'], index=new.index)
+        cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[0, :, :].flatten(),
+                                      (new.Longitude.values, new.Latitude.values), method='nearest'),
+                             columns=['CMAQ'], index=new.index)
         new = new.join(cmaq_val)
         for i, j in enumerate(dates[1:]):
             print '   Interpolating values to AQS, Date : ', j.strftime('%B %d %Y %H utc')
             con = df.datetime == j
             newt = df[con]
-            cmaq_val = pd.DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i, :, :].flatten(),
-                                             (newt.Longitude.values, newt.Latitude.values), method='nearest'),
-                                    columns=['CMAQ'], index=newt.index)
+            cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i, :, :].flatten(),
+                                          (newt.Longitude.values, newt.Latitude.values), method='nearest'),
+                                 columns=['CMAQ'], index=newt.index)
+            newt = newt.join(cmaq_val)
+            new = new.append(newt)
+        return new
+
+    def interp_to_improve_unknown(self, cmaqvar, df, varname):
+        from scipy.interpolate import griddata
+        dates = self.cmaq.dates[self.cmaq.indexdates]
+        lat = self.cmaq.latitude
+        lon = self.cmaq.longitude
+
+        con = df.datetime == self.cmaq.dates[self.cmaq.indexdates][0]
+        new = df[con]
+        print '   Interpolating values to AQS Sites, Date : ', self.cmaq.dates[self.cmaq.indexdates][0].strftime(
+                '%B %d %Y   %H utc')
+        cmaq_val = DataFrame(
+                griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
+                         (new.Longitude.values, new.Latitude.values), method='nearest'),
+                columns=[varname], index=new.index)
+        new = new.join(cmaq_val)
+        for i, j in enumerate(self.cmaq.dates[self.cmaq.indexdates][1:]):
+            print '   Interpolating values to AQS Sites, Date : ', j.strftime('%B %d %Y %H utc')
+            con = df.datetime == j
+            newt = df[con]
+            cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i + 1, :, :].flatten(),
+                                          (newt.Longitude.values, newt.Latitude.values), method='nearest'),
+                                 columns=[varname], index=newt.index)
             newt = newt.join(cmaq_val)
             new = new.append(newt)
         return new
@@ -480,7 +504,7 @@ class verify_aqs:
         from numpy import unique
         r = self.df.groupby('Species').get_group('OZONE')
         r.index = r.datetime_local
-        vals,index = unique(r.SCS.values, return_index=True)
+        vals, index = unique(r.SCS.values, return_index=True)
         g = r.groupby('SCS')['Obs', 'CMAQ', 'Latitude', 'Longitude']
         m = g.rolling(8, center=True, win_type='boxcar').mean()
         q = m.reset_index(level=0)
@@ -488,14 +512,14 @@ class verify_aqs:
         k = q.groupby('SCS').resample('1D').max()
         kk = k.reset_index(level=1)
         kkk = kk.reset_index(drop='SCS').dropna()
-        kkk['Parameter_Name']= 'Ozone'
+        kkk['Parameter_Name'] = 'Ozone'
         kkk['Region'] = ''
         kkk['Species'] = 'OZONE'
         kkk['State_Name'] = ''
         kkk['Units'] = 'PPB'
-        for i,j in enumerate(vals):
-            kkk.loc[kkk.SCS == j,'Region'] = r.Region.values[index[i]]
-            kkk.loc[kkk.SCS == j,'State_Name'] = r.State_Name.values[index[i]]
-            kkk.loc[kkk.SCS == j,'County_Name'] = r.County_Name.values[index[i]]
+        for i, j in enumerate(vals):
+            kkk.loc[kkk.SCS == j, 'Region'] = r.Region.values[index[i]]
+            kkk.loc[kkk.SCS == j, 'State_Name'] = r.State_Name.values[index[i]]
+            kkk.loc[kkk.SCS == j, 'County_Name'] = r.County_Name.values[index[i]]
 
         return kkk

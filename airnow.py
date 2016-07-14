@@ -36,6 +36,8 @@ class airnow:
         self.filelist = None
         self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
         self.monitor_df = None
+        self.savecols = ['datetime', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'datetime_local',
+                         'Site_Name', 'Latitude', 'Longitude', 'CMSA_Name', 'MSA_Name', 'State_Name','Region']
 
     def retrieve_hourly_filelist(self):
         self.ftp.cwd('HourlyData')
@@ -139,6 +141,7 @@ class airnow:
         self.get_station_locations()
         self.get_region()
         self.df = self.df.copy().drop_duplicates()
+        self.df = self.df[self.savecols]
         if output == '':
             output = 'AIRNOW.hdf'
         print 'Outputing data to: ' + output

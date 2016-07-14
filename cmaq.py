@@ -38,7 +38,7 @@ class cmaq:
         self.fname = None
         self.dates = None
         self.keys = None
-        self.metcrokeys = None
+        self.metcrokeys = []
         self.indexdates = None
         self.latitude = None
         self.longitude = None

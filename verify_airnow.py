@@ -179,8 +179,14 @@ class verify_airnow:
                     dfs.append(dfmet)
 
         self.df = pd.concat(dfs)
-        print 'Calculating Daily 8 Hr Max Ozone....\n'
-        self.df8hr = self.calc_airnow_8hr_max_calc()
+        if self.airnow.monitor_df is None:
+            print '\n=========================================================================================='
+            print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
+            print 'run: \'df = calc_airnow_8hr_max_calc()\'\n'
+            print '===========================================================================================\n'
+        else:
+            print 'Calculating Daily 8 Hr Max Ozone....\n'
+            self.df8hr = self.calc_airnow_8hr_max_calc()
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_available()
 
