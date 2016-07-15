@@ -30,4 +30,8 @@ Please refer to [Make Spatial Plot tutorial](https://github.com/bakerbd/arl_veri
 
 ![Spatial Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/ozone_spatial.jpg?raw=true)
 
+![Scatter Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_scatter.jpg?raw=true)
+![PDFS Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_pdf.jpg?raw=true)
+![Difference Scatter Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_diffscatter.jpg?raw=true)
+![Difference PDFS Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_diffpdf.jpg?raw=true)
 
