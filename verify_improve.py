@@ -193,19 +193,19 @@ class verify_improve:
             df2 = new
             title = 'Domain'
         if timeseries:
-            plots.improve_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
         if scatter:
-            plots.improve_scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.airnow_scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
         if pdfs:
-            plots.improve_kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.airnow_kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
         if diffscatter:
-            plots.improve_diffscatter_param(df2, title=title)
+            plots.airnow_diffscatter_param(df2, title=title)
         if diffpdfs:
-            plots.improve_diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.airnow_diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_rmse:
-            plots.improve_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_mb:
-            plots.improve_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
     def improve_spatial(self, df, date,param='NAf', path='', region='', xlim=[], ylim=[]):
         """
@@ -233,7 +233,7 @@ class verify_improve:
         m = self.cmaq.choose_map(path, region)
         index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
         c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m)
-        plots.improve_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
+        plots.airnow_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
         c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
         if len(xlim) > 1:
             plt.xlim([min(xlim), max(xlim)])
