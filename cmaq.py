@@ -77,6 +77,8 @@ class cmaq:
         from numpy import sort
         if self.fname == None:
             self.fname = sort(array(glob(file)))
+        else:
+            self.fname = sort(array(self.fname))
         if self.fname.shape[0] > 1:
             self.load_multi_cmaq_runs()
         else:
