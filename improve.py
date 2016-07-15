@@ -25,6 +25,8 @@ class improve:
 
     def open_file(self, fname, output=''):
         from StringIO import StringIO
+
+        print 'Reading File: ' + fname
         with open(fname, 'rb') as f:
             data = f.read().split('\n\n')
         df = pd.read_csv(StringIO(data[-2]), delimiter=',', parse_dates=[2], infer_datetime_format=True,na_values=-999)
@@ -55,15 +57,18 @@ class improve:
         self.df = pd.concat([obs, lat, lon, date, sitecode, scs, units, state, species, sitename], axis=1,
                             keys=['Obs', 'Latitude', 'Longitude', 'datetime', 'Site_Code', 'SCS', 'Units', 'State_Name',
                                   'Species', 'Site_Name'])
+        print 'Adding in some Meta-Data'
         self.get_region()
         self.df = self.df.copy().drop_duplicates()
-        df.loc['Species' == 'MT'] = 'PM10'
-        df.loc['Species' == 'MF'] = 'PM2.5'
+        self.df.dropna(subset=['Species'],inplace=True)
+        self.df.Species[self.df.Species == 'MT'] = 'PM10'
+        self.df.Species[self.df.Species == 'MF'] = 'PM2.5'
         if output == '':
             output = 'IMPROVE.hdf'
         print 'Outputing data to: ' + output
         self.df.to_hdf(output, 'df', format='fixed')
 
+        
     def get_date_range(self, dates):
         self.dates = dates
         con = (self.df.datetime >= dates[0]) & (self.df.datetime <= dates[-1])

@@ -300,21 +300,21 @@ class cmaq:
             var = self.get_surface_nox()
         elif param == 'NOY':
             var = self.get_surface_noy()
-        elif param == 'CLf':
+        elif param == 'CLF':
             var = self.get_surface_clf()
-        elif param == 'NAf':
+        elif param == 'NAF':
             var = self.get_surface_naf()
-        elif param == 'MGf':
+        elif param == 'MGF':
             var = self.get_surface_mgf()
-        elif param == 'Kf':
+        elif param == 'KF':
             var = self.get_surface_kf()
-        elif param == 'CAf':
+        elif param == 'CAF':
             var = self.get_surface_caf()
-        elif param == 'SO4f':
+        elif param == 'SO4F':
             var = self.get_surface_so4f()
-        elif param == 'NH4f':
+        elif param == 'NH4F':
             var = self.get_surface_nh4f()
-        elif param == 'NO3f':
+        elif param == 'NO3F':
             var = self.get_surface_no3f()
         else:
             print '   Getting CMAQ Variable: ' + param

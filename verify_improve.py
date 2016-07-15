@@ -30,8 +30,10 @@ class verify_improve:
         self.p_states = array(['California', 'Oregon', 'Washington'], dtype='|S10')
         self.df = None
         self.cmaqpm25 = None
-        self.cmaqso2 = None
-        self.cmaqco = None
+        self.cmaqpm10 = None
+        self.cmaqcl = None
+        self.cmaqna = None
+        self.cmaqmg = None
         self.df8hr = None
 
     def combine(self):
@@ -143,7 +145,7 @@ class verify_improve:
                     pass
             elif i == 'NO3f':
                 if ('ANO3I' in self.cmaq.keys) | ('ANO3J' in self.cmaq.keys) | ('PM25_NO3' in self.cmaq.keys):
-                    print 'Interpolating NH4f:'
+                    print 'Interpolating NO3f:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO3f', improve_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO3f') * fac
@@ -160,7 +162,7 @@ class verify_improve:
     def print_available(self):
         print 'Available Functions:\n'
         print '    improve_spatial(df, param=\'OZONE\', path='', region='', date=\'YYYY-MM-DD HH:MM:SS\')'
-        print '    compare_param(param=\'OZONE\', city=\'\', region=\'\', timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
+        print '    compare_param(param=\'PM2.5\', state=\'\', region=\'\', timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
         print 'Species available to compare:'
         print '    ', self.df.Species.unique()
 
@@ -168,10 +170,7 @@ class verify_improve:
                       scatter=False, pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False,
                       timeseries_mb=False, fig=None, label=None, footer=True):
         from numpy import NaN
-        df = self.df.copy()[[
-            'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
-            'Longitude']]
-        df[df < -990] = NaN
+        df = self.df.copy()
         g = df.groupby('Species')
         new = g.get_group(param)
         if epasite != '':
@@ -208,9 +207,9 @@ class verify_improve:
         if timeseries_mb:
             plots.improve_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
-    def improve_spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[]):
+    def improve_spatial(self, df, date,param='NAf', path='', region='', xlim=[], ylim=[]):
         """
-        :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
+        :param param: Species Parameter: 
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
         :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time
         :return:
@@ -232,24 +231,13 @@ class verify_improve:
         elif param == 'NOX':
             cmaq = self.cmaqnox
         m = self.cmaq.choose_map(path, region)
-        if date == '':
-            for index, i in enumerate(self.cmaq.dates):
-                c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
-                                            m)
-                plots.improve_spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'))
-                c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                if len(xlim) > 1:
-                    plt.xlim([min(xlim), max(xlim)])
-                    plt.ylim([min(ylim), max(ylim)])
-
-        else:
-            index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
-            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m)
-            plots.improve_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
-            c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-            if len(xlim) > 1:
-                plt.xlim([min(xlim), max(xlim)])
-                plt.ylim([min(ylim), max(ylim)])
+        index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
+        c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m)
+        plots.improve_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
+        c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
+        if len(xlim) > 1:
+            plt.xlim([min(xlim), max(xlim)])
+            plt.ylim([min(ylim), max(ylim)])
 
     @staticmethod
     def calc_stats2(df):
@@ -260,30 +248,42 @@ class verify_improve:
         return mb, r2, ioa, rmse
 
     def interp_to_improve(self, cmaqvar, df):
+        import pandas as pd
+        from numpy import unique,isnan
         from scipy.interpolate import griddata
+        from tools import search_listinlist
         dates = self.cmaq.dates[self.cmaq.indexdates]
-        lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
-        lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
+        #only interpolate to sites with latitude and longitude
+        df.dropna(subset=['Latitude','Longitude'],inplace=True)
+        vals,index = unique(df.Site_Code,return_index=True)
+        lats = df.Latitude.values[index]
+        lons = df.Longitude.values[index]
+        sites = df.Site_Code.values[index]
+        lat = self.cmaq.latitude
+        lon = self.cmaq.longitude
+        dfs = []
+        vals = pd.Series(dtype=df.Obs.dtype)
+        date = pd.Series(dtype=df.datetime.dtype)
+        site = pd.Series(dtype=df.Site_Code.dtype)
+        for i,j in enumerate(self.cmaq.indexdates):
+            print '   Interpolating values to IMPROVE Sites. Date : ', self.cmaq.dates[j].strftime('%B %d %Y   %H utc')
+            vals = vals.append(pd.Series(griddata((lon.flatten(), lat.flatten()), cmaqvar[i, :, :].flatten(),(lons, lats), method='nearest'))).reset_index(drop=True)
+            date = date.append(pd.Series([self.cmaq.dates[j] for k in lons])).reset_index(drop=True)
+            site = site.append(pd.Series(sites)).reset_index(drop=True)
+        dfs = pd.concat([vals,date,site],axis=1,keys=['CMAQ','datetime','Site_Code'])
 
-        con = df.datetime == self.cmaq.dates[self.cmaq.indexdates][0]
-        new = df[con]
-        print '   Interpolating values to AirNow, Date : ', self.cmaq.dates[self.cmaq.indexdates][0].strftime(
-                '%B %d %Y   %H utc')
-        cmaq_val = DataFrame(
-                griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
-                         (new.Longitude.values, new.Latitude.values), method='nearest'),
-                columns=['CMAQ'], index=new.index)
-        new = new.join(cmaq_val)
-        for i, j in enumerate(self.cmaq.dates[self.cmaq.indexdates][1:]):
-            print '   Interpolating values to AirNow, Date : ', j.strftime('%B %d %Y   %H utc')
-            con = df.datetime == j
-            newt = df[con]
-            cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i + 1, :, :].flatten(),
-                                             (newt.Longitude.values, newt.Latitude.values), method='nearest'),
-                                    columns=['CMAQ'], index=newt.index)
-            newt = newt.join(cmaq_val)
-            new = new.append(newt)
-        return new
+        g = dfs.groupby('Site_Code')
+        q = pd.DataFrame()
+        for i in dfs.Site_Code.unique():
+            c = g.get_group(i)
+            c.index = c.datetime
+            c.drop('datetime',axis=1,inplace=True)
+            r = c.rolling(window=72).mean() #boxcar smoother
+            r.reset_index(inplace=True)
+            q = q.append(r).reset_index(drop=True)
+        df = pd.merge(df,q,how='left',on=['Site_Code','datetime']).dropna(subset=['CMAQ'])
+
+        return df
 
     def interp_to_improve_unknown(self, cmaqvar, df, varname):
         from scipy.interpolate import griddata
