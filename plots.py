@@ -149,7 +149,8 @@ def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, foot
     if fig == None:
 
         f = plt.figure(figsize=(12, 7))
-
+        if label == None:
+            label = 'CMAQ'
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
         obs = df.Obs.resample('H').mean()
@@ -157,7 +158,7 @@ def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, foot
         cmaq = df.CMAQ.resample('H').mean()
         cmaqerr = df.CMAQ.resample('H').std()
         plt.plot(obs, color='darkslategrey')
-        plt.plot(cmaq, color='dodgerblue')
+        plt.plot(cmaq, color='dodgerblue',label=label)
         plt.legend(loc='best')
 
         plt.fill_between(df.datetime.unique(), obs - obserr, obs + obserr, alpha=.2, color='darkslategrey')
