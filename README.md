@@ -28,4 +28,6 @@ Please refer to [Make Spatial Plot tutorial](https://github.com/bakerbd/arl_veri
 
 ![Time Series of RMSE](https://raw.githubusercontent.com/bakerbd/arl_verify/master/sample_figures/pm2.5_timeseries_rmse.jpg)
 
+![Spatial Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/ozone_spatial.jpg?raw=true)
+
 
