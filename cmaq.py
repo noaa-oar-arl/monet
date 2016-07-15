@@ -75,7 +75,8 @@ class cmaq:
         #       file='this_is_my_files*.ncf'
         from glob import glob
         from numpy import sort
-        self.fname = sort(array(glob(file)))
+        if self.fname == None:
+            self.fname = sort(array(glob(file)))
         if self.fname.shape[0] > 1:
             self.load_multi_cmaq_runs()
         else:
