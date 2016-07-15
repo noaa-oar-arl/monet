@@ -334,7 +334,7 @@ def airnow_diffpdfs_param(df, title=None, fig=None, label=None, footer=True):
 
 
 def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
-    from numpy import max, arange, linspace
+    from numpy import max, arange, linspace,isnan
     from scipy.stats import scoreatpercentile as score
     from scipy.stats import linregress
     sns.set_style('ticks')
@@ -352,8 +352,8 @@ def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
         if maxval <= 10.:
             x = linspace(0, maxval, 25)
         plt.plot(x, x, '--', color='slategrey')
-
-        tt = linregress(df.Obs.values, df.CMAQ.values)
+        mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
+        tt = linregress(df.Obs.values[mask], df.CMAQ.values[mask])
         plt.plot(x, tt[0] * x + tt[1], color='tomato')
 
         plt.xlim([0, maxval])
@@ -364,6 +364,7 @@ def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
         if footer:
             airnow_footer_text(df)
         plt.tight_layout()
+        plt.grid(alpha=.5)
     else:
         ax = fig.get_axes()[0]
         l, = ax.scatter(df.Obs, df.CMAQ, marker='o', edgecolors='w', alpha=.3, label=label)
