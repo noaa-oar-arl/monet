@@ -36,6 +36,7 @@ class cmaq:
         self.metcro2d = None
         self.gridobj = None
         self.fname = None
+        self.metcrofnames = None
         self.dates = None
         self.keys = None
         self.metcrokeys = []
@@ -63,7 +64,7 @@ class cmaq:
         self.concobj = Dataset(self.fname[0])
 
     def load_multi_metcro2d_cmaq_runs(self):
-        self.metcro2d = MFDataset(self.fname)
+        self.metcro2d = MFDataset(self.metcrofnames)
 
     def load_multi_cmaq_runs(self):
         self.concobj = MFDataset(self.fname)
@@ -88,7 +89,10 @@ class cmaq:
     def open_metcro2d(self, file):
         from glob import glob
         from numpy import sort
-        self.fname = sort(array(glob(file)))
+        if self.metcrofnames == None:
+            self.metcrofnames = sort(array(glob(file)))
+        else:
+            self.metcrofnames = sort(array(self.metcrofnames))
         self.load_multi_metcro2d_cmaq_runs()
         self.metcrokeys = self.get_keys(self.metcro2d)
 
