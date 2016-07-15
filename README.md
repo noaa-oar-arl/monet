@@ -1,5 +1,5 @@
 # arl_verify
-Chemical Transport Model Verification
+## Introductin to the Chemical Transport Model Verification
 
 
 This is the start to an ARL verification package.  It currently handles CMAQ 4.7.1+, EPA AQS surface data, EPA AIRNOW, and the IMPROVE Aerosol data network.  It will compute statistics, make time series, spatial and scatter plots and more!  
