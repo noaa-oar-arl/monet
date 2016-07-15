@@ -11,8 +11,8 @@ from tools import search_listinlist
 class airnow:
     def __init__(self):
 
-        self.username = 'Barry.Baker'
-        self.password = 'p00pST!ck123'
+        self.username = ''
+        self.password = ''
         self.url = 'ftp.airnowgateway.org'
         self.dates = [datetime.strptime('2016-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
                       datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
