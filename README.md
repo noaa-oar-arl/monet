@@ -1,12 +1,13 @@
 # arl_verify
 ## Introductin to the Chemical Transport Model Verification
 
+* Welcome to the arl_verify wiki!
 
-This is the start to an ARL verification package.  It currently handles CMAQ 4.7.1+, EPA AQS surface data, EPA AIRNOW, and the IMPROVE Aerosol data network.  It will compute statistics, make time series, spatial and scatter plots and more!  
+This is the start to an ARL verification package. Currently, it handles CMAQ 4.7.1+, EPA AQS surface data, EPA AIRNOW, and the IMPROVE Aerosol data network. It will compute statistics, make time series, spatial and scatter plots, and more!  
 
-It is meant to be a one stop shop for quick verification and study of CMAQ data (in the future we will want to add more models such as HYSPLIT, NMMB, WRF-ARW and NGGPS).  
+The ARL verification package is meant to be a one stop shop for quick verification and study of CMAQ data (in the future we will want to add more models such as HYSPLIT, NMMB, WRF-ARW, and NGGPS).  
 
-In the future the addition of satellite data and more may be included.
+In the future, the addition of satellite data and more may be included.
 
 ### Basic tutorial for AIRNOW and AQS.  
 
@@ -16,7 +17,7 @@ The function calls are nearly identical (except for retrieving and loading the n
 
 ### Compare more than one simulation to a surface network
 
-Please refer to [Compare Two Simulation Tutorial](https://github.com/bakerbd/arl_verify/wiki/Comparing-two-CMAQ-Simulations-Plotting-Overlay-Example).  Several examples of how to use the package are shown to make time series with two simulations during July 2016 of NAQFC and NAQFC-Beta.
+Please refer to [Compare Two Simulation Tutorial](https://github.com/bakerbd/arl_verify/wiki/Comparing-two-CMAQ-Simulations-Plotting-Overlay-Example). Several examples of how to use the package are shown to make time series with two simulations during July 2016 of NAQFC and NAQFC-Beta.
 
 ### Make Spatial Plots
 
@@ -34,4 +35,3 @@ Please refer to [Make Spatial Plot tutorial](https://github.com/bakerbd/arl_veri
 ![PDFS Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_pdf.jpg?raw=true)
 ![Difference Scatter Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_diffscatter.jpg?raw=true)
 ![Difference PDFS Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_diffpdf.jpg?raw=true)
-
