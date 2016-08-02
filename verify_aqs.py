@@ -57,7 +57,7 @@ class verify_aqs:
                 cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
                 self.cmaqo3 = cmaq
                 dfo3 = self.interp_to_aqs(cmaq, dfo3)
-                dfo3.Obs, dfo3.CMAQ = dfo3.Obs * 1000., dfo3.CMAQ * 1000.
+                dfo3.Obs, dfo3.CMAQ = dfo3.Obs, dfo3.CMAQ
                 dfo3.Units = 'PPB'
                 dfs.append(dfo3)
             elif i == 'PM2.5':
