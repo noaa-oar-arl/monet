@@ -373,6 +373,8 @@ class aqs:
             aqs = self.retrieve_aqs_hourly_ozone_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
+        aqs.Units='PPB'
+        aqs.Obs = aqs.Obs.values * 1000.
         aqs.index = arange(aqs.index.shape[0])
         return aqs
 
