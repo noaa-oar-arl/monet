@@ -13,6 +13,8 @@ class airnow:
 
         self.username = ''
         self.password = ''
+        self.datadir = '.'
+        self.cwd = os.getcwd()
         self.url = 'ftp.airnowgateway.org'
         self.dates = [datetime.strptime('2016-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
                       datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
@@ -72,8 +74,15 @@ class airnow:
                 else:
                     print 'File Found in Path: ' + i
 
+    def change_path(self):
+        os.chdir(self.datadir)
+
+    def change_back(self):
+        os.chdir(self.cwd)
+        
     def download_hourly_files(self, path='.'):
         from numpy import empty,where
+        self.change_path()
         print 'Connecting to FTP: ' + self.url
         self.openftp()
         print 'Retrieving Hourly file list'
@@ -109,12 +118,13 @@ class airnow:
                 else:
                     print 'File found: ', i
         self.filelist = self.datestr
-
+        self.change_back()
         self.ftp.close()
 
     def aggragate_files(self, output=''):
         from numpy import sort
         from datetime import datetime
+        self.change_path()
         fnames = sort(self.filelist)
         ff = []
         if fnames.shape[0] < 2:
@@ -146,6 +156,7 @@ class airnow:
             output = 'AIRNOW.hdf'
         print 'Outputing data to: ' + output
         self.df.to_hdf(output, 'df', format='fixed')
+        self.change_back()
 
     def calc_datetime(self):
         # takes in an array of string dates and converts to numpy array of datetime objects

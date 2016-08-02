@@ -147,6 +147,17 @@ class verify_aqs:
                     dfnox = self.interp_to_aqs(cmaq, dfnox)
                     self.cmaqpso4 = cmaq
                     dfs.append(dfnox)
+            elif i == 'PM10':
+                if ('ASO4K' not in self.cmaq.keys):
+                    pass
+                else:
+                    print 'Interpolating PM10:'
+                    dfnox = g.get_group(i)
+                    fac = self.check_cmaq_units(param='PM10', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
+                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    self.cmaqpso4 = cmaq
+                    dfs.append(dfnox)
             elif i == 'PM2.5_NO3':
                 if ('PM25_NO3' not in self.cmaq.keys):
                     pass
@@ -198,7 +209,7 @@ class verify_aqs:
                     dfs.append(dfnox)
 
         self.df = concat(dfs)
-        if self.airnow.monitor_df is None:
+        if self.aqs.monitor_df is None:
             print '\n=========================================================================================='
             print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
             print 'run: \'df = calc_aqs_8hr_max_calc()\''
@@ -214,9 +225,9 @@ class verify_aqs:
         print 'Available Functions:\n'
         print '    compare_domain_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
         print '    compare_region_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
-        print '    aqs_spatial(df, param=\'OZONE\', path='', region='', date=\'YYYY-MM-DD HH:MM:SS\')'
+        print '    aqs_spatial(df, param=\'OZONE\', path='', region='', date=\'YYYY-MM-DD HH:MM\')'
         print '    aqs_spatial_8hr(df, path=\'cmaq-basemap-conus.p\', region=\'northeast\', date=\'YYYY-MM-DD\')'
-        print '    compare_param(param=\'OZONE\', region=\'\', timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
+        print '    compare_param(param=\'OZONE\', region=\'\', city=\'\',timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
         print 'Species available to compare:'
         print '    ', self.df.Species.unique()
         print ''
@@ -266,7 +277,7 @@ class verify_aqs:
             if pdfs:
                 plots.airnow_kdeplots(df2)
 
-    def compare_param(self, param='OZONE', site='', city='', region='', timeseries=False, scatter=False, pdfs=False,
+    def compare_param(self, param='OZONE', site='', city='', region='', state='',timeseries=False, scatter=False, pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
                       label=None, footer=True):
         from numpy import NaN
@@ -287,6 +298,9 @@ class verify_aqs:
                     print name
             df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
             title = name
+        elif state !='':
+            df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
+            title= state
         elif region != '':
             df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
             title = region
@@ -352,6 +366,7 @@ class verify_aqs:
         :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time
         :return:
         """
+        from numpy.ma import masked_less
 
         g = df.groupby('Species')
         df2 = g.get_group(param)
@@ -368,6 +383,7 @@ class verify_aqs:
             cmaq = self.cmaqso2
         elif param == 'NOX':
             cmaq = self.cmaqnox
+        cmaq= masked_less(cmaq,.25)
         m = self.cmaq.choose_map(path, region)
         if date == '':
             for index, i in enumerate(self.cmaq.dates):
@@ -425,14 +441,14 @@ class verify_aqs:
         lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
         lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
 
-        con = df.datetime == dates[0]
+        con = df.datetime == self.cmaq.dates[self.cmaq.indexdates][0]
         new = df[con]
         print '   Interpolating values to AQS, Date : ', dates[0].strftime('%B %d %Y %H utc')
         cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[0, :, :].flatten(),
                                       (new.Longitude.values, new.Latitude.values), method='nearest'),
                              columns=['CMAQ'], index=new.index)
         new = new.join(cmaq_val)
-        for i, j in enumerate(dates[1:]):
+        for i, j in enumerate(self.cmaq.dates[self.cmaq.indexdates][1:]):
             print '   Interpolating values to AQS, Date : ', j.strftime('%B %d %Y %H utc')
             con = df.datetime == j
             newt = df[con]

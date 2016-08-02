@@ -193,7 +193,7 @@ class verify_improve:
             df2 = new
             title = 'Domain'
         if timeseries:
-            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer,sample='3D')
         if scatter:
             plots.airnow_scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
         if pdfs:
@@ -203,9 +203,9 @@ class verify_improve:
         if diffpdfs:
             plots.airnow_diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_rmse:
-            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer,sample='3D')
         if timeseries_mb:
-            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer,sample='3D')
 
     def improve_spatial(self, df, date,param='NAf', path='', region='', xlim=[], ylim=[]):
         """

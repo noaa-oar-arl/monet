@@ -40,6 +40,7 @@ class aqs:
                                'North Dakota', 'South Dakota', 'Utah', 'Wyoming'], dtype='|S12')
         self.p_states = array(['California', 'Oregon', 'Washington'], dtype='|S10')
         self.datadir = '.'
+        self.cwd = os.getcwd()
         self.df = None
         self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
         self.monitor_df = None
@@ -493,13 +494,15 @@ class aqs:
         return aqs
 
     def load_all_hourly_data(self, dates):
+        os.chdir(self.datadir)
         dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
                self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
                self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
                self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates)]
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).copy().drop_duplicates()
-
+        os.chdir(self.datadir)
+        self.df.SCS = self.df.SCS.values.astype('int32')
         self.add_metro_metadata()
 
     def load_aqs_daily_pm25_data(self, dates):
@@ -716,8 +719,8 @@ class aqs:
             dfs = self.monitor_df[['SCS', 'MSA_Name']]
             for i in self.df.SCS.unique():
                 con = self.df.SCS == i
-                if dfs.loc[dfs.SCS.values.astype('int32') == i]['MSA_Name'].count() > 0:
-                    self.df.loc[con, 'MSA_Name'] = dfs.loc[dfs.SCS.values.astype('int32') == i]['MSA_Name'].unique()
+                if dfs.loc[dfs.SCS.values == i]['MSA_Name'].count() > 0:
+                    self.df.loc[dfs.SCS.values == i, 'MSA_Name'] = dfs.loc[dfs.SCS.values == i]['MSA_Name'].unique()
                 else:
                     self.df.loc[con, 'MSA_Name'] = NaN
 

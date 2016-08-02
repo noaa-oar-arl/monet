@@ -460,6 +460,40 @@ class verify_airnow:
             new = new.append(newt)
         return new
 
+    def interp_to_airnow2(self, cmaqvar, df):
+        from tools import simple_idw,distance_matrix
+        from pandas import Series,merge,concat
+        from numpy import unique,append,empty
+        
+        dates = self.cmaq.dates[self.cmaq.indexdates]
+        lat = self.cmaq.latitude
+        lon = self.cmaq.longitude
+        scs,index = unique(df.SCS.values,return_index=True)
+        lats = df.Latitude.values[index]
+        lons = df.Longitude.values[index]
+        vals = array([],dtype=cmaqvar.dtype)
+        date = array([],dtype='O')
+        site = array([],dtype=scs.dtype)
+        print '    Calculating Distance Matrix......'
+        w = distance_matrix(lon.flatten(),lat.flatten(),lons,lats)
+        
+        for i,j in enumerate(dates):
+            print i,j
+            val = simple_idw(w,cmaqvar[i,:,:].squeeze().flatten())
+            vals = append(vals,val)
+            dd = empty(lons.shape[0],dtype=date.dtype)
+            dd[:] = j
+            date = append(date,dd)
+            site = append(site,scs)
+
+        vals = pd.Series(vals)
+        date = pd.Series(date)
+        site = pd.Series(site)
+        dfs = concat([vals,date,site],axis=1,keys=['CMAQ','datetime','SCS'])
+        df = pd.merge(df,dfs,how='left',on=['SCS','datetime'])
+
+        return df
+
     def interp_to_airnow_unknown(self, cmaqvar, df, varname):
         from scipy.interpolate import griddata
         dates = self.cmaq.dates[self.cmaq.indexdates]

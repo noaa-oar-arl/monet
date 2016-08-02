@@ -142,27 +142,30 @@ def plot_allsites_timeseries(dataframe, ylabel='PM10 Concentration', savename=''
     plot_timeseries(dataframe, siteave=True, ylabel=ylabel, savename=savename)
 
 
-def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, footer=True):
+def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, footer=True,sample='H'):
     import matplotlib.dates as mdates
+    from numpy import isnan
     sns.set_style('ticks')
     df.index = df.datetime
     if fig == None:
 
-        f = plt.figure(figsize=(12, 7))
-        if label == None:
-            label = 'CMAQ'
+        f = plt.figure(figsize=(13, 8))
+        if label==None:
+            label='CMAQ'
+
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
-        obs = df.Obs.resample('H').mean()
-        obserr = df.Obs.resample('H').std()
-        cmaq = df.CMAQ.resample('H').mean()
-        cmaqerr = df.CMAQ.resample('H').std()
+        obs = df.Obs.resample(sample).mean()
+        obserr = df.Obs.resample(sample).std()
+        cmaq = df.CMAQ.resample(sample).mean()
+        cmaqerr = df.CMAQ.resample(sample).std()
         plt.plot(obs, color='darkslategrey')
         plt.plot(cmaq, color='dodgerblue',label=label)
         plt.legend(loc='best')
-
-        plt.fill_between(df.datetime.unique(), obs - obserr, obs + obserr, alpha=.2, color='darkslategrey')
-        plt.fill_between(df.datetime.unique(), cmaq - cmaqerr, cmaq + cmaqerr, alpha=.2, color='dodgerblue')
+        mask = ~isnan(obs) & ~isnan(obserr)
+        plt.fill_between(obs.index[mask], (obs - obserr)[mask], (obs + obserr)[mask], alpha=.2, color='darkslategrey')
+        mask = ~isnan(cmaq) & ~isnan(cmaqerr)
+        plt.fill_between(cmaq.index[mask], (cmaq - cmaqerr)[mask], (cmaq + cmaqerr)[mask], alpha=.2, color='dodgerblue')
 
         ax = plt.gca().axes
         ax.set_xlabel('UTC Time (mm/dd HH)')
@@ -179,27 +182,28 @@ def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, foot
         plt.grid(alpha=.5)
     else:
         ax = fig.get_axes()[0]
-        cmaq = df.CMAQ.resample('H').mean()
-        cmaqerr = df.CMAQ.resample('H').std()
+        cmaq = df.CMAQ.resample(sample).mean()
+        cmaqerr = df.CMAQ.resample(sample).std()
         lin, = ax.plot(cmaq, label=label)
-        ax.fill_between(df.datetime.unique(), cmaq - cmaqerr, cmaq + cmaqerr, alpha=.2, color=lin.get_color())
+        mask = ~isnan(cmaq) & ~isnan(cmaqerr)
+        plt.fill_between(cmaq.index[mask], (cmaq - cmaqerr)[mask], (cmaq + cmaqerr)[mask], alpha=.2, color=lin.get_color())
         plt.legend(loc='best')
 
 
-def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=True):
+def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=True,sample='H'):
     import matplotlib.dates as mdates
     from numpy import sqrt
     sns.set_style('ticks')
 
     df.index = df.datetime
     if fig == None:
-        plt.figure(figsize=(12, 7))
+        plt.figure(figsize=(13, 8))
 
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
 
-        mb = (df.CMAQ - df.Obs).resample('H').mean()
-        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample('H').mean()
+        mb = (df.CMAQ - df.Obs).resample(sample).mean()
+        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
 
         a = plt.plot(mb, label='Mean Bias', color='dodgerblue')
         ax = plt.gca().axes
@@ -223,8 +227,8 @@ def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=Tru
     else:
         ax1 = fig.get_axes()[0]
         ax2 = fig.get_axes()[1]
-        mb = (df.CMAQ - df.Obs).resample('H').mean()
-        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample('H').mean()
+        mb = (df.CMAQ - df.Obs).resample(sample).mean()
+        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
         ax1.plot(mb, label=label + ' MB')
         ax2.plot(rmse, label=label + ' RMSE')
         lns = ax1.get_lines()[:] + ax2.get_lines()[1:]
@@ -232,16 +236,16 @@ def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=Tru
         plt.legend(lns, labs, loc='best')
 
 
-def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True):
+def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True,sample='H'):
     import matplotlib.dates as mdates
     from numpy import sqrt
     sns.set_style('ticks')
     df.index = df.datetime
     if fig == None:
-        plt.figure(figsize=(12, 7))
+        plt.figure(figsize=(13, 8))
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
-        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample('H').mean()
+        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
         plt.plot(rmse,color='dodgerblue',label=label)
         ylabel = species + ' (' + units + ')'
         plt.gca().axes.set_ylabel('RMSE '+ ylabel)
@@ -254,19 +258,19 @@ def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True
         plt.grid(alpha=.5)
     else:
         ax = fig.get_axes()[0]
-        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample('H').mean()
+        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
         ax.plot(rmse,label=label)
         plt.legend(loc='best')
 
-def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True):
+def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True,sample='H'):
     import matplotlib.dates as mdates
     sns.set_style('ticks')
     df.index = df.datetime
     if fig == None:
-        plt.figure(figsize=(12, 7))
+        plt.figure(figsize=(13, 8))
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
-        mb = (df.CMAQ - df.Obs).resample('H').mean()
+        mb = (df.CMAQ - df.Obs).resample(sample).mean()
         plt.plot(mb,color='dodgerblue',label=label)
         ylabel = species + ' (' + units + ')'
         plt.gca().axes.set_ylabel('MB '+ ylabel)
@@ -278,7 +282,7 @@ def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True):
         plt.grid(alpha=.5)
     else:
         ax = fig.get_axes()[0]
-        rmse = (df.CMAQ - df.Obs).resample('H').mean()
+        rmse = (df.CMAQ - df.Obs).resample(sample).mean()
         ax.plot(rmse,label=label)
         plt.legend(loc='best')
 
@@ -291,7 +295,7 @@ def airnow_kdeplots_param(df, title=None, fig=None, label=None, footer=True):
         maxval1 = score(df.CMAQ.values, per=99.5)
         maxval2 = score(df.Obs.values, per=99.5)
         maxval = max([maxval1, maxval2])
-        plt.figure(figsize=(10, 7))
+        plt.figure(figsize=(13, 8))
 
         sns.kdeplot(df.Obs, color='darkslategrey')
         sns.kdeplot(df.CMAQ, color='dodgerblue')
@@ -341,10 +345,11 @@ def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
     sns.set_style('ticks')
 
     species, units = df.Species.unique()[0], df.Units.unique()[0]
-
-    maxval1 = score(df.CMAQ.values, per=99.5)
-    maxval2 = score(df.Obs.values, per=99.5)
+    mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
+    maxval1 = score(df.CMAQ.values[mask], per=99.5)
+    maxval2 = score(df.Obs.values[mask], per=99.5)
     maxval = max([maxval1, maxval2])
+    print maxval
     if fig == None:
         plt.figure(figsize=(10, 7))
 
@@ -353,7 +358,6 @@ def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
         if maxval <= 10.:
             x = linspace(0, maxval, 25)
         plt.plot(x, x, '--', color='slategrey')
-        mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
         tt = linregress(df.Obs.values[mask], df.CMAQ.values[mask])
         plt.plot(x, tt[0] * x + tt[1], color='tomato')
 
@@ -376,16 +380,18 @@ def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
 
 def airnow_diffscatter_param(df, title=None, fig=None, label=None, footer=True):
     from scipy.stats import scoreatpercentile as score
+    from numpy import isnan
     sns.set_style('ticks')
     df = df.dropna()
+    mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
     if fig == None:
         species, units = df.Species.unique()[0], df.Units.unique()[0]
-        maxval = score(df.Obs.values, per=99.9)
-        minvaly = score(df.CMAQ.values - df.Obs.values, per=.1)
-        maxvaly = score(df.CMAQ.values - df.Obs.values, per=99.9)
+        maxval = score(df.Obs.values[mask], per=99.9)
+        minvaly = score(df.CMAQ.values[mask] - df.Obs.values[mask], per=.1)
+        maxvaly = score(df.CMAQ.values[mask] - df.Obs.values[mask], per=99.9)
         plt.figure(figsize=(10, 7))
 
-        plt.scatter(df.Obs, df.CMAQ - df.Obs, c='cornflowerblue', marker='o', edgecolors='w', alpha=.3, label=label)
+        plt.scatter(df.Obs.values[mask], df.CMAQ.values[mask] - df.Obs.values[mask], c='cornflowerblue', marker='o', edgecolors='w', alpha=.3, label=label)
         plt.plot((0, maxval), (0, 0), '--', color='darkslategrey')
 
         plt.xlim([0, maxval])
@@ -398,7 +404,8 @@ def airnow_diffscatter_param(df, title=None, fig=None, label=None, footer=True):
         plt.tight_layout()
     else:
         ax = fig.get_axes()[0]
-        ax.scatter(df.Obs, df.CMAQ - df.Obs, marker='o', edgecolors='w', alpha=.3, label=label)
+        mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
+        ax.scatter(df.Obs.values[mask], df.CMAQ.values[mask] - df.Obs.values[mask], marker='o', edgecolors='w', alpha=.3, label=label)
         plt.legend(loc='best')
 
 
@@ -565,17 +572,18 @@ def airnow_scatter(df):
 
 
 def airnow_footer_text(df):
-    from numpy import unique
+    from numpy import unique,isnan
     from mystats import NMB, NME, MB, d1
-    nmb = NMB(df.Obs.values, df.CMAQ.values)
-    nme = NME(df.Obs.values, df.CMAQ.values)
-    mb = MB(df.Obs.values, df.CMAQ.values)
-    d1ioa = d1(df.Obs.values, df.CMAQ.values)
+    mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
+    nmb = NMB(df.Obs.values[mask], df.CMAQ.values[mask])
+    nme = NME(df.Obs.values[mask], df.CMAQ.values[mask])
+    mb = MB(df.Obs.values[mask], df.CMAQ.values[mask])
+    d1ioa = d1(df.Obs.values[mask], df.CMAQ.values[mask])
     plt.figtext(.03, .04, df.datetime.min().strftime('START DATE: %Y-%m-%d %H UTC'), fontsize=11, family='monospace')
     plt.figtext(.03, .02, df.datetime.max().strftime('END DATE  : %Y-%m-%d %H UTC'), fontsize=11, family='monospace')
     plt.figtext(0.8, .02, 'd1 = %.3f' % d1ioa, fontsize=11, family='monospace')
     plt.figtext(0.9, .02, 'NME = %.1f' % nme, fontsize=11, family='monospace')
     plt.figtext(0.8, .04, 'MB = %.1f' % mb, fontsize=11, family='monospace')
     plt.figtext(0.9, .04, 'NMB = %.1f' % nmb, fontsize=11, family='monospace')
-    plt.figtext(.3, .04, 'SITES: ' + str(unique(df.SCS.values).shape[0]), fontsize=11, family='monospace')
+    plt.figtext(.3, .04, 'SITES: ' + str(unique(df.SCS.values[mask]).shape[0]), fontsize=11, family='monospace')
     plt.figtext(.3, .02, 'MEASUREMENTS: ' + str(df.SCS.count()), fontsize=11, family='monospace')

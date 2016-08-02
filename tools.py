@@ -1,9 +1,8 @@
 __author__ = 'barry'
-
+import numpy as np
 
 def search_listinlist(array1, array2):
     #find intersections
-    import numpy as np
 
     s1 = set(array1.flatten())
     s2 = set(array2.flatten())
@@ -24,7 +23,6 @@ def search_listinlist(array1, array2):
 
 def linregress(x, y):
     import statsmodels.api as sm
-    import numpy as np
 
     xx = sm.add_constant(x)
     model = sm.OLS(y, xx)
@@ -40,3 +38,40 @@ def findclosest(list, value):
     a = min((abs(x - value), x, i) for i, x in enumerate(list))
     return a[2], a[1]
 
+
+def _force_forder(x):
+    """
+    Converts arrays x to fortran order. Returns
+    a tuple in the form (x, is_transposed).
+    """
+    if x.flags.c_contiguous:
+        return (x.T, True)
+    else:
+        return (x, False)
+
+def simple_idw(weights,z):
+    from scipy import linalg
+    # Multiply the weights for each interpolated point by all observed Z-values
+    A, trans_a = _force_forder(weights)
+    B, trans_b = _force_forder(z)
+    gemm_dot = linalg.get_blas_funcs("gemm", arrays=(A,B))
+    zi = np.dot(weights.T, z)
+    return zi
+
+def distance_matrix(x0, y0, x1, y1):
+    obs = np.vstack((x0, y0)).T
+    interp = np.vstack((x1, y1)).T
+    
+    # Make a distance matrix between pairwise observations
+    # Note: from <http://stackoverflow.com/questions/1871536>
+    # (Yay for ufuncs!)
+    d0 = np.subtract.outer(obs[:,0], interp[:,0])
+    d1 = np.subtract.outer(obs[:,1], interp[:,1])
+
+    weights = 1.0 / np.hypot(d0, d1)
+    weights /= weights.sum(axis=0)
+
+    
+    return weights
+
+print 'reloaded'
