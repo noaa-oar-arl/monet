@@ -189,6 +189,156 @@ class verify_airnow:
             self.df8hr = self.calc_airnow_8hr_max_calc()
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_available()
+    
+    def combine2(self):
+        # get the lats and lons for CMAQ
+        lat = self.cmaq.Latitude
+        lon = self.cmaq.Longitude
+
+        # get the CMAQ dates
+        print 'Acquiring Dates of CMAQ Simulation'
+        print '==============================================================='
+        self.cmaq.get_dates()
+        print 'Simulation Start Date: ', self.cmaq.dates[0].strftime('%Y-%m-%d %H:%M')
+        print 'Simulation End   Date: ', self.cmaq.dates[-1].strftime('%Y-%m-%d %H:%M')
+        print '===============================================================\n'
+        if self.cmaq.metcro2d is None:
+            print 'METCRO2D file not loaded.  To include MET variables please load self.cmaq.open_metcro2d(\'filename\')\n'
+        self.ensure_values_indomain()
+        comparelist = self.airnow.df.Species.unique()
+        g = self.airnow.df.groupby('Species')
+        dfs = []
+        for i in comparelist:
+            if i == 'OZONE':
+                print 'Interpolating Ozone:'
+                dfo3 = g.get_group(i)
+                fac = self.check_cmaq_units(param='O3', airnow_param=i)
+                cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
+                self.cmaqo3 = cmaq
+                dfo3 = self.interp_to_airnow2(cmaq, dfo3)
+                dfs.append(dfo3)
+            elif i == 'PM2.5':
+                print 'Interpolating PM2.5:'
+                dfpm25 = g.get_group(i)
+                fac = self.check_cmaq_units(param='PM25', airnow_param=i)
+                cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
+                dfpm25 = self.interp_to_airnow2(cmaq, dfpm25)
+                self.cmaqpm25 = cmaq
+                dfs.append(dfpm25)
+            elif i == 'PM10':
+                print 'Interpolating PM10:'
+                dfpm = g.get_group(i)
+                fac = self.check_cmaq_units(param='PM10', airnow_param=i)
+                cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
+                dfpm = self.interp_to_airnow2(cmaq, dfpm)
+                self.cmaqpm25 = cmaq
+                dfs.append(dfpm)
+            elif i == 'CO':
+                if 'CO' not in self.cmaq.keys:
+                    pass
+                else:
+                    print 'Interpolating CO:'
+                    dfco = g.get_group(i)
+                    fac = self.check_cmaq_units(param='CO', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
+                    dfco = self.interp_to_airnow2(cmaq, dfco)
+                    self.cmaqco = cmaq
+                    dfs.append(dfco)
+            elif i == 'NOY':
+                if 'NOY' not in self.cmaq.keys:
+                    pass
+                else:
+                    print 'Interpolating NOY:'
+                    dfnoy = g.get_group(i)
+                    fac = self.check_cmaq_units(param='NOY', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
+                    dfnoy = self.interp_to_airnow2(cmaq, dfnoy)
+                    self.cmaqnoy = cmaq
+                    dfs.append(dfnoy)
+            elif i == 'NO':
+                if 'NO' not in self.cmaq.keys:
+                    pass
+                else:
+                    print 'Interpolating NO:'
+                    dfnoy = g.get_group(i)
+                    fac = self.check_cmaq_units(param='NO', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
+                    dfnoy = self.interp_to_airnow2(cmaq, dfnoy)
+                    self.cmaqnoy = cmaq
+                    dfs.append(dfnoy)
+            elif i == 'NO2':
+                if 'NO2' not in self.cmaq.keys:
+                    pass
+                else:
+                    print 'Interpolating NO2:'
+                    dfnoy = g.get_group(i)
+                    fac = self.check_cmaq_units(param='NO2', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
+                    dfnoy = self.interp_to_airnow2(cmaq, dfnoy)
+                    self.cmaqnoy = cmaq
+                    dfs.append(dfnoy)
+            elif i == 'SO2':
+                if 'SO2' not in self.cmaq.keys:
+                    pass
+                else:
+                    print 'Interpolating SO2'
+                    dfso2 = g.get_group(i)
+                    fac = self.check_cmaq_units(param='SO2', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
+                    dfso2 = self.interp_to_airnow2(cmaq, dfso2)
+                    self.cmaqso2 = cmaq
+                    dfs.append(dfso2)
+            elif i == 'NOX':
+                if ('NO' not in self.cmaq.keys) & ('NO2' not in self.cmaq.keys):
+                    pass
+                else:
+                    print 'Interpolating NOX:'
+                    dfnox = g.get_group(i)
+                    fac = self.check_cmaq_units(param='NOX', airnow_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
+                    dfnox = self.interp_to_airnow2(cmaq, dfnox)
+                    self.cmaqnox = cmaq
+                    dfs.append(dfnox)
+            elif i == 'WD':
+                if (self.cmaq.metcro2d is None) | ('WDIR10' not in self.cmaq.metcrokeys):
+                    pass
+                else:
+                    print 'Interpolating Wind Direction:'
+                    dfmet = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
+                    dfmet = self.interp_to_airnow2(cmaq, dfmet)
+                    dfs.append(dfmet)
+            elif i == 'WS':
+                if (self.cmaq.metcro2d is None) | ('WSPD10' not in self.cmaq.metcrokeys):
+                    pass
+                else:
+                    print 'Interpolating Wind Speed:'
+                    dfmet = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
+                    dfmet = self.interp_to_airnow2(cmaq, dfmet)
+                    dfs.append(dfmet)
+            elif i == 'TEMP':
+                if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
+                    pass
+                else:
+                    print 'Interpolating 2 Meter Temperature:'
+                    dfmet = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
+                    dfmet = self.interp_to_airnow2(cmaq, dfmet)
+                    dfmet.Obs += 273.15
+                    dfs.append(dfmet)
+
+        self.df = pd.concat(dfs)
+        if self.airnow.monitor_df is None:
+            print '\n=========================================================================================='
+            print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
+            print 'run: \'df = calc_airnow_8hr_max_calc()\'\n'
+            print '===========================================================================================\n'
+        else:
+            print 'Calculating Daily 8 Hr Max Ozone....\n'
+            self.df8hr = self.calc_airnow_8hr_max_calc()
+        self.df.SCS = self.df.SCS.values.astype('int32')
+        self.print_available()
 
     def print_available(self):
         print 'Available Functions:\n'
@@ -213,6 +363,8 @@ class verify_airnow:
             plots.airnow_domain_bar(df)
         if pdfs:
             plots.airnow_kdeplots(df)
+    
+    
 
     def compare_region_all(self, timeseries=False, scatter=False, bargraph=True, pdfs=False, region='all'):
         from numpy import NaN
@@ -460,27 +612,26 @@ class verify_airnow:
             new = new.append(newt)
         return new
 
-    def interp_to_airnow2(self, cmaqvar, df):
-        from tools import simple_idw,distance_matrix
+    def interp_to_airnow2(self, cmaqvar, df,r=12000.neighbours=10):
+        from pyresample import geometry,image,kd_tree
         from pandas import Series,merge,concat
         from numpy import unique,append,empty
         
         dates = self.cmaq.dates[self.cmaq.indexdates]
         lat = self.cmaq.latitude
         lon = self.cmaq.longitude
-        scs,index = unique(df.SCS.values,return_index=True)
-        lats = df.Latitude.values[index]
-        lons = df.Longitude.values[index]
+        grid1 = geometry.GridDefinition(lons=lon,lats=lat)
         vals = array([],dtype=cmaqvar.dtype)
         date = array([],dtype='O')
         site = array([],dtype=scs.dtype)
-        print '    Calculating Distance Matrix......'
-        w = distance_matrix(lon.flatten(),lat.flatten(),lons,lats)
-        
         for i,j in enumerate(dates):
             print i,j
-            val = simple_idw(w,cmaqvar[i,:,:].squeeze().flatten())
-            vals = append(vals,val)
+            con = df.datetime == j
+            lats = df[con].Latitude.values
+            lons = df[con].Longitude.values
+            grid2 = geometry.GridDefinition(lons=vstack(lons),lats=vstack(lats))
+            wf = lambda r: 1/r**2 
+            vals = kd_tree.resample_custom(grid1,naqfcb.cmaqo3[0,:,:].squeeze(),grid2,radius_of_influence=r,fill_value=None,neighbours=neighbours,weight_funcs=wf)
             dd = empty(lons.shape[0],dtype=date.dtype)
             dd[:] = j
             date = append(date,dd)
