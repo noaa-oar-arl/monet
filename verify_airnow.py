@@ -190,10 +190,20 @@ class verify_airnow:
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_available()
     
-    def combine2(self):
+    def combine2(self,interp='nearest',radius=12000.*2,neighbors=10.,weight_func=lambda r: 1/r**2):
+        ###3 different interpolations
+        ###interp = 'nearest' for nearest neightbor interpolation
+        ###interp = 'idw' for nearest neight interpolation
+        ###interp = 'gauss' for gaussian weighting 
+        ###   if idw is selected you need to provide the weighting function. something like:
+        ###
+        ###   weight_func = lambda r: 1/r**2 for inverse distance squared
+        ###
+        ###   weight_func = lambda r: 1/r    for inverse distance squared
+        ###   
         # get the lats and lons for CMAQ
-        lat = self.cmaq.Latitude
-        lon = self.cmaq.Longitude
+        lat = self.cmaq.latitude
+        lon = self.cmaq.longitude
 
         # get the CMAQ dates
         print 'Acquiring Dates of CMAQ Simulation'
@@ -215,14 +225,14 @@ class verify_airnow:
                 fac = self.check_cmaq_units(param='O3', airnow_param=i)
                 cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
                 self.cmaqo3 = cmaq
-                dfo3 = self.interp_to_airnow2(cmaq, dfo3)
+                dfo3 = self.interp_to_airnow2(cmaq, dfo3,interp=interp,r=radius,weight_func=weight_func)
                 dfs.append(dfo3)
             elif i == 'PM2.5':
                 print 'Interpolating PM2.5:'
                 dfpm25 = g.get_group(i)
                 fac = self.check_cmaq_units(param='PM25', airnow_param=i)
                 cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
-                dfpm25 = self.interp_to_airnow2(cmaq, dfpm25)
+                dfpm25 = self.interp_to_airnow2(cmaq, dfpm25,interp=interp,r=radius,weight_func=weight_func)
                 self.cmaqpm25 = cmaq
                 dfs.append(dfpm25)
             elif i == 'PM10':
@@ -230,7 +240,7 @@ class verify_airnow:
                 dfpm = g.get_group(i)
                 fac = self.check_cmaq_units(param='PM10', airnow_param=i)
                 cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                dfpm = self.interp_to_airnow2(cmaq, dfpm)
+                dfpm = self.interp_to_airnow2(cmaq, dfpm,interp=interp,r=radius,weight_func=weight_func)
                 self.cmaqpm25 = cmaq
                 dfs.append(dfpm)
             elif i == 'CO':
@@ -241,7 +251,7 @@ class verify_airnow:
                     dfco = g.get_group(i)
                     fac = self.check_cmaq_units(param='CO', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
-                    dfco = self.interp_to_airnow2(cmaq, dfco)
+                    dfco = self.interp_to_airnow2(cmaq, dfco,interp=interp,r=radius,weight_func=weight_func)
                     self.cmaqco = cmaq
                     dfs.append(dfco)
             elif i == 'NOY':
@@ -252,7 +262,7 @@ class verify_airnow:
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOY', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
-                    dfnoy = self.interp_to_airnow2(cmaq, dfnoy)
+                    dfnoy = self.interp_to_airnow2(cmaq, dfnoy,interp=interp,r=radius,weight_func=weight_func)
                     self.cmaqnoy = cmaq
                     dfs.append(dfnoy)
             elif i == 'NO':
@@ -263,7 +273,7 @@ class verify_airnow:
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
-                    dfnoy = self.interp_to_airnow2(cmaq, dfnoy)
+                    dfnoy = self.interp_to_airnow2(cmaq, dfnoy,interp=interp,r=radius,weight_func=weight_func)
                     self.cmaqnoy = cmaq
                     dfs.append(dfnoy)
             elif i == 'NO2':
@@ -274,7 +284,7 @@ class verify_airnow:
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO2', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
-                    dfnoy = self.interp_to_airnow2(cmaq, dfnoy)
+                    dfnoy = self.interp_to_airnow2(cmaq, dfnoy,interp=interp,r=radius,weight_func=weight_func)
                     self.cmaqnoy = cmaq
                     dfs.append(dfnoy)
             elif i == 'SO2':
@@ -285,7 +295,7 @@ class verify_airnow:
                     dfso2 = g.get_group(i)
                     fac = self.check_cmaq_units(param='SO2', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
-                    dfso2 = self.interp_to_airnow2(cmaq, dfso2)
+                    dfso2 = self.interp_to_airnow2(cmaq, dfso2,interp=interp,r=radius,weight_func=weight_func)
                     self.cmaqso2 = cmaq
                     dfs.append(dfso2)
             elif i == 'NOX':
@@ -296,7 +306,7 @@ class verify_airnow:
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOX', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
-                    dfnox = self.interp_to_airnow2(cmaq, dfnox)
+                    dfnox = self.interp_to_airnow2(cmaq, dfnox,interp=interp,r=radius,weight_func=weight_func)
                     self.cmaqnox = cmaq
                     dfs.append(dfnox)
             elif i == 'WD':
@@ -306,7 +316,7 @@ class verify_airnow:
                     print 'Interpolating Wind Direction:'
                     dfmet = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
-                    dfmet = self.interp_to_airnow2(cmaq, dfmet)
+                    dfmet = self.interp_to_airnow2(cmaq, dfmet,interp=interp,r=radius,weight_func=weight_func)
                     dfs.append(dfmet)
             elif i == 'WS':
                 if (self.cmaq.metcro2d is None) | ('WSPD10' not in self.cmaq.metcrokeys):
@@ -315,7 +325,7 @@ class verify_airnow:
                     print 'Interpolating Wind Speed:'
                     dfmet = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
-                    dfmet = self.interp_to_airnow2(cmaq, dfmet)
+                    dfmet = self.interp_to_airnow2(cmaq, dfmet,interp=interp,r=radius,weight_func=weight_func)
                     dfs.append(dfmet)
             elif i == 'TEMP':
                 if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
@@ -324,7 +334,7 @@ class verify_airnow:
                     print 'Interpolating 2 Meter Temperature:'
                     dfmet = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
-                    dfmet = self.interp_to_airnow2(cmaq, dfmet)
+                    dfmet = self.interp_to_airnow2(cmaq, dfmet,interp=interp,r=radius,weight_func=weight_func)
                     dfmet.Obs += 273.15
                     dfs.append(dfmet)
 
@@ -337,7 +347,8 @@ class verify_airnow:
         else:
             print 'Calculating Daily 8 Hr Max Ozone....\n'
             self.df8hr = self.calc_airnow_8hr_max_calc()
-        self.df.SCS = self.df.SCS.values.astype('int32')
+        self.df.SCS = self.df.SCS.values
+        self.df.dropna(inplace=True,subset=['Obs','CMAQ'])
         self.print_available()
 
     def print_available(self):
@@ -612,10 +623,10 @@ class verify_airnow:
             new = new.append(newt)
         return new
 
-    def interp_to_airnow2(self, cmaqvar, df,r=12000.neighbours=10):
+    def interp_to_airnow2(self, cmaqvar, df,interp='nearest',r=12000.,n=5,weight_func=lambda r: 1/r**2):
         from pyresample import geometry,image,kd_tree
         from pandas import Series,merge,concat
-        from numpy import unique,append,empty
+        from numpy import unique,append,empty,vstack,NaN
         
         dates = self.cmaq.dates[self.cmaq.indexdates]
         lat = self.cmaq.latitude
@@ -623,19 +634,24 @@ class verify_airnow:
         grid1 = geometry.GridDefinition(lons=lon,lats=lat)
         vals = array([],dtype=cmaqvar.dtype)
         date = array([],dtype='O')
-        site = array([],dtype=scs.dtype)
+        site = array([],dtype=df.SCS.dtype)
+        print '    Interpolating using ' + interp + ' method'
         for i,j in enumerate(dates):
-            print i,j
             con = df.datetime == j
             lats = df[con].Latitude.values
             lons = df[con].Longitude.values
             grid2 = geometry.GridDefinition(lons=vstack(lons),lats=vstack(lats))
-            wf = lambda r: 1/r**2 
-            vals = kd_tree.resample_custom(grid1,naqfcb.cmaqo3[0,:,:].squeeze(),grid2,radius_of_influence=r,fill_value=None,neighbours=neighbours,weight_funcs=wf)
+            if interp.lower() == 'nearest':
+                val = kd_tree.resample_nearest(grid1,cmaqvar[i,:,:].squeeze(),grid2,radius_of_influence=r,fill_value=NaN,nprocs=2).squeeze()
+            elif interp.lower() == 'idw':
+                val = kd_tree.resample_custom(grid1,cmaqvar[i,:,:].squeeze(),grid2,radius_of_influence=r,fill_value=NaN,neighbours=n,weight_funcs=weight_func,nprocs=2).squeeze()
+            elif interp.lower() == 'gauss':
+                val = kd_tree.resample_gauss(grid1,cmaqvar[i,:,:].squeeze(),grid2,radius_of_influence=r,sigmas=r/2.,fill_value=NaN,neighbours=n,nprocs=2).squeeze()
+            vals = append(vals,val)
             dd = empty(lons.shape[0],dtype=date.dtype)
             dd[:] = j
             date = append(date,dd)
-            site = append(site,scs)
+            site = append(site,df[con].SCS.values)
 
         vals = pd.Series(vals)
         date = pd.Series(date)
