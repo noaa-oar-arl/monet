@@ -37,7 +37,7 @@ class verify_aqs:
         self.cmaqco = None
         self.df8hr = None
 
-    def combine(self):
+    def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
         # get the CMAQ dates
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
@@ -56,7 +56,7 @@ class verify_aqs:
                 fac = self.check_cmaq_units(param='O3', aqs_param=i)
                 cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
                 self.cmaqo3 = cmaq
-                dfo3 = self.interp_to_aqs(cmaq, dfo3)
+                dfo3 = self.interp_to_aqs(cmaq, dfo3, interp=interp, r=radius, weight_func=weight_func)
                 dfo3.Obs, dfo3.CMAQ = dfo3.Obs, dfo3.CMAQ
                 dfo3.Units = 'PPB'
                 dfs.append(dfo3)
@@ -65,7 +65,7 @@ class verify_aqs:
                 dfpm25 = g.get_group(i)
                 fac = self.check_cmaq_units(param='PM25', aqs_param=i)
                 cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
-                dfpm25 = self.interp_to_aqs(cmaq, dfpm25)
+                dfpm25 = self.interp_to_aqs(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func)
                 self.cmaqpm25 = cmaq
                 dfs.append(dfpm25)
             elif i == 'CO':
@@ -76,7 +76,7 @@ class verify_aqs:
                     dfco = g.get_group(i)
                     fac = self.check_cmaq_units(param='CO', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
-                    dfco = self.interp_to_aqs(cmaq, dfco)
+                    dfco = self.interp_to_aqs(cmaq, dfco, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqco = cmaq
                     dfs.append(dfco)
             elif i == 'NOY':
@@ -88,7 +88,7 @@ class verify_aqs:
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOY', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
-                    dfnoy = self.interp_to_aqs(cmaq, dfnoy)
+                    dfnoy = self.interp_to_aqs(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqnoy = cmaq
 
                     dfs.append(dfnoy)
@@ -100,7 +100,7 @@ class verify_aqs:
                     dfso2 = g.get_group(i)
                     fac = self.check_cmaq_units(param='SO2', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
-                    dfso2 = self.interp_to_aqs(cmaq, dfso2)
+                    dfso2 = self.interp_to_aqs(cmaq, dfso2, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqso2 = cmaq
                     dfs.append(dfso2)
             elif i == 'NOX':
@@ -111,7 +111,7 @@ class verify_aqs:
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOX', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqno = cmaq
                     dfs.append(dfnox)
             elif i == 'NO':
@@ -122,7 +122,7 @@ class verify_aqs:
                     dfno = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
-                    dfno = self.interp_to_aqs(cmaq, dfno)
+                    dfno = self.interp_to_aqs(cmaq, dfno, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqno = cmaq
                     dfs.append(dfno)
             elif i == 'NO2':
@@ -133,7 +133,7 @@ class verify_aqs:
                     dfno2 = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO2', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
-                    dfno2 = self.interp_to_aqs(cmaq, dfno2)
+                    dfno2 = self.interp_to_aqs(cmaq, dfno2, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqno2 = cmaq
                     dfs.append(dfno2)
             elif i == 'PM2.5_SO4':
@@ -144,7 +144,7 @@ class verify_aqs:
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM25_SO4', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='PM25_SO4') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpso4 = cmaq
                     dfs.append(dfnox)
             elif i == 'PM10':
@@ -155,7 +155,7 @@ class verify_aqs:
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM10', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpso4 = cmaq
                     dfs.append(dfnox)
             elif i == 'PM2.5_NO3':
@@ -166,7 +166,7 @@ class verify_aqs:
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM25_NO3', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='PM25_NO3') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpno3 = cmaq
                     dfs.append(dfnox)
             elif i == 'ISOPRENE':
@@ -177,7 +177,7 @@ class verify_aqs:
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpno3 = cmaq
                     dfs.append(dfnox)
             elif i == 'WS':
@@ -187,7 +187,7 @@ class verify_aqs:
                     print 'Interpolating WS:'
                     dfnox = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
-                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     dfs.append(dfnox)
             elif i == 'TEMP':
                 if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
@@ -196,7 +196,7 @@ class verify_aqs:
                     print 'Interpolating TEMP:'
                     dfnox = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
-                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     dfs.append(dfnox)
             elif i == 'WD':
                 if (self.cmaq.metcro2d is None) | ('WDIR10' not in self.cmaq.metcrokeys):
@@ -205,7 +205,7 @@ class verify_aqs:
                     print 'Interpolating WD:'
                     dfnox = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
-                    dfnox = self.interp_to_aqs(cmaq, dfnox)
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     dfs.append(dfnox)
 
         self.df = concat(dfs)
@@ -277,7 +277,8 @@ class verify_aqs:
             if pdfs:
                 plots.airnow_kdeplots(df2)
 
-    def compare_param(self, param='OZONE', site='', city='', region='', state='',timeseries=False, scatter=False, pdfs=False,
+    def compare_param(self, param='OZONE', site='', city='', region='', state='', timeseries=False, scatter=False,
+                      pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
                       label=None, footer=True):
         from numpy import NaN
@@ -298,9 +299,9 @@ class verify_aqs:
                     print name
             df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
             title = name
-        elif state !='':
+        elif state != '':
             df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
-            title= state
+            title = state
         elif region != '':
             df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
             title = region
@@ -383,7 +384,7 @@ class verify_aqs:
             cmaq = self.cmaqso2
         elif param == 'NOX':
             cmaq = self.cmaqnox
-        cmaq= masked_less(cmaq,.25)
+        cmaq = masked_less(cmaq, .25)
         m = self.cmaq.choose_map(path, region)
         if date == '':
             for index, i in enumerate(self.cmaq.dates):
@@ -435,29 +436,57 @@ class verify_aqs:
         rmse = mystats.RMSE(df.Obs.values, df.cmaq.values)
         return mb, r2, ioa, rmse
 
-    def interp_to_aqs(self, cmaqvar, df):
-        from scipy.interpolate import griddata
-        dates = self.cmaq.dates
-        lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
-        lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
+    def interp_to_aqs(self, cmaqvar, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2):
+        """
 
-        con = df.datetime == self.cmaq.dates[self.cmaq.indexdates][0]
-        new = df[con]
-        print '   Interpolating values to AQS, Date : ', dates[0].strftime('%B %d %Y %H utc')
-        cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[0, :, :].flatten(),
-                                      (new.Longitude.values, new.Latitude.values), method='nearest'),
-                             columns=['CMAQ'], index=new.index)
-        new = new.join(cmaq_val)
-        for i, j in enumerate(self.cmaq.dates[self.cmaq.indexdates][1:]):
-            print '   Interpolating values to AQS, Date : ', j.strftime('%B %d %Y %H utc')
+        :param cmaqvar: this is the CMAQ 3D variable
+        :param df: The aqs
+        :param interp:
+        :param r:
+        :param n:
+        :param weight_func:
+        :return:
+        """
+        from pyresample import geometry, kd_tree
+        from pandas import concat, Series, merge
+        from numpy import append, empty, vstack, NaN
+
+        dates = self.cmaq.dates[self.cmaq.indexdates]
+        lat = self.cmaq.latitude
+        lon = self.cmaq.longitude
+        grid1 = geometry.GridDefinition(lons=lon, lats=lat)
+        vals = array([], dtype=cmaqvar.dtype)
+        date = array([], dtype='O')
+        site = array([], dtype=df.SCS.dtype)
+        print '    Interpolating using ' + interp + ' method'
+        for i, j in enumerate(dates):
             con = df.datetime == j
-            newt = df[con]
-            cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i, :, :].flatten(),
-                                          (newt.Longitude.values, newt.Latitude.values), method='nearest'),
-                                 columns=['CMAQ'], index=newt.index)
-            newt = newt.join(cmaq_val)
-            new = new.append(newt)
-        return new
+            lats = df[con].Latitude.values
+            lons = df[con].Longitude.values
+            grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
+            if interp.lower() == 'nearest':
+                val = kd_tree.resample_nearest(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
+                                               fill_value=NaN, nprocs=2).squeeze()
+            elif interp.lower() == 'idw':
+                val = kd_tree.resample_custom(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
+                                              fill_value=NaN, neighbours=n, weight_funcs=weight_func,
+                                              nprocs=2).squeeze()
+            elif interp.lower() == 'gauss':
+                val = kd_tree.resample_gauss(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
+                                             sigmas=r / 2., fill_value=NaN, neighbours=n, nprocs=2).squeeze()
+            vals = append(vals, val)
+            dd = empty(lons.shape[0], dtype=date.dtype)
+            dd[:] = j
+            date = append(date, dd)
+            site = append(site, df[con].SCS.values)
+
+        vals = Series(vals)
+        date = Series(date)
+        site = Series(site)
+        dfs = concat([vals, date, site], axis=1, keys=['CMAQ', 'datetime', 'SCS'])
+        df = merge(df, dfs, how='left', on=['SCS', 'datetime'])
+
+        return df
 
     def interp_to_improve_unknown(self, cmaqvar, df, varname):
         from scipy.interpolate import griddata

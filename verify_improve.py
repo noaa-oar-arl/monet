@@ -2,8 +2,8 @@
 from datetime import datetime
 
 import matplotlib.pyplot as plt
-from pandas import DataFrame,concat
 from numpy import array, where
+from pandas import concat
 
 import mystats
 import plots
@@ -36,7 +36,7 @@ class verify_improve:
         self.cmaqmg = None
         self.df8hr = None
 
-    def combine(self):
+    def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
         self.cmaq.get_dates()
@@ -56,7 +56,7 @@ class verify_improve:
                     dfpm25 = g.get_group(i)
                     fac = self.check_cmaq_units(param='CLf', improve_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='CLf') * fac
-                    dfpm25 = self.interp_to_improve(cmaq, dfpm25)
+                    dfpm25 = self.interp_to_improve(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm25)
                 else:
@@ -66,7 +66,7 @@ class verify_improve:
                 dfpm = g.get_group(i)
                 fac = self.check_cmaq_units(param='PM10', improve_param=i)
                 cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                dfpm = self.interp_to_improve(cmaq, dfpm)
+                dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
                 self.cmaqpm25 = cmaq
                 dfs.append(dfpm)
             elif i == 'PM2.5':
@@ -74,7 +74,7 @@ class verify_improve:
                 dfpm = g.get_group(i)
                 fac = self.check_cmaq_units(param='PM25', improve_param=i)
                 cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
-                dfpm = self.interp_to_improve(cmaq, dfpm)
+                dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
                 self.cmaqpm25 = cmaq
                 dfs.append(dfpm)
             elif i == 'NAf':
@@ -83,7 +83,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NAf', improve_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NAf') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm)
+                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm)
                 else:
@@ -94,7 +94,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='MGf', improve_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='MGf') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm)
+                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm)
                 else:
@@ -105,7 +105,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='Kf', improve_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='Kf') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm)
+                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm)
                 else:
@@ -116,7 +116,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='CAf', improve_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='CAf') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm)
+                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm)
                 else:
@@ -127,7 +127,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='SO4f', improve_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='SO4f') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm)
+                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm)
                 else:
@@ -138,7 +138,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NH4f', improve_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NH4f') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm)
+                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm)
                 else:
@@ -149,7 +149,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO3f', improve_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO3f') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm)
+                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm)
                 else:
@@ -169,7 +169,6 @@ class verify_improve:
     def compare_param(self, param='OZONE', improvesite='', epasite='', state='', region='', timeseries=False,
                       scatter=False, pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False,
                       timeseries_mb=False, fig=None, label=None, footer=True):
-        from numpy import NaN
         df = self.df.copy()
         g = df.groupby('Species')
         new = g.get_group(param)
@@ -193,7 +192,7 @@ class verify_improve:
             df2 = new
             title = 'Domain'
         if timeseries:
-            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer,sample='3D')
+            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
         if scatter:
             plots.airnow_scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
         if pdfs:
@@ -203,11 +202,11 @@ class verify_improve:
         if diffpdfs:
             plots.airnow_diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_rmse:
-            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer,sample='3D')
+            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
         if timeseries_mb:
-            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer,sample='3D')
+            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
 
-    def improve_spatial(self, df, date,param='NAf', path='', region='', xlim=[], ylim=[]):
+    def improve_spatial(self, df, date, param='NAf', path='', region='', xlim=[], ylim=[]):
         """
         :param param: Species Parameter: 
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
@@ -247,69 +246,54 @@ class verify_improve:
         rmse = mystats.RMSE(df.Obs.values, df.cmaq.values)
         return mb, r2, ioa, rmse
 
-    def interp_to_improve(self, cmaqvar, df):
+    def interp_to_improve(self, cmaqvar, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2):
         import pandas as pd
-        from numpy import unique,isnan
-        from scipy.interpolate import griddata
-        from tools import search_listinlist
+        from numpy import unique
+        from pyresample import geometry, kd_tree
+        from numpy import vstack, NaN
+        grid1 = geometry.GridDefinition(lons=self.cmaq.longitude, lats=self.cmaq.latitude)
         dates = self.cmaq.dates[self.cmaq.indexdates]
-        #only interpolate to sites with latitude and longitude
-        df.dropna(subset=['Latitude','Longitude'],inplace=True)
-        vals,index = unique(df.Site_Code,return_index=True)
+        # only interpolate to sites with latitude and longitude
+        df.dropna(subset=['Latitude', 'Longitude'], inplace=True)
+        vals, index = unique(df.Site_Code, return_index=True)
         lats = df.Latitude.values[index]
         lons = df.Longitude.values[index]
+        grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
         sites = df.Site_Code.values[index]
-        lat = self.cmaq.latitude
-        lon = self.cmaq.longitude
         dfs = []
         vals = pd.Series(dtype=df.Obs.dtype)
         date = pd.Series(dtype=df.datetime.dtype)
         site = pd.Series(dtype=df.Site_Code.dtype)
-        for i,j in enumerate(self.cmaq.indexdates):
+        for i, j in enumerate(self.cmaq.indexdates):
             print '   Interpolating values to IMPROVE Sites. Date : ', self.cmaq.dates[j].strftime('%B %d %Y   %H utc')
-            vals = vals.append(pd.Series(griddata((lon.flatten(), lat.flatten()), cmaqvar[i, :, :].flatten(),(lons, lats), method='nearest'))).reset_index(drop=True)
+            if interp.lower() == 'idw':
+                val = kd_tree.resample_custom(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
+                                              fill_value=NaN, neighbours=n, weight_funcs=weight_func,
+                                              nprocs=2).squeeze()
+            elif interp.lower() == 'gauss':
+                val = kd_tree.resample_gauss(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
+                                             sigmas=r / 2., fill_value=NaN, neighbours=n, nprocs=2).squeeze()
+            else:
+                interp = 'nearest'
+                val = kd_tree.resample_nearest(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
+                                               fill_value=NaN, nprocs=2).squeeze()
+            vals = vals.append(pd.Series(val)).reset_index(drop=True)
             date = date.append(pd.Series([self.cmaq.dates[j] for k in lons])).reset_index(drop=True)
             site = site.append(pd.Series(sites)).reset_index(drop=True)
-        dfs = pd.concat([vals,date,site],axis=1,keys=['CMAQ','datetime','Site_Code'])
+        dfs = pd.concat([vals, date, site], axis=1, keys=['CMAQ', 'datetime', 'Site_Code'])
 
         g = dfs.groupby('Site_Code')
         q = pd.DataFrame()
         for i in dfs.Site_Code.unique():
             c = g.get_group(i)
             c.index = c.datetime
-            c.drop('datetime',axis=1,inplace=True)
-            r = c.rolling(window=72).mean() #boxcar smoother
+            c.drop('datetime', axis=1, inplace=True)
+            r = c.rolling(window=72).mean()  # boxcar smoother
             r.reset_index(inplace=True)
             q = q.append(r).reset_index(drop=True)
-        df = pd.merge(df,q,how='left',on=['Site_Code','datetime']).dropna(subset=['CMAQ'])
+        df = pd.merge(df, q, how='left', on=['Site_Code', 'datetime']).dropna(subset=['CMAQ'])
 
         return df
-
-    def interp_to_improve_unknown(self, cmaqvar, df, varname):
-        from scipy.interpolate import griddata
-        dates = self.cmaq.dates[self.cmaq.indexdates]
-        lat = self.cmaq.latitude
-        lon = self.cmaq.longitude
-
-        con = df.datetime == self.cmaq.dates[self.cmaq.indexdates][0]
-        new = df[con]
-        print '   Interpolating values to AirNow, Date : ', self.cmaq.dates[self.cmaq.indexdates][0].strftime(
-                '%B %d %Y   %H utc')
-        cmaq_val = DataFrame(
-                griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
-                         (new.Longitude.values, new.Latitude.values), method='nearest'),
-                columns=[varname], index=new.index)
-        new = new.join(cmaq_val)
-        for i, j in enumerate(self.cmaq.dates[self.cmaq.indexdates][1:]):
-            print '   Interpolating values to AirNow, Date : ', j.strftime('%B %d %Y %H utc')
-            con = df.datetime == j
-            newt = df[con]
-            cmaq_val = DataFrame(griddata((lon.flatten(), lat.flatten()), cmaqvar[i + 1, :, :].flatten(),
-                                             (newt.Longitude.values, newt.Latitude.values), method='nearest'),
-                                    columns=[varname], index=newt.index)
-            newt = newt.join(cmaq_val)
-            new = new.append(newt)
-        return new
 
     def check_cmaq_units(self, param='O3', improve_param='OZONE'):
         aunit = self.improve.df[self.improve.df.Species == improve_param].Units.unique()[0]
