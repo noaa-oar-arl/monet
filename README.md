@@ -5,7 +5,7 @@
 
 This is the start to an ARL verification package. Currently, it handles CMAQ 4.7.1+, EPA AQS surface data, EPA AIRNOW, and the IMPROVE Aerosol data network. It will compute statistics, make time series, spatial and scatter plots, and more!  
 
-The ARL verification package is meant to be a one stop shop for quick verification and study of CMAQ data (in the future we will want to add more models such as HYSPLIT, NMMB, WRF-ARW, and NGGPS).  
+The ARL verification package is meant to be a one stop shop for quick verification and study of CMAQ data (in the future we will want to add more models such as HYSPLIT, NMMB, WRF-ARW, and NGGPS and observations such as NADP, iicart flight data, VIIRS, MODIS, GOES-R, etc).  
 
 In the future, the addition of satellite data and more may be included.
 ### WHATS NEW!!!!
