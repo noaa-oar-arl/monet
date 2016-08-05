@@ -5,6 +5,19 @@
 
 def aqs_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
                interp='gauss'):
+    """
+
+    :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
+    :param gridcro: Path to the GRIDCRO2D file: example: 'aqm.t12z.gridcro2d.ncf'
+    :param met2dpath: The path to the metcro2d file / files: example: 'CMAQ/aqm.*.metcro2d.ncf'
+    :param datapath: Path to the observational data: example 'DATA' or 'DATA'
+    :param combine: True or false.  if False it will not interpolate CMAQ results to Observations
+    :param radius: 'used for interpolation.  Radius is in meters'
+    :param neighbors: 'number of neighbors used in interpolation
+    :param interp: 'interpolation method.  Valid answers are: 'nearest', 'idw', 'gauss'
+                    note.  if idw you must supply a weight_func.  Example: weight_func=lambda r: 1/r**2
+    :return: verify_aqs() object
+    """
     from verify_aqs import verify_aqs
     va = verify_aqs()
     va.cmaq.open(file=concpath)
@@ -23,6 +36,19 @@ def aqs_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
 
 def airnow_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
                   interp='gauss', airnowoutput=''):
+    """
+
+    :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
+    :param gridcro: Path to the GRIDCRO2D file: example: 'aqm.t12z.gridcro2d.ncf'
+    :param met2dpath: The path to the metcro2d file / files: example: 'CMAQ/aqm.*.metcro2d.ncf'
+    :param datapath: Path to the observational data: example 'DATA' or 'DATA'
+    :param combine: True or false.  if False it will not interpolate CMAQ results to Observations
+    :param radius: 'used for interpolation.  Radius is in meters'
+    :param neighbors: 'number of neighbors used in interpolation
+    :param interp: 'interpolation method.  Valid answers are: 'nearest', 'idw', 'gauss'
+                    note.  if idw you must supply a weight_func.  Example: weight_func=lambda r: 1/r**2
+    :return: verify_aqs() object
+    """
     from verify_airnow import verify_airnow
     va = verify_airnow()
     va.cmaq.open(file=concpath)
@@ -47,6 +73,19 @@ def airnow_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
 
 def improve_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
                    interp='gauss'):
+    """
+
+    :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
+    :param gridcro: Path to the GRIDCRO2D file: example: 'aqm.t12z.gridcro2d.ncf'
+    :param met2dpath: The path to the metcro2d file / files: example: 'CMAQ/aqm.*.metcro2d.ncf'
+    :param datapath: Path to the observational data: example 'DATA' or 'DATA'
+    :param combine: True or false.  if False it will not interpolate CMAQ results to Observations
+    :param radius: 'used for interpolation.  Radius is in meters'
+    :param neighbors: 'number of neighbors used in interpolation
+    :param interp: 'interpolation method.  Valid answers are: 'nearest', 'idw', 'gauss'
+                    note.  if idw you must supply a weight_func.  Example: weight_func=lambda r: 1/r**2
+    :return: verify_aqs() object
+    """
     from verify_improve import verify_improve
     va = verify_improve()
     va.cmaq.open(file=concpath)
