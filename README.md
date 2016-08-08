@@ -45,18 +45,12 @@ Many of the required packages can be gotten with the Anaconda or Enthought Canop
 Required packges:
 
   * pyresample
-
   * basemap
-
   * pandas
-  
   * numpy
-  
   * scipy
-  
   * datetime
-  
   * ftplib
-  
   * pywget
+  * netcdf4-python
 
