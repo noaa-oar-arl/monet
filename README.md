@@ -38,3 +38,25 @@ Please refer to [Make Spatial Plot tutorial](https://github.com/bakerbd/arl_veri
 ![PDFS Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_pdf.jpg?raw=true)
 ![Difference Scatter Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_diffscatter.jpg?raw=true)
 ![Difference PDFS Plots](https://github.com/bakerbd/arl_verify/blob/master/sample_figures/no2_diffpdf.jpg?raw=true)
+
+###Required Packages
+Many of the required packages can be gotten with the Anaconda or Enthought Canopy python packages.
+
+Required packges:
+
+  pyresample
+
+  basemap
+
+  pandas
+  
+  numpy
+  
+  scipy
+  
+  datetime
+  
+  ftplib
+  
+  pywget
+
