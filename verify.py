@@ -35,7 +35,7 @@ def aqs_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
 
 
 def airnow_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
-                  interp='gauss', airnowoutput=''):
+                  interp='gauss', airnowoutput='',user='',passw=''):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -52,6 +52,8 @@ def airnow_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
     from verify_airnow import verify_airnow
     va = verify_airnow()
     va.cmaq.open_cmaq(file=concpath)
+    va.airnow.username=user
+    va.airnow.password=passw
     va.cmaq.set_gridcro2d(gridcro)
     va.cmaq.get_dates()
     va.airnow.dates = va.cmaq.dates
