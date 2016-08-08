@@ -7,8 +7,8 @@ This is the start to an ARL verification package. Currently, it handles CMAQ 4.7
 
 The ARL verification package is meant to be a one stop shop for quick verification and study of CMAQ data (in the future we will want to add more models such as HYSPLIT, NMMB, WRF-ARW, and NGGPS and observations such as NADP, iicart flight data, VIIRS, MODIS, GOES-R, etc).  
 
-In the future, the addition of satellite data and more may be included.
 ### WHATS NEW!!!!
+
 * Interpolation routines now use pyresample KDTrees.  You have the option of nearest neighbor, custom method (1/r or 1/r**2 or what have you), or a guassian method for KDTrees.  This replaces the scipy.interpolate.griddata.  The result is more flexibility and about 800% speedup in interpolating model results to observations.
 * Added a verify driver.  Currently, this is a rudimentary driver.  It only returns a verification object for one of the previous verification objects (verifiy_airnow, verify_aqs, verify_improve).  Updates to the WIKI will be coming shortly.  Stay tuned. 
 
