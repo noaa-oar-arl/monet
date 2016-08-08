@@ -14,7 +14,7 @@ The ARL verification package is meant to be a one stop shop for quick verificati
 
 ### Basic tutorial for AIRNOW and AQS.  
 
-Please refer to the [AQS Tutorial ](https://github.com/bakerbd/arl_verify/wiki/Compare-CMAQ-to-AQS) and [AIRNOW](https://github.com/bakerbd/arl_verify/wiki/Comparing-CMAQ-and-AirNow)
+Please refer to the [AQS Tutorial ](https://github.com/bakerbd/arl_verify/wiki/Compare-CMAQ-to-AQS), [AIRNOW Tutorial](https://github.com/bakerbd/arl_verify/wiki/Comparing-CMAQ-and-AirNow), and [IMPROVE Tutorial](https://github.com/bakerbd/arl_verify/wiki/Compare-CMAQ-to-the-IMPROVE-Network)
 
 The function calls are nearly identical (except for retrieving and loading the network dataset the package is identical).  
 
