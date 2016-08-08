@@ -20,7 +20,7 @@ def aqs_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
     """
     from verify_aqs import verify_aqs
     va = verify_aqs()
-    va.cmaq.open(file=concpath)
+    va.cmaq.open_cmaq(file=concpath)
     va.cmaq.set_gridcro2d(gridcro)
     va.cmaq.get_dates()
     if met2dpath != '':
@@ -51,7 +51,7 @@ def airnow_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
     """
     from verify_airnow import verify_airnow
     va = verify_airnow()
-    va.cmaq.open(file=concpath)
+    va.cmaq.open_cmaq(file=concpath)
     va.cmaq.set_gridcro2d(gridcro)
     va.cmaq.get_dates()
     va.airnow.dates = va.cmaq.dates
@@ -88,7 +88,7 @@ def improve_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=T
     """
     from verify_improve import verify_improve
     va = verify_improve()
-    va.cmaq.open(file=concpath)
+    va.cmaq.open_cmaq(file=concpath)
     va.cmaq.set_gridcro2d(gridcro)
     va.cmaq.get_dates()
     va.improve.dates = va.cmaq.dates
