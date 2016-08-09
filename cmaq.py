@@ -76,14 +76,14 @@ class cmaq:
         #       file='this_is_my_files*.ncf'
         from glob import glob
         from numpy import sort
-        if self.fname == None:
+        if type(file) == str:
             self.fname = sort(array(glob(file)))
         else:
-            self.fname = sort(array(self.fname))
-        if self.fname.shape[0] > 1:
+            self.fname = sort(array(file))
+        if self.fname.shape[0] >= 1:
             self.load_multi_cmaq_runs()
         else:
-            self.load_single_cmaq_run()
+            print 'Files not found'
         self.keys = self.get_keys(self.concobj)
 
     def open_metcro2d(self, file):
