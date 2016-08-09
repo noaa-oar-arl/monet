@@ -3,7 +3,7 @@
 # this is done to make creating verifications easier
 
 
-def aqs_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
+def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
                interp='gauss'):
     """
 
@@ -34,7 +34,7 @@ def aqs_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
     return va
 
 
-def airnow_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
+def verify_airnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
                   interp='gauss', airnowoutput='',user='',passw=''):
     """
 
@@ -73,7 +73,7 @@ def airnow_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
     return va
 
 
-def improve_verify(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
+def verify_improve(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
                    interp='gauss'):
     """
 
