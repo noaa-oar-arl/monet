@@ -79,9 +79,10 @@ class airnow:
 
     def change_back(self):
         os.chdir(self.cwd)
-        
+
     def download_hourly_files(self, path='.'):
         from numpy import empty,where
+        self.datadir = path
         self.change_path()
         print 'Connecting to FTP: ' + self.url
         self.openftp()
@@ -100,7 +101,7 @@ class airnow:
             year = self.dates[0].strftime('%Y')
             self.ftp.cwd('/HourlyData/Archive/'+year)
             for i in array(self.datestr)[index]:
-                if os.path.exists(path + '/' + i) == False:
+                if os.path.exists(i) == False:
                     print 'Downloading from Archive: ', i
                     self.download_single_rawfile(i)
                 else:
@@ -112,7 +113,7 @@ class airnow:
             year = self.dates[0].strftime('%Y')
             self.ftp.cwd('/HourlyData')
             for i in array(self.datestr)[index]:
-                if os.path.exists(path + '/' + i) == False:
+                if os.path.exists(i) == False:
                     print 'Downloading from HourlyData: ' + i
                     self.download_single_rawfile(i)
                 else:
@@ -124,32 +125,25 @@ class airnow:
     def aggragate_files(self, output=''):
         from numpy import sort
         from datetime import datetime
+        from StringIO import StringIO
         self.change_path()
         fnames = sort(self.filelist)
-        ff = []
-        if fnames.shape[0] < 2:
-            print 'Loading ' + fnames[0]
-            dft = pd.read_csv(fnames[0], delimiter='|', header=None, parse_dates=[[0, 1]], infer_datetime_format=True,
-                              na_values='-999')
-            cols = ['datetime', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
-            dft.columns = cols
-            self.df = dft.copy()
-        else:
-            for i in fnames:
-                print 'Aggregating: ' + i
-                dft = pd.read_csv(i, delimiter='|', header=None, parse_dates=[[0, 1]], infer_datetime_format=True,
-                                  na_values='-999')
-                cols = ['datetime', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
-                dft.columns = cols
-                dft.datetime = dft.datetime.values.astype('M8[s]').astype(datetime)
-                dft.index = dft.datetime
-                ff.append(dft)
-
-        self.df = pd.concat(ff)
+        a = ''
+        for i in fnames:
+            with open(i,'rb') as f:
+                a = a + f.read()
+        dft = pd.read_csv(StringIO(a),delimiter='|',header=None)
+        cols = ['date','time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
+        dft.columns = cols
+        dates = [datetime.strptime(x+' '+y,'%m/%d/%y %H:%M') for x,y in zip(dft.date.values,dft.time.values)]
+        dft.drop('date',axis=1,inplace=True)
+        dft.drop('time',axis=1,inplace=True)
+        dft['datetime'] = dates
+        self.df = dft.copy()
         self.calc_datetime()
         print '    Adding in Meta-data'
         self.get_station_locations()
-        self.get_region()
+        self.get_region2()
         self.df = self.df.copy().drop_duplicates()
         self.df = self.df[self.savecols]
         if output == '':
@@ -195,21 +189,23 @@ class airnow:
         self.monitor_df = f.copy()
 
     def get_region(self):
-        sn = self.df.State_Name.values
-        sr = []
-        for i in sn:
-            if i in self.se_states:
-                sr.append('Southeast')
-            elif i in self.ne_states:
-                sr.append('Northeast')
-            elif i in self.nc_states:
-                sr.append('North Central')
-            elif i in self.sc_states:
-                sr.append('South Central')
-            elif i in self.p_states:
-                sr.append('Pacific')
-            elif i in self.r_states:
-                sr.append('Rockies')
-            else:
-                sr.append('????')
+        sr = self.df.State_Name.values
+        for i in self.se_states:
+            con = sr == i
+            sr[con] = 'Southeast'
+        for i in self.ne_states:
+            con= sr == i
+            sr[con] = 'Northeast'
+        for i in self.nc_states:
+            con= sr == i
+            sr[con] = 'North Central'
+        for i in self.sc_states:
+            con= sr == i
+            sr[con] = 'South Central'
+        for i in self.p_states:
+            con= sr == i
+            sr[con] = 'Pacific'
+        for i in self.r_states:
+            con= sr == i
+            sr[con] = 'Rockies'
         self.df['Region'] = array(sr)

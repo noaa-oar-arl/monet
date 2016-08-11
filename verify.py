@@ -56,14 +56,14 @@ def verify_airnow(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
     va.airnow.password=passw
     va.cmaq.set_gridcro2d(gridcro)
     va.cmaq.get_dates()
-    va.airnow.dates = va.cmaq.dates
+    va.airnow.dates = va.cmaq.dates[va.cmaq.indexdates]
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     if datapath[-4:] == '.hdf':
         from pandas import read_hdf
         va.airnow.df = read_hdf(datapath)
     else:
-        va.airnow.download_hourly_files(datapath)
+        va.airnow.download_hourly_files(path=datapath)
         va.airnow.aggragate_files(airnowoutput)
     va.airnow.datadir = datapath
     va.airnow.monitor_file = '/data/aqf/barryb/monitoring_site_locations.dat'
