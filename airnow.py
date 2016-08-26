@@ -22,7 +22,7 @@ class airnow:
         self.ftp = None
         self.df = None
         self.se_states = array(
-                ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TX',
+                ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN',
                  'VA', 'WV'], dtype='|S14')
         self.ne_states = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA',
                                 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'],
@@ -143,7 +143,7 @@ class airnow:
         self.calc_datetime()
         print '    Adding in Meta-data'
         self.get_station_locations()
-        self.get_region2()
+        self.get_region()
         self.df = self.df.copy().drop_duplicates()
         self.df = self.df[self.savecols]
         if output == '':
@@ -189,7 +189,7 @@ class airnow:
         self.monitor_df = f.copy()
 
     def get_region(self):
-        sr = self.df.State_Name.values
+        sr = self.df.State_Name.copy().values
         for i in self.se_states:
             con = sr == i
             sr[con] = 'Southeast'
@@ -208,4 +208,7 @@ class airnow:
         for i in self.r_states:
             con= sr == i
             sr[con] = 'Rockies'
+        sr[sr == 'CC'] = 'Canada'
+        sr[sr == 'MX'] = 'Mexico'
+
         self.df['Region'] = array(sr)

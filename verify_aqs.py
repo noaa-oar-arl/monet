@@ -35,6 +35,7 @@ class verify_aqs:
         self.cmaqpm25 = None
         self.cmaqso2 = None
         self.cmaqco = None
+        self.cmaqisop = None
         self.df8hr = None
 
     def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
@@ -178,7 +179,7 @@ class verify_aqs:
                     fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
                     dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqpno3 = cmaq
+                    self.cmaqisop = cmaq
                     dfs.append(dfnox)
             elif i == 'WS':
                 if (self.cmaq.metcro2d is None) | ('WSPD10' not in self.cmaq.metcrokeys):
@@ -223,8 +224,6 @@ class verify_aqs:
     def print_info(self):
         print 'Ready to Compare!!!!!!!!!!!!!\n'
         print 'Available Functions:\n'
-        print '    compare_domain_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
-        print '    compare_region_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
         print '    aqs_spatial(df, param=\'OZONE\', path='', region='', date=\'YYYY-MM-DD HH:MM\')'
         print '    aqs_spatial_8hr(df, path=\'cmaq-basemap-conus.p\', region=\'northeast\', date=\'YYYY-MM-DD\')'
         print '    compare_param(param=\'OZONE\', region=\'\', city=\'\',timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
@@ -234,49 +233,6 @@ class verify_aqs:
         print 'Defined EPA Regions:'
         print '    ', self.df.Region.unique()
 
-    def compare_domain_all(self, timeseries=False, scatter=False, bargraph=True, pdfs=False):
-
-        from numpy import NaN
-        df = self.df.copy()[['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units']]
-        df[df < -990] = NaN
-        if timeseries:
-            plots.airnow_timeseries(df, title='Domain Timeseries')
-        if scatter:
-            plots.airnow_scatter(df)
-        if bargraph:
-            plots.airnow_domain_bar(df)
-        if pdfs:
-            plots.airnow_kdeplots(df)
-
-    def compare_region_all(self, timeseries=False, scatter=False, bargraph=True, pdfs=False, region='all'):
-        from numpy import NaN
-        region = region.upper()
-        df = self.df.copy()[['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units']]
-        df[df < -990] = NaN
-        if region == 'ALL':
-            regions = ['Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific']
-            for i in regions:
-                df2 = df[df['Region'] == i].copy()
-                if timeseries:
-                    plots.airnow_timeseries(df2, title=i + ' Timeseries')
-                if scatter:
-                    plots.airnow_scatter(df2)
-                if bargraph:
-                    plots.airnow_domain_bar(df2)
-                if pdfs:
-                    plots.airnow_kdeplots(df2)
-        else:
-            i = region
-            df2 = df[df['Region'].str.upper() == region].copy()
-            if timeseries:
-                plots.airnow_timeseries(df2, title=i + ' Timeseries')
-            if scatter:
-                plots.airnow_scatter(df2)
-            if bargraph:
-                plots.airnow_domain_bar(df2)
-            if pdfs:
-                plots.airnow_kdeplots(df2)
-
     def compare_param(self, param='OZONE', site='', city='', region='', state='', timeseries=False, scatter=False,
                       pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
@@ -284,7 +240,7 @@ class verify_aqs:
         from numpy import NaN
         df = self.df.copy()[[
             'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
-            'Longitude']]
+            'Longitude','State_Name']]
         df[df < -990] = NaN
         g = df.groupby('Species')
         new = g.get_group(param)
@@ -297,8 +253,8 @@ class verify_aqs:
                 if city.upper() in i.upper():
                     name = i
                     print name
-            df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
-            title = name
+                    df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
+                    title = name
         elif state != '':
             df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
             title = state
@@ -360,7 +316,7 @@ class verify_aqs:
             else:
                 self.aqs_spatial(df2, param=param, path=path, date=date, xlim=x, ylim=y)
 
-    def aqs_spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[]):
+    def aqs_spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[],vmin=0,vmax=150):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
@@ -384,6 +340,9 @@ class verify_aqs:
             cmaq = self.cmaqso2
         elif param == 'NOX':
             cmaq = self.cmaqnox
+        elif param == 'ISOPRENE':
+            cmaq = self.cmaqisop
+        
         cmaq = masked_less(cmaq, .25)
         m = self.cmaq.choose_map(path, region)
         if date == '':

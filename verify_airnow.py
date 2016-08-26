@@ -199,64 +199,18 @@ class verify_airnow:
 
     def print_available(self):
         print 'Available Functions:\n'
-        print '    compare_domain_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
-        print '    compare_region_all(timeseries=False, scatter=False, bargraph=False, pdfs=False, spatial=False)'
         print '    airnow_spatial(df, param=\'OZONE\', path='', region='', date=\'YYYY-MM-DD HH:MM:SS\')'
         print '    airnow_spatial_8hr(df, path=\'cmaq-basemap-conus.p\', region=\'northeast\', date=\'YYYY-MM-DD\')'
         print '    compare_param(param=\'OZONE\', city=\'\', region=\'\', timeseries=False, scatter=False, pdfs=False,diffscatter=False, diffpdfs=False,timeseries_error=False)\n'
         print 'Species available to compare:'
         print '    ', self.df.Species.unique()
 
-    def compare_domain_all(self, timeseries=False, scatter=False, bargraph=True, pdfs=False):
-
-        from numpy import NaN
-        df = self.df.copy()[['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units']]
-        df[df < -990] = NaN
-        if timeseries:
-            plots.airnow_timeseries(df, title='Domain Timeseries')
-        if scatter:
-            plots.airnow_scatter(df)
-        if bargraph:
-            plots.airnow_domain_bar(df)
-        if pdfs:
-            plots.airnow_kdeplots(df)
-
-    def compare_region_all(self, timeseries=False, scatter=False, bargraph=True, pdfs=False, region='all'):
-        from numpy import NaN
-        region = region.upper()
-        df = self.df.copy()[['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units']]
-        df[df < -990] = NaN
-        if region == 'ALL':
-            regions = ['Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific']
-            for i in regions:
-                df2 = df[df['Region'] == i].copy()
-                if timeseries:
-                    plots.airnow_timeseries(df2, title=i + ' Timeseries')
-                if scatter:
-                    plots.airnow_scatter(df2)
-                if bargraph:
-                    plots.airnow_domain_bar(df2)
-                if pdfs:
-                    plots.airnow_kdeplots(df2)
-        else:
-            i = region
-            df2 = df[df['Region'].str.upper() == region].copy()
-            if timeseries:
-                plots.airnow_timeseries(df2, title=i + ' Timeseries')
-            if scatter:
-                plots.airnow_scatter(df2)
-            if bargraph:
-                plots.airnow_domain_bar(df2)
-            if pdfs:
-                plots.airnow_kdeplots(df2)
-
-    def compare_param(self, param='OZONE', site='', city='', region='', timeseries=False, scatter=False, pdfs=False,
+    def compare_param(self, param='OZONE', site='', city='', state='',region='', timeseries=False, scatter=False, pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
                       label=None, footer=True):
         from numpy import NaN
-        df = self.df.copy()[[
-            'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
-            'Longitude']]
+        df = self.df.copy()[['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
+            'Longitude','State_Name']]
         df[df < -990] = NaN
         g = df.groupby('Species')
         new = g.get_group(param)
@@ -271,6 +225,9 @@ class verify_airnow:
                     print name
             df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
             title = name
+        elif state != '':
+            df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
+            title = state
         elif region != '':
             df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
             title = region

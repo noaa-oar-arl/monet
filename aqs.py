@@ -233,7 +233,7 @@ class aqs:
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
-        df = self.get_species(df)
+        df = self.get_species(df,voc=True)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_VOC_' + year + '.hdf'
@@ -338,7 +338,7 @@ class aqs:
 
     def load_aqs_pm25_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_PM_25_88101_' + year + '.hdf'
+        fname = 'AQS_HOURLY_PM_25_88101_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -352,7 +352,7 @@ class aqs:
 
     def load_aqs_voc_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_VOC_' + year + '.hdf'
+        fname = 'AQS_HOURLY_VOC_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -365,7 +365,7 @@ class aqs:
 
     def load_aqs_ozone_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_OZONE_44201_' + year + '.hdf'
+        fname = 'AQS_HOURLY_OZONE_44201_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -380,7 +380,7 @@ class aqs:
 
     def load_aqs_pm10_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_PM_10_81102_' + year + '.hdf'
+        fname = 'AQS_HOURLY_PM_10_81102_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -393,7 +393,7 @@ class aqs:
 
     def load_aqs_so2_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_SO2_42401_' + year + '.hdf'
+        fname = 'AQS_HOURLY_SO2_42401_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -406,7 +406,7 @@ class aqs:
 
     def load_aqs_no2_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf'
+        fname = 'AQS_HOURLY_NO2_42602_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -419,7 +419,7 @@ class aqs:
 
     def load_aqs_co_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf'
+        fname = 'AQS_HOURLY_CO_42101_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -432,7 +432,7 @@ class aqs:
 
     def load_aqs_spec_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_SPEC_' + year + '.hdf'
+        fname = 'AQS_HOURLY_SPEC_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -445,7 +445,7 @@ class aqs:
 
     def load_aqs_wind_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_WIND_' + year + '.hdf'
+        fname = 'AQS_HOURLY_WIND_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -458,7 +458,7 @@ class aqs:
 
     def load_aqs_temp_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf'
+        fname = 'AQS_HOURLY_TEMP_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -471,7 +471,7 @@ class aqs:
 
     def load_aqs_rhdp_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_RHDP_' + year + '.hdf'
+        fname = 'AQS_HOURLY_RHDP_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -484,7 +484,7 @@ class aqs:
 
     def load_aqs_nonoxnoy_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_HOURLY_NONOXNOY_' + year + '.hdf'
+        fname = 'AQS_HOURLY_NONOXNOY_' + year + '.hdf'
         if os.path.isfile(fname):
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
@@ -503,7 +503,7 @@ class aqs:
                self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates)]
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).copy().drop_duplicates()
-        os.chdir(self.datadir)
+        os.chdir(self.cwd)
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.add_metro_metadata()
 
@@ -604,29 +604,31 @@ class aqs:
             offset.append((rdst.utcoffset() + rdst.dst()).total_seconds() // 3600)
         return array(local), array(offset)
 
-    def get_region(self, df):
-        sn = df.State_Name.values
-        sr = []
-        for i in sn:
-            if i in self.se_states:
-                sr.append('Southeast')
-            elif i in self.ne_states:
-                sr.append('Northeast')
-            elif i in self.nc_states:
-                sr.append('North Central')
-            elif i in self.sc_states:
-                sr.append('South Central')
-            elif i in self.p_states:
-                sr.append('Pacific')
-            elif i in self.r_states:
-                sr.append('Rockies')
-            else:
-                sr.append('????')
+    def get_region(self):
+        sr = self.df.State_Name.copy().values
+        for i in self.se_states:
+            con = sr == i
+            sr[con] = 'Southeast'
+        for i in self.ne_states:
+            con= sr == i
+            sr[con] = 'Northeast'
+        for i in self.nc_states:
+            con= sr == i
+            sr[con] = 'North Central'
+        for i in self.sc_states:
+            con= sr == i
+            sr[con] = 'South Central'
+        for i in self.p_states:
+            con= sr == i
+            sr[con] = 'Pacific'
+        for i in self.r_states:
+            con= sr == i
+            sr[con] = 'Rockies'
+        sr[sr == 'CC'] = 'Canada'
+        sr[sr == 'MX'] = 'Mexico'
+        self.df['Region'] = array(sr)
 
-        df['Region'] = array(sr)
-        return df
-
-    def get_species(self, df):
+    def get_species(self, df,voc=False):
         pc = df.Parameter_Code.unique()
         if len(pc) < 2:
             if pc == 88101:
@@ -673,6 +675,9 @@ class aqs:
                     df.loc[con, 'Species'] = 'RH'
                 if i == 62103:
                     df.loc[con, 'Species'] = 'DP'
+        if voc:
+            df.Species = df.Parameter_Name.str.upper()
+
         return df
 
     @staticmethod

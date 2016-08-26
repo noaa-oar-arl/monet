@@ -9,7 +9,7 @@ sns.set_context('poster')
 
 
 # CMAQ Spatial Plots
-def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename=''):
+def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='',vmin=0,vmax=150):
     from numpy import arange
     fig = plt.figure(figsize=(12, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
@@ -22,13 +22,13 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename=''):
     plt.axis('off')
 
     cmap = plt.cm.get_cmap('plasma')
-    norm = normval(0, 150., cmap)
+    norm = normval(vmin,vmax, cmap)
     m.pcolormesh(x, y, cmaqvar, norm=norm, cmap=cmap)
     titstring = date.strftime('%B %d %Y %H')
     plt.title(titstring)
 
-    c = plt.colorbar(ticks=arange(0, 150, 10) + 10)
-    c.set_ticklabels([str(s) for s in arange(0, 150, 10) + 10])
+    c = plt.colorbar(ticks=arange(vmin,vmax, (vmax-vmin)/10.) + (vmax-vmin)/10.)
+    c.set_ticklabels([str(s) for s in arange(vmin,vmax, (vmax-vmin)/10.) + (vmax-vmin)/10.])
 
     plt.tight_layout()
     if savename != '':

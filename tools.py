@@ -74,4 +74,3 @@ def distance_matrix(x0, y0, x1, y1):
     
     return weights
 
-print 'reloaded'
