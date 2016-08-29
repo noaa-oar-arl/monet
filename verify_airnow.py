@@ -464,8 +464,8 @@ class verify_airnow:
         return mb, mdnb, fe, r2, d1, e1, ioa, rmse
 
     def ensure_values_indomain(self):
-        lat = self.cmaq.gridobj.latitude
-        lon = self.cmaq.gridobj.longitude
+        lat = self.cmaq.latitude
+        lon = self.cmaq.longitude
 
         con = ((self.airnow.df.Latitude.values > lat.min()) & (self.airnow.df.Latitude.values < lat.max()) & (
             self.airnow.df.Longitude.values > lon.min()) & (self.airnow.df.Longitude.values < lon.max()))
