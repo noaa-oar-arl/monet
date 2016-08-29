@@ -288,7 +288,7 @@ class verify_improve:
             c = g.get_group(i)
             c.index = c.datetime
             c.drop('datetime', axis=1, inplace=True)
-            r = c.rolling(window=72).mean()  # boxcar smoother
+            r = c.rolling(window=24).mean()  # boxcar smoother
             r.reset_index(inplace=True)
             q = q.append(r).reset_index(drop=True)
         df = pd.merge(df, q, how='left', on=['Site_Code', 'datetime']).dropna(subset=['CMAQ'])
