@@ -337,8 +337,14 @@ class cmaq:
 
     def set_gridcro2d(self, filename=''):
         self.gridobj = Dataset(filename)
-        self.latitude = self.gridobj.variables['LAT'][:][0, 0, :, :].squeeze()
-        self.longitude = self.gridobj.variables['LON'][:][0, 0, :, :].squeeze()
+        keys = self.gridobj.variables.keys()
+        lat = 'LAT'
+        lon = 'LON'
+        if 'LAT' not in keys:
+            lat = 'LATD'
+            lon = 'LOND'
+        self.latitude = self.gridobj.variables[lat][:][0, 0, :, :].squeeze()
+        self.longitude = self.gridobj.variables[lon][:][0, 0, :, :].squeeze()
 
     def load_conus_basemap(self, path):
         import cPickle as pickle
