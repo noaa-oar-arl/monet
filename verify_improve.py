@@ -2,7 +2,7 @@
 from datetime import datetime
 
 import matplotlib.pyplot as plt
-from numpy import array, where
+from numpy import array, where, NaN
 from pandas import concat
 
 import mystats
@@ -281,18 +281,17 @@ class verify_improve:
             date = date.append(pd.Series([self.cmaq.dates[j] for k in lons])).reset_index(drop=True)
             site = site.append(pd.Series(sites)).reset_index(drop=True)
         dfs = pd.concat([vals, date, site], axis=1, keys=['CMAQ', 'datetime', 'Site_Code'])
-
+        dfs.index=dfs.datetime
+        r = dfs.groupby('Site_Code').get_group(dfs.Site_Code.unique()[0]).resample('D').mean().reset_index()
         g = dfs.groupby('Site_Code')
-        q = pd.DataFrame()
-        for i in dfs.Site_Code.unique():
-            c = g.get_group(i)
-            c.index = c.datetime
-            c.drop('datetime', axis=1, inplace=True)
-            r = c.rolling(window=24).mean()  # boxcar smoother
-            r.reset_index(inplace=True)
-            q = q.append(r).reset_index(drop=True)
-        df = pd.merge(df, q, how='left', on=['Site_Code', 'datetime']).dropna(subset=['CMAQ'])
-
+        for i in df.Site_Code.unique()[1:]:
+            q = dfs.groupby('Site_Code').get_group(i)
+            q = q.resample('D').mean().reset_index()
+            q['Site_Code'] = i
+            r = pd.concat([r,q],ignore_index=True)
+        df = pd.merge(df, r, how='left', on=['Site_Code', 'datetime']).dropna(subset=['CMAQ'])
+        df.Obs.loc[df.Obs < 0] = NaN
+        df.dropna(subset=['Obs'],inplace=True)
         return df
 
     def check_cmaq_units(self, param='O3', improve_param='OZONE'):

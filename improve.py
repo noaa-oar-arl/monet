@@ -2,7 +2,7 @@
 from datetime import datetime
 
 import pandas as pd
-from numpy import array
+from numpy import array,NaN
 
 
 class improve:
@@ -33,6 +33,10 @@ class improve:
         self.df.rename(columns={'Value': 'Obs'}, inplace=True)
         self.df.rename(columns={'State': 'State_Name'}, inplace=True)
         self.df.rename(columns={'ParamCode': 'Species'}, inplace=True)
+        self.df.rename(columns={'SiteCode': 'Site_Code'}, inplace=True)
+        self.df.rename(columns={'Unit': 'Units'}, inplace=True)
+        self.df.rename(columns={'Date': 'datetime'}, inplace=True)
+        self.df.drop('Dataset',axis=1,inplace=True)
         print 'Adding in some Meta-Data'
         self.get_region()
         self.df = self.df.copy().drop_duplicates()
@@ -42,7 +46,9 @@ class improve:
         if output == '':
             output = 'IMPROVE.hdf'
         print 'Outputing data to: ' + output
-        self.df.to_hdf(output, 'df', format='fixed')
+        self.df.Obs.loc[self.df.Obs < 0] = NaN
+        self.df.dropna(subset=['Obs'],inplace=True)
+        self.df.to_hdf(output, 'df', format='fixed',complevel=9,complib='zlib')
 
         
     def get_date_range(self, dates):
