@@ -211,7 +211,8 @@ class verify_airnow:
         from numpy import NaN
         df = self.df.copy()[['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
             'Longitude','State_Name']]
-        df[df < -990] = NaN
+        df.Obs[df.Obs < -990] = NaN
+        df.dropna(subset=['Obs'],inplace=True)
         g = df.groupby('Species')
         new = g.get_group(param)
         if site != '':
