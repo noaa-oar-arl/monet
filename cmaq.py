@@ -340,9 +340,6 @@ class cmaq:
         keys = self.gridobj.variables.keys()
         lat = 'LAT'
         lon = 'LON'
-        if 'LAT' not in keys:
-            lat = 'LATD'
-            lon = 'LOND'
         self.latitude = self.gridobj.variables[lat][:][0, 0, :, :].squeeze()
         self.longitude = self.gridobj.variables[lon][:][0, 0, :, :].squeeze()
 
