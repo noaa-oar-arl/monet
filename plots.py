@@ -21,14 +21,10 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='',vmin=0,vm
     x, y = m(lon, lat)
     plt.axis('off')
 
-    cmap = plt.cm.get_cmap('plasma')
-    norm = normval(vmin,vmax, cmap)
-    m.pcolormesh(x, y, cmaqvar, norm=norm, cmap=cmap)
+    c,cmap = colorbar_index(ncolors, cmap,minval=vmin,maxval=vmax)=
+    m.pcolormesh(x, y, cmaqvar, vmin=vmin,vmax=vmax, cmap=cmap)
     titstring = date.strftime('%B %d %Y %H')
     plt.title(titstring)
-
-    c = plt.colorbar(ticks=arange(vmin,vmax, (vmax-vmin)/10.) + (vmax-vmin)/10.)
-    c.set_ticklabels([str(s) for s in arange(vmin,vmax, (vmax-vmin)/10.) + (vmax-vmin)/10.])
 
     plt.tight_layout()
     if savename != '':
@@ -49,20 +45,25 @@ def normval(vmin, vmax, cmap):
 def aqs_spatial_scatter(aqs, m, date, savename=''):
     new = aqs[aqs.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    cmap = plt.cm.get_cmap('plasma')
-    norm = normval(0, 150., cmap)
+    c,cmap = colorbar_index(ncolors, cmap,minval=vmin,maxval=vmax)
+    if (type(vmin)==None) | (type(vmax) == None):
+        plt.scatter(x, y, c=new['Obs'].values, vmin=0,vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
+    else:
+        plt.scatter(x, y, c=new['Obs'].values, vmin=vmin,vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     plt.scatter(x, y, c=new['Obs_value'].values, norm=norm, cmap=cmap)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
 
-def airnow_spatial_scatter(df, m, date, savename=''):
+def airnow_spatial_scatter(df, m, date, vmin=None,vmax=None,savename='',ncolors=15):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    cmap = plt.cm.get_cmap('plasma')
-    norm = normval(0, 150., cmap)
-    plt.scatter(x, y, c=new['Obs'].values, norm=norm, cmap=cmap, edgecolors='w', linewidths=.1)
+    c,cmap = colorbar_index(ncolors, cmap,minval=vmin,maxval=vmax)
+    if (type(vmin)==None) | (type(vmax) == None):
+        plt.scatter(x, y, c=new['Obs'].values, vmin=0,vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
+    else:
+        plt.scatter(x, y, c=new['Obs'].values, vmin=vmin,vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
@@ -587,3 +588,50 @@ def airnow_footer_text(df):
     plt.figtext(0.9, .04, 'NMB = %.1f' % nmb, fontsize=11, family='monospace')
     plt.figtext(.3, .04, 'SITES: ' + str(unique(df.SCS.values[mask]).shape[0]), fontsize=11, family='monospace')
     plt.figtext(.3, .02, 'MEASUREMENTS: ' + str(df.SCS.count()), fontsize=11, family='monospace')
+    
+def colorbar_index(ncolors, cmap,minval=None,maxval=None):
+    import matplotlib.cm as cm 
+    import numpy as np
+    cmap = cmap_discretize(cmap, ncolors)
+    mappable = cm.ScalarMappable(cmap=cmap)
+    mappable.set_array([])
+    mappable.set_clim(-0.5, ncolors+0.5)
+    colorbar = plt.colorbar(mappable)
+    colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
+    if (type(minval) == None) | (type(maxval) != None):
+        colorbar.set_ticklabels(np.linspace(0,maxval,ncolors).astype('int32'))
+    elif (type(minval) == None) | (type(maxval) != None):
+        colorbar.set_ticklabels(np.linspace(0,ncolors,ncolors).astype('int32'))
+    else:
+        colorbar.set_ticklabels(np.linspace(minval,maxval,ncolors).astype('int32'))
+    
+    return colorbar,cmap
+
+def cmap_discretize(cmap, N):
+    """
+    Return a discrete colormap from the continuous colormap cmap.
+
+    cmap: colormap instance, eg. cm.jet. 
+    N: number of colors.
+
+    Example
+        x = resize(arange(100), (5,100))
+        djet = cmap_discretize(cm.jet, 5)
+        imshow(x, cmap=djet)
+    """
+    import matplotlib.colors as mcolors
+    import matplotlib.cm as cm
+    import numpy as np
+    
+    if type(cmap) == str:
+        cmap = plt.get_cmap(cmap)
+    colors_i = np.concatenate((np.linspace(0, 1., N), (0.,0.,0.,0.)))
+    colors_rgba = cmap(colors_i)
+    indices = np.linspace(0, 1., N+1)
+    cdict = {}
+    for ki,key in enumerate(('red','green','blue')):
+        cdict[key] = [ (indices[i], colors_rgba[i-1,ki], colors_rgba[i,ki])
+                        for i in xrange(N+1) ]
+    #Return colormap object.
+    return mcolors.LinearSegmentedColormap(cmap.name + "_%d"%N, cdict, 1024)
+
