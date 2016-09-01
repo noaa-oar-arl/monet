@@ -92,8 +92,9 @@ class cmaq:
         if self.metcrofnames == None:
             self.metcrofnames = sort(array(glob(file)))
         else:
-            self.metcrofnames = sort(array(self.metcrofnames))
-        self.load_multi_metcro2d_cmaq_runs()
+            self.fname = sort(array(file))
+        if self.fname.shape[0] >= 1:
+            self.load_multi_metcro2d_cmaq_runs()
         self.metcrokeys = self.get_keys(self.metcro2d)
 
     def get_keys(self, cdfobj):
