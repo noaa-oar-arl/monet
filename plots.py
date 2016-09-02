@@ -9,7 +9,7 @@ sns.set_context('poster')
 
 
 # CMAQ Spatial Plots
-def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='',vmin=0,vmax=150,ncolors=11,cmap='YlGnBu_r'):
+def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='',vmin=0,vmax=150,ncolors=11,cmap='YlGnBu'):
     from numpy import arange
     fig = plt.figure(figsize=(12, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
