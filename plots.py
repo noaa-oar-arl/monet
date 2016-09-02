@@ -598,9 +598,9 @@ def colorbar_index(ncolors, cmap,minval=None,maxval=None):
     mappable.set_clim(-0.5, ncolors+0.5)
     colorbar = plt.colorbar(mappable)
     colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
-    if (type(minval) == None) | (type(maxval) != None):
+    if (type(minval) == None) & (type(maxval) != None):
         colorbar.set_ticklabels(np.linspace(0,maxval,ncolors).astype('int32'))
-    elif (type(minval) == None) | (type(maxval) != None):
+    elif (type(minval) == None) & (type(maxval) == None):
         colorbar.set_ticklabels(np.linspace(0,ncolors,ncolors).astype('int32'))
     else:
         colorbar.set_ticklabels(np.linspace(minval,maxval,ncolors).astype('int32'))
