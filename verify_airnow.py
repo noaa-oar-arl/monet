@@ -32,6 +32,7 @@ class verify_airnow:
         self.cmaqnox = None
         self.cmaqnoy = None
         self.cmaqpm25 = None
+        self.cmaqpm10 = None
         self.cmaqso2 = None
         self.cmaqco = None
         self.df8hr = None
@@ -87,7 +88,7 @@ class verify_airnow:
                 fac = self.check_cmaq_units(param='PM10', airnow_param=i)
                 cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
                 dfpm = self.interp_to_airnow(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
-                self.cmaqpm25 = cmaq
+                self.cmaqpm10 = cmaq
                 dfs.append(dfpm)
             elif i == 'CO':
                 if 'CO' not in self.cmaq.keys:
@@ -398,6 +399,7 @@ class verify_airnow:
         ioa = mystats.IOA(df.Obs.values, df.cmaq.values)  # Index of Agreement
         rmse = mystats.RMSE(df.Obs.values, df.cmaq.values)
         return mb, r2, ioa, rmse
+
 
     def interp_to_airnow(self, cmaqvar, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2):
         from pyresample import geometry, kd_tree
