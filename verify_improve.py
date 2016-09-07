@@ -219,11 +219,11 @@ class verify_improve:
                 else:
                     pass
             elif i == 'OCf':
-                if ('AMNJ' in self.cmaq.keys):
+                if ('APOCJ' in self.cmaq.keys):
                     print 'Interpolating MNf:'
                     dfpm = g.get_group(i)
-                    fac = self.check_cmaq_units(param='MNf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='AMNJ') * fac
+                    fac = self.check_cmaq_units(param='OCf', improve_param=i)
+                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC') * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqmn = cmaqvar
                     dfs.append(dfpm)

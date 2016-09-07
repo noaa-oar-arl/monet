@@ -97,6 +97,7 @@ def verify_improve(concpath='', gridcro='', met2dpath='', datapath='', combine=T
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     if datapath[-4:] == '.hdf':
+        print 'Reading file: ' + datapath
         from pandas import read_hdf
         va.improve.df = read_hdf(datapath)
     else:
