@@ -58,7 +58,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -83,7 +83,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -108,7 +108,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -132,7 +132,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -156,7 +156,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -180,7 +180,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -204,7 +204,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -228,7 +228,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -252,7 +252,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -276,7 +276,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
@@ -300,7 +300,7 @@ class aqs:
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
-                         date_parser=dateparse)
+                         infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
