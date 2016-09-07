@@ -21,7 +21,7 @@ def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
     from verify_aqs import verify_aqs
     va = verify_aqs()
     va.cmaq.open_cmaq(file=concpath)
-    va.cmaq.set_gridcro2d(gridcro)
+    va.cmaq.set_gridcro2d(filename=gridcro)
     va.cmaq.get_dates()
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
