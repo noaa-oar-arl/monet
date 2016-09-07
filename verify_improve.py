@@ -267,19 +267,19 @@ class verify_improve:
             df2 = new
             title = 'Domain'
         if timeseries:
-            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
+            plots.timeseries_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
         if scatter:
-            plots.airnow_scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
         if pdfs:
-            plots.airnow_kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
         if diffscatter:
-            plots.airnow_diffscatter_param(df2, title=title)
+            plots.diffscatter_param(df2, title=title)
         if diffpdfs:
-            plots.airnow_diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_rmse:
-            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
+            plots.timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
         if timeseries_mb:
-            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
+            plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
 
     def improve_spatial(self, df, date, param='NAf', path='', region='', xlim=[], ylim=[]):
         """
@@ -307,7 +307,7 @@ class verify_improve:
         m = self.cmaq.choose_map(path, region)
         index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
         c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m)
-        plots.airnow_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
+        plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
         c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
         if len(xlim) > 1:
             plt.xlim([min(xlim), max(xlim)])
@@ -335,10 +335,11 @@ class verify_improve:
         lons = df.Longitude.values[index]
         grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
         sites = df.Site_Code.values[index]
-        dfs = []
+        utc = df.utcoffset.values[index]
         vals = pd.Series(dtype=df.Obs.dtype)
         date = pd.Series(dtype=df.datetime.dtype)
         site = pd.Series(dtype=df.Site_Code.dtype)
+        utcoffset = pd.Series(dtype=df.utcoffset.dtype)
         for i, j in enumerate(self.cmaq.indexdates):
             if interp.lower() == 'idw':
                 val = kd_tree.resample_custom(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
@@ -354,13 +355,14 @@ class verify_improve:
             vals = vals.append(pd.Series(val)).reset_index(drop=True)
             date = date.append(pd.Series([self.cmaq.dates[j] for k in lons])).reset_index(drop=True)
             site = site.append(pd.Series(sites)).reset_index(drop=True)
-        dfs = pd.concat([vals, date, site], axis=1, keys=['CMAQ', 'datetime', 'Site_Code'])
-        dfs.index=dfs.datetime
-        r = dfs.groupby('Site_Code').get_group(dfs.Site_Code.unique()[0]).resample('D').mean().reset_index()
-        g = dfs.groupby('Site_Code')
+            utcoffset = site.append(pd.Series(utc)).reset_index(drop=True)
+        dfs = pd.concat([vals, date, site,utcoffset], axis=1, keys=['CMAQ', 'datetime', 'Site_Code','utcoffset'])
+        dfs.index=dfs.datetime + pd.to_timedelta(dfs.utcoffset,'H')
+        dfs.drop(['datetime','utcoffset'],axis=1,inplace=True)
+        r = dfs.groupby('Site_Code').get_group(dfs.Site_Code.unique()[0]).resample('24H').mean().reset_index()
         for i in df.Site_Code.unique()[1:]:
             q = dfs.groupby('Site_Code').get_group(i)
-            q = q.resample('D').mean().reset_index()
+            q = q.resample('24H').mean().reset_index()
             q['Site_Code'] = i
             r = pd.concat([r,q],ignore_index=True)
         df = pd.merge(df, r, how='left', on=['Site_Code', 'datetime']).dropna(subset=['CMAQ'])

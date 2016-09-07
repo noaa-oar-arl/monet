@@ -2,7 +2,7 @@
 from datetime import datetime
 
 import pandas as pd
-from numpy import array,NaN
+from numpy import array, NaN
 
 
 class improve:
@@ -27,7 +27,7 @@ class improve:
         Fields include Dataset,Site,Date,Parameter,POC,Data_value,Unit,Latitude,Longitude,State,EPA Site Code
         Options are delimited ','  data only and normalized skinny format
         """
-        
+
         self.df = pd.read_csv(fname, delimiter=',', parse_dates=[2], infer_datetime_format=True)
         self.df.rename(columns={'EPACode': 'SCS'}, inplace=True)
         self.df.rename(columns={'Value': 'Obs'}, inplace=True)
@@ -36,21 +36,22 @@ class improve:
         self.df.rename(columns={'SiteCode': 'Site_Code'}, inplace=True)
         self.df.rename(columns={'Unit': 'Units'}, inplace=True)
         self.df.rename(columns={'Date': 'datetime'}, inplace=True)
-        self.df.drop('Dataset',axis=1,inplace=True)
+        self.df.drop('Dataset', axis=1, inplace=True)
         print 'Adding in some Meta-Data'
         self.get_region()
+        print 'Calculating local time'
+        self.df = self.get_local_datetime(self.df)
         self.df = self.df.copy().drop_duplicates()
-        self.df.dropna(subset=['Species'],inplace=True)
+        self.df.dropna(subset=['Species'], inplace=True)
         self.df.Species.loc[self.df.Species == 'MT'] = 'PM10'
         self.df.Species.loc[self.df.Species == 'MF'] = 'PM2.5'
         if output == '':
             output = 'IMPROVE.hdf'
         print 'Outputing data to: ' + output
         self.df.Obs.loc[self.df.Obs < 0] = NaN
-        self.df.dropna(subset=['Obs'],inplace=True)
-        self.df.to_hdf(output, 'df', format='fixed',complevel=9,complib='zlib')
+        self.df.dropna(subset=['Obs'], inplace=True)
+        self.df.to_hdf(output, 'df', format='fixed', complevel=9, complib='zlib')
 
-        
     def get_date_range(self, dates):
         self.dates = dates
         con = (self.df.datetime >= dates[0]) & (self.df.datetime <= dates[-1])
@@ -66,21 +67,43 @@ class improve:
             con = sr == i
             sr[con] = 'Southeast'
         for i in self.ne_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'Northeast'
         for i in self.nc_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'North Central'
         for i in self.sc_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'South Central'
         for i in self.p_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'Pacific'
         for i in self.r_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'Rockies'
         sr[sr == 'CC'] = 'Canada'
         sr[sr == 'MX'] = 'Mexico'
         self.df['Region'] = array(sr)
-        
+
+    def get_local_datetime(self, df):
+        import pytz
+        from numpy import unique
+        from tzwhere import tzwhere
+        from datetime import timedelta
+        tz = tzwhere.tzwhere(forceTZ=True, shapely=True)
+        df.dropna(subset=['Latitude', 'Longitude'], inplace=True)
+        lons, index = unique(df.Longitude.values, return_index=True)
+        lats = df.Latitude.values[index]
+        dates = df.datetime.values[index].astype('M8[s]').astype('O')
+        df['utcoffset'] = 0
+        for i, j, d in zip(lons, lats, dates):
+            l = tz.tzNameAt(j, i, forceTZ=True)
+            timezone = pytz.timezone(l)
+            n = d.replace(tzinfo=pytz.UTC)
+            r = d.replace(tzinfo=timezone)
+            rdst = timezone.normalize(r)
+            offset = (rdst.utcoffset()).total_seconds() // 3600
+            df['utcoffset'].loc[df.Longitude == i] = offset
+
+        df['datetime_local'] = df.datetime + pd.to_timedelta(df.utcoffset,'H')
+        return df

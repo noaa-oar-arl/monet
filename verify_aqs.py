@@ -39,7 +39,14 @@ class verify_aqs:
         self.df8hr = None
 
     def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
-        # get the CMAQ dates
+        """
+
+        :param interp: Interpolation method 'nearest','guassian','
+        :param radius:
+        :param neighbors:
+        :param weight_func:
+        :return:
+        """
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
         self.cmaq.get_dates()
@@ -180,6 +187,48 @@ class verify_aqs:
                     cmaq = self.cmaq.get_surface_cmaqvar(param='ECf') * fac
                     dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpno3 = cmaq
+                    dfs.append(dfnox)
+            elif i == 'OCf':
+                if ('APOCJ' in self.cmaq.keys):
+                    print 'Interpolating OCf:'
+                    dfpm = g.get_group(i)
+                    fac = self.check_cmaq_units(param='OCf', improve_param=i)
+                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC') * fac
+                    dfpm = self.interp_to_aqs(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqoc= cmaqvar
+                    dfs.append(dfpm)
+            elif i == 'ETHANE':
+                if ('ETHA' not in self.cmaq.keys):
+                    pass
+                else:
+                    print 'Interpolating Ethane:'
+                    dfnox = g.get_group(i)
+                    fac = self.check_cmaq_units(param='ETHA', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='ETHA') * fac
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqisop = cmaq
+                    dfs.append(dfnox)
+            elif i == 'BENZENE':
+                if ('BENZENE' not in self.cmaq.keys):
+                    pass
+                else:
+                    print 'Interpolating BENZENE:'
+                    dfnox = g.get_group(i)
+                    fac = self.check_cmaq_units(param='BENZENE', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='BENZENE') * fac
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqisop = cmaq
+                    dfs.append(dfnox)
+            elif i == 'TOLUENE':
+                if ('TOL' not in self.cmaq.keys):
+                    pass
+                else:
+                    print 'Interpolating Isoprene:'
+                    dfnox = g.get_group(i)
+                    fac = self.check_cmaq_units(param='TOL', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='TOL') * fac
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqisop = cmaq
                     dfs.append(dfnox)
             elif i == 'ISOPRENE':
                 if ('ISOP' not in self.cmaq.keys):
@@ -359,8 +408,8 @@ class verify_aqs:
         if date == '':
             for index, i in enumerate(self.cmaq.dates):
                 c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
-                                            m)
-                plots.airnow_spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'))
+                                            m,vmin=vmin,vmax=vmax)
+                plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax)
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
@@ -369,7 +418,7 @@ class verify_aqs:
         else:
             index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
             c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m)
-            plots.airnow_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
+            plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
             c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
             if len(xlim) > 1:
                 plt.xlim([min(xlim), max(xlim)])
@@ -383,7 +432,7 @@ class verify_aqs:
         m = self.cmaq.choose_map(path, region)
         if date == '':
             for index, i in enumerate(self.df8hr.datetime_local.unique()):
-                plots.airnow_8hr_spatial_scatter(self.df8hr, m, i.strftime('%Y-%m-%d'))
+                plots.eight_hr_spatial_scatter(self.df8hr, m, i.strftime('%Y-%m-%d'))
                 c = plt.colorbar()
                 c.set_label('8Hr Ozone Bias ( pbbV )')
                 plt.title(i.strftime('%Y-%m-%d'))
@@ -392,7 +441,7 @@ class verify_aqs:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
         else:
-            plots.airnow_8hr_spatial_scatter(self.df8hr, m, date=date)
+            plots.eight_hr_spatial_scatter(self.df8hr, m, date=date)
             c = plt.colorbar()
             c.set_label('8Hr Ozone Bias ( pbbV )')
             plt.title(date)
@@ -406,16 +455,19 @@ class verify_aqs:
         rmse = mystats.RMSE(df.Obs.values, df.cmaq.values)
         return mb, r2, ioa, rmse
 
-    def interp_to_aqs(self, cmaqvar, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2):
+    def interp_to_aqs(self, cmaqvar, df, interp='nearest', r=12000., n=7, weight_func=lambda r: 1 / r ** 2):
         """
+        This function interpolates variables (2d surface) in time to measurement sites
 
         :param cmaqvar: this is the CMAQ 3D variable
         :param df: The aqs
-        :param interp:
-        :param r:
-        :param n:
-        :param weight_func:
-        :return:
+        :param interp: inteprolation method 'nearest',idw,guass
+        :param r: radius of influence
+        :param n: number of nearest neighbors to include
+        :param weight_func: the user can set a defined method of interpolation
+                            example:
+                                lambda r: 1 / r ** 2
+        :return: df
         """
         from pyresample import geometry, kd_tree
         from pandas import concat, Series, merge

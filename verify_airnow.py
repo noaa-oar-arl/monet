@@ -237,19 +237,19 @@ class verify_airnow:
             df2 = new
             title = 'Domain'
         if timeseries:
-            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
         if scatter:
-            plots.airnow_scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
         if pdfs:
-            plots.airnow_kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
         if diffscatter:
-            plots.airnow_diffscatter_param(df2, title=title)
+            plots.diffscatter_param(df2, title=title)
         if diffpdfs:
-            plots.airnow_diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_rmse:
-            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_mb:
-            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
     def airnow_spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[]):
         """
@@ -266,6 +266,8 @@ class verify_airnow:
             cmaq = self.cmaqo3
         elif param == 'PM2.5':
             cmaq = self.cmaqpm25
+        elif param == 'PM10':
+            cmaq = self.cmaqpm10
         elif param == 'CO':
             cmaq = self.cmaqco
         elif param == 'NOY':
@@ -279,7 +281,7 @@ class verify_airnow:
             for index, i in enumerate(self.cmaq.dates):
                 c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
                                             m)
-                plots.airnow_spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'))
+                plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'))
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
@@ -288,7 +290,7 @@ class verify_airnow:
         else:
             index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
             c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m)
-            plots.airnow_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
+            plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'))
             c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
             if len(xlim) > 1:
                 plt.xlim([min(xlim), max(xlim)])
@@ -302,7 +304,7 @@ class verify_airnow:
         m = self.cmaq.choose_map(path, region)
         if date == '':
             for index, i in enumerate(self.df8hr.datetime_local.unique()):
-                plots.airnow_8hr_spatial_scatter(self.df8hr, m, i.strftime('%Y-%m-%d'))
+                plots.eight_hr_spatial_scatter(self.df8hr, m, i.strftime('%Y-%m-%d'))
                 c = plt.colorbar()
                 c.set_label('8Hr Ozone Bias (pbbV)')
                 plt.title(i.strftime('%Y-%m-%d') + ' Obs - CMAQ')
@@ -311,7 +313,7 @@ class verify_airnow:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
         else:
-            plots.airnow_8hr_spatial_scatter(self.df8hr, m, date=date)
+            plots.eight_hr_spatial_scatter(self.df8hr, m, date=date)
             c = plt.colorbar()
             c.set_label('8Hr Ozone Bias (pbbV)')
             plt.title(date + ' Obs - CMAQ')

@@ -41,22 +41,7 @@ def normval(vmin, vmax, cmap):
     return norm
 
 
-# Spatial Plotting of AQS on basemap instance m
-def aqs_spatial_scatter(aqs, m, date, savename='', vmin=0, vmax=150, ncolors=10, cmap='YlGnBu'):
-    new = aqs[aqs.datetime == date]
-    x, y = m(new.Longitude.values, new.Latitude.values)
-    c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
-    if (type(vmin) == None) | (type(vmax) == None):
-        plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
-    else:
-        plt.scatter(x, y, c=new['Obs'].values, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
-    plt.scatter(x, y, c=new['Obs_value'].values, norm=norm, cmap=cmap)
-    if savename != '':
-        plt.savefig(savename + date + '.jpg', dpi=75.)
-        plt.close()
-
-
-def airnow_spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu'):
+def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu'):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
     c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
@@ -69,7 +54,7 @@ def airnow_spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolo
         plt.close()
 
 
-def airnow_8hr_spatial_scatter(df, m, date, savename=''):
+def eight_hr_spatial_scatter(df, m, date, savename=''):
     fig = plt.figure(figsize=(12, 6), frameon=False)
     m.drawcoastlines(linewidth=.3)
     m.drawstates()
@@ -88,7 +73,7 @@ def airnow_8hr_spatial_scatter(df, m, date, savename=''):
         plt.close()
 
 
-def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, footer=True, sample='H'):
+def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
     from numpy import isnan
     sns.set_style('ticks')
@@ -123,7 +108,7 @@ def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, foot
         ylabel = species + ' (' + units + ')'
         plt.gca().axes.set_ylabel(ylabel)
         if footer:
-            airnow_footer_text(df)
+            footer_text(df)
         plt.tight_layout()
         plt.grid(alpha=.5)
     else:
@@ -137,7 +122,7 @@ def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, foot
         plt.legend(loc='best')
 
 
-def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=True, sample='H'):
+def timeseries_error_param(df, title='', fig=None, label=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
     from numpy import sqrt
     sns.set_style('ticks')
@@ -168,7 +153,7 @@ def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=Tru
         ax.set_ylabel('MB ' + ylabel, color='dodgerblue')
         ax2.set_ylabel('RMSE ' + ylabel, color='tomato')
         if footer:
-            airnow_footer_text(df)
+            footer_text(df)
         plt.tight_layout()
         plt.grid(alpha=.5)
     else:
@@ -183,7 +168,7 @@ def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=Tru
         plt.legend(lns, labs, loc='best')
 
 
-def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True, sample='H'):
+def timeseries_rmse_param(df, title='', fig=None, label=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
     from numpy import sqrt
     sns.set_style('ticks')
@@ -197,7 +182,7 @@ def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True
         ylabel = species + ' (' + units + ')'
         plt.gca().axes.set_ylabel('RMSE ' + ylabel)
         if footer:
-            airnow_footer_text(df)
+            footer_text(df)
         ax = plt.gca().axes
         ax.set_xlabel('UTC Time (mm/dd HH)')
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
@@ -210,7 +195,7 @@ def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True
         plt.legend(loc='best')
 
 
-def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True, sample='H'):
+def timeseries_mb_param(df, title='', fig=None, label=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
     sns.set_style('ticks')
     df.index = df.datetime
@@ -225,7 +210,7 @@ def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True, 
         plt.gca().axes.set_xlabel('UTC Time (mm/dd HH)')
         plt.gca().axes.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
         if footer:
-            airnow_footer_text(df)
+            footer_text(df)
         plt.tight_layout()
         plt.grid(alpha=.5)
     else:
@@ -235,7 +220,7 @@ def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True, 
         plt.legend(loc='best')
 
 
-def airnow_kdeplots_param(df, title=None, fig=None, label=None, footer=True):
+def kdeplots_param(df, title=None, fig=None, label=None, footer=True):
     from scipy.stats import scoreatpercentile as score
     sns.set_style('ticks')
 
@@ -254,7 +239,7 @@ def airnow_kdeplots_param(df, title=None, fig=None, label=None, footer=True):
         plt.title(title)
         plt.gca().axes.set_ylabel('P(' + df.Species.unique()[0] + ')')
         if footer:
-            airnow_footer_text(df)
+            footer_text(df)
         plt.tight_layout()
         plt.grid(alpha=.5)
     else:
@@ -262,7 +247,7 @@ def airnow_kdeplots_param(df, title=None, fig=None, label=None, footer=True):
         sns.kdeplot(df.CMAQ, ax=ax, label=label)
 
 
-def airnow_diffpdfs_param(df, title=None, fig=None, label=None, footer=True):
+def diffpdfs_param(df, title=None, fig=None, label=None, footer=True):
     from scipy.stats import scoreatpercentile as score
     sns.set_style('ticks')
 
@@ -279,14 +264,14 @@ def airnow_diffpdfs_param(df, title=None, fig=None, label=None, footer=True):
         plt.title(title)
         plt.gca().axes.set_ylabel('P( Model - Obs )')
         if footer:
-            airnow_footer_text(df)
+            footer_text(df)
         plt.tight_layout()
     else:
         ax = fig.get_axes()[0]
         sns.kdeplot(df.CMAQ.values - df.Obs.values, ax=ax, label=label)
 
 
-def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
+def scatter_param(df, title=None, fig=None, label=None, footer=True):
     from numpy import max, arange, linspace, isnan
     from scipy.stats import scoreatpercentile as score
     from scipy.stats import linregress
@@ -315,7 +300,7 @@ def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
         plt.title(title)
         plt.gca().axes.set_ylabel('Model ' + species + ' (' + units + ')')
         if footer:
-            airnow_footer_text(df)
+            footer_text(df)
         plt.tight_layout()
         plt.grid(alpha=.5)
     else:
@@ -326,7 +311,7 @@ def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
         plt.legend(loc='Best')
 
 
-def airnow_diffscatter_param(df, title=None, fig=None, label=None, footer=True):
+def diffscatter_param(df, title=None, fig=None, label=None, footer=True):
     from scipy.stats import scoreatpercentile as score
     from numpy import isnan
     sns.set_style('ticks')
@@ -349,7 +334,7 @@ def airnow_diffscatter_param(df, title=None, fig=None, label=None, footer=True):
         plt.title(title)
         plt.gca().axes.set_ylabel('Model - Obs ' + species + ' (' + units + ')')
         if footer:
-            airnow_footer_text(df)
+            footer_text(df)
         plt.tight_layout()
     else:
         ax = fig.get_axes()[0]
@@ -359,7 +344,7 @@ def airnow_diffscatter_param(df, title=None, fig=None, label=None, footer=True):
         plt.legend(loc='best')
 
 
-def airnow_timeseries(df, title=''):
+def timeseries(df, title=''):
     # this is the average for N sites if more than one site exists
     from numpy import sqrt, linspace
     import matplotlib.dates as mdates
@@ -435,7 +420,7 @@ def airnow_timeseries(df, title=''):
     plt.tight_layout()
 
 
-def airnow_domain_bar(df):
+def domain_bar(df):
     import mystats
     from pandas import DataFrame
     from numpy import array
@@ -458,7 +443,7 @@ def airnow_domain_bar(df):
     ax.set_title('Domain Statistics')
 
 
-def airnow_kdeplots(df):
+def kdeplots(df):
     from numpy import max
     from scipy.stats import linregress
     from scipy.stats import scoreatpercentile as score
@@ -478,14 +463,14 @@ def airnow_kdeplots(df):
         nmb = NMB(g.Obs.values, g.CMAQ.values)
         nme = NME(g.Obs.values, g.CMAQ.values)
         mb = MB(g.Obs.values, g.CMAQ.values)
-        airnow_footer_text(g)
+        footer_text(g)
         plt.xlim([0, maxval])
         plt.xlabel(n + '  (' + g.Units.unique()[0] + ')')
         plt.ylabel('P(' + n + ')')
         plt.tight_layout()
 
 
-def airnow_scatter(df):
+def scatter(df):
     from numpy import max, arange, linspace
     from scipy.stats import scoreatpercentile as score
     from scipy.stats import linregress
@@ -513,7 +498,7 @@ def airnow_scatter(df):
         plt.xlim([0, maxval])
         plt.ylim([0, maxval])
         ax = plt.gca().axes
-        airnow_footer_text(g)
+        footer_text(g)
         sns.despine()
         plt.xlabel('Obs')
         plt.ylabel('CMAQ')
@@ -521,7 +506,7 @@ def airnow_scatter(df):
         plt.tight_layout()
 
 
-def airnow_footer_text(df):
+def footer_text(df):
     from numpy import unique, isnan
     from mystats import NMB, NME, MB, d1
     mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
