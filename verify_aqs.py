@@ -325,19 +325,19 @@ class verify_aqs:
             df2 = new
             title = 'Domain'
         if timeseries:
-            plots.airnow_timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
         if scatter:
-            plots.airnow_scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
         if pdfs:
-            plots.airnow_kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.kdeplots_param(df2, title=title, label=label, fig=fig, footer=footer)
         if diffscatter:
-            plots.airnow_diffscatter_param(df2, title=title)
+            plots.diffscatter_param(df2, title=title)
         if diffpdfs:
-            plots.airnow_diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.diffpdfs_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_rmse:
-            plots.airnow_timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_mb:
-            plots.airnow_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
+            plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
     def compare_metro_area_8hr(self, city='Philadelphia', param='OZONE', date='', timeseries=False, scatter=False,
                                bargraph=False, pdfs=False, spatial=False, path=''):
