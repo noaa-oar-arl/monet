@@ -320,6 +320,7 @@ class cmaq:
     def get_surface_cmaqvar(self, param='O3'):
         lvl = 0.
         param = param.upper()
+        print param
         if param == 'PM25':
             var = self.get_surface_pm25()
         elif param == 'PM10':
