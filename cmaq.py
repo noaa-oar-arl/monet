@@ -304,7 +304,7 @@ class cmaq:
         else:
             cmaqvars, temp = search_listinlist(keys, allvars)
         vars = []
-        for i in cmaqvars[:]:
+        for i in allvars[:]:
             if i not in keys[i]:
                 print '    Variable ' + i + ' not found'
                 var = zeros((self.indexdates.shape[0],self.latitude.shape[0],self.longitude.shape[0]))
