@@ -305,8 +305,12 @@ class cmaq:
             cmaqvars, temp = search_listinlist(keys, allvars)
         vars = []
         for i in cmaqvars[:]:
-            print '   Getting CMAQ Variable: ' + keys[i]
-            var = self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+            if i not in keys[i]:
+                print '    Variable ' + i + ' not found'
+                var = zeros((self.indexdates.shape[0],self.latitude.shape[0],self.longitude.shape[0]))
+            else:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var = self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
             vars.append(var)
         OC = (vars[0] + vars[1] + vars[2]) / 2.0 + (vars[3] + vars[4] + vars[5]) / 2.0 + (vars[6] + vars[7] + vars[
             8]) / 2.0 + (vars[9] + vars[10]) / 1.6 + vars[11] / 2.7 + (vars[12] + vars[13]) / 1.4 + vars[
@@ -347,6 +351,8 @@ class cmaq:
             var = self.get_surface_no3f()
         elif (param == 'PM2.5_EC') | (param == 'ECF'):
             var = self.get_surface_ec()
+        elif (param == 'OC'):
+            var = self.get_surface_oc()
 
         else:
             print '   Getting CMAQ Variable: ' + param

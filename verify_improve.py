@@ -218,6 +218,17 @@ class verify_improve:
                     dfs.append(dfpm)
                 else:
                     pass
+            elif i == 'OCf':
+                if ('AMNJ' in self.cmaq.keys):
+                    print 'Interpolating MNf:'
+                    dfpm = g.get_group(i)
+                    fac = self.check_cmaq_units(param='MNf', improve_param=i)
+                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='AMNJ') * fac
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqmn = cmaqvar
+                    dfs.append(dfpm)
+                else:
+                    pass
 
         self.df = concat(dfs)
         self.df.SCS = self.df.SCS.values.astype('int32')
