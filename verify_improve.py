@@ -220,7 +220,7 @@ class verify_improve:
                     pass
             elif i == 'OCf':
                 if ('APOCJ' in self.cmaq.keys):
-                    print 'Interpolating MNf:'
+                    print 'Interpolating OCf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='OCf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC') * fac
