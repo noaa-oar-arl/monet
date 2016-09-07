@@ -2,7 +2,7 @@
 from datetime import datetime
 
 import matplotlib.pyplot as plt
-from numpy import array, where, NaN
+from numpy import array, where, NaN, sort
 from pandas import concat
 
 import mystats
@@ -55,7 +55,7 @@ class verify_improve:
         if self.cmaq.metcro2d is None:
             print 'METCRO2D file not loaded.  To include MET variables please load self.cmaq.open_metcro2d(\'filename\')\n'
         self.ensure_values_indomain()
-        comparelist = self.improve.df.Species.unique()
+        comparelist = sort(self.improve.df.Species.unique())
         g = self.improve.df.groupby('Species')
         dfs = []
         for i in comparelist:
