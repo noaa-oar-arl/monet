@@ -164,7 +164,7 @@ class verify_aqs:
                     print 'Interpolating PNO3:'
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO3f', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25_NO3') * fac
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO3F') * fac
                     dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpno3 = cmaq
                     dfs.append(dfnox)
