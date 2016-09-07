@@ -41,8 +41,8 @@ class improve:
         self.get_region()
         self.df = self.df.copy().drop_duplicates()
         self.df.dropna(subset=['Species'],inplace=True)
-        self.df.Species[self.df.Species == 'MT'] = 'PM10'
-        self.df.Species[self.df.Species == 'MF'] = 'PM2.5'
+        self.df.Species.loc[self.df.Species == 'MT'] = 'PM10'
+        self.df.Species.loc[self.df.Species == 'MF'] = 'PM2.5'
         if output == '':
             output = 'IMPROVE.hdf'
         print 'Outputing data to: ' + output

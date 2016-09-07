@@ -604,8 +604,8 @@ class aqs:
             offset.append((rdst.utcoffset() + rdst.dst()).total_seconds() // 3600)
         return array(local), array(offset)
 
-    def get_region(self):
-        sr = self.df.State_Name.copy().values
+    def get_region(self,df):
+        sr = df.State_Name.copy().values
         for i in self.se_states:
             con = sr == i
             sr[con] = 'Southeast'
@@ -626,7 +626,8 @@ class aqs:
             sr[con] = 'Rockies'
         sr[sr == 'CC'] = 'Canada'
         sr[sr == 'MX'] = 'Mexico'
-        self.df['Region'] = array(sr)
+        df['Region'] = array(sr)
+        return df
 
     def get_species(self, df,voc=False):
         pc = df.Parameter_Code.unique()
@@ -652,15 +653,15 @@ class aqs:
                 if i == 88305:
                     df.loc[con, 'Species'] = 'OC'
                 if i == 88306:
-                    df.loc[con, 'Species'] = 'PM2.5_NO3'
+                    df.loc[con, 'Species'] = 'NO3f'
                 if i == 88307:
-                    df.loc[con, 'Species'] = 'PM2.5_EC'
+                    df.loc[con, 'Species'] = 'ECf'
                 if i == 88316:
-                    df.loc[con, 'Species'] = 'PM2.5_EC_Optical'
+                    df.loc[con, 'Species'] = 'ECf_optical'
                 if i == 88403:
-                    df.loc[con, 'Species'] = 'PM2.5_SO4'
+                    df.loc[con, 'Species'] = 'SO4f'
                 if i == 88312:
-                    df.loc[con, 'Species'] = 'PM2.5_TOT_CARBON'
+                    df.loc[con, 'Species'] = 'TCf'
                 if i == 42600:
                     df.loc[con, 'Species'] = 'NOY'
                 if i == 42601:

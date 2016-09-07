@@ -9,7 +9,7 @@ sns.set_context('poster')
 
 
 # CMAQ Spatial Plots
-def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='',vmin=0,vmax=150,ncolors=11,cmap='YlGnBu'):
+def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, vmax=150, ncolors=10, cmap='YlGnBu'):
     from numpy import arange
     fig = plt.figure(figsize=(12, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
@@ -21,8 +21,8 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='',vmin=0,vm
     x, y = m(lon, lat)
     plt.axis('off')
 
-    c,cmap = colorbar_index(ncolors, cmap,minval=vmin,maxval=vmax)
-    m.pcolormesh(x, y, cmaqvar, vmin=vmin,vmax=vmax, cmap=cmap)
+    c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
+    m.pcolormesh(x, y, cmaqvar, vmin=vmin, vmax=vmax, cmap=cmap)
     titstring = date.strftime('%B %d %Y %H')
     plt.title(titstring)
 
@@ -42,28 +42,28 @@ def normval(vmin, vmax, cmap):
 
 
 # Spatial Plotting of AQS on basemap instance m
-def aqs_spatial_scatter(aqs, m, date, savename=''):
+def aqs_spatial_scatter(aqs, m, date, savename='', vmin=0, vmax=150, ncolors=10, cmap='YlGnBu'):
     new = aqs[aqs.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    c,cmap = colorbar_index(ncolors, cmap,minval=vmin,maxval=vmax)
-    if (type(vmin)==None) | (type(vmax) == None):
-        plt.scatter(x, y, c=new['Obs'].values, vmin=0,vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
+    c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
+    if (type(vmin) == None) | (type(vmax) == None):
+        plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
-        plt.scatter(x, y, c=new['Obs'].values, vmin=vmin,vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+        plt.scatter(x, y, c=new['Obs'].values, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     plt.scatter(x, y, c=new['Obs_value'].values, norm=norm, cmap=cmap)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
 
-def airnow_spatial_scatter(df, m, date, vmin=None,vmax=None,savename='',ncolors=15):
+def airnow_spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu'):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    c,cmap = colorbar_index(ncolors, cmap,minval=vmin,maxval=vmax)
-    if (type(vmin)==None) | (type(vmax) == None):
-        plt.scatter(x, y, c=new['Obs'].values, vmin=0,vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
+    c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
+    if (type(vmin) == None) | (type(vmax) == None):
+        plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
-        plt.scatter(x, y, c=new['Obs'].values, vmin=vmin,vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+        plt.scatter(x, y, c=new['Obs'].values, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
@@ -88,62 +88,7 @@ def airnow_8hr_spatial_scatter(df, m, date, savename=''):
         plt.close()
 
 
-# Spatial Plotting of Improve on maps
-def improve_spatial_scatter(improve, m, date, param, vmin=None, vmax=None, cmap='viridis', savename=''):
-    new = improve[improve.datetime == date]
-    x, y = m(new.Lon.values, new.Lat.values)
-    plt.scatter(x, y, c=new[param].values, vmin=vmin, vmax=vmax, cmap=cmap)
-    if savename != '':
-        plt.savefig(savename + date + '.jpg', dpi=75.)
-    plt.close()
-
-
-# Time series implementation for AQS
-def plot_timeseries(dataframe, domain_ave=True, ylabel='PM10 Concentration', savename='', title='', convert=True):
-    import gc
-    # format plot stuff
-    sns.set_style('whitegrid')
-    if convert:
-        dataframe['Obs_value'] *= 1000.
-    if domain_ave:
-        domainave = dataframe.groupby('datetime').mean()
-        plt.plot(domainave.index.values, domainave['Obs_value'].values, 'k', label='OBS')
-        plt.plot(domainave.index.values, domainave['cmaq'].values, label='CMAQ')
-        plt.ylabel(ylabel)
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
-        plt.xticks(rotation=30)
-        plt.title(title)
-        plt.tight_layout()
-        plt.legend(loc='best')
-        if savename != '':
-            plt.savefig(savename + '_average.jpg', dpi=100)
-            plt.close()
-    else:
-        plt.plot(dataframe.index, dataframe['Obs_value'], 'k', label='OBS')
-        plt.plot(dataframe.index, dataframe['cmaq'], label='CMAQ')
-        plt.ylabel(ylabel)
-        plt.xticks(rotation=30)
-        plt.title(title)
-        plt.tight_layout()
-        plt.legend(loc='best')
-        if savename != '':
-            plt.savefig(savename + str(dataframe['SCS'].unique()[0]) + '.jpg', dpi=100)
-            plt.close()
-
-    gc.collect()
-
-
-# Plot each site in the AQS dataframe
-def plot_allsites_timeseries(dataframe, ylabel='PM10 Concentration', savename=''):
-    sites = dataframe.SCS.unique()
-    dataframe.index = dataframe.datetime
-    for i in sites:
-        sitedf = dataframe[dataframe['SCS'] == i]
-        plot_timeseries(sitedf, siteave=False, ylabel=ylabel, savename=savename)
-    plot_timeseries(dataframe, siteave=True, ylabel=ylabel, savename=savename)
-
-
-def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, footer=True,sample='H'):
+def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
     from numpy import isnan
     sns.set_style('ticks')
@@ -151,8 +96,8 @@ def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, foot
     if fig == None:
 
         f = plt.figure(figsize=(13, 8))
-        if label==None:
-            label='CMAQ'
+        if label == None:
+            label = 'CMAQ'
 
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
@@ -161,7 +106,7 @@ def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, foot
         cmaq = df.CMAQ.resample(sample).mean()
         cmaqerr = df.CMAQ.resample(sample).std()
         plt.plot(obs, color='darkslategrey')
-        plt.plot(cmaq, color='dodgerblue',label=label)
+        plt.plot(cmaq, color='dodgerblue', label=label)
         plt.legend(loc='best')
         mask = ~isnan(obs) & ~isnan(obserr)
         plt.fill_between(obs.index[mask], (obs - obserr)[mask], (obs + obserr)[mask], alpha=.2, color='darkslategrey')
@@ -172,8 +117,8 @@ def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, foot
         ax.set_xlabel('UTC Time (mm/dd HH)')
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
         plt.title(title)
-        minval = min([(obs-obserr).min(),(cmaq-cmaqerr).min()])
-        minval = max([minval,0])
+        minval = min([(obs - obserr).min(), (cmaq - cmaqerr).min()])
+        minval = max([minval, 0])
         plt.gca().set_ylim(bottom=minval)
         ylabel = species + ' (' + units + ')'
         plt.gca().axes.set_ylabel(ylabel)
@@ -187,11 +132,12 @@ def airnow_timeseries_param(df, title='', fig=None, label=None, color=None, foot
         cmaqerr = df.CMAQ.resample(sample).std()
         lin, = ax.plot(cmaq, label=label)
         mask = ~isnan(cmaq) & ~isnan(cmaqerr)
-        plt.fill_between(cmaq.index[mask], (cmaq - cmaqerr)[mask], (cmaq + cmaqerr)[mask], alpha=.2, color=lin.get_color())
+        plt.fill_between(cmaq.index[mask], (cmaq - cmaqerr)[mask], (cmaq + cmaqerr)[mask], alpha=.2,
+                         color=lin.get_color())
         plt.legend(loc='best')
 
 
-def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=True,sample='H'):
+def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
     from numpy import sqrt
     sns.set_style('ticks')
@@ -209,8 +155,8 @@ def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=Tru
         a = plt.plot(mb, label='Mean Bias', color='dodgerblue')
         ax = plt.gca().axes
         ax2 = ax.twinx()
-        b = ax2.plot(rmse,label='RMSE', color='tomato')
-        #b = plt.plot(rmse, label='RMSE', color='tomato')
+        b = ax2.plot(rmse, label='RMSE', color='tomato')
+        # b = plt.plot(rmse, label='RMSE', color='tomato')
         lns = a + b
         labs = [l.get_label() for l in lns]
         plt.legend(lns, labs, loc='best')
@@ -237,7 +183,7 @@ def airnow_timeseries_error_param(df, title='', fig=None, label=None, footer=Tru
         plt.legend(lns, labs, loc='best')
 
 
-def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True,sample='H'):
+def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
     from numpy import sqrt
     sns.set_style('ticks')
@@ -247,9 +193,9 @@ def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
         rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
-        plt.plot(rmse,color='dodgerblue',label=label)
+        plt.plot(rmse, color='dodgerblue', label=label)
         ylabel = species + ' (' + units + ')'
-        plt.gca().axes.set_ylabel('RMSE '+ ylabel)
+        plt.gca().axes.set_ylabel('RMSE ' + ylabel)
         if footer:
             airnow_footer_text(df)
         ax = plt.gca().axes
@@ -260,10 +206,11 @@ def airnow_timeseries_rmse_param(df, title='', fig=None, label=None, footer=True
     else:
         ax = fig.get_axes()[0]
         rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
-        ax.plot(rmse,label=label)
+        ax.plot(rmse, label=label)
         plt.legend(loc='best')
 
-def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True,sample='H'):
+
+def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
     sns.set_style('ticks')
     df.index = df.datetime
@@ -272,9 +219,9 @@ def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True,s
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
         mb = (df.CMAQ - df.Obs).resample(sample).mean()
-        plt.plot(mb,color='dodgerblue',label=label)
+        plt.plot(mb, color='dodgerblue', label=label)
         ylabel = species + ' (' + units + ')'
-        plt.gca().axes.set_ylabel('MB '+ ylabel)
+        plt.gca().axes.set_ylabel('MB ' + ylabel)
         plt.gca().axes.set_xlabel('UTC Time (mm/dd HH)')
         plt.gca().axes.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
         if footer:
@@ -284,7 +231,7 @@ def airnow_timeseries_mb_param(df, title='', fig=None, label=None, footer=True,s
     else:
         ax = fig.get_axes()[0]
         rmse = (df.CMAQ - df.Obs).resample(sample).mean()
-        ax.plot(rmse,label=label)
+        ax.plot(rmse, label=label)
         plt.legend(loc='best')
 
 
@@ -340,7 +287,7 @@ def airnow_diffpdfs_param(df, title=None, fig=None, label=None, footer=True):
 
 
 def airnow_scatter_param(df, title=None, fig=None, label=None, footer=True):
-    from numpy import max, arange, linspace,isnan
+    from numpy import max, arange, linspace, isnan
     from scipy.stats import scoreatpercentile as score
     from scipy.stats import linregress
     sns.set_style('ticks')
@@ -392,7 +339,8 @@ def airnow_diffscatter_param(df, title=None, fig=None, label=None, footer=True):
         maxvaly = score(df.CMAQ.values[mask] - df.Obs.values[mask], per=99.9)
         plt.figure(figsize=(10, 7))
 
-        plt.scatter(df.Obs.values[mask], df.CMAQ.values[mask] - df.Obs.values[mask], c='cornflowerblue', marker='o', edgecolors='w', alpha=.3, label=label)
+        plt.scatter(df.Obs.values[mask], df.CMAQ.values[mask] - df.Obs.values[mask], c='cornflowerblue', marker='o',
+                    edgecolors='w', alpha=.3, label=label)
         plt.plot((0, maxval), (0, 0), '--', color='darkslategrey')
 
         plt.xlim([0, maxval])
@@ -406,7 +354,8 @@ def airnow_diffscatter_param(df, title=None, fig=None, label=None, footer=True):
     else:
         ax = fig.get_axes()[0]
         mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
-        ax.scatter(df.Obs.values[mask], df.CMAQ.values[mask] - df.Obs.values[mask], marker='o', edgecolors='w', alpha=.3, label=label)
+        ax.scatter(df.Obs.values[mask], df.CMAQ.values[mask] - df.Obs.values[mask], marker='o', edgecolors='w',
+                   alpha=.3, label=label)
         plt.legend(loc='best')
 
 
@@ -573,7 +522,7 @@ def airnow_scatter(df):
 
 
 def airnow_footer_text(df):
-    from numpy import unique,isnan
+    from numpy import unique, isnan
     from mystats import NMB, NME, MB, d1
     mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
     nmb = NMB(df.Obs.values[mask], df.CMAQ.values[mask])
@@ -588,24 +537,26 @@ def airnow_footer_text(df):
     plt.figtext(0.9, .04, 'NMB = %.1f' % nmb, fontsize=11, family='monospace')
     plt.figtext(.3, .04, 'SITES: ' + str(unique(df.SCS.values[mask]).shape[0]), fontsize=11, family='monospace')
     plt.figtext(.3, .02, 'MEASUREMENTS: ' + str(df.SCS.count()), fontsize=11, family='monospace')
-    
-def colorbar_index(ncolors, cmap,minval=None,maxval=None):
-    import matplotlib.cm as cm 
+
+
+def colorbar_index(ncolors, cmap, minval=None, maxval=None):
+    import matplotlib.cm as cm
     import numpy as np
     cmap = cmap_discretize(cmap, ncolors)
     mappable = cm.ScalarMappable(cmap=cmap)
     mappable.set_array([])
-    mappable.set_clim(-0.5, ncolors+0.5)
+    mappable.set_clim(-0.5, ncolors + 0.5)
     colorbar = plt.colorbar(mappable)
     colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
     if (type(minval) == None) & (type(maxval) != None):
-        colorbar.set_ticklabels(np.linspace(0,maxval,ncolors).astype('int32'))
+        colorbar.set_ticklabels(np.linspace(0, maxval, ncolors).astype('int32'))
     elif (type(minval) == None) & (type(maxval) == None):
-        colorbar.set_ticklabels(np.linspace(0,ncolors,ncolors).astype('int32'))
+        colorbar.set_ticklabels(np.linspace(0, ncolors, ncolors).astype('int32'))
     else:
-        colorbar.set_ticklabels(np.linspace(minval,maxval,ncolors).astype('int32'))
-    
-    return colorbar,cmap
+        colorbar.set_ticklabels(np.linspace(minval, maxval, ncolors).astype('int32'))
+
+    return colorbar, cmap
+
 
 def cmap_discretize(cmap, N):
     """
@@ -622,16 +573,15 @@ def cmap_discretize(cmap, N):
     import matplotlib.colors as mcolors
     import matplotlib.cm as cm
     import numpy as np
-    
+
     if type(cmap) == str:
         cmap = plt.get_cmap(cmap)
-    colors_i = np.concatenate((np.linspace(0, 1., N), (0.,0.,0.,0.)))
+    colors_i = np.concatenate((np.linspace(0, 1., N), (0., 0., 0., 0.)))
     colors_rgba = cmap(colors_i)
-    indices = np.linspace(0, 1., N+1)
+    indices = np.linspace(0, 1., N + 1)
     cdict = {}
-    for ki,key in enumerate(('red','green','blue')):
-        cdict[key] = [ (indices[i], colors_rgba[i-1,ki], colors_rgba[i,ki])
-                        for i in xrange(N+1) ]
-    #Return colormap object.
-    return mcolors.LinearSegmentedColormap(cmap.name + "_%d"%N, cdict, 1024)
-
+    for ki, key in enumerate(('red', 'green', 'blue')):
+        cdict[key] = [(indices[i], colors_rgba[i - 1, ki], colors_rgba[i, ki])
+                      for i in xrange(N + 1)]
+    # Return colormap object.
+    return mcolors.LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)

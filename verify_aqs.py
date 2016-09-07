@@ -16,14 +16,14 @@ class verify_aqs:
         self.aqs = aqs()
         self.cmaq = cmaq()
         self.se_states = array(
-                ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
-                 'Virginia', 'West Virginia'], dtype='|S14')
+            ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
+             'Virginia', 'West Virginia'], dtype='|S14')
         self.ne_states = array(['Connecticut', 'Delaware', 'District Of Columbia', 'Maine', 'Maryland', 'Massachusetts',
                                 'New Hampshire', 'New Jersey', 'New York', 'Pennsylvania', 'Rhode Island', 'Vermont'],
                                dtype='|S20')
         self.nc_states = array(
-                ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan', 'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
-                dtype='|S9')
+            ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan', 'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
+            dtype='|S9')
         self.sc_states = array(['Arkansas', 'Louisiana', 'Oklahoma', 'Texas'], dtype='|S9')
         self.r_states = array(['Arizona', 'Colorado', 'Idaho', 'Kansas', 'Montana', 'Nebraska', 'Nevada', 'New Mexico',
                                'North Dakota', 'South Dakota', 'Utah', 'Wyoming'], dtype='|S12')
@@ -137,21 +137,19 @@ class verify_aqs:
                     dfno2 = self.interp_to_aqs(cmaq, dfno2, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqno2 = cmaq
                     dfs.append(dfno2)
-            elif i == 'PM2.5_SO4':
-                if ('PM25_SO4' not in self.cmaq.keys):
-                    pass
-                else:
+            elif i == 'SO4f':
+                if ('PM25_SO4' in self.cmaq.keys) | ('ASO4J' in self.cmaq.keys) | ('ASO4I' in self.cmaq.keys):
                     print 'Interpolating PSO4:'
                     dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='PM25_SO4', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25_SO4') * fac
+                    fac = self.check_cmaq_units(param='SO4f', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='SO4f') * fac
                     dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpso4 = cmaq
                     dfs.append(dfnox)
-            elif i == 'PM10':
-                if ('ASO4K' not in self.cmaq.keys):
-                    pass
                 else:
+                    pass
+            elif i == 'PM10':
+                if ('PM_TOTAL' in self.cmaq.keys) | ('ASO4K' in self.cmaq.keys):
                     print 'Interpolating PM10:'
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM10', aqs_param=i)
@@ -159,14 +157,27 @@ class verify_aqs:
                     dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpso4 = cmaq
                     dfs.append(dfnox)
-            elif i == 'PM2.5_NO3':
-                if ('PM25_NO3' not in self.cmaq.keys):
-                    pass
                 else:
+                    pass
+            elif i == 'NO3f':
+                if ('PM25_NO3' in self.cmaq.keys) | ('ANO3J' in self.cmaq.keys) | ('ANO3I' in self.cmaq.keys):
                     print 'Interpolating PNO3:'
                     dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='PM25_NO3', aqs_param=i)
+                    fac = self.check_cmaq_units(param='NO3f', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='PM25_NO3') * fac
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqpno3 = cmaq
+                    dfs.append(dfnox)
+                else:
+                    pass
+            elif i == 'ECf':
+                if ('PM25_EC' in self.cmaq.keys) | ('AECI' in self.cmaq.keys) | ('AECJ' in self.cmaq.keys):
+                    pass
+                else:
+                    print 'Interpolating PEC:'
+                    dfnox = g.get_group(i)
+                    fac = self.check_cmaq_units(param='ECf', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='ECf') * fac
                     dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpno3 = cmaq
                     dfs.append(dfnox)
@@ -240,7 +251,7 @@ class verify_aqs:
         from numpy import NaN
         df = self.df.copy()[[
             'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
-            'Longitude','State_Name']]
+            'Longitude', 'State_Name']]
         df[df < -990] = NaN
         g = df.groupby('Species')
         new = g.get_group(param)
@@ -316,7 +327,7 @@ class verify_aqs:
             else:
                 self.aqs_spatial(df2, param=param, path=path, date=date, xlim=x, ylim=y)
 
-    def aqs_spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[],vmin=0,vmax=150):
+    def aqs_spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
@@ -342,7 +353,7 @@ class verify_aqs:
             cmaq = self.cmaqnox
         elif param == 'ISOPRENE':
             cmaq = self.cmaqisop
-        
+
         cmaq = masked_less(cmaq, .25)
         m = self.cmaq.choose_map(path, region)
         if date == '':
@@ -456,11 +467,11 @@ class verify_aqs:
         con = df.datetime == self.cmaq.dates[self.cmaq.indexdates][0]
         new = df[con]
         print '   Interpolating values to AQS Sites, Date : ', self.cmaq.dates[self.cmaq.indexdates][0].strftime(
-                '%B %d %Y   %H utc')
+            '%B %d %Y   %H utc')
         cmaq_val = DataFrame(
-                griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
-                         (new.Longitude.values, new.Latitude.values), method='nearest'),
-                columns=[varname], index=new.index)
+            griddata((lon.flatten(), lat.flatten()), cmaqvar[self.cmaq.indexdates[0], :, :].flatten(),
+                     (new.Longitude.values, new.Latitude.values), method='nearest'),
+            columns=[varname], index=new.index)
         new = new.join(cmaq_val)
         for i, j in enumerate(self.cmaq.dates[self.cmaq.indexdates][1:]):
             print '   Interpolating values to AQS Sites, Date : ', j.strftime('%B %d %Y %H utc')
