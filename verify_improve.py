@@ -75,7 +75,7 @@ class verify_improve:
                 dfpm = g.get_group(i)
                 fac = self.check_cmaq_units(param='PM10', improve_param=i)
                 cmaqvar = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                 self.cmaqpm10 = cmaqvar
                 dfs.append(dfpm)
             elif i == 'PM2.5':
@@ -83,7 +83,7 @@ class verify_improve:
                 dfpm = g.get_group(i)
                 fac = self.check_cmaq_units(param='PM25', improve_param=i)
                 cmaqvar = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
-                dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                 self.cmaqpm25 = cmaqvar
                 dfs.append(dfpm)
             elif i == 'NAf':
@@ -92,7 +92,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NAf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='NAf') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqna = cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -103,7 +103,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='MGf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='AMGJ') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqmg= cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -114,7 +114,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='TIj', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='ATIJ') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqti= cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -125,7 +125,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='SIj', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='ASIJ') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqti= cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -136,7 +136,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='Kf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='Kf') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqk = cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -147,7 +147,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='CAf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='ACAJ') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqca = cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -158,7 +158,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='SO4f', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='SO4f') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqso4 = cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -169,7 +169,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NH4f', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='NH4f') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqnh4 = cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -180,7 +180,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO3f', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='NO3f') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqno3 = cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -191,7 +191,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='FEf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='AFEJ') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqfe = cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -202,7 +202,7 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='ALf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='AALF') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqal = cmaqvar
                     dfs.append(dfpm)
                 else:
@@ -213,8 +213,8 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='MNf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='AMNJ') * fac
-                    dfpm = self.interp_to_improve(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqn = cmaqvar
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqmn = cmaqvar
                     dfs.append(dfpm)
                 else:
                     pass
