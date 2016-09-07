@@ -340,7 +340,6 @@ class verify_improve:
         date = pd.Series(dtype=df.datetime.dtype)
         site = pd.Series(dtype=df.Site_Code.dtype)
         for i, j in enumerate(self.cmaq.indexdates):
-            print '   Interpolating values to IMPROVE Sites. Date : ', self.cmaq.dates[j].strftime('%B %d %Y   %H utc')
             if interp.lower() == 'idw':
                 val = kd_tree.resample_custom(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
                                               fill_value=NaN, neighbours=n, weight_funcs=weight_func,
