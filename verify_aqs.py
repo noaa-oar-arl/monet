@@ -342,44 +342,7 @@ class verify_aqs:
         if timeseries_mb:
             plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
-    def compare_metro_area_8hr(self, city='Philadelphia', param='OZONE', date='', timeseries=False, scatter=False,
-                               bargraph=False, pdfs=False, spatial=False, path=''):
-        from numpy import NaN, unique
-        from tools import search_listinlist
-        df = self.df8hr.copy()[
-            ['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'SCS', 'Units', 'Latitude',
-             'Longitude']]
-        df[df < -990] = NaN
-        df = df.dropna()
-        names = df.MSA_Name.dropna().unique()
-
-        for i in names:
-            if city.upper() in i.upper():
-                name = i
-        index1, index2 = search_listinlist(array(names), array(city))
-        df2 = df[df['MSA_Name'] == name]
-        if timeseries:
-            plots.airnow_timeseries(df2, title=name)
-        if scatter:
-            plots.airnow_scatter(df2)
-        if bargraph:
-            plots.airnow_domain_bar(df2)
-        if pdfs:
-            plots.airnow_kdeplots(df2)
-        if spatial:
-            m = self.cmaq.load_conus_basemap(path)
-            lats, index = unique(df2.Latitude.values, return_index=True)
-            lons = df2.Longitude.values[index]
-            print lats.mean(), lons.mean()
-            xlim = array([lons.mean() - 3., lons.mean() + 3.])
-            ylim = array([lats.mean() - 1., lats.mean() + 1.])
-            x, y = m(xlim, ylim)
-            if date == '':
-                self.aqs_spatial(df2, param=param, path=path, xlim=x, ylim=y)
-            else:
-                self.aqs_spatial(df2, param=param, path=path, date=date, xlim=x, ylim=y)
-
-    def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150):
+    def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150,ncolors=16,cmap='YlGnBu'):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
@@ -420,8 +383,8 @@ class verify_aqs:
 
         else:
             index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
-            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,vmin=vmin,vmax=vmax)
-            plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax)
+            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
+            plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
             c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
             if len(xlim) > 1:
                 plt.xlim([min(xlim), max(xlim)])
