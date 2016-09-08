@@ -36,6 +36,9 @@ class verify_aqs:
         self.cmaqso2 = None
         self.cmaqco = None
         self.cmaqisop = None
+        self.cmaqbenz = None
+        self.cmaqethane = None
+        self.cmaqtol = None
         self.df8hr = None
 
     def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
@@ -206,7 +209,7 @@ class verify_aqs:
                     fac = self.check_cmaq_units(param='ETHA', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='ETHA') * fac
                     dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqisop = cmaq
+                    self.cmaqethane = cmaq
                     dfs.append(dfnox)
             elif i == 'BENZENE':
                 if ('BENZENE' not in self.cmaq.keys):
@@ -217,18 +220,18 @@ class verify_aqs:
                     fac = self.check_cmaq_units(param='BENZENE', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='BENZENE') * fac
                     dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqisop = cmaq
+                    self.cmaqbenz = cmaq
                     dfs.append(dfnox)
             elif i == 'TOLUENE':
                 if ('TOL' not in self.cmaq.keys):
                     pass
                 else:
-                    print 'Interpolating Isoprene:'
+                    print 'Interpolating Toluene:'
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='TOL', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='TOL') * fac
                     dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqisop = cmaq
+                    self.cmaqtol = cmaq
                     dfs.append(dfnox)
             elif i == 'ISOPRENE':
                 if ('ISOP' not in self.cmaq.keys):
