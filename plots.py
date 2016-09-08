@@ -44,7 +44,7 @@ def normval(vmin, vmax, cmap):
 def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu'):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    cmap = cmap_discretize(cmap,ncolors, minval=vmin, maxval=vmax)
+    cmap = cmap_discretize(cmap,ncolors)
     if (type(vmin) == None) | (type(vmax) == None):
         plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
