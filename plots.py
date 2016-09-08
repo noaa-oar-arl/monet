@@ -9,7 +9,7 @@ sns.set_context('poster')
 
 
 # CMAQ Spatial Plots
-def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, vmax=150, ncolors=10, cmap='YlGnBu'):
+def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, vmax=150, ncolors=15, cmap='YlGnBu'):
     from numpy import arange
     fig = plt.figure(figsize=(12, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
@@ -44,7 +44,7 @@ def normval(vmin, vmax, cmap):
 def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu'):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
+    cmap = cmap_discretize(cmap,ncolors, minval=vmin, maxval=vmax)
     if (type(vmin) == None) | (type(vmax) == None):
         plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
