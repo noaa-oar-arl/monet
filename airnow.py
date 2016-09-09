@@ -132,7 +132,7 @@ class airnow:
         for i in fnames:
             with open(i,'rb') as f:
                 a = a + f.read()
-        dft = pd.read_csv(StringIO(a),delimiter='|',header=None)
+        dft = pd.read_csv(StringIO(a),delimiter='|',header=None,error_bad_lines=False)
         cols = ['date','time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
         dft.columns = cols
         dates = [datetime.strptime(x+' '+y,'%m/%d/%y %H:%M') for x,y in zip(dft.date.values,dft.time.values)]
