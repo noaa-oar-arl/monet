@@ -251,7 +251,7 @@ class verify_airnow:
         if timeseries_mb:
             plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
-    def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[],vmin=vmin,vmax=vmax,ncolors=15,cmap='YlGnBu'):
+    def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[],vmin=0,vmax=150,ncolors=15,cmap='YlGnBu'):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
