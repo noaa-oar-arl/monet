@@ -531,7 +531,7 @@ def colorbar_index(ncolors, cmap, minval=None, maxval=None):
     mappable = cm.ScalarMappable(cmap=cmap)
     mappable.set_array([])
     mappable.set_clim(-0.5, ncolors + 0.5)
-    colorbar = plt.colorbar(mappable)
+    colorbar = plt.colorbar(mappable,format='%1.2g')
     colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
     if (type(minval) == None) & (type(maxval) != None):
         colorbar.set_ticklabels(np.linspace(0, maxval, ncolors).astype('int32'))
