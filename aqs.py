@@ -495,12 +495,15 @@ class aqs:
         aqs.index = arange(aqs.index.shape[0])
         return aqs
 
-    def load_all_hourly_data(self, dates):
+    def load_all_hourly_data(self, dates,datasets='all'):
         os.chdir(self.datadir)
-        dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
-               self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
-               self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
-               self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates)]
+        if datasets.upper() == 'PM':
+            dfs = [self.load_aqs_pm10_data(dates), self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates)]
+        else:
+            dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
+                   self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
+                   self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
+                   self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates)]
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).copy().drop_duplicates()
         os.chdir(self.cwd)
