@@ -72,6 +72,49 @@ def eight_hr_spatial_scatter(df, m, date, savename=''):
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
+def timeseries_single_var(df, varname='Obs',title='', fig=None, label=None, color=None, footer=True, sample='H'):
+    import matplotlib.dates as mdates
+    from numpy import isnan
+    sns.set_style('ticks')
+    df.index = df.datetime
+    if fig == None:
+
+        f = plt.figure(figsize=(13, 8))
+        if label == None:
+            label = 'CMAQ'
+
+        species = df.Species.unique().astype('|S8')[0]
+        units = df.Units.unique().astype('|S8')[0]
+        obs = df[varname].resample(sample).mean()
+        obserr = df[varname].resample(sample).std()
+        plt.plot(obs, color='darkslategrey')
+        plt.legend(loc='best')
+        mask = ~isnan(obs) & ~isnan(obserr)
+        plt.fill_between(obs.index[mask], (obs - obserr)[mask], (obs + obserr)[mask], alpha=.2, color='darkslategrey')
+
+        ax = plt.gca().axes
+        ax.set_xlabel('UTC Time (mm/dd HH)')
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
+        plt.title(title)
+        minval = min([(obs - obserr).min()])
+        minval = max([minval, 0])
+        plt.gca().set_ylim(bottom=minval)
+        ylabel = species + ' (' + units + ')'
+        plt.gca().axes.set_ylabel(ylabel)
+        if footer:
+            footer_text(df)
+        plt.tight_layout()
+        plt.grid(alpha=.5)
+    else:
+        ax = fig.get_axes()[0]
+        data = df[varname].resample(sample).mean()
+        dataerr = df[varname].resample(sample).std()
+        lin, = ax.plot(data, label=label)
+        mask = ~isnan(data) & ~isnan(dataerr)
+        plt.fill_between(data.index[mask], (data - dataerr)[mask], (data + dataerr)[mask], alpha=.2,
+                         color=lin.get_color())
+        plt.legend(loc='best')
+
 
 def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
