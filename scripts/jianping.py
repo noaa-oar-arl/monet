@@ -83,6 +83,30 @@ plots.timeseries_single_var(d, title='California', label='AQS PM2.5', sample='M'
 # use in any other programing language you can save it to a CSV file
 # Lets save the monthly mean
 pm25df.index = pm25df.datetime
-monthlypm25 = pm25df['Obs'].resample('M').mean()
+monthlypm25 = pm25df['Obs'].copy().resample('M').mean()
 monthlypm25 = monthlypm25.reset_index(level=1)
 monthlypm25.to_csv('output.csv')
+
+
+#you also don't have to do the mean.  You can do the folling functions easily:
+#Method 	Description
+#count() 	Number of non-null observations
+#sum() 	        Sum of values
+#mean() 	Mean of values
+#median() 	Arithmetic median of values
+#min() 	        Minimum
+#max() 	        Maximum
+#std() 	        Bessel-corrected sample standard deviation
+#var() 	        Unbiased variance
+#skew() 	Sample skewness (3rd moment)
+#kurt() 	Sample kurtosis (4th moment)
+#quantile() 	Sample quantile (value at %)
+#apply() 	Generic apply
+#cov() 	        Unbiased covariance (binary)
+#corr() 	Correlation (binary)
+
+#as an example.  lets save the median value
+
+monthlypm25 = pm25df['Obs'].copy().resample('M').median()
+monthlypm25 = monthlypm25.reset_index(level=1)
+monthlypm25.to_csv('median.csv')
