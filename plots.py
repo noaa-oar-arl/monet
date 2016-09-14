@@ -79,7 +79,7 @@ def timeseries_single_var(df, varname='Obs',title='', fig=None, label=None, colo
     df.index = df.datetime
     if fig == None:
 
-        f = plt.figure(figsize=(13, 8))
+        f = plt.figure(figsize=(16, 8))
         if label == None:
             label = 'CMAQ'
 
@@ -93,8 +93,8 @@ def timeseries_single_var(df, varname='Obs',title='', fig=None, label=None, colo
         plt.fill_between(obs.index[mask], (obs - obserr)[mask], (obs + obserr)[mask], alpha=.2, color='darkslategrey')
 
         ax = plt.gca().axes
-        ax.set_xlabel('UTC Time (mm/dd HH)')
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
+        ax.set_xlabel('UTC')
+#        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
         plt.title(title)
         minval = min([(obs - obserr).min()])
         minval = max([minval, 0])
@@ -123,7 +123,7 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
     df.index = df.datetime
     if fig == None:
 
-        f = plt.figure(figsize=(13, 8))
+        f = plt.figure(figsize=(16, 8))
         if label == None:
             label = 'CMAQ'
 
