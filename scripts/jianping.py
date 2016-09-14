@@ -64,7 +64,6 @@ plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', sample='M',f
 show()
 
 # replot in each of the EPA regions the month timeseries
-print pm25df.keys()
 regions = pm25df.Region.unique()
 for i in regions:
     title = 'Monthly PM2.5 ' + i
@@ -74,7 +73,7 @@ for i in regions:
 
 #you can create loops over states if you'd like.  Follow the syntax above
 #here is a plot for just over California
-print pm25df.State_Name.unique()
+print 'State Names: ',pm25df.State_Name.unique()
 d = pm25df.loc[pm25df.State_Name == 'California']
 plots.timeseries_single_var(d, title='California', label='AQS PM2.5', sample='M',footer=False)
 
