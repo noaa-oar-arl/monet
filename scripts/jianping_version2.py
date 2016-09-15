@@ -9,9 +9,9 @@ import plots
 
 ##EDIT THE NUMBER OF YEARS HERE
 #####################################################
-years = ['2014', '2015', '2016']
-#####################################################
-
+#years = ['2014', '2015', '2016']
+years = arange(1998,2016).astype('|S4')
+####################################################
 
 dfs = []
 
@@ -39,24 +39,14 @@ so4df = df.groupby('Species').get_group('SO4f')
 ##lets look at PM2.5
 
 # first make a time series plot over the entire domain of the hourly data
-title = 'HOURLY PM2.5 CONUS'
-plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5',footer=False)
+title = 'WEEKLY PM2.5 CONUS'
+plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5',footer=False,sample='W')
 show()
 
 #***************************************************************
 ####if you wish to save the figure uncomment the line below#####
 #************************************************************
 #savefig('pm25_hourly.jpg',dpi=100)
-
-# now lets resample to daily data and replot
-title = 'Daily PM2.5 CONUS'
-plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', sample='D',footer=False)
-show()
-
-# resample to weekly
-title = 'Weekly PM2.5 CONUS'
-plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', sample='W',footer=False)
-show()
 
 # resample to monthly
 title = 'Monthy PM2.5 CONUS'
@@ -65,11 +55,27 @@ show()
 
 # replot in each of the EPA regions the month timeseries
 regions = pm25df.Region.unique()
+
 for i in regions:
     title = 'Monthly PM2.5 ' + i
     d = pm25df.loc[pm25df.Region == i]
     plots.timeseries_single_var(d, title=title, label='AQS PM2.5', sample='M',footer=False)
     show()
+
+#get all of the seperated dataframes
+dfs = {}
+for i in regions:
+    d = pm25df.loc[pm25df.Region == i]
+    d.index = d.datetime
+    dd = d['Obs'].copy().resample('W').mean()
+    dfs[i] == dd
+    
+#now plot all of them on one graph
+f = figure(figsize=(18,8))
+for i,j in enumerate(regions):
+    plot(dfs[j].datetime,dfs[j].Obs,label=j)
+    
+
 
 #you can create loops over states if you'd like.  Follow the syntax above
 #here is a plot for just over California
@@ -109,3 +115,5 @@ monthlypm25.to_csv('output.csv')
 monthlypm25 = pm25df['Obs'].copy().resample('M').median()
 monthlypm25 = monthlypm25.reset_index(level=1)
 monthlypm25.to_csv('median.csv')
+
+
