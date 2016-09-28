@@ -577,11 +577,11 @@ def colorbar_index(ncolors, cmap, minval=None, maxval=None):
     colorbar = plt.colorbar(mappable,format='%1.2g')
     colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
     if (type(minval) == None) & (type(maxval) != None):
-        colorbar.set_ticklabels(np.linspace(0, maxval, ncolors).astype('float'))
+        colorbar.set_ticklabels(np.around(np.linspace(0, maxval, ncolors).astype('float'),2))
     elif (type(minval) == None) & (type(maxval) == None):
-        colorbar.set_ticklabels(np.linspace(0, ncolors, ncolors).astype('float'))
+        colorbar.set_ticklabels(np.around(np.linspace(0, ncolors, ncolors).astype('float'),2))
     else:
-        colorbar.set_ticklabels(np.linspace(minval, maxval, ncolors).astype('float'))
+        colorbar.set_ticklabels(np.around(np.linspace(minval, maxval, ncolors).astype('float'),2))
 
     return colorbar, cmap
 
