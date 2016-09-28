@@ -53,7 +53,7 @@ def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, 
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
-def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15,fact=1.5 cmap='YlGnBu'):
+def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15,fact=1.5, cmap='YlGnBu'):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
     cmap = cmap_discretize(cmap,ncolors)
