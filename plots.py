@@ -53,12 +53,12 @@ def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, 
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
-def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu'):
+def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15,fact=1.5 cmap='YlGnBu'):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
     cmap = cmap_discretize(cmap,ncolors)
     colors = new.CMAQ - new.Obs
-    ss = (new.Obs - new.CMAQ).abs()
+    ss = (new.Obs - new.CMAQ).abs() * fact
     if (type(vmin) == None) | (type(vmax) == None):
         plt.scatter(x, y, c=colors,s=ss, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
