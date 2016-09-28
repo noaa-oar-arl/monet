@@ -286,9 +286,8 @@ def kdeplots_param(df, title=None, fig=None, label=None, footer=True):
         maxval2 = score(df.Obs.values, per=99.5)
         maxval = max([maxval1, maxval2])
         plt.figure(figsize=(13, 8))
-
         sns.kdeplot(df.Obs, color='darkslategrey')
-        sns.kdeplot(df.CMAQ, color='dodgerblue')
+        sns.kdeplot(df.CMAQ, color='dodgerblue',label=label)
         sns.despine()
 
         plt.xlim([0, maxval])
