@@ -65,9 +65,9 @@ def verify_airnow(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
     else:
         va.airnow.download_hourly_files(path=datapath)
         va.airnow.aggragate_files(airnowoutput)
+        va.airnow.monitor_file = '/data/aqf/barryb/monitoring_site_locations.dat'
+        va.airnow.read_monitor_file()
     va.airnow.datadir = datapath
-    va.airnow.monitor_file = '/data/aqf/barryb/monitoring_site_locations.dat'
-    va.airnow.read_monitor_file()
     if combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)
     return va
