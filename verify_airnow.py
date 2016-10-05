@@ -67,6 +67,7 @@ class verify_airnow:
         dfs = []
         for i in comparelist:
             if i == 'OZONE':
+                if ('O3' in self.cmaq.keys):
                 print 'Interpolating Ozone:'
                 dfo3 = g.get_group(i)
                 fac = self.check_cmaq_units(param='O3', airnow_param=i)
@@ -74,6 +75,9 @@ class verify_airnow:
                 self.cmaqo3 = cmaq
                 dfo3 = self.interp_to_airnow(cmaq, dfo3, interp=interp, r=radius, weight_func=weight_func)
                 dfs.append(dfo3)
+                else:   
+                    pass
+                
             elif i == 'PM2.5':
                 print 'Interpolating PM2.5:'
                 dfpm25 = g.get_group(i)
