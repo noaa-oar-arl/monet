@@ -196,8 +196,11 @@ class verify_airnow:
             print 'run: \'df = calc_airnow_8hr_max_calc()\'\n'
             print '===========================================================================================\n'
         else:
-            print 'Calculating Daily 8 Hr Max Ozone....\n'
-            self.df8hr = self.calc_airnow_8hr_max_calc()
+            if ('O3' in self.cmaq.keys):
+                print 'Calculating Daily 8 Hr Max Ozone....\n'
+                self.df8hr = self.calc_airnow_8hr_max_calc()
+            else:
+                pass
         self.df.SCS = self.df.SCS.values
         self.df.dropna(inplace=True, subset=['Obs', 'CMAQ'])
         self.print_available()
