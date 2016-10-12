@@ -22,7 +22,7 @@ grid = sys.argv[2]
 
 va = verify.verify_airnow(concpath=files,gridcro=grid,datapath='.',user=sys.argv[4],passw=sys.argv[5],combine=True,neighbors=9)
 
-names = df.MSA_Name.dropna().unique()
+names = va.df.MSA_Name.dropna().unique()
 city = sys.argv[7]
 name = ''
 for i in names:
