@@ -48,7 +48,7 @@ def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, 
     if (type(vmin) == None) | (type(vmax) == None):
         plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
-        plt.scatter(x, y, c=new['Obs'].values, s = 2,vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+        plt.scatter(x, y, c=new['Obs'].values, s=20,vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
