@@ -33,7 +33,7 @@ for j in params:
     plt.close()
     
     
-###
+'''
 ' Aberdeen, WA ', ' Adrian, MI ', ' Akron, OH ',
        ' Albany-Lebanon, OR ', ' Albany-Schenectady-Troy, NY ',
        ' Albuquerque, NM ', ' Allentown-Bethlehem-Easton, PA-NJ ',
@@ -202,4 +202,4 @@ for j in params:
        ' Worcester, MA ', ' Yakima, WA ', ' York-Hanover, PA ',
        ' Youngstown-Warren-Boardman, OH-PA ', ' Yuba City, CA ',
        ' Yuma, AZ '
-###
+'''
