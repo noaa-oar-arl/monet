@@ -288,11 +288,12 @@ class verify_airnow:
             for index, i in enumerate(self.cmaq.dates):
                 c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
                                             m)
-                plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'))
+                plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
+                savefig(str(index) + '.jpg',dpi=100)
 
         else:
             index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
