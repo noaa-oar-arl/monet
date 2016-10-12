@@ -293,7 +293,7 @@ class verify_airnow:
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
-                savefig(str(index) + '.jpg',dpi=100)
+                plt.savefig(str(index) + '.jpg',dpi=100)
 
         else:
             index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
