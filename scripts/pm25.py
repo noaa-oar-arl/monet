@@ -1,4 +1,7 @@
-#! /data/aqf/barryb/anaconda2/bin/python
+#! /naqfc/noscrub/Barry.Baker/anaconda2/bin/python
+
+
+###for aitken replace the first line with /data/aqf/barryb/anaconda2/bin/python for the line above
 
 import verify
 from glob import glob
