@@ -1,7 +1,10 @@
 #! /naqfc/noscrub/Barry.Baker/anaconda2/bin/python
-
-
 ###for aitken replace the first line with /data/aqf/barryb/anaconda2/bin/python for the line above
+#   To use this function you exectute as follows
+#
+# ./state_compare.py PATH/TO/ACONC PATH/TO/GRIDCRO LABEL USERNAME PASSWORD STATE
+#
+# note the state is the abbreviated state (TX for Texas or MD for Maryland)
 
 import verify
 from glob import glob
