@@ -20,12 +20,9 @@ print "OUTPUT FILENAME: ", sys.argv[6]
 
 files = glob(sys.argv[1])
 grid = sys.argv[2]
-
 va = verify.verify_airnow(concpath=files,gridcro=grid,datapath='.',user=sys.argv[4],passw=sys.argv[5],combine=True,neighbors=9)
-va.compare_param(param='PM2.5',timeseries=True,label=sys.argv[3])
-plt.savefig('pm25_' + sys.argv[6],dpi=100)
-plt.close()
-
-va.compare_param(param='OZONE',timeseries=True,label=sys.argv[3])
-plt.savefig('o3_' + sys.argv[6],dpi=100)
-plt.close()
+params = va.df.groupby('Region').get_group(i).Species.unique()
+for i in params:
+  va.compare_param(param=i,timeseries=True,label=sys.argv[3])
+  plt.savefig(i.replace('.','')+ '_'+sys.argv[6],dpi=100)
+  plt.close()
