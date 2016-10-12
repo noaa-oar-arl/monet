@@ -24,7 +24,7 @@ va = verify.verify_airnow(concpath=files,gridcro=grid,datapath='.',user=sys.argv
 for i in va.df.Region.dropna().unique():
   params = va.df.groupby('Region').get_group(i).Species.unique()
   for j in params:
-    va.compare_param(param=j,timeseries=True,label=sys.argv[3],region=i)
+    va.compare_param(param=j,timeseries=True,label=sys.argv[3],region=i,footer=False)
     plt.savefig(j + '_'+i+ sys.argv[6],dpi=100)
     plt.close()
 
