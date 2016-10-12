@@ -2,7 +2,7 @@
 ###for aitken replace the first line with /data/aqf/barryb/anaconda2/bin/python for the line above
 #   To use this function you exectute as follows
 #
-# ./city_compare.py PATH/TO/ACONC PATH/TO/GRIDCRO LABEL USERNAME PASSWORD
+# ./5x_domain_compare.py PATH/TO/ACONC PATH/TO/GRIDCRO LABEL USERNAME PASSWORD
 
 
 import verify
