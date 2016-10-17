@@ -17,13 +17,14 @@ print "LABEL: ", sys.argv[3]
 print "AIRNOW Username: ", sys.argv[4]
 print "AIRNOW Password: ", sys.argv[5]
 print "OUTPUT FILENAME: ", sys.argv[6]
-print "SECOND ACONC FILE: ", sys.argv[7]
-print "SECOND ACONC LABEL: ", sys.argv[8]
+
 
 files = glob(sys.argv[1])
 grid = sys.argv[2]
 va = verify.verify_airnow(concpath=files,gridcro=grid,datapath='.',user=sys.argv[4],passw=sys.argv[5],combine=True,neighbors=10)
 if len(sys.argv) > 6:
+  print "SECOND ACONC FILE: ", sys.argv[7]
+  print "SECOND ACONC LABEL: ", sys.argv[8]
   files = files = glob(sys.argv[7])
   va2 = verify.verify_airnow(concpath=files,gridcro=grid,datapath='.',user=sys.argv[4],passw=sys.argv[5],combine=True,neighbors=10)
 params = va.df.Species.unique()
