@@ -23,13 +23,13 @@ print "SECOND ACONC LABEL: ", sys.argv[8]
 files = glob(sys.argv[1])
 grid = sys.argv[2]
 va = verify.verify_airnow(concpath=files,gridcro=grid,datapath='.',user=sys.argv[4],passw=sys.argv[5],combine=True,neighbors=10)
-if len(sys.argv[7]) > 4:
+if len(sys.argv) > 6:
   files = files = glob(sys.argv[7])
   va2 = verify.verify_airnow(concpath=files,gridcro=grid,datapath='.',user=sys.argv[4],passw=sys.argv[5],combine=True,neighbors=10)
 params = va.df.Species.unique()
 for i in params:
   va.compare_param(param=i,timeseries=True,label=sys.argv[3],footer=False)
-  if len(sys.argv[7]) > 4:
+  if len(sys.argv) > 6:
     va2.compare_param(param=i,timeseries=True,label=sys.argv[8],footer=False,fig=plt.figure(1))
   plt.savefig(i.replace('.','')+ '_'+sys.argv[6],dpi=100)
   plt.close()
