@@ -20,6 +20,7 @@ def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
     :param species: defaults to all available data,  Can enter 'PM' for just pm10 pm25 and speciated pm
     :return: verify_aqs() object
     """
+    print __file__[:-9] + 'data/monitoring_site_locations.dat'
     from verify_aqs import verify_aqs
     va = verify_aqs()
     va.cmaq.open_cmaq(file=concpath)
