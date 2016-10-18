@@ -1,6 +1,7 @@
 # This is the driver for all verify objects
 
 # this is done to make creating verifications easier
+print __file__
 
 
 def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
