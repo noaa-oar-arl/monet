@@ -449,19 +449,20 @@ class verify_aqs:
         print '    Interpolating using ' + interp + ' method'
         for i, j in enumerate(dates):
             con = df.datetime == j
-            lats = df[con].Latitude.values
-            lons = df[con].Longitude.values
-            grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
-            if interp.lower() == 'nearest':
-                val = kd_tree.resample_nearest(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
-                                               fill_value=NaN, nprocs=2).squeeze()
-            elif interp.lower() == 'idw':
-                val = kd_tree.resample_custom(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
-                                              fill_value=NaN, neighbours=n, weight_funcs=weight_func,
-                                              nprocs=2).squeeze()
-            elif interp.lower() == 'gauss':
-                val = kd_tree.resample_gauss(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
-                                             sigmas=r / 2., fill_value=NaN, neighbours=n, nprocs=2).squeeze()
+            if max(con):
+                lats = df[con].Latitude.values
+                lons = df[con].Longitude.values
+                grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
+                if interp.lower() == 'nearest':
+                    val = kd_tree.resample_nearest(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
+                                                   fill_value=NaN, nprocs=2).squeeze()
+                elif interp.lower() == 'idw':
+                    val = kd_tree.resample_custom(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
+                                                  fill_value=NaN, neighbours=n, weight_funcs=weight_func,
+                                                  nprocs=2).squeeze()
+                elif interp.lower() == 'gauss':
+                    val = kd_tree.resample_gauss(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
+                                                 sigmas=r / 2., fill_value=NaN, neighbours=n, nprocs=2).squeeze()
             vals = append(vals, val)
             dd = empty(lons.shape[0], dtype=date.dtype)
             dd[:] = j
