@@ -4,7 +4,7 @@
 
 
 def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000. * 1.5, neighbors=10,
-               interp='gauss'):
+               interp='gauss',species='all'):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -16,6 +16,7 @@ def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
     :param neighbors: 'number of neighbors used in interpolation
     :param interp: 'interpolation method.  Valid answers are: 'nearest', 'idw', 'gauss'
                     note.  if idw you must supply a weight_func.  Example: weight_func=lambda r: 1/r**2
+    :param species: defaults to all available data,  Can enter 'PM' for just pm10 pm25 and speciated pm
     :return: verify_aqs() object
     """
     from verify_aqs import verify_aqs
@@ -26,8 +27,8 @@ def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     va.aqs.datadir = datapath
-    va.aqs.load_all_hourly_data(va.cmaq.dates)
-    va.aqs.monitor_file = '/data/aqf/barryb/monitoring_site_locations.dat'
+    va.aqs.load_all_hourly_data(va.cmaq.dates,datasets=species)
+    va.aqs.monitor_file = verify_aqs.__file__[:-13] + 'data/monitoring_site_locations.dat'
     va.aqs.read_monitor_file()
     if combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)
@@ -65,7 +66,7 @@ def verify_airnow(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
     else:
         va.airnow.download_hourly_files(path=datapath)
         va.airnow.aggragate_files(airnowoutput)
-        va.airnow.monitor_file = '/data/aqf/barryb/monitoring_site_locations.dat'
+        va.airnow.monitor_file = verify_airnow.__file__[:-16] + 'data/monitoring_site_locations.dat'
         va.airnow.read_monitor_file()
     va.airnow.datadir = datapath
     if combine:
