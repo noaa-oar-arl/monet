@@ -338,6 +338,19 @@ class verify_airnow:
 
 
     def interp_to_airnow(self, cmaqvar, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2):
+        """
+        This function interpolates variables (2d surface) in time to measurement sites
+
+        :param cmaqvar: this is the CMAQ 3D variable
+        :param df: The aqs
+        :param interp: inteprolation method 'nearest',idw,guass
+        :param r: radius of influence
+        :param n: number of nearest neighbors to include
+        :param weight_func: the user can set a defined method of interpolation
+                            example:
+                                lambda r: 1 / r ** 2
+        :return: df
+        """
         from pyresample import geometry, kd_tree
         from pandas import concat
         from numpy import append, empty, vstack, NaN
