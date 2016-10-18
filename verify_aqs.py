@@ -301,9 +301,16 @@ class verify_aqs:
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
                       label=None, footer=True):
         from numpy import NaN
-        df = self.df.copy()[[
-            'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
-            'Longitude', 'State_Name']]
+        cityname=True
+        if 'MSA_Name' in self.df.columns:
+            df = self.df.copy()[[
+                'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
+                'Longitude', 'State_Name']]
+        else:
+            df = self.df.copy()[[
+                'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units', 'Latitude',
+                'Longitude', 'State_Name']]
+            cityname=False
         df[df < -990] = NaN
         g = df.groupby('Species')
         new = g.get_group(param)
@@ -311,13 +318,16 @@ class verify_aqs:
             if site in new.SCS.unique():
                 df2 = new.loc[new.SCS == site]
         elif city != '':
-            names = df.MSA_Name.dropna().unique()
-            for i in names:
-                if city.upper() in i.upper():
-                    name = i
-                    print name
-                    df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
-                    title = name
+            if cityname:
+                names = df.MSA_Name.dropna().unique()
+                for i in names:
+                    if city.upper() in i.upper():
+                        name = i
+                        print name
+                        df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
+                        title = name
+            else:
+                print 'monitor_data_file.dat not loaded. Please download and put in datapath and remerge'
         elif state != '':
             df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
             title = state
