@@ -18,11 +18,14 @@ class aeronet:
         self.ftp = None
         self.df = None
         self.objtype = 'AERONET'
-        self.station_file = __file__ + '/data/aeronet_locations.txt'
+        self.station_file = '{0}data/aeronet_locations.txt'.format(
+            os.path.realpath(__file__).split(os.path.basename(__file__))[0])
         self.station_df = None
-        self.file = None
+        self.file = self.baseurl.split('/')[-1]
 
     def download_aeronet_data(self, path='.'):
+        print 'Downloading the AERONET L2 AOT file from:'
+        print '         ' + self.baseurl
         self.datadir = path
         self.change_path()
         self.file = wget.download(self.baseurl)
@@ -37,18 +40,21 @@ class aeronet:
         lon = float(arr[1].split('=')[1])
         lat = float(arr[2].split('=')[1])
         f.seek(0)
-        dateparse = lambda x: pd.datetime.strptime(x, "%d:%m:%Y %H:%M:%S")
-        df = pd.read_csv(f, skiprows=4, na_values=['N/A'],
-                         parse_dates={'datetime': ['Date(dd-mm-yy)', 'Time(hh:mm:ss)']}, date_parser=dateparse)
+        df = pd.read_csv(f, skiprows=4, na_values=['N/A'])
+
         df['Latitude'] = lat
         df['Longitude'] = lon
         df['Site_Name'] = location
-        con = (df.datetime >= self.dates[0]) & (df.datetime <= self.dates[-1])
-        return df[con]
+
+        return df
 
     def aggragate_files(self):
         from numpy import array
-        members = self.file.getmembers()  # get all file names in the tar file
+        import tarfile
+        print 'Opening file: ' + self.file
+        ff = tarfile.open(self.file)
+        print 'Getting file members:'
+        members = ff.getmembers()  # get all file names in the tar file
         names = [i.name for i in members]
         getnames = self.station_df.Site_Name.values
         n = []
@@ -56,8 +62,20 @@ class aeronet:
             for index, i in enumerate(names):
                 if k in i:
                     n.append(index)
-        dfs = [self.read_aeronet(f) for f in members[array(n)]]
+        dfs = []
+        for f in array(members)[array(n)]:
+            print f
+            dfs.append(self.read_aeronet(ff.extractfile(f)))
+
+        # dfs = [self.read_aeronet(ff.extractfile(f)) for f in array(members)[array(n)]]
         self.df = pd.concat(dfs)
+        dates = [datetime.strptime(x + ' ' + y, '%d:%m:%Y %H:%M:%S') for x, y in
+                 zip(self.df['Date(dd-mm-yy)'].values, self.df['Time(hh:mm:ss)'].values)]
+        self.df.drop('Date(dd-mm-yy)', axis=1, inplace=True)
+        self.df.drop('Time(hh:mm:ss)', axis=1, inplace=True)
+        self.df['datetime'] = dates
+        con = (self.df.datetime >= self.dates[0]) & (self.df.datetime <= self.dates[-1])
+        self.df = self.df[con]
 
     def calc_550nm(self, df):
         from numpy import log, NaN, arange, exp
