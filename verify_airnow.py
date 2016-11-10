@@ -35,6 +35,8 @@ class verify_airnow:
         self.cmaqpm10 = None
         self.cmaqso2 = None
         self.cmaqco = None
+        self.cmaqno = None
+        self.cmaqno2 = None
         self.df8hr = None
 
     def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
@@ -125,7 +127,7 @@ class verify_airnow:
                     fac = self.check_cmaq_units(param='NO', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
                     dfnoy = self.interp_to_airnow(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqnoy = cmaq
+                    self.cmaqno = cmaq
                     dfs.append(dfnoy)
             elif i == 'NO2':
                 if 'NO2' not in self.cmaq.keys:
@@ -136,7 +138,7 @@ class verify_airnow:
                     fac = self.check_cmaq_units(param='NO2', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
                     dfnoy = self.interp_to_airnow(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqnoy = cmaq
+                    self.cmaqno2 = cmaq
                     dfs.append(dfnoy)
             elif i == 'SO2':
                 if 'SO2' not in self.cmaq.keys:
@@ -283,28 +285,38 @@ class verify_airnow:
             cmaq = self.cmaqso2
         elif param == 'NOX':
             cmaq = self.cmaqnox
+        elif param == 'NO':
+            cmaq = self.cmaqno
+        elif param == 'NO2':
+            cmaq = self.cmaqno2
+        else:
+            cmaq = None
         m = self.cmaq.choose_map(path, region)
-        if date == '':
-            for index, i in enumerate(self.cmaq.dates):
-                c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
-                                            m,vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
-                plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
+        print param
+        if isinstance(cmaq, type(None)):
+            print 'This parameter is not in the CMAQ file: ' + param
+        else:
+            if date == '':
+                for index, i in enumerate(self.cmaq.dates):
+                    c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
+                                                m,vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
+                    plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
+                    c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
+                    if len(xlim) > 1:
+                        plt.xlim([min(xlim), max(xlim)])
+                        plt.ylim([min(ylim), max(ylim)])
+                    plt.savefig(str(index+10) + param +'.jpg',dpi=100)
+                    plt.close()
+
+            else:
+                index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
+                c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
+                plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
-                plt.savefig(str(index+10) + '.jpg',dpi=100)
-                plt.close()
-
-        else:
-            index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
-            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
-            plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
-            c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-            if len(xlim) > 1:
-                plt.xlim([min(xlim), max(xlim)])
-                plt.ylim([min(ylim), max(ylim)])
-
+             
     def airnow_spatial_8hr(self, path='', region='', date='', xlim=[], ylim=[]):
         if not isinstance(self.df8hr, pd.DataFrame):
             print '    Calculating 8 Hr Max Ozone '
