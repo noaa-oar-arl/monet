@@ -228,6 +228,7 @@ class verify_airnow:
         if site != '':
             if site in new.SCS.unique():
                 df2 = new.loc[new.SCS == site]
+            title = site
         elif city != '':
             names = df.MSA_Name.dropna().unique()
             for i in names:
