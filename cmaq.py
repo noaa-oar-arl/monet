@@ -255,7 +255,7 @@ class cmaq:
                 print '   Getting CMAQ Variable: ' + keys[i]
                 var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
                 collect()
-        return var
+        return varvar = self.cmaq.get_surface_cmaqvar(param='so4f')
 
     def get_surface_nh4f(self):
         keys = self.keys
@@ -311,7 +311,9 @@ class cmaq:
         if 'PM25_OC' in keys:
             var = self.concobj.variables['PM25_OC'][self.indexdates, 0, :, :].squeeze()
         else:
-            cmaqvars, temp = search_listinlist(keys, allvars)
+            cmaqvars, temp = search_listinlist(keys, allvars)    
+        if len(cmaqvars) <= 1:
+            cmaqvars, temp = search_listinlist(keys, self.poc)
         vars = []
         for i in allvars:
             if i not in keys:
@@ -322,10 +324,10 @@ class cmaq:
                 var = self.concobj.variables[i][self.indexdates, 0, :, :].squeeze()
             vars.append(var)
         OC = (vars[0] + vars[1] + vars[2]) / 2.0 + (vars[3] + vars[4] + vars[5]) / 2.0 + (vars[6] + vars[7] + vars[
-            8]) / 2.0 + (vars[9] + vars[10]) / 1.6 + vars[11] / 2.7 + (vars[12] + vars[13]) / 1.4 + vars[
-                                                                                                        14] / 2.1 + 0.64 * (
+                8]) / 2.0 + (vars[9] + vars[10]) / 1.6 + vars[11] / 2.7 + (vars[12] + vars[13]) / 1.4 + vars[
+                                                                                                            14] / 2.1 + 0.64 * (
         vars[15] + vars[16]) + vars[17] / 2.0 + (vars[18] + vars[19]) / 2.1 + vars[20] + vars[21] + vars[22] / 2.03 + \
-             vars[23] / 2.03 + vars[24] / 2.03
+                 vars[23] / 2.03 + vars[24] / 2.03
         collect()
         return OC
 
