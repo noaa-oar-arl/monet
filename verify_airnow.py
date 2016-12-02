@@ -434,7 +434,7 @@ class verify_airnow:
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNH4')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
         endif
-        if (('AORGAI' in self.cmaq.keys) &  ('AORGBJ' in self.cmaq.keys)) | ('PM2.5_OC' in self.cmaq.keys())):
+        if ((('AORGAI' in self.cmaq.keys) &  ('AORGBJ' in self.cmaq.keys)) | ('PM2.5_OC' in self.cmaq.keys())):
             var = self.cmaq.get_surface_cmaqvar(param='oc')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='POC')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
