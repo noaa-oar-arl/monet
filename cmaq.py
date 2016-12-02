@@ -348,6 +348,8 @@ class cmaq:
             var = self.get_surface_noy()
         elif param == 'CLF':
             var = self.get_surface_clf()
+        elif param == 'CAF':
+            var = self.get_surface_caf()
         elif param == 'NAF':
             var = self.get_surface_naf()
         elif param == 'KF':
