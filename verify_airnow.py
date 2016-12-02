@@ -409,46 +409,62 @@ class verify_airnow:
     def get_pm25spec(self, interp='nearest', radius=12000., neighbors=5., weight_func=lambda r: 1 / r ** 2):
         g = self.df.groupby('Species').get_group('PM2.5')
         #get
-        if (('ACAI' not in self.cmaq.keys) & ('ACAJ' not in self.cmaq.keys)):
+        if (('ACAI' not in self.cmaq.keys) & ('ACAJ' not in self.cmaq.keys)) | ('PM25_CA' not in self.cmaq.keys):
+            pass
+        else:
             var = self.cmaq.get_surface_cmaqvar(param='CAf')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PCA')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        endif
-        if ((('ACLI' in self.cmaq.keys) &  ('ACLJ' in self.cmaq.keys)) | ('PM2.5_CL' in self.cmaq.keys())):
+        
+        if ((('ACLI' not in self.cmaq.keys) &  ('ACLJ' not in self.cmaq.keys)) | ('PM2.5_CL' in self.cmaq.keys())):
+            pass
+        else:
             var = self.cmaq.get_surface_cmaqvar(param='clf')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PCL')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        endif
-        if ((('ASO4I' in self.cmaq.keys) &  ('ASO4J' in self.cmaq.keys) )| ('PM2.5_SO4' in self.cmaq.keys())):
+        
+        if ((('ASO4I' not  in self.cmaq.keys) &  ('ASO4J' in self.cmaq.keys) )| ('PM2.5_SO4' in self.cmaq.keys())):
+            pass
+        else:
             var = self.cmaq.get_surface_cmaqvar(param='so4f')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PSO4')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        endif
-        if ((('ANO3I' in self.cmaq.keys) &  ('ANO3J' in self.cmaq.keys) )| ('PM2.5_NO3' in self.cmaq.keys())):
+        
+        if ((('ANO3I' not in self.cmaq.keys) &  ('ANO3J' not in self.cmaq.keys) )| ('PM2.5_NO3' not in self.cmaq.keys())):
+            pass
+        else:
             var = self.cmaq.get_surface_cmaqvar(param='no3f')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNO3')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        endif
-        if ((('ANH4I' in self.cmaq.keys) &  ('ANH4J' in self.cmaq.keys) )| ('PM2.5_NH4' in self.cmaq.keys())):
+        
+        if ((('ANH4I' not in self.cmaq.keys) &  ('ANH4J' not in self.cmaq.keys) )| ('PM2.5_NH4' not in self.cmaq.keys())):
+            pass
+        else:
             var = self.cmaq.get_surface_cmaqvar(param='nh4f')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNH4')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        endif
-        if ((('AORGAI' in self.cmaq.keys) &  ('AORGBJ' in self.cmaq.keys)) | ('PM2.5_OC' in self.cmaq.keys())):
+        
+        if ((('AORGAI' not in self.cmaq.keys) &  ('AORGBJ' not in self.cmaq.keys)) | ('PM2.5_OC' not in self.cmaq.keys())):
+            pass
+        else:
             var = self.cmaq.get_surface_cmaqvar(param='oc')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='POC')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        endif
-        if ((('AKI' in self.cmaq.keys) &  ('AKJ' in self.cmaq.keys) )| ('PM2.5_CL' in self.cmaq.keys())):
+        
+        if ((('AKI' not in self.cmaq.keys) &  ('AKJ' not in self.cmaq.keys) )| ('PM2.5_CL' not in self.cmaq.keys())):
+            pass
+        else:
             var = self.cmaq.get_surface_cmaqvar(param='kf')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PK')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        endif
-        if ((('ANAI' in self.cmaq.keys) &  ('ANAJ' in self.cmaq.keys)) | ('PM2.5_CL' in self.cmaq.keys())):
+        
+        if ((('ANAI' not in self.cmaq.keys) &  ('ANAJ' not in self.cmaq.keys)) | ('PM2.5_CL' not in self.cmaq.keys())):
+            pass
+        else:
             var = self.cmaq.get_surface_cmaqvar(param='naf')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNA')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        endif
+        
         
     def check_cmaq_units(self, param='O3', airnow_param='OZONE'):
         aunit = self.airnow.df[self.airnow.df.Species == airnow_param].Units.unique()[0]
