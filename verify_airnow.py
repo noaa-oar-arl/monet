@@ -476,7 +476,7 @@ class verify_airnow:
             pass
         else:
             g = self.df.groupby('Species').get_group('PM2.5')
-            var = self.cmaq.get_surface_cmaqvar(param='ec')
+            var = self.cmaq.get_surface_cmaqvar(param='ecf')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PEC')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
         
