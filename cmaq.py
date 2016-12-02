@@ -27,7 +27,7 @@ class cmaq:
              'AORGCJ', 'AOTHRJ', 'APAH1J', 'APAH2J', 'APAH3J', 'APNCOMJ', 'APOCJ', 'ASIJ', 'ASO4J', 'ASQTJ', 'ATIJ',
              'ATOL1J', 'ATOL2J', 'ATOL3J', 'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J', 'AORGAJ',
              'AORGPAJ', 'AORGBJ'])
-        self.coarse = array(['ACLK', 'ACORS', 'AH2OK', 'ANH4K', 'ANO3K', 'ASEACAT', 'ASO4K', 'ASOIL'])
+        self.coarse = array(['ACLK', 'ACORS', 'ANH4K', 'ANO3K', 'ASEACAT', 'ASO4K', 'ASOIL'])
         self.noy_gas = array(
             ['NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO',
              'CRPX', 'OPAN'])
