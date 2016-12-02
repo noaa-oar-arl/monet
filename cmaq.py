@@ -39,7 +39,7 @@ class cmaq:
         self.poc = array(['AOTHRI', 'APNCOMI', 'APOCI', 'AORGAI', 'AORGPAI', 'AORGBI', 'ATOL1J', 'ATOL2J', 'ATOL3J',
                           'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J', 'AORGAJ', 'AORGPAJ', 'AORGBJ', 'AOLGAJ',
                           'AOLGBJ', 'AORGCJ', 'AOTHRJ', 'APAH1J', 'APAH2J', 'APAH3J', 'APNCOMJ', 'APOCJ', 'ASQTJ',
-                          'AISO1J','AISO2J', 'AISO3J','AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J',])
+                          'AISO1J','AISO2J', 'AISO3J','AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J','AORGAI','AORGAJ','AORGPAI','AORGPAJ','AORGBI','AORGBJ'])
         self.minerals = array(['AALJ','ACAJ','AFEJ','AKJ', 'AMGJ', 'AMNJ', 'ANAJ','ATIJ','ASIJ'])
         self.concobj = None
         self.metcro2d = None
@@ -311,23 +311,31 @@ class cmaq:
         if 'PM25_OC' in keys:
             var = self.concobj.variables['PM25_OC'][self.indexdates, 0, :, :].squeeze()
         else:
-            cmaqvars, temp = search_listinlist(keys, allvars)    
+            cmaqvars, temp = search_listinlist(keys, allvars)
+        OC=var
         if len(cmaqvars) <= 1:
             cmaqvars, temp = search_listinlist(keys, self.poc)
-        vars = []
-        for i in allvars:
-            if i not in keys:
-                print '    Variable ' + i + ' not found'
-                var = zeros((self.indexdates.shape[0],self.latitude.shape[0],self.longitude.shape[0]))
-            else:
-                print '   Getting CMAQ Variable: ' + i
-                var = self.concobj.variables[i][self.indexdates, 0, :, :].squeeze()
-            vars.append(var)
-        OC = (vars[0] + vars[1] + vars[2]) / 2.0 + (vars[3] + vars[4] + vars[5]) / 2.0 + (vars[6] + vars[7] + vars[
-                8]) / 2.0 + (vars[9] + vars[10]) / 1.6 + vars[11] / 2.7 + (vars[12] + vars[13]) / 1.4 + vars[
-                                                                                                            14] / 2.1 + 0.64 * (
-        vars[15] + vars[16]) + vars[17] / 2.0 + (vars[18] + vars[19]) / 2.1 + vars[20] + vars[21] + vars[22] / 2.03 + \
-                 vars[23] / 2.03 + vars[24] / 2.03
+            var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
+            for i in cmaqvars[:]:
+                print '   Getting CMAQ Variable: ' + keys[i]
+                var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
+                collect()
+            OC = var
+        else:
+            vars = []
+            for i in temp:
+                if i not in keys:
+                    print '    Variable ' + i + ' not found'
+                    var = zeros((self.indexdates.shape[0],self.latitude.shape[0],self.longitude.shape[0]))
+                else:
+                    print '   Getting CMAQ Variable: ' + i
+                    var = self.concobj.variables[i][self.indexdates, 0, :, :].squeeze()
+                vars.append(var)
+            OC = (vars[0] + vars[1] + vars[2]) / 2.0 + (vars[3] + vars[4] + vars[5]) / 2.0 + (vars[6] + vars[7] + vars[
+                    8]) / 2.0 + (vars[9] + vars[10]) / 1.6 + vars[11] / 2.7 + (vars[12] + vars[13]) / 1.4 + vars[
+                                                                                                                14] / 2.1 + 0.64 * (
+            vars[15] + vars[16]) + vars[17] / 2.0 + (vars[18] + vars[19]) / 2.1 + vars[20] + vars[21] + vars[22] / 2.03 + \
+                     vars[23] / 2.03 + vars[24] / 2.03
         collect()
         return OC
 
