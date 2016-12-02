@@ -406,7 +406,7 @@ class verify_airnow:
 
         return df
     
-    def get_pm25spec(interp='nearest', radius=12000., neighbors=5., weight_func=lambda r: 1 / r ** 2):
+    def get_pm25spec(self, interp='nearest', radius=12000., neighbors=5., weight_func=lambda r: 1 / r ** 2):
         g = self.df.groupby('Species').get_group('PM2.5')
         #get 
         var = self.cmaq.get_surface_caf()
