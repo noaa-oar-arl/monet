@@ -313,7 +313,7 @@ class cmaq:
         else:
             cmaqvars, temp = search_listinlist(keys, allvars)
         OC=var
-        if len(cmaqvars) <= 1:
+        if temp.shape[0] != allvars.shape[0]:
             cmaqvars, temp = search_listinlist(keys, self.poc)
             var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
             for i in cmaqvars[:]:
@@ -323,7 +323,7 @@ class cmaq:
             OC = var
         else:
             vars = []
-            for i in temp:
+            for i in allvars:
                 if i not in keys:
                     print '    Variable ' + i + ' not found'
                     var = zeros((self.indexdates.shape[0],self.latitude.shape[0],self.longitude.shape[0]))
