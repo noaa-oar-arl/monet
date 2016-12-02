@@ -19,19 +19,28 @@ class cmaq:
              'APNCOMJ', 'AECJ', 'AFEJ', 'AALJ', 'ASIJ', 'ATIJ', 'AMNJ', 'AOTHRJ', 'ASOIL'])
         self.aitken = array(['ACLI', 'AECI', 'ANAI', 'ANH4I',
                              'ANO3I', 'AOTHRI', 'APNCOMI', 'APOCI',
-                             'ASO4I', 'A25I', 'AORGAI', 'AORGPAI',
+                             'ASO4I', 'AORGAI', 'AORGPAI',
                              'AORGBI'])
         self.accumulation = array(
             ['AALJ', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'ACAJ', 'ACLJ', 'AECJ', 'AFEJ',
              'AISO1J', 'AISO2J', 'AISO3J', 'AKJ', 'AMGJ', 'AMNJ', 'ANAJ', 'ANH4J', 'ANO3J', 'AOLGAJ', 'AOLGBJ',
              'AORGCJ', 'AOTHRJ', 'APAH1J', 'APAH2J', 'APAH3J', 'APNCOMJ', 'APOCJ', 'ASIJ', 'ASO4J', 'ASQTJ', 'ATIJ',
-             'ATOL1J', 'ATOL2J', 'ATOL3J', 'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J', 'A25J', 'AORGAJ',
+             'ATOL1J', 'ATOL2J', 'ATOL3J', 'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J', 'AORGAJ',
              'AORGPAJ', 'AORGBJ'])
         self.coarse = array(['ACLK', 'ACORS', 'AH2OK', 'ANH4K', 'ANO3K', 'ASEACAT', 'ASO4K', 'ASOIL'])
         self.noy_gas = array(
             ['NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO',
              'CRPX', 'OPAN'])
-
+        self.pec = array(['AECI', 'AECJ'])
+        self.pso4 = array(['ASO4I', 'ASO4J'])
+        self.pno3 = array(['ANO3I', 'ANO3J'])
+        self.pnh4 = array(['ANH4I', 'ANH4J'])
+        self.pcl = array(['ACLI', 'ACLJ'])
+        self.poc = array(['AOTHRI', 'APNCOMI', 'APOCI', 'AORGAI', 'AORGPAI', 'AORGBI', 'ATOL1J', 'ATOL2J', 'ATOL3J',
+                          'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J', 'AORGAJ', 'AORGPAJ', 'AORGBJ', 'AOLGAJ',
+                          'AOLGBJ', 'AORGCJ', 'AOTHRJ', 'APAH1J', 'APAH2J', 'APAH3J', 'APNCOMJ', 'APOCJ', 'ASQTJ',
+                          'AISO1J','AISO2J', 'AISO3J','AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J',])
+        self.minerals = array(['AALJ','ACAJ','AFEJ','AKJ', 'AMGJ', 'AMNJ', 'ANAJ','ATIJ','ASIJ'])
         self.concobj = None
         self.metcro2d = None
         self.gridobj = None
