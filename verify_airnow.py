@@ -317,7 +317,7 @@ class verify_airnow:
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
-             
+
     def airnow_spatial_8hr(self, path='', region='', date='', xlim=[], ylim=[]):
         if not isinstance(self.df8hr, pd.DataFrame):
             print '    Calculating 8 Hr Max Ozone '
@@ -350,7 +350,7 @@ class verify_airnow:
         return mb, r2, ioa, rmse
 
 
-    def interp_to_airnow(self, cmaqvar, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2):
+    def interp_to_airnow(self, cmaqvar, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2,label='CMAQ'):
         """
         This function interpolates variables (2d surface) in time to measurement sites
 
@@ -401,11 +401,39 @@ class verify_airnow:
         vals = pd.Series(vals)
         date = pd.Series(date)
         site = pd.Series(site)
-        dfs = concat([vals, date, site], axis=1, keys=['CMAQ', 'datetime', 'SCS'])
+        dfs = concat([vals, date, site], axis=1, keys=[label, 'datetime', 'SCS'])
         df = pd.merge(df, dfs, how='left', on=['SCS', 'datetime'])
 
         return df
-
+    
+    def get_pm25spec(interp='nearest', radius=12000., neighbors=5., weight_func=lambda r: 1 / r ** 2):
+        g = self.df.groupby('Species').get_group('PM2.5')
+        #get 
+        var = self.cmaq.get_surface_caf()
+        df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PCA')
+        self.df pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        var = self.cmaq.get_surface_clf()
+        df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PCL')
+        self.df pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        var = self.cmaq.get_surface_so4f()
+        df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PSO4')
+        self.df pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        var = self.cmaq.get_surface_no3f()
+        df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNO3')
+        self.df pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        var = self.cmaq.get_surface_nh4f()
+        df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNH4')
+        self.df pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        var = self.cmaq.get_surface_oc()
+        df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='POC')
+        self.df pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        var = self.cmaq.get_surface_kf()
+        df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PK')
+        self.df pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        var = self.cmaq.get_surface_na()
+        df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNA')
+        self.df pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        
     def check_cmaq_units(self, param='O3', airnow_param='OZONE'):
         aunit = self.airnow.df[self.airnow.df.Species == airnow_param].Units.unique()[0]
         if aunit == 'UG/M3':
