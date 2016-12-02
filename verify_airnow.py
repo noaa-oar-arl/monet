@@ -449,13 +449,13 @@ class verify_airnow:
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNH4')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
         
-        if (('AORGAI' not in self.cmaq.keys) & ('AORGBJ' not in self.cmaq.keys)): 
-            pass
-        else:
+        try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='oc')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='POC')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        except:
+            pass
         
         if (('AKI' not in self.cmaq.keys) & ('AKJ' not in self.cmaq.keys)): 
             pass
@@ -471,6 +471,13 @@ class verify_airnow:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='naf')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNA')
+            self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        if (('AECI' not in self.cmaq.keys) & ('AECJ' not in self.cmaq.keys)): 
+            pass
+        else:
+            g = self.df.groupby('Species').get_group('PM2.5')
+            var = self.cmaq.get_surface_cmaqvar(param='ec')
+            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PEC')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
         
         
