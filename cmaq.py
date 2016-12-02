@@ -255,7 +255,7 @@ class cmaq:
                 print '   Getting CMAQ Variable: ' + keys[i]
                 var += self.concobj.variables[keys[i]][self.indexdates, 0, :, :].squeeze()
                 collect()
-        return varvar = self.cmaq.get_surface_cmaqvar(param='so4f')
+        return var
 
     def get_surface_nh4f(self):
         keys = self.keys
