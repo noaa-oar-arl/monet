@@ -409,7 +409,7 @@ class verify_airnow:
     def get_pm25spec(self, interp='nearest', radius=12000., neighbors=5., weight_func=lambda r: 1 / r ** 2):
         g = self.df.groupby('Species').get_group('PM2.5')
         #get
-        if (('ACAI' in self.cmaq.keys) &  ('ACAJ' in self.cmaq.keys) | ('PM2.5_CA' in self.cmaq.keys()):
+        if ((('ACAI' in self.cmaq.keys) &  ('ACAJ' in self.cmaq.keys)) | ('PM2.5_CA' in self.cmaq.keys())):
             var = self.cmaq.get_surface_cmaqvar(param='CAf')
             df = interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PCA')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
