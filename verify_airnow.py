@@ -409,45 +409,50 @@ class verify_airnow:
     def get_pm25spec(self, interp='nearest', radius=12000., neighbors=5., weight_func=lambda r: 1 / r ** 2):
         
         #get
-        if (('ACAI' not in self.cmaq.keys) & ('ACAJ' not in self.cmaq.keys)) :
-            pass
-        else:
+        try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='CAf')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PCA')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        
-        if (('ACLI' not in self.cmaq.keys) & ('ACLJ' not in self.cmaq.keys)):
+        except:
+            print 'PCA Variables not found'
             pass
-        else:
+        
+        try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='clf')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PCL')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        
-        if (('ASO4I' not in self.cmaq.keys) & ('ASO4J' not in self.cmaq.keys)) :
+        except:
+            print 'PCl Variables not found'
             pass
-        else:
+        
+        try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='so4f')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PSO4')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-            
-        if (('ANO3I' not in self.cmaq.keys) & ('ANO3J' not in self.cmaq.keys)): 
+        except:
+            print 'PSO4 Variables not found'
             pass
-        else:
+            
+        try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='no3f')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNO3')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        
-        if (('ANH4I' not in self.cmaq.keys) & ('ANH4J' not in self.cmaq.keys)): 
+        except:
+            print 'PNO3 Variables not found'
             pass
-        else:
+        
+        try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='nh4f')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNH4')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
+        except:
+            print 'PNH4 Variables not found'
+            pass
         
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
@@ -455,31 +460,35 @@ class verify_airnow:
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='POC')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
         except:
+            print 'Organic Carbon Variables not found'
             pass
         
-        if (('AKI' not in self.cmaq.keys) & ('AKJ' not in self.cmaq.keys)): 
-            pass
-        else:
+        try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='kf')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PK')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        
-        if (('ANAI' not in self.cmaq.keys) & ('ANAJ' not in self.cmaq.keys)): 
+        except:
+            print 'Organic Carbon Variables not found'
             pass
-        else:
+        
+        try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='naf')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PNA')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        if (('AECI' not in self.cmaq.keys) & ('AECJ' not in self.cmaq.keys)): 
+        except:
+            print 'PNA Variables not found'
             pass
-        else:
+        
+        try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='ecf')
             df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func,label='PEC')
             self.df = pd.merge(self.df,df,how='left',on=self.df.columns.tolist())
-        
+        except:
+            print 'PEC Variables not found'
+            pass
         
     def check_cmaq_units(self, param='O3', airnow_param='OZONE'):
         aunit = self.airnow.df[self.airnow.df.Species == airnow_param].Units.unique()[0]
