@@ -417,3 +417,27 @@ def ETS(obs, mod, minval, maxval):
     ets =(a - ar) / (a + b + c - ar)
     print 'ETS for range ' + str(minval) + ' --> ' + str(maxval)+': ' + ets
     return ets
+
+def scores(obs, mod, minval, maxval):
+    d = {}
+    d['obs'] = obs
+    d['mod'] = mod
+    df = DataFrame(d)
+    ct = crosstab((df['mod'] > minval) & (df['mod'] < maxval) & (df['obs'] > minval) & (df['obs'] < maxval),
+                  margins=True)
+    print ct
+    a = ct[1][1].astype('float')
+    b = ct[1][1].astype('float')
+    c = ct[1][1].astype('float')
+    d = ct[1][1].astype('float')
+    
+def stats_table(df,minval,maxval):
+    from numpy import sqrt
+    d = {}
+    d['Mean Bias'] = MB(df.Obs.values, df.CMAQ.values)  # mean bias
+    d['Pearson R'] = sqrt(R2(df.Obs.values, df.CMAQ.values))  # pearsonr ** 2
+    d['Index of Agreement'] = IOA(df.Obs.values, df.CMAQ.values)  # Index of Agreement
+    d['RMSE'] = RMSE(df.Obs.values, df.CMAQ.values)
+    d['Equitable Threat Score'] = ETS(df.Obs.values, df.CMAQ.values,minval,maxval)
+    a,b,c,d = scores(df.Obs.values, df.CMAQ.values,minval,maxval)
+    
