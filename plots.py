@@ -44,25 +44,26 @@ def normval(vmin, vmax, cmap):
 def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu'):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    cmap = cmap_discretize(cmap,ncolors)
+    cmap = cmap_discretize(cmap, ncolors)
     if (type(vmin) == None) | (type(vmax) == None):
         plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
-        plt.scatter(x, y, c=new['Obs'].values, s=30,vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+        plt.scatter(x, y, c=new['Obs'].values, s=30, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
-def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15,fact=1.5, cmap='YlGnBu'):
+
+def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, fact=1.5, cmap='YlGnBu'):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    cmap = cmap_discretize(cmap,ncolors)
+    cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
     ss = (new.Obs - new.CMAQ).abs() * fact
     if (type(vmin) == None) | (type(vmax) == None):
-        plt.scatter(x, y, c=colors,s=ss, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
+        plt.scatter(x, y, c=colors, s=ss, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
-        plt.scatter(x, y, c=colors,s=ss, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+        plt.scatter(x, y, c=colors, s=ss, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
@@ -86,7 +87,8 @@ def eight_hr_spatial_scatter(df, m, date, savename=''):
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
-def timeseries_single_var(df, varname='Obs',title='', fig=None, label=None, color=None, footer=True, sample='H'):
+
+def timeseries_single_var(df, varname='Obs', title='', fig=None, label=None, color=None, footer=True, sample='H'):
     import matplotlib.dates as mdates
     from numpy import isnan
     sns.set_style('ticks')
@@ -108,7 +110,7 @@ def timeseries_single_var(df, varname='Obs',title='', fig=None, label=None, colo
 
         ax = plt.gca().axes
         ax.set_xlabel('UTC')
-#        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
+        #        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
         plt.title(title)
         minval = min([(obs - obserr).min()])
         minval = max([minval, 0])
@@ -287,7 +289,7 @@ def kdeplots_param(df, title=None, fig=None, label=None, footer=True):
         maxval = max([maxval1, maxval2])
         plt.figure(figsize=(13, 8))
         sns.kdeplot(df.Obs, color='darkslategrey')
-        sns.kdeplot(df.CMAQ, color='dodgerblue',label=label)
+        sns.kdeplot(df.CMAQ, color='dodgerblue', label=label)
         sns.despine()
 
         plt.xlim([0, maxval])
@@ -587,14 +589,14 @@ def colorbar_index(ncolors, cmap, minval=None, maxval=None):
     mappable = cm.ScalarMappable(cmap=cmap)
     mappable.set_array([])
     mappable.set_clim(-0.5, ncolors + 0.5)
-    colorbar = plt.colorbar(mappable,format='%1.2g')
+    colorbar = plt.colorbar(mappable, format='%1.2g')
     colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
     if (type(minval) == None) & (type(maxval) != None):
-        colorbar.set_ticklabels(np.around(np.linspace(0, maxval, ncolors).astype('float'),2))
+        colorbar.set_ticklabels(np.around(np.linspace(0, maxval, ncolors).astype('float'), 2))
     elif (type(minval) == None) & (type(maxval) == None):
-        colorbar.set_ticklabels(np.around(np.linspace(0, ncolors, ncolors).astype('float'),2))
+        colorbar.set_ticklabels(np.around(np.linspace(0, ncolors, ncolors).astype('float'), 2))
     else:
-        colorbar.set_ticklabels(np.around(np.linspace(minval, maxval, ncolors).astype('float'),2))
+        colorbar.set_ticklabels(np.around(np.linspace(minval, maxval, ncolors).astype('float'), 2))
 
     return colorbar, cmap
 

@@ -495,7 +495,7 @@ class aqs:
         aqs.index = arange(aqs.index.shape[0])
         return aqs
 
-    def load_all_hourly_data(self, dates,datasets='all'):
+    def load_all_hourly_data(self, dates, datasets='all'):
         os.chdir(self.datadir)
         if datasets.upper() == 'PM':
             dfs = [self.load_aqs_pm10_data(dates), self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates)]
@@ -690,7 +690,7 @@ class aqs:
         for i in units:
             con = df.Units == i
             if i == 'Parts per billion Carbon':
-                df.loc[con,'Units'] = 'PPB'
+                df.loc[con, 'Units'] = 'PPB'
             if i == 'Parts per billion':
                 df.loc[con, 'Units'] = 'PPB'
             if i == 'Parts per million':

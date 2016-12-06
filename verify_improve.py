@@ -16,14 +16,14 @@ class verify_improve:
         self.improve = improve()
         self.cmaq = cmaq()
         self.se_states = array(
-                ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
-                 'Virginia', 'West Virginia'], dtype='|S14')
+            ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
+             'Virginia', 'West Virginia'], dtype='|S14')
         self.ne_states = array(['Connecticut', 'Delaware', 'District Of Columbia', 'Maine', 'Maryland', 'Massachusetts',
                                 'New Hampshire', 'New Jersey', 'New York', 'Pennsylvania', 'Rhode Island', 'Vermont'],
                                dtype='|S20')
         self.nc_states = array(
-                ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan', 'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
-                dtype='|S9')
+            ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan', 'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
+            dtype='|S9')
         self.sc_states = array(['Arkansas', 'Louisiana', 'Oklahoma', 'Texas'], dtype='|S9')
         self.r_states = array(['Arizona', 'Colorado', 'Idaho', 'Kansas', 'Montana', 'Nebraska', 'Nevada', 'New Mexico',
                                'North Dakota', 'South Dakota', 'Utah', 'Wyoming'], dtype='|S12')
@@ -104,7 +104,7 @@ class verify_improve:
                     fac = self.check_cmaq_units(param='MGf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='AMGJ') * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqmg= cmaqvar
+                    self.cmaqmg = cmaqvar
                     dfs.append(dfpm)
                 else:
                     pass
@@ -115,7 +115,7 @@ class verify_improve:
                     fac = self.check_cmaq_units(param='TIj', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='ATIJ') * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqti= cmaqvar
+                    self.cmaqti = cmaqvar
                     dfs.append(dfpm)
                 else:
                     pass
@@ -126,7 +126,7 @@ class verify_improve:
                     fac = self.check_cmaq_units(param='SIj', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='ASIJ') * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqti= cmaqvar
+                    self.cmaqti = cmaqvar
                     dfs.append(dfpm)
                 else:
                     pass
@@ -356,18 +356,18 @@ class verify_improve:
             date = date.append(pd.Series([self.cmaq.dates[j] for k in lons])).reset_index(drop=True)
             site = site.append(pd.Series(sites)).reset_index(drop=True)
             utcoffset = site.append(pd.Series(utc)).reset_index(drop=True)
-        dfs = pd.concat([vals, date, site,utcoffset], axis=1, keys=['CMAQ', 'datetime', 'Site_Code','utcoffset'])
-        dfs.index=dfs.datetime + pd.to_timedelta(dfs.utcoffset,'H')
-        dfs.drop(['datetime','utcoffset'],axis=1,inplace=True)
+        dfs = pd.concat([vals, date, site, utcoffset], axis=1, keys=['CMAQ', 'datetime', 'Site_Code', 'utcoffset'])
+        dfs.index = dfs.datetime + pd.to_timedelta(dfs.utcoffset, 'H')
+        dfs.drop(['datetime', 'utcoffset'], axis=1, inplace=True)
         r = dfs.groupby('Site_Code').get_group(dfs.Site_Code.unique()[0]).resample('24H').mean().reset_index()
         for i in df.Site_Code.unique()[1:]:
             q = dfs.groupby('Site_Code').get_group(i)
             q = q.resample('24H').mean().reset_index()
             q['Site_Code'] = i
-            r = pd.concat([r,q],ignore_index=True)
+            r = pd.concat([r, q], ignore_index=True)
         df = pd.merge(df, r, how='left', on=['Site_Code', 'datetime']).dropna(subset=['CMAQ'])
         df.Obs.loc[df.Obs < 0] = NaN
-        df.dropna(subset=['Obs'],inplace=True)
+        df.dropna(subset=['Obs'], inplace=True)
         return df
 
     def check_cmaq_units(self, param='O3', improve_param='OZONE'):

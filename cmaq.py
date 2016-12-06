@@ -39,8 +39,9 @@ class cmaq:
         self.poc = array(['AOTHRI', 'APNCOMI', 'APOCI', 'AORGAI', 'AORGPAI', 'AORGBI', 'ATOL1J', 'ATOL2J', 'ATOL3J',
                           'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J', 'AORGAJ', 'AORGPAJ', 'AORGBJ', 'AOLGAJ',
                           'AOLGBJ', 'AORGCJ', 'AOTHRJ', 'APAH1J', 'APAH2J', 'APAH3J', 'APNCOMJ', 'APOCJ', 'ASQTJ',
-                          'AISO1J','AISO2J', 'AISO3J','AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J','AORGAI','AORGAJ','AORGPAI','AORGPAJ','AORGBI','AORGBJ'])
-        self.minerals = array(['AALJ','ACAJ','AFEJ','AKJ', 'AMGJ', 'AMNJ', 'ANAJ','ATIJ','ASIJ'])
+                          'AISO1J', 'AISO2J', 'AISO3J', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'AORGAI',
+                          'AORGAJ', 'AORGPAI', 'AORGPAJ', 'AORGBI', 'AORGBJ'])
+        self.minerals = array(['AALJ', 'ACAJ', 'AFEJ', 'AKJ', 'AMGJ', 'AMNJ', 'ANAJ', 'ATIJ', 'ASIJ'])
         self.concobj = None
         self.metcro2d = None
         self.gridobj = None
@@ -312,7 +313,7 @@ class cmaq:
             var = self.concobj.variables['PM25_OC'][self.indexdates, 0, :, :].squeeze()
         else:
             cmaqvars, temp = search_listinlist(keys, allvars)
-        OC=var
+        OC = var
         if temp.shape[0] != allvars.shape[0]:
             cmaqvars, temp = search_listinlist(keys, self.poc)
             var = zeros(self.concobj.variables[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
@@ -326,19 +327,19 @@ class cmaq:
             for i in allvars:
                 if i not in keys:
                     print '    Variable ' + i + ' not found'
-                    var = zeros((self.indexdates.shape[0],self.latitude.shape[0],self.longitude.shape[0]))
+                    var = zeros((self.indexdates.shape[0], self.latitude.shape[0], self.longitude.shape[0]))
                 else:
                     print '   Getting CMAQ Variable: ' + i
                     var = self.concobj.variables[i][self.indexdates, 0, :, :].squeeze()
                 vars.append(var)
             OC = (vars[0] + vars[1] + vars[2]) / 2.0 + (vars[3] + vars[4] + vars[5]) / 2.0 + (vars[6] + vars[7] + vars[
-                    8]) / 2.0 + (vars[9] + vars[10]) / 1.6 + vars[11] / 2.7 + (vars[12] + vars[13]) / 1.4 + vars[
-                                                                                                                14] / 2.1 + 0.64 * (
-            vars[15] + vars[16]) + vars[17] / 2.0 + (vars[18] + vars[19]) / 2.1 + vars[20] + vars[21] + vars[22] / 2.03 + \
-                     vars[23] / 2.03 + vars[24] / 2.03
+                8]) / 2.0 + (vars[9] + vars[10]) / 1.6 + vars[11] / 2.7 + (vars[12] + vars[13]) / 1.4 + vars[
+                                                                                                            14] / 2.1 + 0.64 * (
+                vars[15] + vars[16]) + vars[17] / 2.0 + (vars[18] + vars[19]) / 2.1 + vars[20] + vars[21] + vars[
+                                                                                                                22] / 2.03 + \
+                 vars[23] / 2.03 + vars[24] / 2.03
         collect()
         return OC
-
 
     def get_surface_cmaqvar(self, param='O3'):
         lvl = 0.
@@ -380,7 +381,6 @@ class cmaq:
             var = self.concobj.variables[param][self.indexdates, 0, :, :].squeeze()
         return var
 
-
     def get_metcro2d_cmaqvar(self, param='O3'):
         lvl = 0.
         param = param.upper()
@@ -388,14 +388,12 @@ class cmaq:
         var = self.metcro2d.variables[param][self.indexdates, 0, :, :].squeeze()
         return var
 
-
     def set_gridcro2d(self, filename=''):
         self.gridobj = Dataset(filename)
         lat = 'LAT'
         lon = 'LON'
         self.latitude = self.gridobj.variables[lat][:][0, 0, :, :].squeeze()
         self.longitude = self.gridobj.variables[lon][:][0, 0, :, :].squeeze()
-
 
     def load_conus_basemap(self, path):
         import cPickle as pickle
@@ -417,7 +415,6 @@ class cmaq:
 
         return m
 
-
     def load_pacific_coast_basemap(self, path):
         from mpl_toolkits.basemap import Basemap
         import os
@@ -434,7 +431,6 @@ class cmaq:
                         llcrnrlat=29., urcrnrlat=53., llcrnrlon=-125., urcrnrlon=-116., rsphere=6371200.,
                         area_thresh=50.)
         return m
-
 
     def load_rockies_basemap(self, path):
         import cPickle as pickle
@@ -453,7 +449,6 @@ class cmaq:
                         llcrnrlat=29., urcrnrlat=52., llcrnrlon=-116., urcrnrlon=-91., rsphere=6371200.,
                         area_thresh=50.)
         return m
-
 
     def load_south_central_basemap(self, path):
         import cPickle as pickle
@@ -475,7 +470,6 @@ class cmaq:
                         area_thresh=50.)
         return m
 
-
     def load_northeast_basemap(self, path):
         import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
@@ -493,7 +487,6 @@ class cmaq:
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
                         area_thresh=50.)
         return m
-
 
     def load_north_central_basemap(self, path):
         import cPickle as pickle
@@ -513,7 +506,6 @@ class cmaq:
                         area_thresh=50.)
         return m
 
-
     def load_southeast_basemap(self, path):
         import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
@@ -531,7 +523,6 @@ class cmaq:
                         llcrnrlat=25., urcrnrlat=39, llcrnrlon=-93., urcrnrlon=-70., rsphere=6371200.,
                         area_thresh=10.)
         return m
-
 
     def choose_map(self, path, region):
         region = region.upper()

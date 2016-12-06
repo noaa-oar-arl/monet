@@ -10,6 +10,7 @@ import plots
 from crn import crn
 from cmaq import cmaq
 
+
 class verify_crn:
     def __init__(self):
         self.crn = crn()
@@ -103,14 +104,16 @@ class verify_crn:
         print 'Species available to compare:'
         print '    ', self.df.Species.unique()
 
-    def compare_param(self, param='OZONE', site='', city='', state='',region='', timeseries=False, scatter=False, pdfs=False,
+    def compare_param(self, param='OZONE', site='', city='', state='', region='', timeseries=False, scatter=False,
+                      pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
                       label=None, footer=True):
         from numpy import NaN
-        df = self.df.copy()[['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
-            'Longitude','State_Name']]
+        df = self.df.copy()[
+            ['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
+             'Longitude', 'State_Name']]
         df.Obs[df.Obs < -990] = NaN
-        df.dropna(subset=['Obs'],inplace=True)
+        df.dropna(subset=['Obs'], inplace=True)
         g = df.groupby('Species')
         new = g.get_group(param)
         if site != '':
@@ -148,7 +151,7 @@ class verify_crn:
         if timeseries_mb:
             plots.crn_timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
-    def crn_spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[],vmin=None,vmax=None):
+    def crn_spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=None, vmax=None):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
@@ -184,8 +187,10 @@ class verify_crn:
 
         else:
             index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
-            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,vmin=vmin,vmax=vmax)
-            plots.airnow_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax)
+            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,
+                                        vmin=vmin, vmax=vmax)
+            plots.airnow_spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin,
+                                         vmax=vmax)
             c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
             if len(xlim) > 1:
                 plt.xlim([min(xlim), max(xlim)])
@@ -198,7 +203,6 @@ class verify_crn:
         ioa = mystats.IOA(df.Obs.values, df.cmaq.values)  # Index of Agreement
         rmse = mystats.RMSE(df.Obs.values, df.cmaq.values)
         return mb, r2, ioa, rmse
-
 
     def interp_to_crn(self, cmaqvar, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2):
         from pyresample import geometry, kd_tree

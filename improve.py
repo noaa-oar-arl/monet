@@ -105,5 +105,5 @@ class improve:
             offset = (rdst.utcoffset()).total_seconds() // 3600
             df['utcoffset'].loc[df.Longitude == i] = offset
 
-        df['datetime_local'] = df.datetime + pd.to_timedelta(df.utcoffset,'H')
+        df['datetime_local'] = df.datetime + pd.to_timedelta(df.utcoffset, 'H')
         return df

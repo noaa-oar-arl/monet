@@ -3,7 +3,7 @@
 # this is done to make creating verifications easier
 
 def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
-               interp='gauss',species='all'):
+               interp='gauss', species='all'):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -26,7 +26,7 @@ def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     va.aqs.datadir = datapath
-    va.aqs.load_all_hourly_data(va.cmaq.dates,datasets=species)
+    va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
     va.aqs.monitor_file = __file__[:-9] + 'data/monitoring_site_locations.dat'
     va.aqs.read_monitor_file()
     if combine:
@@ -35,7 +35,7 @@ def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
 
 
 def verify_airnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
-                  interp='gauss', airnowoutput='',user='',passw=''):
+                  interp='gauss', airnowoutput='', user='', passw=''):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -52,8 +52,8 @@ def verify_airnow(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
     from verify_airnow import verify_airnow
     va = verify_airnow()
     va.cmaq.open_cmaq(file=concpath)
-    va.airnow.username=user
-    va.airnow.password=passw
+    va.airnow.username = user
+    va.airnow.password = passw
     va.cmaq.set_gridcro2d(gridcro)
     va.cmaq.get_dates()
     va.airnow.dates = va.cmaq.dates[va.cmaq.indexdates]

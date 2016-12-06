@@ -22,14 +22,14 @@ class airnow:
         self.ftp = None
         self.df = None
         self.se_states = array(
-                ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN',
-                 'VA', 'WV'], dtype='|S14')
+            ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN',
+             'VA', 'WV'], dtype='|S14')
         self.ne_states = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA',
                                 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'],
                                dtype='|S20')
         self.nc_states = array(
-                ['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'],
-                dtype='|S9')
+            ['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'],
+            dtype='|S9')
         self.sc_states = array(['AR', 'LA', 'OK', 'TX'], dtype='|S9')
         self.r_states = array(['AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM',
                                'ND', 'SD', 'UT', 'WY'], dtype='|S12')
@@ -39,7 +39,7 @@ class airnow:
         self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
         self.monitor_df = None
         self.savecols = ['datetime', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'datetime_local',
-                         'Site_Name', 'Latitude', 'Longitude', 'CMSA_Name', 'MSA_Name', 'State_Name','Region']
+                         'Site_Name', 'Latitude', 'Longitude', 'CMSA_Name', 'MSA_Name', 'State_Name', 'Region']
 
     def retrieve_hourly_filelist(self):
         self.ftp.cwd('HourlyData')
@@ -81,7 +81,7 @@ class airnow:
         os.chdir(self.cwd)
 
     def download_hourly_files(self, path='.'):
-        from numpy import empty,where
+        from numpy import empty, where
         self.datadir = path
         self.change_path()
         print 'Connecting to FTP: ' + self.url
@@ -96,10 +96,10 @@ class airnow:
         inarchive[index2] = False
         index = where(inarchive)[0]
 
-        #download archive files first
+        # download archive files first
         if index.shape[0] > 0:
             year = self.dates[0].strftime('%Y')
-            self.ftp.cwd('/HourlyData/Archive/'+year)
+            self.ftp.cwd('/HourlyData/Archive/' + year)
             for i in array(self.datestr)[index]:
                 if os.path.exists(i) == False:
                     print 'Downloading from Archive: ', i
@@ -107,8 +107,8 @@ class airnow:
                 else:
                     print 'File found: ', i
 
-        #now downlad all in the Current HourlyData
-        index = where(inarchive==False)[0]
+        # now downlad all in the Current HourlyData
+        index = where(inarchive == False)[0]
         if index.shape[0] > 0:
             year = self.dates[0].strftime('%Y')
             self.ftp.cwd('/HourlyData')
@@ -130,14 +130,14 @@ class airnow:
         fnames = sort(self.filelist)
         a = ''
         for i in fnames:
-            with open(i,'rb') as f:
+            with open(i, 'rb') as f:
                 a = a + f.read()
-        dft = pd.read_csv(StringIO(a),delimiter='|',header=None,error_bad_lines=False)
-        cols = ['date','time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
+        dft = pd.read_csv(StringIO(a), delimiter='|', header=None, error_bad_lines=False)
+        cols = ['date', 'time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
         dft.columns = cols
-        dates = [datetime.strptime(x+' '+y,'%m/%d/%y %H:%M') for x,y in zip(dft.date.values,dft.time.values)]
-        dft.drop('date',axis=1,inplace=True)
-        dft.drop('time',axis=1,inplace=True)
+        dates = [datetime.strptime(x + ' ' + y, '%m/%d/%y %H:%M') for x, y in zip(dft.date.values, dft.time.values)]
+        dft.drop('date', axis=1, inplace=True)
+        dft.drop('time', axis=1, inplace=True)
         dft['datetime'] = dates
         self.df = dft.copy()
         self.calc_datetime()
@@ -194,19 +194,19 @@ class airnow:
             con = sr == i
             sr[con] = 'Southeast'
         for i in self.ne_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'Northeast'
         for i in self.nc_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'North Central'
         for i in self.sc_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'South Central'
         for i in self.p_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'Pacific'
         for i in self.r_states:
-            con= sr == i
+            con = sr == i
             sr[con] = 'Rockies'
         sr[sr == 'CC'] = 'Canada'
         sr[sr == 'MX'] = 'Mexico'

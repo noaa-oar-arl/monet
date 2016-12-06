@@ -198,7 +198,7 @@ class verify_aqs:
                     fac = self.check_cmaq_units(param='OCf', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC') * fac
                     dfpm = self.interp_to_aqs(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqoc= cmaqvar
+                    self.cmaqoc = cmaqvar
                     dfs.append(dfpm)
             elif i == 'ETHANE':
                 if ('ETHA' not in self.cmaq.keys):
@@ -301,16 +301,17 @@ class verify_aqs:
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
                       label=None, footer=True):
         from numpy import NaN
-        cityname=True
+        cityname = True
         if 'MSA_Name' in self.df.columns:
             df = self.df.copy()[[
-                'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
+                'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units',
+                'Latitude',
                 'Longitude', 'State_Name']]
         else:
             df = self.df.copy()[[
                 'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units', 'Latitude',
                 'Longitude', 'State_Name']]
-            cityname=False
+            cityname = False
         df[df < -990] = NaN
         g = df.groupby('Species')
         new = g.get_group(param)
@@ -352,7 +353,8 @@ class verify_aqs:
         if timeseries_mb:
             plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
 
-    def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150,ncolors=16,cmap='YlGnBu'):
+    def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=16,
+                cmap='YlGnBu'):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
@@ -384,8 +386,8 @@ class verify_aqs:
         if date == '':
             for index, i in enumerate(self.cmaq.dates):
                 c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
-                                            m,vmin=vmin,vmax=vmax)
-                plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax)
+                                            m, vmin=vmin, vmax=vmax)
+                plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin, vmax=vmax)
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
@@ -393,8 +395,10 @@ class verify_aqs:
 
         else:
             index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
-            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
-            plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'),vmin=vmin,vmax=vmax,ncolors=ncolors,cmap=cmap)
+            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,
+                                        vmin=vmin, vmax=vmax, ncolors=ncolors, cmap=cmap)
+            plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin, vmax=vmax,
+                                  ncolors=ncolors, cmap=cmap)
             c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
             if len(xlim) > 1:
                 plt.xlim([min(xlim), max(xlim)])

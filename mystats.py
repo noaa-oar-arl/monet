@@ -312,7 +312,7 @@ def RMSEu(obs, mod, axis=None):
 def d1(obs, mod, axis=None):
     """ Modified Index of Agreement, d1"""
     return 1.0 - (np.ma.abs(obs - mod)).sum(axis=axis) / (
-    np.ma.abs(mod - obs.mean(axis=axis)) + np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis)
+        np.ma.abs(mod - obs.mean(axis=axis)) + np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis)
 
 
 def E1(obs, mod, axis=None):
@@ -326,7 +326,7 @@ def IOA(obs, mod, axis=None):
     if not axis is None:
         obsmean = np.expand_dims(obsmean, axis=axis)
     return 1.0 - (np.ma.abs(obs - mod) ** 2).sum(axis=axis) / (
-    (np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis)
+        (np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis)
 
 
 def circlebias(b):
@@ -390,8 +390,9 @@ def HSS(obs, mod, minval, maxval):
     c = ct[1][1].astype('float')
     d = ct[1][1].astype('float')
     hss = 2 * (a * d - b * c) / ((a + c) * (c + d) + (a + b) * (b + d))
-    print 'HSS for range ' + str(minval) + ' --> ' + str(maxval)+': ' + hss
+    print 'HSS for range ' + str(minval) + ' --> ' + str(maxval) + ': ' + hss
     return hss
+
 
 def ETS(obs, mod, minval, maxval):
     """
@@ -413,10 +414,11 @@ def ETS(obs, mod, minval, maxval):
     b = ct[1][1].astype('float')
     c = ct[1][1].astype('float')
     d = ct[1][1].astype('float')
-    ar = (a+b)*(a+c) / (a + b + c + d)
-    ets =(a - ar) / (a + b + c - ar)
-    print 'ETS for range ' + str(minval) + ' --> ' + str(maxval)+': ' + ets
+    ar = (a + b) * (a + c) / (a + b + c + d)
+    ets = (a - ar) / (a + b + c - ar)
+    print 'ETS for range ' + str(minval) + ' --> ' + str(maxval) + ': ' + ets
     return ets
+
 
 def scores(obs, mod, minval, maxval):
     d = {}
@@ -430,14 +432,14 @@ def scores(obs, mod, minval, maxval):
     b = ct[1][1].astype('float')
     c = ct[1][1].astype('float')
     d = ct[1][1].astype('float')
-    
-def stats_table(df,minval,maxval):
+
+
+def stats_table(df, minval, maxval):
     from numpy import sqrt
     d = {}
     d['Mean Bias'] = MB(df.Obs.values, df.CMAQ.values)  # mean bias
     d['Pearson R'] = sqrt(R2(df.Obs.values, df.CMAQ.values))  # pearsonr ** 2
     d['Index of Agreement'] = IOA(df.Obs.values, df.CMAQ.values)  # Index of Agreement
     d['RMSE'] = RMSE(df.Obs.values, df.CMAQ.values)
-    d['Equitable Threat Score'] = ETS(df.Obs.values, df.CMAQ.values,minval,maxval)
-    a,b,c,d = scores(df.Obs.values, df.CMAQ.values,minval,maxval)
-    
+    d['Equitable Threat Score'] = ETS(df.Obs.values, df.CMAQ.values, minval, maxval)
+    a, b, c, d = scores(df.Obs.values, df.CMAQ.values, minval, maxval)
