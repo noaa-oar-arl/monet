@@ -1,5 +1,5 @@
 #
-## Introductin to the Chemical Transport Model Verification
+## Introductin to the Model and ObservatioN Evalution Toolkit (MONET)
 
 This is the start to an ARL verification package. Currently, it handles CMAQ 4.7.1+, EPA AQS surface data, EPA AirNow, and the IMPROVE Aerosol data network. It will compute statistics, make time series, spatial and scatter plots, and more!  
 
