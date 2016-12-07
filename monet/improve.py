@@ -1,5 +1,4 @@
 # this is written to retrive airnow data concatenate and add to pandas array for usage
-from datetime import datetime
 
 import pandas as pd
 from numpy import array, NaN
@@ -89,7 +88,6 @@ class improve:
         import pytz
         from numpy import unique
         from tzwhere import tzwhere
-        from datetime import timedelta
         tz = tzwhere.tzwhere(forceTZ=True, shapely=True)
         df.dropna(subset=['Latitude', 'Longitude'], inplace=True)
         lons, index = unique(df.Longitude.values, return_index=True)

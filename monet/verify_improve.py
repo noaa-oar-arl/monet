@@ -2,7 +2,7 @@
 from datetime import datetime
 
 import matplotlib.pyplot as plt
-from numpy import array, where, NaN, sort
+from numpy import array, where, sort
 from pandas import concat
 
 import mystats

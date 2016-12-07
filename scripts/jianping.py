@@ -1,10 +1,11 @@
 #! /data/aqf/barryb/anaconda2/bin/python
 
-import pandas as pd
-import aqs
 from datetime import datetime
+
+import pandas as pd
 from matplotlib.pyplot import *
-import seaborn as sns
+
+import aqs
 import plots
 
 ##EDIT THE NUMBER OF YEARS HERE
@@ -40,27 +41,27 @@ so4df = df.groupby('Species').get_group('SO4f')
 
 # first make a time series plot over the entire domain of the hourly data
 title = 'HOURLY PM2.5 CONUS'
-plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5',footer=False)
+plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', footer=False)
 show()
 
-#***************************************************************
+# ***************************************************************
 ####if you wish to save the figure uncomment the line below#####
-#************************************************************
-#savefig('pm25_hourly.jpg',dpi=100)
+# ************************************************************
+# savefig('pm25_hourly.jpg',dpi=100)
 
 # now lets resample to daily data and replot
 title = 'Daily PM2.5 CONUS'
-plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', sample='D',footer=False)
+plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', sample='D', footer=False)
 show()
 
 # resample to weekly
 title = 'Weekly PM2.5 CONUS'
-plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', sample='W',footer=False)
+plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', sample='W', footer=False)
 show()
 
 # resample to monthly
 title = 'Monthy PM2.5 CONUS'
-plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', sample='M',footer=False)
+plots.timeseries_single_var(pm25df, title=title, label='AQS PM2.5', sample='M', footer=False)
 show()
 
 # replot in each of the EPA regions the month timeseries
@@ -68,17 +69,16 @@ regions = pm25df.Region.unique()
 for i in regions:
     title = 'Monthly PM2.5 ' + i
     d = pm25df.loc[pm25df.Region == i]
-    plots.timeseries_single_var(d, title=title, label='AQS PM2.5', sample='M',footer=False)
+    plots.timeseries_single_var(d, title=title, label='AQS PM2.5', sample='M', footer=False)
     show()
 
-#you can create loops over states if you'd like.  Follow the syntax above
-#here is a plot for just over California
-print 'State Names: ',pm25df.State_Name.unique()
+# you can create loops over states if you'd like.  Follow the syntax above
+# here is a plot for just over California
+print 'State Names: ', pm25df.State_Name.unique()
 d = pm25df.loc[pm25df.State_Name == 'California']
-plots.timeseries_single_var(d, title='California', label='AQS PM2.5', sample='M',footer=False)
+plots.timeseries_single_var(d, title='California', label='AQS PM2.5', sample='M', footer=False)
 
-
-#if you wish to export this data to something easy you can
+# if you wish to export this data to something easy you can
 # use in any other programing language you can save it to a CSV file
 # Lets save the monthly mean
 pm25df.index = pm25df.datetime
@@ -86,25 +86,24 @@ monthlypm25 = pm25df['Obs'].copy().resample('M').mean()
 monthlypm25 = monthlypm25.reset_index(level=1)
 monthlypm25.to_csv('output.csv')
 
+# you also don't have to do the mean.  You can do the folling functions easily:
+# Method 	Description
+# count() 	Number of non-null observations
+# sum() 	        Sum of values
+# mean() 	Mean of values
+# median() 	Arithmetic median of values
+# min() 	        Minimum
+# max() 	        Maximum
+# std() 	        Bessel-corrected sample standard deviation
+# var() 	        Unbiased variance
+# skew() 	Sample skewness (3rd moment)
+# kurt() 	Sample kurtosis (4th moment)
+# quantile() 	Sample quantile (value at %)
+# apply() 	Generic apply
+# cov() 	        Unbiased covariance (binary)
+# corr() 	Correlation (binary)
 
-#you also don't have to do the mean.  You can do the folling functions easily:
-#Method 	Description
-#count() 	Number of non-null observations
-#sum() 	        Sum of values
-#mean() 	Mean of values
-#median() 	Arithmetic median of values
-#min() 	        Minimum
-#max() 	        Maximum
-#std() 	        Bessel-corrected sample standard deviation
-#var() 	        Unbiased variance
-#skew() 	Sample skewness (3rd moment)
-#kurt() 	Sample kurtosis (4th moment)
-#quantile() 	Sample quantile (value at %)
-#apply() 	Generic apply
-#cov() 	        Unbiased covariance (binary)
-#corr() 	Correlation (binary)
-
-#as an example.  lets save the median value
+# as an example.  lets save the median value
 
 monthlypm25 = pm25df['Obs'].copy().resample('M').median()
 monthlypm25 = monthlypm25.reset_index(level=1)

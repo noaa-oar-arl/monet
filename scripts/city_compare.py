@@ -4,10 +4,11 @@
 #
 # ./city_compare.py PATH/TO/ACONC PATH/TO/GRIDCRO LABEL USERNAME PASSWORD CITY
 
-import verify
-from glob import glob
-import matplotlib.pyplot as plt
 import sys
+from glob import glob
+
+import matplotlib.pyplot as plt
+import verify
 
 print "Name of Script: ", sys.argv[0]
 print "ACONC FILE: ", sys.argv[1]
@@ -21,7 +22,8 @@ print "City Name: ", sys.argv[7]
 files = glob(sys.argv[1])
 grid = sys.argv[2]
 
-va = verify.verify_airnow(concpath=files,gridcro=grid,datapath='.',user=sys.argv[4],passw=sys.argv[5],combine=True,neighbors=9)
+va = verify.verify_airnow(concpath=files, gridcro=grid, datapath='.', user=sys.argv[4], passw=sys.argv[5], combine=True,
+                          neighbors=9)
 
 names = va.df.MSA_Name.dropna().unique()
 city = sys.argv[7]
@@ -31,11 +33,10 @@ for i in names:
         name = i
 params = va.df.groupby('MSA_Name').get_group(name).Species.unique()
 for j in params:
-    va.compare_param(param=j,timeseries=True,label=sys.argv[3],city=name,footer=False)
-    plt.savefig(j + '_'+sys.argv[7]+ sys.argv[6],dpi=100)
+    va.compare_param(param=j, timeseries=True, label=sys.argv[3], city=name, footer=False)
+    plt.savefig(j + '_' + sys.argv[7] + sys.argv[6], dpi=100)
     plt.close()
-    
-    
+
 '''
 ' Aberdeen, WA ', ' Adrian, MI ', ' Akron, OH ',
        ' Albany-Lebanon, OR ', ' Albany-Schenectady-Troy, NY ',

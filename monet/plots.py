@@ -1,4 +1,3 @@
-import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -10,7 +9,6 @@ sns.set_context('poster')
 
 # CMAQ Spatial Plots
 def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, vmax=150, ncolors=15, cmap='YlGnBu'):
-    from numpy import arange
     fig = plt.figure(figsize=(12, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
@@ -89,7 +87,6 @@ def eight_hr_spatial_scatter(df, m, date, savename=''):
 
 
 def timeseries_single_var(df, varname='Obs', title='', fig=None, label=None, color=None, footer=True, sample='H'):
-    import matplotlib.dates as mdates
     from numpy import isnan
     sns.set_style('ticks')
     df.index = df.datetime
@@ -614,7 +611,6 @@ def cmap_discretize(cmap, N):
         imshow(x, cmap=djet)
     """
     import matplotlib.colors as mcolors
-    import matplotlib.cm as cm
     import numpy as np
 
     if type(cmap) == str:

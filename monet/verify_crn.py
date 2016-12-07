@@ -7,8 +7,8 @@ from numpy import array, where
 
 import mystats
 import plots
-from crn import crn
 from cmaq import cmaq
+from crn import crn
 
 
 class verify_crn:

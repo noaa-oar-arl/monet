@@ -1,0 +1,8 @@
+numpy
+pyresample
+basemap
+pytz
+pandas
+xarray
+dask
+wget

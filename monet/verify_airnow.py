@@ -1,12 +1,14 @@
 # verify is the main application.
+from datetime import datetime
+
 import matplotlib.pyplot as plt
-import mystats
 import pandas as pd
+from numpy import array, where
+
+import mystats
 import plots
 from airnow import airnow
 from cmaq import cmaq
-from datetime import datetime
-from numpy import array, where
 
 
 class verify_airnow:
