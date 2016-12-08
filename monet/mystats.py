@@ -420,26 +420,36 @@ def ETS(obs, mod, minval, maxval):
     return ets
 
 
-def scores(obs, mod, minval, maxval):
+def scores(obs, mod, minval, maxval=1.0e5):
     d = {}
     d['obs'] = obs
     d['mod'] = mod
     df = DataFrame(d)
-    ct = crosstab((df['mod'] > minval) & (df['mod'] < maxval) & (df['obs'] > minval) & (df['obs'] < maxval),
+    ct = crosstab((df['mod'] > minval) & (df['mod'] < maxval), (df['obs'] > minval) & (df['obs'] < maxval),
                   margins=True)
     print ct
     a = ct[1][1].astype('float')
-    b = ct[1][1].astype('float')
-    c = ct[1][1].astype('float')
-    d = ct[1][1].astype('float')
+    b = ct[1][0].astype('float')
+    c = ct[0][1].astype('float')
+    d = ct[0][0].astype('float')
+    return a,b,c,d
 
-
-def stats_table(df, minval, maxval):
+def stats(df, minval, maxval):
     from numpy import sqrt
     d = {}
-    d['Mean Bias'] = MB(df.Obs.values, df.CMAQ.values)  # mean bias
-    d['Pearson R'] = sqrt(R2(df.Obs.values, df.CMAQ.values))  # pearsonr ** 2
-    d['Index of Agreement'] = IOA(df.Obs.values, df.CMAQ.values)  # Index of Agreement
-    d['RMSE'] = RMSE(df.Obs.values, df.CMAQ.values)
-    d['Equitable Threat Score'] = ETS(df.Obs.values, df.CMAQ.values, minval, maxval)
-    a, b, c, d = scores(df.Obs.values, df.CMAQ.values, minval, maxval)
+    dd['N'] = df.Obs.dropna().count()
+    dd['Obs'] = df.Obs.mean()
+    dd['Mod'] = df.CMAQ.mean()
+    dd['MB'] = MB(df.Obs.values, df.CMAQ.values)  # mean bias
+    dd['R'] = sqrt(R2(df.Obs.values, df.CMAQ.values))  # pearsonr ** 2
+    dd['IOA'] = IOA(df.Obs.values, df.CMAQ.values)  # Index of Agreement
+    dd['RMSE'] = RMSE(df.Obs.values, df.CMAQ.values)
+    dd['NMB'] = NMB(df.Obs.values,df.CMAQ.values)
+    try:
+        a,b,c,d = scores(df.Obs.values,df.CMAQ.values,70,1000)
+        dd['POD'] = a / (a + b)
+        dd['FAR'] = c / (a + c)
+    except:
+        dd['POD'] = 1.
+        dd['FAR'] = 0.
+    return dd
