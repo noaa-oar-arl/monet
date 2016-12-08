@@ -27,11 +27,11 @@ Please refer to [Make Spatial Plot tutorial](https://github.com/noaa-oar-arl/MON
 
 ### Example Plots
 
-![Time Series](https://github.com/noaa-oar-arl/MONET/master/sample_figures/pm2.5_timeseries.jpg?raw=true)
+![Time Series](https://github.com/noaa-oar-arl/MONET/blob/master/sample_figures/pm2.5_timeseries.jpg?raw=true)
 
-![Time Series of RMSE](https://github.com/noaa-oar-arl/MONET/master/sample_figures/pm2.5_timeseries_rmse.jpg?raw=true)
+![Time Series of RMSE](https://github.com/noaa-oar-arl/MONET/blob/master/sample_figures/pm2.5_timeseries_rmse.jpg?raw=true)
 
-![Spatial Plots](https://github.com/bakerbd/blob/master/sample_figures/ozone_spatial.jpg?raw=true)
+![Spatial Plots](https://github.com/noaa-oar-arl/MONET/blob/master/sample_figures/ozone_spatial.jpg?raw=true)
 
 ![Scatter Plots](https://github.com/noaa-oar-arl/MONET/blob/master/sample_figures/no2_scatter.jpg?raw=true)
 ![PDFS Plots](https://github.com/noaa-oar-arl/MONET/blob/master/sample_figures/no2_pdf.jpg?raw=true)
