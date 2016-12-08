@@ -378,17 +378,7 @@ def HSS(obs, mod, minval, maxval):
     :param maxval:
     :return: HSS
     """
-    d = {}
-    d['obs'] = obs
-    d['mod'] = mod
-    df = DataFrame(d)
-    ct = crosstab((df['mod'] > minval) & (df['mod'] < maxval) & (df['obs'] > minval) & (df['obs'] < maxval),
-                  margins=True)
-    print ct
-    a = ct[1][1].astype('float')
-    b = ct[1][1].astype('float')
-    c = ct[1][1].astype('float')
-    d = ct[1][1].astype('float')
+    a,b,c,d = scores(obs, mod, minval, maxval=maxval)
     hss = 2 * (a * d - b * c) / ((a + c) * (c + d) + (a + b) * (b + d))
     print 'HSS for range ' + str(minval) + ' --> ' + str(maxval) + ': ' + hss
     return hss
@@ -403,17 +393,7 @@ def ETS(obs, mod, minval, maxval):
     :param maxval:
     :return: HSS
     """
-    d = {}
-    d['obs'] = obs
-    d['mod'] = mod
-    df = DataFrame(d)
-    ct = crosstab((df['mod'] > minval) & (df['mod'] < maxval) & (df['obs'] > minval) & (df['obs'] < maxval),
-                  margins=True)
-    print ct
-    a = ct[1][1].astype('float')
-    b = ct[1][1].astype('float')
-    c = ct[1][1].astype('float')
-    d = ct[1][1].astype('float')
+    a,b,c,d = scores(obs, mod, minval, maxval=maxval)
     ar = (a + b) * (a + c) / (a + b + c + d)
     ets = (a - ar) / (a + b + c - ar)
     print 'ETS for range ' + str(minval) + ' --> ' + str(maxval) + ': ' + ets
