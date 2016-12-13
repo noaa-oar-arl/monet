@@ -19,5 +19,5 @@ setup(
                       'wget',
                       'matplotlib',
                       'seaborn'],
-    description='The Model and ObservatioN Evaluation Toolkit (MONET) is designed to allow easy and quick analysis of chemical transport models and relavent observations'
+    description='The Model and ObservatioN Evaluation Toolkit (MONET) is designed to allow easy and quick analysis of chemical transport models and relevant observations'
 )
