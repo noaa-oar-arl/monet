@@ -243,7 +243,7 @@ class verify_improve:
 
     def compare_param(self, param='OZONE', improvesite='', epasite='', state='', region='', timeseries=False,
                       scatter=False, pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False,
-                      timeseries_mb=False, fig=None, label=None, footer=True):
+                      timeseries_mb=False, taylordiagram=False, fig=None, label=None, footer=True, dia=None):
         df = self.df.copy()
         g = df.groupby('Species')
         new = g.get_group(param)
@@ -280,6 +280,11 @@ class verify_improve:
             plots.timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
         if timeseries_mb:
             plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer, sample='3D')
+        if taylordiagram:
+            if fig is None:
+                plots.taylordiagram(df2, label=label, dia=dia, addon=False)
+            else:
+                plots.taylordiagram(df2, label=label, dia=dia, addon=True)
 
     def improve_spatial(self, df, date, param='NAf', path='', region='', xlim=[], ylim=[]):
         """

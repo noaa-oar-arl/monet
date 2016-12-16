@@ -297,9 +297,8 @@ class verify_aqs:
         print '    ', self.df.Region.unique()
 
     def compare_param(self, param='OZONE', site='', city='', region='', state='', timeseries=False, scatter=False,
-                      pdfs=False,
-                      diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
-                      label=None, footer=True):
+                      pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
+                      taylordiagram=False, fig=None, label=None, footer=True, dia=None):
         from numpy import NaN
         cityname = True
         if 'MSA_Name' in self.df.columns:
@@ -352,6 +351,11 @@ class verify_aqs:
             plots.timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_mb:
             plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
+        if taylordiagram:
+            if fig is None:
+                plots.taylordiagram(df2, label=label, dia=dia, addon=False)
+            else:
+                plots.taylordiagram(df2, label=label, dia=dia, addon=True)
 
     def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=16,
                 cmap='YlGnBu'):
