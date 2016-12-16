@@ -223,8 +223,8 @@ class verify_airnow:
 
     def compare_param(self, param='OZONE', site='', city='', state='', region='', timeseries=False, scatter=False,
                       pdfs=False,
-                      diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False, fig=None,
-                      label=None, footer=True):
+                      diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
+                      taylordiagram=False, fig=None, label=None, footer=True, dia=None):
         from numpy import NaN
         df = self.df.copy()[
             ['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
@@ -268,6 +268,11 @@ class verify_airnow:
             plots.timeseries_rmse_param(df2, title=title, label=label, fig=fig, footer=footer)
         if timeseries_mb:
             plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
+        if taylordiagram:
+            if fig is None:
+                plots.taylordiagram(df2, label=label, dia=dia, addon=False)
+            else:
+                plots.taylordiagram(df2, label=label, dia=dia, addon=True)
 
     def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=15,
                 cmap='YlGnBu'):
@@ -545,3 +550,79 @@ class verify_airnow:
         kkk = kk.reset_index(drop='SCS').dropna()
         kkk = self.airnow.get_station_locations_remerge(kkk)
         return kkk
+
+    def write_table(self, df=None, param='OZONE', fname='table.txt', threasholds=[70, 1e5], site=None, city=None,
+                    region=None,
+                    state=None,
+                    append=False,
+                    label='CMAQ'):
+        from StringIO import StringIO
+        single = False
+        if not isinstance(df, None):
+            single = True
+            pass
+        else:
+            df = self.df.groupby('Species').get_group(param)
+        if not isinstance(site, None):
+            try:
+                df = df.groupby('SCS').get_group(site)
+                single = True
+                name = site
+            except KeyError:
+                print 'Site Number not valid.  Enter a valid SCS'
+                return
+        elif not isinstance(city, None):
+            try:
+                names = df.get_group('MSA_Name').dropna().unique()
+                name = [j for j in names if city.upper() in j.upper()]
+                df = self.df.groupby('Species').get_group(param).groupby('MSA_Name').get_group(name[0])
+                single = True
+            except KeyError:
+                print ' City either does not contain montiors for ' + param
+                print '     or City Name is not valid.  Enter a valid City name: self.df.MSA_Name.unique()'
+                return
+        elif not isinstance(state, None):
+            try:
+                names = df.get_group('State_Name').dropna().unique()
+                name = [j for j in names if state.upper() in j.upper()]
+                df = self.df.groupby('Species').get_group(param).groupby('State_Name').get_group(name[0])
+            except KeyError:
+                print 'State not valid. Please enter valid 2 digit state'
+                return
+        elif not isinstance(region, None):
+            try:
+                names = df.get_group('MSA_Name').dropna().unique()
+                name = [j for j in names if region.upper() in j.upper()]
+                df = df.groupby('Region').get_group(name[0])
+            except KeyError:
+                print 'Region not valid.  Enter a valid Region'
+                return
+        if single:
+            d = mystats.stats_table(df, threasholds[0], threasholds[1])
+            d['label'] = name
+            dd = pd.DataFrame(d, dindex=[0])
+        else:
+            d = mystats.stats_table(df, threasholds[0], threasholds[1])
+            d['Region'] = 'Domain'
+            dd = pd.DataFrame(d, index=[0])
+            for i in dd.Region.dropna().unique():
+                try:
+                    dff = df.groupby('Region').get_group(i)
+                    dt = mystats.stats_table(df, threasholds[0], threasholds[1])
+                    dt['Region'] = i
+                    dft = pd.DataFrame(dt, index=[0])
+                    dd = pd.concat([dd, dft])
+                except KeyError:
+                    pass
+        stats = ['N', 'Obs', 'Mod', 'MB', 'NMB', 'RMSE', 'R', 'IOA', 'POD', 'FAR']
+        print dd[stats]
+        out = StringIO()
+        dd.to_string(out, float_format='%10.3f', columns=stats)
+        out.seek(0)
+        with open(fname, 'w') as f:
+            if single:
+                f.write('This is the statistics table for parameter=' + param + ' for area ' + name + '\n')
+            else:
+                f.write('This is the statistics table for parameter=' + param + '\n')
+            f.write('\n')
+            f.writelines(out.readlines())

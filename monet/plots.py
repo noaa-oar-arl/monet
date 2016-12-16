@@ -86,58 +86,25 @@ def eight_hr_spatial_scatter(df, m, date, savename=''):
         plt.close()
 
 
-def timeseries_single_var(df, varname='Obs', title='', fig=None, label=None, color=None, footer=True, sample='H'):
-    from numpy import isnan
-    sns.set_style('ticks')
-    df.index = df.datetime
-    if fig == None:
-
-        f = plt.figure(figsize=(16, 8))
-        if label == None:
-            label = 'CMAQ'
-
-        species = df.Species.unique().astype('|S8')[0]
-        units = df.Units.unique().astype('|S8')[0]
-        obs = df[varname].resample(sample).mean()
-        obserr = df[varname].resample(sample).std()
-        plt.plot(obs, color='darkslategrey')
-        plt.legend(loc='best')
-        mask = ~isnan(obs) & ~isnan(obserr)
-        plt.fill_between(obs.index[mask], (obs - obserr)[mask], (obs + obserr)[mask], alpha=.2, color='darkslategrey')
-
-        ax = plt.gca().axes
-        ax.set_xlabel('UTC')
-        #        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
-        plt.title(title)
-        minval = min([(obs - obserr).min()])
-        minval = max([minval, 0])
-        plt.gca().set_ylim(bottom=minval)
-        ylabel = species + ' (' + units + ')'
-        plt.gca().axes.set_ylabel(ylabel)
-        if footer:
-            footer_text(df)
-        plt.tight_layout()
-        plt.grid(alpha=.5)
-    else:
-        ax = fig.get_axes()[0]
-        data = df[varname].resample(sample).mean()
-        dataerr = df[varname].resample(sample).std()
-        lin, = ax.plot(data, label=label)
-        mask = ~isnan(data) & ~isnan(dataerr)
-        plt.fill_between(data.index[mask], (data - dataerr)[mask], (data + dataerr)[mask], alpha=.2,
-                         color=lin.get_color())
-        plt.legend(loc='best')
-
-
 def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True, sample='H'):
+    """
+
+    :param df: pandas dataframe from a monet verification object
+    :param title:
+    :param fig:
+    :param label:
+    :param color:
+    :param footer:
+    :param sample:
+    """
     import matplotlib.dates as mdates
     from numpy import isnan
     sns.set_style('ticks')
     df.index = df.datetime
-    if fig == None:
+    if fig is None:
 
         f = plt.figure(figsize=(16, 8))
-        if label == None:
+        if label is None:
             label = 'CMAQ'
 
         species = df.Species.unique().astype('|S8')[0]
@@ -160,7 +127,9 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
         plt.title(title)
         minval = min([(obs - obserr).min(), (cmaq - cmaqerr).min()])
         minval = max([minval, 0])
+        maxval = max([(cmaq + cmaqerr).max() * 1.1, (obs + obserr).max() * 1.1])
         plt.gca().set_ylim(bottom=minval)
+        plt.gca().set_ylim(top=maxval)
         ylabel = species + ' (' + units + ')'
         plt.gca().axes.set_ylabel(ylabel)
         if footer:
@@ -179,12 +148,21 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
 
 
 def timeseries_error_param(df, title='', fig=None, label=None, footer=True, sample='H'):
+    """
+
+    :param df:
+    :param title:
+    :param fig:
+    :param label:
+    :param footer:
+    :param sample:
+    """
     import matplotlib.dates as mdates
     from numpy import sqrt
     sns.set_style('ticks')
 
     df.index = df.datetime
-    if fig == None:
+    if fig is None:
         plt.figure(figsize=(13, 8))
 
         species = df.Species.unique().astype('|S8')[0]
@@ -197,7 +175,6 @@ def timeseries_error_param(df, title='', fig=None, label=None, footer=True, samp
         ax = plt.gca().axes
         ax2 = ax.twinx()
         b = ax2.plot(rmse, label='RMSE', color='tomato')
-        # b = plt.plot(rmse, label='RMSE', color='tomato')
         lns = a + b
         labs = [l.get_label() for l in lns]
         plt.legend(lns, labs, loc='best')
@@ -225,11 +202,20 @@ def timeseries_error_param(df, title='', fig=None, label=None, footer=True, samp
 
 
 def timeseries_rmse_param(df, title='', fig=None, label=None, footer=True, sample='H'):
+    """
+
+    :param df:
+    :param title:
+    :param fig:
+    :param label:
+    :param footer:
+    :param sample:
+    """
     import matplotlib.dates as mdates
     from numpy import sqrt
     sns.set_style('ticks')
     df.index = df.datetime
-    if fig == None:
+    if fig is None:
         plt.figure(figsize=(13, 8))
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
@@ -252,6 +238,15 @@ def timeseries_rmse_param(df, title='', fig=None, label=None, footer=True, sampl
 
 
 def timeseries_mb_param(df, title='', fig=None, label=None, footer=True, sample='H'):
+    """
+
+    :param df:
+    :param title:
+    :param fig:
+    :param label:
+    :param footer:
+    :param sample:
+    """
     import matplotlib.dates as mdates
     sns.set_style('ticks')
     df.index = df.datetime
@@ -276,20 +271,27 @@ def timeseries_mb_param(df, title='', fig=None, label=None, footer=True, sample=
         plt.legend(loc='best')
 
 
-def kdeplots_param(df, title=None, fig=None, label=None, footer=True):
+def kdeplots_param(df, title=None, fig=None, label=None, footer=True, cumulative=False):
     from scipy.stats import scoreatpercentile as score
     sns.set_style('ticks')
 
-    if fig == None:
-        maxval1 = score(df.CMAQ.values, per=99.5)
-        maxval2 = score(df.Obs.values, per=99.5)
-        maxval = max([maxval1, maxval2])
-        plt.figure(figsize=(13, 8))
-        sns.kdeplot(df.Obs, color='darkslategrey')
-        sns.kdeplot(df.CMAQ, color='dodgerblue', label=label)
-        sns.despine()
+    if fig is None:
 
-        plt.xlim([0, maxval])
+        if cumulative:
+            plt.figure(figsize=(13, 8))
+            sns.kdeplot(df.Obs, color='darkslategrey', cumulative=True, label='Obs')
+            sns.kdeplot(df.CMAQ, color='dodgerblue', cumulative=True, label=label)
+        else:
+            maxval1 = score(df.CMAQ.values, per=99.5)
+            maxval2 = score(df.Obs.values, per=99.5)
+            maxval = max([maxval1, maxval2])
+            plt.figure(figsize=(13, 8))
+            sns.kdeplot(df.Obs, color='darkslategrey')
+            sns.kdeplot(df.CMAQ, color='dodgerblue', label=label)
+
+        sns.despine()
+        if not cumulative:
+            plt.xlim([0, maxval])
         plt.xlabel(df.Species.unique()[0] + '  (' + df.Units.unique()[0] + ')')
         plt.title(title)
         plt.gca().axes.set_ylabel('P(' + df.Species.unique()[0] + ')')
@@ -299,7 +301,7 @@ def kdeplots_param(df, title=None, fig=None, label=None, footer=True):
         plt.grid(alpha=.5)
     else:
         ax = fig.get_axes()[0]
-        sns.kdeplot(df.CMAQ, ax=ax, label=label)
+        sns.kdeplot(df.CMAQ, ax=ax, label=label, cumulative=cumulative)
 
 
 def diffpdfs_param(df, title=None, fig=None, label=None, footer=True):
@@ -624,3 +626,29 @@ def cmap_discretize(cmap, N):
                       for i in xrange(N + 1)]
     # Return colormap object.
     return mcolors.LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)
+
+
+def taylordiagram(df, marker='o', label='CMAQ', addon=False, dia=None):
+    import taylordiagram as td
+    import mystats
+    if not addon and dia is None:
+        f = plt.figure(figsize=(8, 6))
+        sns.set_style('ticks')
+        obsstd = df.Obs.std()
+
+        dia = td(obsstd, fig=f, rect=111, label='Obs')
+        plt.grid(linewidth=1, alpha=.5)
+
+        cc = mystats.RMSE(df.Obs.values, df.CMAQ.values)
+        dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
+        contours = dia.add_contours(colors='0.5')
+        plt.clabel(contours, inline=1, fontsize=10)
+        plt.legend(fontsize='small', loc='best')
+
+    elif not addon and dia is not None:
+        print 'Do you want to add this on? if so please turn the addon keyword to True'
+    elif addon and dia is None:
+        print 'Please pass the previous Taylor Diagram Instance with dia keyword...'
+    else:
+        cc = mystats.RMSE(df.Obs.values, df.CMAQ.values)
+        dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)

@@ -74,3 +74,16 @@ def distance_matrix(x0, y0, x1, y1):
     weights /= weights.sum(axis=0)
 
     return weights
+
+
+def kolmogorov_zurbenko_filter(df, window, iterations):
+    import pandas as pd
+    """KZ filter implementation
+        series is a pandas series
+        window is the filter window m in the units of the data (m = 2q+1)
+        iterations is the number of times the moving average is evaluated
+        """
+    z = df.copy()
+    for i in range(iterations):
+        z = pd.rolling_mean(z, window=window, min_periods=1, center=True)
+    return z
