@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import taylordiagram as td
 
 colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
 sns.set_palette(sns.color_palette(colors))
@@ -629,22 +630,22 @@ def cmap_discretize(cmap, N):
 
 
 def taylordiagram(df, marker='o', label='CMAQ', addon=False, dia=None):
-    import taylordiagram as td
-    import mystats
+    from numpy import corrcoef
+
     if not addon and dia is None:
-        f = plt.figure(figsize=(8, 6))
+        f = plt.figure(figsize=(12, 10))
         sns.set_style('ticks')
         obsstd = df.Obs.std()
 
-        dia = td(obsstd, fig=f, rect=111, label='Obs')
+        dia = td.TaylorDiagram(obsstd, fig=f, rect=111, label='Obs')
         plt.grid(linewidth=1, alpha=.5)
 
-        cc = mystats.RMSE(df.Obs.values, df.CMAQ.values)
+        cc = corrcoef(df.Obs.values, df.CMAQ.values)
         dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
         contours = dia.add_contours(colors='0.5')
         plt.clabel(contours, inline=1, fontsize=10)
         plt.legend(fontsize='small', loc='best')
-
+        plt.tight_layout()
     elif not addon and dia is not None:
         print 'Do you want to add this on? if so please turn the addon keyword to True'
     elif addon and dia is None:
