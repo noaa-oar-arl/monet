@@ -555,13 +555,12 @@ class verify_airnow:
                     region=None,
                     state=None,
                     append=False,
-                    label='CMAQ'):
+                    label='CMAQ',
+                    html=False):
         from StringIO import StringIO
         single = False
         if df is None:
-            
             print 'Please provide a DataFrame'
-            exit
         else:
             df = self.df.groupby('Species').get_group(param)
         if not isinstance(site, type(None)):
@@ -598,6 +597,11 @@ class verify_airnow:
             except KeyError:
                 print 'Region not valid.  Enter a valid Region'
                 return
+        if single:
+            d = mystats.stats(df, threasholds[0], threasholds[1])
+            d['Region'] = name
+            d['Label'] = label
+            dd = pd.DataFrame(d, index=[0])
         else:
             d = mystats.stats(df, threasholds[0], threasholds[1])
             d['Region'] = 'Domain'
@@ -610,7 +614,6 @@ class verify_airnow:
                     dt['Region'] = i.replace(' ', '_')
                     dt['Label'] = label
                     dft = pd.DataFrame(dt, index=[0])
-
                     dd = pd.concat([dd, dft])
                 except KeyError:
                     pass
@@ -618,13 +621,31 @@ class verify_airnow:
         if append:
             dff = pd.read_csv(fname,skiprows=3,index_col=0,sep='\s+',names=stats)
             dd = pd.concat([dd,dff]).sort_values(by=['Region'])
-        out = StringIO()
-        dd.to_string(out, float_format='%10.3f', columns=stats)
-        out.seek(0)
-        with open(fname, 'w') as f:
-            if single:
-                f.write('This is the statistics table for parameter=' + param + ' for area ' + name + '\n')
-            else:
-                f.write('This is the statistics table for parameter=' + param + '\n')
-            f.write('\n')
-            f.writelines(out.readlines())
+        if not html:
+            out = StringIO()
+            dd.to_string(out, float_format='%10.3f', columns=stats)
+            out.seek(0)
+
+            with open(fname, 'w') as f:
+                if single:
+                    f.write('This is the statistics table for parameter=' + param + ' for area ' + name + '\n')
+                else:
+                    f.write('This is the statistics table for parameter=' + param + '\n')
+                f.write('\n')
+                f.writelines(out.readlines())
+        else:
+            index = dd.reset_index()
+            #dd.to_html(fname)
+
+            cssstyle = '<style>\n.GenericTable\n{\nfont-size:12px;\ncolor:white;\nborder-width: 1px;\nborder-color: rgb(160,160,160);/* This is dark*/\nborder-collapse: collapse;\n}\n.GenericTable th\n{\nfont-size:16px;\ncolor:white;\nbackground-color:rgb(100,100,100);/* This is dark*/\nborder-width: 1px;\npadding: 4px;\nborder-style: solid;\nborder-color: rgb(192, 192, 192);/* This is light*/\ntext-align:left;\n}\n.GenericTable tr\n{\ncolor:black;\nbackground-color:rgb(224, 224, 224);/* This is light*/\n}\n.GenericTable td\n{\nfont-size:14px;\nborder-width: 1px;\nborder-style: solid;\nborder-color: rgb(255, 255, 255);/* This is dark*/\n}\n.hoverTable{\nwidth:100%; \nborder-collapse:collapse; \n}\n.hoverTable td{ \npadding:7px; border:#E0E0E0 1px solid;\n}\n/* Define the default color for all the table rows */\n.hoverTable tr{\nbackground: #C0C0C0;\n}\n/* Define the hover highlight color for the table row */\n    .hoverTable tr:hover {\n          background-color: #ffff99;\n    }\n</style>'
+
+            lines = cssstyle.split('\n')
+            with open('test.html', 'r') as f:
+                for line in f.readlines():
+                    lines.append(line.replace('class="dataframe"', 'class="GenericTable hoverTable"'))
+            f.close()
+            with open('test.html', 'w') as f:
+                for line in lines:
+                    f.write(line)
+            f.close()
+            return dd

@@ -378,7 +378,7 @@ def HSS(obs, mod, minval, maxval):
     :param maxval:
     :return: HSS
     """
-    a,b,c,d = scores(obs, mod, minval, maxval=maxval)
+    a, b, c, d = scores(obs, mod, minval, maxval=maxval)
     hss = 2 * (a * d - b * c) / ((a + c) * (c + d) + (a + b) * (b + d))
     print 'HSS for range ' + str(minval) + ' --> ' + str(maxval) + ': ' + hss
     return hss
@@ -393,7 +393,7 @@ def ETS(obs, mod, minval, maxval):
     :param maxval:
     :return: HSS
     """
-    a,b,c,d = scores(obs, mod, minval, maxval=maxval)
+    a, b, c, d = scores(obs, mod, minval, maxval=maxval)
     ar = (a + b) * (a + c) / (a + b + c + d)
     ets = (a - ar) / (a + b + c - ar)
     print 'ETS for range ' + str(minval) + ' --> ' + str(maxval) + ': ' + ets
@@ -407,12 +407,13 @@ def scores(obs, mod, minval, maxval=1.0e5):
     df = DataFrame(d)
     ct = crosstab((df['mod'] > minval) & (df['mod'] < maxval), (df['obs'] > minval) & (df['obs'] < maxval),
                   margins=True)
-#    print ct
+    #    print ct
     a = ct[1][1].astype('float')
     b = ct[1][0].astype('float')
     c = ct[0][1].astype('float')
     d = ct[0][0].astype('float')
-    return a,b,c,d
+    return a, b, c, d
+
 
 def stats(df, minval, maxval):
     from numpy import sqrt
@@ -424,9 +425,9 @@ def stats(df, minval, maxval):
     dd['R'] = sqrt(R2(df.Obs.values, df.CMAQ.values))  # pearsonr ** 2
     dd['IOA'] = IOA(df.Obs.values, df.CMAQ.values)  # Index of Agreement
     dd['RMSE'] = RMSE(df.Obs.values, df.CMAQ.values)
-    dd['NMB'] = NMB(df.Obs.values,df.CMAQ.values)
+    dd['NMB'] = NMB(df.Obs.values, df.CMAQ.values)
     try:
-        a,b,c,d = scores(df.Obs.values,df.CMAQ.values,70,1000)
+        a, b, c, d = scores(df.Obs.values, df.CMAQ.values, 70, 1000)
         dd['POD'] = a / (a + b)
         dd['FAR'] = c / (a + c)
     except:
