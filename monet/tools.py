@@ -87,3 +87,10 @@ def kolmogorov_zurbenko_filter(df, window, iterations):
     for i in range(iterations):
         z = pd.rolling_mean(z, window=window, min_periods=1, center=True)
     return z
+
+
+def wsdir2uv(ws, wdir):
+    from numpy import pi, sin, cos
+    u = -ws * sin(wdir * pi / 180.)
+    v = -ws * cos(wdir * pi / 180.)
+    return u, v
