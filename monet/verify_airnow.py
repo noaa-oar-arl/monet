@@ -343,6 +343,85 @@ class verify_airnow:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
 
+    def spatial_contours(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150):
+        """
+        :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
+        :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
+        :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time
+        :return:
+        """
+        import colorbars
+        g = df.groupby('Species')
+        df2 = g.get_group(param)
+        param = param.upper()
+        cmap = None
+        if param == 'OZONE':
+            cmaq = self.cmaqo3
+            cmap, levels = colorbars.o3cmap()
+        elif param == 'PM2.5':
+            cmaq = self.cmaqpm25
+            cmap, levels = colorbars.pm25cmap()
+        elif param == 'PM10':
+            cmaq = self.cmaqpm10
+            cmap, levels = colorbars.pm25cmap()
+        elif param == 'CO':
+            cmaq = self.cmaqco
+            cmap, levels = colorbars.noxcmap()
+        elif param == 'NOY':
+            cmaq = self.cmaqnoy
+            cmap, levels = colorbars.noxcmap()
+        elif param == 'SO2':
+            cmaq = self.cmaqso2
+            cmap, levels = colorbars.so2cmap()
+        elif param == 'NOX':
+            cmaq = self.cmaqnox
+            cmap, levels = colorbars.noxcmap()
+        elif param == 'NO':
+            cmaq = self.cmaqno
+            cmap, levels = colorbars.noxcmap()
+        elif param == 'NO2':
+            cmaq = self.cmaqno2
+            cmap, levels = colorbars.noxcmap()
+        else:
+            cmaq = None
+        m = self.cmaq.choose_map(path, region)
+        print param
+        if isinstance(cmaq, type(None)):
+            print 'This parameter is not in the CMAQ file: ' + param
+        else:
+            if date == '':
+                for index, i in enumerate(self.cmaq.dates):
+                    c = plots.make_spatial_contours(cmaq[index, :, :].squeeze(), self.cmaq.gridobj,
+                                                    self.cmaq.dates[index],
+                                                    m, levels=levels, cmap=cmap)
+                    if not isinstance(self.cmaq.metcro2d, type(None)):
+                        ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
+                        wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
+                        plots.wind_barbs(ws, wdir, self.cmaq.gridobj, color='grey', alpha=.5)
+                    plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0], vmax=levels[-1],
+                                     cmap=cmap, discrete=False)
+                    c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
+                    if len(xlim) > 1:
+                        plt.xlim([min(xlim), max(xlim)])
+                        plt.ylim([min(ylim), max(ylim)])
+                    plt.savefig(str(index + 10) + param + '.jpg', dpi=100)
+                    plt.close()
+
+            else:
+                index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
+                c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,
+                                            vmin=vmin, vmax=vmax, cmap=cmap)
+                if not isinstance(self.cmaq.metcro2d, type(None)):
+                    ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
+                    wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
+                    plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, color='grey', alpha=.5)
+                plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0],
+                                      vmax=levels[-1], cmap=cmap, discrete=False)
+                c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
+                if len(xlim) > 1:
+                    plt.xlim([min(xlim), max(xlim)])
+                    plt.ylim([min(ylim), max(ylim)])
+
     def airnow_spatial_8hr(self, path='', region='', date='', xlim=[], ylim=[]):
         if not isinstance(self.df8hr, pd.DataFrame):
             print '    Calculating 8 Hr Max Ozone '

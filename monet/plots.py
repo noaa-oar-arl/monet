@@ -32,14 +32,38 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, 
     return c
 
 
-def wind_barbs(ws,wdir, gridobj, m, **kwargs):
+def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', **kwargs):
+    fig = plt.figure(figsize=(12, 6), frameon=False)
+    lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
+    lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
+    # define map and draw boundries
+    m.drawstates()
+    m.drawcoastlines(linewidth=.3)
+    m.drawcountries()
+    x, y = m(lon, lat)
+    plt.axis('off')
+
+    # c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
+    m.contourf(x, y, cmaqvar, **kwargs)
+    c = plt.colorbar()
+    titstring = date.strftime('%B %d %Y %H')
+    plt.title(titstring)
+
+    plt.tight_layout()
+    if savename != '':
+        plt.savefig(savename + date.strftime('%Y%m%d_%H.jpg'), dpi=dpi)
+        plt.close()
+    return c
+
+
+def wind_barbs(ws, wdir, gridobj, m, **kwargs):
     import tools
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
     # define map and draw boundries
-    x,y = m(lon,lat)
-    u,v = tools.wsdir2uv(ws,wdir)
-    m.quiver(x[::10,::10],y[::10,::10],u[::10,::10],v[::10,::10], **kwargs)
+    x, y = m(lon, lat)
+    u, v = tools.wsdir2uv(ws, wdir)
+    m.quiver(x[::10, ::10], y[::10, ::10], u[::10, ::10], v[::10, ::10], **kwargs)
 
 
 def normval(vmin, vmax, cmap):
@@ -50,14 +74,17 @@ def normval(vmin, vmax, cmap):
     return norm
 
 
-def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu'):
+def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu',discrete=False):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    cmap = cmap_discretize(cmap, ncolors)
-    if (type(vmin) == None) | (type(vmax) == None):
-        plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
+    if discrete:
+        cmap = cmap_discretize(cmap, ncolors)
+        if (type(vmin) == None) | (type(vmax) == None):
+            plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
+        else:
+            plt.scatter(x, y, c=new['Obs'].values, s=30, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
-        plt.scatter(x, y, c=new['Obs'].values, s=30, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+        plt.scatter(x, y, c=new['Obs'].values, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
