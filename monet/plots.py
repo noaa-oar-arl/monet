@@ -32,6 +32,16 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, 
     return c
 
 
+def wind_barbs(ws,wdir, gridobj, m, **kwargs):
+    import tools
+    lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
+    lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
+    # define map and draw boundries
+    x,y = m(lon,lat)
+    u,v = tools.wsdir2uv(ws,wdir)
+    m.quiver(x[::10,::10],y[::10,::10],u[::10,::10],v[::10,::10], **kwargs)
+
+
 def normval(vmin, vmax, cmap):
     from numpy import arange
     from matplotlib.colors import BoundaryNorm
