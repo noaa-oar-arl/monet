@@ -558,12 +558,13 @@ class verify_airnow:
                     label='CMAQ'):
         from StringIO import StringIO
         single = False
-        if not isinstance(df, None):
-            single = True
-            pass
+        if df is None:
+            
+            print 'Please provide a DataFrame'
+            exit
         else:
             df = self.df.groupby('Species').get_group(param)
-        if not isinstance(site, None):
+        if not isinstance(site, type(None)):
             try:
                 df = df.groupby('SCS').get_group(site)
                 single = True
@@ -571,7 +572,7 @@ class verify_airnow:
             except KeyError:
                 print 'Site Number not valid.  Enter a valid SCS'
                 return
-        elif not isinstance(city, None):
+        elif not isinstance(city, type(None)):
             try:
                 names = df.get_group('MSA_Name').dropna().unique()
                 name = [j for j in names if city.upper() in j.upper()]
@@ -581,7 +582,7 @@ class verify_airnow:
                 print ' City either does not contain montiors for ' + param
                 print '     or City Name is not valid.  Enter a valid City name: self.df.MSA_Name.unique()'
                 return
-        elif not isinstance(state, None):
+        elif not isinstance(state, type(None)):
             try:
                 names = df.get_group('State_Name').dropna().unique()
                 name = [j for j in names if state.upper() in j.upper()]
@@ -589,7 +590,7 @@ class verify_airnow:
             except KeyError:
                 print 'State not valid. Please enter valid 2 digit state'
                 return
-        elif not isinstance(region, None):
+        elif not isinstance(region, type(None)):
             try:
                 names = df.get_group('MSA_Name').dropna().unique()
                 name = [j for j in names if region.upper() in j.upper()]
@@ -597,25 +598,26 @@ class verify_airnow:
             except KeyError:
                 print 'Region not valid.  Enter a valid Region'
                 return
-        if single:
-            d = mystats.stats_table(df, threasholds[0], threasholds[1])
-            d['label'] = name
-            dd = pd.DataFrame(d, dindex=[0])
         else:
-            d = mystats.stats_table(df, threasholds[0], threasholds[1])
+            d = mystats.stats(df, threasholds[0], threasholds[1])
             d['Region'] = 'Domain'
+            d['Label'] = label
             dd = pd.DataFrame(d, index=[0])
-            for i in dd.Region.dropna().unique():
+            for i in df.Region.dropna().unique():
                 try:
                     dff = df.groupby('Region').get_group(i)
-                    dt = mystats.stats_table(df, threasholds[0], threasholds[1])
-                    dt['Region'] = i
+                    dt = mystats.stats(dff, threasholds[0], threasholds[1])
+                    dt['Region'] = i.replace(' ', '_')
+                    dt['Label'] = label
                     dft = pd.DataFrame(dt, index=[0])
+
                     dd = pd.concat([dd, dft])
                 except KeyError:
                     pass
-        stats = ['N', 'Obs', 'Mod', 'MB', 'NMB', 'RMSE', 'R', 'IOA', 'POD', 'FAR']
-        print dd[stats]
+        stats = ['Region','Label','N', 'Obs', 'Mod', 'MB', 'NMB', 'RMSE', 'R', 'IOA', 'POD', 'FAR']
+        if append:
+            dff = pd.read_csv(fname,skiprows=3,index_col=0,sep='\s+',names=stats)
+            dd = pd.concat([dd,dff]).sort_values(by=['Region'])
         out = StringIO()
         dd.to_string(out, float_format='%10.3f', columns=stats)
         out.seek(0)

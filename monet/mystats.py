@@ -407,7 +407,7 @@ def scores(obs, mod, minval, maxval=1.0e5):
     df = DataFrame(d)
     ct = crosstab((df['mod'] > minval) & (df['mod'] < maxval), (df['obs'] > minval) & (df['obs'] < maxval),
                   margins=True)
-    print ct
+#    print ct
     a = ct[1][1].astype('float')
     b = ct[1][0].astype('float')
     c = ct[0][1].astype('float')
@@ -416,7 +416,7 @@ def scores(obs, mod, minval, maxval=1.0e5):
 
 def stats(df, minval, maxval):
     from numpy import sqrt
-    d = {}
+    dd = {}
     dd['N'] = df.Obs.dropna().count()
     dd['Obs'] = df.Obs.mean()
     dd['Mod'] = df.CMAQ.mean()
