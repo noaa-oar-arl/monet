@@ -401,6 +401,7 @@ class verify_airnow:
                     plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0], vmax=levels[-1],
                                      cmap=cmap, discrete=False)
                     c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
+                    c.set_ticks(levels[::5])
                     if len(xlim) > 1:
                         plt.xlim([min(xlim), max(xlim)])
                         plt.ylim([min(ylim), max(ylim)])
@@ -418,6 +419,7 @@ class verify_airnow:
                 plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0],
                                       vmax=levels[-1], cmap=cmap, discrete=False)
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
+                c.set_ticks(levels[::5])
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
