@@ -415,11 +415,11 @@ class verify_airnow:
                 if not isinstance(self.cmaq.metcro2d, type(None)):
                     ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
                     wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
-                    plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, color='grey', alpha=.5)
+                    plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, color='black', alpha=.3)
                 plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0],
                                       vmax=levels[-1], cmap=cmap, discrete=False)
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                c.set_ticks(levels[::5])
+                c.set_ticks(levels[::10])
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
