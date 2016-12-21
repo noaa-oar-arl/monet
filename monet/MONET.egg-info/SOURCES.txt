@@ -9,6 +9,8 @@ monet/monet.py
 monet/mystats.py
 monet/plots.py
 monet/tools.py
+monet/taylordiagram.py
+monet/colorbars.py
 monet/verify_airnow.py
 monet/verify_aqs.py
 monet/verify_crn.py
