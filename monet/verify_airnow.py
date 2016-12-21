@@ -343,7 +343,7 @@ class verify_airnow:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
 
-    def spatial_contours(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150):
+    def spatial_contours(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[]):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
@@ -351,6 +351,8 @@ class verify_airnow:
         :return:
         """
         import colorbars
+        from numpy import unique
+
         g = df.groupby('Species')
         df2 = g.get_group(param)
         param = param.upper()
@@ -398,10 +400,13 @@ class verify_airnow:
                         ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
                         wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
                         plots.wind_barbs(ws, wdir, self.cmaq.gridobj, color='grey', alpha=.5)
-                    plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0], vmax=levels[-1],
+                    try:
+                        plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0], vmax=levels[-1],
                                      cmap=cmap, discrete=False)
+                    except:
+                        pass
                     c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                    c.set_ticks(levels[::5])
+                    c.set_ticks(unique(levels.round(-1)))
                     if len(xlim) > 1:
                         plt.xlim([min(xlim), max(xlim)])
                         plt.ylim([min(ylim), max(ylim)])
@@ -416,10 +421,13 @@ class verify_airnow:
                     ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
                     wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
                     plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, color='black', alpha=.3)
-                plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0],
+                try:
+                    plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0],
                                       vmax=levels[-1], cmap=cmap, discrete=False)
+                except:
+                    pass
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                c.set_ticks(levels[::10])
+                c.set_ticks(unique(levels.round(-1)))
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
