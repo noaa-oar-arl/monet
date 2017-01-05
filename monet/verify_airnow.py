@@ -325,7 +325,7 @@ class verify_airnow:
                     if len(xlim) > 1:
                         plt.xlim([min(xlim), max(xlim)])
                         plt.ylim([min(ylim), max(ylim)])
-                    plt.savefig(str(index + 10) + param + '.jpg', dpi=100)
+                    plt.savefig(i.strftime('%Y%m%d%H_spatial_' + param + '.jpg'), dpi=75)
                     plt.close()
 
             else:

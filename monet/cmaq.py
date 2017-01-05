@@ -53,7 +53,8 @@ class cmaq:
         self.indexdates = None
         self.latitude = None
         self.longitude = None
-
+        self.map = None
+        
     def get_dates(self):
         from datetime import datetime
         from pandas import DataFrame
@@ -399,21 +400,24 @@ class cmaq:
         import cPickle as pickle
         from mpl_toolkits.basemap import Basemap
         import os
-        if os.path.isfile(path):
-            print 'Loading from file'
-            m = pickle.load(open(path, 'rb'))
+        if isinstance(self.map, type(None)):
+            if os.path.isfile(path):
+                print 'Loading from file'
+                m = pickle.load(open(path, 'rb'))
+            else:
+                lat1 = self.gridobj.P_ALP
+                lat2 = self.gridobj.P_BET
+                lon1 = self.gridobj.P_GAM
+                lon0 = self.gridobj.XCENT
+                lat0 = self.gridobj.YCENT
+                m = Basemap(projection='lcc', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+                            llcrnrlat=self.latitude[0, 0], urcrnrlat=self.latitude[-1, -1], llcrnrlon=self.longitude[0, 0],
+                            urcrnrlon=self.longitude[-1, -1], rsphere=6371200.,
+                            area_thresh=50.)
+            self.map = m
         else:
-            lat1 = self.gridobj.P_ALP
-            lat2 = self.gridobj.P_BET
-            lon1 = self.gridobj.P_GAM
-            lon0 = self.gridobj.XCENT
-            lat0 = self.gridobj.YCENT
-            m = Basemap(projection='laea', resolution='h', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
-                        llcrnrlat=self.latitude[0, 0], urcrnrlat=self.latitude[-1, -1], llcrnrlon=self.longitude[0, 0],
-                        urcrnrlon=self.longitude[-1, -1], rsphere=6371200.,
-                        area_thresh=50.)
-
-        return m
+            m = self.map
+        return self.map
 
     def load_pacific_coast_basemap(self, path):
         from mpl_toolkits.basemap import Basemap
@@ -427,7 +431,7 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+            m = Basemap(projection='lcc', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=29., urcrnrlat=53., llcrnrlon=-125., urcrnrlon=-116., rsphere=6371200.,
                         area_thresh=50.)
         return m
@@ -445,7 +449,7 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            m = Basemap(projection='laea', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+            m = Basemap(projection='lcc', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=29., urcrnrlat=52., llcrnrlon=-116., urcrnrlon=-91., rsphere=6371200.,
                         area_thresh=50.)
         return m
@@ -465,7 +469,7 @@ class cmaq:
             lat0 = self.gridobj.YCENT
             lat = self.latitude
             lon = self.longitude
-            m = Basemap(projection='laea', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+            m = Basemap(projection='lcc', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=25., urcrnrlat=37.5, llcrnrlon=-108, urcrnrlon=-86., rsphere=6371200.,
                         area_thresh=50.)
         return m
@@ -483,7 +487,7 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+            m = Basemap(projection='lcc', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
                         area_thresh=50.)
         return m
@@ -501,7 +505,7 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+            m = Basemap(projection='lcc', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=37., urcrnrlat=46.5, llcrnrlon=-83.5, urcrnrlon=-61.5, rsphere=6371200.,
                         area_thresh=50.)
         return m
@@ -519,7 +523,7 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            m = Basemap(projection='laea', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+            m = Basemap(projection='lcc', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=25., urcrnrlat=39, llcrnrlon=-93., urcrnrlon=-70., rsphere=6371200.,
                         area_thresh=10.)
         return m

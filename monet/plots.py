@@ -668,7 +668,7 @@ def cmap_discretize(cmap, N):
 
 def taylordiagram(df, marker='o', label='CMAQ', addon=False, dia=None):
     from numpy import corrcoef
-
+    df = df.drop_duplicates().dropna(subset=['Obs','CMAQ'])
     if not addon and dia is None:
         f = plt.figure(figsize=(12, 10))
         sns.set_style('ticks')
@@ -677,7 +677,7 @@ def taylordiagram(df, marker='o', label='CMAQ', addon=False, dia=None):
         dia = td.TaylorDiagram(obsstd, fig=f, rect=111, label='Obs')
         plt.grid(linewidth=1, alpha=.5)
 
-        cc = corrcoef(df.Obs.values, df.CMAQ.values)
+        cc = corrcoef(df.Obs.values, df.CMAQ.values)[0,1]
         dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
         contours = dia.add_contours(colors='0.5')
         plt.clabel(contours, inline=1, fontsize=10)
