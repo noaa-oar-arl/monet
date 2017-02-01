@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pandas as pd
 from numpy import array, arange
-
+from zipfile import ZipFile
 
 class aqs:
     def __init__(self):
@@ -55,8 +55,10 @@ class aqs:
         filename = wget.download(url, );
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -80,8 +82,10 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -105,8 +109,10 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -129,8 +135,10 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -146,6 +154,7 @@ class aqs:
 
     def retrieve_aqs_hourly_no2_data(self, dates):
         import wget
+        
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'hourly_42602_' + year + '.zip'
@@ -153,8 +162,12 @@ class aqs:
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        z = ZipFile(filename)
+        z.extractall()
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -177,8 +190,10 @@ class aqs:
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -201,8 +216,9 @@ class aqs:
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
+        ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -225,8 +241,10 @@ class aqs:
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -249,8 +267,10 @@ class aqs:
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -273,8 +293,10 @@ class aqs:
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -297,8 +319,10 @@ class aqs:
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
@@ -321,8 +345,10 @@ class aqs:
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
+        z = ZipFile(filename)
+        z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                                    'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
         df.columns = self.renamedhcols
@@ -743,6 +769,7 @@ class aqs:
 
     def retrieve_aqs_daily_co_data(self, dates):
         import wget
+        
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42101_' + year + '.zip'
@@ -750,8 +777,10 @@ class aqs:
         filename = wget.download(url)
         print ''
         print 'Unpacking: ' + url
+        ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -764,6 +793,7 @@ class aqs:
 
     def retrieve_aqs_daily_ozone_data(self, dates):
         import wget
+        
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_44201_' + year + '.zip'
@@ -771,8 +801,9 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
+        ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -785,6 +816,7 @@ class aqs:
 
     def retrieve_aqs_daily_pm10_data(self, dates):
         import wget
+        
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_81102_' + year + '.zip'
@@ -792,8 +824,9 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
+        ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -806,6 +839,7 @@ class aqs:
 
     def retrieve_aqs_daily_so2_data(self, dates):
         import wget
+        
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42401_' + year + '.zip'
@@ -813,8 +847,9 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
+        ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -827,6 +862,7 @@ class aqs:
 
     def retrieve_aqs_daily_so2_data(self, dates):
         import wget
+        
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42401_' + year + '.zip'
@@ -834,8 +870,9 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
+        ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -848,6 +885,7 @@ class aqs:
 
     def retrieve_aqs_daily_no2_data(self, dates):
         import wget
+        
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42602_' + year + '.zip'
@@ -855,8 +893,9 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
+        ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -869,6 +908,7 @@ class aqs:
 
     def retrieve_aqs_daily_pm25_data(self, dates):
         import wget
+        
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_88101_' + year + '.zip'
@@ -877,7 +917,8 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, compression='zip', parse_dates={'datetime_local': ["Date Local"]},
+        ZipFile(filename).extractall()
+        df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
