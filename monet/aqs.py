@@ -29,16 +29,25 @@ class aqs:
         self.se_states = array(
             ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
              'Virginia', 'West Virginia'], dtype='|S14')
+        self.se_states_abv = array(
+                        ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN',
+                                      'VA', 'WV'], dtype='|S14')
         self.ne_states = array(['Connecticut', 'Delaware', 'District Of Columbia', 'Maine', 'Maryland', 'Massachusetts',
                                 'New Hampshire', 'New Jersey', 'New York', 'Pennsylvania', 'Rhode Island', 'Vermont'],
                                dtype='|S20')
+        self.ne_states_abv = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA','NH', 'NJ', 'NY', 'PA', 'RI', 'VT'],dtype='|S20')
         self.nc_states = array(
             ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan', 'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
             dtype='|S9')
+        self.nc_states_abv = array(['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'],
+                    dtype='|S9')
         self.sc_states = array(['Arkansas', 'Louisiana', 'Oklahoma', 'Texas'], dtype='|S9')
+        self.sc_states_abv = array(['AR', 'LA', 'OK', 'TX'], dtype='|S9')
         self.r_states = array(['Arizona', 'Colorado', 'Idaho', 'Kansas', 'Montana', 'Nebraska', 'Nevada', 'New Mexico',
                                'North Dakota', 'South Dakota', 'Utah', 'Wyoming'], dtype='|S12')
+        self.r_states_abv = array(['AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD', 'UT', 'WY'], dtype='|S12')
         self.p_states = array(['California', 'Oregon', 'Washington'], dtype='|S10')
+        self.p_states_abv = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.datadir = '.'
         self.cwd = os.getcwd()
         self.df = None
@@ -154,7 +163,7 @@ class aqs:
 
     def retrieve_aqs_hourly_no2_data(self, dates):
         import wget
-        
+
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'hourly_42602_' + year + '.zip'
@@ -635,29 +644,61 @@ class aqs:
 
     def get_region(self, df):
         sr = df.State_Name.copy().values
-        for i in self.se_states:
+        sn = df.State_Name.copy().values
+        for i,j in zip(self.se_states,self.se_states_abv):
             con = sr == i
             sr[con] = 'Southeast'
-        for i in self.ne_states:
+            sn[con] = j
+        for i in zip(self.ne_states,self.ne_states_abv):
             con = sr == i
             sr[con] = 'Northeast'
-        for i in self.nc_states:
+            sn[con] = j
+        for i,j in zip(self.nc_states,self.nc_states_abv):
             con = sr == i
             sr[con] = 'North Central'
-        for i in self.sc_states:
+            sn[con] = j
+        for i,j in zip(self.sc_states,self.sc_states_abv):
             con = sr == i
             sr[con] = 'South Central'
-        for i in self.p_states:
+            sn[con] = j
+        for i,j in zip(self.p_states,self.p_states_abv):
             con = sr == i
             sr[con] = 'Pacific'
-        for i in self.r_states:
+            sn[con] = j
+        for i,j in zip(self.r_states,self.r_states_abv):
             con = sr == i
             sr[con] = 'Rockies'
+            sn[con] = j
         sr[sr == 'CC'] = 'Canada'
         sr[sr == 'MX'] = 'Mexico'
+        
         df['Region'] = array(sr)
+        df['State_Name'] = array(sn)
         return df
 
+    def change_states_to_abv(self,df):
+        for i,j in enumerate(self.se_states):
+            con = df['State_Name'] == j
+            df.loc[con,'State_Name'] = self.se_states_abv[i]
+        for i,j in enumerate(self.nc_states):
+            con = df['State_Name'] == j
+            df.loc[con,'State_Name'] = self.nc_states_abv[i]
+        for i,j in enumerate(self.sc_states):
+            con = df['State_Name'] == j
+            df.loc[con,'State_Name'] = self.sc_states_abv[i]
+        for i,j in enumerate(self.p_states):
+            con = df['State_Name'] == j
+            df.loc[con,'State_Name'] = self.p_states_abv[i]
+        for i,j in enumerate(self.ne_states):
+            con = df['State_Name'] == j
+            df.loc[con,'State_Name'] = self.ne_states_abv[i]
+        for i,j in enumerate(self.r_states):
+            con = df['State_Name'] == j
+            df.loc[con,'State_Name'] = self.r_states_abv[i]
+        con = df['State_Name'] == 'Country Of Mexico'
+        df.loc[con,'State_Name'] = 'MX'
+        return df
+    
     def get_species(self, df, voc=False):
         pc = df.Parameter_Code.unique()
         if len(pc) < 2:
@@ -769,7 +810,7 @@ class aqs:
 
     def retrieve_aqs_daily_co_data(self, dates):
         import wget
-        
+
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42101_' + year + '.zip'
@@ -779,7 +820,7 @@ class aqs:
         print 'Unpacking: ' + url
         ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        
+
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
@@ -793,7 +834,7 @@ class aqs:
 
     def retrieve_aqs_daily_ozone_data(self, dates):
         import wget
-        
+
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_44201_' + year + '.zip'
@@ -816,7 +857,7 @@ class aqs:
 
     def retrieve_aqs_daily_pm10_data(self, dates):
         import wget
-        
+
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_81102_' + year + '.zip'
@@ -839,7 +880,7 @@ class aqs:
 
     def retrieve_aqs_daily_so2_data(self, dates):
         import wget
-        
+
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42401_' + year + '.zip'
@@ -862,7 +903,7 @@ class aqs:
 
     def retrieve_aqs_daily_so2_data(self, dates):
         import wget
-        
+
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42401_' + year + '.zip'
@@ -885,7 +926,7 @@ class aqs:
 
     def retrieve_aqs_daily_no2_data(self, dates):
         import wget
-        
+
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42602_' + year + '.zip'
@@ -908,7 +949,7 @@ class aqs:
 
     def retrieve_aqs_daily_pm25_data(self, dates):
         import wget
-        
+
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_88101_' + year + '.zip'

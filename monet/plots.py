@@ -77,14 +77,16 @@ def normval(vmin, vmax, cmap):
 def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu',discrete=False):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
+    s = 20
     if discrete:
         cmap = cmap_discretize(cmap, ncolors)
+        #s = 20
         if (type(vmin) == None) | (type(vmax) == None):
-            plt.scatter(x, y, c=new['Obs'].values, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
+            plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
         else:
-            plt.scatter(x, y, c=new['Obs'].values, s=30, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+            plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     else:
-        plt.scatter(x, y, c=new['Obs'].values, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+        plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
@@ -668,6 +670,7 @@ def cmap_discretize(cmap, N):
 
 def taylordiagram(df, marker='o', label='CMAQ', addon=False, dia=None):
     from numpy import corrcoef
+    import mystats
     df = df.drop_duplicates().dropna(subset=['Obs','CMAQ'])
     if not addon and dia is None:
         f = plt.figure(figsize=(12, 10))
@@ -681,12 +684,16 @@ def taylordiagram(df, marker='o', label='CMAQ', addon=False, dia=None):
         dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
         contours = dia.add_contours(colors='0.5')
         plt.clabel(contours, inline=1, fontsize=10)
+        plt.grid(alpha=.5)
         plt.legend(fontsize='small', loc='best')
         plt.tight_layout()
+        
     elif not addon and dia is not None:
         print 'Do you want to add this on? if so please turn the addon keyword to True'
     elif addon and dia is None:
         print 'Please pass the previous Taylor Diagram Instance with dia keyword...'
     else:
-        cc = mystats.RMSE(df.Obs.values, df.CMAQ.values)
+        cc = corrcoef(df.Obs.values, df.CMAQ.values)[0,1]
         dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
+
+    return dia

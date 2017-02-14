@@ -1,0 +1,91 @@
+&files
+AQS_DATA_DIR = '/data/aqf2/barryb/5xpm/AQS_DATA'
+SIM1 = 'SIM1_HDF.hdf'
+SIM2 = 'SIM2_HDF.hdf'
+SIM3 = None
+SIM4 = None
+gridcro = '/data/aqf/barryb/aqm.t12z.grdcro2d.ncf'
+basename='edanox'
+SIM1label='SIM1'
+SIM2label='SIM2'
+SIM3label='SIM3'
+SIM4label='SIM4'
+start_date ='2011-02-05 00'
+end_date = '2011-02-07 00'
+save=.true.
+sim1_save_name = 'SIM1_HDF.hdf'
+sim2_save_name = 'SIM2_HDF.hdf'
+sim3_save_name = 'none'
+sim4_save_name = 'none'
+/
+&interp
+method='nearest'
+radius_of_influence=12000.
+neighbors=4
+/
+&Domain
+params='OZONE,PM2.5,NOX'
+tseries=.True.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+/
+&Region
+params='OZONE,PM2.5,NOX'
+region= 'all'
+tseries=.True.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+/
+&State
+params='OZONE,PM2.5'
+state= 'TX,MD,NY,CT,CA,FL'
+tseries=.True.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+/
+&City
+params='OZONE,PM2.5'
+city= 'none'
+tseries=.false.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+/
+&Site
+params='OZONE,PM2.5'
+site= 'none'
+tseries=.false.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+/
+
+

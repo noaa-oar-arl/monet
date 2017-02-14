@@ -66,6 +66,7 @@ class verify_airnow:
             print 'METCRO2D file not loaded.  To include MET variables please load self.cmaq.open_metcro2d(\'filename\')\n'
         self.ensure_values_indomain()
         comparelist = self.airnow.df.Species.unique()
+#        comparelist=['OZONE']
         g = self.airnow.df.groupby('Species')
         dfs = []
         for i in comparelist:
@@ -87,6 +88,7 @@ class verify_airnow:
                     fac = self.check_cmaq_units(param='PM25', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
                     dfpm25 = self.interp_to_airnow(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func)
+                    print dfpm25.keys()
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm25)
                 except:
@@ -168,7 +170,7 @@ class verify_airnow:
                     dfs.append(dfnox)
                 except:
                     pass
-            elif i == 'WD':
+            elif (i == 'WD') & (self.cmaq.metcro2d is not None):
                 try:
                     print 'Interpolating Wind Direction:'
                     dfmet = g.get_group(i)
@@ -177,7 +179,7 @@ class verify_airnow:
                     dfs.append(dfmet)
                 except:
                     pass
-            elif i == 'WS':
+            elif (self.cmaq.metcro2d is not None) & (i == 'WS'):
                 try:
                     print 'Interpolating Wind Speed:'
                     dfmet = g.get_group(i)
@@ -186,7 +188,7 @@ class verify_airnow:
                     dfs.append(dfmet)
                 except:
                     pass
-            elif i == 'TEMP':
+            elif (self.cmaq.metcro2d is not None) & (i == 'TEMP'):
                 try:
                     print 'Interpolating 2 Meter Temperature:'
                     dfmet = g.get_group(i)
@@ -203,12 +205,12 @@ class verify_airnow:
             print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
             print 'run: \'df = calc_airnow_8hr_max_calc()\'\n'
             print '===========================================================================================\n'
-        else:
-            if ('O3' in self.cmaq.keys):
-                print 'Calculating Daily 8 Hr Max Ozone....\n'
-                self.df8hr = self.calc_airnow_8hr_max_calc()
-            else:
-                pass
+#        else:
+#            if ('O3' in self.cmaq.keys):
+#                print 'Calculating Daily 8 Hr Max Ozone....\n'
+#                self.df8hr = self.calc_airnow_8hr_max_calc()
+#            else:
+#                pass
         self.df.SCS = self.df.SCS.values
         self.df.dropna(inplace=True, subset=['Obs', 'CMAQ'])
         self.print_available()
@@ -224,7 +226,7 @@ class verify_airnow:
     def compare_param(self, param='OZONE', site='', city='', state='', region='', timeseries=False, scatter=False,
                       pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
-                      taylordiagram=False, fig=None, label=None, footer=True, dia=None):
+                      taylordiagram=False, fig=None, label=None, footer=True, dia=None,marker=None):
         from numpy import NaN
         df = self.df.copy()[
             ['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
@@ -270,9 +272,9 @@ class verify_airnow:
             plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
         if taylordiagram:
             if fig is None:
-                plots.taylordiagram(df2, label=label, dia=dia, addon=False)
+                plots.taylordiagram(df2, label=label, dia=dia, addon=False,marker=marker)
             else:
-                plots.taylordiagram(df2, label=label, dia=dia, addon=True)
+                plots.taylordiagram(df2, label=label, dia=dia, addon=True,marker=marker)
 
     def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=15,
                 cmap='YlGnBu'):
@@ -670,6 +672,7 @@ class verify_airnow:
                 return
         elif not isinstance(city, type(None)):
             try:
+                single = True
                 names = df.get_group('MSA_Name').dropna().unique()
                 name = [j for j in names if city.upper() in j.upper()]
                 df = self.df.groupby('Species').get_group(param).groupby('MSA_Name').get_group(name[0])
@@ -680,6 +683,7 @@ class verify_airnow:
                 return
         elif not isinstance(state, type(None)):
             try:
+                single = True
                 names = df.get_group('State_Name').dropna().unique()
                 name = [j for j in names if state.upper() in j.upper()]
                 df = self.df.groupby('Species').get_group(param).groupby('State_Name').get_group(name[0])
@@ -688,7 +692,8 @@ class verify_airnow:
                 return
         elif not isinstance(region, type(None)):
             try:
-                names = df.get_group('MSA_Name').dropna().unique()
+                single = True
+                names = df.get_group('Region').dropna().unique()
                 name = [j for j in names if region.upper() in j.upper()]
                 df = df.groupby('Region').get_group(name[0])
             except KeyError:
@@ -714,13 +719,14 @@ class verify_airnow:
                     dd = pd.concat([dd, dft])
                 except KeyError:
                     pass
+        pd.options.display.float_format = '{:,.3f}'.format
         stats = ['Region', 'Label', 'N', 'Obs', 'Mod', 'MB', 'NMB', 'RMSE', 'R', 'IOA', 'POD', 'FAR']
         if append:
             dff = pd.read_csv(fname + '.txt', skiprows=3, index_col=0, sep='\s+', names=stats)
             dd = pd.concat([dd, dff]).sort_values(by=['Region'])
 
         out = StringIO()
-        dd.to_string(out, float_format='%10.3f', columns=stats)
+        dd.to_string(out, columns=stats)
         out.seek(0)
         with open(fname + '.txt', 'w') as f:
             if single:
@@ -736,7 +742,7 @@ class verify_airnow:
             dd.index = dd.Region
             dd.drop(['Region'], axis=1, inplace=True)
 
-            dd[stats[1:]].round(decimals=3).to_html(fname + '.html')
+            dd[stats[1:]].to_html(fname + '.html')
 
             cssstyle = '<style>\n.GenericTable\n{\nfont-size:12px;\ncolor:white;\nborder-width: 1px;\nborder-color: rgb(160,160,160);/* This is dark*/\nborder-collapse: collapse;\n}\n.GenericTable th\n{\nfont-size:16px;\ncolor:white;\nbackground-color:rgb(100,100,100);/* This is dark*/\nborder-width: 1px;\npadding: 4px;\nborder-style: solid;\nborder-color: rgb(192, 192, 192);/* This is light*/\ntext-align:left;\n}\n.GenericTable tr\n{\ncolor:black;\nbackground-color:rgb(224, 224, 224);/* This is light*/\n}\n.GenericTable td\n{\nfont-size:14px;\nborder-width: 1px;\nborder-style: solid;\nborder-color: rgb(255, 255, 255);/* This is dark*/\n}\n.hoverTable{\nwidth:100%; \nborder-collapse:collapse; \n}\n.hoverTable td{ \npadding:7px; border:#E0E0E0 1px solid;\n}\n/* Define the default color for all the table rows */\n.hoverTable tr{\nbackground: #C0C0C0;\n}\n/* Define the hover highlight color for the table row */\n    .hoverTable tr:hover {\n          background-color: #ffff99;\n    }\n</style>'
 
@@ -749,4 +755,4 @@ class verify_airnow:
                 for line in lines:
                     f.write(line)
             f.close()
-            return dd
+        return dd

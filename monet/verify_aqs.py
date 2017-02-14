@@ -50,6 +50,8 @@ class verify_aqs:
         :param weight_func:
         :return:
         """
+        from numpy import sort
+        
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
         self.cmaq.get_dates()
@@ -57,220 +59,279 @@ class verify_aqs:
         print 'Simulation End   Date: ', self.cmaq.dates[-1].strftime('%Y-%m-%d %H:%M')
         print '==============================================================='
         self.ensure_values_indomain()
-        comparelist = self.aqs.df.Species.unique()
+        comparelist = sort(self.aqs.df.Species.unique())
         dfs = []
         g = self.aqs.df.groupby('Species')
         for i in comparelist:
             if i == 'OZONE':
-                print 'Interpolating Ozone:'
-                dfo3 = g.get_group(i)
-                fac = self.check_cmaq_units(param='O3', aqs_param=i)
-                cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
-                self.cmaqo3 = cmaq
-                dfo3 = self.interp_to_aqs(cmaq, dfo3, interp=interp, r=radius, weight_func=weight_func)
-                dfo3.Obs, dfo3.CMAQ = dfo3.Obs, dfo3.CMAQ
-                dfo3.Units = 'PPB'
-                dfs.append(dfo3)
-            elif i == 'PM2.5':
-                print 'Interpolating PM2.5:'
-                dfpm25 = g.get_group(i)
-                fac = self.check_cmaq_units(param='PM25', aqs_param=i)
-                cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
-                dfpm25 = self.interp_to_aqs(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func)
-                self.cmaqpm25 = cmaq
-                dfs.append(dfpm25)
-            elif i == 'CO':
-                if 'CO' not in self.cmaq.keys:
+                try:
+                    print 'Interpolating Ozone:'
+                    dfo3 = g.get_group(i)
+                    fac = self.check_cmaq_units(param='O3', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
+                    self.cmaqo3 = cmaq
+                    dfo3 = self.interp_to_aqs(cmaq, dfo3, interp=interp, r=radius, weight_func=weight_func)
+                    dfo3.Obs, dfo3.CMAQ = dfo3.Obs, dfo3.CMAQ
+                    dfo3.Units = 'PPB'
+                    dfs.append(dfo3)
+                except:
                     pass
-                else:
-                    print 'Interpolating CO:'
-                    dfco = g.get_group(i)
-                    fac = self.check_cmaq_units(param='CO', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
-                    dfco = self.interp_to_aqs(cmaq, dfco, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqco = cmaq
-                    dfs.append(dfco)
+            elif i == 'PM2.5':
+                try:
+                    print 'Interpolating PM2.5:'
+                    dfpm25 = g.get_group(i)
+                    fac = self.check_cmaq_units(param='PM25', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
+                    dfpm25 = self.interp_to_aqs(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqpm25 = cmaq
+                    dfs.append(dfpm25)
+                except:
+                    pass
+            elif i == 'CO':
+                try:
+                    if 'CO' not in self.cmaq.keys:
+                        pass
+                    else:
+                        print 'Interpolating CO:'
+                        dfco = g.get_group(i)
+                        fac = self.check_cmaq_units(param='CO', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
+                        dfco = self.interp_to_aqs(cmaq, dfco, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqco = cmaq
+                        dfs.append(dfco)
+                except:
+                    pass
             elif i == 'NOY':
                 # con = ('NOY' not in self.cmaq.keys()) |
-                if 'NOY' not in self.cmaq.keys:
+                try:
+                    if 'NOY' not in self.cmaq.keys:
+                        pass
+                    else:
+                        print 'Interpolating NOY:'
+                        dfnoy = g.get_group(i)
+                        fac = self.check_cmaq_units(param='NOY', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
+                        dfnoy = self.interp_to_aqs(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqnoy = cmaq
+                        dfs.append(dfnoy)
+                except:
                     pass
-                else:
-                    print 'Interpolating NOY:'
-                    dfnoy = g.get_group(i)
-                    fac = self.check_cmaq_units(param='NOY', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
-                    dfnoy = self.interp_to_aqs(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqnoy = cmaq
-
-                    dfs.append(dfnoy)
             elif i == 'SO2':
-                if 'SO2' not in self.cmaq.keys:
+                try:
+                    if 'SO2' not in self.cmaq.keys:
+                        pass
+                    else:
+                        print 'Interpolating SO2'
+                        dfso2 = g.get_group(i)
+                        fac = self.check_cmaq_units(param='SO2', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
+                        dfso2 = self.interp_to_aqs(cmaq, dfso2, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqso2 = cmaq
+                        dfs.append(dfso2)
+                except:
                     pass
-                else:
-                    print 'Interpolating SO2'
-                    dfso2 = g.get_group(i)
-                    fac = self.check_cmaq_units(param='SO2', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
-                    dfso2 = self.interp_to_aqs(cmaq, dfso2, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqso2 = cmaq
-                    dfs.append(dfso2)
             elif i == 'NOX':
-                if ('NO' not in self.cmaq.keys) | ('NO2' not in self.cmaq.keys):
+                try:
+                    if ('NO' not in self.cmaq.keys) | ('NO2' not in self.cmaq.keys):
+                        pass
+                    else:
+                        print 'Interpolating NOX:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='NOX', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqno = cmaq
+                        dfs.append(dfnox)
+                except:
                     pass
-                else:
-                    print 'Interpolating NOX:'
-                    dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='NOX', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqno = cmaq
-                    dfs.append(dfnox)
             elif i == 'NO':
-                if ('NO' not in self.cmaq.keys):
+                try:
+                    if ('NO' not in self.cmaq.keys):
+                        pass
+                    else:
+                        print 'Interpolating NO:'
+                        dfno = g.get_group(i)
+                        fac = self.check_cmaq_units(param='NO', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
+                        dfno = self.interp_to_aqs(cmaq, dfno, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqno = cmaq
+                        dfs.append(dfno)
+                except:
                     pass
-                else:
-                    print 'Interpolating NO:'
-                    dfno = g.get_group(i)
-                    fac = self.check_cmaq_units(param='NO', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
-                    dfno = self.interp_to_aqs(cmaq, dfno, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqno = cmaq
-                    dfs.append(dfno)
             elif i == 'NO2':
-                if ('NO2' not in self.cmaq.keys):
+                try:
+                    if ('NO2' not in self.cmaq.keys):
+                        pass
+                    else:
+                        print 'Interpolating NO2:'
+                        dfno2 = g.get_group(i)
+                        fac = self.check_cmaq_units(param='NO2', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
+                        dfno2 = self.interp_to_aqs(cmaq, dfno2, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqno2 = cmaq
+                        dfs.append(dfno2)
+                except:
                     pass
-                else:
-                    print 'Interpolating NO2:'
-                    dfno2 = g.get_group(i)
-                    fac = self.check_cmaq_units(param='NO2', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
-                    dfno2 = self.interp_to_aqs(cmaq, dfno2, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqno2 = cmaq
-                    dfs.append(dfno2)
             elif i == 'SO4f':
-                if ('PM25_SO4' in self.cmaq.keys) | ('ASO4J' in self.cmaq.keys) | ('ASO4I' in self.cmaq.keys):
-                    print 'Interpolating PSO4:'
-                    dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='SO4f', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='SO4f') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqpso4 = cmaq
-                    dfs.append(dfnox)
-                else:
+                try:
+                    if ('PM25_SO4' in self.cmaq.keys) | ('ASO4J' in self.cmaq.keys) | ('ASO4I' in self.cmaq.keys):
+                        print 'Interpolating PSO4:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='SO4f', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO4f') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqpso4 = cmaq
+                        dfs.append(dfnox)
+                    else:
+                        pass
+                except:
                     pass
             elif i == 'PM10':
-                if ('PM_TOTAL' in self.cmaq.keys) | ('ASO4K' in self.cmaq.keys):
-                    print 'Interpolating PM10:'
-                    dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='PM10', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqpso4 = cmaq
-                    dfs.append(dfnox)
-                else:
+                try:
+                    if ('PM_TOTAL' in self.cmaq.keys) | ('ASO4K' in self.cmaq.keys):
+                        print 'Interpolating PM10:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='PM10', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqpso4 = cmaq
+                        dfs.append(dfnox)
+                    else:
+                        pass
+                except:
                     pass
             elif i == 'NO3f':
-                if ('PM25_NO3' in self.cmaq.keys) | ('ANO3J' in self.cmaq.keys) | ('ANO3I' in self.cmaq.keys):
-                    print 'Interpolating PNO3:'
-                    dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='NO3f', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO3F') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqpno3 = cmaq
-                    dfs.append(dfnox)
-                else:
+                try:
+                    if ('PM25_NO3' in self.cmaq.keys) | ('ANO3J' in self.cmaq.keys) | ('ANO3I' in self.cmaq.keys):
+                        print 'Interpolating PNO3:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='NO3f', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO3F') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqpno3 = cmaq
+                        dfs.append(dfnox)
+                    else:
+                        pass
+                except:
                     pass
             elif i == 'ECf':
-                if ('PM25_EC' in self.cmaq.keys) | ('AECI' in self.cmaq.keys) | ('AECJ' in self.cmaq.keys):
+                try:
+                    if ('PM25_EC' in self.cmaq.keys) | ('AECI' in self.cmaq.keys) | ('AECJ' in self.cmaq.keys):
+                        pass
+                    else:
+                        print 'Interpolating PEC:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='ECf', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ECf') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqpno3 = cmaq
+                        dfs.append(dfnox)
+                except:
                     pass
-                else:
-                    print 'Interpolating PEC:'
-                    dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='ECf', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='ECf') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqpno3 = cmaq
-                    dfs.append(dfnox)
             elif i == 'OCf':
-                if ('APOCJ' in self.cmaq.keys):
-                    print 'Interpolating OCf:'
-                    dfpm = g.get_group(i)
-                    fac = self.check_cmaq_units(param='OCf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC') * fac
-                    dfpm = self.interp_to_aqs(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqoc = cmaqvar
-                    dfs.append(dfpm)
+                try:
+                    if ('APOCJ' in self.cmaq.keys):
+                        print 'Interpolating OCf:'
+                        dfpm = g.get_group(i)
+                        fac = self.check_cmaq_units(param='OCf', improve_param=i)
+                        cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC') * fac
+                        dfpm = self.interp_to_aqs(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqoc = cmaqvar
+                        dfs.append(dfpm)
+                except:
+                    pass
             elif i == 'ETHANE':
-                if ('ETHA' not in self.cmaq.keys):
+                try:
+                    if ('ETHA' not in self.cmaq.keys):
+                        pass
+                    else:
+                        print 'Interpolating Ethane:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='ETHA', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ETHA') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqethane = cmaq
+                        dfs.append(dfnox)
+                except:
                     pass
-                else:
-                    print 'Interpolating Ethane:'
-                    dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='ETHA', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='ETHA') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqethane = cmaq
-                    dfs.append(dfnox)
             elif i == 'BENZENE':
-                if ('BENZENE' not in self.cmaq.keys):
+                try:
+                    if ('BENZENE' not in self.cmaq.keys):
+                        pass
+                    else:
+                        print 'Interpolating BENZENE:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='BENZENE', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='BENZENE') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqbenz = cmaq
+                        dfs.append(dfnox)
+                except:
                     pass
-                else:
-                    print 'Interpolating BENZENE:'
-                    dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='BENZENE', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='BENZENE') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqbenz = cmaq
-                    dfs.append(dfnox)
             elif i == 'TOLUENE':
-                if ('TOL' not in self.cmaq.keys):
+                try:
+                    if ('TOL' not in self.cmaq.keys):
+                        pass
+                    else:
+                        print 'Interpolating Toluene:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='TOL', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='TOL') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqtol = cmaq
+                        dfs.append(dfnox)
+                except:
                     pass
-                else:
-                    print 'Interpolating Toluene:'
-                    dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='TOL', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='TOL') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqtol = cmaq
-                    dfs.append(dfnox)
             elif i == 'ISOPRENE':
-                if ('ISOP' not in self.cmaq.keys):
+                try:
+                    if ('ISOP' not in self.cmaq.keys):
+                        pass
+                    else:
+                        print 'Interpolating Isoprene:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqisop = cmaq
+                        dfs.append(dfnox)
+                except:
                     pass
-                else:
-                    print 'Interpolating Isoprene:'
-                    dfnox = g.get_group(i)
-                    fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    self.cmaqisop = cmaq
-                    dfs.append(dfnox)
             elif i == 'WS':
-                if (self.cmaq.metcro2d is None) | ('WSPD10' not in self.cmaq.metcrokeys):
+                try:
+                    if (self.cmaq.metcro2d is None) | ('WSPD10' not in self.cmaq.metcrokeys):
+                        pass
+                    else:
+                        print 'Interpolating WS:'
+                        dfnox = g.get_group(i)
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        dfs.append(dfnox)
+                except:
                     pass
-                else:
-                    print 'Interpolating WS:'
-                    dfnox = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    dfs.append(dfnox)
             elif i == 'TEMP':
-                if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
+                try:
+                    if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
+                        pass
+                    else:
+                        print 'Interpolating TEMP:'
+                        dfnox = g.get_group(i)
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        dfs.append(dfnox)
+                except:
                     pass
-                else:
-                    print 'Interpolating TEMP:'
-                    dfnox = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    dfs.append(dfnox)
             elif i == 'WD':
-                if (self.cmaq.metcro2d is None) | ('WDIR10' not in self.cmaq.metcrokeys):
+                try:
+                    if (self.cmaq.metcro2d is None) | ('WDIR10' not in self.cmaq.metcrokeys):
+                        pass
+                    else:
+                        print 'Interpolating WD:'
+                        dfnox = g.get_group(i)
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        dfs.append(dfnox)
+                except:
                     pass
-                else:
-                    print 'Interpolating WD:'
-                    dfnox = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                    dfs.append(dfnox)
 
         self.df = concat(dfs)
         if self.aqs.monitor_df is None:
@@ -281,6 +342,8 @@ class verify_aqs:
         else:
             print 'Calculating Daily 8 Hr Max Ozone....\n'
             self.df8hr = self.calc_aqs_8hr_max_calc()
+        self.df = self.aqs.change_states_to_abv(self.df)
+        self.df8hr = self.aqs.change_states_to_abv(self.df8hr)
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_info()
 
@@ -298,7 +361,7 @@ class verify_aqs:
 
     def compare_param(self, param='OZONE', site='', city='', region='', state='', timeseries=False, scatter=False,
                       pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
-                      taylordiagram=False, fig=None, label=None, footer=True, dia=None):
+                      taylordiagram=False, fig=None, label=None, footer=True, dia=None,marker=None):
         from numpy import NaN
         cityname = True
         if 'MSA_Name' in self.df.columns:
@@ -352,10 +415,13 @@ class verify_aqs:
         if timeseries_mb:
             plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
         if taylordiagram:
+            if marker is None: marker = 'o'
             if fig is None:
-                plots.taylordiagram(df2, label=label, dia=dia, addon=False)
+                dia = plots.taylordiagram(df2, label=label, dia=dia, addon=False,marker=marker)
+                return dia
             else:
-                plots.taylordiagram(df2, label=label, dia=dia, addon=True)
+                dia = plots.taylordiagram(df2, label=label, dia=dia, addon=True,marker=marker)
+                return dia
 
     def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=16,
                 cmap='YlGnBu'):
@@ -456,7 +522,7 @@ class verify_aqs:
         from pyresample import geometry, kd_tree
         from pandas import concat, Series, merge
         from numpy import append, empty, vstack, NaN
-
+        from gc import collect
         dates = self.cmaq.dates[self.cmaq.indexdates]
         lat = self.cmaq.latitude
         lon = self.cmaq.longitude
@@ -467,7 +533,8 @@ class verify_aqs:
         print '    Interpolating using ' + interp + ' method'
         for i, j in enumerate(dates):
             con = df.datetime == j
-            if max(con):
+            print j
+            try:
                 lats = df[con].Latitude.values
                 lons = df[con].Longitude.values
                 grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
@@ -481,12 +548,15 @@ class verify_aqs:
                 elif interp.lower() == 'gauss':
                     val = kd_tree.resample_gauss(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
                                                  sigmas=r / 2., fill_value=NaN, neighbours=n, nprocs=2).squeeze()
-            vals = append(vals, val)
-            dd = empty(lons.shape[0], dtype=date.dtype)
-            dd[:] = j
-            date = append(date, dd)
-            site = append(site, df[con].SCS.values)
-
+                vals = append(vals, val)
+                dd = empty(lons.shape[0], dtype=date.dtype)
+                dd[:] = j
+                date = append(date, dd)
+                site = append(site, df[con].SCS.values)
+                collect()
+            except:
+                pass
+            
         vals = Series(vals)
         date = Series(date)
         site = Series(site)
