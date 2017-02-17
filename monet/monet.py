@@ -26,9 +26,8 @@ def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     va.aqs.datadir = datapath
+    va.aqs.monitor_file = __file__[:-15] + '/data/monitoring_site_locations.dat'
     va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
-    va.aqs.monitor_file = __file__[:-15] + 'data/monitoring_site_locations.dat'
-    print va.aqs.monitor_file
     va.aqs.read_monitor_file()
     if combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)
@@ -65,9 +64,9 @@ def verify_airnow(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
         va.airnow.df = read_hdf(datapath)
     else:
         va.airnow.download_hourly_files(path=datapath)
-        va.airnow.aggragate_files(airnowoutput)
         va.airnow.monitor_file = __file__[:-15] + 'data/monitoring_site_locations.dat'
         va.airnow.read_monitor_file()
+        va.airnow.aggragate_files(airnowoutput)
     va.airnow.datadir = datapath
     if combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)

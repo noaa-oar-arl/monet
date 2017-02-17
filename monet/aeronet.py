@@ -18,7 +18,7 @@ class aeronet:
         self.ftp = None
         self.df = None
         self.objtype = 'AERONET'
-        self.station_file = '{0}data/aeronet_locations.txt'.format(
+        self.station_file = '{0}/../data/aeronet_locations.txt'.format(
             os.path.realpath(__file__).split(os.path.basename(__file__))[0])
         self.station_df = None
         self.file = self.baseurl.split('/')[-1]
@@ -44,7 +44,7 @@ class aeronet:
 
         df['Latitude'] = lat
         df['Longitude'] = lon
-        df['Site_Name'] = location
+#        df['Site_Name'] = location
 
         return df
 

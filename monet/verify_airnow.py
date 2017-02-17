@@ -3,7 +3,7 @@ from datetime import datetime
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from numpy import array, where
+from numpy import array, where,sort
 
 import mystats
 import plots
@@ -65,7 +65,7 @@ class verify_airnow:
         if self.cmaq.metcro2d is None:
             print 'METCRO2D file not loaded.  To include MET variables please load self.cmaq.open_metcro2d(\'filename\')\n'
         self.ensure_values_indomain()
-        comparelist = self.airnow.df.Species.unique()
+        comparelist = sort(self.airnow.df.Species.unique())
 #        comparelist=['OZONE']
         g = self.airnow.df.groupby('Species')
         dfs = []

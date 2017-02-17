@@ -381,16 +381,13 @@ class verify_aqs:
             if site in new.SCS.unique():
                 df2 = new.loc[new.SCS == site]
         elif city != '':
-            if cityname:
-                names = df.MSA_Name.dropna().unique()
-                for i in names:
-                    if city.upper() in i.upper():
-                        name = i
-                        print name
-                        df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
-                        title = name
-            else:
-                print 'monitor_data_file.dat not loaded. Please download and put in datapath and remerge'
+            names = df.MSA_Name.dropna().unique()
+            for i in names:
+                if city.upper() in i.upper():
+                    name = i
+                    print name
+                df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
+                title = name
         elif state != '':
             df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
             title = state
