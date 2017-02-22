@@ -155,8 +155,12 @@ class crn:
         self.df = dft.copy()
         self.df = self.df.copy().drop_duplicates()
         print 'Reshuffling DataFrame....'
-        self.agg_cols()
-
+        self.df = self.agg_cols()
+        cols = self.df.columns.values
+        cols[2] = 'WBAN'
+        self.df.columns = cols
+        con = (self.df.datetime >= self.dates[0]) & (self.df.datetime <= self.dates[-1])
+        self.df = self.df[con]
         if output == '':
             output = 'CRN.hdf'
         print 'Outputing dataframe to: ' + output
@@ -166,6 +170,13 @@ class crn:
     def set_daterange(self, begin='', end=''):
         dates = pd.date_range(start=begin, end=end, freq='H').values.astype('M8[s]').astype('O')
         self.dates = dates
+
+    def get_monitor_df(self):
+        self.monitor_df = pd.read_csv(self.monitor_file, delimiter='\t')
+
+    def merge_monitor_meta_data(self):
+        self.df.WBAN = self.df.WBAN.astype('|S5')
+        self.df = self.df.merge(self.monitor_df, on=['WBAN', 'LONGITUDE', 'LATITUDE'], how='left')
 
     def agg_cols(self):
         cols = array(['T_CALC', 'T_HR_AVG', 'T_MAX', 'T_MIN', 'P_CALC', 'SOLARAD', 'SOLARAD_FLAG', 'SOLARAD_MAX',

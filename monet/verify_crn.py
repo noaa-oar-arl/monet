@@ -16,12 +16,12 @@ class verify_crn:
         self.crn = crn()
         self.cmaq = cmaq()
         self.df = None
-        self.cmaqo3 = None
-        self.cmaqnox = None
-        self.cmaqnoy = None
-        self.cmaqpm25 = None
-        self.cmaqpm10 = None
-        self.cmaqso2 = None
+        self.soim1 = None
+        self.soim2 = None
+        self.soit1 = None
+        self.soit2 = None
+        self.rgrnd = None
+        self.temp2m = None
         self.cmaqco = None
         self.df8hr = None
 
@@ -55,43 +55,68 @@ class verify_crn:
         dfs = []
         for i in comparelist:
             if i == 'SUR_TEMP':
-                if (self.cmaq.metcro2d is None) | ('TEMPG' not in self.cmaq.metcrokeys):
+                try:
+                    if (self.cmaq.metcro2d is None) | ('TEMPG' not in self.cmaq.metcrokeys):
+                        pass
+                    else:
+                        print 'Interpolating Surface Skin Temperature:'
+                        dfmet = g.get_group(i)
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMPG')
+                        dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                        dfmet.Obs += 273.15
+                        dfs.append(dfmet)
+                except:
                     pass
-                else:
-                    print 'Interpolating Surface Skin Temperature:'
-                    dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMPG')
-                    dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
-                    dfmet.Obs += 273.15
-                    dfs.append(dfmet)
             elif i == 'T_HR_AVG':
-                if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
+                try:
+                    if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
+                        pass
+                    else:
+                        print 'Interpolating 2 Meter Temperature:'
+                        dfmet = g.get_group(i)
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
+                        dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                        dfmet.Obs += 273.15
+                        dfs.append(dfmet)
+                except:
                     pass
-                else:
-                    print 'Interpolating 2 Meter Temperature:'
-                    dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
-                    dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
-                    dfmet.Obs += 273.15
-                    dfs.append(dfmet)
             elif i == 'SOLARAD':
-                if (self.cmaq.metcro2d is None) | ('RGRND' not in self.cmaq.metcrokeys):
+                try:
+                    if (self.cmaq.metcro2d is None) | ('RGRND' not in self.cmaq.metcrokeys):
+                        pass
+                    else:
+                        print 'Interpolating Downward Solar Radiation:'
+                        dfmet = g.get_group(i)
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RGRND')
+                        dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                        dfs.append(dfmet)
+                except:
                     pass
-                else:
-                    print 'Interpolating Downward Solar Radiation:'
-                    dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RGRND')
-                    dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
-                    dfs.append(dfmet)
             elif i == 'SOIL_MOISTURE_5':
-                if (self.cmaq.metcro2d is None) | ('SOILW' not in self.cmaq.metcrokeys):
+                try:
+                    if (self.cmaq.metcro2d is None) | ('SOIM1' not in self.cmaq.metcrokeys):
+                        pass
+                    else:
+                        print 'Interpolating Surface Volumetric Soil Moisture Content:'
+                        dfmet = g.get_group(i)
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='SOILW')
+                        dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                        dfs.append(dfmet)
+                except:
                     pass
-                else:
-                    print 'Interpolating Surface Volumetric Soil Moisture Content:'
-                    dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='SOILW')
-                    dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
-                    dfs.append(dfmet)
+
+            elif i == 'SOIL_MOISTURE_10':
+                try:
+                    if (self.cmaq.metcro2d is None) | ('SOIM1' not in self.cmaq.metcrokeys):
+                        pass
+                    else:
+                        print 'Interpolating Surface Volumetric Soil Moisture Content:'
+                        dfmet = g.get_group(i)
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='SOILW')
+                        dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                        dfs.append(dfmet)
+                except:
+                    pass
 
         self.df = pd.concat(dfs)
         self.df.dropna(inplace=True, subset=['Obs', 'CMAQ'])

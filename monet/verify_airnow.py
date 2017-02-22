@@ -397,7 +397,7 @@ class verify_airnow:
                 for index, i in enumerate(self.cmaq.dates):
                     c = plots.make_spatial_contours(cmaq[index, :, :].squeeze(), self.cmaq.gridobj,
                                                     self.cmaq.dates[index],
-                                                    m, levels=levels, cmap=cmap)
+                                                    m, levels=levels, cmap=cmap, units='xy')
                     if not isinstance(self.cmaq.metcro2d, type(None)):
                         ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
                         wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
@@ -418,7 +418,7 @@ class verify_airnow:
             else:
                 index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
                 c = plots.make_spatial_contours(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,
-                                            levels=levels,cmap=cmap)
+                                                levels=levels, cmap=cmap, units='xy')
                 if not isinstance(self.cmaq.metcro2d, type(None)):
                     ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
                     wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()

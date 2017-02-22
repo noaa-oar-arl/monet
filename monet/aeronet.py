@@ -44,7 +44,7 @@ class aeronet:
 
         df['Latitude'] = lat
         df['Longitude'] = lon
-#        df['Site_Name'] = location
+        #        df['Site_Name'] = location
 
         return df
 

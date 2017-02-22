@@ -54,7 +54,7 @@ class cmaq:
         self.latitude = None
         self.longitude = None
         self.map = None
-        
+
     def get_dates(self):
         from datetime import datetime
         from pandas import DataFrame
@@ -382,11 +382,20 @@ class cmaq:
             var = self.concobj.variables[param][self.indexdates, 0, :, :].squeeze()
         return var
 
-    def get_metcro2d_cmaqvar(self, param='O3'):
-        lvl = 0.
+    def get_metcro2d_rh(self):
+        import atmos
+        data = {'T': self.metcro2d.variables['TEMP2'][:], 'rv': self.metcro2d.variables['Q2'][:],
+                'P': self.metcro2d.variables['PRSFC'][:]}
+        return atmos.calculate('RH', **data)
+
+    def get_metcro2d_cmaqvar(self, param='TEMPG', lvl=0.):
         param = param.upper()
-        print '   Getting CMAQ Variable: ' + param
-        var = self.metcro2d.variables[param][self.indexdates, 0, :, :].squeeze()
+        if param == 'RH':
+            print '   Calculating CMAQ Variable: ' + param
+            var = self.get_metcro2d_rh()
+        else:
+            print '   Getting CMAQ Variable: ' + param
+            var = self.metcro2d.variables[param][self.indexdates, 0, :, :].squeeze()
         return var
 
     def set_gridcro2d(self, filename=''):
@@ -410,8 +419,10 @@ class cmaq:
                 lon1 = self.gridobj.P_GAM
                 lon0 = self.gridobj.XCENT
                 lat0 = self.gridobj.YCENT
-                m = Basemap(projection='lcc', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
-                            llcrnrlat=self.latitude[0, 0], urcrnrlat=self.latitude[-1, -1], llcrnrlon=self.longitude[0, 0],
+                m = Basemap(projection='lcc', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0,
+                            lon_1=lon1,
+                            llcrnrlat=self.latitude[0, 0], urcrnrlat=self.latitude[-1, -1],
+                            llcrnrlon=self.longitude[0, 0],
                             urcrnrlon=self.longitude[-1, -1], rsphere=6371200.,
                             area_thresh=50.)
             self.map = m

@@ -1,10 +1,11 @@
 # this is a class to deal with aqs data
 import os
 from datetime import datetime
+from zipfile import ZipFile
 
 import pandas as pd
 from numpy import array, arange
-from zipfile import ZipFile
+
 
 class aqs:
     def __init__(self):
@@ -30,22 +31,24 @@ class aqs:
             ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
              'Virginia', 'West Virginia'], dtype='|S14')
         self.se_states_abv = array(
-                        ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN',
-                                      'VA', 'WV'], dtype='|S14')
+            ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN',
+             'VA', 'WV'], dtype='|S14')
         self.ne_states = array(['Connecticut', 'Delaware', 'District Of Columbia', 'Maine', 'Maryland', 'Massachusetts',
                                 'New Hampshire', 'New Jersey', 'New York', 'Pennsylvania', 'Rhode Island', 'Vermont'],
                                dtype='|S20')
-        self.ne_states_abv = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA','NH', 'NJ', 'NY', 'PA', 'RI', 'VT'],dtype='|S20')
+        self.ne_states_abv = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'],
+                                   dtype='|S20')
         self.nc_states = array(
             ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan', 'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
             dtype='|S9')
         self.nc_states_abv = array(['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'],
-                    dtype='|S9')
+                                   dtype='|S9')
         self.sc_states = array(['Arkansas', 'Louisiana', 'Oklahoma', 'Texas'], dtype='|S9')
         self.sc_states_abv = array(['AR', 'LA', 'OK', 'TX'], dtype='|S9')
         self.r_states = array(['Arizona', 'Colorado', 'Idaho', 'Kansas', 'Montana', 'Nebraska', 'Nevada', 'New Mexico',
                                'North Dakota', 'South Dakota', 'Utah', 'Wyoming'], dtype='|S12')
-        self.r_states_abv = array(['AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD', 'UT', 'WY'], dtype='|S12')
+        self.r_states_abv = array(['AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD', 'UT', 'WY'],
+                                  dtype='|S12')
         self.p_states = array(['California', 'Oregon', 'Washington'], dtype='|S10')
         self.p_states_abv = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.datadir = '.'
@@ -68,7 +71,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -95,7 +98,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -122,7 +125,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -148,7 +151,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -177,7 +180,7 @@ class aqs:
         z = ZipFile(filename)
         z.extractall()
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -203,7 +206,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -228,7 +231,7 @@ class aqs:
         ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -254,7 +257,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -280,7 +283,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -306,7 +309,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -332,7 +335,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -358,7 +361,7 @@ class aqs:
         z.extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M')
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                                   'datetime_local': ["Date Local", "Time Local"]},
+                                                              'datetime_local': ["Date Local", "Time Local"]},
                          date_parser=dateparse)
         df.columns = self.renamedhcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
@@ -645,60 +648,60 @@ class aqs:
     def get_region(self, df):
         sr = df.State_Name.copy().values
         sn = df.State_Name.copy().values
-        for i,j in zip(self.se_states,self.se_states_abv):
+        for i, j in zip(self.se_states, self.se_states_abv):
             con = sr == i
             sr[con] = 'Southeast'
             sn[con] = j
-        for i in zip(self.ne_states,self.ne_states_abv):
+        for i in zip(self.ne_states, self.ne_states_abv):
             con = sr == i
             sr[con] = 'Northeast'
             sn[con] = j
-        for i,j in zip(self.nc_states,self.nc_states_abv):
+        for i, j in zip(self.nc_states, self.nc_states_abv):
             con = sr == i
             sr[con] = 'North Central'
             sn[con] = j
-        for i,j in zip(self.sc_states,self.sc_states_abv):
+        for i, j in zip(self.sc_states, self.sc_states_abv):
             con = sr == i
             sr[con] = 'South Central'
             sn[con] = j
-        for i,j in zip(self.p_states,self.p_states_abv):
+        for i, j in zip(self.p_states, self.p_states_abv):
             con = sr == i
             sr[con] = 'Pacific'
             sn[con] = j
-        for i,j in zip(self.r_states,self.r_states_abv):
+        for i, j in zip(self.r_states, self.r_states_abv):
             con = sr == i
             sr[con] = 'Rockies'
             sn[con] = j
         sr[sr == 'CC'] = 'Canada'
         sr[sr == 'MX'] = 'Mexico'
-        
+
         df['Region'] = array(sr)
         df['State_Name'] = array(sn)
         return df
 
-    def change_states_to_abv(self,df):
-        for i,j in enumerate(self.se_states):
+    def change_states_to_abv(self, df):
+        for i, j in enumerate(self.se_states):
             con = df['State_Name'] == j
-            df.loc[con,'State_Name'] = self.se_states_abv[i]
-        for i,j in enumerate(self.nc_states):
+            df.loc[con, 'State_Name'] = self.se_states_abv[i]
+        for i, j in enumerate(self.nc_states):
             con = df['State_Name'] == j
-            df.loc[con,'State_Name'] = self.nc_states_abv[i]
-        for i,j in enumerate(self.sc_states):
+            df.loc[con, 'State_Name'] = self.nc_states_abv[i]
+        for i, j in enumerate(self.sc_states):
             con = df['State_Name'] == j
-            df.loc[con,'State_Name'] = self.sc_states_abv[i]
-        for i,j in enumerate(self.p_states):
+            df.loc[con, 'State_Name'] = self.sc_states_abv[i]
+        for i, j in enumerate(self.p_states):
             con = df['State_Name'] == j
-            df.loc[con,'State_Name'] = self.p_states_abv[i]
-        for i,j in enumerate(self.ne_states):
+            df.loc[con, 'State_Name'] = self.p_states_abv[i]
+        for i, j in enumerate(self.ne_states):
             con = df['State_Name'] == j
-            df.loc[con,'State_Name'] = self.ne_states_abv[i]
-        for i,j in enumerate(self.r_states):
+            df.loc[con, 'State_Name'] = self.ne_states_abv[i]
+        for i, j in enumerate(self.r_states):
             con = df['State_Name'] == j
-            df.loc[con,'State_Name'] = self.r_states_abv[i]
+            df.loc[con, 'State_Name'] = self.r_states_abv[i]
         con = df['State_Name'] == 'Country Of Mexico'
-        df.loc[con,'State_Name'] = 'MX'
+        df.loc[con, 'State_Name'] = 'MX'
         return df
-    
+
     def get_species(self, df, voc=False):
         pc = df.Parameter_Code.unique()
         if len(pc) < 2:

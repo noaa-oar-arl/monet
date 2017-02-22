@@ -112,7 +112,6 @@ class TaylorDiagram(object):
 
         return contours
 
-
 # if __name__ == '__main__':
 
 #     # Reference dataset

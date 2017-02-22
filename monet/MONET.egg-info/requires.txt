@@ -6,3 +6,4 @@ pandas
 xarray
 dask
 wget
+atmos
