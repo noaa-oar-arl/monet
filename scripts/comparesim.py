@@ -1,5 +1,10 @@
-#!/data/aqf/barryb/anaconda2/bin/python
+#!/naqfc/noscrub/Barry.Baker/anaconda2/bin/python
 
+###for AITKEN
+#### /data/aqf/barryb/anaconda2/bin/python
+
+###for WCOSS
+### /naqfc/noscrub/Barry.Baker/anaconda2/bin/python
 import monet
 import f90nml
 from numpy import sort
@@ -17,7 +22,7 @@ nml = f90nml.read('comparesim.namelist')
 base = nml['files']['basename']
 
 from glob import glob
-files = sort(glob(nml['files']['sim1']))
+#!files = sort(glob(nml['files']['sim1']))
 
 #INTERP SIMULATIONS TO OBSERVATIONS
 if nml['files']['sim1'].lower() != 'none':
@@ -29,6 +34,8 @@ if nml['files']['sim1'].lower() != 'none':
         sim1 = verify_aqs()
         sim1.df = pd.read_hdf(nml['files']['sim1'])
     else:
+        files = sort(glob(nml['files']['sim1']))
+        print files
         sim1 = monet.verify_aqs(concpath=files,gridcro=nml['files']['gridcro'],datapath=nml['files']['aqs_data_dir'],interp=nml['interp']['method'],neighbors=nml['interp']['neighbors'],radius=nml['interp']['radius_of_influence'])
 
 if nml['files']['sim2'].lower()!= 'none':
