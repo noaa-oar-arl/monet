@@ -647,36 +647,31 @@ class aqs:
 
     def get_region(self, df):
         sr = df.State_Name.copy().values
-        sn = df.State_Name.copy().values
-        for i, j in zip(self.se_states, self.se_states_abv):
+        for i in self.se_states:
             con = sr == i
             sr[con] = 'Southeast'
-            sn[con] = j
-        for i in zip(self.ne_states, self.ne_states_abv):
+        for i in self.ne_states:
             con = sr == i
+            #print con.max()
             sr[con] = 'Northeast'
-            sn[con] = j
-        for i, j in zip(self.nc_states, self.nc_states_abv):
+        for i in self.nc_states:
             con = sr == i
             sr[con] = 'North Central'
-            sn[con] = j
-        for i, j in zip(self.sc_states, self.sc_states_abv):
+        for i in self.sc_states:
             con = sr == i
             sr[con] = 'South Central'
-            sn[con] = j
-        for i, j in zip(self.p_states, self.p_states_abv):
+        for i in self.p_states:
             con = sr == i
             sr[con] = 'Pacific'
-            sn[con] = j
-        for i, j in zip(self.r_states, self.r_states_abv):
+        for i in self.r_states:
             con = sr == i
             sr[con] = 'Rockies'
-            sn[con] = j
         sr[sr == 'CC'] = 'Canada'
         sr[sr == 'MX'] = 'Mexico'
 
         df['Region'] = array(sr)
-        df['State_Name'] = array(sn)
+        
+        df = self.change_states_to_abv(df)
         return df
 
     def change_states_to_abv(self, df):
@@ -700,6 +695,12 @@ class aqs:
             df.loc[con, 'State_Name'] = self.r_states_abv[i]
         con = df['State_Name'] == 'Country Of Mexico'
         df.loc[con, 'State_Name'] = 'MX'
+        con = df['State_Name'] == 'Alaska'
+        df.loc[con, 'State_Name'] = 'AK'
+        con = df['State_Name'] == 'Hawaii'
+        df.loc[con, 'State_Name'] = 'HI'
+        con = df['State_Name'] == 'Puerto Rico'
+        df.loc[con, 'State_Name'] = 'PR'
         return df
 
     def get_species(self, df, voc=False):

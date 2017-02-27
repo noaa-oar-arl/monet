@@ -342,8 +342,8 @@ class verify_aqs:
         else:
             print 'Calculating Daily 8 Hr Max Ozone....\n'
             self.df8hr = self.calc_aqs_8hr_max_calc()
-        self.df = self.aqs.change_states_to_abv(self.df)
-        self.df8hr = self.aqs.change_states_to_abv(self.df8hr)
+#        self.df = self.aqs.change_states_to_abv(self.df)
+#        self.df8hr = self.aqs.change_states_to_abv(self.df8hr)
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_info()
 
