@@ -697,5 +697,6 @@ def taylordiagram(df, marker='o', label='CMAQ', addon=False, dia=None):
     else:
         cc = corrcoef(df.Obs.values, df.CMAQ.values)[0, 1]
         dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
-
+        plt.legend(fontsize='small', loc='best')
+        plt.tight_layout()
     return dia

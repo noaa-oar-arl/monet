@@ -2,7 +2,7 @@
 
 # this is done to make creating verifications easier
 
-def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
+def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
                interp='gauss', species='all'):
     """
 
@@ -26,15 +26,16 @@ def verify_aqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True,
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     va.aqs.datadir = datapath
-    va.aqs.monitor_file = __file__[:-15] + '/data/monitoring_site_locations.dat'
     va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
+    va.aqs.monitor_file = __file__[:-15] + '/data/monitoring_site_locations.dat'
+
     va.aqs.read_monitor_file()
     if combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)
     return va
 
 
-def verify_airnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
+def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
                   interp='gauss', airnowoutput='', user='', passw=''):
     """
 
@@ -64,16 +65,16 @@ def verify_airnow(concpath='', gridcro='', met2dpath='', datapath='', combine=Tr
         va.airnow.df = read_hdf(datapath)
     else:
         va.airnow.download_hourly_files(path=datapath)
-        va.airnow.monitor_file = __file__[:-15] + 'data/monitoring_site_locations.dat'
-        va.airnow.read_monitor_file()
         va.airnow.aggragate_files(airnowoutput)
+        va.airnow.monitor_file = __file__[:-15] + '/data/monitoring_site_locations.dat'
+        va.airnow.read_monitor_file()
     va.airnow.datadir = datapath
     if combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)
     return va
 
 
-def verify_improve(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
+def vimprove(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
                    interp='gauss'):
     """
 

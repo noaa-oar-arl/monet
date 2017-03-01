@@ -69,11 +69,13 @@ class verify_aqs:
                     dfo3 = g.get_group(i)
                     fac = self.check_cmaq_units(param='O3', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
+                    print cmaq.shape
                     self.cmaqo3 = cmaq
                     dfo3 = self.interp_to_aqs(cmaq, dfo3, interp=interp, r=radius, weight_func=weight_func)
                     dfo3.Obs, dfo3.CMAQ = dfo3.Obs, dfo3.CMAQ
                     dfo3.Units = 'PPB'
                     dfs.append(dfo3)
+                    print dfo3.variables.keys()
                 except:
                     pass
             elif i == 'PM2.5':
@@ -345,6 +347,7 @@ class verify_aqs:
 #        self.df = self.aqs.change_states_to_abv(self.df)
 #        self.df8hr = self.aqs.change_states_to_abv(self.df8hr)
         self.df.SCS = self.df.SCS.values.astype('int32')
+        self.df = self.aqs.add_metro_metadata2(self.df)
         self.print_info()
 
     def print_info(self):
@@ -361,18 +364,18 @@ class verify_aqs:
 
     def compare_param(self, param='OZONE', site='', city='', region='', state='', timeseries=False, scatter=False,
                       pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
-                      taylordiagram=False, fig=None, label=None, footer=True, dia=None,marker=None):
+                      taylordiagram=False, fig=None, label=None, footer=False, dia=None,marker=None):
         from numpy import NaN
         cityname = True
         if 'MSA_Name' in self.df.columns:
             df = self.df.copy()[[
                 'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units',
                 'Latitude',
-                'Longitude', 'State_Name']]
+                'Longitude', 'State_Name','EPA_region']]
         else:
             df = self.df.copy()[[
                 'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units', 'Latitude',
-                'Longitude', 'State_Name']]
+                'Longitude', 'State_Name','EPA_region']]
             cityname = False
         df[df < -990] = NaN
         g = df.groupby('Species')
@@ -386,8 +389,8 @@ class verify_aqs:
                 if city.upper() in i.upper():
                     name = i
                     print name
-                df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
-                title = name
+            df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
+            title = name
         elif state != '':
             df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
             title = state
@@ -418,6 +421,7 @@ class verify_aqs:
                 return dia
             else:
                 dia = plots.taylordiagram(df2, label=label, dia=dia, addon=True,marker=marker)
+                plt.legend()
                 return dia
 
     def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=16,
@@ -631,14 +635,14 @@ class verify_aqs:
         k = q.groupby('SCS').resample('1D').max()
         kk = k.reset_index(level=1)
         kkk = kk.reset_index(drop='SCS').dropna()
-        kkk['Parameter_Name'] = 'Ozone'
-        kkk['Region'] = ''
+        kkk = self.aqs.add_metro_metadata2(kkk)
+#re        kkk['Region'] = ''
         kkk['Species'] = 'OZONE'
-        kkk['State_Name'] = ''
+#        kkk['State_Name'] = ''
         kkk['Units'] = 'PPB'
-        for i, j in enumerate(vals):
-            kkk.loc[kkk.SCS == j, 'Region'] = r.Region.values[index[i]]
-            kkk.loc[kkk.SCS == j, 'State_Name'] = r.State_Name.values[index[i]]
-            kkk.loc[kkk.SCS == j, 'County_Name'] = r.County_Name.values[index[i]]
+        # for i, j in enumerate(vals):
+        #     kkk.loc[kkk.SCS == j, 'Region'] = r.Region.values[index[i]]
+        #     kkk.loc[kkk.SCS == j, 'State_Name'] = r.State_Name.values[index[i]]
+        #     kkk.loc[kkk.SCS == j, 'County_Name'] = r.County_Name.values[index[i]]
 
         return kkk

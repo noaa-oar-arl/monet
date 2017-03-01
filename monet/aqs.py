@@ -25,8 +25,7 @@ class aqs:
                              '1st_Max Hour', 'AQI', 'Method_Code', 'Method_Name',
                              'Local_Site_Name', 'Address', 'State_Name', 'County_Name',
                              'City_Name', 'CBSA_Name', 'Date_of_Last_Change']
-        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude',
-                         'Parameter_Name', 'Obs', 'Units', 'State_Name', 'County_Name', 'Species', 'Region']
+        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude','Obs', 'Units','Species', 'Region']
         self.se_states = array(
             ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
              'Virginia', 'West Virginia'], dtype='|S14')
@@ -81,6 +80,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_PM_25_88101_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_PM_25_88101_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -107,6 +107,8 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
+        print df.keys()
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_OZONE_44201_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_OZONE_44201_' + year + '.hdf', 'df', format='fixed')
 
@@ -134,6 +136,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_PM_10_81102_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_PM_10_81102_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -160,6 +163,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_SO2_42401_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_SO2_42401_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -189,6 +193,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_NO2_42602_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -215,6 +220,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_CO_42101_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -240,6 +246,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_NONOXNOY_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_NONOXNOY_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -266,6 +273,7 @@ class aqs:
         df = self.get_species(df, voc=True)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_VOC_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_VOC_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -292,6 +300,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_SPEC_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_SPEC_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -318,6 +327,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_WIND_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_WIND_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -344,6 +354,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_TEMP_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -370,6 +381,7 @@ class aqs:
         df = self.get_species(df)
         df = self.get_region(df)
         df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_RHDP_' + year + '.hdf'
         df.to_hdf('AQS_HOURLY_RHDP_' + year + '.hdf', 'df', format='fixed')
         return df
@@ -545,8 +557,8 @@ class aqs:
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).copy().drop_duplicates()
         os.chdir(self.cwd)
-        self.df.SCS = self.df.SCS.values.astype('int32')
-        self.add_metro_metadata()
+#        self.df.SCS = self.df.SCS.values.astype('int32')
+        self.df = self.add_metro_metadata2(self.df)
 
     def load_aqs_daily_pm25_data(self, dates):
         from datetime import timedelta
@@ -671,7 +683,7 @@ class aqs:
 
         df['Region'] = array(sr)
         
-        df = self.change_states_to_abv(df)
+#        df = self.change_states_to_abv(df)
         return df
 
     def change_states_to_abv(self, df):
@@ -783,34 +795,52 @@ class aqs:
         return df
 
     def read_monitor_file(self):
-        if os.path.isfile(self.monitor_file):
-            fname = self.monitor_file
-            colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-            f = pd.read_csv(fname, delimiter='|', header=None, usecols=colsinuse)
-            f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
+        if type(self.monitor_df) == type(None):
+            if os.path.isfile(self.monitor_file):
+                fname = self.monitor_file
+                colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+                f = pd.read_csv(fname, delimiter='|', header=None, usecols=colsinuse)
+                f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
                          'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
                          'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
-            self.monitor_df = f.copy()
-        else:
-            print '   Monitor File not found.  Meta-Data city names not added'
-            f = None
+                
+                self.monitor_df = f.drop_duplicates().dropna(subset=['SCS']).copy()
+                self.monitor_df.SCS = self.monitor_df.SCS.values.astype('int32')
+            else:
+                print '   Monitor File not found.  Meta-Data city names not added'
+                f = None
 
-    def add_metro_metadata(self):
+    # def add_metro_metadata(self):
+    #     from numpy import NaN
+    #     if os.path.isfile(self.monitor_file):
+    #         print '    Monitor Station Meta-Data Found: Compiling Dataset'
+    #         self.read_monitor_file()
+    #         dfs = self.monitor_df[['SCS', 'MSA_Name']]
+    #         for i in self.df.SCS.unique():
+    #             con = self.df.SCS == i
+    #             if dfs.loc[dfs.SCS.values == i]['MSA_Name'].count() > 0:
+    #                 self.df.loc[dfs.SCS.values == i, 'MSA_Name'] = dfs.loc[dfs.SCS.values == i]['MSA_Name'].unique()
+    #             else:
+    #                 self.df.loc[con, 'MSA_Name'] = NaN
+
+    #         self.df = pd.merge(self.df, dfs, on='SCS', how='left')
+    #         self.df.drop('MSA_Name_y', axis=1, inplace=True)
+    #         self.df.rename(columns={'MSA_Name_x': 'MSA_Name'}, inplace=True)
+
+    def add_metro_metadata2(self,df):
         from numpy import NaN
-        if os.path.isfile(self.monitor_file):
+        if type(self.monitor_df) != type(None):
+            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region']].drop_duplicates()
+            dfs.SCS = dfs.SCS.values.astype('int32')
+            df = pd.merge(df,dfs,on=['SCS'],how='left')
+        elif os.path.isfile(self.monitor_file):
             print '    Monitor Station Meta-Data Found: Compiling Dataset'
             self.read_monitor_file()
-            dfs = self.monitor_df[['SCS', 'MSA_Name']]
-            for i in self.df.SCS.unique():
-                con = self.df.SCS == i
-                if dfs.loc[dfs.SCS.values == i]['MSA_Name'].count() > 0:
-                    self.df.loc[dfs.SCS.values == i, 'MSA_Name'] = dfs.loc[dfs.SCS.values == i]['MSA_Name'].unique()
-                else:
-                    self.df.loc[con, 'MSA_Name'] = NaN
-
-            self.df = pd.merge(self.df, dfs, on='SCS', how='left')
-            self.df.drop('MSA_Name_y', axis=1, inplace=True)
-            self.df.rename(columns={'MSA_Name_x': 'MSA_Name'}, inplace=True)
+            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region']].drop_duplicates()
+            dfs.SCS = dfs.SCS.values.astype('int32')
+            df = pd.merge(df,dfs,on=['SCS'],how='left')
+        
+        return df
 
     def retrieve_aqs_daily_co_data(self, dates):
         import wget
@@ -832,6 +862,7 @@ class aqs:
                           dtype='int32')
         utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
         df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_CO_42101_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
@@ -855,6 +886,7 @@ class aqs:
                           dtype='int32')
         utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
         df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_OZONE_44201_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()
@@ -878,6 +910,7 @@ class aqs:
                           dtype='int32')
         utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
         df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_PM_10_81102_' + year + '.hdf', 'df', format='fixed')
         self.aqsdf = df.copy()

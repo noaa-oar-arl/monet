@@ -11,6 +11,9 @@ __author__ = "Yannick Copin <yannick.copin@laposte.net>"
 
 import matplotlib.pyplot as PLT
 import numpy as NP
+import seaborn as sns
+colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
+sns.set_palette(sns.color_palette(colors))
 
 
 class TaylorDiagram(object):
