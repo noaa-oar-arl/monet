@@ -70,7 +70,7 @@ WBAN	COUNTRY	STATE	LOCATION	VECTOR	NAME	LATITUDE	LONGITUDE	ELEVATION	STATUS	COMM
 23803	US	MS	Holly Springs	4 N	MSU, MAFES, North MS R&E Center, (North MS Branch)	34.82	-89.43	484	Commissioned	2008-04-03 20:00:00.0		Operational		USCRN
 23904	US	AR	Batesville	8 WNW	LFST Br. Exp. Stn.,Univ.of AR, Div.of Agriculture(Field #1)	35.82	-91.78	455	Commissioned	2007-02-22 19:00:00.0		Operational		USCRN
 23906	US	TX	Port Aransas	32 NNE	Aransas National Wildlife Refuge (Weather Site)	28.3	-96.82	15	Commissioned	2008-04-01 20:00:00.0		Operational		USCRN
-23907	US	TX	Austin	33 NW	Balcones National Wildlife Refuge (Flying "X" Ranch)	30.62	-98.08	1361	Commissioned	2008-04-03 20:00:00.0		Operational		USCRN
+23907	US	TX	Austin	33 NW	Balcones National Wildlife Refuge (Flying X Ranch)	30.62	-98.08	1361	Commissioned	2008-04-03 20:00:00.0		Operational		USCRN
 23908	US	MO	Joplin	24 N	Shawnee Trail Conservation Area	37.42	-94.58	952	Commissioned	2007-08-02 20:00:00.0		Operational		USCRN
 23909	US	MO	Salem	10 W	White River Trace Conservation Area (Stand 4, Compartment 7)	37.63	-91.72	1198	Commissioned	2007-08-02 20:00:00.0		Operational		USCRN
 25379	US	AK	Sitka	1 NE	USGS  Sitka Magnetic Observatory	57.05	-135.32	78	Commissioned	2013-07-21 20:00:00.0		Operational		USCRN
