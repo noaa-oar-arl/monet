@@ -80,7 +80,7 @@ class crn:
         self.r_states = array(['AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM',
                                'ND', 'SD', 'UT', 'WY'], dtype='|S12')
         self.p_states = array(['CA', 'OR', 'WA'], dtype='|S10')
-        self.objtype = 'AirNow'
+        self.objtype = 'CRN'
         self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
         self.monitor_df = None
         self.cols = ['WBANNO', 'UTC_DATE', 'UTC_TIME', 'LST_DATE', 'LST_TIME', 'CRX_VN',
@@ -161,6 +161,7 @@ class crn:
         self.df.columns = cols
         con = (self.df.datetime >= self.dates[0]) & (self.df.datetime <= self.dates[-1])
         self.df = self.df[con]
+        self.merge_monitor_meta_data()
         if output == '':
             output = 'CRN.hdf'
         print 'Outputing dataframe to: ' + output
