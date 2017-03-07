@@ -60,6 +60,7 @@ class verify_aqs:
         print '==============================================================='
         self.ensure_values_indomain()
         comparelist = sort(self.aqs.df.Species.unique())
+        print 'List of species available to compare:',comparelist
         dfs = []
         g = self.aqs.df.groupby('Species')
         for i in comparelist:
@@ -69,13 +70,11 @@ class verify_aqs:
                     dfo3 = g.get_group(i)
                     fac = self.check_cmaq_units(param='O3', aqs_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
-                    print cmaq.shape
                     self.cmaqo3 = cmaq
                     dfo3 = self.interp_to_aqs(cmaq, dfo3, interp=interp, r=radius, weight_func=weight_func)
                     dfo3.Obs, dfo3.CMAQ = dfo3.Obs, dfo3.CMAQ
                     dfo3.Units = 'PPB'
                     dfs.append(dfo3)
-                    print dfo3.variables.keys()
                 except:
                     pass
             elif i == 'PM2.5':
@@ -286,10 +285,25 @@ class verify_aqs:
                     pass
             elif i == 'ISOPRENE':
                 try:
-                    if ('ISOP' not in self.cmaq.keys):
+                    if ('ISOP' not in self.cmaq.keys) & ('VOC' not in self.cmaq.keys):
                         pass
                     else:
                         print 'Interpolating Isoprene:'
+                        dfnox = g.get_group(i)
+                        fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
+                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        self.cmaqisop = cmaq
+                        dfs.append(dfnox)
+                except:
+                    pass
+            elif i == 'XYLENE':
+                try:
+                    if ('XYL' not in self.cmaq.keys):
+                        print 'Variable \"XYL\" not in CMAQ keys'
+                        pass
+                    else:
+                        print 'Interpolating Xylene'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
                         cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
@@ -598,6 +612,16 @@ class verify_aqs:
             fac = 1.
         elif aunit == 'PPB':
             fac = 1000.
+        elif aunit == 'Parts per billion Carbon':
+            fac = 1000.
+            if aqs_param == 'ISOP':
+                fac *= 5.
+            elif aqs_param == 'BENZENE':
+                fac *= 6.
+            elif aqm_param == 'TOLUENE':
+                fac *= 7.
+            elif aqm_param == 'XYL':
+                fac *= 8.
         else:
             fac = 1.
         return fac

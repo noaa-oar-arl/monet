@@ -773,7 +773,7 @@ class aqs:
         for i in units:
             con = df.Units == i
             if i == 'Parts per billion Carbon':
-                df.loc[con, 'Units'] = 'PPB'
+                df.loc[con, 'Units'] = 'PPBC'
             if i == 'Parts per billion':
                 df.loc[con, 'Units'] = 'PPB'
             if i == 'Parts per million':

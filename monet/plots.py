@@ -139,7 +139,7 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
     :param sample:
     """
     import matplotlib.dates as mdates
-    from numpy import isnan
+    from numpy import isnan,NaN,nanmax,nanmin
     sns.set_style('ticks')
     df.index = df.datetime
     if fig is None:
@@ -147,16 +147,23 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
         f = plt.figure(figsize=(16, 8))
         if label is None:
             label = 'CMAQ'
-
+        df.Obs[df.Obs < 0] = NaN
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
         obs = df.Obs.resample(sample).mean()
-        obserr = df.Obs.resample(sample).std()
+        if df.SCS.unique().shape[0] == 1:
+            obserr = 0.
+            cmaqerr = 0.
+        else:
+            obserr = nanmax([df.Obs.resample(sample).std(),0])
+            cmaqerr = nanmax([df.CMAQ.resample(sample).std(),0])
+
         cmaq = df.CMAQ.resample(sample).mean()
         cmaqerr = df.CMAQ.resample(sample).std()
         plt.plot(obs, color='darkslategrey')
         plt.plot(cmaq, color='dodgerblue', label=label)
         plt.legend(loc='best')
+        
         mask = ~isnan(obs) & ~isnan(obserr)
         plt.fill_between(obs.index[mask], (obs - obserr)[mask], (obs + obserr)[mask], alpha=.2, color='darkslategrey')
         mask = ~isnan(cmaq) & ~isnan(cmaqerr)
@@ -166,9 +173,12 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
         ax.set_xlabel('UTC Time (mm/dd HH)')
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
         plt.title(title)
-        minval = min([(obs - obserr).min(), (cmaq - cmaqerr).min()])
-        minval = max([minval, 0])
-        maxval = max([(cmaq + cmaqerr).max() * 1.1, (obs + obserr).max() * 1.1])
+        minval = nanmin([(obs - obserr).min(), (cmaq - cmaqerr).min()])
+        minval = nanmax([minval, 0])
+        maxval = nanmax([(cmaq + cmaqerr).max() * 1.1, (obs + obserr).max() * 1.1])
+        maxval = nanmax([maxval,(obs + obserr).max() * 1.1])
+        print 'minval','maxval','cmaq_max', 'obs_max'
+        print minval,maxval,str((cmaq + cmaqerr).max() * 1.1),str((obs + obserr).max() * 1.1)
         plt.gca().set_ylim(bottom=minval)
         plt.gca().set_ylim(top=maxval)
         ylabel = species + ' (' + units + ')'

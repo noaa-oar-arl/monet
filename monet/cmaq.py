@@ -376,7 +376,8 @@ class cmaq:
             var = self.get_surface_ec()
         elif (param == 'OC'):
             var = self.get_surface_oc()
-
+        elif (param == 'VOC'):
+            var = self.concobj.variables['VOC'][self.indexdates, 0, :, :].squeeze()
         else:
             print '   Getting CMAQ Variable: ' + param
             var = self.concobj.variables[param][self.indexdates, 0, :, :].squeeze()
