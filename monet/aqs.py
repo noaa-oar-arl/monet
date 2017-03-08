@@ -772,21 +772,21 @@ class aqs:
         units = df.Units.unique()
         for i in units:
             con = df.Units == i
-            if i == 'Parts per billion Carbon':
-                df.loc[con, 'Units'] = 'PPBC'
+            if i.upper() == 'Parts per billion Carbon'.upper():
+                df.loc[con, 'Units'] = 'ppbC'
             if i == 'Parts per billion':
-                df.loc[con, 'Units'] = 'PPB'
+                df.loc[con, 'Units'] = 'ppb'
             if i == 'Parts per million':
-                df.loc[con, 'Units'] = 'PPM'
+                df.loc[con, 'Units'] = 'ppm'
             if i == 'Micrograms/cubic meter (25 C)':
-                df.loc[con, 'Units'] = 'UG/M3'
+                df.loc[con, 'Units'] = 'UG/M3'.lower()
             if i == 'Degrees Centigrade':
                 df.loc[con, 'Units'] = 'C'
             if i == 'Micrograms/cubic meter (LC)':
-                df.loc[con, 'Units'] = 'UG/M3'
+                df.loc[con, 'Units'] = 'UG/M3'.lower()
             if i == 'Knots':
                 df.loc[con, 'Obs'] *= 0.51444
-                df.loc[con, 'Units'] = 'M/S'
+                df.loc[con, 'Units'] = 'M/S'.lower()
             if i == 'Degrees Fahrenheit':
                 df.loc[con, 'Obs'] = (df.loc[con, 'Obs'] + 459.67) * 5. / 9.
                 df.loc[con, 'Units'] = 'K'

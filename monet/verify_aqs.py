@@ -608,11 +608,11 @@ class verify_aqs:
 
     def check_cmaq_units(self, param='O3', aqs_param='OZONE'):
         aunit = self.aqs.df[self.aqs.df.Species == aqs_param].Units.unique()[0]
-        if aunit == 'UG/M3':
+        if aunit == 'UG/M3'.lower():
             fac = 1.
-        elif aunit == 'PPB':
+        elif aunit == 'PPB'.lower():
             fac = 1000.
-        elif aunit == 'Parts per billion Carbon':
+        elif aunit == 'ppbC':
             fac = 1000.
             if aqs_param == 'ISOP':
                 fac *= 5.
