@@ -39,6 +39,7 @@ class verify_aqs:
         self.cmaqbenz = None
         self.cmaqethane = None
         self.cmaqtol = None
+        self.cmaqxyl = None
         self.df8hr = None
 
     def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
@@ -285,7 +286,7 @@ class verify_aqs:
                     pass
             elif i == 'ISOPRENE':
                 try:
-                    if ('ISOP' not in self.cmaq.keys) & ('VOC' not in self.cmaq.keys):
+                    if ('ISOP' not in self.cmaq.keys):
                         pass
                     else:
                         print 'Interpolating Isoprene:'
@@ -297,7 +298,7 @@ class verify_aqs:
                         dfs.append(dfnox)
                 except:
                     pass
-            elif i == 'XYLENE':
+            elif i == 'O-XYLENE':
                 try:
                     if ('XYL' not in self.cmaq.keys):
                         print 'Variable \"XYL\" not in CMAQ keys'
@@ -305,10 +306,10 @@ class verify_aqs:
                     else:
                         print 'Interpolating Xylene'
                         dfnox = g.get_group(i)
-                        fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
+                        fac = self.check_cmaq_units(param='XYL', aqs_param=i)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='XYL') * fac
                         dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                        self.cmaqisop = cmaq
+                        self.cmaqxyl = cmaq
                         dfs.append(dfnox)
                 except:
                     pass
@@ -614,13 +615,13 @@ class verify_aqs:
             fac = 1000.
         elif aunit == 'ppbC':
             fac = 1000.
-            if aqs_param == 'ISOP':
+            if aqs_param == 'ISOPRENE':
                 fac *= 5.
             elif aqs_param == 'BENZENE':
                 fac *= 6.
-            elif aqm_param == 'TOLUENE':
+            elif aqs_param == 'TOLUENE':
                 fac *= 7.
-            elif aqm_param == 'XYL':
+            elif aqs_param == 'O-XYLENE':
                 fac *= 8.
         else:
             fac = 1.

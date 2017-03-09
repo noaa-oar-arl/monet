@@ -155,8 +155,8 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
             obserr = 0.
             cmaqerr = 0.
         else:
-            obserr = nanmax([df.Obs.resample(sample).std(),0])
-            cmaqerr = nanmax([df.CMAQ.resample(sample).std(),0])
+            obserr = df.Obs.resample(sample).std()
+            cmaqerr = df.CMAQ.resample(sample).std()
 
         cmaq = df.CMAQ.resample(sample).mean()
         cmaqerr = df.CMAQ.resample(sample).std()
