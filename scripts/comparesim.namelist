@@ -1,17 +1,17 @@
 &files
-AQS_DATA_DIR = '/naqfc/noscrub/Barry.Baker/AQS_DATA'
-SIM1 = '/naqfc/noscrub/Daniel.Tong/rapid_nox/aqm.t12z.aconc-sfc-2015*.ncf'
-SIM2 = '/naqfc/noscrub/Daniel.Tong/rapid_nox/aqme.t12z.aconc-sfc-2015*.ncf'
+AQS_DATA_DIR = '/data/aqf/barryb/AQS_DATA'
+SIM1 = '/data/aqf2/barryb/5xpm/20140701/aqm.t12z.aconc.ncf' !'/data/aqf/barryb/for_hyuncheol/EDA_NOX_RESULTS/aqm.t12z.aconc.201508*'
+SIM2 = None !'/data/aqf/barryb/for_hyuncheol/EDA_NOX_RESULTS/aqme.t12z.aconc.201508*'
 SIM3 = None
 SIM4 = None
-gridcro = '/naqfc/noscrub/Barry.Baker/cmaq_grids/aqm.t12z.grdcro2d.ncf'
-basename='edanox'
-SIM1label='CMAQ'
-SIM2label='CMAQ-EDA'
-SIM3label='SIM3'
-SIM4label='SIM4'
-start_date ='2015-08-01 00'
-end_date = '2011-08-31 00'
+gridcro = '/data/aqf/barryb/aqm.t12z.grdcro2d.ncf'
+basename = 'edanox'
+SIM1label = 'NAQFC'
+SIM2label = 'CMAQ-EDA'
+SIM3label = 'SIM3'
+SIM4label = 'SIM4'
+start_date = '2014-01-01 00'
+end_date = '2014-12-31 00'
 save=.true.
 sim1_save_name = '../../../CMAQ_DATA/AQM_RAPID_NOX.hdf'
 sim2_save_name = '../../../CMAQ_DATA/AQME_RAPID_NOX.hdf'
@@ -24,7 +24,7 @@ radius_of_influence=12000.
 neighbors=4
 /
 &Domain
-params='OZONE,PM2.5,NOX,NO,NO2'
+params='OZONE,PM2.5,NOX,NO,NO2,ISOPRENE,TOLUENE,SO4f,NO3f'
 tseries=.True.
 tseriesrmse=.true.
 tseriesbias=.true.
@@ -36,8 +36,21 @@ taylordiagram=.true.
 footers=.false.
 /
 &Region
-params='OZONE,PM2.5,NOX,NO,NO2'
-region= 'all'
+params='OZONE,PM2.5,NOX,NO,NO2,ISOPRENE,TOLUENE,SO4f,NO3f'
+region= None
+tseries=.True.
+tseriesrmse=.true.
+tseriesbias=.true.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.true.
+footers=.false.
+/
+&EPA_region
+params='OZONE,PM2.5,NOX,NO,NO2,ISOPRENE,TOLUENE,SO4f,NO3f'
+epa_region= 'all'
 tseries=.True.
 tseriesrmse=.true.
 tseriesbias=.true.
@@ -63,7 +76,7 @@ footers=.false.
 /
 &City
 params='OZONE,PM2.5'
-city= ''New York,Baltimore, Las Angeles, Chicago'
+city= 'New York,Baltimore, Las Angeles, Chicago'
 tseries=.True.
 tseriesrmse=.true.
 tseriesbias=.true.

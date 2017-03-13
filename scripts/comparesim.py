@@ -1,4 +1,4 @@
-#!/naqfc/noscrub/Barry.Baker/anaconda2/bin/python
+#!/data/aqf/barryb/anaconda2/bin/python
 
 ###for AITKEN
 #### /data/aqf/barryb/anaconda2/bin/python
@@ -260,7 +260,7 @@ if (nml['region']['params'].lower() != 'none') & (nml['region']['region'].lower(
                     if sim4 is not False:
                         sim4.compare_param(param=i,region=j,timeseries=True,fig=plt.figure(1),label=nml['files']['sim4label'])
                     plt.savefig(base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'timeseries.jpg',dpi=75)
-                    print 'Saving: ' + base +'_'+i.replace('.','')+'_'+'timeseries.jpg'
+                    print 'Saving: ' + base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'timeseries.jpg'
                     plt.close('all')
                 except:
                     plt.close('all')
@@ -364,6 +364,137 @@ if (nml['region']['params'].lower() != 'none') & (nml['region']['region'].lower(
                 except:
                     plt.close('all')
                     pass
+
+#EPA Regions
+if (nml['epa_region']['params'].lower() != 'none') & (nml['epa_region']['epa_region'].lower() !='none'):
+    if nml['epa_region']['params'] == 'all':
+        params = sim1.df.Species.unique()
+    else:
+        params = nml['epa_region']['params'].split(',')
+    if nml['epa_region']['epa_region'] =='all':
+        regions = sim1.df.EPA_region.dropna().unique()
+        print regions
+    else:
+        regions = nml['epa_region']['epa_region'].split(',')
+    for j in regions:
+        for i in params:
+            print i,j
+            if nml['epa_region']['tseries']:
+                try:
+                    sim1.compare_param(param=i,epa_region=j,timeseries=True,label=nml['files']['sim1label'],footer=nml['epa_region']['footers'])
+                    print 'here'
+                    if sim2 is not False:
+                        sim2.compare_param(param=i,epa_region=j,timeseries=True,fig=plt.figure(1),label=nml['files']['sim2label'])
+                    if sim3 is not False:
+                        sim3.compare_param(param=i,epa_region=j,timeseries=True,fig=plt.figure(1),label=nml['files']['sim3label'])
+                    if sim4 is not False:
+                        sim4.compare_param(param=i,epa_region=j,timeseries=True,fig=plt.figure(1),label=nml['files']['sim4label'])
+                    plt.savefig(base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'timeseries.jpg',dpi=75)
+                    print 'Saving: ' + base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'timeseries.jpg'
+                    plt.close('all')
+                except:
+                    plt.close('all')
+                    pass
+            if nml['epa_region']['tseriesrmse']:
+                try:
+                    sim1.compare_param(param=i,epa_region=j,timeseries_rmse=True,label=nml['files']['sim1label'],footer=nml['epa_region']['footers'])
+                    if sim2 is not False:
+                        sim2.compare_param(param=i,epa_region=j,timeseries_rmse=True,fig=plt.figure(1),label=nml['files']['sim2label'])
+                    if sim3 is not False:
+                        sim3.compare_param(param=i,epa_region=j,timeseries_rmse=True,fig=plt.figure(1),label=nml['files']['sim3label'])
+                    if sim4 is not False:
+                        sim4.compare_param(param=i,epa_region=j,timeseries_rmse=True,fig=plt.figure(1),label=nml['files']['sim4label'])
+                    plt.savefig(base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'timeseries_rmse.jpg',dpi=75)
+                    print 'Saving: ' + base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'timeseries_rmse.jpg'
+                    plt.close('all')
+                except:
+                    plt.close('all')
+                    pass
+            if nml['epa_region']['tseriesbias']:
+                try:
+                    sim1.compare_param(param=i,epa_region=j,timeseries_mb=True,label=nml['files']['sim1label'],footer=nml['epa_region']['footers'])
+                    if sim2 is not False:
+                        sim2.compare_param(param=i,epa_region=j,timeseries_mb=True,fig=plt.figure(1),label=nml['files']['sim2label'])
+                    if sim3 is not False:
+                        sim3.compare_param(param=i,epa_region=j,timeseries_mb=True,fig=plt.figure(1),label=nml['files']['sim3label'])
+                    if sim4 is not False:
+                        sim4.compare_param(param=i,epa_region=j,timeseries_mb=True,fig=plt.figure(1),label=nml['files']['sim4label'])
+                    plt.savefig(base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'timeseries_mb.jpg',dpi=75)
+                    plt.close('all')
+                except:
+                    plt.close('all')
+                    pass
+            if nml['epa_region']['scatter']:
+                try:
+                    sim1.compare_param(param=i,epa_region=j,scatter=True,label=nml['files']['sim1label'],footer=nml['epa_region']['footers'])
+                    if sim2 is not False:
+                        sim2.compare_param(param=i,epa_region=j,scatter=True,fig=plt.figure(1),label=nml['files']['sim2label'])
+                    if sim3 is not False:
+                        sim3.compare_param(param=i,epa_region=j,scatter=True,fig=plt.figure(1),label=nml['files']['sim3label'])
+                    if sim4 is not False:
+                        sim4.compare_param(param=i,epa_region=j,scatter=True,fig=plt.figure(1),label=nml['files']['sim4label'])
+                    plt.savefig(base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'scatter.jpg',dpi=75)
+                    plt.close('all')
+                except:
+                    plt.close('all')
+                    pass
+            if nml['epa_region']['diffscatter']:
+                try:
+                    sim1.compare_param(param=i,epa_region=j,diffscatter=True,label=nml['files']['sim1label'],footer=nml['epa_region']['footers'])
+                    if sim2 is not False:
+                        sim2.compare_param(param=i,epa_region=j,diffscatter=True,fig=plt.figure(1),label=nml['files']['sim2label'])
+                    if sim3 is not False:
+                        sim3.compare_param(param=i,epa_region=j,diffscatter=True,fig=plt.figure(1),label=nml['files']['sim3label'])
+                    if sim4 is not False:
+                        sim4.compare_param(param=i,epa_region=j,diffscatter=True,fig=plt.figure(1),label=nml['files']['sim4label'])
+                    plt.savefig(base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'diffscatter.jpg',dpi=75)
+                    plt.close('all')
+                except:
+                    plt.close('all')
+                    pass
+            if nml['epa_region']['pdfs']:
+                try:
+                    sim1.compare_param(param=i,epa_region=j,pdfs=True,label=nml['files']['sim1label'],footer=nml['epa_region']['footers'])
+                    if sim2 is not False:
+                        sim2.compare_param(param=i,epa_region=j,pdfs=True,fig=plt.figure(1),label=nml['files']['sim2label'])
+                    if sim3 is not False:
+                        sim3.compare_param(param=i,epa_region=j,pdfs=True,fig=plt.figure(1),label=nml['files']['sim3label'])
+                    if sim4 is not False:
+                        sim4.compare_param(param=i,epa_region=j,pdfs=True,fig=plt.figure(1),label=nml['files']['sim4label'])
+                    plt.savefig(base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'pdfs.jpg',dpi=75)
+                    plt.close('all')
+                except:
+                    plt.close('all')
+                    pass
+            if nml['epa_region']['diffpdfs']:
+                try:
+                    sim1.compare_param(param=i,epa_region=j,diffpdfs=True,label=nml['files']['sim1label'],footer=nml['epa_region']['footers'])
+                    if sim2 is not False:
+                        sim2.compare_param(param=i,epa_region=j,diffpdfs=True,fig=plt.figure(1),label=nml['files']['sim2label'])
+                    if sim3 is not False:
+                        sim3.compare_param(param=i,epa_region=j,diffpdfs=True,fig=plt.figure(1),label=nml['files']['sim3label'])
+                    if sim4 is not False:
+                        sim4.compare_param(param=i,epa_region=j,diffpdfs=True,fig=plt.figure(1),label=nml['files']['sim4label'])
+                    plt.savefig(base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'diffpdfs.jpg',dpi=75)
+                    plt.close('all')
+                except:
+                    plt.close('all')
+                    pass
+            if nml['epa_region']['taylordiagram']:
+                try:
+                    dia = sim1.compare_param(param=i,epa_region=j,taylordiagram=True,label=nml['files']['sim1label'])
+                    if sim2 is not False:
+                        sim2.compare_param(param=i,epa_region=j,taylordiagram=True,fig=plt.figure(1),label=nml['files']['sim2label'],dia=dia)
+                    if sim3 is not False:
+                        sim3.compare_param(param=i,epa_region=j,taylordiagram=True,fig=plt.figure(1),label=nml['files']['sim3label'],dia=dia)
+                    if sim4 is not False:
+                        sim4.compare_param(param=i,epa_region=j,taylordiagram=True,fig=plt.figure(1),label=nml['files']['sim4label'],dia=dia)
+                    plt.savefig(base +'_'+i.replace('.','')+'_'+j.replace(' ','')+'_'+'taylor.jpg',dpi=75)
+                    plt.close('all')
+                except:
+                    plt.close('all')
+                    pass
+
 
 #States
 if (nml['state']['params'].lower() != 'none') & (nml['state']['state'].lower() !='none'):
@@ -618,3 +749,5 @@ if (nml['city']['params'].lower() != 'none') & (nml['city']['city'].lower() !='n
                     plt.close('all')
                     pass
 
+
+#  LocalWords:  nml
