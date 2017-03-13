@@ -177,8 +177,8 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
         minval = nanmax([minval, 0])
         maxval = nanmax([(cmaq + cmaqerr).max() * 1.1, (obs + obserr).max() * 1.1])
         maxval = nanmax([maxval,(obs + obserr).max() * 1.1])
-        print 'minval','maxval','cmaq_max', 'obs_max'
-        print minval,maxval,str((cmaq + cmaqerr).max() * 1.1),str((obs + obserr).max() * 1.1)
+#        print 'minval','maxval','cmaq_max', 'obs_max'
+#        print minval,maxval,str((cmaq + cmaqerr).max() * 1.1),str((obs + obserr).max() * 1.1)
         plt.gca().set_ylim(bottom=minval)
         plt.gca().set_ylim(top=maxval)
         ylabel = species + ' (' + units + ')'

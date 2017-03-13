@@ -25,7 +25,7 @@ class aqs:
                              '1st_Max Hour', 'AQI', 'Method_Code', 'Method_Name',
                              'Local_Site_Name', 'Address', 'State_Name', 'County_Name',
                              'City_Name', 'CBSA_Name', 'Date_of_Last_Change']
-        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude','Obs', 'Units','Species', 'Region']
+        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude','Obs', 'Units','Species', 'Region','EPA_region']
         self.se_states = array(
             ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
              'Virginia', 'West Virginia'], dtype='|S14')
@@ -423,7 +423,7 @@ class aqs:
             aqs = self.retrieve_aqs_hourly_ozone_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
-        aqs.Units = 'PPB'
+        aqs.Units = 'ppb'
         aqs.Obs = aqs.Obs.values * 1000.
         aqs.index = arange(aqs.index.shape[0])
         return aqs
