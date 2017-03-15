@@ -9,7 +9,7 @@ import sys
 from glob import glob
 
 import matplotlib.pyplot as plt
-import verify
+import monet as verify
 
 print "Name of Script: ", sys.argv[0]
 print "ACONC FILE: ", sys.argv[1]
@@ -18,7 +18,7 @@ print "LABEL: ", sys.argv[3]
 print "OUTPUT FILENAME: ", sys.argv[4]
 files = glob(sys.argv[1])
 grid = sys.argv[2]
-va = verify.verify_aqs(concpath=files, gridcro=grid, datapath='.', combine=True, neighbors=9)
+va = verify.vaqs(concpath=files, gridcro=grid, datapath='.', combine=True, neighbors=9)
 params = va.df.Species.unique()
 for i in params:
     va.compare_param(param=i, timeseries=True, label=sys.argv[3])

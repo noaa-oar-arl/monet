@@ -10,7 +10,7 @@ import sys
 from glob import glob
 
 import matplotlib.pyplot as plt
-import verify
+import monet as verify
 
 print "Name of Script: ", sys.argv[0]
 print "ACONC FILE: ", sys.argv[1]
@@ -22,7 +22,7 @@ print 'OUTPUT FILE EXTENSION: ', sys.argv[5]
 files = glob(sys.argv[1])
 grid = sys.argv[2]
 
-va = verify.verify_aqs(concpath=files, gridcro=grid, datapath='.', combine=True, neighbors=9)
+va = verify.vaqs(concpath=files, gridcro=grid, datapath='.', combine=True, neighbors=9)
 params = va.df.groupby('State_Name').get_group(sys.argv[4]).Species.unique()
 for j in params:
     va.compare_param(param=j, timeseries=True, label=sys.argv[3], state=sys.argv[5], footer=False)
