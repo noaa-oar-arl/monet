@@ -5,7 +5,7 @@ from zipfile import ZipFile
 
 import pandas as pd
 from numpy import array, arange
-
+import inspect
 
 class aqs:
     def __init__(self):
@@ -25,7 +25,7 @@ class aqs:
                              '1st_Max Hour', 'AQI', 'Method_Code', 'Method_Name',
                              'Local_Site_Name', 'Address', 'State_Name', 'County_Name',
                              'City_Name', 'CBSA_Name', 'Date_of_Last_Change']
-        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude','Obs', 'Units','Species', 'Region','EPA_region']
+        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude','Obs', 'Units','Species', 'Region']
         self.se_states = array(
             ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
              'Virginia', 'West Virginia'], dtype='|S14')
@@ -53,7 +53,7 @@ class aqs:
         self.datadir = '.'
         self.cwd = os.getcwd()
         self.df = None
-        self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
+        self.monitor_file = inspect.getfile(self.__class__)[:-13] + '/data/monitoring_site_locations.dat'
         self.monitor_df = None
 
     def retrieve_aqs_hourly_pm25_data(self, dates):
@@ -558,7 +558,7 @@ class aqs:
         self.df = self.change_units(self.df).copy().drop_duplicates()
         os.chdir(self.cwd)
 #        self.df.SCS = self.df.SCS.values.astype('int32')
-        self.df = self.add_metro_metadata2(self.df)
+        #self.df = self.add_metro_metadata2(self.df)
 
     def load_aqs_daily_pm25_data(self, dates):
         from datetime import timedelta

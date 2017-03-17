@@ -26,10 +26,11 @@ def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radiu
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     va.aqs.datadir = datapath
-    va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
+    #va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
     va.aqs.monitor_file = __file__[:-15] + '/data/monitoring_site_locations.dat'
-
+    print va.aqs.monitor_file
     va.aqs.read_monitor_file()
+    va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
     if combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)
     return va

@@ -147,7 +147,9 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
         f = plt.figure(figsize=(16, 8))
         if label is None:
             label = 'CMAQ'
-        df.Obs[df.Obs < 0] = NaN
+        obs = df.Obs.values
+        obs[(obs < 0) | (obs > 1000)] = NaN
+        df.Obs = obs
         species = df.Species.unique().astype('|S8')[0]
         units = df.Units.unique().astype('|S8')[0]
         obs = df.Obs.resample(sample).mean()
@@ -177,8 +179,6 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
         minval = nanmax([minval, 0])
         maxval = nanmax([(cmaq + cmaqerr).max() * 1.1, (obs + obserr).max() * 1.1])
         maxval = nanmax([maxval,(obs + obserr).max() * 1.1])
-#        print 'minval','maxval','cmaq_max', 'obs_max'
-#        print minval,maxval,str((cmaq + cmaqerr).max() * 1.1),str((obs + obserr).max() * 1.1)
         plt.gca().set_ylim(bottom=minval)
         plt.gca().set_ylim(top=maxval)
         ylabel = species + ' (' + units + ')'

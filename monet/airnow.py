@@ -39,7 +39,7 @@ class airnow:
         self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
         self.monitor_df = None
         self.savecols = ['datetime', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'datetime_local',
-                         'Site_Name', 'Latitude', 'Longitude', 'CMSA_Name', 'MSA_Name', 'State_Name', 'Region']
+                         'Site_Name', 'Latitude', 'Longitude', 'CMSA_Name', 'MSA_Code','MSA_Name', 'State_Name', 'EPA_region']
 
     def retrieve_hourly_filelist(self):
         self.ftp.cwd('HourlyData')
@@ -122,7 +122,7 @@ class airnow:
         self.change_back()
         self.ftp.close()
 
-    def aggragate_files(self, output=''):
+    def aggragate_files(self, output=False,outname='AIRNOW.hdf'):
         from numpy import sort
         from datetime import datetime
         from StringIO import StringIO
@@ -143,13 +143,13 @@ class airnow:
         self.calc_datetime()
         print '    Adding in Meta-data'
         self.get_station_locations()
-        self.get_region()
+#        self.get_region()
+        self.df['Region'] = ' '
         self.df = self.df.copy().drop_duplicates()
         self.df = self.df[self.savecols]
-        if output == '':
-            output = 'AIRNOW.hdf'
-        print 'Outputing data to: ' + output
-        self.df.to_hdf(output, 'df', format='fixed')
+        if output:
+            print 'Outputing data to: ' + outname
+            self.df.to_hdf(outname, 'df', format='fixed')
         self.change_back()
 
     def calc_datetime(self):

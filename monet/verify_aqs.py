@@ -349,7 +349,7 @@ class verify_aqs:
 #        self.df = self.aqs.change_states_to_abv(self.df)
 #        self.df8hr = self.aqs.change_states_to_abv(self.df8hr)
         self.df.SCS = self.df.SCS.values.astype('int32')
-        self.df = self.aqs.add_metro_metadata2(self.df)
+#        self.df = self.aqs.add_metro_metadata2(self.df)
         self.print_info()
 
     def print_info(self):

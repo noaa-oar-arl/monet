@@ -15,19 +15,6 @@ class verify_airnow:
     def __init__(self):
         self.airnow = airnow()
         self.cmaq = cmaq()
-        self.se_states = array(
-            ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
-             'Virginia', 'West Virginia'], dtype='|S14')
-        self.ne_states = array(['Connecticut', 'Delaware', 'District Of Columbia', 'Maine', 'Maryland', 'Massachusetts',
-                                'New Hampshire', 'New Jersey', 'New York', 'Pennsylvania', 'Rhode Island', 'Vermont'],
-                               dtype='|S20')
-        self.nc_states = array(
-            ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan', 'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
-            dtype='|S9')
-        self.sc_states = array(['Arkansas', 'Louisiana', 'Oklahoma', 'Texas'], dtype='|S9')
-        self.r_states = array(['Arizona', 'Colorado', 'Idaho', 'Kansas', 'Montana', 'Nebraska', 'Nevada', 'New Mexico',
-                               'North Dakota', 'South Dakota', 'Utah', 'Wyoming'], dtype='|S12')
-        self.p_states = array(['California', 'Oregon', 'Washington'], dtype='|S10')
         self.df = None
         self.cmaqo3 = None
         self.cmaqnox = None
@@ -229,7 +216,7 @@ class verify_airnow:
                       taylordiagram=False, fig=None, label=None, footer=True, dia=None,marker=None):
         from numpy import NaN
         df = self.df.copy()[
-            ['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units', 'Latitude',
+            ['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'EPA_region', 'SCS', 'Units', 'Latitude',
              'Longitude', 'State_Name']]
         df.Obs[df.Obs < -990] = NaN
         df.dropna(subset=['Obs'], inplace=True)
@@ -251,7 +238,7 @@ class verify_airnow:
             df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
             title = state
         elif region != '':
-            df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
+            df2 = new[new['EPA_region'].str.upper() == region.upper()].copy().drop_duplicates()
             title = region
         else:
             df2 = new
