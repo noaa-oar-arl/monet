@@ -117,17 +117,18 @@ def spatial_stat_scatter(df,m,date, stat=mystats.MB,ncolors=15,fact=1.5,cmap='Rd
     colors = new.CMAQ - new.Obs
     ss = (new.Obs - new.CMAQ).abs() * fact
     
-def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, fact=1.5, cmap='YlGnBu'):
+def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, fact=1.5, cmap='RdBu_r'):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
     f,ax = plt.subplots()
     ax.set_axis_bgcolor('white')
+    diff = (df.CMAQ - df.Obs).abs()
+    top = around(score(diff, per=90))
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
     cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
-    ss = (new.Obs - new.CMAQ).abs() * fact
-    top = around(score(ss, per=90))
+    ss = (new.CMAQ - new.Obs).abs() * fact
     print top
     plt.scatter(x, y, c=colors, s=ss, vmin=-top, vmax=top, cmap=cmap, edgecolors='w', linewidths=.1)
     if savename != '':
