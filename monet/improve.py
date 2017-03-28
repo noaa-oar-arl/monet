@@ -29,7 +29,7 @@ class improve:
 
         self.df = pd.read_csv(fname, delimiter=',', parse_dates=[2], infer_datetime_format=True)
         self.df.rename(columns={'EPACode': 'SCS'}, inplace=True)
-        self.df.rename(columns={'Value': 'Obs'}, inplace=True)
+        self.df.rename(columns={'Value2': 'Obs'}, inplace=True)
         self.df.rename(columns={'State': 'State_Name'}, inplace=True)
         self.df.rename(columns={'ParamCode': 'Species'}, inplace=True)
         self.df.rename(columns={'SiteCode': 'Site_Code'}, inplace=True)

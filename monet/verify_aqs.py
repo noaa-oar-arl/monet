@@ -27,6 +27,7 @@ class verify_aqs:
         self.cmaqethane = None
         self.cmaqtol = None
         self.cmaqxyl = None
+        self.cmaqpm10 = None
         self.df8hr = None
 
     def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
@@ -183,7 +184,7 @@ class verify_aqs:
                         fac = self.check_cmaq_units(param='PM10', aqs_param=i)
                         cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
                         dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                        self.cmaqpso4 = cmaq
+                        self.cmaqpm10 = cmaq
                         dfs.append(dfnox)
                     else:
                         pass
@@ -456,8 +457,15 @@ class verify_aqs:
             cmaq = self.cmaqnox
         elif param == 'ISOPRENE':
             cmaq = self.cmaqisop
+        elif param == 'PM10':
+            cmaq = self.cmaqpm10
+        elif param == 'NO3f':
+            cmaq = self.cmaqpno3
+        elif param == 'SO4f':
+            cmaq = self.cmaqpso4
+        
 
-        cmaq = masked_less(cmaq, .25)
+        cmaq = masked_less(cmaq, .01)
         m = self.cmaq.choose_map(path, region)
         if date == '':
             for index, i in enumerate(self.cmaq.dates):

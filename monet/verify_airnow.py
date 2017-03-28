@@ -75,7 +75,7 @@ class verify_airnow:
                     fac = self.check_cmaq_units(param='PM25', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
                     dfpm25 = self.interp_to_airnow(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func)
-                    print dfpm25.keys()
+
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm25)
                 except:

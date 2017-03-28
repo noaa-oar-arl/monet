@@ -81,7 +81,7 @@ class crn:
                                'ND', 'SD', 'UT', 'WY'], dtype='|S12')
         self.p_states = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.objtype = 'CRN'
-        self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
+        self.monitor_file = inspect.getfile(self.__class__)[:-13] + '/data/stations.tsv'
         self.monitor_df = None
         self.cols = ['WBANNO', 'UTC_DATE', 'UTC_TIME', 'LST_DATE', 'LST_TIME', 'CRX_VN',
                      'LONGITUDE', 'LATITUDE', 'T_CALC', 'T_HR_AVG', 'T_MAX', 'T_MIN',

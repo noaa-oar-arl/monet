@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import mystats
 import taylordiagram as td
 
 colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
@@ -30,6 +30,24 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, 
     if savename != '':
         plt.savefig(savename + date.strftime('%Y%m%d_%H.jpg'), dpi=dpi)
         plt.close()
+    return c
+
+def make_spatial_plot_no_obs(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, vmax=150, ncolors=15, cmap='viridis'):
+    fig = plt.figure(figsize=(12, 6), frameon=False)
+    lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
+    lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
+    # define map and draw boundries                                                                                                                                                                                                                                   
+    m.drawstates()
+    m.drawcoastlines(linewidth=.3)
+    m.drawcountries()
+    x, y = m(lon, lat)
+    plt.axis('off')
+
+    c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
+    m.pcolormesh(x, y, cmaqvar, vmin=vmin, vmax=vmax, cmap=cmap)
+    
+    plt.tight_layout()
+    
     return c
 
 
@@ -92,17 +110,26 @@ def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, 
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
-
-def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, fact=1.5, cmap='YlGnBu'):
+def spatial_stat_scatter(df,m,date, stat=mystats.MB,ncolors=15,fact=1.5,cmap='RdYlBu_r'):
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
     cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
     ss = (new.Obs - new.CMAQ).abs() * fact
-    if (type(vmin) == None) | (type(vmax) == None):
-        plt.scatter(x, y, c=colors, s=ss, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
-    else:
-        plt.scatter(x, y, c=colors, s=ss, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+    
+def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, fact=1.5, cmap='YlGnBu'):
+    from scipy.stats import scoreatpercentile as score
+    from numpy import around
+    f,ax = plt.subplots()
+    ax.set_axis_bgcolor('white')
+    new = df[df.datetime == date]
+    x, y = m(new.Longitude.values, new.Latitude.values)
+    cmap = cmap_discretize(cmap, ncolors)
+    colors = new.CMAQ - new.Obs
+    ss = (new.Obs - new.CMAQ).abs() * fact
+    top = around(score(ss, per=90))
+    print top
+    plt.scatter(x, y, c=colors, s=ss, vmin=-top, vmax=top, cmap=cmap, edgecolors='w', linewidths=.1)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
