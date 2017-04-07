@@ -94,3 +94,27 @@ def wsdir2uv(ws, wdir):
     u = -ws * sin(wdir * pi / 180.)
     v = -ws * cos(wdir * pi / 180.)
     return u, v
+
+
+def get_region(self, df):
+    sr = df.State_Name.copy().values
+    for i,j in zip(self.se_states,self.se_states_abv):
+        con = (sr == i) | (sr == j)
+        sr[con] = 'Southeast'
+    for i in self.ne_states:
+        con = (sr == i) | (sr == j)
+        sr[con] = 'Northeast'
+    for i in self.nc_states:
+        con = (sr == i) | (sr == j)
+        sr[con] = 'North Central'
+    for i in self.sc_states:
+        con = (sr == i) | (sr == j)
+        sr[con] = 'South Central'
+    for i in self.p_states:
+        con = (sr == i) | (sr == j)
+        sr[con] = 'Pacific'
+    for i in self.r_states:
+        con = (sr == i) | (sr == j)
+        sr[con] = 'Rockies'
+    sr[sr == 'CC'] = 'Canada'
+    sr[sr == 'MX'] = 'Mexico'

@@ -8,7 +8,6 @@ sns.set_palette(sns.color_palette(colors))
 
 sns.set_context('poster')
 
-
 # CMAQ Spatial Plots
 def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, vmax=150, ncolors=15, cmap='YlGnBu'):
     fig = plt.figure(figsize=(12, 6), frameon=False)
@@ -120,21 +119,24 @@ def spatial_stat_scatter(df,m,date, stat=mystats.MB,ncolors=15,fact=1.5,cmap='Rd
 def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, fact=1.5, cmap='RdBu_r'):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
-    f,ax = plt.subplots()
-    ax.set_axis_bgcolor('white')
-    diff = (df.CMAQ - df.Obs).abs()
-    top = around(score(diff, per=90))
+#    plt.figure(figsize=(12, 6), frameon=False)
+    f,ax = plt.subplots(figsize=(12,6),frameon=False)
+    ax.set_facecolor('white')
+    diff = (df.CMAQ - df.Obs)
+    top = around(score(diff.abs(), per=95))
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    cmap = cmap_discretize(cmap, ncolors)
+    c, cmap = colorbar_index(ncolors, cmap, minval=top*-1, maxval=top)
+    c.ax.tick_params(labelsize=13)
+#    cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
-    ss = (new.CMAQ - new.Obs).abs() * fact
-    print top
-    plt.scatter(x, y, c=colors, s=ss, vmin=-top, vmax=top, cmap=cmap, edgecolors='w', linewidths=.1)
+    ss = (new.CMAQ - new.Obs).abs() /top * 100.
+
+    plt.scatter(x, y, c=colors, s=ss, vmin=-1.*top, vmax=top, cmap=cmap, edgecolors='k', linewidths=.25)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
-
+    return f,ax,c
 
 def eight_hr_spatial_scatter(df, m, date, savename=''):
     fig = plt.figure(figsize=(12, 6), frameon=False)
@@ -147,7 +149,7 @@ def eight_hr_spatial_scatter(df, m, date, savename=''):
     x, y = m(new.Longitude.values, new.Latitude.values)
     cmap = plt.cm.get_cmap('plasma')
     norm = normval(-40, 40., cmap)
-    ss = (new.Obs - new.CMAQ).abs()
+    ss = (new.Obs - new.CMAQ).abs()/top*100.
     colors = new.Obs - new.CMAQ
     m.scatter(x, y, s=ss, c=colors, norm=norm, cmap=cmap)
     if savename != '':

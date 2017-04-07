@@ -363,49 +363,14 @@ class verify_aqs:
         print '    ', self.df.Species.unique()
         print ''
         print 'Defined EPA Regions:'
-        print '    ', self.df.Region.unique()
+        print '    ', self.df.EPA_region.unique()
 
-    def compare_param(self, param='OZONE', site='', city='', region='', state='', epa_region='',timeseries=False, scatter=False,
+    def compare_param(self, param='OZONE', site='', city='', state='', region='', epa_region='',timeseries=False, scatter=False,
                       pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
                       taylordiagram=False, fig=None, label=None, footer=False, dia=None,marker=None):
         from numpy import NaN
-        cityname = True
-        if 'MSA_Name' in self.df.columns:
-            df = self.df.copy()[[
-                'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'Region', 'SCS', 'Units',
-                'Latitude',
-                'Longitude', 'State_Name','EPA_region']]
-        else:
-            df = self.df.copy()[[
-                'datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'Region', 'SCS', 'Units', 'Latitude',
-                'Longitude', 'State_Name','EPA_region']]
-            cityname = False
-        df[df < -990] = NaN
-        g = df.groupby('Species')
-        new = g.get_group(param)
-        if site != '':
-            if site in new.SCS.unique():
-                df2 = new.loc[new.SCS == site]
-        elif city != '':
-            names = df.MSA_Name.dropna().unique()
-            for i in names:
-                if city.upper() in i.upper():
-                    name = i
-                    print name
-            df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
-            title = name
-        elif state != '':
-            df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
-            title = state
-        elif region != '':
-            df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
-            title = region
-        elif epa_region != '':
-            df2 = new[new['EPA_region'].str.upper() == epa_region.upper()].copy().drop_duplicates()
-            title = 'EPA_REGION: ' + epa_region
-        else:
-            df2 = new
-            title = 'Domain'
+        from utils import get_epa_location_df
+        df2,title = get_epa_location_df(self.df.copy(),param,site=site,city=city,state=state,region=region,epa_region=epa_region)
         if timeseries:
             plots.timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
         if scatter:

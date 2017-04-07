@@ -25,7 +25,7 @@ class aqs:
                              '1st_Max Hour', 'AQI', 'Method_Code', 'Method_Name',
                              'Local_Site_Name', 'Address', 'State_Name', 'County_Name',
                              'City_Name', 'CBSA_Name', 'Date_of_Last_Change']
-        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude','Obs', 'Units','Species', 'Region']
+        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude','Obs', 'Units','Species']
         self.se_states = array(
             ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
              'Virginia', 'West Virginia'], dtype='|S14')
@@ -78,7 +78,7 @@ class aqs:
 
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+        #df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_PM_25_88101_' + year + '.hdf'
@@ -105,7 +105,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+        #df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print df.keys()
@@ -134,7 +134,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+        #df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_PM_10_81102_' + year + '.hdf'
@@ -161,7 +161,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+        #df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_SO2_42401_' + year + '.hdf'
@@ -191,7 +191,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+#        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf'
@@ -218,7 +218,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+#        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf'
@@ -244,7 +244,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+#        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_NONOXNOY_' + year + '.hdf'
@@ -271,7 +271,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df, voc=True)
-        df = self.get_region(df)
+#        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_VOC_' + year + '.hdf'
@@ -298,7 +298,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+#        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_SPEC_' + year + '.hdf'
@@ -325,7 +325,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+#        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_WIND_' + year + '.hdf'
@@ -352,7 +352,7 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
+#        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf'
@@ -379,7 +379,6 @@ class aqs:
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_RHDP_' + year + '.hdf'
@@ -553,7 +552,7 @@ class aqs:
             dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
                    self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
                    self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
-                   self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates)]
+                   self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).copy().drop_duplicates()
         os.chdir(self.cwd)
@@ -659,24 +658,24 @@ class aqs:
 
     def get_region(self, df):
         sr = df.State_Name.copy().values
-        for i in self.se_states:
-            con = sr == i
+        for i,j in zip(self.se_states,self.se_states_abv):
+            con = (sr == i) | (sr == j)
             sr[con] = 'Southeast'
         for i in self.ne_states:
-            con = sr == i
+            con = (sr == i) | (sr == j)
             #print con.max()
             sr[con] = 'Northeast'
         for i in self.nc_states:
-            con = sr == i
+            con = (sr == i) | (sr == j)
             sr[con] = 'North Central'
         for i in self.sc_states:
-            con = sr == i
+            con = (sr == i) | (sr == j)
             sr[con] = 'South Central'
         for i in self.p_states:
-            con = sr == i
+            con = (sr == i) | (sr == j)
             sr[con] = 'Pacific'
         for i in self.r_states:
-            con = sr == i
+            con = (sr == i) | (sr == j)
             sr[con] = 'Rockies'
         sr[sr == 'CC'] = 'Canada'
         sr[sr == 'MX'] = 'Mexico'

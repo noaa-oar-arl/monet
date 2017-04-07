@@ -51,6 +51,8 @@ class cmaq:
         self.keys = None
         self.metcrokeys = []
         self.indexdates = None
+        self.metdates = None
+        self.metindex = None
         self.latitude = None
         self.longitude = None
         self.map = None
@@ -70,12 +72,30 @@ class cmaq:
             self.indexdates = concatenate([arange(24), r.dates[r.dates.duplicated()].index.values])
         else:
             self.indexdates = arange(len(date))
+    
+    def get_metcro_dates(self):
+        from datetime import datetime
+        from pandas import DataFrame
+        from numpy import concatenate, arange
+        tflag1 = array(self.metcro2d.variables['TFLAG'][:, 0, 0], dtype='|S7')
+        tflag2 = array(self.metcro2d.variables['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
+        date = array([])
+        for i, j in zip(tflag1, tflag2):
+            date.append(datetime.strptime(i + j, '%Y%j%H'))
+        self.metdates = array(date)
+        r = DataFrame(self.metdates, columns=['dates']).drop_duplicates(keep='last')
+        self.metindex = r.index.values
+        # if r.dates.count() > len(r.dates.unique()):
+        #     self.metindex = concatenate([arange(24), r.dates[r.dates.duplicated()].index.values])
+        # else:
+        #     self.metindex = arange(len(date))
 
     def load_single_cmaq_run(self):
         self.concobj = Dataset(self.fname[0])
 
     def load_multi_metcro2d_cmaq_runs(self):
         self.metcro2d = MFDataset(self.metcrofnames)
+        self.get_metcro_dates()
 
     def load_multi_cmaq_runs(self):
         self.concobj = MFDataset(self.fname)
@@ -96,17 +116,33 @@ class cmaq:
         else:
             print 'Files not found'
         self.keys = self.get_keys(self.concobj)
-
-    def open_metcro2d(self, file):
+    
+    def open_metcro2d(self,f):
         from glob import glob
         from numpy import sort
-        if self.metcrofnames == None:
-            self.metcrofnames = sort(array(glob(file)))
-        else:
-            self.fname = sort(array(file))
-        if self.fname.shape[0] >= 1:
-            self.load_multi_metcro2d_cmaq_runs()
-        self.metcrokeys = self.get_keys(self.metcro2d)
+        try:
+            if type(f) == str:
+                self.metcrofnames = sort(array(glob(f)))
+            else:
+                self.metcrofnames = sort(array(f))
+            if self.metcrofnames.shape[0] >= 1:
+                self.load_multi_metcro2d_cmaq_runs() 
+            self.metcrokeys =  self.get_keys(self.metcro2d)
+            self.get_metcro_dates()
+        except:
+            print 'METCRO2D Files Not Found'
+            pass
+    # def open_metcro2d(self, fnames=None):
+    #     from glob import glob
+    #     from numpy import sort,shape
+    #     if (self.metcrofnames == None) & (isinstance(fnames,str)):
+    #         self.metcrofnames = sort(array(glob(fnames)))
+    #     elif isinstance(fnames,list):
+    #         self.metcrofnames = sort(array(fnames))
+    #     if self.metcrofnames.shape[0] >= 1:
+    #         self.load_multi_metcro2d_cmaq_runs()
+    #     self.metcrokeys = self.get_keys(self.metcro2d)
+    #     self.get_metcro_dates()
 
     def get_keys(self, cdfobj):
         return array(cdfobj.variables.keys()).astype('|S10')
@@ -387,7 +423,7 @@ class cmaq:
         import atmos
         data = {'T': self.metcro2d.variables['TEMP2'][:], 'rv': self.metcro2d.variables['Q2'][:],
                 'P': self.metcro2d.variables['PRSFC'][:]}
-        return atmos.calculate('RH', **data)
+        return atmos.calculate('RH', **data)[self.metindex,0,:,:].squeeze()
 
     def get_metcro2d_cmaqvar(self, param='TEMPG', lvl=0.):
         param = param.upper()
@@ -396,7 +432,7 @@ class cmaq:
             var = self.get_metcro2d_rh()
         else:
             print '   Getting CMAQ Variable: ' + param
-            var = self.metcro2d.variables[param][self.indexdates, 0, :, :].squeeze()
+            var = self.metcro2d.variables[param][self.metindex, 0, :, :].squeeze()
         return var
 
     def set_gridcro2d(self, filename=''):

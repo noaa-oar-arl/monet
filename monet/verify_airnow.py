@@ -31,13 +31,13 @@ class verify_airnow:
         ###3 different interpolations
         ###interp = 'nearest' for nearest neightbor interpolation
         ###interp = 'idw' for nearest neight interpolation
-        ###interp = 'gauss' for gaussian weighting 
+        ###interp = 'gauss' for gaussian weighting
         ###   if idw is selected you need to provide the weighting function. something like:
         ###
         ###   weight_func = lambda r: 1/r**2 for inverse distance squared
         ###
         ###   weight_func = lambda r: 1/r    for inverse distance squared
-        ###   
+        ###
         # get the lats and lons for CMAQ
         lat = self.cmaq.latitude
         lon = self.cmaq.longitude
@@ -185,6 +185,16 @@ class verify_airnow:
                     dfs.append(dfmet)
                 except:
                     pass
+            elif (self.cmaq.metcro2d is not None) & (i == 'RHUM'):
+                try:
+                    print 'Interpolating Relative Humidity:'
+                    dfmet = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RH')
+                    dfmet = self.interp_to_airnow(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dfmet.Obs += 273.15
+                    dfs.append(dfmet)
+                except:
+                    pass
 
         self.df = pd.concat(dfs)
         if self.airnow.monitor_df is None:
@@ -210,39 +220,13 @@ class verify_airnow:
         print 'Species available to compare:'
         print '    ', self.df.Species.unique()
 
-    def compare_param(self, param='OZONE', site='', city='', state='', region='', timeseries=False, scatter=False,
+    def compare_param(self, param='OZONE', site='', city='', state='', epa_region='',region='', timeseries=False, scatter=False,
                       pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
                       taylordiagram=False, fig=None, label=None, footer=True, dia=None,marker=None):
         from numpy import NaN
-        df = self.df.copy()[
-            ['datetime', 'datetime_local', 'Obs', 'CMAQ', 'Species', 'MSA_Name', 'EPA_region', 'SCS', 'Units', 'Latitude',
-             'Longitude', 'State_Name']]
-        df.Obs[df.Obs < -990] = NaN
-        df.dropna(subset=['Obs'], inplace=True)
-        g = df.groupby('Species')
-        new = g.get_group(param)
-        if site != '':
-            if site in new.SCS.unique():
-                df2 = new.loc[new.SCS == site]
-            title = site
-        elif city != '':
-            names = df.MSA_Name.dropna().unique()
-            for i in names:
-                if city.upper() in i.upper():
-                    name = i
-                    print name
-            df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
-            title = name
-        elif state != '':
-            df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
-            title = state
-        elif region != '':
-            df2 = new[new['EPA_region'].str.upper() == region.upper()].copy().drop_duplicates()
-            title = region
-        else:
-            df2 = new
-            title = 'Domain'
+        from utils import get_epa_location_df
+        df2,title = get_epa_location_df(self.df.copy(),param,site=site,city=city,state=state,region=region,epa_region=epa_region)
         if timeseries:
             plots.timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
         if scatter:
@@ -637,7 +621,31 @@ class verify_airnow:
         kkk = self.airnow.get_station_locations_remerge(kkk)
         return kkk
 
-    def write_table(self, df=None, param='OZONE', fname='table', threasholds=[70, 1e5], site=None, city=None,
+    def calc_8hr_max(self,df=None):
+        species = df.Species.unique()[0]
+        r = df
+        r.index = r.datetime_local
+        g = r.groupby('SCS')['Obs', 'CMAQ', 'Latitude', 'Longitude']
+        m = g.rolling(8, center=True, win_type='boxcar').mean()
+        q = m.reset_index(level=0)
+        k = q.groupby('SCS').resample('1D').max()
+        kk = k.reset_index(level=1)
+        kkk = kk.reset_index(drop='SCS').dropna()
+        kkk = self.airnow.get_station_locations_remerge(kkk)
+        kkk['Species'] = species
+        return kkk.drop_duplicates()
+
+    def calc_24hr_ave(self,df=None):
+        species = df.Species.unique()[0]
+        df.index = df.datetime_local
+        df = df.groupby('SCS').resample('D').mean().reset_index(level=1).reset_index(level=0)
+        df.drop('MSA_Code',inplace=True,axis=1)
+        df.drop('CMSA_Name',inplace=True,axis=1)
+        dff = self.airnow.get_station_locations_remerge(df)
+        dff['Species'] = species
+        return dff
+
+    def write_table(self, df=None, fname='table', threasholds=[70, 1e5], site=None, city=None,
                     region=None,
                     state=None,
                     append=False,
@@ -645,10 +653,9 @@ class verify_airnow:
                     html=False):
         from StringIO import StringIO
         single = False
-        if df is None:
-            print 'Please provide a DataFrame'
-        else:
-            df = self.df.groupby('Species').get_group(param)
+        df = df.dropna(subset=['Obs','CMAQ'])
+        df = df[df.EPA_region != 'USEPA']
+        param = df.Species.unique()[0]
         if not isinstance(site, type(None)):
             try:
                 df = df.groupby('SCS').get_group(site)
@@ -680,9 +687,10 @@ class verify_airnow:
         elif not isinstance(region, type(None)):
             try:
                 single = True
-                names = df.get_group('Region').dropna().unique()
+                names = df.get_group('EPA_region').dropna().unique()
                 name = [j for j in names if region.upper() in j.upper()]
-                df = df.groupby('Region').get_group(name[0])
+                print name
+                df = df.groupby('EPA_region').get_group(name[0])
             except KeyError:
                 print 'Region not valid.  Enter a valid Region'
                 return
@@ -696,9 +704,9 @@ class verify_airnow:
             d['Region'] = 'Domain'
             d['Label'] = label
             dd = pd.DataFrame(d, index=[0])
-            for i in df.Region.dropna().unique():
+            for i in df.EPA_region.dropna().unique():
                 try:
-                    dff = df.groupby('Region').get_group(i)
+                    dff = df.groupby('EPA_region').get_group(i)
                     dt = mystats.stats(dff, threasholds[0], threasholds[1])
                     dt['Region'] = i.replace(' ', '_')
                     dt['Label'] = label
@@ -743,3 +751,5 @@ class verify_airnow:
                     f.write(line)
             f.close()
         return dd
+
+

@@ -360,18 +360,16 @@ class verify_improve:
             vals = vals.append(pd.Series(val)).reset_index(drop=True)
             date = date.append(pd.Series([self.cmaq.dates[j] for k in lons])).reset_index(drop=True)
             site = site.append(pd.Series(sites)).reset_index(drop=True)
-            utcoffset = site.append(pd.Series(utc)).reset_index(drop=True)
+            utcoffset = utcoffset.append(pd.Series(utc)).reset_index(drop=True)
         dfs = pd.concat([vals, date, site, utcoffset], axis=1, keys=['CMAQ', 'datetime', 'Site_Code', 'utcoffset'])
-        dfs.index = dfs.datetime + pd.to_timedelta(dfs.utcoffset, 'H')
-        dfs.drop(['datetime', 'utcoffset'], axis=1, inplace=True)
-        r = dfs.groupby('Site_Code').get_group(dfs.Site_Code.unique()[0]).resample('24H').mean().reset_index()
-        for i in df.Site_Code.unique()[1:]:
-            q = dfs.groupby('Site_Code').get_group(i)
-            q = q.resample('24H').mean().reset_index()
-            q['Site_Code'] = i
-            r = pd.concat([r, q], ignore_index=True)
+        dfs['datetime_local'] = dfs.datetime + pd.to_timedelta(dfs.utcoffset, 'H')
+        dfs.index = dfs.datetime_local
+        #dfs.drop(['datetime', 'utcoffset','datetime_local'], axis=1, inplace=True)
+        r = dfs.groupby('Site_Code').resample('24H').mean().reset_index()
+        r['datetime'] = r['datetime_local'].values.astype('M8[s]').astype('O') - pd.to_timedelta(r.utcoffset, 'H')
         df = pd.merge(df, r, how='left', on=['Site_Code', 'datetime']).dropna(subset=['CMAQ'])
-        df.Obs.loc[df.Obs < 0] = NaN
+        #df.Obs.loc[df.Obs < 0] = NaN
+        df['Obs'][df['Obs'] < 0] = NaN
         df.dropna(subset=['Obs'], inplace=True)
         return df
 

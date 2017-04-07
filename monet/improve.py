@@ -2,6 +2,7 @@
 
 import pandas as pd
 from numpy import array, NaN
+from datetime import datetime
 
 
 class improve:
@@ -37,13 +38,13 @@ class improve:
         self.df.rename(columns={'Date': 'datetime'}, inplace=True)
         self.df.drop('Dataset', axis=1, inplace=True)
         print 'Adding in some Meta-Data'
-        self.get_region()
         print 'Calculating local time'
         self.df = self.get_local_datetime(self.df)
         self.df = self.df.copy().drop_duplicates()
         self.df.dropna(subset=['Species'], inplace=True)
         self.df.Species.loc[self.df.Species == 'MT'] = 'PM10'
         self.df.Species.loc[self.df.Species == 'MF'] = 'PM2.5'
+        self.df.datetime = [datetime.strptime(i,'%Y%m%d') for i in self.df.datetime]
         if output == '':
             output = 'IMPROVE.hdf'
         print 'Outputing data to: ' + output
@@ -59,30 +60,6 @@ class improve:
     def set_daterange(self, begin='', end=''):
         dates = pd.date_range(start=begin, end=end, freq='H').values.astype('M8[s]').astype('O')
         self.dates = dates
-
-    def get_region(self):
-        sr = self.df.State_Name.copy().values
-        for i in self.se_states:
-            con = sr == i
-            sr[con] = 'Southeast'
-        for i in self.ne_states:
-            con = sr == i
-            sr[con] = 'Northeast'
-        for i in self.nc_states:
-            con = sr == i
-            sr[con] = 'North Central'
-        for i in self.sc_states:
-            con = sr == i
-            sr[con] = 'South Central'
-        for i in self.p_states:
-            con = sr == i
-            sr[con] = 'Pacific'
-        for i in self.r_states:
-            con = sr == i
-            sr[con] = 'Rockies'
-        sr[sr == 'CC'] = 'Canada'
-        sr[sr == 'MX'] = 'Mexico'
-        self.df['Region'] = array(sr)
 
     def get_local_datetime(self, df):
         import pytz
