@@ -79,7 +79,7 @@ class cmaq:
         from numpy import concatenate, arange
         tflag1 = array(self.metcro2d.variables['TFLAG'][:, 0, 0], dtype='|S7')
         tflag2 = array(self.metcro2d.variables['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
-        date = array([])
+        date = []
         for i, j in zip(tflag1, tflag2):
             date.append(datetime.strptime(i + j, '%Y%j%H'))
         self.metdates = array(date)

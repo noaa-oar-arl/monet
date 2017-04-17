@@ -231,6 +231,7 @@ class verify_improve:
                     pass
 
         self.df = concat(dfs)
+        self.df.dropna(subset=['Obs','CMAQ'],inplace=True)
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_available()
 

@@ -681,7 +681,7 @@ class aqs:
         sr[sr == 'MX'] = 'Mexico'
 
         df['Region'] = array(sr)
-        
+
 #        df = self.change_states_to_abv(df)
         return df
 
@@ -802,7 +802,7 @@ class aqs:
                 f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
                          'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
                          'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
-                
+
                 self.monitor_df = f.drop_duplicates().dropna(subset=['SCS']).copy()
                 self.monitor_df.SCS = self.monitor_df.SCS.values.astype('int32')
             else:
@@ -829,7 +829,7 @@ class aqs:
     def add_metro_metadata2(self,df):
         from numpy import NaN
         if type(self.monitor_df) != type(None):
-            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region']].drop_duplicates()
+            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region','MSA_Code']].drop_duplicates()
             dfs.SCS = dfs.SCS.values.astype('int32')
             df = pd.merge(df,dfs,on=['SCS'],how='left')
         elif os.path.isfile(self.monitor_file):
@@ -838,12 +838,10 @@ class aqs:
             dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region']].drop_duplicates()
             dfs.SCS = dfs.SCS.values.astype('int32')
             df = pd.merge(df,dfs,on=['SCS'],how='left')
-        
         return df
 
     def retrieve_aqs_daily_co_data(self, dates):
         import wget
-
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42101_' + year + '.zip'
@@ -853,7 +851,6 @@ class aqs:
         print 'Unpacking: ' + url
         ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-
         df = pd.read_csv(filename[:-4] + '.csv', parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols

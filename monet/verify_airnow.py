@@ -195,8 +195,9 @@ class verify_airnow:
                     dfs.append(dfmet)
                 except:
                     pass
-
+        
         self.df = pd.concat(dfs)
+        self.df.dropna(subset=['Obs','CMAQ'],inplace=True)
         if self.airnow.monitor_df is None:
             print '\n=========================================================================================='
             print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
@@ -242,13 +243,18 @@ class verify_airnow:
         if timeseries_mb:
             plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
         if taylordiagram:
+            if marker is None: marker = 'o'
             if fig is None:
-                plots.taylordiagram(df2, label=label, dia=dia, addon=False,marker=marker)
+                dia = plots.taylordiagram(df2, label=label, dia=dia, addon=False,marker=marker)
+                return dia
             else:
-                plots.taylordiagram(df2, label=label, dia=dia, addon=True,marker=marker)
+                dia = plots.taylordiagram(df2, label=label, dia=dia, addon=True,marker=marker)
+                plt.legend()
+                return dia
+
 
     def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=15,
-                cmap='YlGnBu'):
+                cmap='YlGnBu',**barbs):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
@@ -291,7 +297,7 @@ class verify_airnow:
                     if not isinstance(self.cmaq.metcro2d, type(None)):
                         ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
                         wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
-                        plots.wind_barbs(ws, wdir, self.cmaq.gridobj, color='grey', alpha=.5)
+                        plots.wind_barbs(ws, wdir, self.cmaq.gridobj,self.cmaq.map, barbs)
                     plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin, vmax=vmax,
                                           ncolors=ncolors, cmap=cmap)
                     c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
@@ -308,7 +314,7 @@ class verify_airnow:
                 if not isinstance(self.cmaq.metcro2d, type(None)):
                     ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
                     wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
-                    plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, color='grey', alpha=.5)
+                    plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, **barbs)
                 plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin,
                                       vmax=vmax, ncolors=ncolors, cmap=cmap)
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')

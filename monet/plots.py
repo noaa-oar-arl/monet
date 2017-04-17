@@ -81,7 +81,7 @@ def wind_barbs(ws, wdir, gridobj, m, **kwargs):
     # define map and draw boundries
     x, y = m(lon, lat)
     u, v = tools.wsdir2uv(ws, wdir)
-    m.quiver(x[::10, ::10], y[::10, ::10], u[::10, ::10], v[::10, ::10], **kwargs)
+    m.barbs(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
 
 
 def normval(vmin, vmax, cmap):

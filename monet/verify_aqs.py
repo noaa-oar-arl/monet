@@ -337,8 +337,8 @@ class verify_aqs:
                         dfs.append(dfnox)
                 except:
                     pass
-
         self.df = concat(dfs)
+        self.df.dropna(subset=['Obs','CMAQ'],inplace=True)
         if self.aqs.monitor_df is None:
             print '\n=========================================================================================='
             print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
