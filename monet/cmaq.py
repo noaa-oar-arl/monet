@@ -68,7 +68,7 @@ class cmaq:
             date.append(datetime.strptime(i + j, '%Y%j%H'))
         self.dates = array(date)
         r = DataFrame(self.dates, columns=['dates'])
-        r = DataFrame(self.metdates, columns=['dates']).drop_duplicates(keep='last')
+        r = DataFrame(self.dates, columns=['dates']).drop_duplicates(keep='last')
         self.indexdates = r.index.values
     
     def get_metcro_dates(self):
@@ -126,17 +126,6 @@ class cmaq:
         except:
             print 'METCRO2D Files Not Found'
             pass
-    # def open_metcro2d(self, fnames=None):
-    #     from glob import glob
-    #     from numpy import sort,shape
-    #     if (self.metcrofnames == None) & (isinstance(fnames,str)):
-    #         self.metcrofnames = sort(array(glob(fnames)))
-    #     elif isinstance(fnames,list):
-    #         self.metcrofnames = sort(array(fnames))
-    #     if self.metcrofnames.shape[0] >= 1:
-    #         self.load_multi_metcro2d_cmaq_runs()
-    #     self.metcrokeys = self.get_keys(self.metcro2d)
-    #     self.get_metcro_dates()
 
     def get_keys(self, cdfobj):
         return array(cdfobj.variables.keys()).astype('|S10')
