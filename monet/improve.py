@@ -51,6 +51,10 @@ class improve:
         self.df.Obs.loc[self.df.Obs < 0] = NaN
         self.df.dropna(subset=['Obs'], inplace=True)
         self.df.to_hdf(output, 'df', format='fixed', complevel=9, complib='zlib')
+    
+    def load_hdf(self,fname,dates):
+        self.df = pd.read_hdf(fname)
+        self.get_date_range(self.dates)
 
     def get_date_range(self, dates):
         self.dates = dates

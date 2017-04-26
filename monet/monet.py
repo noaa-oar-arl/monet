@@ -96,10 +96,10 @@ def vimprove(concpath='', gridcro='', met2dpath='', datapath='', combine=True, r
         va.cmaq.open_metcro2d(met2dpath)
     if datapath[-4:] == '.hdf':
         print 'Reading file: ' + datapath
-        from pandas import read_hdf
-        va.improve.df = read_hdf(datapath)
+        va.improve.load_hdf(datapath,va.cmaq.dates)
     else:
         va.improve.open(datapath)
+    
     if combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)
     return va

@@ -195,7 +195,17 @@ class verify_airnow:
                     dfs.append(dfmet)
                 except:
                     pass
-        
+            elif (self.cmaq.metcro2d is not None) & (i == 'SRAD'):
+                try:
+                    print 'Interpolating Short Wave Radiation:'
+                    dfmet = g.get_group(i)
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RSWIN')
+                    dfmet = self.interp_to_airnow(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dfmet.Obs += 273.15
+                    dfs.append(dfmet)
+                except:
+                    pass
+
         self.df = pd.concat(dfs)
         self.df.dropna(subset=['Obs','CMAQ'],inplace=True)
         if self.airnow.monitor_df is None:

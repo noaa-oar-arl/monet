@@ -15,19 +15,6 @@ class verify_improve:
     def __init__(self):
         self.improve = improve()
         self.cmaq = cmaq()
-        self.se_states = array(
-            ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
-             'Virginia', 'West Virginia'], dtype='|S14')
-        self.ne_states = array(['Connecticut', 'Delaware', 'District Of Columbia', 'Maine', 'Maryland', 'Massachusetts',
-                                'New Hampshire', 'New Jersey', 'New York', 'Pennsylvania', 'Rhode Island', 'Vermont'],
-                               dtype='|S20')
-        self.nc_states = array(
-            ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan', 'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
-            dtype='|S9')
-        self.sc_states = array(['Arkansas', 'Louisiana', 'Oklahoma', 'Texas'], dtype='|S9')
-        self.r_states = array(['Arizona', 'Colorado', 'Idaho', 'Kansas', 'Montana', 'Nebraska', 'Nevada', 'New Mexico',
-                               'North Dakota', 'South Dakota', 'Utah', 'Wyoming'], dtype='|S12')
-        self.p_states = array(['California', 'Oregon', 'Washington'], dtype='|S10')
         self.df = None
         self.cmaqpm25 = None
         self.cmaqpm10 = None
@@ -234,6 +221,7 @@ class verify_improve:
         self.df.dropna(subset=['Obs','CMAQ'],inplace=True)
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_available()
+        return dfpm
 
     def print_available(self):
         print 'Available Functions:\n'
@@ -363,13 +351,14 @@ class verify_improve:
             site = site.append(pd.Series(sites)).reset_index(drop=True)
             utcoffset = utcoffset.append(pd.Series(utc)).reset_index(drop=True)
         dfs = pd.concat([vals, date, site, utcoffset], axis=1, keys=['CMAQ', 'datetime', 'Site_Code', 'utcoffset'])
-        dfs['datetime_local'] = dfs.datetime + pd.to_timedelta(dfs.utcoffset, 'H')
-        dfs.index = dfs.datetime_local
+#        dfs['datetime_local'] = dfs.datetime + pd.to_timedelta(dfs.utcoffset, 'H')
+#        dfs.index = dfs.datetime_local
+        dfs.index = dfs.datetime
         #dfs.drop(['datetime', 'utcoffset','datetime_local'], axis=1, inplace=True)
         r = dfs.groupby('Site_Code').resample('24H').mean().reset_index()
-        r['datetime'] = r['datetime_local'].values.astype('M8[s]').astype('O') - pd.to_timedelta(r.utcoffset, 'H')
-        df = pd.merge(df, r, how='left', on=['Site_Code', 'datetime']).dropna(subset=['CMAQ'])
-        #df.Obs.loc[df.Obs < 0] = NaN
+        #r['datetime'] = r['datetime_local'].values.astype('M8[s]').astype('O') - pd.to_timedelta(r.utcoffset, 'H')
+        #df = pd.merge(df, r, how='left', on=['Site_Code', 'datetime','datetime_local','utcoffset']).dropna(subset=['CMAQ'])
+        df = pd.merge(df, r, how='left', on=['Site_Code', 'datetime','utcoffset']).dropna(subset=['CMAQ'])
         df['Obs'][df['Obs'] < 0] = NaN
         df.dropna(subset=['Obs'], inplace=True)
         return df
@@ -403,4 +392,4 @@ class verify_improve:
 
         con = ((self.improve.df.Latitude.values > lat.min()) & (self.improve.df.Latitude.values < lat.max()) & (
             self.improve.df.Longitude.values > lon.min()) & (self.improve.df.Longitude.values < lon.max()))
-        self.improve.df = self.improve.df[con].copy()
+        self.improve.df = self.improve.df[con]

@@ -68,10 +68,8 @@ class cmaq:
             date.append(datetime.strptime(i + j, '%Y%j%H'))
         self.dates = array(date)
         r = DataFrame(self.dates, columns=['dates'])
-        if r.dates.count() > len(r.dates.unique()):
-            self.indexdates = concatenate([arange(24), r.dates[r.dates.duplicated()].index.values])
-        else:
-            self.indexdates = arange(len(date))
+        r = DataFrame(self.metdates, columns=['dates']).drop_duplicates(keep='last')
+        self.indexdates = r.index.values
     
     def get_metcro_dates(self):
         from datetime import datetime
@@ -85,10 +83,6 @@ class cmaq:
         self.metdates = array(date)
         r = DataFrame(self.metdates, columns=['dates']).drop_duplicates(keep='last')
         self.metindex = r.index.values
-        # if r.dates.count() > len(r.dates.unique()):
-        #     self.metindex = concatenate([arange(24), r.dates[r.dates.duplicated()].index.values])
-        # else:
-        #     self.metindex = arange(len(date))
 
     def load_single_cmaq_run(self):
         self.concobj = Dataset(self.fname[0])
