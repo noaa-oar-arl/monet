@@ -3,7 +3,7 @@ from datetime import datetime
 
 import matplotlib.pyplot as plt
 from numpy import array, where, sort
-from pandas import concat
+from pandas import concat,merge
 
 import mystats
 import plots
@@ -46,6 +46,7 @@ class verify_improve:
         g = self.improve.df.groupby('Species')
         dfs = []
         for i in comparelist:
+            print i
             if i == 'CLf':
                 if ('ACLI' in self.cmaq.keys) | ('ACLJ' in self.cmaq.keys) | ('PM25_CL' in self.cmaq.keys):
                     print 'Interpolating CLf:'
@@ -156,6 +157,22 @@ class verify_improve:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NH4f', improve_param=i)
                     cmaqvar = self.cmaq.get_surface_cmaqvar(param='NH4f') * fac
+                    dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqnh4 = cmaqvar
+                    dfs.append(dfpm)
+                else:
+                    pass
+            elif i == 'ammSO4f':
+                if ('ANH4I' in self.cmaq.keys) | ('ANH4J' in self.cmaq.keys) | ('PM25_NH4' in self.cmaq.keys):
+                    print 'Interpolating NH4f:'
+                    dfpmso4 = g.get_group(i) 
+                    dfpmno3 = g.get_group('ammNO3f')
+                    dfpmso4.Species = 'NH4f'
+                    dfpm = merge(dfpmso4,dfpmno3[['Obs','datetime','Site_Code']],on=['datetime','Site_Code'])
+                    dfpm.rename(columns={'Obs_x':'Obs'},inplace=True)
+                    dfpm.Obs = 2*dfpm.Obs * 18. / 132. + dfpm.Obs_y * 18. / 80.
+                    dfpm.drop('Obs_y',axis=1,inplace=True)
+                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='NH4f')
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqnh4 = cmaqvar
                     dfs.append(dfpm)

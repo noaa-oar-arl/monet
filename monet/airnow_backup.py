@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 from numpy import array
-import inspect
+
 from tools import search_listinlist
 
 
@@ -36,7 +36,7 @@ class airnow:
         self.p_states = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.objtype = 'AirNow'
         self.filelist = None
-        self.monitor_file = inspect.getfile(self.__class__)[:-16] + '/data/monitoring_site_locations.dat'
+        self.monitor_file = os.getcwd() + '/monitoring_site_locations.dat'
         self.monitor_df = None
         self.savecols = ['datetime', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'datetime_local',
                          'Site_Name', 'Latitude', 'Longitude', 'CMSA_Name', 'MSA_Code','MSA_Name', 'State_Name', 'EPA_region']
@@ -79,94 +79,78 @@ class airnow:
 
     def change_back(self):
         os.chdir(self.cwd)
-    
-    def download_hourly_files(self,path='./'):
-        from numpy import empty,where
-        import wget
-        from glob import glob
-        
-        self.datadir = path 
+
+    def download_hourly_files(self, path='.'):
+        from numpy import empty, where
+        self.datadir = path
         self.change_path()
-        flist = []
-        furls = []
-        url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/' #2017/20170131/HourlyData_2017012408.dat
-        for i in self.dates:
-            ff = i.strftime('HourlyData_%Y%m%d%H.dat')
-            f = url + i.strftime('%Y/%Y%m%d/HourlyData_%Y%m%d%H.dat')
-            flist.append(os.path.join(path, ff))
-            furls.append(f)
-        
-        #files needed for comparison
-        files = pd.Series(flist,index=None)
-        urls = pd.Series(furls,index=None)
-        #files already in directory
-        filesindir = pd.Series(glob(os.path.join(path,'HourlyData*.dat')))
-        # files needed for downloading
-        #print filesindir.values
-        #print files.values
-        ftodownload = urls.loc[~files.isin(filesindir)]
-        #print files.loc[files.isin(filesindir)].values
-        #print files.loc[~files.isin(filesindir)].values
-        #print files.values        
-        for i in ftodownload:
-            print '\nDownloading:',i
-            wget.download(i)
+        print 'Connecting to FTP: ' + self.url
+        self.openftp()
+        print 'Retrieving Hourly file list'
+        nlst = self.retrieve_hourly_filelist()
+        self.convert_dates_tofnames()
+        cwd = 'HourlyData'
+        index1, index2 = search_listinlist(array(nlst), array(self.datestr))
+        inarchive = empty(array(self.datestr).shape[0])
+        inarchive[:] = True
+        inarchive[index2] = False
+        index = where(inarchive)[0]
+
+        # download archive files first
+        if index.shape[0] > 0:
+            year = self.dates[0].strftime('%Y')
+            self.ftp.cwd('/HourlyData/Archive/' + year)
+            for i in array(self.datestr)[index]:
+                if os.path.exists(i) == False:
+                    print 'Downloading from Archive: ', i
+                    self.download_single_rawfile(i)
+                else:
+                    print 'File found: ', i
+
+        # now downlad all in the Current HourlyData
+        index = where(inarchive == False)[0]
+        if index.shape[0] > 0:
+            year = self.dates[0].strftime('%Y')
+            self.ftp.cwd('/HourlyData')
+            for i in array(self.datestr)[index]:
+                if os.path.exists(i) == False:
+                    print 'Downloading from HourlyData: ' + i
+                    self.download_single_rawfile(i)
+                else:
+                    print 'File found: ', i
+        self.filelist = self.datestr
         self.change_back()
-        self.filelist = files.values
-    
-    def read_csv(self,fn):
-        dft = pd.read_csv(fn, delimiter='|', header=None, error_bad_lines=False)
+        self.ftp.close()
+
+    def aggragate_files(self, output=False,outname='AIRNOW.hdf'):
+        from numpy import sort
+        from datetime import datetime
+        from StringIO import StringIO
+        self.change_path()
+        fnames = sort(self.filelist)
+        a = ''
+        for i in fnames:
+            with open(i, 'rb') as f:
+                a = a + f.read()
+        dft = pd.read_csv(StringIO(a), delimiter='|', header=None, error_bad_lines=False)
         cols = ['date', 'time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
         dft.columns = cols
-        return dft
-
-    def aggragate_files(self,output=False,outname='AIRNOW.hdf'):
-        import dask
-        import dask.dataframe as dd
-        dfs = [dask.delayed(self.read_csv)(f) for f in self.filelist]
-        dff = dd.from_delayed(dfs)
-        df = dff.compute()
-        df['datetime'] = pd.to_datetime(df.date + ' ' + df.time,format='%m/%d/%y %H:%M',exact=True,box=False)
-        df.drop(['date','time'],axis=1,inplace=True)
-        df['datetime_local'] = df.datetime + pd.to_timedelta(df.utcoffset,unit='H')
-        self.df = df
+        dates = [datetime.strptime(x + ' ' + y, '%m/%d/%y %H:%M') for x, y in zip(dft.date.values, dft.time.values)]
+        dft.drop('date', axis=1, inplace=True)
+        dft.drop('time', axis=1, inplace=True)
+        dft['datetime'] = dates
+        self.df = dft.copy()
+        self.calc_datetime()
         print '    Adding in Meta-data'
         self.get_station_locations()
+#        self.get_region()
+        self.df['Region'] = ' '
+        self.df = self.df.copy().drop_duplicates()
         self.df = self.df[self.savecols]
-        self.df.drop_duplicates(inplace=True)
         if output:
             print 'Outputing data to: ' + outname
-            self.df.to_hdf(outname, 'df', format='table')
-        
-#     def aggragate_files(self, output=False,outname='AIRNOW.hdf'):
-#         from numpy import sort
-#         from datetime import datetime
-#         from StringIO import StringIO
-#         self.change_path()
-#         fnames = sort(self.filelist)
-#         a = ''
-#         for i in fnames:
-#             with open(i, 'rb') as f:
-#                 a = a + f.read()
-#         dft = pd.read_csv(StringIO(a), delimiter='|', header=None, error_bad_lines=False)
-#         cols = ['date', 'time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
-#         dft.columns = cols
-#         dates = [datetime.strptime(x + ' ' + y, '%m/%d/%y %H:%M') for x, y in zip(dft.date.values, dft.time.values)]
-#         dft.drop('date', axis=1, inplace=True)
-#         dft.drop('time', axis=1, inplace=True)
-#         dft['datetime'] = dates
-#         self.df = dft.copy()
-#         self.calc_datetime()
-#         print '    Adding in Meta-data'
-#         self.get_station_locations()
-# #        self.get_region()
-#         self.df['Region'] = ' '
-#         self.df = self.df.copy().drop_duplicates()
-#         self.df = self.df[self.savecols]
-#         if output:
-#             print 'Outputing data to: ' + outname
-#             self.df.to_hdf(outname, 'df', format='fixed')
-#         self.change_back()
+            self.df.to_hdf(outname, 'df', format='fixed')
+        self.change_back()
 
     def calc_datetime(self):
         # takes in an array of string dates and converts to numpy array of datetime objects

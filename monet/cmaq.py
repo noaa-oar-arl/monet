@@ -439,7 +439,7 @@ class cmaq:
                 lon1 = self.gridobj.P_GAM
                 lon0 = self.gridobj.XCENT
                 lat0 = self.gridobj.YCENT
-                m = Basemap(projection='lcc', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0,
+                m = Basemap(projection='lcc', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0,
                             lon_1=lon1,
                             llcrnrlat=self.latitude[0, 0], urcrnrlat=self.latitude[-1, -1],
                             llcrnrlon=self.longitude[0, 0],
@@ -480,7 +480,7 @@ class cmaq:
             lon1 = self.gridobj.P_GAM
             lon0 = self.gridobj.XCENT
             lat0 = self.gridobj.YCENT
-            m = Basemap(projection='lcc', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+            m = Basemap(projection='lcc', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=29., urcrnrlat=52., llcrnrlon=-116., urcrnrlon=-91., rsphere=6371200.,
                         area_thresh=50.)
         return m
@@ -500,7 +500,7 @@ class cmaq:
             lat0 = self.gridobj.YCENT
             lat = self.latitude
             lon = self.longitude
-            m = Basemap(projection='lcc', resolution='i', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
+            m = Basemap(projection='lcc', resolution='l', lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0, lon_1=lon1,
                         llcrnrlat=25., urcrnrlat=37.5, llcrnrlon=-108, urcrnrlon=-86., rsphere=6371200.,
                         area_thresh=50.)
         return m

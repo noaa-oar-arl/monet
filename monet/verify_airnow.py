@@ -64,7 +64,8 @@ class verify_airnow:
                     fac = self.check_cmaq_units(param='O3', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
                     self.cmaqo3 = cmaq
-                    dfo3 = self.interp_to_airnow(cmaq, dfo3, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.dates[self.cmaq.indexdates]
+                    dfo3 = self.interp_to_airnow(cmaq, dates, dfo3, interp=interp, r=radius, weight_func=weight_func)
                     dfs.append(dfo3)
                 except:
                     pass
@@ -74,7 +75,8 @@ class verify_airnow:
                     dfpm25 = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM25', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
-                    dfpm25 = self.interp_to_airnow(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.dates[self.cmaq.indexdates]
+                    dfpm25 = self.interp_to_airnow(cmaq, dates, dfpm25, interp=interp, r=radius, weight_func=weight_func)
 
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm25)
@@ -86,7 +88,8 @@ class verify_airnow:
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM10', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                    dfpm = self.interp_to_airnow(cmaq, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.dates[self.cmaq.indexdates]
+                    dfpm = self.interp_to_airnow(cmaq, dates, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm10 = cmaq
                     dfs.append(dfpm)
                 except:
@@ -97,7 +100,8 @@ class verify_airnow:
                     dfco = g.get_group(i)
                     fac = self.check_cmaq_units(param='CO', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
-                    dfco = self.interp_to_airnow(cmaq, dfco, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.dates[self.cmaq.indexdates]
+                    dfco = self.interp_to_airnow(cmaq, dates, dfco, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqco = cmaq
                     dfs.append(dfco)
                 except:
@@ -108,7 +112,8 @@ class verify_airnow:
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOY', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
-                    dfnoy = self.interp_to_airnow(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.dates[self.cmaq.indexdates]
+                    dfnoy = self.interp_to_airnow(cmaq, dates, dfnoy, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqnoy = cmaq
                     dfs.append(dfnoy)
                 except:
@@ -119,7 +124,8 @@ class verify_airnow:
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
-                    dfnoy = self.interp_to_airnow(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.dates[self.cmaq.indexdates]
+                    dfnoy = self.interp_to_airnow(cmaq, dates, dfnoy, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqno = cmaq
                     dfs.append(dfnoy)
                 except:
@@ -130,7 +136,8 @@ class verify_airnow:
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO2', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
-                    dfnoy = self.interp_to_airnow(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.dates[self.cmaq.indexdates]
+                    dfnoy = self.interp_to_airnow(cmaq, dates, dfnoy, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqno2 = cmaq
                     dfs.append(dfnoy)
                 except:
@@ -141,7 +148,8 @@ class verify_airnow:
                     dfso2 = g.get_group(i)
                     fac = self.check_cmaq_units(param='SO2', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
-                    dfso2 = self.interp_to_airnow(cmaq, dfso2, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.dates[self.cmaq.indexdates]
+                    dfso2 = self.interp_to_airnow(cmaq, dates, dfso2, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqso2 = cmaq
                     dfs.append(dfso2)
                 except:
@@ -152,7 +160,8 @@ class verify_airnow:
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOX', airnow_param=i)
                     cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
-                    dfnox = self.interp_to_airnow(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.dates[self.cmaq.indexdates]
+                    dfnox = self.interp_to_airnow(cmaq, dates, dfnox, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqnox = cmaq
                     dfs.append(dfnox)
                 except:
@@ -162,7 +171,8 @@ class verify_airnow:
                     print 'Interpolating Wind Direction:'
                     dfmet = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
-                    dfmet = self.interp_to_airnow(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.metdates[self.cmaq.metindex]
+                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
                     dfs.append(dfmet)
                 except:
                     pass
@@ -171,7 +181,8 @@ class verify_airnow:
                     print 'Interpolating Wind Speed:'
                     dfmet = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
-                    dfmet = self.interp_to_airnow(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.metdates[self.cmaq.metindex]
+                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
                     dfs.append(dfmet)
                 except:
                     pass
@@ -180,7 +191,8 @@ class verify_airnow:
                     print 'Interpolating 2 Meter Temperature:'
                     dfmet = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
-                    dfmet = self.interp_to_airnow(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.metdates[self.cmaq.metindex]
+                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
                     dfmet.Obs += 273.15
                     dfs.append(dfmet)
                 except:
@@ -190,7 +202,8 @@ class verify_airnow:
                     print 'Interpolating Relative Humidity:'
                     dfmet = g.get_group(i)
                     cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RH')
-                    dfmet = self.interp_to_airnow(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dates = self.cmaq.metdates[self.cmaq.metindex]
+                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
                     dfmet.Obs += 273.15
                     dfs.append(dfmet)
                 except:
@@ -199,9 +212,10 @@ class verify_airnow:
                 try:
                     print 'Interpolating Short Wave Radiation:'
                     dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RSWIN')
-                    dfmet = self.interp_to_airnow(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
-                    dfmet.Obs += 273.15
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RGRND')
+                    dates = self.cmaq.metdates[self.cmaq.metindex]
+                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    #dfmet.Obs += 273.15
                     dfs.append(dfmet)
                 except:
                     pass
@@ -452,7 +466,7 @@ class verify_airnow:
         rmse = mystats.RMSE(df.Obs.values, df.cmaq.values)
         return mb, r2, ioa, rmse
 
-    def interp_to_airnow(self, cmaqvar, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2,
+    def interp_to_airnow(self, cmaqvar,dates, df, interp='nearest', r=12000., n=5, weight_func=lambda r: 1 / r ** 2,
                          label='CMAQ'):
         """
         This function interpolates variables (2d surface) in time to measurement sites
@@ -471,7 +485,7 @@ class verify_airnow:
         from pandas import concat
         from numpy import append, empty, vstack, NaN
 
-        dates = self.cmaq.dates[self.cmaq.indexdates]
+        #dates = self.cmaq.dates[self.cmaq.indexdates]
         lat = self.cmaq.latitude
         lon = self.cmaq.longitude
         grid1 = geometry.GridDefinition(lons=lon, lats=lat)
@@ -654,7 +668,7 @@ class verify_airnow:
     def calc_24hr_ave(self,df=None):
         species = df.Species.unique()[0]
         df.index = df.datetime_local
-        df = df.groupby('SCS').resample('D').mean().reset_index(level=1).reset_index(level=0)
+        df = df.groupby('SCS').resample('D').mean().reset_index()
         df.drop('MSA_Code',inplace=True,axis=1)
         df.drop('CMSA_Name',inplace=True,axis=1)
         dff = self.airnow.get_station_locations_remerge(df)

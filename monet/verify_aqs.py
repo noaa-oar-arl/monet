@@ -178,16 +178,16 @@ class verify_aqs:
                     pass
             elif i == 'PM10':
                 try:
-                    if ('PM_TOTAL' in self.cmaq.keys) | ('ASO4K' in self.cmaq.keys):
-                        print 'Interpolating PM10:'
-                        dfnox = g.get_group(i)
-                        fac = self.check_cmaq_units(param='PM10', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
-                        self.cmaqpm10 = cmaq
-                        dfs.append(dfnox)
-                    else:
-                        pass
+                    #if ('PM_TOTAL' in self.cmaq.keys) | ('ASO4K' in self.cmaq.keys):
+                    print 'Interpolating PM10:'
+                    dfnox = g.get_group(i)
+                    fac = self.check_cmaq_units(param='PM10', aqs_param=i)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
+                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                    self.cmaqpm10 = cmaq
+                    dfs.append(dfnox)
+                    #else:
+                    #    pass
                 except:
                     pass
             elif i == 'NO3f':

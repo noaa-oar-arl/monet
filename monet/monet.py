@@ -34,7 +34,7 @@ def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radiu
 
 
 def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
-                  interp='gauss', airnowoutput='', user='', passw=''):
+                  interp='gauss', airnowoutput=''):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -49,14 +49,13 @@ def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, ra
     :return: verify_aqs() object
     """
     from verify_airnow import verify_airnow
+    import pandas as pd
     va = verify_airnow()
     va.cmaq.open_cmaq(file=concpath)
-    va.airnow.username = user
-    va.airnow.password = passw
     va.cmaq.set_gridcro2d(gridcro)
     va.cmaq.get_dates()
     va.airnow.dates = va.cmaq.dates[va.cmaq.indexdates]
-    if met2dpath != '':
+    if pd.Series(met2dpath).notnull().max():
         va.cmaq.open_metcro2d(met2dpath)
     if datapath[-4:] == '.hdf':
         from pandas import read_hdf
@@ -64,7 +63,6 @@ def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, ra
     else:
         va.airnow.download_hourly_files(path=datapath)
         va.airnow.aggragate_files(airnowoutput)
-        va.airnow.read_monitor_file()
     va.airnow.datadir = datapath
     if combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)
