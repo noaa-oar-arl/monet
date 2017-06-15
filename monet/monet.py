@@ -23,6 +23,7 @@ def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radiu
     va.cmaq.open_cmaq(file=concpath)
     va.cmaq.set_gridcro2d(filename=gridcro)
     va.cmaq.get_dates()
+    print va.cmaq.dates.min()
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     va.aqs.datadir = datapath

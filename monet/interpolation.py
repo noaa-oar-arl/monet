@@ -1,4 +1,4 @@
-def interp_to_pt_obs(cmaqvar, df, lon,lat,interp='nearest', r=12000., n=7, weight_func=lambda r: 1 / r ** 2,site_label='SCS"):
+def interp_to_pt_obs(cmaqvar,dates, df, lon,lat,interp='nearest', r=12000., n=7, weight_func=lambda r: 1 / r ** 2,site_label='SCS',daily=False):
         """
         This function interpolates variables (2d surface) in time to measurement sites
 
@@ -14,9 +14,9 @@ def interp_to_pt_obs(cmaqvar, df, lon,lat,interp='nearest', r=12000., n=7, weigh
         """
         from pyresample import geometry, kd_tree
         from pandas import concat, Series, merge
-        from numpy import append, empty, vstack, NaN
+        from numpy import append, empty, vstack, NaN,array
         from gc import collect
-        dates = self.cmaq.dates[self.cmaq.indexdates]
+        #dates = self.cmaq.dates[self.cmaq.indexdates]
         grid1 = geometry.GridDefinition(lons=lon, lats=lat)
         vals = array([], dtype=cmaqvar.dtype)
         date = array([], dtype='O')
@@ -52,6 +52,8 @@ def interp_to_pt_obs(cmaqvar, df, lon,lat,interp='nearest', r=12000., n=7, weigh
         date = Series(date)
         site = Series(site)
         dfs = concat([vals, date, site], axis=1, keys=['CMAQ', 'datetime', 'SCS'])
+        if daily:
+                dfs = dfs.resample('D').mean()
         df = merge(df, dfs, how='left', on=['SCS', 'datetime'])
 
         return df

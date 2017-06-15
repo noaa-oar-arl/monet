@@ -575,6 +575,53 @@ class aqs:
         aqs.index = arange(aqs.index.shape[0])
         return aqs
 
+    def load_data(self,param,dates):
+        if param=='PM2.5':
+            df = self.load_aqs_pm25_data(dates)
+        elif param == 'PM10':
+            df = self.load_aqs_pm10_data(dates)
+        elif param == 'SPEC':
+            df = self.load_aqs_spec_data(dates)
+        elif param == 'CO':
+            df = self.load_aqs_co_data(dates)
+        elif param == 'OZONE':
+            df = self.load_aqs_no2_data(dates)
+        elif param == 'SO2':
+            df = self.load_aqs_so2_data(dates)
+        elif param == 'VOC':
+            df = self.load_aqs_voc_data(dates)
+        elif param == 'NONOXNOY':
+            df = self.load_aqs_nonoxnoy_data(dates)
+        elif param == 'WIND':
+            df = self.load_aqs_wind_data(dates)
+        elif param == 'TEMP':
+            df = self.load_aqs_temp_data(dates)
+        elif param == 'RHDP':
+            df = self.load_aqs_rhdp_data(dates)
+        return df
+        
+    def load_all_hourly_data2(self,dates,datasets='all'):
+        import dask
+        import dask.dataframe as dd
+        os.chdir(self.datadir)
+        params = ['SPEC','PM10','PM2.5','CO','OZONE','SO2','VOC','NONOXNOY','WIND','TEMP','RHDP']
+        dfs = [dask.delayed(self.load_data)(i,dates) for i in params]
+        dff = dd.from_delayed(dfs)
+        #dff = dff.drop_duplicates()
+        self.df = dff.compute()
+        self.df = self.change_units(self.df)
+#        self.df = pd.concat(dfs, ignore_index=True)
+#        self.df = self.change_units(self.df).drop_duplicates(subset=['datetime','SCS','Species','Obs']).dropna(subset=['Obs'])
+        os.chdir(self.cwd)
+    
+    def get_all_hourly_data(self,dates):
+        os.chdir(self.datadir)
+        dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
+                   self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
+                   self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
+                   self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]
+        os.chdir(self.cwd)
+
     def load_all_hourly_data(self, dates, datasets='all'):
         os.chdir(self.datadir)
         if datasets.upper() == 'PM':
@@ -583,9 +630,9 @@ class aqs:
             dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
                    self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
                    self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
-                   self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]
+                   self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]#,self.load_aqs_daily_spec_data(dates)]
         self.df = pd.concat(dfs, ignore_index=True)
-        self.df = self.change_units(self.df).copy().drop_duplicates()
+        self.df = self.change_units(self.df).drop_duplicates()
         os.chdir(self.cwd)
 
     def load_aqs_daily_pm25_data(self, dates):
@@ -609,7 +656,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_pm25_data(dates)
+            self.retrieve_aqs_daily_ozone_data(dates)
             aqs = pd.read_hdf(fname)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -622,7 +669,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_pm25_data(dates)
+            self.retrieve_aqs_daily_pm10_data(dates)
             aqs = pd.read_hdf(fname)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -635,7 +682,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_pm25_data(dates)
+            self.retrieve_aqs_daily_so2_data(dates)
             aqs = pd.read_hdf(fname)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -648,7 +695,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_pm25_data(dates)
+            self.retrieve_aqs_daily_no2_data(dates)
             aqs = pd.read_hdf(fname)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -662,12 +709,26 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_pm25_data(dates)
+            self.retrieve_aqs_daily_co_data(dates)
             aqs = pd.read_hdf(fname)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
         return aqs
+        
+    def load_aqs_daily_spec_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_DAILY_SPEC_' + year + '.hdf'
+        if os.path.isfile(fname):
+            aqs = pd.read_hdf(fname)
+        else:
+            self.retrieve_aqs_daily_spec_data(dates)
+            aqs = pd.read_hdf(fname)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+
 
     def tzutc(self, lon, lat, dates):
         from tzwhere import tzwhere
@@ -724,9 +785,9 @@ class aqs:
                     df.loc[con, 'Species'] = 'NO'
                 if i == 42603:
                     df.loc[con, 'Species'] = 'NOX'
-                if i == 61103:
+                if (i == 61103) | (i == 61101):
                     df.loc[con, 'Species'] = 'WS'
-                if i == 61104:
+                if (i == 61104) | (i == 61102):
                     df.loc[con, 'Species'] = 'WD'
                 if i == 62201:
                     df.loc[con, 'Species'] = 'RH'
@@ -783,13 +844,13 @@ class aqs:
     def add_metro_metadata2(self,df):
         from numpy import NaN
         if type(self.monitor_df) != type(None):
-            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region','MSA_Code']].drop_duplicates()
+            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region','MSA_Code','GMT_Offset']].drop_duplicates()
             dfs.SCS = dfs.SCS.values.astype('int32')
             df = pd.merge(df,dfs,on=['SCS'],how='left')
         elif os.path.isfile(self.monitor_file):
             print '    Monitor Station Meta-Data Found: Compiling Dataset'
             self.read_monitor_file()
-            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region']].drop_duplicates()
+            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region','GMT_Offset']].drop_duplicates()
             dfs.SCS = dfs.SCS.values.astype('int32')
             df = pd.merge(df,dfs,on=['SCS'],how='left')
         return df
@@ -960,3 +1021,55 @@ class aqs:
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_PM_25_88101_' + year + '.hdf', 'df', format='table')
         self.aqsdf = df.copy()
+
+    def retrieve_aqs_daily_spec_data(self, dates):
+        import wget
+
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_SPEC_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+#        ZipFile(filename).extractall()
+        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        #utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
+        #df['datetime'], df['utcoffset'] = utc[0], utc[1]
+        df = self.add_metro_metadata2(df)
+#        df['datetime'] = 
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SPEC_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_SPEC_' + year + '.hdf', 'df', format='table')
+        self.aqsdf = df.copy()
+
+    def retrieve_aqs_hourly_no2_data(self, dates):
+        import wget
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'hourly_42602_' + year + '.zip'
+        print 'Downloading Hourly NO2: ' + url
+        filename = wget.download(url)
+        print ''
+        print 'Unpacking: ' + url
+        df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
+                                                              'datetime_local': ["Date Local", "Time Local"]},
+                         infer_datetime_format=True)
+        df.columns = self.renamedhcols
+        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
+        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
+        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        df.drop('Qualifier', axis=1, inplace=True)
+        df = self.get_species(df)
+#        df = self.get_region(df)                                                                                                                                                                                     
+        df = df.copy()[self.savecols]
+        df = self.add_metro_metadata2(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf'
+        df.to_hdf('AQS_HOURLY_NO2_42602_' + year + '.hdf', 'df', format='table')
+        return df

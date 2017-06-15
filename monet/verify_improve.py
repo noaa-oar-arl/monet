@@ -256,15 +256,17 @@ class verify_improve:
         if epasite != '':
             if epasite in new.SCS.unique():
                 df2 = new.loc[new.SCS == epasite]
+                title=epasite
         elif improvesite != '':
             if improvesite in new.Site_Code.unique():
                 df2 = new.loc[new.Site_Code == improvesite]
+                title= improvesite
         elif state != '':
             names = df.State_Name.dropna().unique()
             for i in names:
                 if state.upper() in i.upper():
                     name = i
-            df2 = new[new['State'] == name].copy().drop_duplicates()
+            df2 = new[new['State_Name'] == name].copy().drop_duplicates()
             title = name
         elif region != '':
             df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
@@ -295,7 +297,7 @@ class verify_improve:
     def improve_spatial(self, df, date, param='NAf', path='', region='', xlim=[], ylim=[]):
         """
         :param param: Species Parameter: 
-        :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
+        :param region: EPA Region: 'Northeast', 'Southeast', 'North_Central', 'South_Central', 'Rockies', 'Pacific'
         :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time
         :return:
         """

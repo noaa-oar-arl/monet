@@ -102,12 +102,7 @@ class airnow:
         #files already in directory
         filesindir = pd.Series(glob(os.path.join(path,'HourlyData*.dat')))
         # files needed for downloading
-        #print filesindir.values
-        #print files.values
         ftodownload = urls.loc[~files.isin(filesindir)]
-        #print files.loc[files.isin(filesindir)].values
-        #print files.loc[~files.isin(filesindir)].values
-        #print files.values        
         for i in ftodownload:
             print '\nDownloading:',i
             wget.download(i)
@@ -137,36 +132,6 @@ class airnow:
         if output:
             print 'Outputing data to: ' + outname
             self.df.to_hdf(outname, 'df', format='table')
-        
-#     def aggragate_files(self, output=False,outname='AIRNOW.hdf'):
-#         from numpy import sort
-#         from datetime import datetime
-#         from StringIO import StringIO
-#         self.change_path()
-#         fnames = sort(self.filelist)
-#         a = ''
-#         for i in fnames:
-#             with open(i, 'rb') as f:
-#                 a = a + f.read()
-#         dft = pd.read_csv(StringIO(a), delimiter='|', header=None, error_bad_lines=False)
-#         cols = ['date', 'time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
-#         dft.columns = cols
-#         dates = [datetime.strptime(x + ' ' + y, '%m/%d/%y %H:%M') for x, y in zip(dft.date.values, dft.time.values)]
-#         dft.drop('date', axis=1, inplace=True)
-#         dft.drop('time', axis=1, inplace=True)
-#         dft['datetime'] = dates
-#         self.df = dft.copy()
-#         self.calc_datetime()
-#         print '    Adding in Meta-data'
-#         self.get_station_locations()
-# #        self.get_region()
-#         self.df['Region'] = ' '
-#         self.df = self.df.copy().drop_duplicates()
-#         self.df = self.df[self.savecols]
-#         if output:
-#             print 'Outputing data to: ' + outname
-#             self.df.to_hdf(outname, 'df', format='fixed')
-#         self.change_back()
 
     def calc_datetime(self):
         # takes in an array of string dates and converts to numpy array of datetime objects

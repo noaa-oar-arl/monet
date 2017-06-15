@@ -281,7 +281,7 @@ class verify_airnow:
                 cmap='YlGnBu',**barbs):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
-        :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
+        :param region: EPA Region: 'Northeast', 'Southeast', 'North_Central', 'South_Central', 'Rockies', 'Pacific'
         :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time
         :return:
         """
@@ -349,7 +349,7 @@ class verify_airnow:
     def spatial_contours(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[]):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
-        :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
+        :param region: EPA Region: 'Northeast', 'Southeast', 'North_Central', 'South_Central', 'Rockies', 'Pacific'
         :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time
         :return:
         """
