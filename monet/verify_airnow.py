@@ -25,6 +25,9 @@ class verify_airnow:
         self.cmaqco = None
         self.cmaqno = None
         self.cmaqno2 = None
+        self.cmaqtemp = None
+        self.cmaqsrad = None
+        self.cmaqws = None
         self.df8hr = None
 
     def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
@@ -170,9 +173,9 @@ class verify_airnow:
                 try:
                     print 'Interpolating Wind Direction:'
                     dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
+                    self.cmaqwdir = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
                     dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dfmet = self.interp_to_airnow(self.cmaqwdir, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
                     dfs.append(dfmet)
                 except:
                     pass
@@ -180,9 +183,9 @@ class verify_airnow:
                 try:
                     print 'Interpolating Wind Speed:'
                     dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
+                    self.cmaqws = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
                     dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dfmet = self.interp_to_airnow(self.cmaqws, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
                     dfs.append(dfmet)
                 except:
                     pass
@@ -190,9 +193,9 @@ class verify_airnow:
                 try:
                     print 'Interpolating 2 Meter Temperature:'
                     dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
+                    self.cmaqtemp = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
                     dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dfmet = self.interp_to_airnow(self.cmaqtemp, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
                     dfmet.Obs += 273.15
                     dfs.append(dfmet)
                 except:
@@ -201,10 +204,10 @@ class verify_airnow:
                 try:
                     print 'Interpolating Relative Humidity:'
                     dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RH')
+                    self.cmaqrh = self.cmaq.get_metcro2d_cmaqvar(param='RH')
                     dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
-                    dfmet.Obs += 273.15
+                    dfmet = self.interp_to_airnow(self.cmaqrh, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    #dfmet.Obs += 273.15
                     dfs.append(dfmet)
                 except:
                     pass
@@ -212,10 +215,9 @@ class verify_airnow:
                 try:
                     print 'Interpolating Short Wave Radiation:'
                     dfmet = g.get_group(i)
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RGRND')
+                    self.cmaqsrad = self.cmaq.get_metcro2d_cmaqvar(param='RGRND')
                     dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(cmaq, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
-                    #dfmet.Obs += 273.15
+                    dfmet = self.interp_to_airnow(self.cmaqsrad, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
                     dfs.append(dfmet)
                 except:
                     pass
@@ -346,7 +348,7 @@ class verify_airnow:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])
 
-    def spatial_contours(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[]):
+    def spatial_contours(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[],ncolors=None):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North_Central', 'South_Central', 'Rockies', 'Pacific'
@@ -387,10 +389,21 @@ class verify_airnow:
         elif param == 'NO2':
             cmaq = self.cmaqno2
             cmap, levels = colorbars.noxcmap()
+        elif param == 'SRAD':
+            cmaq = self.cmaqsrad
+            cmap, levels = colorbars.sradcmap()
+        elif param == 'WS':
+            cmaq = self.cmaqws
+            cmap, levels = colorbars.wscmap()
+        elif param == 'TEMP':
+            cmaq = self.cmaqtemp
+            cmap, levels = colorbars.tempcmap()
+        elif param == 'RHUM':
+            cmaq = self.cmaqrh
+            cmap, levels = colorbars.rhcmap()
         else:
             cmaq = None
-        m = self.cmaq.choose_map(path, region)
-        print param
+        m = self.cmaq.map #m = self.cmaq.choose_map(path, region)
         if isinstance(cmaq, type(None)):
             print 'This parameter is not in the CMAQ file: ' + param
         else:
@@ -398,11 +411,11 @@ class verify_airnow:
                 for index, i in enumerate(self.cmaq.dates):
                     c = plots.make_spatial_contours(cmaq[index, :, :].squeeze(), self.cmaq.gridobj,
                                                     self.cmaq.dates[index],
-                                                    m, levels=levels, cmap=cmap, units='xy')
+                                                    m, levels=levels[::4], cmap=cmap, units='xy',ncolors=ncolors)
                     if not isinstance(self.cmaq.metcro2d, type(None)):
-                        ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
-                        wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
-                        plots.wind_barbs(ws, wdir, self.cmaq.gridobj, color='grey', alpha=.5)
+                        ws = self.cmaqws[index,:,:].squeeze() #self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
+                        wdir = self.cmaqwdir[index,:,:].squeeze() #self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
+                        plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, color='grey', alpha=.5)
                     try:
                         plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0], vmax=levels[-1],
                                      cmap=cmap, discrete=False)
@@ -419,18 +432,18 @@ class verify_airnow:
             else:
                 index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
                 c = plots.make_spatial_contours(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,
-                                                levels=levels, cmap=cmap, units='xy')
+                                                levels=levels, cmap=cmap, units='xy',ncolors=ncolors)
                 if not isinstance(self.cmaq.metcro2d, type(None)):
-                    ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
-                    wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
-                    plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, color='black', alpha=.3)
+                    ws = self.cmaqws[index,:,:].squeeze() #self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
+                    wdir = self.cmaqwdir[index,:,:].squeeze()  #self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
+                    plots.wind_quiver(ws, wdir, self.cmaq.gridobj, m, alpha=.3,headwidth=2,headlength=4)
                 try:
                     plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0],
                                       vmax=levels[-1], cmap=cmap, discrete=False)
                 except:
                     pass
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                c.set_ticks(unique(levels.round(-1)))
+                #c.set_ticks(unique(levels.round(-1)))
                 if len(xlim) > 1:
                     plt.xlim([min(xlim), max(xlim)])
                     plt.ylim([min(ylim), max(ylim)])

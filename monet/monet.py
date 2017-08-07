@@ -3,7 +3,7 @@
 # this is done to make creating verifications easier
 
 def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
-               interp='gauss', species='all'):
+               interp='gauss', species='all',daily=False):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -29,7 +29,9 @@ def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radiu
     va.aqs.datadir = datapath
     va.aqs.read_monitor_file()
     va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
-    if combine:
+    if combine and daily:
+        va.combine_daily(interp=interp,radius=radius,neighbors=neighbors)
+    elif combine:
         va.combine(interp=interp, radius=radius, neighbors=neighbors)
     return va
 

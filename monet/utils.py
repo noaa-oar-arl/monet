@@ -37,6 +37,7 @@ def get_epa_location_df(df,param,site='',city='',region='',epa_region='',state='
     if site != '':
         if site in new.SCS.unique():
             df2 = new.loc[new.SCS == site]
+            title = df2.SCS.unique().astype('str')[0].zfill(9)
     elif city != '':
         names = df.MSA_Name.dropna().unique()
         for i in names:
@@ -58,6 +59,13 @@ def get_epa_location_df(df,param,site='',city='',region='',epa_region='',state='
         df2 = new
         title = 'Domain'
     return df2,title
+
+
+def load_site_file():
+    from pandas import read_hdf
+    monitor_file = inspect.getfile(self.__class__)[:-13] + '/data/monitoring_site_locations.dat'
+    df = read_hdf(monitor_file)
+    return df
 
 
 def get_region(df):

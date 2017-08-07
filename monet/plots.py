@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import mystats
 import taylordiagram as td
-
+from colorbars import colorbar_index
 colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
 sns.set_palette(sns.color_palette(colors))
 
@@ -35,7 +35,7 @@ def make_spatial_plot_no_obs(cmaqvar, gridobj, date, m, dpi=None, savename='', v
     fig = plt.figure(figsize=(12, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
-    # define map and draw boundries                                                                                                                                                                                                                                   
+    # define map and draw boundries
     m.drawstates()
     m.drawcoastlines(linewidth=.3)
     m.drawcountries()
@@ -44,13 +44,13 @@ def make_spatial_plot_no_obs(cmaqvar, gridobj, date, m, dpi=None, savename='', v
 
     c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
     m.pcolormesh(x, y, cmaqvar, vmin=vmin, vmax=vmax, cmap=cmap)
-    
+
     plt.tight_layout()
-    
+
     return c
 
 
-def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', **kwargs):
+def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', discrete=True,ncolors=None, dtype='int',**kwargs):
     fig = plt.figure(figsize=(12, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
@@ -60,10 +60,15 @@ def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', **kw
     m.drawcountries()
     x, y = m(lon, lat)
     plt.axis('off')
-
-    # c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
     m.contourf(x, y, cmaqvar, **kwargs)
-    c = plt.colorbar()
+    cmap = kwargs['cmap']
+    levels=kwargs['levels']
+    if discrete:
+        c, cmap = colorbar_index(ncolors,cmap,minval=levels[0],maxval=levels[-1],basemap=m,dtype=dtype)
+#        m.contourf(x, y, cmaqvar, **kwargs,cmap=cmap)
+    # c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
+    else:
+        c = m.colorbar()
     titstring = date.strftime('%B %d %Y %H')
     plt.title(titstring)
 
@@ -73,6 +78,15 @@ def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', **kw
         plt.close()
     return c
 
+def wind_quiver(ws,wdir,gridobj,m, **kwargs):
+    import tools
+    lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
+    lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
+    # define map and draw boundries
+    x, y = m(lon, lat)
+    u, v = tools.wsdir2uv(ws, wdir)
+    quiv = m.quiver(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
+    return quiv
 
 def wind_barbs(ws, wdir, gridobj, m, **kwargs):
     import tools
@@ -100,11 +114,11 @@ def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, 
         cmap = cmap_discretize(cmap, ncolors)
         # s = 20
         if (type(vmin) == None) | (type(vmax) == None):
-            plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.1)
+            plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.25)
         else:
-            plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+            plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.25)
     else:
-        plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.1)
+        plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.25)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
@@ -115,24 +129,24 @@ def spatial_stat_scatter(df,m,date, stat=mystats.MB,ncolors=15,fact=1.5,cmap='Rd
     cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
     ss = (new.Obs - new.CMAQ).abs() * fact
-    
+
 def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, fact=1.5, cmap='RdBu_r'):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
 #    plt.figure(figsize=(12, 6), frameon=False)
-    f,ax = plt.subplots(figsize=(12,6),frameon=False)
+    f,ax = plt.subplots(figsize=(11,6),frameon=False)
     ax.set_facecolor('white')
     diff = (df.CMAQ - df.Obs)
     top = around(score(diff.abs(), per=95))
     new = df[df.datetime == date]
     x, y = m(new.Longitude.values, new.Latitude.values)
-    c, cmap = colorbar_index(ncolors, cmap, minval=top*-1, maxval=top)
+    c, cmap = colorbar_index(ncolors, cmap, minval=top*-1, maxval=top,basemap=m)
     c.ax.tick_params(labelsize=13)
 #    cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
     ss = (new.CMAQ - new.Obs).abs() /top * 100.
-
-    plt.scatter(x, y, c=colors, s=ss, vmin=-1.*top, vmax=top, cmap=cmap, edgecolors='k', linewidths=.25)
+    ss[ss> 300] = 300.
+    plt.scatter(x, y, c=colors, s=ss, vmin=-1.*top, vmax=top, cmap=cmap, edgecolors='k', linewidths=.25,alpha=.7)
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
@@ -195,7 +209,7 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
         plt.plot(obs, color='darkslategrey')
         plt.plot(cmaq, color='dodgerblue', label=label)
         plt.legend(loc='best')
-        
+
         mask = ~isnan(obs) & ~isnan(obserr)
         plt.fill_between(obs.index[mask], (obs - obserr)[mask], (obs + obserr)[mask], alpha=.2, color='darkslategrey')
         mask = ~isnan(cmaq) & ~isnan(cmaqerr)
@@ -662,51 +676,51 @@ def footer_text(df):
     plt.figtext(.3, .02, 'MEASUREMENTS: ' + str(df.SCS.count()), fontsize=11, family='monospace')
 
 
-def colorbar_index(ncolors, cmap, minval=None, maxval=None):
-    import matplotlib.cm as cm
-    import numpy as np
-    cmap = cmap_discretize(cmap, ncolors)
-    mappable = cm.ScalarMappable(cmap=cmap)
-    mappable.set_array([])
-    mappable.set_clim(-0.5, ncolors + 0.5)
-    colorbar = plt.colorbar(mappable, format='%1.2g')
-    colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
-    if (type(minval) == None) & (type(maxval) != None):
-        colorbar.set_ticklabels(np.around(np.linspace(0, maxval, ncolors).astype('float'), 2))
-    elif (type(minval) == None) & (type(maxval) == None):
-        colorbar.set_ticklabels(np.around(np.linspace(0, ncolors, ncolors).astype('float'), 2))
-    else:
-        colorbar.set_ticklabels(np.around(np.linspace(minval, maxval, ncolors).astype('float'), 2))
+# def colorbar_index(ncolors, cmap, minval=None, maxval=None):
+#     import matplotlib.cm as cm
+#     import numpy as np
+#     cmap = cmap_discretize(cmap, ncolors)
+#     mappable = cm.ScalarMappable(cmap=cmap)
+#     mappable.set_array([])
+#     mappable.set_clim(-0.5, ncolors + 0.5)
+#     colorbar = plt.colorbar(mappable, format='%1.2g')
+#     colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
+#     if (type(minval) == None) & (type(maxval) != None):
+#         colorbar.set_ticklabels(np.around(np.linspace(0, maxval, ncolors).astype('float'), 2))
+#     elif (type(minval) == None) & (type(maxval) == None):
+#         colorbar.set_ticklabels(np.around(np.linspace(0, ncolors, ncolors).astype('float'), 2))
+#     else:
+#         colorbar.set_ticklabels(np.around(np.linspace(minval, maxval, ncolors).astype('float'), 2))
 
-    return colorbar, cmap
+#     return colorbar, cmap
 
 
-def cmap_discretize(cmap, N):
-    """
-    Return a discrete colormap from the continuous colormap cmap.
+# def cmap_discretize(cmap, N):
+#     """
+#     Return a discrete colormap from the continuous colormap cmap.
 
-    cmap: colormap instance, eg. cm.jet. 
-    N: number of colors.
+#     cmap: colormap instance, eg. cm.jet.
+#     N: number of colors.
 
-    Example
-        x = resize(arange(100), (5,100))
-        djet = cmap_discretize(cm.jet, 5)
-        imshow(x, cmap=djet)
-    """
-    import matplotlib.colors as mcolors
-    import numpy as np
+#     Example
+#         x = resize(arange(100), (5,100))
+#         djet = cmap_discretize(cm.jet, 5)
+#         imshow(x, cmap=djet)
+#     """
+#     import matplotlib.colors as mcolors
+#     import numpy as np
 
-    if type(cmap) == str:
-        cmap = plt.get_cmap(cmap)
-    colors_i = np.concatenate((np.linspace(0, 1., N), (0., 0., 0., 0.)))
-    colors_rgba = cmap(colors_i)
-    indices = np.linspace(0, 1., N + 1)
-    cdict = {}
-    for ki, key in enumerate(('red', 'green', 'blue')):
-        cdict[key] = [(indices[i], colors_rgba[i - 1, ki], colors_rgba[i, ki])
-                      for i in xrange(N + 1)]
-    # Return colormap object.
-    return mcolors.LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)
+#     if type(cmap) == str:
+#         cmap = plt.get_cmap(cmap)
+#     colors_i = np.concatenate((np.linspace(0, 1., N), (0., 0., 0., 0.)))
+#     colors_rgba = cmap(colors_i)
+#     indices = np.linspace(0, 1., N + 1)
+#     cdict = {}
+#     for ki, key in enumerate(('red', 'green', 'blue')):
+#         cdict[key] = [(indices[i], colors_rgba[i - 1, ki], colors_rgba[i, ki])
+#                       for i in xrange(N + 1)]
+#     # Return colormap object.
+#     return mcolors.LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)
 
 
 def taylordiagram(df, marker='o', label='CMAQ', addon=False, dia=None):

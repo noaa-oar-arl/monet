@@ -83,8 +83,9 @@ class airnow:
     def download_hourly_files(self,path='./'):
         from numpy import empty,where
         import wget
+        import requests
         from glob import glob
-        
+        print 'Retrieving AIRNOW files...'
         self.datadir = path 
         self.change_path()
         flist = []
@@ -95,19 +96,30 @@ class airnow:
             f = url + i.strftime('%Y/%Y%m%d/HourlyData_%Y%m%d%H.dat')
             flist.append(os.path.join(path, ff))
             furls.append(f)
+#            if requests.get(f,proxies=None).status_code != 404:
+#                print f
+#                flist.append(os.path.join(path, ff))
+#                furls.append(f)
         
         #files needed for comparison
         files = pd.Series(flist,index=None)
         urls = pd.Series(furls,index=None)
         #files already in directory
-        filesindir = pd.Series(glob(os.path.join(path,'HourlyData*.dat')))
+        filesindir = pd.Series(glob(path + '/HourlyData*.dat'))
         # files needed for downloading
+#        print files,filesindir
+#        print files.isin(filesindir)
         ftodownload = urls.loc[~files.isin(filesindir)]
-        for i in ftodownload:
-            print '\nDownloading:',i
-            wget.download(i)
+        for j,i in enumerate(ftodownload):
+            f = i
+            if requests.get(f,proxies=None).status_code != 404:
+                print '\nDownloading:',i
+                wget.download(i)
+            else:
+                files.drop(j,inplace=True)
         self.change_back()
         self.filelist = files.values
+        print 'done'
     
     def read_csv(self,fn):
         dft = pd.read_csv(fn, delimiter='|', header=None, error_bad_lines=False)
@@ -118,6 +130,7 @@ class airnow:
     def aggragate_files(self,output=False,outname='AIRNOW.hdf'):
         import dask
         import dask.dataframe as dd
+        print 'Aggregating AIRNOW files...'
         dfs = [dask.delayed(self.read_csv)(f) for f in self.filelist]
         dff = dd.from_delayed(dfs)
         df = dff.compute()

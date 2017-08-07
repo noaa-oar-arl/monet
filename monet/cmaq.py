@@ -61,6 +61,7 @@ class cmaq:
         from datetime import datetime
         from pandas import DataFrame
         from numpy import concatenate, arange
+        print 'Reading CMAQ dates...'
         tflag1 = array(self.concobj.variables['TFLAG'][:, 0, 0], dtype='|S7')
         tflag2 = array(self.concobj.variables['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
         date = []
@@ -75,6 +76,7 @@ class cmaq:
         from datetime import datetime
         from pandas import DataFrame
         from numpy import concatenate, arange
+        print 'Reading CMAQ METCRO2D dates...'
         tflag1 = array(self.metcro2d.variables['TFLAG'][:, 0, 0], dtype='|S7')
         tflag2 = array(self.metcro2d.variables['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
         date = []
@@ -363,39 +365,40 @@ class cmaq:
 
     def get_surface_cmaqvar(self, param='O3'):
         lvl = 0.
-        param = param.upper()
+        revert = param
+        p = param.upper()
         print param
-        if param == 'PM25':
+        if p == 'PM25':
             var = self.get_surface_pm25()
-        elif param == 'PM10':
+        elif p == 'PM10':
             var = self.get_surface_pm10()
-        elif param == 'PM25_DUST':
+        elif p == 'PM25_DUST':
             var = self.get_surface_dust_pm25()
-        elif param == 'PM10_DUST':
+        elif p == 'PM10_DUST':
             var = self.get_surface_dust_total()
-        elif param == 'NOX':
+        elif p == 'NOX':
             var = self.get_surface_nox()
-        elif param == 'NOY':
+        elif p == 'NOY':
             var = self.get_surface_noy()
-        elif param == 'CLF':
+        elif p == 'CLF':
             var = self.get_surface_clf()
-        elif param == 'CAF':
+        elif p == 'CAF':
             var = self.get_surface_caf()
-        elif param == 'NAF':
+        elif p == 'NAF':
             var = self.get_surface_naf()
-        elif param == 'KF':
+        elif p == 'KF':
             var = self.get_surface_kf()
-        elif (param == 'SO4F') | (param == 'PM2.5_SO4'):
+        elif (p == 'SO4F') | (p == 'PM2.5_SO4'):
             var = self.get_surface_so4f()
-        elif param == 'NH4F':
+        elif p == 'NH4F':
             var = self.get_surface_nh4f()
-        elif (param == 'NO3F') | (param == 'PM2.5_NO3'):
+        elif (p == 'NO3F') | (p == 'PM2.5_NO3'):
             var = self.get_surface_no3f()
-        elif (param == 'PM2.5_EC') | (param == 'ECF'):
+        elif (p == 'PM2.5_EC') | (p == 'ECF'):
             var = self.get_surface_ec()
-        elif (param == 'OC'):
+        elif (p == 'OC'):
             var = self.get_surface_oc()
-        elif (param == 'VOC'):
+        elif (p == 'VOC'):
             var = self.concobj.variables['VOC'][self.indexdates, 0, :, :].squeeze()
         else:
             print '   Getting CMAQ Variable: ' + param
@@ -404,8 +407,7 @@ class cmaq:
 
     def get_metcro2d_rh(self):
         import atmos
-        data = {'T': self.metcro2d.variables['TEMP2'][:], 'rv': self.metcro2d.variables['Q2'][:],
-                'P': self.metcro2d.variables['PRSFC'][:]}
+        data = {'T': self.metcro2d.variables['TEMP2'][:], 'rv': self.metcro2d.variables['Q2'][:], 'p': self.metcro2d.variables['PRSFC'][:]}
         return atmos.calculate('RH', **data)[self.metindex,0,:,:].squeeze()
 
     def get_metcro2d_cmaqvar(self, param='TEMPG', lvl=0.):

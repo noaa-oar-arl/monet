@@ -24,7 +24,7 @@ class aqs:
                              'Observation_Percent', 'Obs', '1st_Max_Value',
                              '1st_Max Hour', 'AQI', 'Method_Code', 'Method_Name',
                              'Local_Site_Name', 'Address', 'State_Name', 'County_Name',
-                             'City_Name', 'CBSA_Name', 'Date_of_Last_Change']
+                             'City_Name', 'MSA_Name', 'Date_of_Last_Change']
         self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude','Obs', 'Units','Species']
         self.se_states = array(
             ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
@@ -52,9 +52,10 @@ class aqs:
         self.p_states_abv = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.datadir = '.'
         self.cwd = os.getcwd()
-        self.df = None
+        self.df = None #hourly dataframe
         self.monitor_file = inspect.getfile(self.__class__)[:-13] + '/data/monitoring_site_locations.dat'
         self.monitor_df = None
+        self.d_df = None #daily dataframe
 
     def check_file_size(self,url):
         test = requests.head(url).headers
@@ -100,7 +101,7 @@ class aqs:
             df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
             df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                               dtype='int32')
-            
+
             #df.drop('Qualifier', axis=1, inplace=True)
             df = self.get_species(df)
             #df = self.get_region(df)
@@ -599,7 +600,33 @@ class aqs:
         elif param == 'RHDP':
             df = self.load_aqs_rhdp_data(dates)
         return df
-        
+
+    def load_daily_data(self,param,dates):
+        if param=='PM2.5':
+            df = self.load_aqs_daily_pm25_data(dates)
+        elif param == 'PM10':
+            df = self.load_aqs_daily_pm10_data(dates)
+        elif param == 'SPEC':
+            df = self.load_aqs_daily_spec_data(dates)
+        elif param == 'CO':
+            df = self.load_aqs_daily_co_data(dates)
+        elif param == 'OZONE':
+            df = self.load_aqs_daily_no2_data(dates)
+        elif param == 'SO2':
+            df = self.load_aqs_daily_so2_data(dates)
+        elif param == 'VOC':
+            df = self.load_aqs_daily_voc_data(dates)
+        elif param == 'NONOXNOY':
+            df = self.load_aqs_daily_nonoxnoy_data(dates)
+        elif param == 'WIND':
+            df = self.load_aqs_daily_wind_data(dates)
+        elif param == 'TEMP':
+            df = self.load_aqs_daily_temp_data(dates)
+        elif param == 'RHDP':
+            df = self.load_aqs_daily_rhdp_data(dates)
+        return df
+
+
     def load_all_hourly_data2(self,dates,datasets='all'):
         import dask
         import dask.dataframe as dd
@@ -613,7 +640,22 @@ class aqs:
 #        self.df = pd.concat(dfs, ignore_index=True)
 #        self.df = self.change_units(self.df).drop_duplicates(subset=['datetime','SCS','Species','Obs']).dropna(subset=['Obs'])
         os.chdir(self.cwd)
-    
+
+    def load_all_daily_data(self,dates,datasets='all'):
+        import dask
+        import dask.dataframe as dd
+        from dask.diagnostics import ProgressBar
+        os.chdir(self.datadir)
+        pbar = ProgressBar()
+        pbar.register()
+        params = ['SPEC','PM10','PM2.5','CO','OZONE','SO2','VOC','NONOXNOY','WIND','TEMP','RHDP']
+        dfs = [dask.delayed(self.load_daily_data)(i,dates) for i in params]
+#        print dfs
+        dff = dd.from_delayed(dfs)
+        self.d_df = dff.compute()
+        self.d_df = self.change_units(self.d_df)
+        os.chdir(self.cwd)
+
     def get_all_hourly_data(self,dates):
         os.chdir(self.datadir)
         dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
@@ -638,13 +680,12 @@ class aqs:
     def load_aqs_daily_pm25_data(self, dates):
         from datetime import timedelta
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf'
+        fname = self.datadir + '/' + 'AQS_DAILY_PM25_' + year + '.hdf'
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
             self.retrieve_aqs_daily_pm25_data(dates)
             aqs = pd.read_hdf(fname)
-        aqs = pd.read_hdf(self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf')
         con = (aqs.datetime >= dates[0] - timedelta(days=1)) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -652,7 +693,7 @@ class aqs:
 
     def load_aqs_daily_ozone_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf'
+        fname = self.datadir + '/' + 'AQS_DAILY_OZONE_' + year + '.hdf'
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
@@ -665,7 +706,7 @@ class aqs:
 
     def load_aqs_daily_pm10_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf'
+        fname = self.datadir + '/' + 'AQS_DAILY_PM10_' + year + '.hdf'
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
@@ -678,7 +719,7 @@ class aqs:
 
     def load_aqs_daily_so2_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf'
+        fname = self.datadir + '/' + 'AQS_DAILY_SO2_' + year + '.hdf'
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
@@ -691,7 +732,7 @@ class aqs:
 
     def load_aqs_daily_no2_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf'
+        fname = self.datadir + '/' + 'AQS_DAILY_NO2_' + year + '.hdf'
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
@@ -705,7 +746,7 @@ class aqs:
 
     def load_aqs_daily_co_data(self, dates):
         year = dates[0].strftime('%Y')
-        fname = self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf'
+        fname = self.datadir + '/' + 'AQS_DAILY_CO_' + year + '.hdf'
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
@@ -715,7 +756,33 @@ class aqs:
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
         return aqs
-        
+    
+    def load_aqs_daily_temp_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_DAILY_TEMP_' + year + '.hdf'
+        if os.path.isfile(fname):
+            aqs = pd.read_hdf(fname)
+        else:
+            self.retrieve_aqs_daily_temp_data(dates)
+            aqs = pd.read_hdf(fname)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+    
+    def load_aqs_daily_rh_dp_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_DAILY_RH_DP_' + year + '.hdf'
+        if os.path.isfile(fname):
+            aqs = pd.read_hdf(fname)
+        else:
+            self.retrieve_aqs_daily_rh_dp_data(dates)
+            aqs = pd.read_hdf(fname)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+
     def load_aqs_daily_spec_data(self, dates):
         year = dates[0].strftime('%Y')
         fname = self.datadir + '/' + 'AQS_DAILY_SPEC_' + year + '.hdf'
@@ -728,7 +795,32 @@ class aqs:
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
         return aqs
-
+        
+    def load_aqs_daily_voc_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_DAILY_VOC_' + year + '.hdf'
+        if os.path.isfile(fname):
+            aqs = pd.read_hdf(fname)
+        else:
+            self.retrieve_aqs_daily_voc_data(dates)
+            aqs = pd.read_hdf(fname)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+        
+    def load_aqs_daily_wind_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_DAILY_WIND_' + year + '.hdf'
+        if os.path.isfile(fname):
+            aqs = pd.read_hdf(fname)
+        else:
+            self.retrieve_aqs_daily_wind_data(dates)
+            aqs = pd.read_hdf(fname)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
 
     def tzutc(self, lon, lat, dates):
         from tzwhere import tzwhere
@@ -771,7 +863,7 @@ class aqs:
                     df.loc[con, 'Species'] = 'OC'
                 if i == 88306:
                     df.loc[con, 'Species'] = 'NO3f'
-                if i == 88307:
+                if (i == 88307):
                     df.loc[con, 'Species'] = 'ECf'
                 if i == 88316:
                     df.loc[con, 'Species'] = 'ECf_optical'
@@ -779,6 +871,132 @@ class aqs:
                     df.loc[con, 'Species'] = 'SO4f'
                 if i == 88312:
                     df.loc[con, 'Species'] = 'TCf'
+                if i == 88104:
+                    df.loc[con, 'Species'] = 'Alf'
+                if i == 88107:
+                    df.loc[con, 'Species'] = 'Baf'
+                if i == 88313:
+                    df.loc[con, 'Species'] = 'BCf'
+                if i == 88109:
+                    df.loc[con, 'Species'] = 'Brf'
+                if i == 88110:
+                    df.loc[con, 'Species'] = 'Cdf'
+                if i == 88111:
+                    df.loc[con, 'Species'] = 'Caf'
+                if i ==88117:
+                    df.loc[con, 'Species'] = 'Cef'
+                if i == 88118:
+                    df.loc[con, 'Species'] = 'Csf'
+                if i == 88203:
+                    df.loc[con, 'Species'] = 'Cl-f'
+                if i == 88115:
+                    df.loc[con, 'Species'] = 'Clf'
+                if i == 88112:
+                    df.loc[con, 'Species'] = 'Crf'
+                if i == 88113:
+                    df.loc[con, 'Species'] = 'Cof'
+                if i == 88114:
+                    df.loc[con, 'Species'] = 'Cuf'
+                if i == 88121:
+                    df.loc[con, 'Species'] = 'Euf'
+                if i == 88143:
+                    df.loc[con, 'Species'] = 'Auf'
+                if i == 88127:
+                    df.loc[con, 'Species'] = 'Hff'
+                if i == 88131:
+                    df.loc[con, 'Species'] = 'Inf'
+                if i == 88126:
+                    df.loc[con, 'Species'] = 'Fef'
+                if i == 88146:
+                    df.loc[con, 'Species'] = 'Laf'
+                if i == 88128:
+                    df.loc[con, 'Species'] = 'Pbf'
+                if i == 88140:
+                    df.loc[con, 'Species'] = 'Mgf'
+                if i == 88132:
+                    df.loc[con, 'Species'] = 'Mnf'
+                if i == 88142:
+                    df.loc[con, 'Species'] = 'Hgf'
+                if i == 88134:
+                    df.loc[con, 'Species'] = 'Mof'
+                if i == 88136:
+                    df.loc[con, 'Species'] = 'Nif'
+                if i == 88147:
+                    df.loc[con, 'Species'] = 'Nbf'
+                if i == 88310:
+                    df.loc[con, 'Species'] = 'NO3f'
+                if i == 88152:
+                    df.loc[con, 'Species'] = 'Pf'
+                if i == 88303:
+                    df.loc[con, 'Species'] = 'K+f'
+                if i == 88176:
+                    df.loc[con, 'Species'] = 'Rbf'
+                if i == 88162:
+                    df.loc[con, 'Species'] = 'Smf'
+                if i == 88163:
+                    df.loc[con, 'Species'] = 'Scf'
+                if i == 88154:
+                    df.loc[con, 'Species'] = 'Sef'
+                if i == 88165:
+                    df.loc[con, 'Species'] = 'Sif'
+                if i == 88166:
+                    df.loc[con, 'Species'] = 'Agf'
+                if i == 88302:
+                    df.loc[con, 'Species'] = 'Na+f'
+                if i == 88184:
+                    df.loc[con, 'Species'] = 'Naf'
+                if i == 88168:
+                    df.loc[con, 'Species'] = 'Srf'
+                if i == 88403:
+                    df.loc[con, 'Species'] = 'SO4f'
+                if i == 88169:
+                    df.loc[con, 'Species'] = 'Sf'
+                if i == 88170:
+                    df.loc[con, 'Species'] = 'Taf'
+                if i == 88172:
+                    df.loc[con, 'Species'] = 'Tbf'
+                if i == 88160:
+                    df.loc[con, 'Species'] = 'Snf'
+                if i == 88161:
+                    df.loc[con, 'Species'] = 'Tif'
+                if i == 88312:
+                    df.loc[con, 'Species'] = 'TOT_Cf'
+                if i == 88310:
+                    df.loc[con, 'Species'] = 'NON-VOLITILE_NO3f'
+                if i == 88309:
+                    df.loc[con, 'Species'] = 'VOLITILE_NO3f'
+                if i == 88186:
+                    df.loc[con, 'Species'] = 'Wf'
+                if i == 88314:
+                    df.loc[con, 'Species'] = 'C_370nmf'
+                if i == 88179:
+                    df.loc[con, 'Species'] = 'Uf'
+                if i == 88164:
+                    df.loc[con, 'Species'] = 'Vf'
+                if i == 88183:
+                    df.loc[con, 'Species'] = 'Yf'
+                if i == 88167:
+                    df.loc[con, 'Species'] = 'Znf'
+                if i == 88185:
+                    df.loc[con, 'Species'] = 'Zrf'
+                if i == 88102:
+                    df.loc[con, 'Species'] = 'Sbf'
+                if i == 88103:
+                    df.loc[con, 'Species'] = 'Asf'
+                if i == 88105:
+                    df.loc[con, 'Species'] = 'Bef'
+                if i == 88124:
+                    df.loc[con, 'Species'] = 'Gaf'
+                if i == 88185:
+                    df.loc[con, 'Species'] = 'Irf'
+                if i == 88180:
+                    df.loc[con, 'Species'] = 'Kf'
+                if i == 88301:
+                    df.loc[con, 'Species'] = 'NH4+f'
+                if (i == 88320) | (i == 88355):
+                    df.loc[con, 'Species'] = 'OCf'
+                if (i == 88357) | (i == 88321):
+                    df.loc[con, 'Species'] = 'ECf'
                 if i == 42600:
                     df.loc[con, 'Species'] = 'NOY'
                 if i == 42601:
@@ -855,34 +1073,187 @@ class aqs:
             df = pd.merge(df,dfs,on=['SCS'],how='left')
         return df
 
-    def retrieve_aqs_daily_co_data(self, dates):
+    def retrieve_aqs_daily_voc_data(self, dates):
         import wget
+        from numpy import NaN, int64
         i = dates[0]
         year = i.strftime('%Y')
-        url = self.baseurl + 'daily_42101_' + year + '.zip'
+        url = self.baseurl + 'daily_VOCS_' + year + '.zip'
         print 'Downloading: ' + url
-        filename = wget.download(url)
+        filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
-        ZipFile(filename).extractall()
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+#        ZipFile(filename).extractall()
+        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_VOC_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_VOC_' + year + '.hdf', 'df', format='table')
+        return df
+    
+    def retrieve_aqs_daily_temp_data(self, dates):
+        import wget
+        from numpy import NaN, int64
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_TEMP_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
-        df = pd.to_numeric(df[['State_Code','County_Code','Site_Num']],errors='coerce')
-        df.dropna(subset=['State_Code','County_Code','Site_Num'],inplace=True)
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        df = self.add_metro_metadata2(df)
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_CO_42101_' + year + '.hdf'
-        df.to_hdf('AQS_DAILY_CO_42101_' + year + '.hdf', 'df', format='table')
-        self.aqsdf = df.copy()
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_TEMP_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_TEMP_' + year + '.hdf', 'df', format='table')
+        return df
+    
+    def retrieve_aqs_daily_rh_dp_data(self, dates):
+        import wget
+        from numpy import NaN, int64
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_RH_DP_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_RH_DP_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_RH_DP_' + year + '.hdf', 'df', format='table')
+        return df
+
+    def retrieve_aqs_daily_wind_data(self, dates):
+        import wget
+        from numpy import NaN, int64
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_WIND_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+#        ZipFile(filename).extractall()
+        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_WIND_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_WIND_' + year + '.hdf', 'df', format='table')
+        return df
+
+    def retrieve_aqs_daily_co_data(self, dates):
+        import wget
+        from numpy import NaN, int64
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_42101_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+#        ZipFile(filename).extractall()
+        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_CO_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_CO_' + year + '.hdf', 'df', format='table')
+        return df
 
     def retrieve_aqs_daily_ozone_data(self, dates):
         import wget
-
+        from numpy import NaN, int64
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_44201_' + year + '.zip'
@@ -890,95 +1261,35 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
-        ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
-                         date_parser=dateparse)
-        df.columns = self.renameddcols
-        df = pd.to_numeric(df[['State_Code','County_Code','Site_Num']],errors='coerce')
-        df.dropna(subset=['State_Code','County_Code','Site_Num'],inplace=True)
-        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
-                          dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        df = self.add_metro_metadata2(df)
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_OZONE_44201_' + year + '.hdf'
-        df.to_hdf('AQS_DAILY_OZONE_44201_' + year + '.hdf', 'df', format='table')
-        self.aqsdf = df.copy()
-
-    def retrieve_aqs_daily_pm10_data(self, dates):
-        import wget
-
-        i = dates[0]
-        year = i.strftime('%Y')
-        url = self.baseurl + 'daily_81102_' + year + '.zip'
-        print 'Downloading: ' + url
-        filename = wget.download(url);
-        print ''
-        print 'Unpacking: ' + url
-        ZipFile(filename).extractall()
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+#        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        df = self.add_metro_metadata2(df)
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_10_81102_' + year + '.hdf'
-        df.to_hdf('AQS_DAILY_PM_10_81102_' + year + '.hdf', 'df', format='table')
-        self.aqsdf = df.copy()
-
-    def retrieve_aqs_daily_so2_data(self, dates):
-        import wget
-
-        i = dates[0]
-        year = i.strftime('%Y')
-        url = self.baseurl + 'daily_42401_' + year + '.zip'
-        print 'Downloading: ' + url
-        filename = wget.download(url);
-        print ''
-        print 'Unpacking: ' + url
-        ZipFile(filename).extractall()
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
-                         date_parser=dateparse)
-        df.columns = self.renameddcols
-        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
-                          dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf'
-        df.to_hdf('AQS_DAILY_SO2_42401_' + year + '.hdf', 'df', format='table')
-        self.aqsdf = df.copy()
-
-    def retrieve_aqs_daily_so2_data(self, dates):
-        import wget
-
-        i = dates[0]
-        year = i.strftime('%Y')
-        url = self.baseurl + 'daily_42401_' + year + '.zip'
-        print 'Downloading: ' + url
-        filename = wget.download(url);
-        print ''
-        print 'Unpacking: ' + url
-        ZipFile(filename).extractall()
-        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
-                         date_parser=dateparse)
-        df.columns = self.renameddcols
-        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
-                          dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SO2_42401_' + year + '.hdf'
-        df.to_hdf('AQS_DAILY_SO2_42401_' + year + '.hdf', 'df', format='table')
-        self.aqsdf = df.copy()
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_OZONE_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_OZONE_' + year + '.hdf', 'df', format='table')
+        return df
 
     def retrieve_aqs_daily_no2_data(self, dates):
         import wget
-
+        from numpy import NaN, int64
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_42602_' + year + '.zip'
@@ -986,45 +1297,160 @@ class aqs:
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
-        ZipFile(filename).extractall()
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+#        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_NO2_42602_' + year + '.hdf'
-        df.to_hdf('AQS_DAILY_NO2_42602_' + year + '.hdf', 'df', format='table')
-        self.aqsdf = df.copy()
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
 
-    def retrieve_aqs_daily_pm25_data(self, dates):
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_NO2_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_NO2_' + year + '.hdf', 'df', format='table')
+        return df
+
+    def retrieve_aqs_daily_so2_data(self, dates):
         import wget
-
+        from numpy import NaN, int64
         i = dates[0]
         year = i.strftime('%Y')
-        url = self.baseurl + 'daily_88101_' + year + '.zip'
+        url = self.baseurl + 'daily_42401_' + year + '.zip'
         print 'Downloading: ' + url
         filename = wget.download(url);
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-        ZipFile(filename).extractall()
+#        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM_25_88101_' + year + '.hdf'
-        df.to_hdf('AQS_DAILY_PM_25_88101_' + year + '.hdf', 'df', format='table')
-        self.aqsdf = df.copy()
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SO2_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_SO2_' + year + '.hdf', 'df', format='table')
+        return df
+
+    def retrieve_aqs_daily_pm10_data(self, dates):
+        import wget
+        from numpy import NaN, int64
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_81102_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+#        ZipFile(filename).extractall()
+        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM10_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_PM10_' + year + '.hdf', 'df', format='table')
+        return df
+
+    def retrieve_aqs_daily_pm25_data(self, dates):
+        import wget
+        from numpy import NaN, int64
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_88101_' + year + '.zip'
+        if self.check_file_size(url):
+            print 'Downloading: ' + url
+            filename = wget.download(url);
+            print ''
+            print 'Unpacking: ' + url
+            dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+            df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+            df.columns = self.renameddcols
+            df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        else:
+            df = pd.DataFrame()
+        url2 = self.baseurl + 'daily_88502_' + year + '.zip'
+        if self.check_file_size(url2):
+            print 'Downloading: ' + url2
+            filename = wget.download(url2)
+            dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+            df2 = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                             date_parser=dateparse)
+            df2.columns = self.renameddcols
+            df2['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                              dtype='int32')
+        else:
+            df2 = pd.DataFrame()
+        if self.check_file_size(url) | self.check_file_size(url2):
+            df = pd.concat([df,df2],ignore_index=True)
+            df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+            df.dropna(subset=['Parameter_Code'],inplace=True)
+            df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+            df = self.read_monitor_and_site(df)
+            df['SCS'] = df.SCS.astype(str).str.zfill(9)
+            df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+            df = self.get_species(df)
+            df.to_hdf('AQS_DAILY_PM25_' + year + '.hdf', 'df', format='table')
+        else:
+            df = pd.DataFrame()
+        return df
 
     def retrieve_aqs_daily_spec_data(self, dates):
         import wget
-
+        from numpy import NaN, int64
         i = dates[0]
         year = i.strftime('%Y')
         url = self.baseurl + 'daily_SPEC_' + year + '.zip'
@@ -1039,37 +1465,35 @@ class aqs:
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        #utc = self.tzutc(df.Longitude.values, df.Latitude.values, df.datetime_local.values)
-        #df['datetime'], df['utcoffset'] = utc[0], utc[1]
-        df = self.add_metro_metadata2(df)
-#        df['datetime'] = 
+        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'],inplace=True)
+        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df = self.get_species(df)
+#        df['datetime'] =
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SPEC_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_SPEC_' + year + '.hdf', 'df', format='table')
-        self.aqsdf = df.copy()
-
-    def retrieve_aqs_hourly_no2_data(self, dates):
-        import wget
-        i = dates[0]
-        year = i.strftime('%Y')
-        url = self.baseurl + 'hourly_42602_' + year + '.zip'
-        print 'Downloading Hourly NO2: ' + url
-        filename = wget.download(url)
-        print ''
-        print 'Unpacking: ' + url
-        df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
-                         infer_datetime_format=True)
-        df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
-        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
-                          dtype='int32')
-        df.drop('Qualifier', axis=1, inplace=True)
-        df = self.get_species(df)
-#        df = self.get_region(df)                                                                                                                                                                                     
-        df = df.copy()[self.savecols]
-        df = self.add_metro_metadata2(df)
-        print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf'
-        df.to_hdf('AQS_HOURLY_NO2_42602_' + year + '.hdf', 'df', format='table')
         return df
+
+    def read_monitor_and_site(self,df):
+        site_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_sites.zip' #has GMT Land Use and Location Setting (RURAL URBAN etc...)
+        monitor_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_monitors.zip' #has network info (CSN IMPROVE etc....)
+        site = pd.read_csv(site_url)
+        monitor = pd.read_csv(monitor_url,index_col=None,usecols=range(29))
+        site['SCS'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site['Site Number'].astype(str).str.zfill(4)
+        monitor['SCS'] = monitor['State Code'].astype(str).str.zfill(2) + monitor['County Code'].astype(str).str.zfill(3) + monitor['Site Number'].astype(str).str.zfill(4)
+        site.columns = [i.replace(' ','_') for i in site.columns]
+        s = monitor.merge(site[['SCS','Land_Use', 'Location_Setting','GMT_Offset']],on=['SCS'],how='left')
+        s.columns = [i.replace(' ','_') for i in s.columns]
+        s['SCS'] = pd.to_numeric(s.SCS,errors='coerce')
+        return df.merge(s[['SCS', u'GMT_Offset', 'Networks',u'Land_Use',u'Location_Setting','Parameter_Code']],on=['SCS','Parameter_Code'],how='left')
