@@ -108,7 +108,7 @@ def noxcmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.plasma_r(linspace(.042, .75, 128))
     colors = vstack((colors1, colors2))
-    return mcolors.LinearSegmentedColormap.from_list('noxcmap', colors), arange(0, 70.2, .2)
+    return mcolors.LinearSegmentedColormap.from_list('noxcmap', colors), arange(0, 40.2, .2)
 
 def rhcmap():
     # This function returns the colormap and bins for the NO2/NO/NOx spatial plots

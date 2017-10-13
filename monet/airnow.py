@@ -5,8 +5,6 @@ from datetime import datetime, timedelta
 import pandas as pd
 from numpy import array
 import inspect
-from tools import search_listinlist
-
 
 class airnow:
     def __init__(self):
@@ -96,20 +94,18 @@ class airnow:
             f = url + i.strftime('%Y/%Y%m%d/HourlyData_%Y%m%d%H.dat')
             flist.append(os.path.join(path, ff))
             furls.append(f)
-#            if requests.get(f,proxies=None).status_code != 404:
-#                print f
-#                flist.append(os.path.join(path, ff))
-#                furls.append(f)
         
         #files needed for comparison
         files = pd.Series(flist,index=None)
         urls = pd.Series(furls,index=None)
-        #files already in directory
         filesindir = pd.Series(glob(path + '/HourlyData*.dat'))
-        # files needed for downloading
-#        print files,filesindir
-#        print files.isin(filesindir)
-        ftodownload = urls.loc[~files.isin(filesindir)]
+        if filesindir.shape[0] == 0:
+            #no files found
+            ftodownload = urls
+        else:
+            #files already in directory
+            ftodownload = urls.loc[~files.isin(filesindir)]
+
         for j,i in enumerate(ftodownload):
             f = i
             if requests.get(f,proxies=None).status_code != 404:
@@ -166,20 +162,31 @@ class airnow:
         return df
 
     def read_monitor_file(self):
-        from glob import glob
-        if os.path.isfile(self.monitor_file) == True:
+        try:
             print '    Monitor Station Meta-Data Found: Compiling Dataset'
-            fname = self.monitor_file
-        else:
-            self.openftp()
-            self.ftp.cwd('Locations')
-            self.download_single_rawfile(fname='monitoring_site_locations.dat')
+            monitor_url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/today/monitoring_site_locations.dat'
+            colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+            f = pd.read_csv(monitor_url, delimiter='|', header=None, usecols=colsinuse)
+            f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
+                         'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
+                         'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
+        except:
+            from glob import glob
+            if os.path.isfile(self.monitor_file) == True:
+                print '    Monitor Station Meta-Data Found: Compiling Dataset'
+                fname = self.monitor_file
+            else:
+                self.openftp()
+                self.ftp.cwd('Locations')
+                self.download_single_rawfile(fname='monitoring_site_locations.dat')
             fname = glob('monitoring_site_locations.dat')[0]
-        colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-        f = pd.read_csv(fname, delimiter='|', header=None, usecols=colsinuse)
-        f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
-                     'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
-                     'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
+            colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+            f = pd.read_csv(fname, delimiter='|', header=None, usecols=colsinuse)
+            f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
+                         'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
+                         'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
+            
+            
         self.monitor_df = f.copy()
 
     def get_region(self):

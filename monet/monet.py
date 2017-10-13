@@ -20,15 +20,18 @@ def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radiu
     """
     from verify_aqs import verify_aqs
     va = verify_aqs()
+#    va = verify_airnow()
     va.cmaq.open_cmaq(file=concpath)
-    va.cmaq.set_gridcro2d(filename=gridcro)
-    va.cmaq.get_dates()
-    print va.cmaq.dates.min()
+    va.cmaq.set_gridcro2d(gridcro)
+    va.aqs.dates = va.cmaq.conc.TSTEP.to_index()
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     va.aqs.datadir = datapath
     va.aqs.read_monitor_file()
-    va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
+    if daily:
+        va.aqs.load_all_daily_data(va.aqs.dates, datasets=species)
+    else:
+        va.aqs.load_all_hourly_data(va.aqs.dates, datasets=species)
     if combine and daily:
         va.combine_daily(interp=interp,radius=radius,neighbors=neighbors)
     elif combine:
@@ -56,8 +59,7 @@ def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, ra
     va = verify_airnow()
     va.cmaq.open_cmaq(file=concpath)
     va.cmaq.set_gridcro2d(gridcro)
-    va.cmaq.get_dates()
-    va.airnow.dates = va.cmaq.dates[va.cmaq.indexdates]
+    va.airnow.dates = va.cmaq.conc.TSTEP.to_index() 
     if pd.Series(met2dpath).notnull().max():
         va.cmaq.open_metcro2d(met2dpath)
     if datapath[-4:] == '.hdf':
@@ -68,7 +70,7 @@ def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, ra
         va.airnow.aggragate_files(airnowoutput)
     va.airnow.datadir = datapath
     if combine:
-        va.combine(interp=interp, radius=radius, neighbors=neighbors)
+        va.combine(interp=interp, radius=radius)
     return va
 
 

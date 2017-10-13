@@ -30,57 +30,40 @@ class verify_airnow:
         self.cmaqws = None
         self.df8hr = None
 
-    def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
-        ###3 different interpolations
-        ###interp = 'nearest' for nearest neightbor interpolation
-        ###interp = 'idw' for nearest neight interpolation
-        ###interp = 'gauss' for gaussian weighting
-        ###   if idw is selected you need to provide the weighting function. something like:
-        ###
-        ###   weight_func = lambda r: 1/r**2 for inverse distance squared
-        ###
-        ###   weight_func = lambda r: 1/r    for inverse distance squared
-        ###
-        # get the lats and lons for CMAQ
-        lat = self.cmaq.latitude
-        lon = self.cmaq.longitude
-
+    def combine(self, interp='nearest', radius=12000. * 2):
+        from interpolation import interp_to_obs_new
         # get the CMAQ dates
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
-        self.cmaq.get_dates()
-        print 'Simulation Start Date: ', self.cmaq.dates[0].strftime('%Y-%m-%d %H:%M')
-        print 'Simulation End   Date: ', self.cmaq.dates[-1].strftime('%Y-%m-%d %H:%M')
+        #self.cmaq.get_dates()
+        print 'Simulation Start Date: ', self.cmaq.conc.TSTEP.to_index()[0].strftime('%Y-%m-%d %H:%M')
+        print 'Simulation End   Date: ', self.cmaq.conc.TSTEP.to_index()[-1].strftime('%Y-%m-%d %H:%M')
         print '===============================================================\n'
         if self.cmaq.metcro2d is None:
             print 'METCRO2D file not loaded.  To include MET variables please load self.cmaq.open_metcro2d(\'filename\')\n'
-        self.ensure_values_indomain()
+        self.airnow.df.dropna(subset=['Latitude','Longitude'],inplace=True)
         comparelist = sort(self.airnow.df.Species.unique())
-#        comparelist=['OZONE']
         g = self.airnow.df.groupby('Species')
         dfs = []
         for i in comparelist:
             if i == 'OZONE':
-                try:
+                #try:
                     print 'Interpolating Ozone:'
                     dfo3 = g.get_group(i)
                     fac = self.check_cmaq_units(param='O3', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='O3').compute() * fac
                     self.cmaqo3 = cmaq
-                    dates = self.cmaq.dates[self.cmaq.indexdates]
-                    dfo3 = self.interp_to_airnow(cmaq, dates, dfo3, interp=interp, r=radius, weight_func=weight_func)
+                    dfo3 = interp_to_obs_new(cmaq, dfo3,self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfo3)
-                except:
-                    pass
+                #except:
+                #    pass
             elif i == 'PM2.5':
                 try:
                     print 'Interpolating PM2.5:'
                     dfpm25 = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM25', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
-                    dates = self.cmaq.dates[self.cmaq.indexdates]
-                    dfpm25 = self.interp_to_airnow(cmaq, dates, dfpm25, interp=interp, r=radius, weight_func=weight_func)
-
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25').compute() * fac
+                    dfpm25 = interp_to_obs_new(cmaq, dfpm25, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm25)
                 except:
@@ -90,9 +73,8 @@ class verify_airnow:
                     print 'Interpolating PM10:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM10', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                    dates = self.cmaq.dates[self.cmaq.indexdates]
-                    dfpm = self.interp_to_airnow(cmaq, dates, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10').compute() * fac
+                    dfpm = interp_to_obs_new(cmaq, dfpm, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqpm10 = cmaq
                     dfs.append(dfpm)
                 except:
@@ -102,9 +84,8 @@ class verify_airnow:
                     print 'Interpolating CO:'
                     dfco = g.get_group(i)
                     fac = self.check_cmaq_units(param='CO', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
-                    dates = self.cmaq.dates[self.cmaq.indexdates]
-                    dfco = self.interp_to_airnow(cmaq, dates, dfco, interp=interp, r=radius, weight_func=weight_func)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='CO').compute() * fac
+                    dfco = interp_to_obs_new(cmaq, dfco, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqco = cmaq
                     dfs.append(dfco)
                 except:
@@ -114,9 +95,8 @@ class verify_airnow:
                     print 'Interpolating NOY:'
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOY', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
-                    dates = self.cmaq.dates[self.cmaq.indexdates]
-                    dfnoy = self.interp_to_airnow(cmaq, dates, dfnoy, interp=interp, r=radius, weight_func=weight_func)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOY').compute() * fac
+                    dfnoy = interp_to_obs_new(cmaq, dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqnoy = cmaq
                     dfs.append(dfnoy)
                 except:
@@ -126,9 +106,8 @@ class verify_airnow:
                     print 'Interpolating NO:'
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
-                    dates = self.cmaq.dates[self.cmaq.indexdates]
-                    dfnoy = self.interp_to_airnow(cmaq, dates, dfnoy, interp=interp, r=radius, weight_func=weight_func)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO').compute() * fac
+                    dfnoy = interp_to_obs_new(cmaq, dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqno = cmaq
                     dfs.append(dfnoy)
                 except:
@@ -138,9 +117,8 @@ class verify_airnow:
                     print 'Interpolating NO2:'
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO2', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
-                    dates = self.cmaq.dates[self.cmaq.indexdates]
-                    dfnoy = self.interp_to_airnow(cmaq, dates, dfnoy, interp=interp, r=radius, weight_func=weight_func)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO2').compute() * fac
+                    dfnoy = interp_to_obs_new(cmaq, dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqno2 = cmaq
                     dfs.append(dfnoy)
                 except:
@@ -150,9 +128,8 @@ class verify_airnow:
                     print 'Interpolating SO2'
                     dfso2 = g.get_group(i)
                     fac = self.check_cmaq_units(param='SO2', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
-                    dates = self.cmaq.dates[self.cmaq.indexdates]
-                    dfso2 = self.interp_to_airnow(cmaq, dates, dfso2, interp=interp, r=radius, weight_func=weight_func)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='SO2').compute() * fac
+                    dfso2 = interp_to_obs_new(cmaq, dfso2, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqso2 = cmaq
                     dfs.append(dfso2)
                 except:
@@ -162,9 +139,8 @@ class verify_airnow:
                     print 'Interpolating NOX:'
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOX', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
-                    dates = self.cmaq.dates[self.cmaq.indexdates]
-                    dfnox = self.interp_to_airnow(cmaq, dates, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOX').compute() * fac
+                    dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqnox = cmaq
                     dfs.append(dfnox)
                 except:
@@ -174,8 +150,7 @@ class verify_airnow:
                     print 'Interpolating Wind Direction:'
                     dfmet = g.get_group(i)
                     self.cmaqwdir = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
-                    dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(self.cmaqwdir, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dfmet = interp_to_obs_new(self.cmaqwdir, dfmet, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfmet)
                 except:
                     pass
@@ -184,8 +159,8 @@ class verify_airnow:
                     print 'Interpolating Wind Speed:'
                     dfmet = g.get_group(i)
                     self.cmaqws = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
-                    dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(self.cmaqws, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
+
+                    dfmet = interp_to_obs_new(self.cmaqws, dfmet, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfmet)
                 except:
                     pass
@@ -193,10 +168,8 @@ class verify_airnow:
                 try:
                     print 'Interpolating 2 Meter Temperature:'
                     dfmet = g.get_group(i)
-                    self.cmaqtemp = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
-                    dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(self.cmaqtemp, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
-                    dfmet.Obs += 273.15
+                    self.cmaqtemp = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2') - 273.15
+                    dfmet = interp_to_obs_new(self.cmaqtemp, dfmet, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfmet)
                 except:
                     pass
@@ -205,9 +178,7 @@ class verify_airnow:
                     print 'Interpolating Relative Humidity:'
                     dfmet = g.get_group(i)
                     self.cmaqrh = self.cmaq.get_metcro2d_cmaqvar(param='RH')
-                    dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(self.cmaqrh, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
-                    #dfmet.Obs += 273.15
+                    dfmet = interp_to_obs_new(self.cmaqrh, dfmet, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfmet)
                 except:
                     pass
@@ -216,25 +187,14 @@ class verify_airnow:
                     print 'Interpolating Short Wave Radiation:'
                     dfmet = g.get_group(i)
                     self.cmaqsrad = self.cmaq.get_metcro2d_cmaqvar(param='RGRND')
-                    dates = self.cmaq.metdates[self.cmaq.metindex]
-                    dfmet = self.interp_to_airnow(self.cmaqsrad, dates, dfmet, interp=interp, r=radius, weight_func=weight_func)
+                    dfmet = interp_to_obs_new(self.cmaqsrad, dates, dfmet, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfmet)
                 except:
                     pass
-
+#        print dfs
         self.df = pd.concat(dfs)
         self.df.dropna(subset=['Obs','CMAQ'],inplace=True)
-        if self.airnow.monitor_df is None:
-            print '\n=========================================================================================='
-            print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
-            print 'run: \'df = calc_airnow_8hr_max_calc()\'\n'
-            print '===========================================================================================\n'
-#        else:
-#            if ('O3' in self.cmaq.keys):
-#                print 'Calculating Daily 8 Hr Max Ozone....\n'
-#                self.df8hr = self.calc_airnow_8hr_max_calc()
-#            else:
-#                pass
+
         self.df.SCS = self.df.SCS.values
         self.df.dropna(inplace=True, subset=['Obs', 'CMAQ'])
         self.print_available()
@@ -250,7 +210,7 @@ class verify_airnow:
     def compare_param(self, param='OZONE', site='', city='', state='', epa_region='',region='', timeseries=False, scatter=False,
                       pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
-                      taylordiagram=False, fig=None, label=None, footer=True, dia=None,marker=None):
+                      taylordiagram=False, fig=None, label=None, footer=False, dia=None,marker=None):
         from numpy import NaN
         from utils import get_epa_location_df
         df2,title = get_epa_location_df(self.df.copy(),param,site=site,city=city,state=state,region=region,epa_region=epa_region)
@@ -279,17 +239,20 @@ class verify_airnow:
                 return dia
 
 
-    def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=15,
-                cmap='YlGnBu',**barbs):
+    def spatial(self, df, param='OZONE', date=None, imshow_args={},scatter_args={'s':20, 'edgecolors':'w','lw':.25},barbs_args={},barbs=False,Obs=True,ncolors=None,discrete=False):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North_Central', 'South_Central', 'Rockies', 'Pacific'
         :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time
         :return:
         """
-
-        g = df.groupby('Species')
-        df2 = g.get_group(param)
+        if Obs:
+            try:
+                g = df.groupby('Species')
+                df2 = g.get_group(param)
+            except KeyError:
+                print param + ' Species not available!!!!'
+                exit
         param = param.upper()
         if param == 'OZONE':
             cmaq = self.cmaqo3
@@ -310,43 +273,41 @@ class verify_airnow:
         elif param == 'NO2':
             cmaq = self.cmaqno2
         else:
-            cmaq = None
-        m = self.cmaq.choose_map(path, region)
-        print param
+            try:
+                if not isinstance(self.cmaq.metcro2d, type(None)):
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param=param)
+            except:
+                pass
+            try:
+                cmaq = self.cmaq.get_surface_cmaqvar(param=param)
+            except:
+                exit
+        m = self.cmaq.map
+#        print cmaq
         if isinstance(cmaq, type(None)):
             print 'This parameter is not in the CMAQ file: ' + param
         else:
-            if date == '':
-                for index, i in enumerate(self.cmaq.dates):
-                    c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
-                                                m, vmin=vmin, vmax=vmax, ncolors=ncolors, cmap=cmap)
-                    if not isinstance(self.cmaq.metcro2d, type(None)):
-                        ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
-                        wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
-                        plots.wind_barbs(ws, wdir, self.cmaq.gridobj,self.cmaq.map, barbs)
-                    plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin, vmax=vmax,
-                                          ncolors=ncolors, cmap=cmap)
-                    c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                    if len(xlim) > 1:
-                        plt.xlim([min(xlim), max(xlim)])
-                        plt.ylim([min(ylim), max(ylim)])
-                    plt.savefig(i.strftime('%Y%m%d%H_spatial_' + param + '.jpg'), dpi=75)
-                    plt.close()
-
+            dts = cmaq.TSTEP.to_index()
+            if isinstance(date,type(None)):
+                index = where(dts == dts[0])[0][0]
             else:
-                index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
-                c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,
-                                            vmin=vmin, vmax=vmax, ncolors=ncolors, cmap=cmap)
-                if not isinstance(self.cmaq.metcro2d, type(None)):
-                    ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
-                    wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
-                    plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, **barbs)
-                plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin,
-                                      vmax=vmax, ncolors=ncolors, cmap=cmap)
+                index = where(dts.isin([date]))[0][0]
+ #           print index
+ #           print cmaq[index,:,]
+            f,ax,c,cmap,vmin,vmax = plots.make_spatial_plot2(cmaq[index, :, :].squeeze(), m,plotargs=imshow_args,ncolors=ncolors,discrete=discrete)
+            plt.tight_layout()
+            if not isinstance(self.cmaq.metcro2d, type(None)) and barbs==False:
+                ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
+                wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
+                plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, **barbs_args)
+            if Obs:
+                scatter_args['vmin'] = vmin
+                scatter_args['vmax'] = vmax
+                scatter_args['cmap'] = cmap
+                df2 = df2.loc[df2.datetime == dts[index]]
+                plots.spatial_scatter(df2, m, plotargs=scatter_args)
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                if len(xlim) > 1:
-                    plt.xlim([min(xlim), max(xlim)])
-                    plt.ylim([min(ylim), max(ylim)])
+                
 
     def spatial_contours(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[],ncolors=None):
         """
@@ -542,7 +503,7 @@ class verify_airnow:
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='CAf')
-            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func, label='PCA')
+            df = interp_to_obs_new(var, g, interp=interp, r=radius, weight_func=weight_func, label='PCA')
             self.df = pd.merge(self.df, df, how='left', on=self.df.columns.tolist())
         except:
             print 'PCA Variables not found'
@@ -551,7 +512,7 @@ class verify_airnow:
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='clf')
-            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func, label='PCL')
+            df = interp_to_obs_new(var, g, interp=interp, r=radius, weight_func=weight_func, label='PCL')
             self.df = pd.merge(self.df, df, how='left', on=self.df.columns.tolist())
         except:
             print 'PCl Variables not found'
@@ -560,7 +521,7 @@ class verify_airnow:
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='so4f')
-            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func, label='PSO4')
+            df = interp_to_obs_new(var, g, interp=interp, r=radius, weight_func=weight_func, label='PSO4')
             self.df = pd.merge(self.df, df, how='left', on=self.df.columns.tolist())
         except:
             print 'PSO4 Variables not found'
@@ -569,7 +530,7 @@ class verify_airnow:
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='no3f')
-            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func, label='PNO3')
+            df = interp_to_obs_new(var, g, interp=interp, r=radius, weight_func=weight_func, label='PNO3')
             self.df = pd.merge(self.df, df, how='left', on=self.df.columns.tolist())
         except:
             print 'PNO3 Variables not found'
@@ -578,7 +539,7 @@ class verify_airnow:
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='nh4f')
-            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func, label='PNH4')
+            df = interp_to_obs_new(var, g, interp=interp, r=radius, weight_func=weight_func, label='PNH4')
             self.df = pd.merge(self.df, df, how='left', on=self.df.columns.tolist())
         except:
             print 'PNH4 Variables not found'
@@ -587,7 +548,7 @@ class verify_airnow:
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='oc')
-            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func, label='POC')
+            df = interp_to_obs_new(var, g, interp=interp, r=radius, weight_func=weight_func, label='POC')
             self.df = pd.merge(self.df, df, how='left', on=self.df.columns.tolist())
         except:
             print 'Organic Carbon Variables not found'
@@ -596,7 +557,7 @@ class verify_airnow:
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='kf')
-            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func, label='PK')
+            df = interp_to_obs_new(var, g, interp=interp, r=radius, weight_func=weight_func, label='PK')
             self.df = pd.merge(self.df, df, how='left', on=self.df.columns.tolist())
         except:
             print 'Organic Carbon Variables not found'
@@ -605,7 +566,7 @@ class verify_airnow:
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='naf')
-            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func, label='PNA')
+            df = interp_to_obs_new(var, g, interp=interp, r=radius, weight_func=weight_func, label='PNA')
             self.df = pd.merge(self.df, df, how='left', on=self.df.columns.tolist())
         except:
             print 'PNA Variables not found'
@@ -614,7 +575,7 @@ class verify_airnow:
         try:
             g = self.df.groupby('Species').get_group('PM2.5')
             var = self.cmaq.get_surface_cmaqvar(param='ecf')
-            df = self.interp_to_airnow(var, g, interp=interp, r=radius, weight_func=weight_func, label='PEC')
+            df = interp_to_obs_new(var, g, interp=interp, r=radius, weight_func=weight_func, label='PEC')
             self.df = pd.merge(self.df, df, how='left', on=self.df.columns.tolist())
         except:
             print 'PEC Variables not found'
@@ -664,28 +625,27 @@ class verify_airnow:
         kkk = self.airnow.get_station_locations_remerge(kkk)
         return kkk
 
-    def calc_8hr_max(self,df=None):
-        species = df.Species.unique()[0]
-        r = df
-        r.index = r.datetime_local
-        g = r.groupby('SCS')['Obs', 'CMAQ', 'Latitude', 'Longitude']
-        m = g.rolling(8, center=True, win_type='boxcar').mean()
-        q = m.reset_index(level=0)
-        k = q.groupby('SCS').resample('1D').max()
-        kk = k.reset_index(level=1)
-        kkk = kk.reset_index(drop='SCS').dropna()
-        kkk = self.airnow.get_station_locations_remerge(kkk)
-        kkk['Species'] = species
-        return kkk.drop_duplicates()
 
-    def calc_24hr_ave(self,df=None):
-        species = df.Species.unique()[0]
-        df.index = df.datetime_local
-        df = df.groupby('SCS').resample('D').mean().reset_index()
-        df.drop('MSA_Code',inplace=True,axis=1)
-        df.drop('CMSA_Name',inplace=True,axis=1)
-        dff = self.airnow.get_station_locations_remerge(df)
-        dff['Species'] = species
+    def calc_8hr_max(self,df=None,param='OZONE'):
+        temp = df.groupby('Species').get_group(param)
+        temp.index = temp.datetime_local
+        g = temp.groupby('SCS')['Obs','CMAQ','Latitude','Longitude','utcoffset'].rolling(8,center=True,win_type='boxcar').mean()
+        q = g.reset_index(level=0)
+        k = q.groupby('SCS').resample('D').max().reset_index(level=1).reset_index(drop='SCS').dropna()
+        columnstomerge = df.columns[~df.columns.isin(k.columns) & (df.columns!='datetime')].append(pd.Index(['SCS']))
+        dff= k.merge(df.groupby('Species').get_group(param)[columnstomerge],on='SCS',how='left').drop_duplicates(subset=['SCS','datetime_local'])
+        dff['datetime'] = dff.datetime_local + pd.to_timedelta(dff.utcoffset,unit='H')
+        return dff
+
+    def calc_24hr_ave(self,df=None,param='PM2.5'):
+        temp = df.groupby('Species').get_group(param)
+        temp.index = temp.datetime_local
+        dff = temp.groupby('SCS').resample('D').mean().reset_index()
+        dff.drop('MSA_Code',inplace=True,axis=1)
+        dff.drop('CMSA_Name',inplace=True,axis=1)
+        columnstomerge = df.columns[~df.columns.isin(dff.columns) & (df.columns!='datetime')].append(pd.Index(['SCS']))
+        dff= dff.merge(df.groupby('Species').get_group(param)[columnstomerge],on='SCS',how='left').drop_duplicates(subset=['SCS','datetime_local'])
+        dff['datetime'] = dff.datetime_local + pd.to_timedelta(dff.utcoffset,unit='H')
         return dff
 
     def write_table(self, df=None, fname='table', threasholds=[70, 1e5], site=None, city=None,
@@ -762,7 +722,8 @@ class verify_airnow:
         if append:
             dff = pd.read_csv(fname + '.txt', skiprows=3, index_col=0, sep='\s+', names=stats)
             dd = pd.concat([dd, dff]).sort_values(by=['Region'])
-
+        
+        dd.sort_values(by=['Region','Label'],inplace=True)
         out = StringIO()
         dd.to_string(out, columns=stats)
         out.seek(0)

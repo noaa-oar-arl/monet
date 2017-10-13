@@ -3,6 +3,7 @@ import seaborn as sns
 import mystats
 import taylordiagram as td
 from colorbars import colorbar_index
+#colors = ['#1e90ff','#045C5C','#00A847','#DB4291','#BB7E5D']
 colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
 sns.set_palette(sns.color_palette(colors))
 
@@ -10,7 +11,7 @@ sns.set_context('poster')
 
 # CMAQ Spatial Plots
 def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, vmax=150, ncolors=15, cmap='YlGnBu'):
-    fig = plt.figure(figsize=(12, 6), frameon=False)
+    fig = plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
     # define map and draw boundries
@@ -19,7 +20,6 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, 
     m.drawcountries()
     x, y = m(lon, lat)
     plt.axis('off')
-
     c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
     m.pcolormesh(x, y, cmaqvar, vmin=vmin, vmax=vmax, cmap=cmap)
     titstring = date.strftime('%B %d %Y %H')
@@ -31,8 +31,37 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, 
         plt.close()
     return c
 
+def make_spatial_plot2(cmaqvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
+    #create figure
+    f,ax = plt.subplots(1,1,figsize=(11, 6), frameon=False)
+    #determine colorbar 
+    if 'cmap' not in plotargs:
+        plotargs['cmap'] = 'viridis'
+    if discrete and 'vmin' in plotargs and 'vmax' in plotargs:
+        c, cmap = colorbar_index(ncolors, plotargs['cmap'], minval=plotargs['vmin'], maxval=plotargs['vmax'],basemap=m)
+        plotargs['cmap'] = cmap
+        m.imshow(cmaqvar,**plotargs)
+        vmin,vmax = plotargs['vmin'],plotargs['vmax']
+    elif discrete:
+        temp = m.imshow(cmaqvar,cmap=cmap)
+        vmin,vmax = temp.get_clim()
+        c, cmap = colorbar_index(ncolors, plotargs['cmap'], minval=vmin,maxval=vmax,basemap=m)
+        plotargs['cmap'] = cmap
+        m.imshow(cmaqvar,vmin=vmin,vmax=vmax,**plotargs)
+    else:
+        temp = m.imshow(cmaqvar,**plotargs)
+        c = m.colorbar()
+        vmin,vmax = temp.get_clim()
+        cmap = plotargs['cmap']
+    #draw borders
+    m.drawstates()
+    m.drawcoastlines(linewidth=.3)
+    m.drawcountries()
+    return f,ax,c,cmap,vmin,vmax    
+    
+
 def make_spatial_plot_no_obs(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, vmax=150, ncolors=15, cmap='viridis'):
-    fig = plt.figure(figsize=(12, 6), frameon=False)
+    fig = plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
     # define map and draw boundries
@@ -51,7 +80,7 @@ def make_spatial_plot_no_obs(cmaqvar, gridobj, date, m, dpi=None, savename='', v
 
 
 def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', discrete=True,ncolors=None, dtype='int',**kwargs):
-    fig = plt.figure(figsize=(12, 6), frameon=False)
+    fig = plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
     # define map and draw boundries
@@ -106,22 +135,22 @@ def normval(vmin, vmax, cmap):
     return norm
 
 
-def spatial_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, cmap='YlGnBu', discrete=False):
-    new = df[df.datetime == date]
-    x, y = m(new.Longitude.values, new.Latitude.values)
+def spatial_scatter(df, m, discrete=False,plotargs={},create_cbar=True):
+    x, y = m(df.Longitude.values, df.Latitude.values)
     s = 20
-    if discrete:
-        cmap = cmap_discretize(cmap, ncolors)
-        # s = 20
-        if (type(vmin) == None) | (type(vmax) == None):
-            plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=0, vmax=ncolors, cmap=cmap, edgecolors='w', linewidths=.25)
+    if create_cbar:
+        if discrete:
+            cmap = cmap_discretize(cmap, ncolors)
+            # s = 20
+            if (type(plotargs(vmin)) == None) | (type(plotargs(vmax)) == None):
+                plt.scatter(x, y, c=df['Obs'].values, **plotargs)
+            else:
+                plt.scatter(x, y, c=df['Obs'].values, **plotargs)
         else:
-            plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.25)
+            plt.scatter(x, y, c=df['Obs'].values, **plotargs)
     else:
-        plt.scatter(x, y, c=new['Obs'].values, s=s, vmin=vmin, vmax=vmax, cmap=cmap, edgecolors='w', linewidths=.25)
-    if savename != '':
-        plt.savefig(savename + date + '.jpg', dpi=75.)
-        plt.close()
+        plt.scatter(x,y,c=df['Obs'].values,**plotargs)
+
 
 def spatial_stat_scatter(df,m,date, stat=mystats.MB,ncolors=15,fact=1.5,cmap='RdYlBu_r'):
     new = df[df.datetime == date]
@@ -133,7 +162,7 @@ def spatial_stat_scatter(df,m,date, stat=mystats.MB,ncolors=15,fact=1.5,cmap='Rd
 def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, fact=1.5, cmap='RdBu_r'):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
-#    plt.figure(figsize=(12, 6), frameon=False)
+#    plt.figure(figsize=(11, 6), frameon=False)
     f,ax = plt.subplots(figsize=(11,6),frameon=False)
     ax.set_facecolor('white')
     diff = (df.CMAQ - df.Obs)
@@ -153,7 +182,7 @@ def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors
     return f,ax,c
 
 def eight_hr_spatial_scatter(df, m, date, savename=''):
-    fig = plt.figure(figsize=(12, 6), frameon=False)
+    fig = plt.figure(figsize=(11, 6), frameon=False)
     m.drawcoastlines(linewidth=.3)
     m.drawstates()
     m.drawcountries()
@@ -170,17 +199,45 @@ def eight_hr_spatial_scatter(df, m, date, savename=''):
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
+def timeseries_param_new(df, col='Obs',ax=None, sample='H', plotargs={},fillargs={}):
+    import pandas as pd
+
+    if ax is None:
+        f,ax = plt.subplots(figsize=(11,6),frameon=False)
+
+    sns.set_palette(sns.color_palette(colors))
+    sns.set_style('ticks')
+    df.index = df.datetime
+    m = df.groupby(pd.TimeGrouper(sample)).mean()
+    e = df.groupby(pd.TimeGrouper(sample)).std()
+    species = df.Species[0]
+    unit = df.Units[0]
+    upper = (m[col] + e[col]).values
+    lower = m[col] - e[col]
+    lower.loc[lower < 0] = 0
+    lower = lower.values
+    if col=='Obs': plotargs['color'] = 'darkslategrey'
+    if col=='Obs': fillargs['color'] = 'darkslategrey'
+    if col!='Obs' and 'color' not in plotargs: plotargs['color'] = None
+
+    ax.plot(m[col], **plotargs)
+#    print m[col].shape,lower.shape,upper,shape
+    ax.fill_between(m[col].index,lower,upper,**fillargs)
+    plt.gcf().autofmt_xdate()
+    ax.set_ylabel(species + ' (' + unit + ')')
+    plt.legend()
+    return ax
 
 def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True, sample='H'):
-    """
-
-    :param df: pandas dataframe from a monet verification object
-    :param title:
-    :param fig:
-    :param label:
-    :param color:
-    :param footer:
-    :param sample:
+    """                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                 
+    :param df: pandas dataframe from a monet verification object                                                                                                                                                                 
+    :param title:                                                                                                                                                                                                                
+    :param fig:                                                                                                                                                                                                                  
+    :param label:                                                                                                                                                                                                                
+    :param color:                                                                                                                                                                                                                
+    :param footer:                                                                                                                                                                                                               
+    :param sample:                                                                                                                                                                                                               
     """
     import matplotlib.dates as mdates
     from numpy import isnan,NaN,nanmax,nanmin

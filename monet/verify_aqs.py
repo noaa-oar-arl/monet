@@ -33,47 +33,42 @@ class verify_aqs:
 
     def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
         """
-
-        :param interp: Interpolation method 'nearest','guassian','
-        :param radius:
-        :param neighbors:
-        :param weight_func:
         :return:
         """
+        from interpolation import interp_to_obs_new
         from numpy import sort
-        
-        print 'Acquiring Dates of CMAQ Simulation'
+
         print '==============================================================='
-        self.cmaq.get_dates()
-        print 'Simulation Start Date: ', self.cmaq.dates[0].strftime('%Y-%m-%d %H:%M')
-        print 'Simulation End   Date: ', self.cmaq.dates[-1].strftime('%Y-%m-%d %H:%M')
-        print '==============================================================='
-        self.ensure_values_indomain()
+        print 'Simulation Start Date: ', self.cmaq.conc.TSTEP.to_index()[0].strftime('%Y-%m-%d %H:%M')
+        print 'Simulation End   Date: ', self.cmaq.conc.TSTEP.to_index()[-1].strftime('%Y-%m-%d %H:%M')
+        print '===============================================================\n'
+        self.aqs.df.dropna(subset=['Latitude','Longitude'],inplace=True)
         comparelist = sort(self.aqs.df.Species.unique())
+        self.aqs.df.rename(columns={'GMT_Offset':'utcoffset'},inplace=True)
         print 'List of species available to compare:',comparelist
         dfs = []
         g = self.aqs.df.groupby('Species')
         for i in comparelist:
             if i == 'OZONE':
-                try:
+#                try:
                     print 'Interpolating Ozone:'
                     dfo3 = g.get_group(i)
                     fac = self.check_cmaq_units(param='O3', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='O3').compute() * fac
                     self.cmaqo3 = cmaq
-                    dfo3 = self.interp_to_aqs(cmaq, dfo3, interp=interp, r=radius, weight_func=weight_func)
-                    dfo3.Obs, dfo3.CMAQ = dfo3.Obs, dfo3.CMAQ
+                    dfo3 = interp_to_obs_new(cmaq, dfo3, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
+#                    dfo3.Obs, dfo3.CMAQ = dfo3.Obs, dfo3.CMAQ
                     dfo3.Units = 'PPB'
                     dfs.append(dfo3)
-                except:
-                    pass
+#                except:
+#                    pass
             elif i == 'PM2.5':
                 try:
                     print 'Interpolating PM2.5:'
                     dfpm25 = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM25', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
-                    dfpm25 = self.interp_to_aqs(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25').compute() * fac
+                    dfpm25 = interp_to_obs_new(cmaq, dfpm25, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm25)
                 except:
@@ -86,8 +81,8 @@ class verify_aqs:
                         print 'Interpolating CO:'
                         dfco = g.get_group(i)
                         fac = self.check_cmaq_units(param='CO', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
-                        dfco = self.interp_to_aqs(cmaq, dfco, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='CO').compute() * fac
+                        dfco = interp_to_obs_new(cmaq, dfco, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqco = cmaq
                         dfs.append(dfco)
                 except:
@@ -101,8 +96,8 @@ class verify_aqs:
                         print 'Interpolating NOY:'
                         dfnoy = g.get_group(i)
                         fac = self.check_cmaq_units(param='NOY', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
-                        dfnoy = self.interp_to_aqs(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOY').compute() * fac
+                        dfnoy = interp_to_obs_new(cmaq, dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqnoy = cmaq
                         dfs.append(dfnoy)
                 except:
@@ -115,8 +110,8 @@ class verify_aqs:
                         print 'Interpolating SO2'
                         dfso2 = g.get_group(i)
                         fac = self.check_cmaq_units(param='SO2', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
-                        dfso2 = self.interp_to_aqs(cmaq, dfso2, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO2').compute() * fac
+                        dfso2 = interp_to_obs_new(cmaq, dfso2, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqso2 = cmaq
                         dfs.append(dfso2)
                 except:
@@ -129,8 +124,8 @@ class verify_aqs:
                         print 'Interpolating NOX:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='NOX', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOX').compute() * fac
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqno = cmaq
                         dfs.append(dfnox)
                 except:
@@ -143,8 +138,8 @@ class verify_aqs:
                         print 'Interpolating NO:'
                         dfno = g.get_group(i)
                         fac = self.check_cmaq_units(param='NO', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
-                        dfno = self.interp_to_aqs(cmaq, dfno, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO').compute() * fac
+                        dfno = interp_to_obs_new(cmaq, dfno, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqno = cmaq
                         dfs.append(dfno)
                 except:
@@ -157,8 +152,8 @@ class verify_aqs:
                         print 'Interpolating NO2:'
                         dfno2 = g.get_group(i)
                         fac = self.check_cmaq_units(param='NO2', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
-                        dfno2 = self.interp_to_aqs(cmaq, dfno2, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO2').compute() * fac
+                        dfno2 = interp_to_obs_new(cmaq, dfno2, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqno2 = cmaq
                         dfs.append(dfno2)
                 except:
@@ -169,8 +164,8 @@ class verify_aqs:
                         print 'Interpolating PSO4:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='SO4f', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO4f') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO4f').compute() * fac
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqpso4 = cmaq
                         dfs.append(dfnox)
                     else:
@@ -183,8 +178,8 @@ class verify_aqs:
                     print 'Interpolating PM10:'
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM10', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                    dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10').compute() * fac
+                    dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqpm10 = cmaq
                     dfs.append(dfnox)
                     #else:
@@ -197,8 +192,8 @@ class verify_aqs:
                         print 'Interpolating PNO3:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='NO3f', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO3F') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO3F').compute() * fac
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqpno3 = cmaq
                         dfs.append(dfnox)
                     else:
@@ -213,8 +208,8 @@ class verify_aqs:
                         print 'Interpolating PEC:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='ECf', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='ECf') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ECf').compute() * fac
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqpno3 = cmaq
                         dfs.append(dfnox)
                 except:
@@ -225,8 +220,8 @@ class verify_aqs:
                         print 'Interpolating OCf:'
                         dfpm = g.get_group(i)
                         fac = self.check_cmaq_units(param='OCf', improve_param=i)
-                        cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC') * fac
-                        dfpm = self.interp_to_aqs(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
+                        cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC').compute() * fac
+                        dfpm = interp_to_obs_new(cmaqvar, dfpm, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqoc = cmaqvar
                         dfs.append(dfpm)
                 except:
@@ -239,8 +234,8 @@ class verify_aqs:
                         print 'Interpolating Ethane:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='ETHA', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='ETHA') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ETHA').compute() * fac
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqethane = cmaq
                         dfs.append(dfnox)
                 except:
@@ -253,8 +248,8 @@ class verify_aqs:
                         print 'Interpolating BENZENE:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='BENZENE', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='BENZENE') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='BENZENE').compute() * fac
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqbenz = cmaq
                         dfs.append(dfnox)
                 except:
@@ -267,8 +262,8 @@ class verify_aqs:
                         print 'Interpolating Toluene:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='TOL', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='TOL') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='TOL').compute() * fac
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqtol = cmaq
                         dfs.append(dfnox)
                 except:
@@ -281,8 +276,8 @@ class verify_aqs:
                         print 'Interpolating Isoprene:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP').compute() * fac
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqisop = cmaq
                         dfs.append(dfnox)
                 except:
@@ -296,8 +291,8 @@ class verify_aqs:
                         print 'Interpolating Xylene'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='XYL', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='XYL') * fac
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='XYL').compute() * fac
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         self.cmaqxyl = cmaq
                         dfs.append(dfnox)
                 except:
@@ -310,7 +305,7 @@ class verify_aqs:
                         print 'Interpolating WS:'
                         dfnox = g.get_group(i)
                         cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         dfs.append(dfnox)
                 except:
                     pass
@@ -322,7 +317,7 @@ class verify_aqs:
                         print 'Interpolating TEMP:'
                         dfnox = g.get_group(i)
                         cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         dfs.append(dfnox)
                 except:
                     pass
@@ -334,24 +329,22 @@ class verify_aqs:
                         print 'Interpolating WD:'
                         dfnox = g.get_group(i)
                         cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
-                        dfnox = self.interp_to_aqs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func)
+                        dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                         dfs.append(dfnox)
                 except:
                     pass
         self.df = concat(dfs)
+        print self.df.keys()
         self.df.dropna(subset=['Obs','CMAQ'],inplace=True)
-        if self.aqs.monitor_df is None:
-            print '\n=========================================================================================='
-            print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
-            print 'run: \'df = calc_aqs_8hr_max_calc()\''
-            print '==========================================================================================\n'
-        else:
-            print 'Calculating Daily 8 Hr Max Ozone....\n'
-            self.df8hr = self.calc_aqs_8hr_max_calc()
-#        self.df = self.aqs.change_states_to_abv(self.df)
-#        self.df8hr = self.aqs.change_states_to_abv(self.df8hr)
+        # if self.aqs.monitor_df is None:
+        #     print '\n=========================================================================================='
+        #     print 'Please load the Monitor Site Meta-Data to calculate 8hr Ozone: airnow.read_monitor_file()\n'
+        #     print 'run: \'df = calc_aqs_8hr_max_calc()\''
+        #     print '==========================================================================================\n'
+        # else:
+        #     print 'Calculating Daily 8 Hr Max Ozone....\n'
+        #     self.df8hr = self.calc_aqs_8hr_max_calc()
         self.df.SCS = self.df.SCS.values.astype('int32')
-#        self.df = self.aqs.add_metro_metadata2(self.df)
         self.print_info()
 
     def combine_daily(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
@@ -364,39 +357,46 @@ class verify_aqs:
         :return:
         """
         from numpy import sort
-        import interpolation as interpo
+        import interpolation as interp
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
         self.cmaq.get_dates()
         print 'Simulation Start Date: ', self.cmaq.dates[0].strftime('%Y-%m-%d %H:%M')
         print 'Simulation End   Date: ', self.cmaq.dates[-1].strftime('%Y-%m-%d %H:%M')
         print '==============================================================='
-        self.ensure_values_indomain()
+        self.aqs.d_df = self.ensure_values_indomain(self.aqs.d_df)
         comparelist = sort(self.aqs.d_df.Species.unique())
         print 'List of species available to compare:',comparelist
         dfs = []
         g = self.aqs.d_df.groupby('Species')
+        comparelist=['OZONE']
         for i in comparelist:
             if i == 'OZONE':
-                try:
+#                try:
                     print 'Interpolating Ozone:'
                     dfo3 = g.get_group(i)
-                    fac = self.check_cmaq_units(param='O3', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
+                    print 'test'
+#                    print dfo3
+                    fac = 1000. #self.check_cmaq_units(param='O3', aqs_param=i)
+                    print 'test2'
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='O3').compute() * fac
                     self.cmaqo3 = cmaq
-                    dfo3 = interpo.interp_to_pt_obs(cmaq, dfo3, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                    print 'here',cmaq
+                    dfo3 = interp.interp_to_pt_obs(cmaq, dfo3, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
+                    print 'here2'
                     dfo3.Obs, dfo3.CMAQ = dfo3.Obs, dfo3.CMAQ
                     dfo3.Units = 'PPB'
+                    print dfo3
                     dfs.append(dfo3)
-                except:
-                    pass
+#                except:
+#                    pass
             elif i == 'PM2.5':
                 try:
                     print 'Interpolating PM2.5:'
                     dfpm25 = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM25', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
-                    dfpm25 = interpo.interp_to_pt_obs(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25').compute() * fac
+                    dfpm25 = interp.interp_to_pt_obs(cmaq, dfpm25, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm25)
                 except:
@@ -409,8 +409,8 @@ class verify_aqs:
                         print 'Interpolating CO:'
                         dfco = g.get_group(i)
                         fac = self.check_cmaq_units(param='CO', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
-                        dfco = interpo.interp_to_pt_obs(cmaq, dfco, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='CO').compute() * fac
+                        dfco = interp.interp_to_pt_obs(cmaq, dfco, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqco = cmaq
                         dfs.append(dfco)
                 except:
@@ -424,8 +424,8 @@ class verify_aqs:
                         print 'Interpolating NOY:'
                         dfnoy = g.get_group(i)
                         fac = self.check_cmaq_units(param='NOY', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
-                        dfnoy = interpo.interp_to_pt_obs(cmaq, dfnoy, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOY').compute() * fac
+                        dfnoy = interp.interp_to_pt_obs(cmaq, dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqnoy = cmaq
                         dfs.append(dfnoy)
                 except:
@@ -438,8 +438,8 @@ class verify_aqs:
                         print 'Interpolating SO2'
                         dfso2 = g.get_group(i)
                         fac = self.check_cmaq_units(param='SO2', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
-                        dfso2 = interpo.interp_to_pt_obs(cmaq, dfso2, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO2').compute() * fac
+                        dfso2 = interp.interp_to_pt_obs(cmaq, dfso2, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqso2 = cmaq
                         dfs.append(dfso2)
                 except:
@@ -452,8 +452,8 @@ class verify_aqs:
                         print 'Interpolating NOX:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='NOX', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NOX').compute() * fac
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqno = cmaq
                         dfs.append(dfnox)
                 except:
@@ -466,8 +466,8 @@ class verify_aqs:
                         print 'Interpolating NO:'
                         dfno = g.get_group(i)
                         fac = self.check_cmaq_units(param='NO', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
-                        dfno = interpo.interp_to_pt_obs(cmaq, dfno, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO').compute() * fac
+                        dfno = interp.interp_to_pt_obs(cmaq, dfno, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqno = cmaq
                         dfs.append(dfno)
                 except:
@@ -480,8 +480,8 @@ class verify_aqs:
                         print 'Interpolating NO2:'
                         dfno2 = g.get_group(i)
                         fac = self.check_cmaq_units(param='NO2', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
-                        dfno2 = interpo.interp_to_pt_obs(cmaq, dfno2, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO2').compute() * fac
+                        dfno2 = interp.interp_to_pt_obs(cmaq, dfno2, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqno2 = cmaq
                         dfs.append(dfno2)
                 except:
@@ -492,8 +492,8 @@ class verify_aqs:
                         print 'Interpolating PSO4:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='SO4f', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO4f') * fac
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='SO4f').compute() * fac
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqpso4 = cmaq
                         dfs.append(dfnox)
                     else:
@@ -506,8 +506,8 @@ class verify_aqs:
                     print 'Interpolating PM10:'
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM10', aqs_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
-                    dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10').compute() * fac
+                    dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                     self.cmaqpm10 = cmaq
                     dfs.append(dfnox)
                     #else:
@@ -520,8 +520,8 @@ class verify_aqs:
                         print 'Interpolating PNO3:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='NO3f', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO3F') * fac
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='NO3F').compute() * fac
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqpno3 = cmaq
                         dfs.append(dfnox)
                     else:
@@ -536,8 +536,8 @@ class verify_aqs:
                         print 'Interpolating PEC:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='ECf', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='ECf') * fac
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ECf').compute() * fac
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqpno3 = cmaq
                         dfs.append(dfnox)
                 except:
@@ -548,8 +548,8 @@ class verify_aqs:
                         print 'Interpolating OCf:'
                         dfpm = g.get_group(i)
                         fac = self.check_cmaq_units(param='OCf', improve_param=i)
-                        cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC') * fac
-                        dfpm = interpo.interp_to_pt_obs(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC').compute() * fac
+                        dfpm = interp.interp_to_pt_obs(cmaqvar, dfpm, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqoc = cmaqvar
                         dfs.append(dfpm)
                 except:
@@ -562,8 +562,8 @@ class verify_aqs:
                         print 'Interpolating Ethane:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='ETHA', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='ETHA') * fac
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ETHA').compute() * fac
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqethane = cmaq
                         dfs.append(dfnox)
                 except:
@@ -576,8 +576,8 @@ class verify_aqs:
                         print 'Interpolating BENZENE:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='BENZENE', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='BENZENE') * fac
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='BENZENE').compute() * fac
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqbenz = cmaq
                         dfs.append(dfnox)
                 except:
@@ -590,8 +590,8 @@ class verify_aqs:
                         print 'Interpolating Toluene:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='TOL', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='TOL') * fac
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='TOL').compute() * fac
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqtol = cmaq
                         dfs.append(dfnox)
                 except:
@@ -604,8 +604,8 @@ class verify_aqs:
                         print 'Interpolating Isoprene:'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='ISOP', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP') * fac
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='ISOP').compute() * fac
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqisop = cmaq
                         dfs.append(dfnox)
                 except:
@@ -619,8 +619,8 @@ class verify_aqs:
                         print 'Interpolating Xylene'
                         dfnox = g.get_group(i)
                         fac = self.check_cmaq_units(param='XYL', aqs_param=i)
-                        cmaq = self.cmaq.get_surface_cmaqvar(param='XYL') * fac
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        cmaq = self.cmaq.get_surface_cmaqvar(param='XYL').compute() * fac
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         self.cmaqxyl = cmaq
                         dfs.append(dfnox)
                 except:
@@ -633,7 +633,7 @@ class verify_aqs:
                         print 'Interpolating WS:'
                         dfnox = g.get_group(i)
                         cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WSPD10')
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         dfs.append(dfnox)
                 except:
                     pass
@@ -645,7 +645,7 @@ class verify_aqs:
                         print 'Interpolating TEMP:'
                         dfnox = g.get_group(i)
                         cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         dfs.append(dfnox)
                 except:
                     pass
@@ -657,10 +657,11 @@ class verify_aqs:
                         print 'Interpolating WD:'
                         dfnox = g.get_group(i)
                         cmaq = self.cmaq.get_metcro2d_cmaqvar(param='WDIR10')
-                        dfnox = interpo.interp_to_pt_obs(cmaq, dfnox, interp=interp, r=radius, weight_func=weight_func,daily=True)
+                        dfnox = interp.interp_to_pt_obs(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius,daily=True)
                         dfs.append(dfnox)
                 except:
                     pass
+        print dfs
         self.df = concat(dfs)
         self.df.dropna(subset=['Obs','CMAQ'],inplace=True)
         if self.aqs.monitor_df is None:
@@ -713,8 +714,7 @@ class verify_aqs:
                 plt.legend()
                 return dia
 
-    def spatial(self, df, param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=16,
-                cmap='YlGnBu'):
+    def spatial(self, df, param='OZONE', date=None, imshow_args={},scatter_args={'s':20, 'edgecolors':'w','lw':.25},barb_args={},barbs=False,Obs=True):
         """
         :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North_Central', 'South_Central', 'Rockies', 'Pacific'
@@ -723,8 +723,13 @@ class verify_aqs:
         """
         from numpy.ma import masked_less
 
-        g = df.groupby('Species')
-        df2 = g.get_group(param)
+        if Obs:
+            try:
+                g = df.groupby('Species')
+                df2 = g.get_group(param)
+            except KeyError:
+                print param + ' Species not available!!!!'
+                exit
         param = param.upper()
         if param == 'OZONE':
             cmaq = self.cmaqo3
@@ -746,30 +751,39 @@ class verify_aqs:
             cmaq = self.cmaqpno3
         elif param == 'SO4f':
             cmaq = self.cmaqpso4
-        
-
-        cmaq = masked_less(cmaq, .01)
-        m = self.cmaq.choose_map(path, region)
-        if date == '':
-            for index, i in enumerate(self.cmaq.dates):
-                c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
-                                            m, vmin=vmin, vmax=vmax)
-                plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin, vmax=vmax)
-                c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                if len(xlim) > 1:
-                    plt.xlim([min(xlim), max(xlim)])
-                    plt.ylim([min(ylim), max(ylim)])
-
         else:
-            index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
-            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,
-                                        vmin=vmin, vmax=vmax, ncolors=ncolors, cmap=cmap)
-            plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin, vmax=vmax,
-                                  ncolors=ncolors, cmap=cmap)
-            c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-            if len(xlim) > 1:
-                plt.xlim([min(xlim), max(xlim)])
-                plt.ylim([min(ylim), max(ylim)])
+            try:
+                if not isinstance(self.cmaq.metcro2d, type(None)):
+                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param=param)
+            except:
+                pass
+            try:
+                cmaq = self.cmaq.get_surface_cmaqvar(param=param)
+            except:
+                exit
+        m = self.cmaq.map
+        if isinstance(cmaq, type(None)):
+            print 'This parameter is not in the CMAQ file: ' + param
+        else:
+            dts = cmaq.TSTEP.to_index()
+            if isinstance(date,type(None)):
+                index = where(dts == dts[0])[0][0]
+            else:
+                index = where(dts.isin([date]))[0][0]
+ #           print index                                                                                                                                                                                                   
+ #           print cmaq[index,:,]                                                                                                                                                                                          
+            f,ax,c,cmap,vmin,vmax = plots.make_spatial_plot2(cmaq[index, :, :].squeeze(), m,plotargs=imshow_args)
+            if not isinstance(self.cmaq.metcro2d, type(None)) and barbs==False:
+                ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
+                wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
+                plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, **barbs_args)
+            if Obs:
+                scatter_args['vmin'] = vmin
+                scatter_args['vmax'] = vmax
+                scatter_args['cmap'] = cmap
+                df2 = df2.loc[df2.datetime == dts[index]]
+                plots.spatial_scatter(df2, m, plotargs=scatter_args)
+                c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
 
     def spatial_8hr(self, path='', region='', date='', xlim=[], ylim=[]):
         if not isinstance(self.df8hr, DataFrame):
@@ -853,7 +867,7 @@ class verify_aqs:
                 collect()
             except:
                 pass
-            
+
         vals = Series(vals)
         date = Series(date)
         site = Series(site)
@@ -921,13 +935,13 @@ class verify_aqs:
         rmse = mystats.RMSE(pandasobj['Obs_value'].values, pandasobj['CMAQ'].values)
         return mb, mdnb, fe, r2, d1, e1, ioa, rmse
 
-    def ensure_values_indomain(self):
+    def ensure_values_indomain(self,df):
         lat = self.cmaq.gridobj.variables['LAT'][0, 0, :, :].squeeze()
         lon = self.cmaq.gridobj.variables['LON'][0, 0, :, :].squeeze()
 
-        con = ((self.aqs.df.Latitude.values > lat.min()) & (self.aqs.df.Latitude.values < lat.max()) & (
-            self.aqs.df.Longitude.values > lon.min()) & (self.aqs.df.Longitude.values < lon.max()))
-        self.aqs.df = self.aqs.df[con].copy()
+        con = ((df.Latitude.values > lat.min()) & (df.Latitude.values < lat.max()) & (
+            df.Longitude.values > lon.min()) & (df.Longitude.values < lon.max()))
+        return df[con].copy()
 
     def calc_aqs_8hr_max_calc(self):
         from numpy import unique

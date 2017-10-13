@@ -9,7 +9,8 @@ import inspect
 import requests
 class aqs:
     def __init__(self):
-        self.baseurl = 'http://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/'
+#        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
+        self.baseurl = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/'
         self.dates = [datetime.strptime('2014-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
                       datetime.strptime('2014-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
         self.renamedhcols = ['datetime_local', 'datetime', 'State_Code', 'County_Code',
@@ -80,7 +81,7 @@ class aqs:
             dffrm.columns = self.renamedhcols
             dffrm['SCS'] = array(dffrm['State_Code'].values * 1.E7 + dffrm['County_Code'].values * 1.E4 + dffrm['Site_Num'].values,dtype='int32')
         else:
-            dffrm = pd.DataFrame()
+            dffrm = pd.DataFrame(columns=self.renamedhcols)
         url2 = self.baseurl + 'hourly_88502_' + year + '.zip'
         if self.check_file_size(url2):
             print 'Downloading Hourly PM25 NON-FRM: ' + url2
@@ -93,7 +94,7 @@ class aqs:
             dfnfrm.columns = self.renamedhcols
             dfnfrm['SCS'] = array(dfnfrm['State_Code'].values * 1.E7 + dfnfrm['County_Code'].values * 1.E4 + dfnfrm['Site_Num'].values,dtype='int32')
         else:
-            dfnfrm = pd.DataFrame()
+            dfnfrm = pd.DataFrame(columns=self.renamedhcols)
         if self.check_file_size(url1) | self.check_file_size(url2):
             df = pd.concat([dfnfrm,dffrm],ignore_index=True)
             df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
@@ -111,7 +112,7 @@ class aqs:
             print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_PM_25_88101_' + year + '.hdf'
             df.to_hdf('AQS_HOURLY_PM_25_88101_' + year + '.hdf', 'df', format='table')
         else:
-            df = pd.DataFrame()
+            df = pd.DataFrame(columns=self.renamedhcols)
         return df
 
     def retrieve_aqs_hourly_ozone_data(self, dates):
@@ -309,7 +310,7 @@ class aqs:
         year = i.strftime('%Y')
         url = self.baseurl + 'hourly_SPEC_' + year + '.zip'
         if self.check_file_size(url):
-            print 'Downloading CSN Speciation: ' + url
+            print 'Downloading PM Speciation: ' + url
             filename = wget.download(url)
             print ''
             print 'Unpacking: ' + url
@@ -330,7 +331,7 @@ class aqs:
             df.to_hdf('AQS_HOURLY_SPEC_' + year + '.hdf', 'df', format='table')
             return df
         else:
-            return pd.DataFrame()
+            return pd.DataFrame(columns=self.renamedhcols)
 
     def retrieve_aqs_hourly_wind_data(self, dates):
         import wget
@@ -515,9 +516,10 @@ class aqs:
             print "File Found, Loading: " + fname
             aqs = pd.read_hdf(fname)
         else:
+            print 'Retrieving Data'
             aqs = self.retrieve_aqs_hourly_spec_data(dates)
         if aqs.empty:
-            return aqs
+            return pd.DataFrame(columns=self.renamedhcols)
         else:
             con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
             aqs = aqs[con]
@@ -586,7 +588,7 @@ class aqs:
         elif param == 'CO':
             df = self.load_aqs_co_data(dates)
         elif param == 'OZONE':
-            df = self.load_aqs_no2_data(dates)
+            df = self.load_aqs_ozone_data(dates)
         elif param == 'SO2':
             df = self.load_aqs_so2_data(dates)
         elif param == 'VOC':
@@ -840,180 +842,178 @@ class aqs:
 
     def get_species(self, df, voc=False):
         pc = df.Parameter_Code.unique()
-        if len(pc) < 2:
-            if (pc == 88101) | (pc == 88502):
-                df['Species'] = pd.Series(['PM2.5' for i in df.Parameter_Code], index=df.index)
-            if pc == 44201:
-                df['Species'] = pd.Series(['OZONE' for i in df.Parameter_Code], index=df.index)
-            if pc == 81102:
-                df['Species'] = pd.Series(['PM10' for i in df.Parameter_Code], index=df.index)
-            if pc == 42401:
-                df['Species'] = pd.Series(['SO2' for i in df.Parameter_Code], index=df.index)
-            if pc == 42602:
-                df['Species'] = pd.Series(['NO2' for i in df.Parameter_Code], index=df.index)
-            if pc == 42101:
-                df['Species'] = pd.Series(['CO' for i in df.Parameter_Code], index=df.index)
-            if pc == 62101:
-                df['Species'] = pd.Series(['TEMP' for i in df.Parameter_Code], index=df.index)
-        else:
-            df['Species'] = ''
-            for i in pc:
-                con = df.Parameter_Code == i
-                if i == 88305:
-                    df.loc[con, 'Species'] = 'OC'
-                if i == 88306:
-                    df.loc[con, 'Species'] = 'NO3f'
-                if (i == 88307):
-                    df.loc[con, 'Species'] = 'ECf'
-                if i == 88316:
-                    df.loc[con, 'Species'] = 'ECf_optical'
-                if i == 88403:
-                    df.loc[con, 'Species'] = 'SO4f'
-                if i == 88312:
-                    df.loc[con, 'Species'] = 'TCf'
-                if i == 88104:
-                    df.loc[con, 'Species'] = 'Alf'
-                if i == 88107:
-                    df.loc[con, 'Species'] = 'Baf'
-                if i == 88313:
-                    df.loc[con, 'Species'] = 'BCf'
-                if i == 88109:
-                    df.loc[con, 'Species'] = 'Brf'
-                if i == 88110:
-                    df.loc[con, 'Species'] = 'Cdf'
-                if i == 88111:
-                    df.loc[con, 'Species'] = 'Caf'
-                if i ==88117:
-                    df.loc[con, 'Species'] = 'Cef'
-                if i == 88118:
-                    df.loc[con, 'Species'] = 'Csf'
-                if i == 88203:
-                    df.loc[con, 'Species'] = 'Cl-f'
-                if i == 88115:
-                    df.loc[con, 'Species'] = 'Clf'
-                if i == 88112:
-                    df.loc[con, 'Species'] = 'Crf'
-                if i == 88113:
-                    df.loc[con, 'Species'] = 'Cof'
-                if i == 88114:
-                    df.loc[con, 'Species'] = 'Cuf'
-                if i == 88121:
-                    df.loc[con, 'Species'] = 'Euf'
-                if i == 88143:
-                    df.loc[con, 'Species'] = 'Auf'
-                if i == 88127:
-                    df.loc[con, 'Species'] = 'Hff'
-                if i == 88131:
-                    df.loc[con, 'Species'] = 'Inf'
-                if i == 88126:
-                    df.loc[con, 'Species'] = 'Fef'
-                if i == 88146:
-                    df.loc[con, 'Species'] = 'Laf'
-                if i == 88128:
-                    df.loc[con, 'Species'] = 'Pbf'
-                if i == 88140:
-                    df.loc[con, 'Species'] = 'Mgf'
-                if i == 88132:
-                    df.loc[con, 'Species'] = 'Mnf'
-                if i == 88142:
-                    df.loc[con, 'Species'] = 'Hgf'
-                if i == 88134:
-                    df.loc[con, 'Species'] = 'Mof'
-                if i == 88136:
-                    df.loc[con, 'Species'] = 'Nif'
-                if i == 88147:
-                    df.loc[con, 'Species'] = 'Nbf'
-                if i == 88310:
-                    df.loc[con, 'Species'] = 'NO3f'
-                if i == 88152:
-                    df.loc[con, 'Species'] = 'Pf'
-                if i == 88303:
-                    df.loc[con, 'Species'] = 'K+f'
-                if i == 88176:
-                    df.loc[con, 'Species'] = 'Rbf'
-                if i == 88162:
-                    df.loc[con, 'Species'] = 'Smf'
-                if i == 88163:
-                    df.loc[con, 'Species'] = 'Scf'
-                if i == 88154:
-                    df.loc[con, 'Species'] = 'Sef'
-                if i == 88165:
-                    df.loc[con, 'Species'] = 'Sif'
-                if i == 88166:
-                    df.loc[con, 'Species'] = 'Agf'
-                if i == 88302:
-                    df.loc[con, 'Species'] = 'Na+f'
-                if i == 88184:
-                    df.loc[con, 'Species'] = 'Naf'
-                if i == 88168:
-                    df.loc[con, 'Species'] = 'Srf'
-                if i == 88403:
-                    df.loc[con, 'Species'] = 'SO4f'
-                if i == 88169:
-                    df.loc[con, 'Species'] = 'Sf'
-                if i == 88170:
-                    df.loc[con, 'Species'] = 'Taf'
-                if i == 88172:
-                    df.loc[con, 'Species'] = 'Tbf'
-                if i == 88160:
-                    df.loc[con, 'Species'] = 'Snf'
-                if i == 88161:
-                    df.loc[con, 'Species'] = 'Tif'
-                if i == 88312:
-                    df.loc[con, 'Species'] = 'TOT_Cf'
-                if i == 88310:
-                    df.loc[con, 'Species'] = 'NON-VOLITILE_NO3f'
-                if i == 88309:
-                    df.loc[con, 'Species'] = 'VOLITILE_NO3f'
-                if i == 88186:
-                    df.loc[con, 'Species'] = 'Wf'
-                if i == 88314:
-                    df.loc[con, 'Species'] = 'C_370nmf'
-                if i == 88179:
-                    df.loc[con, 'Species'] = 'Uf'
-                if i == 88164:
-                    df.loc[con, 'Species'] = 'Vf'
-                if i == 88183:
-                    df.loc[con, 'Species'] = 'Yf'
-                if i == 88167:
-                    df.loc[con, 'Species'] = 'Znf'
-                if i == 88185:
-                    df.loc[con, 'Species'] = 'Zrf'
-                if i == 88102:
-                    df.loc[con, 'Species'] = 'Sbf'
-                if i == 88103:
-                    df.loc[con, 'Species'] = 'Asf'
-                if i == 88105:
-                    df.loc[con, 'Species'] = 'Bef'
-                if i == 88124:
-                    df.loc[con, 'Species'] = 'Gaf'
-                if i == 88185:
-                    df.loc[con, 'Species'] = 'Irf'
-                if i == 88180:
-                    df.loc[con, 'Species'] = 'Kf'
-                if i == 88301:
-                    df.loc[con, 'Species'] = 'NH4+f'
-                if (i == 88320) | (i == 88355):
-                    df.loc[con, 'Species'] = 'OCf'
-                if (i == 88357) | (i == 88321):
-                    df.loc[con, 'Species'] = 'ECf'
-                if i == 42600:
-                    df.loc[con, 'Species'] = 'NOY'
-                if i == 42601:
-                    df.loc[con, 'Species'] = 'NO'
-                if i == 42603:
-                    df.loc[con, 'Species'] = 'NOX'
-                if (i == 61103) | (i == 61101):
-                    df.loc[con, 'Species'] = 'WS'
-                if (i == 61104) | (i == 61102):
-                    df.loc[con, 'Species'] = 'WD'
-                if i == 62201:
-                    df.loc[con, 'Species'] = 'RH'
-                if i == 62103:
-                    df.loc[con, 'Species'] = 'DP'
+        df['Species'] = ''
         if voc:
             df['Species'] = df.Parameter_Name.str.upper()
-
+            return df
+        for i in pc:
+            con = df.Parameter_Code == i
+            if (i == 88101) | (i == 88502):
+                df.loc[con, 'Species'] = 'PM2.5'
+            if i == 44201:
+                df.loc[con, 'Species'] = 'OZONE'
+            if i == 81102:
+                df.loc[con, 'Species'] = 'PM10' 
+            if i == 42401:
+                df.loc[con, 'Species'] = 'SO2'
+            if i == 42602:
+                df.loc[con, 'Species'] = 'NO2'
+            if i == 42101:
+                df.loc[con, 'Species'] = 'CO' 
+            if i == 62101:
+                df.loc[con, 'Species'] = 'TEMP'
+            if i == 88305:
+                df.loc[con, 'Species'] = 'OC'
+            if i == 88306:
+                df.loc[con, 'Species'] = 'NO3f'
+            if (i == 88307):
+                df.loc[con, 'Species'] = 'ECf'
+            if i == 88316:
+                df.loc[con, 'Species'] = 'ECf_optical'
+            if i == 88403:
+                df.loc[con, 'Species'] = 'SO4f'
+            if i == 88312:
+                df.loc[con, 'Species'] = 'TCf'
+            if i == 88104:
+                df.loc[con, 'Species'] = 'Alf'
+            if i == 88107:
+                df.loc[con, 'Species'] = 'Baf'
+            if i == 88313:
+                df.loc[con, 'Species'] = 'BCf'
+            if i == 88109:
+                df.loc[con, 'Species'] = 'Brf'
+            if i == 88110:
+                df.loc[con, 'Species'] = 'Cdf'
+            if i == 88111:
+                df.loc[con, 'Species'] = 'Caf'
+            if i ==88117:
+                df.loc[con, 'Species'] = 'Cef'
+            if i == 88118:
+                df.loc[con, 'Species'] = 'Csf'
+            if i == 88203:
+                df.loc[con, 'Species'] = 'Cl-f'
+            if i == 88115:
+                df.loc[con, 'Species'] = 'Clf'
+            if i == 88112:
+                df.loc[con, 'Species'] = 'Crf'
+            if i == 88113:
+                df.loc[con, 'Species'] = 'Cof'
+            if i == 88114:
+                df.loc[con, 'Species'] = 'Cuf'
+            if i == 88121:
+                df.loc[con, 'Species'] = 'Euf'
+            if i == 88143:
+                df.loc[con, 'Species'] = 'Auf'
+            if i == 88127:
+                df.loc[con, 'Species'] = 'Hff'
+            if i == 88131:
+                df.loc[con, 'Species'] = 'Inf'
+            if i == 88126:
+                df.loc[con, 'Species'] = 'Fef'
+            if i == 88146:
+                df.loc[con, 'Species'] = 'Laf'
+            if i == 88128:
+                df.loc[con, 'Species'] = 'Pbf'
+            if i == 88140:
+                df.loc[con, 'Species'] = 'Mgf'
+            if i == 88132:
+                df.loc[con, 'Species'] = 'Mnf'
+            if i == 88142:
+                df.loc[con, 'Species'] = 'Hgf'
+            if i == 88134:
+                df.loc[con, 'Species'] = 'Mof'
+            if i == 88136:
+                df.loc[con, 'Species'] = 'Nif'
+            if i == 88147:
+                df.loc[con, 'Species'] = 'Nbf'
+            if i == 88310:
+                df.loc[con, 'Species'] = 'NO3f'
+            if i == 88152:
+                df.loc[con, 'Species'] = 'Pf'
+            if i == 88303:
+                df.loc[con, 'Species'] = 'K+f'
+            if i == 88176:
+                df.loc[con, 'Species'] = 'Rbf'
+            if i == 88162:
+                df.loc[con, 'Species'] = 'Smf'
+            if i == 88163:
+                df.loc[con, 'Species'] = 'Scf'
+            if i == 88154:
+                df.loc[con, 'Species'] = 'Sef'
+            if i == 88165:
+                df.loc[con, 'Species'] = 'Sif'
+            if i == 88166:
+                df.loc[con, 'Species'] = 'Agf'
+            if i == 88302:
+                df.loc[con, 'Species'] = 'Na+f'
+            if i == 88184:
+                df.loc[con, 'Species'] = 'Naf'
+            if i == 88168:
+                df.loc[con, 'Species'] = 'Srf'
+            if i == 88403:
+                df.loc[con, 'Species'] = 'SO4f'
+            if i == 88169:
+                df.loc[con, 'Species'] = 'Sf'
+            if i == 88170:
+                df.loc[con, 'Species'] = 'Taf'
+            if i == 88172:
+                df.loc[con, 'Species'] = 'Tbf'
+            if i == 88160:
+                df.loc[con, 'Species'] = 'Snf'
+            if i == 88161:
+                df.loc[con, 'Species'] = 'Tif'
+            if i == 88312:
+                df.loc[con, 'Species'] = 'TOT_Cf'
+            if i == 88310:
+                df.loc[con, 'Species'] = 'NON-VOLITILE_NO3f'
+            if i == 88309:
+                df.loc[con, 'Species'] = 'VOLITILE_NO3f'
+            if i == 88186:
+                df.loc[con, 'Species'] = 'Wf'
+            if i == 88314:
+                df.loc[con, 'Species'] = 'C_370nmf'
+            if i == 88179:
+                df.loc[con, 'Species'] = 'Uf'
+            if i == 88164:
+                df.loc[con, 'Species'] = 'Vf'
+            if i == 88183:
+                df.loc[con, 'Species'] = 'Yf'
+            if i == 88167:
+                df.loc[con, 'Species'] = 'Znf'
+            if i == 88185:
+                df.loc[con, 'Species'] = 'Zrf'
+            if i == 88102:
+                df.loc[con, 'Species'] = 'Sbf'
+            if i == 88103:
+                df.loc[con, 'Species'] = 'Asf'
+            if i == 88105:
+                df.loc[con, 'Species'] = 'Bef'
+            if i == 88124:
+                df.loc[con, 'Species'] = 'Gaf'
+            if i == 88185:
+                df.loc[con, 'Species'] = 'Irf'
+            if i == 88180:
+                df.loc[con, 'Species'] = 'Kf'
+            if i == 88301:
+                df.loc[con, 'Species'] = 'NH4+f'
+            if (i == 88320) | (i == 88355):
+                df.loc[con, 'Species'] = 'OCf'
+            if (i == 88357) | (i == 88321):
+                df.loc[con, 'Species'] = 'ECf'
+            if i == 42600:
+                df.loc[con, 'Species'] = 'NOY'
+            if i == 42601:
+                df.loc[con, 'Species'] = 'NO'
+            if i == 42603:
+                df.loc[con, 'Species'] = 'NOX'
+            if (i == 61103) | (i == 61101):
+                df.loc[con, 'Species'] = 'WS'
+            if (i == 61104) | (i == 61102):
+                df.loc[con, 'Species'] = 'WD'
+            if i == 62201:
+                df.loc[con, 'Species'] = 'RH'
+            if i == 62103:
+                df.loc[con, 'Species'] = 'DP'
         return df
 
     @staticmethod

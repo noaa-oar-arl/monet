@@ -61,7 +61,7 @@ class verify_crn:
                     else:
                         print 'Interpolating Surface Skin Temperature:'
                         dfmet = g.get_group(i)
-                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMPG')
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMPG').compute()
                         dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
                         dfmet.Obs += 273.15
                         dfs.append(dfmet)
@@ -74,7 +74,7 @@ class verify_crn:
                     else:
                         print 'Interpolating 2 Meter Temperature:'
                         dfmet = g.get_group(i)
-                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2')
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='TEMP2').compute()
                         dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
                         dfmet.Obs += 273.15
                         dfs.append(dfmet)
@@ -87,7 +87,7 @@ class verify_crn:
                     else:
                         print 'Interpolating Downward Solar Radiation:'
                         dfmet = g.get_group(i)
-                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RGRND')
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='RGRND').compute()
                         dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
                         dfs.append(dfmet)
                 except:
@@ -99,7 +99,7 @@ class verify_crn:
                     else:
                         print 'Interpolating Surface Volumetric Soil Moisture Content:'
                         dfmet = g.get_group(i)
-                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='SOILW')
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='SOILW').compute()
                         dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
                         dfs.append(dfmet)
                 except:
@@ -112,7 +112,7 @@ class verify_crn:
                     else:
                         print 'Interpolating Surface Volumetric Soil Moisture Content:'
                         dfmet = g.get_group(i)
-                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='SOILW')
+                        cmaq = self.cmaq.get_metcro2d_cmaqvar(param='SOILW').compute()
                         dfmet = self.interp_to_crn(cmaq, dfmet, interp=interp, r=radius, weight_func=weight_func)
                         dfs.append(dfmet)
                 except:
