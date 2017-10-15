@@ -45,7 +45,7 @@ MONET can easily be installed by using pip
 
 ```pip install https://github.com/noaa-oar-arl/MONET.git```
 
-###Required Packages
+### Required Packages
 Many of the required packages can be gotten with the Anaconda or Enthought Canopy python packages.
 
 Required packges:
