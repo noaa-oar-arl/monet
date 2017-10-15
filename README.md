@@ -7,9 +7,10 @@ The ARL verification package is meant to be a one stop shop for quick verificati
 
 ### New in MONET
 
-* Interpolation routines now use pyresample KDTrees.  You have the option of nearest neighbor, custom method (1/r or 1/r**2 or what have you), or a guassian method for KDTrees.  This replaces the scipy.interpolate.griddata.  The result is more flexibility and about 800% speedup in interpolating model results to observations.
-* Added a verify driver.  Currently, this is a rudimentary driver.  It only returns a verification object for one of the previous verification objects (verifiy_airnow, verify_aqs, verify_improve).  Updates to the WIKI will be coming shortly.  Stay tuned. 
-* AirNow aggregation has been signficantly accelerated up to ~1000% compared to previous method.
+* Additional objects created for the Integrated Surface Database (ISD), the U.S. Climate Reference Network (CRN), Aerosol Robotic Network (AERONET)
+* Moved the interpolation to a pyresample ImageContainer.  This restricts users to a nearest neighbor resampling with minimal differences in interpolation differences.  Speed improvements are substantial.
+* Moved to xarray for opening CMAQ files.  xarray is an implimentation of N-Dimensional pandas dataframes and allows out of memory computation using dask to increase reading and processing.
+* Increased usage of dask to read observational data increasing read speed of many files.  
 
 ### Basic tutorial for AirNow and AQS.  
 
@@ -38,6 +39,12 @@ Please refer to [Make Spatial Plot tutorial](https://github.com/noaa-oar-arl/MON
 ![Difference Scatter Plots](https://github.com/noaa-oar-arl/MONET/blob/master/sample_figures/no2_diffscatter.jpg?raw=true)
 ![Difference PDFS Plots](https://github.com/noaa-oar-arl/MONET/blob/master/sample_figures/no2_diffpdf.jpg?raw=true)
 
+### Installation
+
+MONET can easily be installed by using pip
+
+```pip install https://github.com/noaa-oar-arl/MONET.git```
+
 ###Required Packages
 Many of the required packages can be gotten with the Anaconda or Enthought Canopy python packages.
 
@@ -51,5 +58,7 @@ Required packges:
   * datetime
   * ftplib
   * pywget
+  * xarray
+  * dask
   * netcdf4-python
 
