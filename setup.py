@@ -4,7 +4,7 @@ setup(
     name='MONET',
     version='v1.0',
     packages=['MONET'],
-    package_dir={'': 'monet'},
+    package_dir={'MONET': 'monet'},
     url='https://github.com/noaa-oar-arl/MONET',
     license='',
     author='Barry Baker - NOAA ARL',
