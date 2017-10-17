@@ -2,7 +2,8 @@ from distutils.core import setup
 
 setup(
     name='MONET',
-    packages=[''],
+    version='v1.0'
+    packages=['MONET'],
     package_dir={'': 'monet'},
     url='https://github.com/noaa-oar-arl/MONET',
     license='',
