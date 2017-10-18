@@ -41,11 +41,12 @@ class aeronet:
             self.url = 'https://aeronet.gsfc.nasa.gov/cgi-bin/print_web_data_v3?year='+sy+'&month='+sm+'&day='+sd+'&hour='+sh+'&year2='+ey+'&month2='+em+'&day2='+ed+'&hour2='+eh+'&lat1='+lat1+'&lat2='+lat2+'&lon1='+lon1+'&lon2='+lon2+'&AOD15=1&AVG=10&if_no_html=1'
 
     def read_aeronet(self):
+        import requests
+        from io import StringIO
         print 'Reading Aeronet Data...'
-        df = pd.read_csv(self.url,usecols=self.usecols,names=self.colnames,parse_dates=[[1,2]],infer_datetime_format=True,header=None,sep=None,engine='python',na_values=-999,skiprows=6)
-#        df['datetime'] = pd.to_datetime(df.date + ' ' + df.time,format='%d.%m.%Y %H:%M:%S',box=False,exact=True)
+        s = requests.get(url).text
+        df = pd.read_csv(StringIO(s),usecols=self.usecols,names=self.colnames,parse_dates=[[1,2]],infer_datetime_format=True,header=None,sep=None,engine='python',na_values=-999,skiprows=6)
         df.rename(columns={'date_time':'datetime'},inplace=True)
-#        df.drop(['date','time'],inplace=True)
         df.index = df.datetime
         df.dropna(subset=['Latitude','Longitude'],inplace=True)
         self.df = df.groupby('Site_Name').resample('H').mean().reset_index()
