@@ -44,7 +44,7 @@ class aeronet:
         import requests
         from io import StringIO
         print 'Reading Aeronet Data...'
-        s = requests.get(url).text
+        s = requests.get(self.url).text
         df = pd.read_csv(StringIO(s),usecols=self.usecols,names=self.colnames,parse_dates=[[1,2]],infer_datetime_format=True,header=None,sep=None,engine='python',na_values=-999,skiprows=6)
         df.rename(columns={'date_time':'datetime'},inplace=True)
         df.index = df.datetime
