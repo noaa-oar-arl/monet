@@ -51,7 +51,7 @@ class verify_airnow:
                     print 'Interpolating Ozone:'
                     dfo3 = g.get_group(i)
                     fac = self.check_cmaq_units(param='O3', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='O3').compute() * fac
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='O3') * fac
                     self.cmaqo3 = cmaq
                     dfo3 = interp_to_obs_new(cmaq, dfo3,self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfo3)
@@ -62,8 +62,8 @@ class verify_airnow:
                     print 'Interpolating PM2.5:'
                     dfpm25 = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM25', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25').compute() * fac
-                    dfpm25 = interp_to_obs_new(cmaq, dfpm25, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM25') * fac
+                    dfpm25 = interp_to_obs_new(cmaq.copy(), dfpm25, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm25)
                 except:
@@ -73,8 +73,8 @@ class verify_airnow:
                     print 'Interpolating PM10:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='PM10', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10').compute() * fac
-                    dfpm = interp_to_obs_new(cmaq, dfpm, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='PM10') * fac
+                    dfpm = interp_to_obs_new(cmaq.copy(), dfpm, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqpm10 = cmaq
                     dfs.append(dfpm)
                 except:
@@ -84,8 +84,8 @@ class verify_airnow:
                     print 'Interpolating CO:'
                     dfco = g.get_group(i)
                     fac = self.check_cmaq_units(param='CO', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='CO').compute() * fac
-                    dfco = interp_to_obs_new(cmaq, dfco, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='CO') * fac
+                    dfco = interp_to_obs_new(cmaq.copy(), dfco, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqco = cmaq
                     dfs.append(dfco)
                 except:
@@ -95,8 +95,8 @@ class verify_airnow:
                     print 'Interpolating NOY:'
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOY', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOY').compute() * fac
-                    dfnoy = interp_to_obs_new(cmaq, dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOY') * fac
+                    dfnoy = interp_to_obs_new(cmaq.copy(), dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqnoy = cmaq
                     dfs.append(dfnoy)
                 except:
@@ -106,8 +106,8 @@ class verify_airnow:
                     print 'Interpolating NO:'
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO').compute() * fac
-                    dfnoy = interp_to_obs_new(cmaq, dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO') * fac
+                    dfnoy = interp_to_obs_new(cmaq.copy(), dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqno = cmaq
                     dfs.append(dfnoy)
                 except:
@@ -117,8 +117,8 @@ class verify_airnow:
                     print 'Interpolating NO2:'
                     dfnoy = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO2', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO2').compute() * fac
-                    dfnoy = interp_to_obs_new(cmaq, dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NO2') * fac
+                    dfnoy = interp_to_obs_new(cmaq.copy(), dfnoy, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqno2 = cmaq
                     dfs.append(dfnoy)
                 except:
@@ -128,8 +128,8 @@ class verify_airnow:
                     print 'Interpolating SO2'
                     dfso2 = g.get_group(i)
                     fac = self.check_cmaq_units(param='SO2', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='SO2').compute() * fac
-                    dfso2 = interp_to_obs_new(cmaq, dfso2, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='SO2') * fac
+                    dfso2 = interp_to_obs_new(cmaq.copy(), dfso2, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqso2 = cmaq
                     dfs.append(dfso2)
                 except:
@@ -139,8 +139,8 @@ class verify_airnow:
                     print 'Interpolating NOX:'
                     dfnox = g.get_group(i)
                     fac = self.check_cmaq_units(param='NOX', airnow_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOX').compute() * fac
-                    dfnox = interp_to_obs_new(cmaq, dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
+                    cmaq = self.cmaq.get_surface_cmaqvar(param='NOX') * fac
+                    dfnox = interp_to_obs_new(cmaq.copy(), dfnox, self.cmaq.latitude.values,self.cmaq.longitude.values, radius=radius)
                     self.cmaqnox = cmaq
                     dfs.append(dfnox)
                 except:
@@ -255,23 +255,23 @@ class verify_airnow:
                 exit
         param = param.upper()
         if param == 'OZONE':
-            cmaq = self.cmaqo3
+            cmaq = self.cmaqo3.copy()
         elif param == 'PM2.5':
-            cmaq = self.cmaqpm25
+            cmaq = self.cmaqpm25.copy()
         elif param == 'PM10':
-            cmaq = self.cmaqpm10
+            cmaq = self.cmaqpm10.copy()
         elif param == 'CO':
-            cmaq = self.cmaqco
+            cmaq = self.cmaqco.copy()
         elif param == 'NOY':
-            cmaq = self.cmaqnoy
+            cmaq = self.cmaqnoy.copy()
         elif param == 'SO2':
-            cmaq = self.cmaqso2
+            cmaq = self.cmaqso2.copy()
         elif param == 'NOX':
-            cmaq = self.cmaqnox
+            cmaq = self.cmaqnox.copy()
         elif param == 'NO':
-            cmaq = self.cmaqno
+            cmaq = self.cmaqno.copy()
         elif param == 'NO2':
-            cmaq = self.cmaqno2
+            cmaq = self.cmaqno2.copy()
         else:
             try:
                 if not isinstance(self.cmaq.metcro2d, type(None)):
@@ -289,22 +289,21 @@ class verify_airnow:
         else:
             dts = cmaq.TSTEP.to_index()
             if isinstance(date,type(None)):
-                index = where(dts == dts[0])[0][0]
+                index = dts[0]
             else:
-                index = where(dts.isin([date]))[0][0]
- #           print index
- #           print cmaq[index,:,]
-            f,ax,c,cmap,vmin,vmax = plots.make_spatial_plot2(cmaq[index, :, :].squeeze(), m,plotargs=imshow_args,ncolors=ncolors,discrete=discrete)
+                index = date
+            cmaq = cmaq.sel(TSTEP=index)
+            f,ax,c,cmap,vmin,vmax = plots.make_spatial_plot2(cmaq, m,plotargs=imshow_args,ncolors=ncolors,discrete=discrete)
             plt.tight_layout()
             if not isinstance(self.cmaq.metcro2d, type(None)) and barbs==False:
-                ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
-                wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
+                ws = self.cmaq.metcro2d.variables['WSPD10'].sel(TSTEP=index,LAY=0)
+                wdir = self.cmaq.metcro2d.variables['WDIR10'].sel(TSTEP=index,LAY=0)
                 plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, **barbs_args)
             if Obs:
                 scatter_args['vmin'] = vmin
                 scatter_args['vmax'] = vmax
                 scatter_args['cmap'] = cmap
-                df2 = df2.loc[df2.datetime == dts[index]]
+                df2 = df2.loc[df2.datetime == cmaq.TSTEP.to_pandas()]
                 plots.spatial_scatter(df2, m, plotargs=scatter_args)
                 c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
                 
@@ -690,10 +689,10 @@ class verify_airnow:
         elif not isinstance(region, type(None)):
             try:
                 single = True
-                names = df.get_group('EPA_region').dropna().unique()
+                names = df.get_group('Region').dropna().unique()
                 name = [j for j in names if region.upper() in j.upper()]
                 print name
-                df = df.groupby('EPA_region').get_group(name[0])
+                df = df.groupby('Region').get_group(name[0])
             except KeyError:
                 print 'Region not valid.  Enter a valid Region'
                 return
@@ -707,9 +706,9 @@ class verify_airnow:
             d['Region'] = 'Domain'
             d['Label'] = label
             dd = pd.DataFrame(d, index=[0])
-            for i in df.EPA_region.dropna().unique():
+            for i in df.Region.dropna().unique():
                 try:
-                    dff = df.groupby('EPA_region').get_group(i)
+                    dff = df.groupby('Region').get_group(i)
                     dt = mystats.stats(dff, threasholds[0], threasholds[1])
                     dt['Region'] = i.replace(' ', '_')
                     dt['Label'] = label

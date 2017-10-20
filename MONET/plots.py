@@ -43,7 +43,7 @@ def make_spatial_plot2(cmaqvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
         m.imshow(cmaqvar,**plotargs)
         vmin,vmax = plotargs['vmin'],plotargs['vmax']
     elif discrete:
-        temp = m.imshow(cmaqvar,cmap=cmap)
+        temp = m.imshow(cmaqvar,**plotargs)
         vmin,vmax = temp.get_clim()
         c, cmap = colorbar_index(ncolors, plotargs['cmap'], minval=vmin,maxval=vmax,basemap=m)
         plotargs['cmap'] = cmap
