@@ -6,6 +6,7 @@ import pandas as pd
 from numpy import array
 import inspect
 
+
 class airnow:
     def __init__(self):
 
@@ -13,7 +14,7 @@ class airnow:
         self.password = ''
         self.datadir = '.'
         self.cwd = os.getcwd()
-        self.url = 'ftp.airnowgateway.org'
+        self.url = None
         self.dates = [datetime.strptime('2016-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
                       datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
         self.datestr = []
@@ -37,102 +38,59 @@ class airnow:
         self.monitor_file = inspect.getfile(self.__class__)[:-16] + '/data/monitoring_site_locations.dat'
         self.monitor_df = None
         self.savecols = ['datetime', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'datetime_local',
-                         'Site_Name', 'Latitude', 'Longitude', 'CMSA_Name', 'MSA_Code','MSA_Name', 'State_Name', 'EPA_region']
-
-    def retrieve_hourly_filelist(self):
-        self.ftp.cwd('HourlyData')
-        nlst = self.ftp.nlst('2*')
-        return nlst
-
-    def openftp(self):
-        from ftplib import FTP
-        self.ftp = FTP(self.url)
-        self.ftp.login(self.username, self.password)
+                         'Site_Name', 'Latitude', 'Longitude', 'CMSA_Name', 'MSA_Code', 'MSA_Name', 'State_Name',
+                         'EPA_region']
 
     def convert_dates_tofnames(self):
         self.datestr = []
         for i in self.dates:
             self.datestr.append(i.strftime('%Y%m%d%H.dat'))
 
-    def download_single_rawfile(self, fname):
-        localfile = open(fname, 'wb')
-        self.ftp.retrbinary('RETR ' + fname, localfile.write, 1024)
-        localfile.close()
-
-    def download_rawfiles(self, flist, path='.'):
-        import os
-        if flist.shape[0] < 2:
-            print 'Downloading: ' + flist[0]
-            self.download_single_rawfile(flist[0])
-        else:
-            for i in flist:
-                if os.path.exists(path + '/' + i) == False:
-                    print 'Downloading: ' + i
-                    self.download_single_rawfile(i)
-                else:
-                    print 'File Found in Path: ' + i
-
     def change_path(self):
         os.chdir(self.datadir)
 
     def change_back(self):
         os.chdir(self.cwd)
-    
-    def download_hourly_files(self,path='./'):
-        from numpy import empty,where
+
+    def build_urls(self):
+        from numpy import empty, where
         import wget
         import requests
         from glob import glob
-        print 'Retrieving AIRNOW files...'
-        self.datadir = path 
-        self.change_path()
-        flist = []
-        furls = []
-        url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/' #2017/20170131/HourlyData_2017012408.dat
-        for i in self.dates:
-            ff = i.strftime('HourlyData_%Y%m%d%H.dat')
-            f = url + i.strftime('%Y/%Y%m%d/HourlyData_%Y%m%d%H.dat')
-            flist.append(os.path.join(path, ff))
-            furls.append(f)
-        
-        #files needed for comparison
-        files = pd.Series(flist,index=None)
-        urls = pd.Series(furls,index=None)
-        filesindir = pd.Series(glob(path + '/HourlyData*.dat'))
-        if filesindir.shape[0] == 0:
-            #no files found
-            ftodownload = urls
-        else:
-            #files already in directory
-            ftodownload = urls.loc[~files.isin(filesindir)]
 
-        for j,i in enumerate(ftodownload):
-            f = i
-            if requests.get(f,proxies=None).status_code != 404:
-                print '\nDownloading:',i
-                wget.download(i)
-            else:
-                files.drop(j,inplace=True)
-        self.change_back()
-        self.filelist = files.values
-        print 'done'
-    
-    def read_csv(self,fn):
-        dft = pd.read_csv(fn, delimiter='|', header=None, error_bad_lines=False)
-        cols = ['date', 'time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
-        dft.columns = cols
+        furls = []
+
+        print 'Retrieving AIRNOW files...'
+        url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/'  # 2017/20170131/HourlyData_2017012408.dat
+        for i in self.dates:
+            f = url + i.strftime('%Y/%Y%m%d/HourlyData_%Y%m%d%H.dat')
+            furls.append(f)
+
+        # files needed for comparison
+        self.url = pd.Series(furls, index=None)
+
+    def read_csv(self, fn):
+        try:
+            dft = pd.read_csv(fn, delimiter='|', header=None, error_bad_lines=False)
+            cols = ['date', 'time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
+            dft.columns = cols
+        except:
+            cols = ['date', 'time', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'Source']
+            dft = pd.DataFrame(columns=cols)
         return dft
 
-    def aggragate_files(self,output=False,outname='AIRNOW.hdf'):
+    def aggragate_files(self, output=False, outname='AIRNOW.hdf'):
         import dask
         import dask.dataframe as dd
+
         print 'Aggregating AIRNOW files...'
-        dfs = [dask.delayed(self.read_csv)(f) for f in self.filelist]
+        self.build_urls()
+        dfs = [dask.delayed(self.read_csv)(f) for f in self.url]
         dff = dd.from_delayed(dfs)
         df = dff.compute()
-        df['datetime'] = pd.to_datetime(df.date + ' ' + df.time,format='%m/%d/%y %H:%M',exact=True,box=False)
-        df.drop(['date','time'],axis=1,inplace=True)
-        df['datetime_local'] = df.datetime + pd.to_timedelta(df.utcoffset,unit='H')
+        df['datetime'] = pd.to_datetime(df.date + ' ' + df.time, format='%m/%d/%y %H:%M', exact=True, box=False)
+        df.drop(['date', 'time'], axis=1, inplace=True)
+        df['datetime_local'] = df.datetime + pd.to_timedelta(df.utcoffset, unit='H')
         self.df = df
         print '    Adding in Meta-data'
         self.get_station_locations()
@@ -185,8 +143,7 @@ class airnow:
             f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
                          'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
                          'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
-            
-            
+
         self.monitor_df = f.copy()
 
     def get_region(self):

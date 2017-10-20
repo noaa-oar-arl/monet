@@ -7,9 +7,11 @@ import pandas as pd
 from numpy import array, arange
 import inspect
 import requests
+
+
 class aqs:
     def __init__(self):
-#        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
+        #        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
         self.baseurl = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/'
         self.dates = [datetime.strptime('2014-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
                       datetime.strptime('2014-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
@@ -26,7 +28,7 @@ class aqs:
                              '1st_Max Hour', 'AQI', 'Method_Code', 'Method_Name',
                              'Local_Site_Name', 'Address', 'State_Name', 'County_Name',
                              'City_Name', 'MSA_Name', 'Date_of_Last_Change']
-        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude','Obs', 'Units','Species']
+        self.savecols = ['datetime_local', 'datetime', 'SCS', 'Latitude', 'Longitude', 'Obs', 'Units', 'Species']
         self.se_states = array(
             ['Alabama', 'Florida', 'Georgia', 'Mississippi', 'North Carolina', 'South Carolina', 'Tennessee',
              'Virginia', 'West Virginia'], dtype='|S14')
@@ -53,12 +55,12 @@ class aqs:
         self.p_states_abv = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.datadir = '.'
         self.cwd = os.getcwd()
-        self.df = None #hourly dataframe
+        self.df = None  # hourly dataframe
         self.monitor_file = inspect.getfile(self.__class__)[:-13] + '/data/monitoring_site_locations.dat'
         self.monitor_df = None
-        self.d_df = None #daily dataframe
+        self.d_df = None  # daily dataframe
 
-    def check_file_size(self,url):
+    def check_file_size(self, url):
         test = requests.head(url).headers
         if int(test['Content-Length']) > 1000:
             return True
@@ -76,10 +78,12 @@ class aqs:
             print ''
             print 'Unpacking: ' + url1
             dffrm = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                    'datetime_local': ["Date Local", "Time Local"]},
-                                                    infer_datetime_format=True)
+                                                       'datetime_local': ["Date Local", "Time Local"]},
+                                infer_datetime_format=True)
             dffrm.columns = self.renamedhcols
-            dffrm['SCS'] = array(dffrm['State_Code'].values * 1.E7 + dffrm['County_Code'].values * 1.E4 + dffrm['Site_Num'].values,dtype='int32')
+            dffrm['SCS'] = array(
+                dffrm['State_Code'].values * 1.E7 + dffrm['County_Code'].values * 1.E4 + dffrm['Site_Num'].values,
+                dtype='int32')
         else:
             dffrm = pd.DataFrame(columns=self.renamedhcols)
         url2 = self.baseurl + 'hourly_88502_' + year + '.zip'
@@ -92,20 +96,22 @@ class aqs:
                                                         'datetime_local': ["Date Local", "Time Local"]},
                                  infer_datetime_format=True)
             dfnfrm.columns = self.renamedhcols
-            dfnfrm['SCS'] = array(dfnfrm['State_Code'].values * 1.E7 + dfnfrm['County_Code'].values * 1.E4 + dfnfrm['Site_Num'].values,dtype='int32')
+            dfnfrm['SCS'] = array(
+                dfnfrm['State_Code'].values * 1.E7 + dfnfrm['County_Code'].values * 1.E4 + dfnfrm['Site_Num'].values,
+                dtype='int32')
         else:
             dfnfrm = pd.DataFrame(columns=self.renamedhcols)
         if self.check_file_size(url1) | self.check_file_size(url2):
-            df = pd.concat([dfnfrm,dffrm],ignore_index=True)
-            df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-            df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-            df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+            df = pd.concat([dfnfrm, dffrm], ignore_index=True)
+            df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+            df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+            df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
             df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                               dtype='int32')
 
-            #df.drop('Qualifier', axis=1, inplace=True)
+            # df.drop('Qualifier', axis=1, inplace=True)
             df = self.get_species(df)
-            #df = self.get_region(df)
+            # df = self.get_region(df)
             df = df.copy()[self.savecols]
             df = self.add_metro_metadata2(df)
             df['Species'] = 'PM2.5'
@@ -125,12 +131,12 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
@@ -152,17 +158,17 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        #df = self.get_region(df)
+        # df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_PM_10_81102_' + year + '.hdf'
@@ -179,17 +185,17 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-        #df = self.get_region(df)
+        # df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_SO2_42401_' + year + '.hdf'
@@ -206,17 +212,17 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-#        df = self.get_region(df)
+        #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_NO2_42602_' + year + '.hdf'
@@ -233,17 +239,17 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-#        df = self.get_region(df)
+        #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf'
@@ -260,17 +266,17 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-#        df = self.get_region(df)
+        #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_NONOXNOY_' + year + '.hdf'
@@ -287,17 +293,17 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df, voc=True)
-#        df = self.get_region(df)
+        #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_VOC_' + year + '.hdf'
@@ -318,9 +324,9 @@ class aqs:
                                                     'datetime_local': ["Date Local", "Time Local"]},
                              infer_datetime_format=True)
             df.columns = self.renamedhcols
-            df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-            df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-            df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+            df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+            df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+            df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
             df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                               dtype='int32')
             df.drop('Qualifier', axis=1, inplace=True)
@@ -343,17 +349,17 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-#        df = self.get_region(df)
+        #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_WIND_' + year + '.hdf'
@@ -370,17 +376,17 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
         df = self.get_species(df)
-#        df = self.get_region(df)
+        #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf'
@@ -397,12 +403,12 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         df = pd.read_csv(filename, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
-                                                              'datetime_local': ["Date Local", "Time Local"]},
+                                                'datetime_local': ["Date Local", "Time Local"]},
                          infer_datetime_format=True)
         df.columns = self.renamedhcols
-        df.loc[:,'State_Code'] = pd.to_numeric(df.State_Code,errors='coerce')
-        df.loc[:,'Site_Num'] = pd.to_numeric(df.Site_Num,errors='coerce')
-        df.loc[:,'County_Code'] = pd.to_numeric(df.County_Code,errors='coerce')
+        df.loc[:, 'State_Code'] = pd.to_numeric(df.State_Code, errors='coerce')
+        df.loc[:, 'Site_Num'] = pd.to_numeric(df.Site_Num, errors='coerce')
+        df.loc[:, 'County_Code'] = pd.to_numeric(df.County_Code, errors='coerce')
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
         df.drop('Qualifier', axis=1, inplace=True)
@@ -578,8 +584,8 @@ class aqs:
         aqs.index = arange(aqs.index.shape[0])
         return aqs
 
-    def load_data(self,param,dates):
-        if param=='PM2.5':
+    def load_data(self, param, dates):
+        if param == 'PM2.5':
             df = self.load_aqs_pm25_data(dates)
         elif param == 'PM10':
             df = self.load_aqs_pm10_data(dates)
@@ -603,8 +609,8 @@ class aqs:
             df = self.load_aqs_rhdp_data(dates)
         return df
 
-    def load_daily_data(self,param,dates):
-        if param=='PM2.5':
+    def load_daily_data(self, param, dates):
+        if param == 'PM2.5':
             df = self.load_aqs_daily_pm25_data(dates)
         elif param == 'PM10':
             df = self.load_aqs_daily_pm10_data(dates)
@@ -628,42 +634,42 @@ class aqs:
             df = self.load_aqs_daily_rhdp_data(dates)
         return df
 
-
-    def load_all_hourly_data2(self,dates,datasets='all'):
+    def load_all_hourly_data2(self, dates, datasets='all'):
         import dask
         import dask.dataframe as dd
         os.chdir(self.datadir)
-        params = ['SPEC','PM10','PM2.5','CO','OZONE','SO2','VOC','NONOXNOY','WIND','TEMP','RHDP']
-        dfs = [dask.delayed(self.load_data)(i,dates) for i in params]
+        params = ['SPEC', 'PM10', 'PM2.5', 'CO', 'OZONE', 'SO2', 'VOC', 'NONOXNOY', 'WIND', 'TEMP', 'RHDP']
+        dfs = [dask.delayed(self.load_data)(i, dates) for i in params]
         dff = dd.from_delayed(dfs)
-        #dff = dff.drop_duplicates()
+        # dff = dff.drop_duplicates()
         self.df = dff.compute()
         self.df = self.change_units(self.df)
-#        self.df = pd.concat(dfs, ignore_index=True)
-#        self.df = self.change_units(self.df).drop_duplicates(subset=['datetime','SCS','Species','Obs']).dropna(subset=['Obs'])
+        #        self.df = pd.concat(dfs, ignore_index=True)
+        #        self.df = self.change_units(self.df).drop_duplicates(subset=['datetime','SCS','Species','Obs']).dropna(subset=['Obs'])
         os.chdir(self.cwd)
 
-    def load_all_daily_data(self,dates,datasets='all'):
+    def load_all_daily_data(self, dates, datasets='all'):
         import dask
         import dask.dataframe as dd
         from dask.diagnostics import ProgressBar
         os.chdir(self.datadir)
         pbar = ProgressBar()
         pbar.register()
-        params = ['SPEC','PM10','PM2.5','CO','OZONE','SO2','VOC','NONOXNOY','WIND','TEMP','RHDP']
-        dfs = [dask.delayed(self.load_daily_data)(i,dates) for i in params]
-#        print dfs
-        dff = dd.from_delayed(dfs)
-        self.d_df = dff.compute()
+        params = ['SPEC', 'PM10', 'PM2.5', 'CO', 'OZONE', 'SO2', 'VOC', 'NONOXNOY', 'WIND', 'TEMP', 'RHDP']
+        # dfs = [dask.delayed(self.load_daily_data)(i,dates) for i in params]
+        #        print dfs
+        # dff = dd.from_delayed(dfs)
+        # self.d_df = dff.compute()
+        dfs = [self.load_all_daily_data(i, dates) for i in params]
         self.d_df = self.change_units(self.d_df)
         os.chdir(self.cwd)
 
-    def get_all_hourly_data(self,dates):
+    def get_all_hourly_data(self, dates):
         os.chdir(self.datadir)
         dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
-                   self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
-                   self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
-                   self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]
+               self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
+               self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
+               self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]
         os.chdir(self.cwd)
 
     def load_all_hourly_data(self, dates, datasets='all'):
@@ -674,7 +680,8 @@ class aqs:
             dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
                    self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(dates), self.load_aqs_no2_data(dates),
                    self.load_aqs_so2_data(dates), self.load_aqs_voc_data(dates), self.load_aqs_nonoxnoy_data(dates),
-                   self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]#,self.load_aqs_daily_spec_data(dates)]
+                   self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates),
+                   self.load_aqs_rhdp_data(dates)]  # ,self.load_aqs_daily_spec_data(dates)]
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).drop_duplicates()
         os.chdir(self.cwd)
@@ -758,7 +765,7 @@ class aqs:
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
         return aqs
-    
+
     def load_aqs_daily_temp_data(self, dates):
         year = dates[0].strftime('%Y')
         fname = self.datadir + '/' + 'AQS_DAILY_TEMP_' + year + '.hdf'
@@ -771,7 +778,7 @@ class aqs:
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
         return aqs
-    
+
     def load_aqs_daily_rh_dp_data(self, dates):
         year = dates[0].strftime('%Y')
         fname = self.datadir + '/' + 'AQS_DAILY_RH_DP_' + year + '.hdf'
@@ -797,7 +804,7 @@ class aqs:
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
         return aqs
-        
+
     def load_aqs_daily_voc_data(self, dates):
         year = dates[0].strftime('%Y')
         fname = self.datadir + '/' + 'AQS_DAILY_VOC_' + year + '.hdf'
@@ -810,7 +817,7 @@ class aqs:
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
         return aqs
-        
+
     def load_aqs_daily_wind_data(self, dates):
         year = dates[0].strftime('%Y')
         fname = self.datadir + '/' + 'AQS_DAILY_WIND_' + year + '.hdf'
@@ -853,13 +860,13 @@ class aqs:
             if i == 44201:
                 df.loc[con, 'Species'] = 'OZONE'
             if i == 81102:
-                df.loc[con, 'Species'] = 'PM10' 
+                df.loc[con, 'Species'] = 'PM10'
             if i == 42401:
                 df.loc[con, 'Species'] = 'SO2'
             if i == 42602:
                 df.loc[con, 'Species'] = 'NO2'
             if i == 42101:
-                df.loc[con, 'Species'] = 'CO' 
+                df.loc[con, 'Species'] = 'CO'
             if i == 62101:
                 df.loc[con, 'Species'] = 'TEMP'
             if i == 88305:
@@ -886,7 +893,7 @@ class aqs:
                 df.loc[con, 'Species'] = 'Cdf'
             if i == 88111:
                 df.loc[con, 'Species'] = 'Caf'
-            if i ==88117:
+            if i == 88117:
                 df.loc[con, 'Species'] = 'Cef'
             if i == 88118:
                 df.loc[con, 'Species'] = 'Csf'
@@ -1049,9 +1056,11 @@ class aqs:
                 fname = self.monitor_file
                 colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
                 f = pd.read_csv(fname, delimiter='|', header=None, usecols=colsinuse)
-                f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
-                         'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
-                         'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
+                f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region',
+                             'Latitude',
+                             'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name',
+                             'MSA_Code',
+                             'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
 
                 self.monitor_df = f.drop_duplicates().dropna(subset=['SCS']).copy()
                 self.monitor_df.SCS = self.monitor_df.SCS.values.astype('int32')
@@ -1059,18 +1068,20 @@ class aqs:
                 print '   Monitor File not found.  Meta-Data city names not added'
                 f = None
 
-    def add_metro_metadata2(self,df):
+    def add_metro_metadata2(self, df):
         from numpy import NaN
         if type(self.monitor_df) != type(None):
-            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region','MSA_Code','GMT_Offset']].drop_duplicates()
+            dfs = self.monitor_df[['SCS', 'MSA_Name', 'State_Name', 'County_Name', 'EPA_region', 'MSA_Code',
+                                   'GMT_Offset']].drop_duplicates()
             dfs.SCS = dfs.SCS.values.astype('int32')
-            df = pd.merge(df,dfs,on=['SCS'],how='left')
+            df = pd.merge(df, dfs, on=['SCS'], how='left')
         elif os.path.isfile(self.monitor_file):
             print '    Monitor Station Meta-Data Found: Compiling Dataset'
             self.read_monitor_file()
-            dfs = self.monitor_df[['SCS', 'MSA_Name','State_Name','County_Name','EPA_region','GMT_Offset']].drop_duplicates()
+            dfs = self.monitor_df[
+                ['SCS', 'MSA_Name', 'State_Name', 'County_Name', 'EPA_region', 'GMT_Offset']].drop_duplicates()
             dfs.SCS = dfs.SCS.values.astype('int32')
-            df = pd.merge(df,dfs,on=['SCS'],how='left')
+            df = pd.merge(df, dfs, on=['SCS'], how='left')
         return df
 
     def retrieve_aqs_daily_voc_data(self, dates):
@@ -1084,31 +1095,31 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-#        ZipFile(filename).extractall()
+        #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_VOC_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_VOC_' + year + '.hdf', 'df', format='table')
         return df
-    
+
     def retrieve_aqs_daily_temp_data(self, dates):
         import wget
         from numpy import NaN, int64
@@ -1125,25 +1136,25 @@ class aqs:
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_TEMP_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_TEMP_' + year + '.hdf', 'df', format='table')
         return df
-    
+
     def retrieve_aqs_daily_rh_dp_data(self, dates):
         import wget
         from numpy import NaN, int64
@@ -1160,20 +1171,20 @@ class aqs:
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_RH_DP_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_RH_DP_' + year + '.hdf', 'df', format='table')
@@ -1190,26 +1201,26 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-#        ZipFile(filename).extractall()
+        #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_WIND_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_WIND_' + year + '.hdf', 'df', format='table')
@@ -1226,26 +1237,26 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-#        ZipFile(filename).extractall()
+        #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_CO_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_CO_' + year + '.hdf', 'df', format='table')
@@ -1262,26 +1273,26 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-#        ZipFile(filename).extractall()
+        #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_OZONE_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_OZONE_' + year + '.hdf', 'df', format='table')
@@ -1298,26 +1309,26 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-#        ZipFile(filename).extractall()
+        #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
 
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_NO2_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_NO2_' + year + '.hdf', 'df', format='table')
@@ -1334,26 +1345,26 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-#        ZipFile(filename).extractall()
+        #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SO2_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_SO2_' + year + '.hdf', 'df', format='table')
@@ -1370,26 +1381,26 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-#        ZipFile(filename).extractall()
+        #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_PM10_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_PM10_' + year + '.hdf', 'df', format='table')
@@ -1408,10 +1419,10 @@ class aqs:
             print 'Unpacking: ' + url
             dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
             df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
-                         date_parser=dateparse)
+                             date_parser=dateparse)
             df.columns = self.renameddcols
             df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
-                          dtype='int32')
+                              dtype='int32')
         else:
             df = pd.DataFrame()
         url2 = self.baseurl + 'daily_88502_' + year + '.zip'
@@ -1420,28 +1431,28 @@ class aqs:
             filename = wget.download(url2)
             dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
             df2 = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
-                             date_parser=dateparse)
+                              date_parser=dateparse)
             df2.columns = self.renameddcols
             df2['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
-                              dtype='int32')
+                               dtype='int32')
         else:
             df2 = pd.DataFrame()
         if self.check_file_size(url) | self.check_file_size(url2):
-            df = pd.concat([df,df2],ignore_index=True)
-            df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-            df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-            df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-            df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-            df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-            df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-            df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-            df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-            df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-            df.dropna(subset=['Parameter_Code'],inplace=True)
-            df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+            df = pd.concat([df, df2], ignore_index=True)
+            df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+            df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+            df.dropna(subset=['Parameter_Code'], inplace=True)
+            df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
             df = self.read_monitor_and_site(df)
             df['SCS'] = df.SCS.astype(str).str.zfill(9)
-            df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+            df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
             df = self.get_species(df)
             df.to_hdf('AQS_DAILY_PM25_' + year + '.hdf', 'df', format='table')
         else:
@@ -1459,41 +1470,44 @@ class aqs:
         print ''
         print 'Unpacking: ' + url
         dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
-#        ZipFile(filename).extractall()
+        #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
         df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
                           dtype='int32')
-        df.loc[df.Parameter_Code == 68101,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68102,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68108,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68103,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68105,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68104,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68106,'Parameter_Code'] = NaN
-        df.loc[df.Parameter_Code == 68107,'Parameter_Code'] = NaN
-        df.dropna(subset=['Parameter_Code'],inplace=True)
-        df.loc[:,'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
-        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset,unit='h')
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-#        df['datetime'] =
+        #        df['datetime'] =
         print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_SPEC_' + year + '.hdf'
         df.to_hdf('AQS_DAILY_SPEC_' + year + '.hdf', 'df', format='table')
         return df
 
-    def read_monitor_and_site(self,df):
-        site_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_sites.zip' #has GMT Land Use and Location Setting (RURAL URBAN etc...)
-        monitor_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_monitors.zip' #has network info (CSN IMPROVE etc....)
+    def read_monitor_and_site(self, df):
+        site_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_sites.zip'  # has GMT Land Use and Location Setting (RURAL URBAN etc...)
+        monitor_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_monitors.zip'  # has network info (CSN IMPROVE etc....)
         site = pd.read_csv(site_url)
-        monitor = pd.read_csv(monitor_url,index_col=None,usecols=range(29))
-        site['SCS'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site['Site Number'].astype(str).str.zfill(4)
-        monitor['SCS'] = monitor['State Code'].astype(str).str.zfill(2) + monitor['County Code'].astype(str).str.zfill(3) + monitor['Site Number'].astype(str).str.zfill(4)
-        site.columns = [i.replace(' ','_') for i in site.columns]
-        s = monitor.merge(site[['SCS','Land_Use', 'Location_Setting','GMT_Offset']],on=['SCS'],how='left')
-        s.columns = [i.replace(' ','_') for i in s.columns]
-        s['SCS'] = pd.to_numeric(s.SCS,errors='coerce')
-        return df.merge(s[['SCS', u'GMT_Offset', 'Networks',u'Land_Use',u'Location_Setting','Parameter_Code']],on=['SCS','Parameter_Code'],how='left')
+        monitor = pd.read_csv(monitor_url, index_col=None, usecols=range(29))
+        site['SCS'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site[
+            'Site Number'].astype(str).str.zfill(4)
+        monitor['SCS'] = monitor['State Code'].astype(str).str.zfill(2) + monitor['County Code'].astype(str).str.zfill(
+            3) + monitor['Site Number'].astype(str).str.zfill(4)
+        site.columns = [i.replace(' ', '_') for i in site.columns]
+        s = monitor.merge(site[['SCS', 'Land_Use', 'Location_Setting', 'GMT_Offset']], on=['SCS'], how='left')
+        s.columns = [i.replace(' ', '_') for i in s.columns]
+        s['SCS'] = pd.to_numeric(s.SCS, errors='coerce')
+        return df.merge(s[['SCS', u'GMT_Offset', 'Networks', u'Land_Use', u'Location_Setting', 'Parameter_Code']],
+                        on=['SCS', 'Parameter_Code'], how='left')

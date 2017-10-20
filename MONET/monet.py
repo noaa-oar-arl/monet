@@ -66,9 +66,9 @@ def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, ra
         from pandas import read_hdf
         va.airnow.df = read_hdf(datapath)
     else:
-        va.airnow.download_hourly_files(path=datapath)
+       # va.airnow.download_hourly_files(path=datapath)
         va.airnow.aggragate_files(airnowoutput)
-    va.airnow.datadir = datapath
+    #va.airnow.datadir = datapath
     if combine:
         va.combine(interp=interp, radius=radius)
     return va
