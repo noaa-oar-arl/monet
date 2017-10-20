@@ -55,114 +55,16 @@ def compare_param(df, param='OZONE', site='', city='', region='', state='', time
     if timeseries_mb:
         plots.timeseries_mb_param(df2, title=title, label=label, fig=fig, footer=footer)
     if taylordiagram:
-        if marker is None: marker = 'o'
-            if fig is None:
-                dia = plots.taylordiagram(df2, label=label, dia=dia, addon=False,marker=marker)
-                return dia
-            else:
-                dia = plots.taylordiagram(df2, label=label, dia=dia, addon=True,marker=marker)
-                plt.legend()
-                return dia
-
-def spatial( df, cmaqvar,m,param='OZONE', path='', region='', date='', xlim=[], ylim=[], vmin=0, vmax=150, ncolors=16,
-            cmap='YlGnBu'):
-    """
-    :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
-    :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'
-    :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time
-    :return:
-    """
-    from numpy.ma import masked_less
-    
-    g = df.groupby('Species')
-    df2 = g.get_group(param)
-        
-    cmaq = masked_less(cmaqvar, .001)
-    if date == '':
-        for index, i in enumerate(self.cmaq.dates):
-            c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index],
-                                        m, vmin=vmin, vmax=vmax)
-            plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin, vmax=vmax)
-            c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-            if len(xlim) > 1:
-                plt.xlim([min(xlim), max(xlim)])
-                plt.ylim([min(ylim), max(ylim)])
-                
-    else:
-        index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
-        c = plots.make_spatial_plot(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,
-                                    vmin=vmin, vmax=vmax, ncolors=ncolors, cmap=cmap)
-        plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=vmin, vmax=vmax,
-                              ncolors=ncolors, cmap=cmap)
-        c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-        if len(xlim) > 1:
-            plt.xlim([min(xlim), max(xlim)])
-            plt.ylim([min(ylim), max(ylim)])
-            
-def spatial_contours(df, cmaqvar,m,cmap=None,levels=None,param='OZONE', path='', region='', date='', xlim=[], ylim=[]):
-        """                                                                                                                                                                                             
-        :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'                                                                                               
-        :param region: EPA Region: 'Northeast', 'Southeast', 'North Central', 'South Central', 'Rockies', 'Pacific'                                                                                     
-        :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time                                                                                                     
-        :return:                                                                                                                                                                                        
-        """
-        import colorbars
-        from numpy import unique
-        
-        g = df.groupby('Species')
-        df2 = g.get_group(param)
-        param = param.upper()
-        cmaq = cmaqvar
-        if isinstance(cmaq, type(None)):
-            print 'This parameter is not in the CMAQ file: ' + param
+        if marker is None: 
+            marker = 'o'
+        if fig is None:
+            dia = plots.taylordiagram(df2, label=label, dia=dia, addon=False,marker=marker)
+            return dia
         else:
-            if date == '':
-                for index, i in enumerate(self.cmaq.dates):
-                    c = plots.make_spatial_contours(cmaq[index, :, :].squeeze(), self.cmaq.gridobj,
-                                                    self.cmaq.dates[index],
-                                                    m, levels=levels, cmap=cmap, units='xy')
-                    if not isinstance(self.cmaq.metcro2d, type(None)):
-                        ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
-                        wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
-                        plots.wind_barbs(ws, wdir, self.cmaq.gridobj, color='grey', alpha=.5)
-                    try:
-                        plots.spatial_scatter(df2, m, i.strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0], vmax=levels[-1],
-                                     cmap=cmap, discrete=False)
-                    except:
-                        pass
-                    c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                    c.set_ticks(unique(levels.round(-1)))
-                    if len(xlim) > 1:
-                        plt.xlim([min(xlim), max(xlim)])
-                        plt.ylim([min(ylim), max(ylim)])
-                    plt.savefig(str(index + 10) + param + '.jpg', dpi=100)
-                    plt.close()
+            dia = plots.taylordiagram(df2, label=label, dia=dia, addon=True,marker=marker)
+            plt.legend()
+            return dia
 
-            else:
-                index = where(self.cmaq.dates == datetime.strptime(date, '%Y-%m-%d %H:%M'))[0][0]
-                c = plots.make_spatial_contours(cmaq[index, :, :].squeeze(), self.cmaq.gridobj, self.cmaq.dates[index], m,
-                                                levels=levels, cmap=cmap, units='xy')
-                if not isinstance(self.cmaq.metcro2d, type(None)):
-                    ws = self.cmaq.metcro2d.variables['WSPD10'][index, :, :, :].squeeze()
-                    wdir = self.cmaq.metcro2d.variables['WDIR10'][index, :, :, :].squeeze()
-                    plots.wind_barbs(ws, wdir, self.cmaq.gridobj, m, color='black', alpha=.3)
-                try:
-                    plots.spatial_scatter(df2, m, self.cmaq.dates[index].strftime('%Y-%m-%d %H:%M:%S'), vmin=levels[0],
-                                      vmax=levels[-1], cmap=cmap, discrete=False)
-                except:
-                    pass
-                c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
-                c.set_ticks(unique(levels.round(-1)))
-                if len(xlim) > 1:
-                    plt.xlim([min(xlim), max(xlim)])
-                    plt.ylim([min(ylim), max(ylim)])
-            cmap, levels = colorbars.noxcmap()
-        elif param == 'NOY':
-            cmaq = self.cmaqnoy
-            cmap, levels = colorbars.noxcmap()
-        elif param == 'SO2':
-            cmaq = self.cmaqso2
-        
 def ensure_values_indomain(df,lon,lat):
      con = ((df.Latitude.values > lat.min()) & (df.Latitude.values < lat.max()) & (
              df.Longitude.values > lon.min()) & (df.Longitude.values < lon.max()))
