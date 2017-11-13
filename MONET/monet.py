@@ -2,8 +2,7 @@
 
 # this is done to make creating verifications easier
 
-def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
-               interp='gauss', species='all',daily=False):
+def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., species='all',daily=False):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -33,14 +32,13 @@ def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radiu
     else:
         va.aqs.load_all_hourly_data(va.aqs.dates, datasets=species)
     if combine and daily:
-        va.combine_daily(interp=interp,radius=radius,neighbors=neighbors)
+        va.combine_daily(radius=radius)
     elif combine:
-        va.combine(interp=interp, radius=radius, neighbors=neighbors)
+        va.combine( radius=radius)
     return va
 
 
-def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
-                  interp='gauss', airnowoutput=''):
+def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., airnowoutput=''):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -59,7 +57,7 @@ def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, ra
     va = verify_airnow()
     va.cmaq.open_cmaq(file=concpath)
     va.cmaq.set_gridcro2d(gridcro)
-    va.airnow.dates = va.cmaq.conc.TSTEP.to_index() 
+    va.airnow.dates = va.cmaq.conc.TSTEP.to_index()
     if pd.Series(met2dpath).notnull().max():
         va.cmaq.open_metcro2d(met2dpath)
     if datapath[-4:] == '.hdf':
@@ -70,12 +68,11 @@ def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, ra
         va.airnow.aggragate_files(airnowoutput)
     #va.airnow.datadir = datapath
     if combine:
-        va.combine(interp=interp, radius=radius)
+        va.combine( radius=radius)
     return va
 
 
-def vimprove(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
-                   interp='gauss'):
+def vimprove(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000.):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -102,13 +99,12 @@ def vimprove(concpath='', gridcro='', met2dpath='', datapath='', combine=True, r
         va.improve.load_hdf(datapath,va.cmaq.dates)
     else:
         va.improve.open(datapath)
-    
+
     if combine:
-        va.combine(interp=interp, radius=radius, neighbors=neighbors)
+        va.combine( radius=radius)
     return va
 
-def vcrn(gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
-         interp='gauss', species='all'):
+def vcrn(gridcro='', met2dpath='', datapath='', combine=True, radius=12000., species='all'):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -135,5 +131,5 @@ def vcrn(gridcro='', met2dpath='', datapath='', combine=True, radius=12000., nei
 #    va.crn.monitor_file = __file__[:-15] + '/data/stations.tsv'
     va.crn.read_monitor_file()
     if combine:
-        va.combine(interp=interp, radius=radius, neighbors=neighbors)
+        va.combine(radius=radius)
     return va
