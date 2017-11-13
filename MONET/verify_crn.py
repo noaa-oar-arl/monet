@@ -48,7 +48,7 @@ class verify_crn:
         print 'Simulation End   Date: ', self.cmaq.dates[-1].strftime('%Y-%m-%d %H:%M')
         print '===============================================================\n'
         if self.cmaq.metcro2d is None:
-            print 'METCRO2D file not loaded.  To include MET variables please load self.cmaq.open_metcro2d(\'filename\')\n'
+            print 'METCRO2D file not loaded.  To include MET variables please load self.camx.open_metcro2d(\'filename\')\n'
         self.ensure_values_indomain()
         comparelist = self.crn.df.Species.unique()
         g = self.crn.df.groupby('Species')

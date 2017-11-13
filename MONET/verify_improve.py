@@ -3,7 +3,7 @@ from datetime import datetime
 
 import matplotlib.pyplot as plt
 from numpy import array, where, sort
-from pandas import concat,merge
+from pandas import concat, merge
 
 import mystats
 import plots
@@ -32,7 +32,7 @@ class verify_improve:
         self.cmaqal = None
         self.cmaqti = None
 
-    def combine(self, interp='nearest', radius=12000. * 2, neighbors=10., weight_func=lambda r: 1 / r ** 2):
+    def combine(self, interp='nearest', radius=12000. * 2):
         print 'Acquiring Dates of CMAQ Simulation'
         print '==============================================================='
         self.cmaq.get_dates()
@@ -40,7 +40,7 @@ class verify_improve:
         print 'Simulation End   Date: ', self.cmaq.dates[-1].strftime('%Y-%m-%d %H:%M')
         print '===============================================================\n'
         if self.cmaq.metcro2d is None:
-            print 'METCRO2D file not loaded.  To include MET variables please load self.cmaq.open_metcro2d(\'filename\')\n'
+            print 'METCRO2D file not loaded.  To include MET variables please load self.camx.open_metcro2d(\'filename\')\n'
         self.ensure_values_indomain()
         comparelist = sort(self.improve.df.Species.unique())
         g = self.improve.df.groupby('Species')
@@ -52,7 +52,7 @@ class verify_improve:
                     print 'Interpolating CLf:'
                     dfpm25 = g.get_group(i)
                     fac = self.check_cmaq_units(param='CLf', improve_param=i)
-                    cmaq = self.cmaq.get_surface_cmaqvar(param='CLf').compute() * fac
+                    cmaq = self.cmaq.get_cmaqvar(lay=0, param='CLf').compute() * fac
                     dfpm25 = self.interp_to_improve(cmaq, dfpm25, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqpm25 = cmaq
                     dfs.append(dfpm25)
@@ -62,7 +62,7 @@ class verify_improve:
                 print 'Interpolating PM10:'
                 dfpm = g.get_group(i)
                 fac = self.check_cmaq_units(param='PM10', improve_param=i)
-                cmaqvar = self.cmaq.get_surface_cmaqvar(param='PM10').compute() * fac
+                cmaqvar = self.cmaq.get_var(lay=0, param='PM10').compute() * fac
                 dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                 self.cmaqpm10 = cmaqvar
                 dfs.append(dfpm)
@@ -70,7 +70,7 @@ class verify_improve:
                 print 'Interpolating PM25:'
                 dfpm = g.get_group(i)
                 fac = self.check_cmaq_units(param='PM25', improve_param=i)
-                cmaqvar = self.cmaq.get_surface_cmaqvar(param='PM25').compute() * fac
+                cmaqvar = self.cmaq.get_var(lay=0, param='PM25').compute() * fac
                 dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                 self.cmaqpm25 = cmaqvar
                 dfs.append(dfpm)
@@ -79,7 +79,7 @@ class verify_improve:
                     print 'Interpolating NAf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NAf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='NAf').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='NAf').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqna = cmaqvar
                     dfs.append(dfpm)
@@ -90,7 +90,7 @@ class verify_improve:
                     print 'Interpolating MGf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='MGf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='AMGJ').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='AMGJ').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqmg = cmaqvar
                     dfs.append(dfpm)
@@ -101,7 +101,7 @@ class verify_improve:
                     print 'Interpolating TIj:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='TIj', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='ATIJ').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='ATIJ').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqti = cmaqvar
                     dfs.append(dfpm)
@@ -112,7 +112,7 @@ class verify_improve:
                     print 'Interpolating SIf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='SIj', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='ASIJ').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='ASIJ').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqti = cmaqvar
                     dfs.append(dfpm)
@@ -123,7 +123,7 @@ class verify_improve:
                     print 'Interpolating Kf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='Kf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='Kf').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='Kf').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqk = cmaqvar
                     dfs.append(dfpm)
@@ -134,7 +134,7 @@ class verify_improve:
                     print 'Interpolating CAf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='CAf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='ACAJ').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='ACAJ').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqca = cmaqvar
                     dfs.append(dfpm)
@@ -145,7 +145,7 @@ class verify_improve:
                     print 'Interpolating SO4f:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='SO4f', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='SO4f').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='SO4f').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqso4 = cmaqvar
                     dfs.append(dfpm)
@@ -156,7 +156,7 @@ class verify_improve:
                     print 'Interpolating NH4f:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NH4f', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='NH4f').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='NH4f').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqnh4 = cmaqvar
                     dfs.append(dfpm)
@@ -165,14 +165,14 @@ class verify_improve:
             elif i == 'ammSO4f':
                 if ('ANH4I' in self.cmaq.keys) | ('ANH4J' in self.cmaq.keys) | ('PM25_NH4' in self.cmaq.keys):
                     print 'Interpolating NH4f:'
-                    dfpmso4 = g.get_group(i) 
+                    dfpmso4 = g.get_group(i)
                     dfpmno3 = g.get_group('ammNO3f')
                     dfpmso4.Species = 'NH4f'
-                    dfpm = merge(dfpmso4,dfpmno3[['Obs','datetime','Site_Code']],on=['datetime','Site_Code'])
-                    dfpm.rename(columns={'Obs_x':'Obs'},inplace=True)
-                    dfpm.Obs = 2*dfpm.Obs * 18. / 132. + dfpm.Obs_y * 18. / 80.
-                    dfpm.drop('Obs_y',axis=1,inplace=True)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='NH4f')
+                    dfpm = merge(dfpmso4, dfpmno3[['Obs', 'datetime', 'Site_Code']], on=['datetime', 'Site_Code'])
+                    dfpm.rename(columns={'Obs_x': 'Obs'}, inplace=True)
+                    dfpm.Obs = 2 * dfpm.Obs * 18. / 132. + dfpm.Obs_y * 18. / 80.
+                    dfpm.drop('Obs_y', axis=1, inplace=True)
+                    cmaqvar = self.cmaq.get_var(lay=0, param='NH4f')
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqnh4 = cmaqvar
                     dfs.append(dfpm)
@@ -183,7 +183,7 @@ class verify_improve:
                     print 'Interpolating NO3f:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='NO3f', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='NO3f').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='NO3f').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqno3 = cmaqvar
                     dfs.append(dfpm)
@@ -194,7 +194,7 @@ class verify_improve:
                     print 'Interpolating FEf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='FEf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='AFEJ').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='AFEJ').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqfe = cmaqvar
                     dfs.append(dfpm)
@@ -205,7 +205,7 @@ class verify_improve:
                     print 'Interpolating ALf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='ALf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='AALF').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='AALF').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqal = cmaqvar
                     dfs.append(dfpm)
@@ -216,7 +216,7 @@ class verify_improve:
                     print 'Interpolating MNf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='MNf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='AMNJ').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='AMNJ').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqmn = cmaqvar
                     dfs.append(dfpm)
@@ -227,7 +227,7 @@ class verify_improve:
                     print 'Interpolating OCf:'
                     dfpm = g.get_group(i)
                     fac = self.check_cmaq_units(param='OCf', improve_param=i)
-                    cmaqvar = self.cmaq.get_surface_cmaqvar(param='OC').compute() * fac
+                    cmaqvar = self.cmaq.get_var(lay=0, param='OC').compute() * fac
                     dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
                     self.cmaqmn = cmaqvar
                     dfs.append(dfpm)
@@ -235,7 +235,7 @@ class verify_improve:
                     pass
 
         self.df = concat(dfs)
-        self.df.dropna(subset=['Obs','CMAQ'],inplace=True)
+        self.df.dropna(subset=['Obs', 'CMAQ'], inplace=True)
         self.df.SCS = self.df.SCS.values.astype('int32')
         self.print_available()
         return dfpm
@@ -256,11 +256,11 @@ class verify_improve:
         if epasite != '':
             if epasite in new.SCS.unique():
                 df2 = new.loc[new.SCS == epasite]
-                title=epasite
+                title = epasite
         elif improvesite != '':
             if improvesite in new.Site_Code.unique():
                 df2 = new.loc[new.Site_Code == improvesite]
-                title= improvesite
+                title = improvesite
         elif state != '':
             names = df.State_Name.dropna().unique()
             for i in names:
@@ -372,7 +372,7 @@ class verify_improve:
         dfs = pd.concat([vals, date, site, utcoffset], axis=1, keys=['CMAQ', 'datetime', 'Site_Code', 'utcoffset'])
         dfs.index = dfs.datetime
         r = dfs.groupby('Site_Code').resample('24H').mean().reset_index()
-        df = pd.merge(df, r, how='left', on=['Site_Code', 'datetime','utcoffset']).dropna(subset=['CMAQ'])
+        df = pd.merge(df, r, how='left', on=['Site_Code', 'datetime', 'utcoffset']).dropna(subset=['CMAQ'])
         df['Obs'][df['Obs'] < 0] = NaN
         df.dropna(subset=['Obs'], inplace=True)
         return df
