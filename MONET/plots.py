@@ -4,7 +4,7 @@ import mystats
 import taylordiagram as td
 from colorbars import colorbar_index
 #colors = ['#1e90ff','#045C5C','#00A847','#DB4291','#BB7E5D']
-colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
+colors = ['#1e90ff','#DA70D6', '#228B22', '#FA8072', '#FF1493']
 sns.set_palette(sns.color_palette(colors))
 
 sns.set_context('poster')
@@ -34,7 +34,7 @@ def make_spatial_plot(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, 
 def make_spatial_plot2(cmaqvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
     #create figure
     f,ax = plt.subplots(1,1,figsize=(11, 6), frameon=False)
-    #determine colorbar 
+    #determine colorbar
     if 'cmap' not in plotargs:
         plotargs['cmap'] = 'viridis'
     if discrete and 'vmin' in plotargs and 'vmax' in plotargs:
@@ -57,8 +57,8 @@ def make_spatial_plot2(cmaqvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
     m.drawstates()
     m.drawcoastlines(linewidth=.3)
     m.drawcountries()
-    return f,ax,c,cmap,vmin,vmax    
-    
+    return f,ax,c,cmap,vmin,vmax
+
 
 def make_spatial_plot_no_obs(cmaqvar, gridobj, date, m, dpi=None, savename='', vmin=0, vmax=150, ncolors=15, cmap='viridis'):
     fig = plt.figure(figsize=(11, 6), frameon=False)
@@ -199,7 +199,7 @@ def eight_hr_spatial_scatter(df, m, date, savename=''):
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
 
-def timeseries_param_new(df, col='Obs',ax=None, sample='H', plotargs={},fillargs={}):
+def timeseries_param_new(df, col='Obs',ax=None, sample='H', plotargs={},fillargs={},title='',label=None):
     import pandas as pd
 
     if ax is None:
@@ -208,11 +208,11 @@ def timeseries_param_new(df, col='Obs',ax=None, sample='H', plotargs={},fillargs
     sns.set_palette(sns.color_palette(colors))
     sns.set_style('ticks')
     df.index = df.datetime
-    m = df.groupby(pd.TimeGrouper(sample)).mean()
-    e = df.groupby(pd.TimeGrouper(sample)).std()
+    m = df.groupby(pd.Grouper(freq=sample)).mean()
+    e = df.groupby(pd.Grouper(freq=sample)).std()
     species = df.Species[0]
     unit = df.Units[0]
-    upper = (m[col] + e[col]).values
+    upper = m[col] + e[col]
     lower = m[col] - e[col]
     lower.loc[lower < 0] = 0
     lower = lower.values
@@ -220,27 +220,29 @@ def timeseries_param_new(df, col='Obs',ax=None, sample='H', plotargs={},fillargs
     if col=='Obs': fillargs['color'] = 'darkslategrey'
     if col!='Obs' and 'color' not in plotargs: plotargs['color'] = None
 
-    ax.plot(m[col], **plotargs)
-#    print m[col].shape,lower.shape,upper,shape
+    m[col].plot(ax=ax, **plotargs)
     ax.fill_between(m[col].index,lower,upper,**fillargs)
-    plt.gcf().autofmt_xdate()
-    ax.set_ylabel(species + ' (' + unit + ')')
+    if label is None:
+        ax.set_ylabel(species + ' (' + unit + ')')
+    else:
+        ax.set_ylabel(label)
     plt.legend()
+    plt.title(title)
+    plt.tight_layout()
     return ax
 
 def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True, sample='H'):
-    """                                                                                                                                                                                                                          
-                                                                                                                                                                                                                                 
-    :param df: pandas dataframe from a monet verification object                                                                                                                                                                 
-    :param title:                                                                                                                                                                                                                
-    :param fig:                                                                                                                                                                                                                  
-    :param label:                                                                                                                                                                                                                
-    :param color:                                                                                                                                                                                                                
-    :param footer:                                                                                                                                                                                                               
-    :param sample:                                                                                                                                                                                                               
+    """
+    :param df: pandas dataframe from a monet verification object
+    :param title:
+    :param fig:
+    :param label:
+    :param color:
+    :param footer:
+    :param sample:
     """
     import matplotlib.dates as mdates
-    from numpy import isnan,NaN,nanmax,nanmin
+    from numpy import isnan,NaN,nanmax,nanmin,isfinite
     sns.set_style('ticks')
     df.index = df.datetime
     if fig is None:
@@ -267,7 +269,7 @@ def timeseries_param(df, title='', fig=None, label=None, color=None, footer=True
         plt.plot(cmaq, color='dodgerblue', label=label)
         plt.legend(loc='best')
 
-        mask = ~isnan(obs) & ~isnan(obserr)
+        mask = isfinite(obs) & isfinite(obserr)
         plt.fill_between(obs.index[mask], (obs - obserr)[mask], (obs + obserr)[mask], alpha=.2, color='darkslategrey')
         mask = ~isnan(cmaq) & ~isnan(cmaqerr)
         plt.fill_between(cmaq.index[mask], (cmaq - cmaqerr)[mask], (cmaq + cmaqerr)[mask], alpha=.2, color='dodgerblue')

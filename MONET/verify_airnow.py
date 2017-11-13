@@ -224,13 +224,16 @@ class verify_airnow:
                       scatter=False,
                       pdfs=False,
                       diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
-                      taylordiagram=False, fig=None, label=None, footer=False, dia=None, marker=None):
+                      taylordiagram=False, ax=None, label=None, footer=False, dia=None, marker=None):
         from numpy import NaN
         from utils import get_epa_location_df
         df2, title = get_epa_location_df(self.df.copy(), param, site=site, city=city, state=state, region=region,
                                          epa_region=epa_region)
+        df2 = df2.groupby('Species').get_group(param)
         if timeseries:
-            plots.timeseries_param(df2, title=title, label=label, fig=fig, footer=footer)
+            if ax is None:
+                ax = plots.timeseries_param_new(df2, col='Obs',title=title, label=label, ax=ax, plotargs={'color':'darkslategrey'},fillargs={'color':'darkslategrey','alpha':.2})
+            ax = plots.timeseries_param_new(df2, col='CMAQ',title=title, label=label, ax=ax, fillargs={'alpha':.2})
         if scatter:
             plots.scatter_param(df2, title=title, label=label, fig=fig, footer=footer)
         if pdfs:
