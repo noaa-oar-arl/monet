@@ -2,8 +2,7 @@
 
 # this is done to make creating verifications easier
 
-def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., neighbors=5,
-               interp='gauss', species='all'):
+def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radius=12000., species='all'):
     """
 
     :param concpath: The path to the concetration file / files: example: 'CMAQ/aqm.*.aconc.ncf'
@@ -26,13 +25,13 @@ def vaqs(concpath='', gridcro='', met2dpath='', datapath='', combine=True, radiu
     if met2dpath != '':
         va.cmaq.open_metcro2d(met2dpath)
     va.aqs.datadir = datapath
-    #va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
+    #va.aqs.load_all_hourly_data(va.camx.dates, datasets=species)
 #    va.aqs.monitor_file = __file__[:-15] + '/data/monitoring_site_locations.dat'
  #   print va.aqs.monitor_file
     va.aqs.read_monitor_file()
     va.aqs.load_all_hourly_data(va.cmaq.dates, datasets=species)
     if combine:
-        va.combine(interp=interp, radius=radius, neighbors=neighbors)
+        va.combine(radius=radius)
     return va
 
 
@@ -71,7 +70,7 @@ def vairnow(concpath='', gridcro='', met2dpath='', datapath='', combine=True, ra
         va.airnow.read_monitor_file()
     va.airnow.datadir = datapath
     if combine:
-        va.combine(interp=interp, radius=radius, neighbors=neighbors)
+        va.combine(radius=radius)
     return va
 
 
@@ -105,7 +104,7 @@ def vimprove(concpath='', gridcro='', met2dpath='', datapath='', combine=True, r
         va.improve.open(datapath)
 
     if combine:
-        va.combine(interp=interp, radius=radius, neighbors=neighbors)
+        va.combine(radius=radius)
     return va
 
 

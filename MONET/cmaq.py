@@ -1,11 +1,11 @@
 # This file is to deal with CMAQ code - try to make it general for cmaq 4.7.1 --> 5.1
-import cPickle as pickle
 from gc import collect
+
 import pandas as pd
 import xarray as xr
-from netCDF4 import Dataset, MFDataset
-from numpy import array, zeros
 from dask.diagnostics import ProgressBar
+from numpy import array, zeros
+
 ProgressBar().register()
 from tools import search_listinlist
 
@@ -44,10 +44,10 @@ class cmaq:
                           'AISO1J', 'AISO2J', 'AISO3J', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'AORGAI',
                           'AORGAJ', 'AORGPAI', 'AORGPAJ', 'AORGBI', 'AORGBJ'])
         self.minerals = array(['AALJ', 'ACAJ', 'AFEJ', 'AKJ', 'AMGJ', 'AMNJ', 'ANAJ', 'ATIJ', 'ASIJ'])
-        self.conc = None #concentration object
-        self.metcro2d = None # metcro2d obj
-        self.aerodiam = None # aerodiam obj
-        self.grid = None #gridcro2d obj
+        self.conc = None  # concentration object
+        self.metcro2d = None  # metcro2d obj
+        self.aerodiam = None  # aerodiam obj
+        self.grid = None  # gridcro2d obj
         self.fname = None
         self.metcrofnames = None
         self.aerofnames = None
@@ -62,46 +62,36 @@ class cmaq:
         self.map = None
 
     def get_conc_dates(self):
-        from datetime import datetime
-        from numpy import concatenate, arange
         print 'Reading CMAQ dates...'
         tflag1 = array(self.conc['TFLAG'][:, 0, 0], dtype='|S7')
         tflag2 = array(self.conc['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
-        date = [i + j.zfill(2) for i,j in zip(tflag1,tflag2)]
-        self.conc['TSTEP'] = pd.to_datetime(date,format='%Y%j%H')
+        date = [i + j.zfill(2) for i, j in zip(tflag1, tflag2)]
+        self.conc['TSTEP'] = pd.to_datetime(date, format='%Y%j%H')
         self.indexdates = pd.Series(date).drop_duplicates(keep='last').index.values
         self.dates = self.conc.TSTEP[self.indexdates].to_index()
-        
+        self.conc = self.conc.isel(TSTEP=self.indexdates)
+
     def get_metcro2d_dates(self):
-        from datetime import datetime
-        from pandas import DataFrame
-        from numpy import concatenate, arange
         print 'Reading CMAQ METCRO2D dates...'
         tflag1 = array(self.metcro2d['TFLAG'][:, 0, 0], dtype='|S7')
         tflag2 = array(self.metcro2d['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
-        date = [i + j.zfill(2) for i,j in zip(tflag1,tflag2)]
-        self.metcro2d['TSTEP'] = pd.to_datetime(date,format='%Y%j%H')
+        date = [i + j.zfill(2) for i, j in zip(tflag1, tflag2)]
+        self.metcro2d['TSTEP'] = pd.to_datetime(date, format='%Y%j%H')
         self.metindex = pd.Series(date).drop_duplicates(keep='last').index.values
-        self.metdates = self.conc.TSTEP[self.metindex].to_index()
+        self.metdates = self.metcro2d.TSTEP[self.metindex].to_index()
+        self.metcro2d = self.metcro2d.isel(TSTEP=self.metindex)
 
     def get_aerodiam_dates(self):
-        from datetime import datetime
-        from pandas import DataFrame
-        from numpy import concatenate, arange
         print 'Reading CMAQ METCRO2D dates...'
         tflag1 = array(self.aerodiam['TFLAG'][:, 0, 0], dtype='|S7')
         tflag2 = array(self.aerodiam['TFLAG'][:, 1, 1] / 10000, dtype='|S6')
-        date = [i + j.zfill(2) for i,j in zip(tflag1,tflag2)]
+        date = [i + j.zfill(2) for i, j in zip(tflag1, tflag2)]
         if 'AGRID' in self.conc.FILEDESC:
-            self.aerodiam['TSTEP'] = pd.to_datetime(date,format='%Y%j%H') + pd.TimeDelta
-        self.aerodiam['TSTEP'] = pd.to_datetime(date,format='%Y%j%H')
+            self.aerodiam['TSTEP'] = pd.to_datetime(date, format='%Y%j%H') + pd.TimeDelta
+        self.aerodiam['TSTEP'] = pd.to_datetime(date, format='%Y%j%H')
         self.aerodiamindex = pd.Series(date).drop_duplicates(keep='last').index.values
 
     def open_cmaq(self, file):
-        # file can be a single file or many files
-        # example:
-        #       file='this_is_my_file.ncf'
-        #       file='this_is_my_files*.ncf'
         from glob import glob
         from numpy import sort
         if type(file) == str:
@@ -109,14 +99,14 @@ class cmaq:
         else:
             self.fname = sort(array(file))
         if self.fname.shape[0] >= 1:
-#            print self.fname
-            self.conc = xr.open_mfdataset(self.fname.tolist(),concat_dim='TSTEP')
+            #            print self.fname
+            self.conc = xr.open_mfdataset(self.fname.tolist(), concat_dim='TSTEP')
         else:
             print 'Files not found'
         self.get_conc_dates()
         self.keys = self.conc.keys()
 
-    def open_metcro2d(self,f):
+    def open_metcro2d(self, f):
         from glob import glob
         from numpy import sort
         try:
@@ -127,14 +117,14 @@ class cmaq:
                 self.metcrofnames = sort(array(f))
                 print self.metcrofnames
             if self.metcrofnames.shape[0] >= 1:
-                self.metcro2d = xr.open_mfdataset(self.metcrofnames.tolist(),concat_dim='TSTEP')
-            self.metcrokeys =  self.metcro2d.keys()
+                self.metcro2d = xr.open_mfdataset(self.metcrofnames.tolist(), concat_dim='TSTEP')
+            self.metcrokeys = self.metcro2d.keys()
             self.get_metcro2d_dates()
         except:
             print 'METCRO2D Files Not Found'
             pass
 
-    def open_aerodiam(self,f):
+    def open_aerodiam(self, f):
         from glob import glob
         from numpy import sort
         try:
@@ -143,357 +133,417 @@ class cmaq:
             else:
                 self.aerodiamfnames = sort(array(f))
             if self.aerodiamfnames.shape[0] >= 1:
-                self.aerodiam2d = xr.open_mfdataset(self.aerodiamfnames.tolist(),concat_dim='TSTEP')
-            self.aerodiamkeys =  self.aerodiam2d.keys()
+                self.aerodiam2d = xr.open_mfdataset(self.aerodiamfnames.tolist(), concat_dim='TSTEP')
+            self.aerodiamkeys = self.aerodiam2d.keys()
             self.get_aerodiam_dates()
         except:
             print 'AERODIAM2D Files Not Found'
-            self.aerodiam=None
+            self.aerodiam = None
             pass
 
-    def get_surface_dust_total(self):
+    def get_dust_total(self, lay=None):
         keys = self.keys
-        cmaqvars, temp = search_listinlist(keys, self.dust_total)
-        var = zeros(self.conc[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
-        for i in cmaqvars[:]:
+        cmaqvars = keys[pd.Series(self.dust_totl).isin(keys)]
+        if lay is not None:
+            var = self.conc[cmaqvars[0]][:][:, lay, :, :].squeeze()
+        else:
+            var = self.conc[cmaqvars[0]][:][:, :, :, :].squeeze()
+        for i in cmaqvars[1:]:
             print '   Getting CMAQ PM DUST: ' + keys[i]
-            var += self.conc[keys[i]][self.indexdates, 0, :, :].squeeze()
-            collect()
+            if lay is not None:
+                var += self.conc[i][:, lay, :, :].squeeze()
+            else:
+                var += self.conc[i][:, :, :, :].squeeze()
         return var
 
-    def get_surface_noy(self):
+    def get_noy(self, lay=None):
         keys = self.keys
         if 'NOY' in keys:
-            var = self.conc['NOY'][:][self.indexdates, 0, :, :]
+            if lay is not None:
+                var = self.conc['NOY'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['NOY'][:, :, :, :]
         else:
-            cmaqvars, temp = search_listinlist(keys, self.noy_gas)
-            var = zeros(self.conc[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
-            for i in cmaqvars[:]:
+            cmaqvars = keys[pd.Series(self.noy_gas).isin(keys)]
+            if lay is not None:
+                var = self.conc[cmaqvars[0]][:, lay, :, :].squeeze()
+            else:
+                var = self.conc[cmaqvars[0]][:, :, :, :].squeeze()
+            for i in cmaqvars[1:]:
                 print '   Getting CMAQ NOy: ' + keys[i]
-                var += self.conc[keys[i]][self.indexdates, 0, :, :].squeeze()
-                collect()
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze()
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze()
         return var
 
-    def get_surface_nox(self):
+    def get_nox(self, lay=None):
         print '   Getting CMAQ NOx:  NO'
-        var = self.conc['NO'][self.indexdates, 0, :, :].squeeze()
+        if lay is not None:
+            var = self.conc['NO'][:, lay, :, :].squeeze()
+        else:
+            var = self.conc['NO'][:, :, :, :].squeeze()
         print '   Getting CMAQ NOx:  NO2'
-        var += self.conc['NO2'][self.indexdates, 0, :, :].squeeze()
-        collect()
+        if lay is not None:
+            var += self.conc['NO2'][:, lay, :, :].squeeze()
+        else:
+            var += self.conc['NO2'][:, :, :, :].squeeze()
         return var
 
-    def get_surface_dust_pm25(self):
+    def get_dust_pm25(self, lay=None):
         keys = self.keys
-#        allvars =
-        cmaqvars, temp = search_listinlist(keys, self.dust_pm25)
-        var = zeros(self.conc[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
-        for i in cmaqvars[:]:
+        cmaqvars = keys[pd.Series(self.dust_pm25).isin(keys)]
+        if lay is not None:
+            var = self.conc[cmaqvars[0]][:][:, lay, :, :].squeeze()
+        else:
+            var = self.conc[cmaqvars[0]][:][:, :, :, :].squeeze()
+        for i in cmaqvars[1:]:
             print '   Getting CMAQ PM25 DUST: ' + keys[i]
-            var += self.conc[keys[i]][self.indexdates, 0, :, :].squeeze()
-            collect()
+            if lay is not None:
+                var += self.conc[i][:, lay, :, :].squeeze()
+            else:
+                var += self.conc[i][:, :, :, :].squeeze()
         return var
 
-    def get_surface_pm25(self):
+    def get_pm25(self, lay=None):
         from numpy import concatenate
         keys = self.keys
-        allvars = concatenate([self.aitken, self.accumulation,self.coarse])
-        weights = array([ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1., 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1., 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1., 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1., 1.,  1.,  1.,  1.,  0.2,  0.2,  0.2,  0.2,  0.2,  0.2,  0.2])
+        allvars = concatenate([self.aitken, self.accumulation, self.coarse])
+        weights = array(
+            [1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
+             1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
+             1., 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2])
         if 'PM25_TOT' in keys:
             print 'Getting CMAQ PM25: PM25_TOT'
-            var = self.conc['PM25_TOT'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PM25_TOT'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PM25_TOT'][:, :, :, :].squeeze()
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze() * neww[0]
-            for i,j in zip(newkeys[1:],neww[1:]):
-                var += self.conc[i][:,0,:,:].squeeze() * j
+            var = self.conc[newkeys[0]][:, lay, :, :].squeeze() * neww[0]
+            for i, j in zip(newkeys[1:], neww[1:]):
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze() * j
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze() * j
         var.name = 'PM2.5'
         var['long_name'] = 'PM2.5'
         var['var_desc'] = 'Variable PM2.5'
 
         return var
 
-    def get_surface_pm10(self):
+    def get_pm10(self, lay=None):
         from numpy import concatenate
         keys = self.keys
         allvars = concatenate([self.aitken, self.accumulation, self.coarse])
         var = None
         if 'PMC_TOT' in keys:
-            var = self.conc['PMC_TOT'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PMC_TOT'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PMC_TOT'][:, :, :, :].squeeze()
             print 'DONE'
         elif 'PM10' in keys:
-            var = self.conc['PMC_TOT'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PMC_TOT'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PMC_TOT'][:, :, :, :].squeeze()
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze()
+            if lay is not None:
+                var = self.conc[newkeys[0]][:, lay, :, :].squeeze()
+            else:
+                var = self.conc[newkeys[0]][:, lay, :, :].squeeze()
             for i in newkeys[1:]:
-                var += self.conc[i][:,0,:,:].squeeze()
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze()
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze()
         var.name = 'PM10'
         var['long_name'] = 'PM10'
         var['var_desc'] = 'Variable PM10'
         return var
 
-    def get_surface_clf(self):
+    def get_clf(self, lay=None):
         keys = self.keys
-        allvars = array(['ACLI', 'ACLJ','ACLK'])
-        weights = array([1,1,.2])
+        allvars = array(['ACLI', 'ACLJ', 'ACLK'])
+        weights = array([1, 1, .2])
         var = None
         if 'PM25_CL' in keys:
-            var = self.conc['PM25_CL'][self.indexdates, 0, :, :].squeeze()
+            var = self.conc['PM25_CL'][:, lay, :, :].squeeze()
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze() * neww[0]
-            for i,j in zip(newkeys[1:],neww[1:]):
-                var += self.conc[i][:,0,:,:].squeeze() * j
+            var = self.conc[newkeys[0]][:, 0, :, :].squeeze() * neww[0]
+            for i, j in zip(newkeys[1:], neww[1:]):
+                var += self.conc[i][:, 0, :, :].squeeze() * j
         var.name = 'PM25_CL'
         var['long_name'] = 'PM25_CL'
         var['var_desc'] = 'Variable PM25_CL'
         return var
 
-    def get_surface_naf(self):
+    def get_naf(self, lay=None):
         keys = self.keys
-        allvars = array(['ANAI', 'ANAJ','ASEACAT','ASOIL','ACORS'])
-        weights = array([1,1,.2*837.3/1000.,.2*62.6/1000.,.2*2.3/1000.])
-        var = None
+        allvars = array(['ANAI', 'ANAJ', 'ASEACAT', 'ASOIL', 'ACORS'])
+        weights = array([1, 1, .2 * 837.3 / 1000., .2 * 62.6 / 1000., .2 * 2.3 / 1000.])
         if 'PM25_NA' in keys:
-            var = self.conc['PM25_NA'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PM25_NA'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PM25_NA'][:, :, :, :].squeeze()
         else:
             print '    Computing PM25_NA...'
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze() * neww[0]
-            for i,j in zip(newkeys[1:],neww[1:]):
-                var += self.conc[i][:,0,:,:].squeeze() * j
+            if lay is not None:
+                var = self.conc[newkeys[0]][:, lay, :, :].squeeze() * neww[0]
+            else:
+                var = self.conc[newkeys[0]][:, :, :, :].squeeze() * neww[0]
+            for i, j in zip(newkeys[1:], neww[1:]):
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze() * j
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze() * j
         var.name = 'PM25_NA'
         var['long_name'] = 'PM25_NA'
         var['var_desc'] = 'Variable PM25_NA'
 
         return var
 
-    def get_surface_kf(self):
+    def get_kf(self, lay=None):
         keys = self.keys
-        allvars = array(['AKI', 'AKJ','ASEACAT','ASOIL','ACORS'])
-        weights = array([1,1,.2*31./1000.,.2*24./1000.,.2*17.6/1000.])
-        var = None
+        allvars = array(['AKI', 'AKJ', 'ASEACAT', 'ASOIL', 'ACORS'])
+        weights = array([1, 1, .2 * 31. / 1000., .2 * 24. / 1000., .2 * 17.6 / 1000.])
         if 'PM25_K' in keys:
-            var = self.conc['PM25_K'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PM25_K'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PM25_K'][:, :, :, :].squeeze()
         else:
             print '    Computing PM25_K...'
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze() * neww[0]
-            for i,j in zip(newkeys[1:],neww[1:]):
-                var += self.conc[i][:,0,:,:].squeeze() * j
+            if lay is not None:
+                var = self.conc[newkeys[0]][:, lay, :, :].squeeze() * neww[0]
+            else:
+                var = self.conc[newkeys[0]][:, :, :, :].squeeze() * neww[0]
+            for i, j in zip(newkeys[1:], neww[1:]):
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze() * j
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze() * j
         var.name = 'PM25_K'
         var['long_name'] = 'PM25_K'
         var['var_desc'] = 'Variable PM25_K'
 
         return var
 
-    def get_surface_caf(self):
+    def get_caf(self, lay=None):
         keys = self.keys
-        allvars = array(['ACAI', 'ACAJ','ASEACAT','ASOIL','ACORS'])
-        weights = array([1,1,.2*32./1000.,.2*83.8/1000.,.2*56.2/1000.])
-        var = None
+        allvars = array(['ACAI', 'ACAJ', 'ASEACAT', 'ASOIL', 'ACORS'])
+        weights = array([1, 1, .2 * 32. / 1000., .2 * 83.8 / 1000., .2 * 56.2 / 1000.])
         if 'PM25_CA' in keys:
-            var = self.conc['PM25_CA'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PM25_CA'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PM25_CA'][:, :, :, :].squeeze()
         else:
             print '    Computing PM25_NO3...'
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index.values]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze() * neww[0]
-            for i,j in zip(newkeys[1:],neww[1:]):
-                var += self.conc[i][:,0,:,:].squeeze() * j
+            if lay is not None:
+                var = self.conc[newkeys[0]][:, lay, :, :].squeeze() * neww[0]
+            else:
+                var = self.conc[newkeys[0]][:, :, :, :].squeeze() * neww[0]
+            for i, j in zip(newkeys[1:], neww[1:]):
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze() * j
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze() * j
         var.name = 'PM25_CA'
         var['long_name'] = 'PM25_CA'
         var['var_desc'] = 'Variable PM25_CA'
-
         return var
 
-    def get_surface_so4f(self):
+    def get_so4f(self, lay=None):
         keys = self.keys
-        allvars = array(['ASO4I', 'ASO4J','ASO4K'])
-        weights = array([1.,1.,.2])
-        var = None
+        allvars = array(['ASO4I', 'ASO4J', 'ASO4K'])
+        weights = array([1., 1., .2])
         if 'PM25_SO4' in keys:
-            var = self.conc['PM25_SO4'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PM25_SO4'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PM25_SO4'][:, :, :, :].squeeze()
         else:
             print '    Computing PM25_SO4...'
             index = pd.Series(allvars).isin(keys)
             print index
             newkeys = allvars[index]
             neww = weights[index.values]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze() * neww[0]
-            for i,j in zip(newkeys[1:],neww[1:]):
-                var += self.conc[i][:,0,:,:].squeeze() * j
+            if lay is not None:
+                var = self.conc[newkeys[0]][:, lay, :, :].squeeze() * neww[0]
+            else:
+                var = self.conc[newkeys[0]][:, :, :, :].squeeze() * neww[0]
+            for i, j in zip(newkeys[1:], neww[1:]):
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze() * j
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze() * j
         var.name = 'PM25_SO4'
         var['long_name'] = 'PM25_SO4'
         var['var_desc'] = 'Variable PM25_SO4'
-
         return var
 
-    def get_surface_nh4f(self):
+    def get_nh4f(self, lay=None):
         keys = self.keys
-        allvars = array(['ANH4I', 'ANH4J','ANH4K'])
-        weights = array([1.,1.,.2])
+        allvars = array(['ANH4I', 'ANH4J', 'ANH4K'])
+        weights = array([1., 1., .2])
         var = None
         if 'PM25_NH4' in keys:
-            var = self.conc['PM25_NH4'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PM25_NH4'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PM25_NH4'][:, :, :, :].squeeze()
         else:
             print '    Computing PM25_NH4...'
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze() * neww[0]
-            for i,j in zip(newkeys[1:],neww[1:]):
-                var += self.conc[i][:,0,:,:].squeeze() * j
+            if lay is not None:
+                var = self.conc[newkeys[0]][:, lay, :, :].squeeze() * neww[0]
+            else:
+                var = self.conc[newkeys[0]][:, :, :, :].squeeze() * neww[0]
+            for i, j in zip(newkeys[1:], neww[1:]):
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze() * j
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze() * j
         var.name = 'PM25_NH4'
         var['long_name'] = 'PM25_NH4'
         var['var_desc'] = 'Variable PM25_NH4'
 
         return var
 
-    def get_surface_no3f(self):
+    def get_no3f(self, lay=None):
         keys = self.keys
-        allvars = array(['ANO3I', 'ANO3J','ANO3K'])
-        weights = array([1.,1.,.2])
+        allvars = array(['ANO3I', 'ANO3J', 'ANO3K'])
+        weights = array([1., 1., .2])
         var = None
         if 'PM25_NO3' in keys:
-            var = self.conc['PM25_NO3'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PM25_NO3'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PM25_NO3'][:, :, :, :].squeeze()
         else:
             print '    Computing PM25_NO3...'
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze() * neww[0]
-            for i,j in zip(newkeys[1:],neww[1:]):
-                var += self.conc[i][:,0,:,:].squeeze() * j
+            if lay is not None:
+                var = self.conc[newkeys[0]][:, lay, :, :].squeeze() * neww[0]
+            else:
+                var = self.conc[newkeys[0]][:, :, :, :].squeeze() * neww[0]
+            for i, j in zip(newkeys[1:], neww[1:]):
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze() * j
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze() * j
         var.name = 'PM25_NO3'
         var['long_name'] = 'PM25_NO3'
         var['var_desc'] = 'Variable PM25_NO3'
         return var
 
-    def get_surface_ec(self):
+    def get_ec(self, lay=None):
         keys = self.keys
         allvars = array(['AECI', 'AECJ'])
-        weights = array([1.,1.])
+        weights = array([1., 1.])
         var = None
         if 'PM25_EC' in keys:
-            var = self.conc['PM25_EC'][self.indexdates, 0, :, :].squeeze()
+            if lay is not None:
+                var = self.conc['PM25_EC'][:, lay, :, :].squeeze()
+            else:
+                var = self.conc['PM25_EC'][:, :, :, :].squeeze()
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index]
-            var = self.conc[newkeys[0]][:,0,:,:].squeeze() * neww[0]
-            for i,j in zip(newkeys[1:],neww[1:]):
-                var += self.conc[i][:,0,:,:].squeeze() * j
+            if lay is not None:
+                var = self.conc[newkeys[0]][:, lay, :, :].squeeze() * neww[0]
+            else:
+                var = self.conc[newkeys[0]][:, :, :, :].squeeze() * neww[0]
+            for i, j in zip(newkeys[1:], neww[1:]):
+                if lay is not None:
+                    var += self.conc[i][:, lay, :, :].squeeze() * j
+                else:
+                    var += self.conc[i][:, :, :, :].squeeze() * j
         var.name = 'PM25_EC'
         var['long_name'] = 'PM25_EC'
         var['var_desc'] = 'Variable PM25_EC'
 
         return var
 
-    # def get_surface_oc(self):
-    #     keys = self.keys
-    #     allvars = array(['AXYL1J', 'AXYL2J', 'AXYL3J', 'ATOL1J', 'ATOL2J', 'ATOL3J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J',
-    #                      'AISO1J', 'AISO2J', 'AISO3J', 'ATRP1J', 'ATRP2J', 'ASQTJ', 'AALK1J', 'AALK2J', 'AORGCJ',
-    #                      'AOLGBJ', 'AOLGAJ', 'APOCI', 'APOCJ', 'APAH1J', 'APAH2J', 'APAH3J'])
-    #     weights = array([.5,.5,.5,.5,.5,.5,.5,.5,.5,.625,.625,.37
-    #     var = None
-    #     if 'PM25_OC' in keys:
-    #         var = self.conc['PM25_OC'][self.indexdates, 0, :, :].squeeze()
-    #     else:
-    #         cmaqvars, temp = search_listinlist(keys, allvars)
-    #     OC = var
-    #     if temp.shape[0] != allvars.shape[0]:
-    #         cmaqvars, temp = search_listinlist(keys, self.poc)
-    #         var = zeros(self.conc[keys[cmaqvars[0]]][:][self.indexdates, 0, :, :].squeeze().shape)
-    #         for i in cmaqvars[:]:
-    #             print '   Getting CMAQ Variable: ' + keys[i]
-    #             var += self.conc[keys[i]][self.indexdates, 0, :, :].squeeze()
-    #             collect()
-    #         OC = var
-    #     else:
-    #         vars = []
-    #         for i in allvars:
-    #             if i not in keys:
-    #                 print '    Variable ' + i + ' not found'
-    #                 var = zeros((self.indexdates.shape[0], self.latitude.shape[0], self.longitude.shape[0]))
-    #             else:
-    #                 print '   Getting CMAQ Variable: ' + i
-    #                 var = self.conc[i][self.indexdates, 0, :, :].squeeze()
-    #             vars.append(var)
-    #         OC = (vars[0] + vars[1] + vars[2]) / 2.0 + (vars[3] + vars[4] + vars[5]) / 2.0 + (vars[6] + vars[7] + vars[
-    #             8]) / 2.0 + (vars[9] + vars[10]) / 1.6 + vars[11] / 2.7 + (vars[12] + vars[13]) / 1.4 + vars[
-    #                                                                                                         14] / 2.1 + 0.64 * (
-    #             vars[15] + vars[16]) + vars[17] / 2.0 + (vars[18] + vars[19]) / 2.1 + vars[20] + vars[21] + vars[
-    #                                                                                                             22] / 2.03 + \
-    #              vars[23] / 2.03 + vars[24] / 2.03
-    #     collect()
-    #     return OC
-
-    def get_surface_cmaqvar(self, param='O3'):
-        lvl = 0.
-        revert = param
+    def get_var(self, param='O3', lay=None):
         p = param.upper()
         print param
         if p == 'PM25':
-            var = self.get_surface_pm25()
+            var = self.get_pm25(lay=lay)
         elif p == 'PM10':
-            var = self.get_surface_pm10()
+            var = self.get_pm10(lay=lay)
         elif p == 'PM25_DUST':
-            var = self.get_surface_dust_pm25()
+            var = self.get_dust_pm25(lay=lay)
         elif p == 'PM10_DUST':
-            var = self.get_surface_dust_total()
+            var = self.get_dust_total(lay=lay)
         elif p == 'NOX':
-            var = self.get_surface_nox()
+            var = self.get_nox(lay=lay)
         elif p == 'NOY':
-            var = self.get_surface_noy()
+            var = self.get_noy(lay=lay)
         elif p == 'CLF':
-            var = self.get_surface_clf()
+            var = self.get_clf(lay=lay)
         elif p == 'CAF':
-            var = self.get_surface_caf()
+            var = self.get_caf(lay=lay)
         elif p == 'NAF':
-            var = self.get_surface_naf()
+            var = self.get_naf(lay=lay)
         elif p == 'KF':
-            var = self.get_surface_kf()
+            var = self.get_kf(lay=lay)
         elif (p == 'SO4F') | (p == 'PM2.5_SO4'):
-            var = self.get_surface_so4f()
+            var = self.get_so4f(lay=lay)
         elif p == 'NH4F':
-            var = self.get_surface_nh4f()
+            var = self.get_nh4f(lay=lay)
         elif (p == 'NO3F') | (p == 'PM2.5_NO3'):
-            var = self.get_surface_no3f()
+            var = self.get_no3f(lay=lay)
         elif (p == 'PM2.5_EC') | (p == 'ECF'):
-            var = self.get_surface_ec()
-        elif (p == 'OC'):
-            var = self.get_surface_oc()
-        elif (p == 'VOC'):
-            var = self.conc['VOC'][self.indexdates, 0, :, :].squeeze()
+            var = self.get_ec(lay=lay)
+        elif p == 'OC':
+            var = self.get_oc(lay=lay)
+        elif p == 'VOC':
+            var = self.conc['VOC'][:, lay, :, :].squeeze()
         else:
             print '   Getting CMAQ Variable: ' + param
-            var = self.conc[param][self.indexdates, 0, :, :].squeeze()
+            var = self.conc[param][:, lay, :, :].squeeze()
         return var
 
-    def get_metcro2d_rh(self):
+    def get_metcro2d_rh(self, lay=None):
         import atmos
-        data = {'T': self.metcro2d['TEMP2'][:].compute().values, 'rv': self.metcro2d['Q2'][:].compute().values, 'p': self.metcro2d['PRSFC'][:].compute().values}
-        return atmos.calculate('RH', **data)[self.metindex,0,:,:].squeeze()
+        data = {'T': self.metcro2d['TEMP2'][:].compute().values, 'rv': self.metcro2d['Q2'][:].compute().values,
+                'p': self.metcro2d['PRSFC'][:].compute().values}
+        return atmos.calculate('RH', **data)[self.metindex, 0, :, :].squeeze()
 
-    def get_metcro2d_cmaqvar(self, param='TEMPG', lvl=0.):
+    def get_metcro2d_var(self, param='TEMPG', lvl=0.):
         param = param.upper()
         if param == 'RH':
             print '   Calculating CMAQ Variable: ' + param
             var = self.get_metcro2d_rh()
         else:
             print '   Getting CMAQ Variable: ' + param
-            var = self.metcro2d[param][self.metindex, 0, :, :].squeeze()
+            var = self.metcro2d[param][self.metindex, lay, :, :].squeeze()
         return var
 
     def set_gridcro2d(self, filename):
@@ -504,10 +554,8 @@ class cmaq:
         self.longitude = self.grid[lon][:][0, 0, :, :].squeeze().compute()
         self.load_conus_basemap(res='l')
 
-    def load_conus_basemap(self,res='l'):
-        import cPickle as pickle
+    def load_conus_basemap(self, res='l'):
         from mpl_toolkits.basemap import Basemap
-        import os
         if isinstance(self.map, type(None)):
             lat1 = self.grid.P_ALP
             lat2 = self.grid.P_BET
