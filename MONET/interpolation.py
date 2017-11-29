@@ -1,68 +1,3 @@
-def interp_to_pt_obs(cmaqvar,dates, df, lon,lat,interp='nearest', r=12000., n=7, weight_func=lambda r: 1 / r ** 2,site_label='SCS',daily=False,md8hr=False):
-        """
-        This function interpolates variables (2d surface) in time to measurement sites
-
-        :param cmaqvar: this is the CMAQ 3D variable
-        :param df: The aqs
-        :param interp: inteprolation method 'nearest',idw,guass
-        :param r: radius of influence
-        :param n: number of nearest neighbors to include
-        :param weight_func: the user can set a defined method of interpolation
-                            example:
-                                lambda r: 1 / r ** 2
-        :return: df
-        """
-        from pyresample import geometry, kd_tree
-        from pandas import concat, Series, merge,to_numeric
-        from numpy import append, empty, vstack, NaN,array
-        from gc import collect
-        #dates = self.camx.dates[self.camx.indexdates]
-        grid1 = geometry.GridDefinition(lons=lon, lats=lat)
-        vals = array([], dtype=cmaqvar.dtype)
-        date = array([], dtype='O')
-        site = array([], dtype=df[site_label].dtype)
-        print '    Interpolating using ' + interp + ' method'
-        for i, j in enumerate(dates):
-            con = df.datetime == j
-            print j
-            try:
-                lats = df[con].Latitude.values
-                lons = df[con].Longitude.values
-                grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
-                if interp.lower() == 'nearest':
-                    val = kd_tree.resample_nearest(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
-                                                   fill_value=NaN, nprocs=2).squeeze()
-                elif interp.lower() == 'idw':
-                    val = kd_tree.resample_custom(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
-                                                  fill_value=NaN, neighbours=n, weight_funcs=weight_func,
-                                                  nprocs=2).squeeze()
-                elif interp.lower() == 'gauss':
-                    val = kd_tree.resample_gauss(grid1, cmaqvar[i, :, :].squeeze(), grid2, radius_of_influence=r,
-                                                 sigmas=r / 2., fill_value=NaN, neighbours=n, nprocs=2).squeeze()
-                vals = append(vals, val)
-                dd = empty(lons.shape[0], dtype=date.dtype)
-                dd[:] = j
-                date = append(date, dd)
-                site = append(site, df[con].SCS.values)
-                collect()
-            except:
-                pass
-
-        vals = Series(vals)
-        date = Series(date)
-        site = Series(site)
-        dfs = concat([vals, date, site], axis=1, keys=['CMAQ', 'datetime', 'SCS'])
-       # if daily:
-       #         a = dfs.merge(dfo3,on=
-       #         dfs.index = dfs.datetime
-       #         dfs['SCS'] = to_numeric(dfs.SCS)
-       #         dfs = dfs.groupby('SCS').resample('D').mean()
-       #         dfs = dfs.drop('SCS',axis=1).reset_index(level=0).reset_index()
-       #         print dfs
-        df = merge(df, dfs, how='left', on=['SCS', 'datetime'])
-
-        return dfs
-
 def interp_to_obs_new(var,df,lat,lon,radius=12000.):
     from numpy import NaN,vstack
     from pyresample import geometry,image
@@ -89,6 +24,16 @@ def interp_to_obs_new(var,df,lat,lon,radius=12000.):
     w['datetime_local'] = w.datetime + to_timedelta(w.utcoffset,'H')
 
     return w
+
+def find_nearest_latlon_xarray(arr,lat=37.102400,lon=-76.392900,radius=12e3):
+    from pyresample import utils,geometry
+    from numpy import array,vstack
+    grid1 = geometry.GridDefinition(lons=arr.longitude,lats=arr.latitude)
+    grid2 = geometry.GridDefinition(lons=vstack([lon]), lats=vstack([lat]))
+    row,col = utils.generate_nearest_neighbour_linesample_arrays(grid1,grid2,radius)
+    row = row.flatten()
+    col = col.flatten()
+    return arr.sel(COL=col).sel(ROW=row).squeeze()
 
 #this function is used to create and define various grids
 #SMOPS grid first (Equidistant Cylindrical or Plate Carree)

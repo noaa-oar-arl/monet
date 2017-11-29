@@ -9,16 +9,12 @@ import inspect
 
 class airnow:
     def __init__(self):
-
-        self.username = ''
-        self.password = ''
         self.datadir = '.'
         self.cwd = os.getcwd()
         self.url = None
         self.dates = [datetime.strptime('2016-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
                       datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
         self.datestr = []
-        self.ftp = None
         self.df = None
         self.se_states = array(
             ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN',

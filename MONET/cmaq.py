@@ -103,6 +103,10 @@ class cmaq:
             self.conc = xr.open_mfdataset(self.fname.tolist(), concat_dim='TSTEP')
         else:
             print 'Files not found'
+        if self.grid is not None:
+            self.conc = self.conc.assign(latitude=self.grid.LAT.squeeze())
+            self.conc = self.conc.assign(longitude=self.grid.LON.squeeze())
+            self.conc = self.conc.set_coords(['latitude','longitude'])
         self.get_conc_dates()
         self.keys = self.conc.keys()
 
@@ -120,6 +124,10 @@ class cmaq:
                 self.metcro2d = xr.open_mfdataset(self.metcrofnames.tolist(), concat_dim='TSTEP')
             self.metcrokeys = self.metcro2d.keys()
             self.get_metcro2d_dates()
+            if self.grid is not None:
+                self.metcro2d =	self.metcro2d.assign(latitude=self.grid.LAT.squeeze())
+                self.metcro2d =	self.metcor2d.assign(longitude=self.grid.LON.squeeze())
+                self.metcro2d =	self.metcro2d.set_coords(['latitude','longitude'])
         except:
             print 'METCRO2D Files Not Found'
             pass
@@ -136,6 +144,10 @@ class cmaq:
                 self.aerodiam2d = xr.open_mfdataset(self.aerodiamfnames.tolist(), concat_dim='TSTEP')
             self.aerodiamkeys = self.aerodiam2d.keys()
             self.get_aerodiam_dates()
+            if self.grid is not None:
+                self.aerodiam2d = self.aerodiam2d.assign(latitude=self.grid.LAT.squeeze())
+                self.aerodiam2d = self.metcor2d.assign(longitude=self.grid.LON.squeeze())
+                self.aerodiam2d = self.aerodiam2d.set_coords(['latitude','longitude'])
         except:
             print 'AERODIAM2D Files Not Found'
             self.aerodiam = None
@@ -534,16 +546,23 @@ class cmaq:
         import atmos
         data = {'T': self.metcro2d['TEMP2'][:].compute().values, 'rv': self.metcro2d['Q2'][:].compute().values,
                 'p': self.metcro2d['PRSFC'][:].compute().values}
-        return atmos.calculate('RH', **data)[self.metindex, 0, :, :].squeeze()
+        if lay is None:
+            a = atmos.calculate('RH', **data)[:, :, :, :].squeeze()
+        else:
+            atmos.calculate('RH', **data)[:, lay, :, :].squeeze()
+        return a
 
-    def get_metcro2d_var(self, param='TEMPG', lvl=0.):
+    def get_metcro2d_var(self, param='TEMPG', lay=None):
         param = param.upper()
         if param == 'RH':
             print '   Calculating CMAQ Variable: ' + param
-            var = self.get_metcro2d_rh()
+            var = self.get_metcro2d_rh(lay=lay)
         else:
             print '   Getting CMAQ Variable: ' + param
-            var = self.metcro2d[param][self.metindex, lay, :, :].squeeze()
+            if lay is None:
+                var = self.metcro2d[param][:, :, :, :].squeeze()
+            else:
+                var = self.metcro2d[param][:, lay, :, :].squeeze()
         return var
 
     def set_gridcro2d(self, filename):

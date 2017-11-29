@@ -660,7 +660,8 @@ class aqs:
         #        print dfs
         # dff = dd.from_delayed(dfs)
         # self.d_df = dff.compute()
-        dfs = [self.load_all_daily_data(i, dates) for i in params]
+        dfs = [self.load_daily_data(i, dates) for i in params]
+        self.d_df = pd.concat(dfs,ignore_index=True)
         self.d_df = self.change_units(self.d_df)
         os.chdir(self.cwd)
 
@@ -693,12 +694,27 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_pm25_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_pm25_data(dates)
+#            aqs = pd.read_hdf(fname)
         con = (aqs.datetime >= dates[0] - timedelta(days=1)) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
         return aqs
+
+    def load_aqs_daily_rhdp_data(self, dates):
+        from datetime import timedelta
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_DAILY_RHDP_' + year + '.hdf'
+        if os.path.isfile(fname):
+            aqs = pd.read_hdf(fname)
+        else:
+            aqs = self.retrieve_aqs_daily_rhdp_data(dates)
+#            aqs = pd.read_hdf(fname)
+        con = (aqs.datetime >= dates[0] - timedelta(days=1)) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+
 
     def load_aqs_daily_ozone_data(self, dates):
         year = dates[0].strftime('%Y')
@@ -706,8 +722,19 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_ozone_data(dates)
+            aqs = self.retrieve_aqs_daily_ozone_data(dates)
+        con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
+        aqs = aqs[con]
+        aqs.index = arange(aqs.index.shape[0])
+        return aqs
+
+    def load_aqs_daily_nonoxnoy_data(self, dates):
+        year = dates[0].strftime('%Y')
+        fname = self.datadir + '/' + 'AQS_DAILY_NONOXNOY_' + year + '.hdf'
+        if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
+        else:
+            aqs = self.retrieve_aqs_daily_nonoxnoy_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -719,8 +746,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_pm10_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_pm10_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -732,8 +758,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_so2_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_so2_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -745,8 +770,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_no2_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_no2_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -759,8 +783,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_co_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_co_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -772,8 +795,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_temp_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_temp_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -785,8 +807,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_rh_dp_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_rh_dp_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -798,8 +819,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_spec_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_spec_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -811,8 +831,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_voc_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_voc_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -824,8 +843,7 @@ class aqs:
         if os.path.isfile(fname):
             aqs = pd.read_hdf(fname)
         else:
-            self.retrieve_aqs_daily_wind_data(dates)
-            aqs = pd.read_hdf(fname)
+            aqs = self.retrieve_aqs_daily_wind_data(dates)
         con = (aqs.datetime >= dates[0]) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
         aqs.index = arange(aqs.index.shape[0])
@@ -1155,6 +1173,77 @@ class aqs:
         df.to_hdf('AQS_DAILY_TEMP_' + year + '.hdf', 'df', format='table')
         return df
 
+    def retrieve_aqs_daily_rhdp_data(self, dates):
+        import wget
+        from numpy import NaN, int64
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_RH_DP_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_TEMP_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_TEMP_' + year + '.hdf', 'df', format='table')
+        return df
+
+
+    def retrieve_aqs_daily_nonoxnoy_data(self, dates):
+        import wget
+        from numpy import NaN, int64
+        i = dates[0]
+        year = i.strftime('%Y')
+        url = self.baseurl + 'daily_NONOxNOy_' + year + '.zip'
+        print 'Downloading: ' + url
+        filename = wget.download(url);
+        print ''
+        print 'Unpacking: ' + url
+        dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d')
+        df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
+                         date_parser=dateparse)
+        df.columns = self.renameddcols
+        df['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+                          dtype='int32')
+        df.loc[df.Parameter_Code == 68101, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68102, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68108, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68103, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68105, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68104, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68106, 'Parameter_Code'] = NaN
+        df.loc[df.Parameter_Code == 68107, 'Parameter_Code'] = NaN
+        df.dropna(subset=['Parameter_Code'], inplace=True)
+        df.loc[:, 'Parameter_Code'] = df.Parameter_Code.astype(int64)
+        df = self.read_monitor_and_site(df)
+        df['SCS'] = df.SCS.astype(str).str.zfill(9)
+        df['datetime'] = df.datetime_local - pd.to_timedelta(df.GMT_Offset, unit='h')
+        df = self.get_species(df)
+        print 'Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_TEMP_' + year + '.hdf'
+        df.to_hdf('AQS_DAILY_NONOXNOY_' + year + '.hdf', 'df', format='table')
+        return df
+
     def retrieve_aqs_daily_rh_dp_data(self, dates):
         import wget
         from numpy import NaN, int64
@@ -1433,7 +1522,7 @@ class aqs:
             df2 = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                               date_parser=dateparse)
             df2.columns = self.renameddcols
-            df2['SCS'] = array(df['State_Code'].values * 1.E7 + df['County_Code'].values * 1.E4 + df['Site_Num'].values,
+            df2['SCS'] = array(df2['State_Code'].values * 1.E7 + df2['County_Code'].values * 1.E4 + df2['Site_Num'].values,
                                dtype='int32')
         else:
             df2 = pd.DataFrame()

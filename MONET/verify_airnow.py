@@ -157,28 +157,28 @@ class verify_airnow:
                 try:
                     print 'Interpolating Wind Direction:'
                     dfmet = g.get_group(i)
-                    self.cmaqwdir = self.cmaq.get_metcro2d_cmaqvar(lay=0, param='WDIR10')
+                    self.cmaqwdir = self.cmaq.get_metcro2d_var(lay=0, param='WDIR10')
                     dfmet = interp_to_obs_new(self.cmaqwdir, dfmet, self.cmaq.latitude.values,
                                               self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfmet)
                 except:
                     pass
             elif (self.cmaq.metcro2d is not None) & (i == 'WS'):
-                try:
+#                try:
                     print 'Interpolating Wind Speed:'
                     dfmet = g.get_group(i)
-                    self.cmaqws = self.cmaq.get_metcro2d_cmaqvar(lay=0, param='WSPD10')
+                    self.cmaqws = self.cmaq.get_metcro2d_var(lay=0, param='WSPD10')
 
                     dfmet = interp_to_obs_new(self.cmaqws, dfmet, self.cmaq.latitude.values, self.cmaq.longitude.values,
                                               radius=radius)
                     dfs.append(dfmet)
-                except:
-                    pass
+#                except:
+#                    pass
             elif (self.cmaq.metcro2d is not None) & (i == 'TEMP'):
                 try:
                     print 'Interpolating 2 Meter Temperature:'
                     dfmet = g.get_group(i)
-                    self.cmaqtemp = self.cmaq.get_metcro2d_cmaqvar(lay=0, param='TEMP2') - 273.15
+                    self.cmaqtemp = self.cmaq.get_metcro2d_var(lay=0, param='TEMP2') - 273.15
                     dfmet = interp_to_obs_new(self.cmaqtemp, dfmet, self.cmaq.latitude.values,
                                               self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfmet)
@@ -188,7 +188,7 @@ class verify_airnow:
                 try:
                     print 'Interpolating Relative Humidity:'
                     dfmet = g.get_group(i)
-                    self.cmaqrh = self.cmaq.get_metcro2d_cmaqvar(lay=0, param='RH')
+                    self.cmaqrh = self.cmaq.get_metcro2d_var(lay=0, param='RH')
                     dfmet = interp_to_obs_new(self.cmaqrh, dfmet, self.cmaq.latitude.values, self.cmaq.longitude.values,
                                               radius=radius)
                     dfs.append(dfmet)
@@ -198,7 +198,7 @@ class verify_airnow:
                 try:
                     print 'Interpolating Short Wave Radiation:'
                     dfmet = g.get_group(i)
-                    self.cmaqsrad = self.cmaq.get_metcro2d_cmaqvar(lay=0, param='RGRND')
+                    self.cmaqsrad = self.cmaq.get_metcro2d_var(lay=0, param='RGRND')
                     dfmet = interp_to_obs_new(self.cmaqsrad, dates, dfmet, self.cmaq.latitude.values,
                                               self.cmaq.longitude.values, radius=radius)
                     dfs.append(dfmet)
@@ -294,7 +294,7 @@ class verify_airnow:
         else:
             try:
                 if not isinstance(self.cmaq.metcro2d, type(None)):
-                    cmaq = self.cmaq.get_metcro2d_cmaqvar(param=param)
+                    cmaq = self.cmaq.get_metcro2d_var(param=param)
             except:
                 pass
             try:
