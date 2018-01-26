@@ -1,8 +1,6 @@
 # this is written to retrive airnow data concatenate and add to pandas array for usage
-import os
 from datetime import datetime
 import pandas as pd
-import wget
 
 
 class aeronet:
