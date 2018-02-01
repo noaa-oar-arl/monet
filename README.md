@@ -15,7 +15,7 @@ Baker, Barry; Pan, Li.	2017. "Overview of the Model and Observation Evaluation T
 
 * Additional objects created for the Integrated Surface Database (ISD), the U.S. Climate Reference Network (CRN), Aerosol Robotic Network (AERONET)
 * Moved the interpolation to a pyresample ImageContainer.  This restricts users to a nearest neighbor resampling with minimal differences in interpolation differences.  Speed improvements are substantial.
-* Moved to xarray for opening CMAQ files.  xarray is an implimentation of N-Dimensional pandas dataframes and allows out of memory computation using dask to increase reading and processing.
+* Moved to xarray for opening CMAQ files.  xarray is an implementation of N-Dimensional pandas dataframes and allows out of memory computation using dask to increase reading and processing.
 * Increased usage of dask to read observational data increasing read speed of many files.  
 
 ### Basic tutorial for AirNow and AQS.  
@@ -67,4 +67,3 @@ Required packges:
   * xarray
   * dask
   * netcdf4-python
-
