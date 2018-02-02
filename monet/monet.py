@@ -151,19 +151,20 @@ class MONET(object):
 
         """
         if obs.upper() == 'AIRNOW':
-            self.add_airnow(**kwargs)
+            o = self.add_airnow(**kwargs)
         if obs.upper() == 'AERONET':
-            self.add_aeronet(**kwargs)
+            o = self.add_aeronet(**kwargs)
         if obs.upper() == 'TOLNET':
-            self.add_tolnet(**kwargs)
+            o = self.add_tolnet(**kwargs)
         if obs.upper() == 'AQS':
-            self.add_aqs(**kwargs)
+            o = self.add_aqs(**kwargs)
         if obs.upper() == 'ISH':
-            self.add_ish(**kwargs)
+            o = self.add_ish(**kwargs)
         if obs.upper() == 'CRN':
-            self.add_crn(**kwargs)
+            o = self.add_crn(**kwargs)
         if obs.upper() == 'IMPROVE':
-            self.add_improve(**kwargs)
+            o = self.add_improve(**kwargs)
+        return o
 
     def add_airnow(self, dates=[]):
         """Short summary.
