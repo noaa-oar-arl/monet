@@ -25,7 +25,8 @@ class VERIFY(object):
             Description of returned object.
 
         """
-        if (self.obs.objtype is 'AQS' or self.obs.objtype is 'AirNow') and (self.model.objtype is 'CMAQ' or self.model.objtype is 'CAMX'):
+        if (self.obs.objtype is 'AQS' or self.obs.objtype is 'AirNow') and (
+                self.model.objtype is 'CMAQ' or self.model.objtype is 'CAMX'):
             self.compare_epa(**kwargs)
 
     def compare_spatial(self, **kwargs):
@@ -116,7 +117,8 @@ class VERIFY(object):
             c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
 
     def compare_epa(self, param='OZONE', site='', city='', state='', epa_region='', region='', timeseries=False,
-                    scatter=False, pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False, timeseries_mb=False,
+                    scatter=False, pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False,
+                    timeseries_mb=False,
                     taylordiagram=False, ax=None, label=None, footer=False, dia=None, marker=None):
         """Short summary.
 
@@ -174,7 +176,9 @@ class VERIFY(object):
         df2 = df2.groupby('Species').get_group(param)
         if timeseries:
             if ax is None:
-                ax = plots.timeseries_param(df2, col='Obs', title=title, label=label, ax=ax, plotargs={'color': 'darkslategrey'}, fillargs={'color': 'darkslategrey', 'alpha': .2})
+                ax = plots.timeseries_param(df2, col='Obs', title=title, label=label, ax=ax,
+                                            plotargs={'color': 'darkslategrey'},
+                                            fillargs={'color': 'darkslategrey', 'alpha': .2})
             ax = plots.timeseries_param(df2, col='model', title=title, label=label, ax=ax, fillargs={'alpha': .2})
         if scatter:
             plots.scatter_param(df2, title=title, label=label, fig=fig, footer=footer)

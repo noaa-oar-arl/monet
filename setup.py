@@ -26,7 +26,7 @@ packages = find_packages()
 
 setup(
     name='monet',
-    version='1.1',
+    version='1.2',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
     author='Barry D. Baker',
@@ -34,7 +34,8 @@ setup(
     maintainer='Barry Baker',
     maintainer_email='barry.baker@noaa.gov',
     packages=packages,
-    package_dir={'': 'MONET'},
+    package_dir={'': 'src'},
+    keywords=['model','verification','hysplit','cmaq','atmosphere','camx','evaluation']
     description='The Model and Observation Evaluation Toolkit (MONET)',
     install_requires=['numpy', 'pandas', 'wget', 'pyresample', 'netcdf4', 'pynio', 'xarray', 'dask', 'matplotlib', 'seaborn', 'pseudonetcdf'],
     dependency_links=["git+ssh://git@github.com/barronh/pseudonetcdf.git@develop", "git+ssh://git@github.com/barronh/xarray.git@pnc-backend"]

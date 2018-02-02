@@ -187,7 +187,8 @@ def MNPE(obs, mod, paxis, axis=None):
 
 def MdnNPE(obs, mod, paxis, axis=None):
     """ Median Normalized Peak Bias (%)"""
-    return np.ma.median(old_div((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))), obs.max(axis=paxis)), axis=axis) * 100.
+    return np.ma.median(old_div((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))), obs.max(axis=paxis)),
+                        axis=axis) * 100.
 
 
 def NMPB(obs, mod, paxis, axis=None):
@@ -316,7 +317,7 @@ def RMSEu(obs, mod, axis=None):
 def d1(obs, mod, axis=None):
     """ Modified Index of Agreement, d1"""
     return 1.0 - old_div((np.ma.abs(obs - mod)).sum(axis=axis), (
-        np.ma.abs(mod - obs.mean(axis=axis)) + np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
+            np.ma.abs(mod - obs.mean(axis=axis)) + np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
 
 
 def E1(obs, mod, axis=None):
@@ -330,7 +331,7 @@ def IOA(obs, mod, axis=None):
     if not axis is None:
         obsmean = np.expand_dims(obsmean, axis=axis)
     return 1.0 - old_div((np.ma.abs(obs - mod) ** 2).sum(axis=axis), (
-        (np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis))
+            (np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis))
 
 
 def circlebias(b):

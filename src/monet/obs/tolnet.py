@@ -41,7 +41,7 @@ class TOLNet(object):
             dset[i] = (['z', 't'], val)
         for i in altvars:
             dset[i] = (['z'], data[i][:].squeeze())
-        #coords = {'time': time, 'z': alt, 'start_time': stime, 'end_time': etime}
+        # coords = {'time': time, 'z': alt, 'start_time': stime, 'end_time': etime}
         attributes = {}
         for i in list(atts.attrs.keys()):
             attributes[i] = atts.attrs[i]

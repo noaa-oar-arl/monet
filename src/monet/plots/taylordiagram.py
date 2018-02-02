@@ -12,12 +12,14 @@ from builtins import zip
 from builtins import map
 from builtins import object
 from past.utils import old_div
+
 __version__ = "Time-stamp: <2012-02-17 20:59:35 ycopin>"
 __author__ = "Yannick Copin <yannick.copin@laposte.net>"
 
 import matplotlib.pyplot as PLT
 import numpy as NP
 import seaborn as sns
+
 colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
 sns.set_palette(sns.color_palette(colors))
 

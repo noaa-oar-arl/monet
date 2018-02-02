@@ -62,7 +62,7 @@ def ensure_values_indomain(df, lon, lat):
 
     """
     con = ((df.Latitude.values > lat.min()) & (df.Latitude.values < lat.max()) & (
-        df.Longitude.values > lon.min()) & (df.Longitude.values < lon.max()))
+            df.Longitude.values > lon.min()) & (df.Longitude.values < lon.max()))
     df = df[con].copy()
     return df
 

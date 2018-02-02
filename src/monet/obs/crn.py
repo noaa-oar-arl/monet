@@ -49,6 +49,7 @@ Data is taken from the Climate Reference Network.  This is to expand validation 
     """
 from __future__ import print_function
 from future import standard_library
+
 standard_library.install_aliases()
 from builtins import zip
 from builtins import object
@@ -190,7 +191,7 @@ class crn(object):
         self.openftp()
         print('Retrieving Hourly file list')
         cwd = '/pub/data/uscrn/products/hourly02/' + \
-            self.dates[0].strftime('%Y')
+              self.dates[0].strftime('%Y')
         nlst = self.retrieve_hourly_filelist(cwd)
 
         if nlst.shape[0] > 0:
@@ -243,7 +244,7 @@ class crn(object):
         cols[2] = 'WBAN'
         self.df.columns = cols
         con = (self.df.datetime >= self.dates[0]) & (
-            self.df.datetime <= self.dates[-1])
+                self.df.datetime <= self.dates[-1])
         self.df = self.df[con]
         self.merge_monitor_meta_data()
         if output == '':
@@ -294,7 +295,7 @@ class crn(object):
         """
         self.df.WBAN = self.df.WBAN.astype('|S5')
         self.df = self.df.merge(self.monitor_df, on=[
-                                'WBAN', 'LONGITUDE', 'LATITUDE'], how='left')
+            'WBAN', 'LONGITUDE', 'LATITUDE'], how='left')
 
     def agg_cols(self):
         """Short summary.

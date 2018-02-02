@@ -49,7 +49,7 @@ class AQS(object):
                                    dtype='|S20')
         self.nc_states = array(
             ['Illinois', 'Indiana', 'Iowa', 'Kentucky', 'Michigan',
-                'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
+             'Minnesota', 'Missouri', 'Ohio', 'Wisconsin'],
             dtype='|S9')
         self.nc_states_abv = array(['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'],
                                    dtype='|S9')
@@ -132,7 +132,7 @@ class AQS(object):
             df = self.add_metro_metadata2(df)
             df['Species'] = 'PM2.5'
             print('Saving file to: ' + self.datadir + '/' + \
-                'AQS_HOURLY_PM_25_88101_' + year + '.hdf')
+                  'AQS_HOURLY_PM_25_88101_' + year + '.hdf')
             df.to_hdf('AQS_HOURLY_PM_25_88101_' +
                       year + '.hdf', 'df', format='table')
         else:
@@ -163,7 +163,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + '/' + \
-            'AQS_HOURLY_OZONE_44201_' + year + '.hdf')
+              'AQS_HOURLY_OZONE_44201_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_OZONE_44201_' +
                   year + '.hdf', 'df', format='table')
 
@@ -194,7 +194,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + '/' + \
-            'AQS_HOURLY_PM_10_81102_' + year + '.hdf')
+              'AQS_HOURLY_PM_10_81102_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_PM_10_81102_' +
                   year + '.hdf', 'df', format='table')
         return df
@@ -224,7 +224,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + '/' + \
-            'AQS_HOURLY_SO2_42401_' + year + '.hdf')
+              'AQS_HOURLY_SO2_42401_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_SO2_42401_' + year +
                   '.hdf', 'df', format='table')
         return df
@@ -254,7 +254,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + '/' + \
-            'AQS_HOURLY_NO2_42602_' + year + '.hdf')
+              'AQS_HOURLY_NO2_42602_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_NO2_42602_' + year +
                   '.hdf', 'df', format='table')
         return df
@@ -284,7 +284,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf')
+              '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_CO_42101_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -313,7 +313,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_HOURLY_NONOXNOY_' + year + '.hdf')
+              '/' + 'AQS_HOURLY_NONOXNOY_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_NONOXNOY_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -342,7 +342,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_HOURLY_VOC_' + year + '.hdf')
+              '/' + 'AQS_HOURLY_VOC_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_VOC_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -372,7 +372,7 @@ class AQS(object):
             df = df.copy()[self.savecols]
             df = self.add_metro_metadata2(df)
             print('Saving file to: ' + self.datadir + \
-                '/' + 'AQS_HOURLY_SPEC_' + year + '.hdf')
+                  '/' + 'AQS_HOURLY_SPEC_' + year + '.hdf')
             df.to_hdf('AQS_HOURLY_SPEC_' + year + '.hdf', 'df', format='table')
             return df
         else:
@@ -403,7 +403,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_HOURLY_WIND_' + year + '.hdf')
+              '/' + 'AQS_HOURLY_WIND_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_WIND_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -432,7 +432,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf')
+              '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_TEMP_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -460,7 +460,7 @@ class AQS(object):
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_HOURLY_RHDP_' + year + '.hdf')
+              '/' + 'AQS_HOURLY_RHDP_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_RHDP_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -716,9 +716,9 @@ class AQS(object):
         os.chdir(self.datadir)
         dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
                self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(
-                   dates), self.load_aqs_no2_data(dates),
+                dates), self.load_aqs_no2_data(dates),
                self.load_aqs_so2_data(dates), self.load_aqs_voc_data(
-                   dates), self.load_aqs_nonoxnoy_data(dates),
+                dates), self.load_aqs_nonoxnoy_data(dates),
                self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]
         os.chdir(self.cwd)
 
@@ -730,9 +730,9 @@ class AQS(object):
         else:
             dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
                    self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(
-                       dates), self.load_aqs_no2_data(dates),
+                    dates), self.load_aqs_no2_data(dates),
                    self.load_aqs_so2_data(dates), self.load_aqs_voc_data(
-                       dates), self.load_aqs_nonoxnoy_data(dates),
+                    dates), self.load_aqs_nonoxnoy_data(dates),
                    self.load_aqs_wind_data(
                        dates), self.load_aqs_temp_data(dates),
                    self.load_aqs_rhdp_data(dates)]  # ,self.load_aqs_daily_spec_data(dates)]
@@ -748,7 +748,7 @@ class AQS(object):
             aqs = pd.read_hdf(fname)
         else:
             aqs = self.retrieve_aqs_daily_pm25_data(dates)
-#            aqs = pd.read_hdf(fname)
+        #            aqs = pd.read_hdf(fname)
         con = (aqs.datetime >=
                dates[0] - timedelta(days=1)) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -763,7 +763,7 @@ class AQS(object):
             aqs = pd.read_hdf(fname)
         else:
             aqs = self.retrieve_aqs_daily_rhdp_data(dates)
-#            aqs = pd.read_hdf(fname)
+        #            aqs = pd.read_hdf(fname)
         con = (aqs.datetime >=
                dates[0] - timedelta(days=1)) & (aqs.datetime <= dates[-1])
         aqs = aqs[con]
@@ -1173,6 +1173,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
@@ -1193,10 +1194,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_VOC_' + year + '.hdf')
+              '/' + 'AQS_DAILY_VOC_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_VOC_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1212,6 +1213,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
@@ -1231,10 +1233,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_TEMP_' + year + '.hdf')
+              '/' + 'AQS_DAILY_TEMP_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_TEMP_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1250,6 +1252,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
@@ -1269,10 +1272,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_TEMP_' + year + '.hdf')
+              '/' + 'AQS_DAILY_TEMP_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_TEMP_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1288,6 +1291,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
@@ -1307,10 +1311,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_TEMP_' + year + '.hdf')
+              '/' + 'AQS_DAILY_TEMP_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_NONOXNOY_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1326,6 +1330,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
         df.columns = self.renameddcols
@@ -1345,10 +1350,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_RH_DP_' + year + '.hdf')
+              '/' + 'AQS_DAILY_RH_DP_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_RH_DP_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1364,6 +1369,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
@@ -1384,10 +1390,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_WIND_' + year + '.hdf')
+              '/' + 'AQS_DAILY_WIND_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_WIND_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1403,6 +1409,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
@@ -1423,7 +1430,7 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_CO_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_CO_' + year + '.hdf', 'df', format='table')
@@ -1441,6 +1448,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
@@ -1461,10 +1469,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_OZONE_' + year + '.hdf')
+              '/' + 'AQS_DAILY_OZONE_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_OZONE_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1480,6 +1488,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
@@ -1500,10 +1509,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
 
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_NO2_' + year + '.hdf')
+              '/' + 'AQS_DAILY_NO2_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_NO2_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1519,6 +1528,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
@@ -1539,10 +1549,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_SO2_' + year + '.hdf')
+              '/' + 'AQS_DAILY_SO2_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_SO2_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1558,6 +1568,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
@@ -1578,10 +1589,10 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_PM10_' + year + '.hdf')
+              '/' + 'AQS_DAILY_PM10_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_PM10_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1597,7 +1608,9 @@ class AQS(object):
             print('')
             print('Unpacking: ' + url)
 
-            def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+            def dateparse(x):
+                return pd.datetime.strptime(x, '%Y-%m-%d')
+
             df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                              date_parser=dateparse)
             df.columns = self.renameddcols
@@ -1610,12 +1623,15 @@ class AQS(object):
             print('Downloading: ' + url2)
             filename = wget.download(url2)
 
-            def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+            def dateparse(x):
+                return pd.datetime.strptime(x, '%Y-%m-%d')
+
             df2 = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                               date_parser=dateparse)
             df2.columns = self.renameddcols
-            df2['SCS'] = array(df2['State_Code'].values * 1.E7 + df2['County_Code'].values * 1.E4 + df2['Site_Num'].values,
-                               dtype='int32')
+            df2['SCS'] = array(
+                df2['State_Code'].values * 1.E7 + df2['County_Code'].values * 1.E4 + df2['Site_Num'].values,
+                dtype='int32')
         else:
             df2 = pd.DataFrame()
         if self.check_file_size(url) | self.check_file_size(url2):
@@ -1634,7 +1650,7 @@ class AQS(object):
             df = self.read_monitor_and_site(df)
             df['SCS'] = df.SCS.astype(str).str.zfill(9)
             df['datetime'] = df.datetime_local - \
-                pd.to_timedelta(df.GMT_Offset, unit='h')
+                             pd.to_timedelta(df.GMT_Offset, unit='h')
             df = self.get_species(df)
             df.to_hdf('AQS_DAILY_PM25_' + year + '.hdf', 'df', format='table')
         else:
@@ -1653,6 +1669,7 @@ class AQS(object):
         print('Unpacking: ' + url)
 
         def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
+
         #        ZipFile(filename).extractall()
         df = pd.read_csv(filename, parse_dates={'datetime_local': ["Date Local"]},
                          date_parser=dateparse)
@@ -1673,11 +1690,11 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         #        df['datetime'] =
         print('Saving file to: ' + self.datadir + \
-            '/' + 'AQS_DAILY_SPEC_' + year + '.hdf')
+              '/' + 'AQS_DAILY_SPEC_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_SPEC_' + year + '.hdf', 'df', format='table')
         return df
 
@@ -1694,7 +1711,7 @@ class AQS(object):
             3) + monitor['Site Number'].astype(str).str.zfill(4)
         site.columns = [i.replace(' ', '_') for i in site.columns]
         s = monitor.merge(site[['SCS', 'Land_Use', 'Location_Setting', 'GMT_Offset']], on=[
-                          'SCS'], how='left')
+            'SCS'], how='left')
         s.columns = [i.replace(' ', '_') for i in s.columns]
         s['SCS'] = pd.to_numeric(s.SCS, errors='coerce')
         return df.merge(s[['SCS', u'GMT_Offset', 'Networks', u'Land_Use', u'Location_Setting', 'Parameter_Code']],

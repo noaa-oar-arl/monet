@@ -37,7 +37,8 @@ def interp_to_obs(var, df, lat, lon, radius=12000.):
     lons = dfn.Longitude.values
     grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
     # Create image container
-    i = image.ImageContainerNearest(var.transpose('y', 'x', 'time').values, grid1, radius_of_influence=radius, fill_value=NaN)
+    i = image.ImageContainerNearest(var.transpose('y', 'x', 'time').values, grid1, radius_of_influence=radius,
+                                    fill_value=NaN)
     # resample
     ii = i.resample(grid2).image_data.squeeze()
     # recombine data
@@ -151,7 +152,8 @@ def geotiff_meta_to_areadef(meta):
     name = ""
     proj_id = "Generated from GeoTIFF"
     proj_dict = meta['crs']
-    proj_dict_with_string_values = dict(list(zip([str(key) for key in list(proj_dict.keys())], [str(value) for value in list(proj_dict.values())])))
+    proj_dict_with_string_values = dict(
+        list(zip([str(key) for key in list(proj_dict.keys())], [str(value) for value in list(proj_dict.values())])))
     x_size = meta['width']
     x_res = meta['transform'][0]
     y_res = meta['transform'][4] * -1
@@ -188,7 +190,8 @@ def geotiff_meta_to_areadef2(meta):
     name = ""
     proj_id = "Generated from GeoTIFF"
     proj_dict = meta['crs']
-    proj_dict_with_string_values = dict(list(zip([str(key) for key in list(proj_dict.keys())], [str(value) for value in list(proj_dict.values())])))
+    proj_dict_with_string_values = dict(
+        list(zip([str(key) for key in list(proj_dict.keys())], [str(value) for value in list(proj_dict.values())])))
     x_size = meta['width']
     x_res = 50000.
     y_res = 50000.

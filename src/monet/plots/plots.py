@@ -11,6 +11,7 @@ sns.set_palette(sns.color_palette(colors))
 
 sns.set_context('poster')
 
+
 # CMAQ Spatial Plots
 
 
@@ -43,7 +44,8 @@ def make_spatial_plot(cmaqvar, m, dpi=None, plotargs={}, ncolors=15, discrete=Fa
     return f, ax, c, cmap, vmin, vmax
 
 
-def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', discrete=True, ncolors=None, dtype='int', **kwargs):
+def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', discrete=True, ncolors=None, dtype='int',
+                          **kwargs):
     fig = plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
@@ -58,7 +60,7 @@ def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', disc
     levels = kwargs['levels']
     if discrete:
         c, cmap = colorbar_index(ncolors, cmap, minval=levels[0], maxval=levels[-1], basemap=m, dtype=dtype)
-#        m.contourf(x, y, cmaqvar, **kwargs,cmap=cmap)
+    #        m.contourf(x, y, cmaqvar, **kwargs,cmap=cmap)
     # c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
     else:
         c = m.colorbar()
@@ -129,7 +131,7 @@ def spatial_stat_scatter(df, m, date, stat=mystats.MB, ncolors=15, fact=1.5, cma
 def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors=15, fact=1.5, cmap='RdBu_r'):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
-#    plt.figure(figsize=(11, 6), frameon=False)
+    #    plt.figure(figsize=(11, 6), frameon=False)
     f, ax = plt.subplots(figsize=(11, 6), frameon=False)
     ax.set_facecolor('white')
     diff = (df.CMAQ - df.Obs)
@@ -138,7 +140,7 @@ def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors
     x, y = m(new.Longitude.values, new.Latitude.values)
     c, cmap = colorbar_index(ncolors, cmap, minval=top * -1, maxval=top, basemap=m)
     c.ax.tick_params(labelsize=13)
-#    cmap = cmap_discretize(cmap, ncolors)
+    #    cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
     ss = (new.CMAQ - new.Obs).abs() / top * 100.
     ss[ss > 300] = 300.
@@ -231,7 +233,8 @@ def timeseries_param(df, col='Obs', ax=None, sample='H', plotargs={}, fillargs={
     return ax
 
 
-def timeseries_error_param(df, col='Obs', ax=None, resample=False, freq='H', plotargs={}, fillargs={}, title='', label=None):
+def timeseries_error_param(df, col='Obs', ax=None, resample=False, freq='H', plotargs={}, fillargs={}, title='',
+                           label=None):
     """Short summary.
 
     Parameters

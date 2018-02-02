@@ -544,7 +544,7 @@ def combine_aqs_cmaq(model, obs):
             print('Interpolating Ozone:')
             df = g.get_group(i)
             fac = epa_util.check_cmaq_units(df, param='O3', aqs_param=i)
-            print (fac)
+            print(fac)
             cmaq = model.get_var(lay=0, param='O3').compute() * fac
             df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
                                        radius=model.dset.XCELL)
