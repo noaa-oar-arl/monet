@@ -70,7 +70,7 @@ class MONET(object):
 
         """
         from .models.cmaq import CMAQ
-        cmaq = CMAQ()
+        model = CMAQ()
         if gridcro2d is not None:
             model.set_gridcro2d(gridcro2d)
         if emission is not None:
