@@ -4,7 +4,7 @@ import seaborn as sns
 import taylordiagram as td
 from colorbars import colorbar_index
 
-from ..tools import mystats
+from ..util import mystats
 
 # colors = ['#1e90ff','#045C5C','#00A847','#DB4291','#BB7E5D']
 colors = ['#1e90ff', '#DA70D6', '#228B22', '#FA8072', '#FF1493']
