@@ -228,6 +228,7 @@ def timeseries_param(df, col='Obs', ax=None, sample='H', plotargs={}, fillargs={
         ax.set_ylabel(species + ' (' + unit + ')')
     else:
         ax.set_ylabel(label)
+    plt.set_xlabel('')
     plt.legend()
     plt.title(title)
     plt.tight_layout()
