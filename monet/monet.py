@@ -8,8 +8,14 @@ from builtins import object
 
 class MONET(object):
     def __init__(self):
-        self.model = None
-        self.obs = None
+        self.cmaq = None
+        self.hysplit = None
+        self.camx = None
+        self.aeronet = None
+        self.aqs = None
+        self.airnow = None
+        self.crn = None
+        self.ish = None
         self.combined = None
         self.verify = None
 
@@ -64,7 +70,7 @@ class MONET(object):
 
         """
         from .models.cmaq import CMAQ
-        self.model = CMAQ()
+        self.cmaq = CMAQ()
         if gridcro2d is not None:
             self.model.set_gridcro2d(gridcro2d)
         if emission is not None:
@@ -107,7 +113,7 @@ class MONET(object):
 
         """
         from .models.camx import CAMx
-        self.model = CAMx()
+        self.camx = CAMx()
         if met2d is not None:
             self.model.set_gridcro2d(met2d)
         if sfc2d is not None:
@@ -171,9 +177,9 @@ class MONET(object):
 
         """
         from .obs.airnow import AirNow
-        self.obs = AirNow()
-        self.obs.dates = dates
-        self.obs.aggragate_files()
+        self.airnow = AirNow()
+        self.airnow.dates = dates
+        self.airnow.aggragate_files()
 
     def add_aqs(self, dates=[], daily=False):
         """Short summary.
@@ -192,11 +198,11 @@ class MONET(object):
 
         """
         from .obs.aqs import AQS
-        self.obs = AQS()
+        self.aqs = AQS()
         if daily:
-            self.obs.load_all_daily_data(dates)
+            self.aqs.load_all_daily_data(dates)
         else:
-            self.obs.load_all_hourly_data(dates)
+            self.aqs.load_all_hourly_data(dates)
 
     def add_aeronet(self, dates=[], latlonbox=None):
         """Short summary.
@@ -215,11 +221,11 @@ class MONET(object):
 
         """
         from .obs.aeronet import AERONET
-        self.obs = AERONET()
-        self.obs.dates = dates
-        self.obs.latlonbox = latlonbox
-        self.obs.build_url()
-        self.obs.read_aeronet()
+        self.aeronet = AERONET()
+        self.aeronet.dates = dates
+        self.aeronet.latlonbox = latlonbox
+        self.aeronet.build_url()
+        self.aeronet.read_aeronet()
 
     def add_tolnet(self, fname=None):
         """Short summary.
@@ -236,9 +242,9 @@ class MONET(object):
 
         """
         from .obs.tolnet import TOLNET
-        self.obs = TOLNet()
+        self.tolnet = TOLNet()
         if fname is not None:
-            self.obs.open_data(fname)
+            self.tolnet.open_data(fname)
 
     def add_ish(self):
         print('this is a dummy right now')
@@ -249,7 +255,7 @@ class MONET(object):
     def add_improve(self):
         print('this is a dummy right now')
 
-    def combine(self):
+    def combine(self, model=None, obs=None, **kwargs):
         """Short summary.
 
         Returns
@@ -258,8 +264,13 @@ class MONET(object):
             Description of returned object.
 
         """
-        if self.model is not None and self.obs is not None:
+        if model is not None and obs is not None:
             from .verification.combine import combine as pair
-            self.combined = pair(model=self.model, obs=self.obs)
-            from .verification.verify import VERIFY
-            self.verify = VERIFY(model=self.model, obs=self.obs, dset=self.combined)
+            if model.objtype == 'TOLNET':
+                dset, combined = pair(model=model, obs=obs, **kwargs)
+                return dset, combined
+            else:
+                combined = pair(model=model, obs=obs)
+                from .verification.verify import VERIFY
+                verify = VERIFY(model=model, obs=obs, dset=combined)
+                return combined, verify
