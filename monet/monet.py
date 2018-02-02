@@ -41,9 +41,10 @@ class MONET(object):
                                            self.add_camx
          """
         if model.upper() == 'CMAQ':
-            self.add_cmaq(**kwargs)
+            model = self.add_cmaq(**kwargs)
         if model.upper() == 'CAMX':
-            self.add_camx(**kwargs)
+            model = self.add_camx(**kwargs)
+        return model
 
     def add_cmaq(self, gridcro2d=None, emission=None, metcro2d=None, metcro3d=None, depn=None, conc=None):
         """Short summary.
