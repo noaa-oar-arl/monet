@@ -1,0 +1,119 @@
+&files
+OBS_NETWORK = 'AQS' ! AQS or AIRNOW
+DATA_DIR = '/data/aqf2/barryb/5xpm/AQS_DATA' ! /data/aqf2/barryb/5xpm/AQS_DATA
+SIM1 = '/data/aqf/youhuat/AQS/CMAQ_DATA/x-e51-ltgn5-ptfire1-binh3_2011.hdf'
+SIM2 = '/data/aqf/youhuat/AQS/CMAQ_DATA/x-L42-e51-OI5.hdf'
+SIM3 = None
+SIM4 = None
+SIM1MET = '/data/aqf2/barryb/5xpm/20140901/aqm.t12z.metcro2d.ncf'
+SIM2MET	= None
+SIM3MET	= None
+SIM4MET	= None 
+gridcro = '/data/aqf/barryb/aqm.t12z.grdcro2d.ncf'
+basename = 'OI'
+SIM1label = 'PROD'
+SIM2label = 'CMAQ-EDA'
+SIM3label = 'SIM3'
+SIM4label = 'SIM4'
+start_date = '2011-07-04 12'
+end_date = '2011-07-10 00'
+save=.false.
+sim1_save_name = '../../../CMAQ_DATA/AQM_OI-out.hdf
+sim2_save_name = '../../../CMAQ_DATA/AQME_RAPID_NOX.hdf'
+sim3_save_name = 'none'
+sim4_save_name = 'none'
+/
+&interp
+method='nearest'
+radius_of_influence=12000.
+neighbors=4
+/
+&Domain
+params=none
+tseries=.True.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.true.
+footers=.false.
+stats=.False.
+/
+&EPA_region
+params=none
+epa_region='R1,R2,R3,R4,R5,R6,R7,R8,R9,R10'
+tseries=.False.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+stats=.False.
+/
+&Region
+params=OZONE
+region=all
+tseries=.false.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.True.
+footers=.false.
+stats=.False.
+/
+&State
+params=none
+state=none
+tseries=.False.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+stats=.False.
+/
+&City
+params=all
+city= 'Atlanta,Austin,Boston,Charlotte-Gastonia,Chicago,Chicago,Dallas,Denver,Detroit,El Paso,Indianapolis,Jacksonville,Los Angeles,New York,Philadelphia,Phoenix-Mesa,Portland-Vancouver,San Francisco,San Jose,Washington-Arlington'
+tseries=.false.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+stats=.False.
+/
+&Site
+params='OZONE,PM2.5'
+site= 'none'
+tseries=.false.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+stats=.False.
+/
+&Spatial
+params='OZONE,TEMP,PM2.5,PM10,NO2,NOX,WS'
+monitors=.False.
+bias=.False.
+/
+

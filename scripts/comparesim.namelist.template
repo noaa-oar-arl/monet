@@ -1,0 +1,91 @@
+&files
+AQS_DATA_DIR = '/data/aqf2/barryb/5xpm/AQS_DATA' ! Data Directory for storing AQS DATA 
+SIM1 = '/data/aqf2/barryb/5xpm/2011020*/aqm.t12z.aconc.ncf' ! Data Directory Paths for the first simulation to compare (netcdf raw format or .hdf for preprocessed data)
+SIM2 = '/data/aqf2/youhuat/AQS/data/OI-out/2011020*/adj-oi.*.ncf' ! Data Directory Paths for the second simulation to compare
+SIM3 = None                     ! Data Directory Paths for the third simulation to compare
+SIM4 = None                     ! Data Directory Paths for the fourth simulation to compare
+gridcro = '/data/aqf/barryb/aqm.t12z.grdcro2d.ncf' ! gridcro 2d file for CMAQ
+basename='edanox'               ! PLOT BASE NAME: example edanox will become eda_Northeast_NOX_timeseries.jpg for regional nox in the northeast
+SIM1label='SIM1'                ! Plot label for SIM1
+SIM2label='SIM2'                ! Plot Label for SIM2
+SIM3label='SIM3'                ! Plot label for SIM3
+SIM4label='SIM4'                ! Plot label for SIM4
+start_date ='2011-02-05 00'     ! plotting start date
+end_date = '2011-02-07 00'      ! plotting end date
+save = .true.                   ! if true save paired data else don't 
+sim1_save_name = 'SIM1_HDF.hdf' ! save SIM1 filename (end in .hdf)
+sim2_save_name = 'SIM2_HDF.hdf' ! save SIM2 filename (end in .hdf)
+sim3_save_name = 'none'         ! save SIM3 filename (end in .hdf)
+sim4_save_name = 'none'         ! save SIM4 filename (end in .hdf)
+/
+&interp
+method='nearest'                ! Interpolation method (nearest or gauss)
+radius_of_influence=12000.      ! Radius of Influence (m)
+neighbors=4                     ! Number of Neighbors used
+/
+&Domain
+params='OZONE,PM2.5,NOX'        ! Species.  list by comma delimited or 'all' for all species (OZONE 
+tseries=.True.                  ! Make Time series plots
+tseriesrmse=.false.             ! Make hourly RMSE time series plots
+tseriesbias=.false.             ! Make hourly MB timeseries plots
+scatter=.false.                 ! Make scatter plots
+diffscatter=.false.             ! Make difference scatter plots
+pdfs=.false.                    ! Make pdf plots
+diffpdfs=.false.                ! Make difference pdf plots
+taylordiagram=.false.           ! Taylor diagrams
+footers=.false.
+/
+&Region
+params='OZONE,PM2.5,NOX'
+region= 'all'
+tseries=.True.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+/
+&State
+params='OZONE,PM2.5'
+state= 'TX,MD,NY,CT,CA,FL'
+tseries=.True.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+/
+&City
+params='OZONE,PM2.5'
+city= 'none'
+tseries=.false.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+/
+&Site
+params='OZONE,PM2.5'
+site= 'none'
+tseries=.false.
+tseriesrmse=.false.
+tseriesbias=.false.
+scatter=.false.
+diffscatter=.false.
+pdfs=.false.
+diffpdfs=.false.
+taylordiagram=.false.
+footers=.false.
+/
+
+
