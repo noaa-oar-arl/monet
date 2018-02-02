@@ -70,19 +70,20 @@ class MONET(object):
 
         """
         from .models.cmaq import CMAQ
-        self.cmaq = CMAQ()
+        cmaq = CMAQ()
         if gridcro2d is not None:
-            self.model.set_gridcro2d(gridcro2d)
+            model.set_gridcro2d(gridcro2d)
         if emission is not None:
-            self.model.open_cmaq(emission)
+            model.open_cmaq(emission)
         if metcro2d is not None:
-            self.model.open_cmaq(metcro2d)
+            model.open_cmaq(metcro2d)
         if metcro3d is not None:
-            self.model.open_cmaq(metcro3d)
+            model.open_cmaq(metcro3d)
         if depn is not None:
-            self.model.open_cmaq(depn)
+            model.open_cmaq(depn)
         if conc is not None:
-            self.model.open_cmaq(conc)
+            model.open_cmaq(conc)
+        return model
 
     def add_camx(self, met2d=None, sfc2d=None, cld3d=None, kv=None, met3d=None, avrg=None, emission=None, depn=None):
         """Short summary.
@@ -113,23 +114,24 @@ class MONET(object):
 
         """
         from .models.camx import CAMx
-        self.camx = CAMx()
+        model = CAMx()
         if met2d is not None:
-            self.model.set_gridcro2d(met2d)
+            model.set_gridcro2d(met2d)
         if sfc2d is not None:
-            self.model.open_cmaq(sfc2d)
+            model.open_cmaq(sfc2d)
         if cld3d is not None:
-            self.model.open_cmaq(cld3d)
+            model.open_cmaq(cld3d)
         if kv is not None:
-            self.model.open_cmaq(kv)
+            model.open_cmaq(kv)
         if met3d is not None:
-            self.model.open_cmaq(met3d)
+            model.open_cmaq(met3d)
         if avrg is not None:
-            self.model.open_cmaq(avrg)
+            model.open_cmaq(avrg)
         if emission is not None:
-            self.model.open_cmaq(emission)
+            model.open_cmaq(emission)
         if depn is not None:
-            self.model.open_cmaq(depn)
+            model.open_cmaq(depn)
+        return model
 
     def add_obs(self, obs='AirNOW', **kwargs):
         """Short summary.
