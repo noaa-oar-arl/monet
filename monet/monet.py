@@ -63,7 +63,7 @@ class MONET(object):
             Description of returned object.
 
         """
-        from .models.cmaq import CMAQ
+        from models.cmaq import CMAQ
         self.model = CMAQ()
         if gridcro2d is not None:
             self.model.set_gridcro2d(gridcro2d)
