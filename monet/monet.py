@@ -181,9 +181,10 @@ class MONET(object):
 
         """
         from .obs.airnow import AirNow
-        self.airnow = AirNow()
-        self.airnow.dates = dates
-        self.airnow.aggragate_files()
+        airnow = AirNow()
+        airnow.dates = dates
+        airnow.aggragate_files()
+        return airnow
 
     def add_aqs(self, dates=[], daily=False):
         """Short summary.
@@ -202,11 +203,12 @@ class MONET(object):
 
         """
         from .obs.aqs import AQS
-        self.aqs = AQS()
+        aqs = AQS()
         if daily:
-            self.aqs.load_all_daily_data(dates)
+            aqs.load_all_daily_data(dates)
         else:
-            self.aqs.load_all_hourly_data(dates)
+            aqs.load_all_hourly_data(dates)
+        return aqs
 
     def add_aeronet(self, dates=[], latlonbox=None):
         """Short summary.
@@ -225,11 +227,12 @@ class MONET(object):
 
         """
         from .obs.aeronet import AERONET
-        self.aeronet = AERONET()
-        self.aeronet.dates = dates
-        self.aeronet.latlonbox = latlonbox
-        self.aeronet.build_url()
-        self.aeronet.read_aeronet()
+        aeronet = AERONET()
+        aeronet.dates = dates
+        aeronet.latlonbox = latlonbox
+        aeronet.build_url()
+        aeronet.read_aeronet()
+        return aeronet
 
     def add_tolnet(self, fname=None):
         """Short summary.
@@ -246,9 +249,10 @@ class MONET(object):
 
         """
         from .obs.tolnet import TOLNET
-        self.tolnet = TOLNet()
+        tolnet = TOLNet()
         if fname is not None:
-            self.tolnet.open_data(fname)
+            tolnet.open_data(fname)
+        return tolnet
 
     def add_ish(self):
         print('this is a dummy right now')
