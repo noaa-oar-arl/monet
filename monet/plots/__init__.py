@@ -1,6 +1,6 @@
 from __future__ import absolute_import, print_function
 
-from . import colorbars, plots, taylordiagram
+from . import colorbars  # , plots, taylordiagram
 
 __all__ = ['colorbars', 'plots', 'taylordiagram']
 
