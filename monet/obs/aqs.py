@@ -1699,9 +1699,9 @@ class AQS(object):
 
     def read_monitor_and_site(self, df):
         # has GMT Land Use and Location Setting (RURAL URBAN etc...)
-        site_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_sites.zip'
+        site_url = self.baseurl + 'aqs_sites.zip'
         # has network info (CSN IMPROVE etc....)
-        monitor_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_monitors.zip'
+        monitor_url = self.baseurl + 'aqs_monitors.zip'
         site = pd.read_csv(site_url)
         monitor = pd.read_csv(monitor_url, index_col=None, usecols=list(range(29)))
         site['SCS'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site[
