@@ -83,6 +83,9 @@ def find_nearest_latlon_xarray(arr, lat=37.102400, lon=-76.392900, radius=12e3):
     return arr.sel(x=col).sel(y=row).squeeze()
 
 
+# def interp_to_press_xarray()
+
+
 def get_smops_area_def(nx=1440, ny=720):
     """Short summary.
 
