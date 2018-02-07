@@ -6,7 +6,7 @@ from datetime import datetime
 import pandas as pd
 from numpy import NaN, array
 
-from .epa_util import read_monitor_and_site
+from epa_util import read_monitor_and_site
 
 # this is written to retrive airnow data concatenate and add to pandas array for usage
 
