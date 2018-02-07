@@ -323,5 +323,5 @@ def read_monitor_file(network=None):
         s = s.loc[s.Networks].drop_duplicates(subset=['Networks'])
         return s
     else:
-    return df.merge(s[['SCS', u'GMT_Offset', 'Networks', u'Land_Use', u'Location_Setting', 'Parameter_Code']],
-                    on=['SCS', 'Parameter_Code'], how='left')
+        return df.merge(s[['SCS', u'GMT_Offset', 'Networks', u'Land_Use', u'Location_Setting', 'Parameter_Code']],
+                        on=['SCS', 'Parameter_Code'], how='left')
