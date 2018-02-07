@@ -62,7 +62,7 @@ def ensure_values_indomain(df, lon, lat):
 
     """
     con = ((df.Latitude.values > lat.min()) & (df.Latitude.values < lat.max()) & (
-            df.Longitude.values > lon.min()) & (df.Longitude.values < lon.max()))
+        df.Longitude.values > lon.min()) & (df.Longitude.values < lon.max()))
     df = df[con].copy()
     return df
 
@@ -301,3 +301,111 @@ def get_epa_location_df(df, param, site='', city='', region='', epa_region='', s
         df2 = new
         title = 'Domain'
     return df2, title
+
+
+def convert_statenames_to_abv(df):
+    d = {'Alabama': 'AL',
+         'Alaska': 'AK',
+         'Arizona': 'AZ',
+         'Arkansas': 'AR',
+         'California': 'CA',
+         'Colorado': 'CO',
+         'Connecticut': 'CT',
+         'Delaware': 'DE',
+         'Florida': 'FL',
+         'Georgia': 'GA',
+         'Hawaii': 'HI',
+         'Idaho': 'ID',
+         'Illinois': 'IL',
+         'Indiana': 'IN',
+         'Iowa': 'IA',
+         'Kansas': 'KS',
+         'Kentucky': 'KY',
+         'Louisiana': 'LA',
+         'Maine': 'ME',
+         'Maryland': 'MD',
+         'Massachusetts': 'MA',
+         'Michigan': 'MI',
+         'Minnesota': 'MN',
+         'Mississippi': 'MS',
+         'Missouri': 'MO',
+         'Montana': 'MT',
+         'Nebraska': 'NE',
+         'Nevada': 'NV',
+         'New Hampshire': 'NH',
+         'New Jersey': 'NJ',
+         'New Mexico': 'NM',
+         'New York': 'NY',
+         'North Carolina': 'NC',
+         'North Dakota': 'ND',
+         'Ohio': 'OH',
+         'Oklahoma': 'OK',
+         'Oregon': 'OR',
+         'Pennsylvania': 'PA',
+         'Rhode Island': 'RI',
+         'South Carolina': 'SC',
+         'South Dakota': 'SD',
+         'State': 'Postal',
+         'Tennessee': 'TN',
+         'Texas': 'TX',
+         'Utah': 'UT',
+         'Vermont': 'VT',
+         'Virginia': 'VA',
+         'Washington': 'WA',
+         'West Virginia': 'WV',
+         'Wisconsin': 'WI',
+         'Wyoming': 'WY'}
+    for i in d:
+        df['State_Name'].loc[df.State_Name.isin([i])] = d[i]
+    df['State_Name'].loc[df.State_Name.isin(['Canada'])] = 'CC'
+    df['State_Name'].loc[df.State_Name.isin(['Mexico'])] = 'MM'
+    return df
+
+
+def read_monitor_file(network=None):
+    from numpy import NaN
+    import pandas as pd
+    import os
+    try:
+        basedir = os.path.abspath(os.path.dirname(__file__))[:-10]
+        s = pd.read_csv(os.path.join(basedir, 'data', 'monitoring_site_locations.dat'))
+    except:
+        print('Monitor File Not Found... Reprocessing')
+        baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
+        site_url = baseurl + 'aqs_sites.zip'
+        # has network info (CSN IMPROVE etc....)
+        monitor_url = baseurl + 'aqs_monitors.zip'
+        # Airnow monitor file
+        monitor_airnow_url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/today/monitoring_site_locations.dat'
+        colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                     11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+        airnow = pd.read_csv(monitor_airnow_url, delimiter='|', header=None, usecols=colsinuse)
+        airnow.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
+                          'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
+                          'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
+        airnow['SCS'] = pd.to_numeric(airnow.SCS, errors='coerce')
+        # Read EPA Site file
+        site = pd.read_csv(site_url)
+        # read epa monitor file
+        monitor = pd.read_csv(monitor_url)
+        # make SCS column
+        site['SCS'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site[
+            'Site Number'].astype(str).str.zfill(4)
+        monitor['SCS'] = monitor['State Code'].astype(str).str.zfill(2) + monitor['County Code'].astype(str).str.zfill(
+            3) + monitor['Site Number'].astype(str).str.zfill(4)
+        site.columns = [i.replace(' ', '_') for i in site.columns]
+        s = monitor.merge(site[['SCS', 'Land_Use', 'Location_Setting', 'GMT_Offset']], on=['SCS'], how='left')
+        s.columns = [i.replace(' ', '_') for i in s.columns]
+        s['SCS'] = pd.to_numeric(s.SCS, errors='coerce')
+        monitor_drop = ['State_Code', u'County_Code', u'Site_Number', 'Extraction_Date', 'Parameter_Code', 'Parameter_Name', 'POC', 'Last_Sample_Date', 'PQAO',
+                        'Reporting_Agency', 'Exclusions', u'Monitoring_Objective', 'Last_Method_Code', 'Last_Method', u'NAAQS_Primary_Monitor', u'QA_Primary_Monitor']
+        s.drop(monitor_drop, axis=1, inplace=True)
+        # drop airnow keys for merge
+        airnow_drop = [u'Site_Code', u'Site_Name', u'Status', u'Agency', 'Agency_Name', 'Country_Code', u'CMSA_Code',
+                       'State_Code', u'County_Code', u'City_Code', u'Latitude', u'Longitude', 'GMT_Offset', 'State_Name', 'County_Name']
+        airnow.drop(airnow_drop, axis=1, inplace=True)
+        s = s.merge(airnow, how='left', on='SCS')
+        s = convert_statenames_to_abv(s).dropna(subset=['Latitude', 'Longitude'])
+    if network is not None:
+        s = s.loc[s.Networks.isin([network])].drop_duplicates(subset=['SCS'])
+    return s

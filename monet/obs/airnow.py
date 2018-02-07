@@ -83,11 +83,7 @@ class AirNow(object):
             df.date + ' ' + df.time, format='%m/%d/%y %H:%M', exact=True, box=False)
         df.drop(['date', 'time'], axis=1, inplace=True)
         df['datetime_local'] = df.datetime + \
-<<<<<<< HEAD:monet/obs/airnow.py
             pd.to_timedelta(df.utcoffset, unit='H')
-=======
-                               pd.to_timedelta(df.utcoffset, unit='H')
->>>>>>> master:monet/obs/airnow.py
         self.df = df
         print('    Adding in Meta-data')
         self.get_station_locations()
