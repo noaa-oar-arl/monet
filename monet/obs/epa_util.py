@@ -62,7 +62,7 @@ def ensure_values_indomain(df, lon, lat):
 
     """
     con = ((df.Latitude.values > lat.min()) & (df.Latitude.values < lat.max()) & (
-            df.Longitude.values > lon.min()) & (df.Longitude.values < lon.max()))
+        df.Longitude.values > lon.min()) & (df.Longitude.values < lon.max()))
     df = df[con].copy()
     return df
 
@@ -301,3 +301,27 @@ def get_epa_location_df(df, param, site='', city='', region='', epa_region='', s
         df2 = new
         title = 'Domain'
     return df2, title
+
+
+def read_monitor_file(network=None):
+    baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
+    site_url = baseurl + 'aqs_sites.zip'
+    # has network info (CSN IMPROVE etc....)
+    monitor_url = baseurl + 'aqs_monitors.zip'
+    site = pd.read_csv(site_url)
+    monitor = pd.read_csv(monitor_url, index_col=None, usecols=list(range(29)))
+    site['SCS'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site[
+        'Site Number'].astype(str).str.zfill(4)
+    monitor['SCS'] = monitor['State Code'].astype(str).str.zfill(2) + monitor['County Code'].astype(str).str.zfill(
+        3) + monitor['Site Number'].astype(str).str.zfill(4)
+    site.columns = [i.replace(' ', '_') for i in site.columns]
+    s = monitor.merge(site[['SCS', 'Land_Use', 'Location_Setting', 'GMT_Offset']], on=[
+        'SCS'], how='left')
+    s.columns = [i.replace(' ', '_') for i in s.columns]
+    s['SCS'] = pd.to_numeric(s.SCS, errors='coerce')
+    if network is not None:
+        s = s.loc[s.Networks].drop_duplicates(subset=['Networks'])
+        return s
+    else:
+    return df.merge(s[['SCS', u'GMT_Offset', 'Networks', u'Land_Use', u'Location_Setting', 'Parameter_Code']],
+                    on=['SCS', 'Parameter_Code'], how='left')

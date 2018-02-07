@@ -1,12 +1,14 @@
 from __future__ import print_function
-# this is written to retrive airnow data concatenate and add to pandas array for usage
 
-from builtins import zip
-from builtins import object
+from builtins import object, zip
 from datetime import datetime
 
 import pandas as pd
 from numpy import NaN, array
+
+from .epa_util import read_monitor_and_site
+
+# this is written to retrive airnow data concatenate and add to pandas array for usage
 
 
 class improve(object):
@@ -53,12 +55,15 @@ class improve(object):
         self.df.drop('Dataset', axis=1, inplace=True)
         print('Adding in some Meta-Data')
         print('Calculating local time')
-        self.df = self.get_local_datetime(self.df)
+        dropkeys = ['Latitude', 'Longitude', 'POC']
+        monitor_df = read_monitor_and_site(network='IMPROVE').drop(dropkeys, axis=1)
+        self.df = self.df.merge(monitor)
+        #self.df = self.get_local_datetime(self.df)
         self.df = self.df.copy().drop_duplicates()
         self.df.dropna(subset=['Species'], inplace=True)
         self.df.Species.loc[self.df.Species == 'MT'] = 'PM10'
         self.df.Species.loc[self.df.Species == 'MF'] = 'PM2.5'
-        self.df.datetime = [datetime.strptime(i, '%Y%m%d') for i in self.df.datetime]
+        #self.df.datetime = [datetime.strptime(i, '%Y%m%d') for i in self.df.datetime]
         if output == '':
             output = 'IMPROVE.hdf'
         print('Outputing data to: ' + output)
