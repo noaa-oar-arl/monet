@@ -19,19 +19,6 @@ class AirNow(object):
                       datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
         self.datestr = []
         self.df = None
-        self.se_states = array(
-            ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN',
-             'VA', 'WV'], dtype='|S14')
-        self.ne_states = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA',
-                                'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'],
-                               dtype='|S20')
-        self.nc_states = array(
-            ['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'],
-            dtype='|S9')
-        self.sc_states = array(['AR', 'LA', 'OK', 'TX'], dtype='|S9')
-        self.r_states = array(['AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM',
-                               'ND', 'SD', 'UT', 'WY'], dtype='|S12')
-        self.p_states = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.objtype = 'AirNow'
         self.filelist = None
         self.monitor_file = inspect.getfile(
@@ -96,7 +83,11 @@ class AirNow(object):
             df.date + ' ' + df.time, format='%m/%d/%y %H:%M', exact=True, box=False)
         df.drop(['date', 'time'], axis=1, inplace=True)
         df['datetime_local'] = df.datetime + \
+<<<<<<< HEAD:monet/obs/airnow.py
+            pd.to_timedelta(df.utcoffset, unit='H')
+=======
                                pd.to_timedelta(df.utcoffset, unit='H')
+>>>>>>> master:monet/obs/airnow.py
         self.df = df
         print('    Adding in Meta-data')
         self.get_station_locations()
@@ -155,28 +146,3 @@ class AirNow(object):
                          'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
 
         self.monitor_df = f.copy()
-
-    def get_region(self):
-        sr = self.df.State_Name.copy().values
-        for i in self.se_states:
-            con = sr == i
-            sr[con] = 'Southeast'
-        for i in self.ne_states:
-            con = sr == i
-            sr[con] = 'Northeast'
-        for i in self.nc_states:
-            con = sr == i
-            sr[con] = 'North Central'
-        for i in self.sc_states:
-            con = sr == i
-            sr[con] = 'South Central'
-        for i in self.p_states:
-            con = sr == i
-            sr[con] = 'Pacific'
-        for i in self.r_states:
-            con = sr == i
-            sr[con] = 'Rockies'
-        sr[sr == 'CC'] = 'Canada'
-        sr[sr == 'MX'] = 'Mexico'
-
-        self.df['Region'] = array(sr)

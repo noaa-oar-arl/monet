@@ -1,15 +1,16 @@
 from __future__ import print_function
-
-import inspect
-import os
 # this is a class to deal with aqs data
-from builtins import object, range, zip
+from builtins import zip
+from builtins import range
+from builtins import object
+import os
 from datetime import datetime
 from zipfile import ZipFile
 
 import pandas as pd
+from numpy import array, arange
+import inspect
 import requests
-from numpy import arange, array
 
 
 class AQS(object):
@@ -17,7 +18,7 @@ class AQS(object):
         #        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
         self.objtype = 'AQS'
         self.daily = False
-        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
+        self.baseurl = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/'
         self.dates = [datetime.strptime('2014-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
                       datetime.strptime('2014-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
         self.renamedhcols = ['datetime_local', 'datetime', 'State_Code', 'County_Code',
@@ -130,7 +131,7 @@ class AQS(object):
             df = df.copy()[self.savecols]
             df = self.add_metro_metadata2(df)
             df['Species'] = 'PM2.5'
-            print('Saving file to: ' + self.datadir + '/' +
+            print('Saving file to: ' + self.datadir + '/' + \
                   'AQS_HOURLY_PM_25_88101_' + year + '.hdf')
             df.to_hdf('AQS_HOURLY_PM_25_88101_' +
                       year + '.hdf', 'df', format='table')
@@ -161,7 +162,7 @@ class AQS(object):
         df = self.get_species(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir + '/' +
+        print('Saving file to: ' + self.datadir + '/' + \
               'AQS_HOURLY_OZONE_44201_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_OZONE_44201_' +
                   year + '.hdf', 'df', format='table')
@@ -192,7 +193,7 @@ class AQS(object):
         # df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir + '/' +
+        print('Saving file to: ' + self.datadir + '/' + \
               'AQS_HOURLY_PM_10_81102_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_PM_10_81102_' +
                   year + '.hdf', 'df', format='table')
@@ -222,7 +223,7 @@ class AQS(object):
         # df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir + '/' +
+        print('Saving file to: ' + self.datadir + '/' + \
               'AQS_HOURLY_SO2_42401_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_SO2_42401_' + year +
                   '.hdf', 'df', format='table')
@@ -252,7 +253,7 @@ class AQS(object):
         #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir + '/' +
+        print('Saving file to: ' + self.datadir + '/' + \
               'AQS_HOURLY_NO2_42602_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_NO2_42602_' + year +
                   '.hdf', 'df', format='table')
@@ -282,7 +283,7 @@ class AQS(object):
         #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_HOURLY_CO_42101_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_CO_42101_' + year + '.hdf', 'df', format='table')
         return df
@@ -311,7 +312,7 @@ class AQS(object):
         #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_HOURLY_NONOXNOY_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_NONOXNOY_' + year + '.hdf', 'df', format='table')
         return df
@@ -340,7 +341,7 @@ class AQS(object):
         #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_HOURLY_VOC_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_VOC_' + year + '.hdf', 'df', format='table')
         return df
@@ -370,7 +371,7 @@ class AQS(object):
             df = self.get_species(df)
             df = df.copy()[self.savecols]
             df = self.add_metro_metadata2(df)
-            print('Saving file to: ' + self.datadir +
+            print('Saving file to: ' + self.datadir + \
                   '/' + 'AQS_HOURLY_SPEC_' + year + '.hdf')
             df.to_hdf('AQS_HOURLY_SPEC_' + year + '.hdf', 'df', format='table')
             return df
@@ -401,7 +402,7 @@ class AQS(object):
         #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_HOURLY_WIND_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_WIND_' + year + '.hdf', 'df', format='table')
         return df
@@ -430,7 +431,7 @@ class AQS(object):
         #        df = self.get_region(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_HOURLY_TEMP_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_TEMP_' + year + '.hdf', 'df', format='table')
         return df
@@ -458,7 +459,7 @@ class AQS(object):
         df = self.get_species(df)
         df = df.copy()[self.savecols]
         df = self.add_metro_metadata2(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_HOURLY_RHDP_' + year + '.hdf')
         df.to_hdf('AQS_HOURLY_RHDP_' + year + '.hdf', 'df', format='table')
         return df
@@ -715,10 +716,10 @@ class AQS(object):
         os.chdir(self.datadir)
         dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
                self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(
-            dates), self.load_aqs_no2_data(dates),
-            self.load_aqs_so2_data(dates), self.load_aqs_voc_data(
-            dates), self.load_aqs_nonoxnoy_data(dates),
-            self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]
+                dates), self.load_aqs_no2_data(dates),
+               self.load_aqs_so2_data(dates), self.load_aqs_voc_data(
+                dates), self.load_aqs_nonoxnoy_data(dates),
+               self.load_aqs_wind_data(dates), self.load_aqs_temp_data(dates), self.load_aqs_rhdp_data(dates)]
         os.chdir(self.cwd)
 
     def load_all_hourly_data(self, dates, datasets='all'):
@@ -729,12 +730,12 @@ class AQS(object):
         else:
             dfs = [self.load_aqs_co_data(dates), self.load_aqs_pm10_data(dates), self.load_aqs_ozone_data(dates),
                    self.load_aqs_pm25_data(dates), self.load_aqs_spec_data(
-                dates), self.load_aqs_no2_data(dates),
-                self.load_aqs_so2_data(dates), self.load_aqs_voc_data(
-                dates), self.load_aqs_nonoxnoy_data(dates),
-                self.load_aqs_wind_data(
+                    dates), self.load_aqs_no2_data(dates),
+                   self.load_aqs_so2_data(dates), self.load_aqs_voc_data(
+                    dates), self.load_aqs_nonoxnoy_data(dates),
+                   self.load_aqs_wind_data(
                        dates), self.load_aqs_temp_data(dates),
-                self.load_aqs_rhdp_data(dates)]  # ,self.load_aqs_daily_spec_data(dates)]
+                   self.load_aqs_rhdp_data(dates)]  # ,self.load_aqs_daily_spec_data(dates)]
         self.df = pd.concat(dfs, ignore_index=True)
         self.df = self.change_units(self.df).drop_duplicates()
         os.chdir(self.cwd)
@@ -1193,9 +1194,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_VOC_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_VOC_' + year + '.hdf', 'df', format='table')
         return df
@@ -1232,9 +1233,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_TEMP_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_TEMP_' + year + '.hdf', 'df', format='table')
         return df
@@ -1271,9 +1272,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_TEMP_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_TEMP_' + year + '.hdf', 'df', format='table')
         return df
@@ -1310,9 +1311,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_TEMP_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_NONOXNOY_' + year + '.hdf', 'df', format='table')
         return df
@@ -1349,9 +1350,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_RH_DP_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_RH_DP_' + year + '.hdf', 'df', format='table')
         return df
@@ -1389,9 +1390,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_WIND_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_WIND_' + year + '.hdf', 'df', format='table')
         return df
@@ -1429,7 +1430,7 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         print('Saving file to: ' + self.datadir + '/' + 'AQS_DAILY_CO_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_CO_' + year + '.hdf', 'df', format='table')
@@ -1468,9 +1469,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_OZONE_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_OZONE_' + year + '.hdf', 'df', format='table')
         return df
@@ -1508,9 +1509,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
 
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_NO2_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_NO2_' + year + '.hdf', 'df', format='table')
         return df
@@ -1548,9 +1549,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_SO2_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_SO2_' + year + '.hdf', 'df', format='table')
         return df
@@ -1588,9 +1589,9 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_PM10_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_PM10_' + year + '.hdf', 'df', format='table')
         return df
@@ -1649,7 +1650,7 @@ class AQS(object):
             df = self.read_monitor_and_site(df)
             df['SCS'] = df.SCS.astype(str).str.zfill(9)
             df['datetime'] = df.datetime_local - \
-                pd.to_timedelta(df.GMT_Offset, unit='h')
+                             pd.to_timedelta(df.GMT_Offset, unit='h')
             df = self.get_species(df)
             df.to_hdf('AQS_DAILY_PM25_' + year + '.hdf', 'df', format='table')
         else:
@@ -1689,19 +1690,19 @@ class AQS(object):
         df = self.read_monitor_and_site(df)
         df['SCS'] = df.SCS.astype(str).str.zfill(9)
         df['datetime'] = df.datetime_local - \
-            pd.to_timedelta(df.GMT_Offset, unit='h')
+                         pd.to_timedelta(df.GMT_Offset, unit='h')
         df = self.get_species(df)
         #        df['datetime'] =
-        print('Saving file to: ' + self.datadir +
+        print('Saving file to: ' + self.datadir + \
               '/' + 'AQS_DAILY_SPEC_' + year + '.hdf')
         df.to_hdf('AQS_DAILY_SPEC_' + year + '.hdf', 'df', format='table')
         return df
 
     def read_monitor_and_site(self, df):
         # has GMT Land Use and Location Setting (RURAL URBAN etc...)
-        site_url = self.baseurl + 'aqs_sites.zip'
+        site_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_sites.zip'
         # has network info (CSN IMPROVE etc....)
-        monitor_url = self.baseurl + 'aqs_monitors.zip'
+        monitor_url = 'https://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/aqs_monitors.zip'
         site = pd.read_csv(site_url)
         monitor = pd.read_csv(monitor_url, index_col=None, usecols=list(range(29)))
         site['SCS'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site[

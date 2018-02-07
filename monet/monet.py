@@ -186,7 +186,11 @@ class MONET(object):
         airnow.aggragate_files()
         return airnow
 
+<<<<<<< HEAD
+    def add_aqs(self, dates=[], daily=False, network=None):
+=======
     def add_aqs(self, dates=[], daily=False):
+>>>>>>> master
         """Short summary.
 
         Parameters
@@ -204,10 +208,14 @@ class MONET(object):
         """
         from .obs.aqs import AQS
         aqs = AQS()
+<<<<<<< HEAD
+        aqs.add_data(dates, daily=daily, network=network)
+=======
         if daily:
             aqs.load_all_daily_data(dates)
         else:
             aqs.load_all_hourly_data(dates)
+>>>>>>> master
         return aqs
 
     def add_aeronet(self, dates=[], latlonbox=None):
@@ -260,8 +268,19 @@ class MONET(object):
     def add_crn(self):
         print('this is a dummy right now')
 
+<<<<<<< HEAD
+    def add_improve(self, fname):
+        from .obs.airnow import IMPROVE
+        improve = IMPROVE()
+        if fname[-4:] == '.hdf':
+            improve.load_hdf(fname)
+        else:
+            improve.open_file(fname)
+        return improve
+=======
     def add_improve(self):
         print('this is a dummy right now')
+>>>>>>> master
 
     def combine(self, model=None, obs=None, **kwargs):
         """Short summary.
