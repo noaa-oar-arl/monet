@@ -53,6 +53,7 @@ class AQS(object):
             df = pd.read_csv(url, parse_dates={'datetime_local': ["Date Local"]},
                              date_parser=dateparse)
             df.columns = self.renameddcols
+            df['Pollutant_Standard'] = df.Pollutant_Standard.astype(str)
         else:
             df = pd.read_csv(url, parse_dates={'datetime': ['Date GMT', 'Time GMT'],
                                                'datetime_local': ["Date Local", "Time Local"]},
