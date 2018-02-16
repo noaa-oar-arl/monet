@@ -36,105 +36,22 @@ class MONET(object):
 
         """
         """ adds model to monet object
-
                  for more information on kwargs see: self.add_cmaq
                                            self.add_camx
          """
-        print("TESTING WORKFLOW")
         if model.upper() == 'CMAQ':
-            m = self.add_cmaq(**kwargs)
+            from .models.cmaq import CMAQ
+            #m = self.add_cmaq(**kwargs)
+            mmm = CMAQ()
         if model.upper() == 'CAMX':
-            m = self.add_camx(**kwargs)
-        return m
+            from .models.camx import CMAQ
+            mmm = CAMx()
+        if model.upper() == 'HYSPLIT':
+            from .models.hysplit import HYSPLIT
+            mmm = HYSPLIT()
+        mmm.open_files(**kwargs)
+        return mmm
 
-    def add_cmaq(self, gridcro2d=None, emission=None, metcro2d=None, metcro3d=None, depn=None, conc=None):
-        """Short summary.
-
-        Parameters
-        ----------
-        gridcro2d : type
-            Description of parameter `gridcro2d` (the default is None).
-        emission : type
-            Description of parameter `emission` (the default is None).
-        metcro2d : type
-            Description of parameter `metcro2d` (the default is None).
-        metcro3d : type
-            Description of parameter `metcro3d` (the default is None).
-        depn : type
-            Description of parameter `depn` (the default is None).
-        conc : type
-            Description of parameter `conc` (the default is None).
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
-        from .models.cmaq import CMAQ
-        model = CMAQ()
-        print('THis is a change')
-        if gridcro2d is not None:
-            model.set_gridcro2d(gridcro2d)
-        if emission is not None:
-            model.open_cmaq(emission)
-        if metcro2d is not None:
-            model.open_cmaq(metcro2d)
-        if metcro3d is not None:
-            model.open_cmaq(metcro3d)
-        if depn is not None:
-            model.open_cmaq(depn)
-        if conc is not None:
-            model.open_cmaq(conc)
-        return model
-
-    def add_camx(self, met2d=None, sfc2d=None, cld3d=None, kv=None, met3d=None, avrg=None, emission=None, depn=None):
-        """Short summary.
-
-        Parameters
-        ----------
-        met2d : type
-            Description of parameter `met2d` (the default is None).
-        sfc2d : type
-            Description of parameter `sfc2d` (the default is None).
-        cld3d : type
-            Description of parameter `cld3d` (the default is None).
-        kv : type
-            Description of parameter `kv` (the default is None).
-        met3d : type
-            Description of parameter `met3d` (the default is None).
-        avrg : type
-            Description of parameter `avrg` (the default is None).
-        emission : type
-            Description of parameter `emission` (the default is None).
-        depn : type
-            Description of parameter `depn` (the default is None).
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
-        from .models.camx import CAMx
-        model = CAMx()
-        if met2d is not None:
-            model.set_gridcro2d(met2d)
-        if sfc2d is not None:
-            model.open_cmaq(sfc2d)
-        if cld3d is not None:
-            model.open_cmaq(cld3d)
-        if kv is not None:
-            model.open_cmaq(kv)
-        if met3d is not None:
-            model.open_cmaq(met3d)
-        if avrg is not None:
-            model.open_cmaq(avrg)
-        if emission is not None:
-            model.open_cmaq(emission)
-        if depn is not None:
-            model.open_cmaq(depn)
-        return model
 
     def add_obs(self, obs='AirNOW', **kwargs):
         """Short summary.
@@ -188,7 +105,7 @@ class MONET(object):
         airnow.aggragate_files()
         return airnow
 
-    def add_aqs(self, dates=[], daily=False, network=None):
+    def add_aqs(self, dates=[], daily=False):
         """Short summary.
 
         Parameters
@@ -206,8 +123,10 @@ class MONET(object):
         """
         from .obs.aqs import AQS
         aqs = AQS()
-        aqs.add_data(dates, daily=daily, network=network)
-
+        if daily:
+            aqs.load_all_daily_data(dates)
+        else:
+            aqs.load_all_hourly_data(dates)
         return aqs
 
     def add_aeronet(self, dates=[], latlonbox=None):
@@ -260,14 +179,8 @@ class MONET(object):
     def add_crn(self):
         print('this is a dummy right now')
 
-    def add_improve(self, fname):
-        from .obs.airnow import IMPROVE
-        improve = IMPROVE()
-        if fname[-4:] == '.hdf':
-            improve.load_hdf(fname)
-        else:
-            improve.open_file(fname)
-        return improve
+    def add_improve(self):
+        print('this is a dummy right now')
 
     def combine(self, model=None, obs=None, **kwargs):
         """Short summary.
