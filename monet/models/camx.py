@@ -7,15 +7,16 @@ import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import array
 from past.utils import old_div
-
+from monet.models.basemodel import BaseModel
 # This file is to deal with CAMx code - try to make it general for CAMx 4.7.1 --> 5.1
 
 
 ProgressBar().register()
 
 
-class CAMx(object):
+class CAMx(BaseModel):
     def __init__(self):
+        BaseModel.__init__(self)
         self.objtype = 'CAMX'
         self.coarse = array(
             ['NA', 'PSO4', 'PNO3', 'PNH4', 'PH2O', 'PCL', 'PEC', 'FPRM', 'FCRS', 'CPRM', 'CCRS', 'SOA1', 'SOA2', 'SOA3',
@@ -50,7 +51,17 @@ class CAMx(object):
         self.dset = self.dset.isel(time=indexdates)
         self.dset['time'] = date[indexdates]
 
-    def open_camx(self, file):
+    def open_files(self, flist=None, mlist=None):
+        """flist is list of files which are added using add_file
+           mlist is list of files which are added using set_gridcro2d
+        """
+        for mname in mlist:    
+            self.set_gridcro2d(mname)
+        for fname in flist:
+            self.add_file(fname)
+
+
+    def add_files(self, file):
         from glob import glob
         from numpy import sort
         dropset = ['layer', 'longitude_bounds', 'latitude_bounds',
