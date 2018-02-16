@@ -40,6 +40,7 @@ class MONET(object):
                  for more information on kwargs see: self.add_cmaq
                                            self.add_camx
          """
+        print("TESTING WORKFLOW")
         if model.upper() == 'CMAQ':
             m = self.add_cmaq(**kwargs)
         if model.upper() == 'CAMX':
