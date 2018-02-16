@@ -9,12 +9,14 @@ import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import array, zeros
 from past.utils import old_div
+from monet.models.basemodel import BaseModel
 
 ProgressBar().register()
 
 
-class CMAQ(object):
+class CMAQ(BaseModel):
     def __init__(self):
+        BaseModel.__init__(self)
         self.objtype = 'CMAQ'
         self.dust_pm25 = array(
             ['ASO4J', 'ANO3J', 'ACLJ', 'ANH4J', 'ANAJ', 'ACAJ', 'AMGJ', 'AKJ', 'APOCJ', 'APNCOMJ', 'AECJ', 'AFEJ',
@@ -73,14 +75,20 @@ class CMAQ(object):
         self.dset = self.dset.isel(time=indexdates)
         self.dset['time'] = date[indexdates]
 
-    def open_cmaq(self, file):
+    def open_files(self, flist=None, mlist=None):
+        for mname in mlist:
+            self.set_gridcro2d(mname)
+        for fname in flist:
+            self.add_files(fname)
+          
+    def add_files(self, mfile):
         from glob import glob
         from numpy import sort
         nameset = {'COL': 'x', 'ROW': 'y', 'TSTEP': 'time', 'LAY': 'z'}
-        if type(file) == str:
-            fname = sort(array(glob(file)))
+        if type(mfile) == str:
+            fname = sort(array(glob(mfile)))
         else:
-            fname = sort(array(file))
+            fname = sort(array(mfile))
         if fname.shape[0] >= 1:
             if self.dset is None:
                 self.dset = xr.open_mfdataset(fname.tolist(), concat_dim='TSTEP').rename(nameset).squeeze()
@@ -423,25 +431,10 @@ class CMAQ(object):
         self.grid = xr.open_dataset(filename).rename({'COL': 'x', 'ROW': 'y'}).drop('TFLAG').squeeze()
         lat = 'LAT'
         lon = 'LON'
-        self.latitude = self.grid[lat][:][:, :].squeeze().compute()
-        self.longitude = self.grid[lon][:][:, :].squeeze().compute()
+        #self.latitude = self.grid[lat][:][:, :].squeeze().compute()
+        #self.longitude = self.grid[lon][:][:, :].squeeze().compute()
+        self.latitude = self.grid[lat][:][:, :].squeeze()
+        self.longitude = self.grid[lon][:][:, :].squeeze()
+        self.load_conus_basemap(res='l')  
         self.load_conus_basemap(res='l')
 
-    def load_conus_basemap(self, res='l'):
-        from mpl_toolkits.basemap import Basemap
-        if isinstance(self.map, type(None)):
-            lat1 = self.grid.P_ALP
-            lat2 = self.grid.P_BET
-            lon1 = self.grid.P_GAM
-            lon0 = self.grid.XCENT
-            lat0 = self.grid.YCENT
-            m = Basemap(projection='lcc', resolution=res, lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0,
-                        lon_1=lon1,
-                        llcrnrlat=self.latitude[0, 0], urcrnrlat=self.latitude[-1, -1],
-                        llcrnrlon=self.longitude[0, 0],
-                        urcrnrlon=self.longitude[-1, -1], rsphere=6371200.,
-                        area_thresh=50.)
-            self.map = m
-        else:
-            m = self.map
-        return self.map
