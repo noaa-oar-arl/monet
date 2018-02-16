@@ -18,9 +18,22 @@ class CEMSEmissions(object):
       self.lb2kg = 0.453592  #number of kilograms per pound.
       self.info = "Data from continuous emission monitoring systems (CEMS) \n"
       self.info += self.url + '\n'
+      self.df = None
 
     def __str__(self):
         return self.info
+
+    def get_data(self, rdate, states=['md']):
+        """gets the ftp url from the retrieve method and then 
+           loads the data from the ftp site using the load method.
+           TO DO add loop for adding multiple months.
+        """
+        if isinstance(states, str):
+           states = [states] 
+        for st in states:
+            url = self.retrieve(rdate, st, download=False)
+            self.load(url)
+
 
     def retrieve(self, rdate, state, download=True):
         """rdate - datetime object. Uses year and month. Day and hour are not used.
@@ -59,15 +72,13 @@ class CEMSEmissions(object):
         lhash[1229]   = (38.670, -76.865) #brandywine
         lhash[316]   = (29.238,-76.5119) #perryman
 
-    def load(self, efile):
+    def load(self, efile, verbose=True):
         """loads information found in efile into a pandas dataframe.
-           Currently cannot load from ftp site directly.
         """
         dftemp = pd.read_csv(efile)
         columns = list(dftemp.columns.values)
         ckeep=[]
         for ccc in columns:
-            #print('Column name: ' + ccc)
             #print( dftemp[ccc].unique())
             if 'so2' in ccc.lower():
                 ckeep.append(ccc) 
@@ -87,12 +98,17 @@ class CEMSEmissions(object):
         cnan = ['SO2_MASS (lbs)']
         ##drop rows with NaN in the cnan column.
         dftemp.dropna(axis=0,  inplace=True, subset=cnan)
-        print(dftemp['FACILITY_NAME'].unique())
-        print(dftemp['FAC_ID'].unique())
+        #print(dftemp['FACILITY_NAME'].unique())
+        #print(dftemp['FAC_ID'].unique())
         pairs = zip(dftemp['FAC_ID'], dftemp['FACILITY_NAME'])
         pairs = list(set(pairs))
         #print(pairs)
         self.namehash = dict(pairs)  #key is facility id and value is name.
-        self.df = dftemp
+        if self.df is None:
+            self.df = dftemp
+            if verbose: print('Initializing pandas dataframe. Loading ' + efile)
+        else:
+            self.df.append(dftemp)        
+            if verbose: print('Appending to pandas dataframe. Loading ' + efile)
         return dftemp
         
