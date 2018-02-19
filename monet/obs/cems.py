@@ -8,6 +8,10 @@ def getdegrees(degrees, minutes, seconds):
         return degrees+ minutes/60.0 + seconds/3600.00
 
 
+def lbs2kg(lbs):
+    kg = 0.453592 * lbs
+    return kg
+
 class CEMSEmissions(object):
     """Class for data from continuous emission monitoring systems (CEMS).
        Data from power plants can be downloaded from ftp://newftp.epa.gov/DMDNLoad/emissions/"""
@@ -34,6 +38,18 @@ class CEMSEmissions(object):
             url = self.retrieve(rdate, st, download=False)
             self.load(url)
 
+
+    def get_var(self, varname, loc=None, daterange=None):
+        """returns time series with variable indicated by varname.
+           TO DO filter for specified dates.
+           TO DO filter for specified location."""
+        columns =  list(self.df.columns.values)
+        #temp = self.df['OP_DATE', 'OP_HOUR', 'OP_TIME']
+        #print(temp[0:10])
+        for ccc in columns:
+            print(ccc)
+            #if varname.lower() is in ccc.lower():
+        return ccc               
 
     def retrieve(self, rdate, state, download=True):
         """rdate - datetime object. Uses year and month. Day and hour are not used.
@@ -104,6 +120,13 @@ class CEMSEmissions(object):
         pairs = list(set(pairs))
         #print(pairs)
         self.namehash = dict(pairs)  #key is facility id and value is name.
+
+        ##create column with datetime information from column with month-day-year and column with hour.
+        dftime = dftemp.apply(lambda x:pd.datetime.strptime("{0} {1}".format(x['OP_DATE'], x['OP_HOUR'])  , "%m-%d-%Y %H"), axis=1) 
+        dftemp = pd.concat([dftime, dftemp], axis=1) 
+        dftemp.rename(columns={0:'date'}, inplace=True)
+        dftemp.drop(['OP_DATE', 'OP_HOUR'], axis=1, inplace=True)
+
         if self.df is None:
             self.df = dftemp
             if verbose: print('Initializing pandas dataframe. Loading ' + efile)
