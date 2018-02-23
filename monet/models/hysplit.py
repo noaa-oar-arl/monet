@@ -150,8 +150,8 @@ class ModelBin(object):
                       ('ne'     ,int4), #number of elements
                       ])
     
-     rec8b = np.dtype([('indx'   ,int2),
-                       ('jndx'   ,int2),
+     rec8b = np.dtype([('indx'   ,int2),   #longitude index
+                       ('jndx'   ,int2),   #latitude index
                        ('conc'   ,real4),
                       ])
      
@@ -208,8 +208,8 @@ class ModelBin(object):
      ahash['llcrnr longitude'] = hdata3['llcrnr_lon'][0]
      ahash['llrcrnr latitude']  = hdata3['llcrnr_lat'][0]
 
-     self.llcrnr_lat = hdata3['llcrnr_lon'][0]
-     self.llcrnr_lon  = hdata3['llcrnr_lat'][0]
+     self.llcrnr_lon = hdata3['llcrnr_lon'][0]
+     self.llcrnr_lat  = hdata3['llcrnr_lat'][0]
      self.nlat = hdata3['nlat'][0]
      self.nlon  = hdata3['nlon'][0]
      self.dlat  = hdata3['dlat'][0]
