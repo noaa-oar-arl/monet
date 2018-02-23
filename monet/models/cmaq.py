@@ -9,6 +9,7 @@ import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import array, zeros
 from past.utils import old_div
+
 from monet.models.basemodel import BaseModel
 
 ProgressBar().register()
@@ -49,17 +50,6 @@ class CMAQ(BaseModel):
                           'AISO1J', 'AISO2J', 'AISO3J', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'AORGAI',
                           'AORGAJ', 'AORGPAI', 'AORGPAJ', 'AORGBI', 'AORGBJ'])
         self.minerals = array(['AALJ', 'ACAJ', 'AFEJ', 'AKJ', 'AMGJ', 'AMNJ', 'ANAJ', 'ATIJ', 'ASIJ'])
-        self.dset = None  # CMAQ xarray dataset object
-        self.grid = None  # CMAQ xarray dataset gridcro2d obj
-        self.dates = None
-        self.keys = None
-        self.metcrokeys = []
-        self.indexdates = None
-        self.metdates = None
-        self.metindex = None
-        self.latitude = None
-        self.longitude = None
-        self.map = None
 
     def get_dates(self):
         print('Reading CMAQ dates...')
@@ -75,12 +65,11 @@ class CMAQ(BaseModel):
         self.dset = self.dset.isel(time=indexdates)
         self.dset['time'] = date[indexdates]
 
-    def open_files(self, flist=None, mlist=None):
-        for mname in mlist:
-            self.set_gridcro2d(mname)
+    def open_files(self, flist=None, grid=None):
+        self.set_gridcro2d(grid)
         for fname in flist:
             self.add_files(fname)
-          
+
     def add_files(self, mfile):
         from glob import glob
         from numpy import sort
@@ -166,7 +155,7 @@ class CMAQ(BaseModel):
         if 'PM25_TOT' in keys:
             if self.check_z('PM25_TOT'):
                 if lay is not None:
-                    var = self.dset['PM25_TOT'][:, lay, :, :].copy().squeeze()
+                    var = self.dset['PM25_TOT'].sel(z=lay).copy().squeeze()
                 else:
                     var = self.dset['PM25_TOT'][:, :, :, :].copy()
             else:
@@ -187,7 +176,7 @@ class CMAQ(BaseModel):
         allvars = concatenate([self.aitken, self.accumulation, self.coarse])
         var = None
         if 'PMC_TOT' in keys:
-            if self.check_z('PM10_TOT'):
+            if self.check_z('PMC_TOT'):
                 if lay is not None:
                     var = self.dset['PMC_TOT'][:, lay, :, :].copy().squeeze()
                 else:
@@ -195,13 +184,13 @@ class CMAQ(BaseModel):
             else:
                 var = self.dset['PMC_TOT'][:, :, :].copy()
         elif 'PM10' in keys:
-            if self.check_z('PM10_TOT'):
+            if self.check_z('PM10'):
                 if lay is not None:
                     var = self.dset['PM10'][:, lay, :, :].squeeze()
                 else:
                     var = self.dset['PM10'][:, :, :, :].squeeze()
             else:
-                var = self.dset['PMC_TOT'][:, :, :].copy()
+                var = self.dset['PM10'][:, :, :].copy()
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
@@ -370,7 +359,7 @@ class CMAQ(BaseModel):
 
         return var
 
-    def get_var(self, param='O3', lay=None):
+    def get_var(self, param, lay=None):
         p = param.upper()
         print(param)
         if p == 'PM25':
@@ -431,10 +420,25 @@ class CMAQ(BaseModel):
         self.grid = xr.open_dataset(filename).rename({'COL': 'x', 'ROW': 'y'}).drop('TFLAG').squeeze()
         lat = 'LAT'
         lon = 'LON'
-        #self.latitude = self.grid[lat][:][:, :].squeeze().compute()
-        #self.longitude = self.grid[lon][:][:, :].squeeze().compute()
         self.latitude = self.grid[lat][:][:, :].squeeze()
         self.longitude = self.grid[lon][:][:, :].squeeze()
-        self.load_conus_basemap(res='l')  
         self.load_conus_basemap(res='l')
 
+    def load_conus_basemap(self, res='l'):
+        from mpl_toolkits.basemap import Basemap
+        if isinstance(self.map, type(None)):
+            lat1 = self.grid.P_ALP
+            lat2 = self.grid.P_BET
+            lon1 = self.grid.P_GAM
+            lon0 = self.grid.XCENT
+            lat0 = self.grid.YCENT
+            m = Basemap(projection='lcc', resolution=res, lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0,
+                        lon_1=lon1,
+                        llcrnrlat=self.latitude[0, 0], urcrnrlat=self.latitude[-1, -1],
+                        llcrnrlon=self.longitude[0, 0],
+                        urcrnrlon=self.longitude[-1, -1], rsphere=6371200.,
+                        area_thresh=50.)
+            self.map = m
+        else:
+            m = self.map
+        return self.map

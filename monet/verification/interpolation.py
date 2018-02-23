@@ -3,15 +3,13 @@ from __future__ import print_function
 from builtins import str, zip
 
 
-def interp_to_obs(var, df, lat, lon, radius=12000.):
+def interp_latlon(var, lat, lon, radius=12000.):
     """Short summary.
 
     Parameters
     ----------
     var : type
         Description of parameter `var`.
-    df : type
-        Description of parameter `df`.
     lat : type
         Description of parameter `lat`.
     lon : type
@@ -25,32 +23,104 @@ def interp_to_obs(var, df, lat, lon, radius=12000.):
         Description of returned object.
 
     """
-    from numpy import NaN, vstack
+    from numpy import NaN, vstack, dstack, meshgrid
     from pyresample import geometry, image
-    from pandas import to_timedelta, DataFrame
-    # define CMAQ pyresample grid (source)
-    grid1 = geometry.GridDefinition(lons=lon, lats=lat)
-    # get unique sites from df
-    dfn = df.drop_duplicates(subset=['Latitude', 'Longitude'])
-    # define site grid (target)
-    lats = dfn.Latitude.values
-    lons = dfn.Longitude.values
-    grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
-    # Create image container
-    i = image.ImageContainerNearest(var.transpose('y', 'x', 'time').values, grid1, radius_of_influence=radius,
-                                    fill_value=NaN)
+    if len(lat.shape) < 2:  # need to vstack latitudes
+        lat = vstack(lat)
+        lon = vstack(lon)
+    if len(var.longitude.shape) < 2:  # need to meshgrid variables to create grid
+        varlons, varlats = meshgrid(var.longitude, var.latitude)
+    else:
+        varlons, varlats = var.longitude.values, var.latitude.values
+    grid1 = geometry.SwathDefinition(lons=varlons, lats=varlats)
+    grid2 = geometry.SwathDefinition(lons=lon, lats=lat)
+    # useful flatten for tuples
+
+    def flatten(lst): return reduce(lambda l, i: l + flatten(i) if isinstance(i, (list, tuple)) else l + [i], lst, [])
+    from pandas import Series
+    if len(var.dims) > 3:  # this has 4 dimensions need to dstack
+        varlays = []
+        # temporary fix for hysplit
+        if Series(var.dims).isin(['levels']).max():
+            for i in var.levels:
+                varlays.append(var.sel(levels=i).squeeze().transpose('latitude', 'longitude', 'time').values)
+            data = dstack(varlays)
+            datashape = flatten((grid2.shape, var.levels.shape[0], var.time.shape[0]))
+        else:
+            for i in var.z:
+                varlays.append(var.isel(z=i).squeeze().transpose('y', 'x', 'time').values)
+            data = dstack(varlays)
+            datashape = flatten((grid2.shape, var.z.shape[0], var.time.shape[0]))
+    elif len(var.dims) > 2:
+        if Series(var.dims).isin(['y']).max():
+            data = var.transpose('y', 'x', 'time').values
+            datashape = flatten((grid2.shape, var.time.shape[0]))  # var.transpose('y', 'x', 'time').shape
+        else:
+            data = var.transpose('latitude', 'longitude', 'time').values
+            datashape = flatten((grid2.shape, var.time.shape[0]))
+    else:  # assume 2d space
+        if Series(var.dims).isin(['y']).max():
+            data = var.transpose('y', 'x').values
+            datashape = grid2.shape  # var.transpose('y', 'x')grid2.shape
+        else:
+            data = var.transpose('latitude', 'longitude').values
+            datashape = grid2.shape
+    icon = image.ImageContainerNearest(data, grid1, radius_of_influence=radius, fill_value=NaN)
     # resample
-    ii = i.resample(grid2).image_data.squeeze()
-    # recombine data
-    e = DataFrame(ii, index=dfn.SCS, columns=var.time.values)
-    w = e.stack().reset_index().rename(columns={'level_1': 'datetime', 0: 'model'})
-    w = w.merge(dfn.drop(['datetime', 'datetime_local', 'Obs'], axis=1), on='SCS', how='left')
-    w = w.merge(df[['datetime', 'SCS', 'Obs']], on=['SCS', 'datetime'], how='left')
-    # calculate datetime local
+    ii = icon.resample(grid2).image_data.reshape(datashape).squeeze()
+    return ii
 
-    w['datetime_local'] = w.datetime + to_timedelta(w.utcoffset, 'H')
-
-    return w
+#
+# def interp_to_obs(var, df, lat, lon, radius=12000.):
+#     """Short summary.
+#
+#     Parameters
+#     ----------
+#     var : type
+#         Description of parameter `var`.
+#     df : type
+#         Description of parameter `df`.
+#     lat : type
+#         Description of parameter `lat`.
+#     lon : type
+#         Description of parameter `lon`.
+#     radius : type
+#         Description of parameter `radius` (the default is 12000.).
+#
+#     Returns
+#     -------
+#     type
+#         Description of returned object.
+#
+#     """
+#     from numpy import NaN, vstack
+#     from pyresample import geometry, image
+#     from pandas import to_timedelta, DataFrame
+#     # define CMAQ pyresample grid (source)
+#     grid1 = geometry.GridDefinition(lons=lon, lats=lat)
+#     # get unique sites from df
+#     dfn = df.drop_duplicates(subset=['Latitude', 'Longitude'])
+#     # define site grid (target)
+#     lats = dfn.Latitude.values
+#     lons = dfn.Longitude.values
+#     grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
+#     # Create image container
+#     i = image.ImageContainerNearest(var.transpose('y', 'x', 'time').values, grid1, radius_of_influence=radius,
+#                                     fill_value=NaN)
+#     # resample
+#     ii = i.resample(grid2).image_data.squeeze()
+#     # recombine data
+#     e = DataFrame(ii, index=dfn.SCS, columns=var.time.values)
+#     w = e.stack().reset_index().rename(columns={'level_1': 'datetime', 0: 'model'})
+#     w = w.merge(dfn.drop(['datetime', 'datetime_local', 'Obs'], axis=1), on='SCS', how='left')
+#     w = w.merge(df[['datetime', 'SCS', 'Obs']], on=['SCS', 'datetime'], how='left')
+#     # calculate datetime local
+#
+#     w['datetime_local'] = w.datetime + to_timedelta(w.utcoffset, 'H')
+#
+#     return w
+#
+# # pyresample has started adding xarray support.  Need documentation on this before it is implemented.
 
 
 def find_nearest_latlon_xarray(arr, lat=37.102400, lon=-76.392900, radius=12e3):

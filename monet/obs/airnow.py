@@ -19,14 +19,14 @@ class AirNow(object):
                       datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
         self.datestr = []
         self.df = None
+        self.daily = False
         self.objtype = 'AirNow'
         self.filelist = None
         self.monitor_file = inspect.getfile(
             self.__class__)[:-16] + '/data/monitoring_site_locations.dat'
         self.monitor_df = None
-        self.savecols = ['datetime', 'SCS', 'Site', 'utcoffset', 'Species', 'Units', 'Obs', 'datetime_local',
-                         'Site_Name', 'Latitude', 'Longitude', 'CMSA_Name', 'MSA_Code', 'MSA_Name', 'State_Name',
-                         'EPA_region']
+        self.savecols = ['time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs', 'time_local', 'latitude', 'longitude', 'cmsa_name', 'msa_code', 'msa_name', 'state_name',
+                         'epa_region']
 
     def convert_dates_tofnames(self):
         self.datestr = []
@@ -59,15 +59,15 @@ class AirNow(object):
 
     def read_csv(self, fn):
         try:
-            dft = pd.read_csv(fn, delimiter='|', header=None,
-                              error_bad_lines=False)
-            cols = ['date', 'time', 'SCS', 'Site', 'utcoffset',
-                    'Species', 'Units', 'Obs', 'Source']
+            dft = pd.read_csv(fn, delimiter='|', header=None, error_bad_lines=False)
+            cols = ['date', 'time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs', 'source']
             dft.columns = cols
         except:
-            cols = ['date', 'time', 'SCS', 'Site', 'utcoffset',
-                    'Species', 'Units', 'Obs', 'Source']
+            cols = ['date', 'time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs', 'source']
             dft = pd.DataFrame(columns=cols)
+        dft['obs'] = dft.obs.astype(float)
+        dft['siteid'] = dft.siteid.str.zfill(9)
+        dft['utcoffset'] = dft.utcoffset.astype(int)
         return dft
 
     def aggragate_files(self):
@@ -79,23 +79,15 @@ class AirNow(object):
         dfs = [dask.delayed(self.read_csv)(f) for f in self.url]
         dff = dd.from_delayed(dfs)
         df = dff.compute()
-        df['datetime'] = pd.to_datetime(
+        df['time'] = pd.to_datetime(
             df.date + ' ' + df.time, format='%m/%d/%y %H:%M', exact=True, box=False)
-        df.drop(['date', 'time'], axis=1, inplace=True)
-        df['datetime_local'] = df.datetime + \
-            pd.to_timedelta(df.utcoffset, unit='H')
+        df.drop(['date'], axis=1, inplace=True)
+        df['time_local'] = df.time + pd.to_timedelta(df.utcoffset, unit='H')
         self.df = df
         print('    Adding in Meta-data')
         self.get_station_locations()
         self.df = self.df[self.savecols]
         self.df.drop_duplicates(inplace=True)
-
-    def calc_datetime(self):
-        # takes in an array of string dates and converts to numpy array of datetime objects
-        dt = []
-        for i in self.df.utcoffset.values:
-            dt.append(timedelta(hours=i))
-        self.df['datetime_local'] = self.df.datetime + dt
 
     def set_daterange(self, begin='', end=''):
         dates = pd.date_range(start=begin, end=end,
@@ -103,42 +95,13 @@ class AirNow(object):
         self.dates = dates
 
     def get_station_locations(self):
-        self.read_monitor_file()
-        self.df = pd.merge(self.df, self.monitor_df, on='SCS', how='left')
+        from .epa_util import read_monitor_file
+        self.monitor_df = read_monitor_file()
+        #self.monitor_df = self.monitor_df.loc[self.monitor_df.siteid.notnull()]
+        #self.monitor_df['siteid'] = self.monitor_df.siteid.astype(int).astype(str).str.zfill(9)
+        self.df = pd.merge(self.df, self.monitor_df, on='siteid', how='left')
 
     def get_station_locations_remerge(self, df):
         df = pd.merge(df, self.monitor_df.drop(
-            ['Latitude', 'Longitude'], axis=1), on='SCS', how='left')
+            ['Latitude', 'Longitude'], axis=1), on='siteid', how='left')
         return df
-
-    def read_monitor_file(self):
-        try:
-            print('    Monitor Station Meta-Data Found: Compiling Dataset')
-            monitor_url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/today/monitoring_site_locations.dat'
-            colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                         11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-            f = pd.read_csv(monitor_url, delimiter='|',
-                            header=None, usecols=colsinuse)
-            f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
-                         'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
-                         'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
-        except:
-            from glob import glob
-            if os.path.isfile(self.monitor_file) == True:
-                print('    Monitor Station Meta-Data Found: Compiling Dataset')
-                fname = self.monitor_file
-            else:
-                self.openftp()
-                self.ftp.cwd('Locations')
-                self.download_single_rawfile(
-                    fname='monitoring_site_locations.dat')
-            fname = glob('monitoring_site_locations.dat')[0]
-            colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                         11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-            f = pd.read_csv(fname, delimiter='|',
-                            header=None, usecols=colsinuse)
-            f.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
-                         'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
-                         'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
-
-        self.monitor_df = f.copy()

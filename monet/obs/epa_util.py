@@ -23,7 +23,7 @@ def check_cmaq_units(df, param='O3', aqs_param='OZONE'):
         Description of returned object.
 
     """
-    aunit = df[df.Species == aqs_param].Units.unique()[0]
+    aunit = df[df.variable == aqs_param].Units.unique()[0]
     if aunit == 'UG/M3':
         fac = 1.
     elif aunit == 'PPB':
@@ -113,32 +113,32 @@ def write_table(self, df=None, param='OZONE', fname='table', threasholds=[70, 1e
     if df is None:
         print('Please provide a DataFrame')
     else:
-        df = df.groupby('Species').get_group(param)
+        df = df.groupby('variable').get_group(param)
         if not isinstance(site, type(None)):
             try:
-                df = df.groupby('SCS').get_group(site)
+                df = df.groupby('siteid').get_group(site)
                 single = True
                 name = site
             except KeyError:
-                print('Site Number not valid.  Enter a valid SCS')
+                print('Site Number not valid.  Enter a valid siteid')
                 return
         elif not isinstance(city, type(None)):
             try:
                 single = True
-                names = df.get_group('MSA_Name').dropna().unique()
+                names = df.get_group('msa_name').dropna().unique()
                 name = [j for j in names if city.upper() in j.upper()]
-                df = df.groupby('Species').get_group(param).groupby('MSA_Name').get_group(name[0])
+                df = df.groupby('variable').get_group(param).groupby('MSA_name').get_group(name[0])
                 single = True
             except KeyError:
                 print(' City either does not contain montiors for ' + param)
-                print('     or City Name is not valid.  Enter a valid City name: df.MSA_Name.unique()')
+                print('     or City Name is not valid.  Enter a valid City name: df.msa_name.unique()')
                 return
         elif not isinstance(state, type(None)):
             try:
                 single = True
-                names = df.get_group('State_Name').dropna().unique()
+                names = df.get_group('State_name').dropna().unique()
                 name = [j for j in names if state.upper() in j.upper()]
-                df = df.groupby('Species').get_group(param).groupby('State_Name').get_group(name[0])
+                df = df.groupby('variable').get_group(param).groupby('state_name').get_group(name[0])
             except KeyError:
                 print('State not valid. Please enter valid 2 digit state')
                 return
@@ -240,8 +240,8 @@ def get_region(df):
     pr = array(['Pacific' for i in p])
     states = concatenate([se, ne, nc, sc, r, p])
     region = concatenate([ser, ner, ncr, scr, rr, pr])
-    dd = DataFrame({'State_Name': states, 'Region': region})
-    return merge(df, dd, how='left', on='State_Name')
+    dd = DataFrame({'state_name': states, 'region': region})
+    return merge(df, dd, how='left', on='state_name')
 
 
 def get_epa_location_df(df, param, site='', city='', region='', epa_region='', state=''):
@@ -271,25 +271,25 @@ def get_epa_location_df(df, param, site='', city='', region='', epa_region='', s
 
     """
     cityname = True
-    if 'MSA_Name' in df.columns:
+    if 'msa_name' in df.columns:
         cityname = True
     else:
         cityname = False
-    new = df.groupby('Species').get_group(param)
+    new = df.groupby('variable').get_group(param)
     if site != '':
-        if site in new.SCS.unique():
-            df2 = new.loc[new.SCS == site]
-            title = df2.SCS.unique().astype('str')[0].zfill(9)
+        if site in new.siteid.unique():
+            df2 = new.loc[new.siteid == site]
+            title = df2.siteid.unique().astype('str')[0].zfill(9)
     elif city != '':
-        names = df.MSA_Name.dropna().unique()
+        names = df.msa_name.dropna().unique()
         for i in names:
             if i.upper().find(city.upper()) != -1:
                 name = i
                 print(name)
-        df2 = new[new['MSA_Name'] == name].copy().drop_duplicates()
+        df2 = new[new['msa_name'] == name].copy().drop_duplicates()
         title = name
     elif state != '':
-        df2 = new[new['State_Name'].str.upper() == state.upper()].copy().drop_duplicates()
+        df2 = new[new['state_name'].str.upper() == state.upper()].copy().drop_duplicates()
         title = 'STATE: ' + state.upper()
     elif region != '':
         df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
@@ -301,6 +301,55 @@ def get_epa_location_df(df, param, site='', city='', region='', epa_region='', s
         df2 = new
         title = 'Domain'
     return df2, title
+
+
+def regulatory_resample(df, col='model', pollutant_standard=None):
+    from pandas import to_timedelta, concat
+    df['time_local'] = df.time + to_timedelta(df.gmt_offset, unit='H')
+    if df.variable.unique()[0] == 'CO':
+        df1 = calc_daily_max(df, rolling_frequency=1)
+        df1['pollutant_standard'] = 'CO 1-hour 1971'
+        df2 = calc_daily_max(df, rolling_frequency=8)
+        df2['pollutant_standard'] = 'CO 8-hour 1971'
+        dfreturn = concat([df1, df2], ignore_index=True)
+    elif df.variable.unique()[0] == 'OZONE':
+        dfreturn = calc_daily_max(df, rolling_frequency=8)
+    elif df.variable.unique()[0] == 'SO2':
+        df1 = calc_daily_max(df, rolling_frequency=1)
+        df1['pollutant_standard'] = 'SO2 1-hour 1971'
+        df2 = calc_daily_max(df, rolling_frequency=3)
+        df2['pollutant_standard'] = 'SO2 8-hour 1971'
+        dfreturn = concat([df1, df2], ignore_index=True)
+    elif df.variable.unique()[0] == 'NO2':
+        dfreturn = calc_daily_max(df, rolling_frequency=1)
+    else:  # do daily average
+        dfn = df.drop_duplicates(subset=['siteid'])
+        df = df.groupby('siteid')[col].resample('D').mean().reset_index().rename(columns={'level_1': 'time_local'})
+        dfreturn = df.merge(dfn, how='left', on='siteid')
+    return dfreturn
+
+
+def calc_daily_max(df, param=None, rolling_frequency=8):
+    from pandas import Index, to_timedelta
+    if param is None:
+        temp = df.copy()
+    else:
+        temp = df.groupby('variable').get_group(param)
+    temp.index = temp.time_local
+    dfn = temp.drop_duplicates(subset=['siteid'])
+    if rolling_frequency > 1:
+        g = temp.groupby('siteid')['model', 'gmt_offset'].rolling(rolling_frequency, center=True, win_type='boxcar').mean()
+        q = g.reset_index(level=0)
+        k = q.groupby('siteid').resample('D').max().reset_index(level=1).reset_index(drop='siteid').dropna()
+    else:
+        k = temp.groupby('siteid')['model', 'gmt_offset'].resample('D').max().reset_index().rename({'level_1': 'time_local'})
+    columnstomerge = temp.columns[~temp.columns.isin(k.columns) * (temp.columns != 'time')].append(Index(['siteid']))
+    if param is None:
+        dff = k.merge(df[columnstomerge], on='siteid', how='left').drop_duplicates(subset=['siteid', 'time_local'])
+    else:
+        dff = k.merge(df.groupby('variable').get_group(param)[columnstomerge], on='siteid', how='left').drop_duplicates(subset=['siteid', 'time_local'])
+    dff['time'] = dff.time_local - to_timedelta(dff.gmt_offset, unit='H')
+    return dff
 
 
 def convert_statenames_to_abv(df):
@@ -345,7 +394,7 @@ def convert_statenames_to_abv(df):
          'Rhode Island': 'RI',
          'South Carolina': 'SC',
          'South Dakota': 'SD',
-         'State': 'Postal',
+         'state': 'Postal',
          'Tennessee': 'TN',
          'Texas': 'TX',
          'Utah': 'UT',
@@ -356,9 +405,9 @@ def convert_statenames_to_abv(df):
          'Wisconsin': 'WI',
          'Wyoming': 'WY'}
     for i in d:
-        df['State_Name'].loc[df.State_Name.isin([i])] = d[i]
-    df['State_Name'].loc[df.State_Name.isin(['Canada'])] = 'CC'
-    df['State_Name'].loc[df.State_Name.isin(['Mexico'])] = 'MM'
+        df['state_name'].loc[df.state_name.isin([i])] = d[i]
+    df['state_name'].loc[df.state_name.isin(['Canada'])] = 'CC'
+    df['state_name'].loc[df.state_name.isin(['Mexico'])] = 'MM'
     return df
 
 
@@ -368,7 +417,9 @@ def read_monitor_file(network=None):
     import os
     try:
         basedir = os.path.abspath(os.path.dirname(__file__))[:-10]
-        s = pd.read_csv(os.path.join(basedir, 'data', 'monitoring_site_locations.dat'))
+        fname = os.path.join(basedir, 'data', 'monitoring_site_locations.hdf')
+        print('Monitor File Path: ' + fname)
+        s = pd.read_hdf(fname)
     except:
         print('Monitor File Not Found... Reprocessing')
         baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
@@ -379,33 +430,35 @@ def read_monitor_file(network=None):
         monitor_airnow_url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/today/monitoring_site_locations.dat'
         colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                      11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-        airnow = pd.read_csv(monitor_airnow_url, delimiter='|', header=None, usecols=colsinuse)
-        airnow.columns = ['SCS', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
+        airnow = pd.read_csv(monitor_airnow_url, delimiter='|', header=None, usecols=colsinuse, dtype={0: str})
+        airnow.columns = ['siteid', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
                           'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
-                          'MSA_Name', 'State_Code', 'State_Name', 'County_Code', 'County_Name', 'City_Code']
-        airnow['SCS'] = pd.to_numeric(airnow.SCS, errors='coerce')
+                          'MSA_Name', 'state_Code', 'state_Name', 'County_Code', 'County_Name', 'City_Code']
+        airnow.columns = [i.lower() for i in airnow.columns]
+        # airnow['siteid'] = pd.to_numeric(airnow.siteid, errors='coerce')
         # Read EPA Site file
         site = pd.read_csv(site_url)
         # read epa monitor file
         monitor = pd.read_csv(monitor_url)
-        # make SCS column
-        site['SCS'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site[
+        # make siteid column
+        site['siteid'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site[
             'Site Number'].astype(str).str.zfill(4)
-        monitor['SCS'] = monitor['State Code'].astype(str).str.zfill(2) + monitor['County Code'].astype(str).str.zfill(
+        monitor['siteid'] = monitor['State Code'].astype(str).str.zfill(2) + monitor['County Code'].astype(str).str.zfill(
             3) + monitor['Site Number'].astype(str).str.zfill(4)
         site.columns = [i.replace(' ', '_') for i in site.columns]
-        s = monitor.merge(site[['SCS', 'Land_Use', 'Location_Setting', 'GMT_Offset']], on=['SCS'], how='left')
-        s.columns = [i.replace(' ', '_') for i in s.columns]
-        s['SCS'] = pd.to_numeric(s.SCS, errors='coerce')
-        monitor_drop = ['State_Code', u'County_Code', u'Site_Number', 'Extraction_Date', 'Parameter_Code', 'Parameter_Name', 'POC', 'Last_Sample_Date', 'PQAO',
-                        'Reporting_Agency', 'Exclusions', u'Monitoring_Objective', 'Last_Method_Code', 'Last_Method', u'NAAQS_Primary_Monitor', u'QA_Primary_Monitor']
+        s = monitor.merge(site[['siteid', 'Land_Use', 'Location_Setting', 'GMT_Offset']], on=['siteid'], how='left')
+        s.columns = [i.replace(' ', '_').lower() for i in s.columns]
+        s['siteid'] = pd.to_numeric(s.siteid, errors='coerce')
+        monitor_drop = ['state_code', u'county_code', u'site_number', 'extraction_date', 'parameter_code', 'parameter_name', 'poc', 'last_sample_date', 'pqao',
+                        'reporting_agency', 'exclusions', u'monitoring_objective', 'last_method_code', 'last_method', u'naaqs_primary_monitor', u'qa_primary_monitor']
         s.drop(monitor_drop, axis=1, inplace=True)
         # drop airnow keys for merge
-        airnow_drop = [u'Site_Code', u'Site_Name', u'Status', u'Agency', 'Agency_Name', 'Country_Code', u'CMSA_Code',
-                       'State_Code', u'County_Code', u'City_Code', u'Latitude', u'Longitude', 'GMT_Offset', 'State_Name', 'County_Name']
-        airnow.drop(airnow_drop, axis=1, inplace=True)
-        s = s.merge(airnow, how='left', on='SCS')
-        s = convert_statenames_to_abv(s).dropna(subset=['Latitude', 'Longitude'])
+        # airnow_drop = [u'site_Code', u'site_Name', u'status', u'agency', 'agency_name', 'country_code', u'cmsa_code',
+        # 'state_code', u'county_code', u'city_code', u'latitude', u'longitude', 'gmt_offset', 'state_name', 'county_name']
+        # airnow_drop = [i.lower() for i in airnow_drop]
+        #airnow.drop(airnow_drop, axis=1, inplace=True)
+        s = pd.concat([s, airnow], ignore_index=True)
+        s = convert_statenames_to_abv(s).dropna(subset=['latitude', 'longitude'])
     if network is not None:
-        s = s.loc[s.Networks.isin([network])].drop_duplicates(subset=['SCS'])
+        s = s.loc[s.Networks.isin([network])].drop_duplicates(subset=['siteid'])
     return s

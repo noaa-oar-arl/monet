@@ -7,7 +7,9 @@ import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import array
 from past.utils import old_div
+
 from monet.models.basemodel import BaseModel
+
 # This file is to deal with CAMx code - try to make it general for CAMx 4.7.1 --> 5.1
 
 
@@ -28,17 +30,6 @@ class CAMx(BaseModel):
             ['NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO',
              'CRPX', 'OPAN'])
         self.poc = array(['SOA1', 'SOA2', 'SOA3', 'SOA4'])
-        self.dset = None
-        self.grid = None  # gridcro2d obj
-        self.fname = None
-        self.metcrofnames = None
-        self.aerofnames = None
-        self.dates = None
-        self.keys = None
-        self.indexdates = None
-        self.metindex = None
-        self.latitude = None
-        self.longitude = None
         self.map = None
 
     def get_dates(self):
@@ -50,16 +41,6 @@ class CAMx(BaseModel):
         indexdates = pd.Series(date).drop_duplicates(keep='last').index.values
         self.dset = self.dset.isel(time=indexdates)
         self.dset['time'] = date[indexdates]
-
-    def open_files(self, flist=None, mlist=None):
-        """flist is list of files which are added using add_file
-           mlist is list of files which are added using set_gridcro2d
-        """
-        for mname in mlist:    
-            self.set_gridcro2d(mname)
-        for fname in flist:
-            self.add_file(fname)
-
 
     def add_files(self, file):
         from glob import glob

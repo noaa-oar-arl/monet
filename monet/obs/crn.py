@@ -48,16 +48,16 @@ Data is taken from the Climate Reference Network.  This is to expand validation 
        38   SOIL_TEMP_100                  Celsius
     """
 from __future__ import print_function
-from future import standard_library
 
-standard_library.install_aliases()
-from builtins import zip
-from builtins import object
 import os
+from builtins import object, zip
 from datetime import datetime
 
 import pandas as pd
+from future import standard_library
 from numpy import array
+
+standard_library.install_aliases()
 
 
 class crn(object):
@@ -71,6 +71,7 @@ class crn(object):
         self.dates = [datetime.strptime('2016-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
                       datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
         self.filelist = []
+        self.daily = False
         self.ftp = None
         self.df = None
         self.se_states = array(
@@ -244,7 +245,7 @@ class crn(object):
         cols[2] = 'WBAN'
         self.df.columns = cols
         con = (self.df.datetime >= self.dates[0]) & (
-                self.df.datetime <= self.dates[-1])
+            self.df.datetime <= self.dates[-1])
         self.df = self.df[con]
         self.merge_monitor_meta_data()
         if output == '':
@@ -322,7 +323,7 @@ class crn(object):
         for i, j in zip(cols, units):
             bdfadd = self.df.copy()[bcols]
             bdfadd['Obs'] = self.df[i].values
-            bdfadd['Species'] = i
+            bdfadd['Variable'] = i
             bdfadd['Unit'] = j
             dfs.append(bdfadd)
 

@@ -11,6 +11,7 @@ class IMPROVE(object):
     def __init__(self):
         self.datestr = []
         self.df = None
+        self.daily = True
         self.se_states = array(['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN', 'VA', 'WV'], dtype='|S2')
         self.ne_states = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'], dtype='|S2')
         self.nc_states = array(['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'], dtype='|S2')
@@ -43,24 +44,25 @@ class IMPROVE(object):
         from .epa_util import read_monitor_file
 
         self.df = pd.read_csv(fname, delimiter=',', parse_dates=[2], infer_datetime_format=True)
-        self.df.rename(columns={'EPACode': 'SCS'}, inplace=True)
+        self.df.rename(columns={'EPACode': 'siteid'}, inplace=True)
         self.df.rename(columns={'Val': 'Obs'}, inplace=True)
         self.df.rename(columns={'State': 'State_Name'}, inplace=True)
-        self.df.rename(columns={'ParamCode': 'Species'}, inplace=True)
+        self.df.rename(columns={'ParamCode': 'Variable'}, inplace=True)
         self.df.rename(columns={'SiteCode': 'Site_Code'}, inplace=True)
         self.df.rename(columns={'Unit': 'Units'}, inplace=True)
-        self.df.rename(columns={'Date': 'datetime'}, inplace=True)
+        self.df.rename(columns={'Date': 'siteid'}, inplace=True)
         self.df.drop('Dataset', axis=1, inplace=True)
-        self.df['datetime'] = pd.to_datetime(self.df.datetime, format='%Y%m%d')
+        self.df['time'] = pd.to_datetime(self.df.time, format='%Y%m%d')
         dropkeys = ['Latitude', 'Longitude', 'POC']
+        self.df.columns = [i.lower() for i in self.df.columns]
         monitor_df = read_monitor_file(network='IMPROVE').drop(dropkeys, axis=1)
-        self.df = self.df.merge(monitor_df, how='left', on='SCS')
-        self.df = self.df.dropna(subset=['Species', 'GMT_Offset']).drop_duplicates()
-        self.df.Species.loc[self.df.Species == 'MT'] = 'PM10'
-        self.df.Species.loc[self.df.Species == 'MF'] = 'PM2.5'
+        self.df = self.df.merge(monitor_df, how='left', on='siteid')
+        self.df = self.df.dropna(subset=['variable', 'gmt_offset']).drop_duplicates()
+        self.df.Variable.loc[self.df.Variable == 'MT'] = 'PM10'
+        self.df.Variable.loc[self.df.Variable == 'MF'] = 'PM2.5'
         self.df.Obs.loc[self.df.Obs < 0] = NaN
-        self.df.dropna(subset=['Obs'], inplace=True)
-        self.df['datetime_local'] = self.df.datetime + pd.to_timedelta(self.df.GMT_Offset.astype(float), unit='H')
+        self.df.dropna(subset=['obs'], inplace=True)
+        self.df['time_local'] = self.df.time + pd.to_timedelta(self.df.gmt_offset.astype(float), unit='H')
         return self.df
 
     def load_hdf(self, fname, dates):
@@ -97,7 +99,7 @@ class IMPROVE(object):
 
         """
         self.dates = dates
-        con = (self.df.datetime >= dates[0]) & (self.df.datetime <= dates[-1])
+        con = (self.df.time >= dates[0]) & (self.df.time <= dates[-1])
         self.df = self.df.loc[con]
 
     def set_daterange(self, begin='', end=''):

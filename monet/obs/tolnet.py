@@ -11,6 +11,7 @@ class TOLNet(object):
         self.cwd = os.getcwd()
         self.dates = pd.date_range(start='2017-09-25', end='2017-09-26', freq='H')
         self.dset = None
+        self.daily = False
 
     def open_data(self, fname):
         from h5py import File

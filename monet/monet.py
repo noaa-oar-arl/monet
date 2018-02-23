@@ -8,14 +8,6 @@ from builtins import object
 
 class MONET(object):
     def __init__(self):
-        self.cmaq = None
-        self.hysplit = None
-        self.camx = None
-        self.aeronet = None
-        self.aqs = None
-        self.airnow = None
-        self.crn = None
-        self.ish = None
         self.combined = None
         self.verify = None
 
@@ -51,7 +43,6 @@ class MONET(object):
             mmm = HYSPLIT()
         mmm.open_files(**kwargs)
         return mmm
-
 
     def add_obs(self, obs='AirNOW', **kwargs):
         """Short summary.
@@ -105,13 +96,13 @@ class MONET(object):
         airnow.aggragate_files()
         return airnow
 
-    def add_aqs(self, dates=[], daily=False):
+    def add_aqs(self, dates=None, param=None, network=None, daily=False, download=False):
         """Short summary.
 
         Parameters
         ----------
         dates : type
-            Description of parameter `dates` (the default is []).
+            Description of parameter `dates` .
         daily : type
             Description of parameter `daily` (the default is False).
 
@@ -123,10 +114,7 @@ class MONET(object):
         """
         from .obs.aqs import AQS
         aqs = AQS()
-        if daily:
-            aqs.load_all_daily_data(dates)
-        else:
-            aqs.load_all_hourly_data(dates)
+        aqs.add_data(dates, param=param, daily=daily, network=network, download=download)
         return aqs
 
     def add_aeronet(self, dates=[], latlonbox=None):
@@ -193,11 +181,11 @@ class MONET(object):
         """
         if model is not None and obs is not None:
             from .verification.combine import combine as pair
-            if model.objtype == 'TOLNET':
+            if obs.objtype == 'TOLNET':
                 dset, combined = pair(model=model, obs=obs, **kwargs)
                 return dset, combined
             else:
-                combined = pair(model=model, obs=obs)
+                combined = pair(model=model, obs=obs, **kwargs)
                 from .verification.verify import VERIFY
                 verify = VERIFY(model=model, obs=obs, dset=combined)
                 return combined, verify
