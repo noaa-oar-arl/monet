@@ -363,17 +363,11 @@ class CMAQ(BaseModel):
         elif p == 'OC':
             var = self.get_oc(lay=lay)
         elif p == 'VOC':
-            var = self.dset['VOC'][:, lay, :, :].squeeze()
+            var = self.select_layer(self.dset['VOC'], lay=lay)
         elif p == 'RH':
-            var = self.get_metcro2d_rh(self, lay=lay)
+            var = self.get_metcro2d_rh('param', lay=lay)
         else:
-            if self.check_z(param):
-                if lay is None:
-                    var = self.dset[param][:, :, :, :].copy()
-                else:
-                    var = self.dset[param][:, lay, :, :].copy().squeeze()
-            else:
-                var = self.dset[param][:, :, :].copy()
+            var = self.select_layer(self.dset[param], lay=lay)
         return var
 
     def get_metcro2d_rh(self, lay=None):

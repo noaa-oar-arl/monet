@@ -30,13 +30,10 @@ def combine(model=None, obs=None, mapping_table=None, lay=None, radius=None):
             dfn = obsdf.drop_duplicates(subset=['latitude', 'longitude'])
             factor = check_units(model, obsunit, variable=mapping_table[i][0])
             try:
-                if lay is None and Series(['IMPROVE', 'AirNow', 'AQS', 'CRN', 'ISH']).isin([obs.objtype]).max():
+                if lay is None and Series([model.objtype]).isin(['CAMX', 'CMAQ']).max():
                     modelvar = get_model_fields(model, mapping_table[i], lay=0).compute() * factor
                 else:
                     modelvar = get_model_fields(model, mapping_table[i], lay=lay).compute() * factor
-            # except KeyError:
-            #     print(i, ' not found... Skipping')
-            #     pass
                 mvar_interped = interpo.interp_latlon(modelvar, dfn.latitude.values, dfn.longitude.values, radius=radius)
                 combined_df = merge_obs_and_model(mvar_interped, obsdf, dfn, model_time=modelvar.time.to_index(), daily=obs.daily, obstype=obs.objtype)
                 dfs.append(combined_df)
