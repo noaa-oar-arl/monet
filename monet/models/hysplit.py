@@ -45,6 +45,21 @@ class HYSPLIT(BaseModel):
         else:
             self.dset = xr.merge([self.dset, dset])
 
+    @staticmethod
+    def select_layer(variable, lay=None):
+        if lay is not None:
+            try:
+                var = variable.sel(levels=lay)
+            except ValueError:
+                print('Dimension \'levels\' not in Dataset.  Returning Dataset anyway')
+                var = variable
+        else:
+            var = variable
+        return var
+
+    def get_var(self, param, lay=None):
+        return self.select_layer(self.dset[param], lay=lay)
+
 
 class ModelBin(object):
     """represents a binary cdump (concentration) output file from HYSPLIT

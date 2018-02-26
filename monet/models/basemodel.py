@@ -36,26 +36,5 @@ class BaseModel(object):
         else:
             return False
 
-    def add_multiple_fields(self, findkeys, lay=None, weights=None):
-        from numpy import ones
-        keys = self.keys
-        newkeys = pd.Series(findkeys).loc[pd.Series(findkeys).isin(keys)].values
-        if weights is None:
-            w = ones(len(newkeys))
-        if self.check_z(newkeys[0]):
-            if lay is not None:
-                var = self.dset[newkeys[0]][:, 0, :, :].squeeze() * w[0]
-                for i, j in zip(newkeys[1:], w[1:]):
-                    var += self.dset[i][:, 0, :, :].squeeze() * j
-            else:
-                var = self.dset[newkeys[0]][:, :, :, :].squeeze() * w[0]
-                for i, j in zip(newkeys[1:], w[1:]):
-                    var += self.dset[i][:, :, :, :].squeeze() * j
-        else:
-            var = self.dset[newkeys[0]][:, :, :].copy() * w[0]
-            for i, j in zip(newkeys[1:], w[1:]):
-                var += self.dset[i][:, :, :].squeeze() * j
-        return var
-
     def get_var(self, varname):
         return self.dset[varname]

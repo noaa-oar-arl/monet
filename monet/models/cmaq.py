@@ -80,9 +80,9 @@ class CMAQ(BaseModel):
             fname = sort(array(mfile))
         if fname.shape[0] >= 1:
             if self.dset is None:
-                self.dset = xr.open_mfdataset(fname.tolist(), concat_dim='TSTEP').rename(nameset).squeeze()
+                self.dset = xr.open_mfdataset(fname.tolist(), concat_dim='TSTEP').rename(nameset)
             else:
-                dset = xr.open_mfdataset(fname.tolist(), concat_dim='TSTEP').rename(nameset).squeeze()
+                dset = xr.open_mfdataset(fname.tolist(), concat_dim='TSTEP').rename(nameset)
                 self.dset = xr.merge([self.dset, dset])
         else:
             print('Files not found')
@@ -105,19 +105,35 @@ class CMAQ(BaseModel):
         newkeys = pd.Series(findkeys).loc[pd.Series(findkeys).isin(keys)].values
         if weights is None:
             w = ones(len(newkeys))
-        if self.check_z(newkeys[0]):
-            if lay is not None:
-                var = self.dset[newkeys[0]][:, 0, :, :].squeeze() * w[0]
-                for i, j in zip(newkeys[1:], w[1:]):
-                    var += self.dset[i][:, 0, :, :].squeeze() * j
-            else:
-                var = self.dset[newkeys[0]][:, :, :, :].squeeze() * w[0]
-                for i, j in zip(newkeys[1:], w[1:]):
-                    var += self.dset[i][:, :, :, :].squeeze() * j
+        var = self.dset[newkeys[0]] * w[0]
+        for i, j in zip(newkeys[1:], w[1:]):
+            var = var + self.dset[i] * j
+        return select_layer(var, lay=lay)
+        # if self.check_z(newkeys[0]):
+        #     if lay is not None:
+        #         var = self.dset[newkeys[0]][:, 0, :, :].squeeze() * w[0]
+        #         for i, j in zip(newkeys[1:], w[1:]):
+        #             var += self.dset[i][:, 0, :, :].squeeze() * j
+        #     else:
+        #         var = self.dset[newkeys[0]][:, :, :, :].squeeze() * w[0]
+        #         for i, j in zip(newkeys[1:], w[1:]):
+        #             var += self.dset[i][:, :, :, :].squeeze() * j
+        # else:
+        #     var = self.dset[newkeys[0]][:, :, :].copy() * w[0]
+        #     for i, j in zip(newkeys[1:], w[1:]):
+        #         var += self.dset[i][:, :, :].squeeze() * j
+        # return var
+
+    @staticmethod
+    def select_layer(variable, lay=None):
+        if lay is not None:
+            try:
+                var = variable.sel(z=lay)
+            except ValueError:
+                print('Dimension \'z\' not in Dataset.  Returning Dataset anyway')
+                var = variable
         else:
-            var = self.dset[newkeys[0]][:, :, :].copy() * w[0]
-            for i, j in zip(newkeys[1:], w[1:]):
-                var += self.dset[i][:, :, :].squeeze() * j
+            var = variable
         return var
 
     def get_dust_total(self, lay=None):
@@ -126,19 +142,13 @@ class CMAQ(BaseModel):
     def get_noy(self, lay=None):
         keys = self.keys
         if 'NOY' in keys:
-            if self.check_z('NOY'):
-                if lay is not None:
-                    var = self.dset['NOY'][:, lay, :, :].squeeze()
-                else:
-                    var = self.dset['NOY'][:, :, :, :]
-            else:
-                var = self.dset['NOY'][:]
+            var = self.select_layer(self.dset['NOY'], lay=lay)
         else:
             var = self.add_multiple_fields(self.noy_gas, lay=lay)
         return var
 
     def get_nox(self, lay=None):
-        var = self.add_multiple_fields(['NO', 'NOX'], lay=lay)
+        var = self.add_multiple_fields(['NO', 'NO2'], lay=lay)
         return var
 
     def get_dust_pm25(self, lay=None):
@@ -153,13 +163,7 @@ class CMAQ(BaseModel):
              1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
              1., 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2])
         if 'PM25_TOT' in keys:
-            if self.check_z('PM25_TOT'):
-                if lay is not None:
-                    var = self.dset['PM25_TOT'].sel(z=lay).copy().squeeze()
-                else:
-                    var = self.dset['PM25_TOT'][:, :, :, :].copy()
-            else:
-                var = self.dset['PM25_TOT'][:, :, :].copy()
+            var = self.select_layer(self.dset['PM25_TOT'], lay=lay)
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
@@ -176,29 +180,17 @@ class CMAQ(BaseModel):
         allvars = concatenate([self.aitken, self.accumulation, self.coarse])
         var = None
         if 'PMC_TOT' in keys:
-            if self.check_z('PMC_TOT'):
-                if lay is not None:
-                    var = self.dset['PMC_TOT'][:, lay, :, :].copy().squeeze()
-                else:
-                    var = self.dset['PMC_TOT'][:, :, :, :].copy()
-            else:
-                var = self.dset['PMC_TOT'][:, :, :].copy()
+            var = self.select_layer(self.dset['PMC_TOT'], lay=lay)
         elif 'PM10' in keys:
-            if self.check_z('PM10'):
-                if lay is not None:
-                    var = self.dset['PM10'][:, lay, :, :].squeeze()
-                else:
-                    var = self.dset['PM10'][:, :, :, :].squeeze()
-            else:
-                var = self.dset['PM10'][:, :, :].copy()
+            var = self.select_layer(self.dset['PM10'], lay=lay)
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index]
             var = self.add_multiple_fields(newkeys, lay=lay, weights=neww)
-        var.name = 'PM2.5'
-        var['long_name'] = 'PM2.5'
-        var['var_desc'] = 'Variable PM2.5'
+        var.name = 'PM10'
+        var['long_name'] = 'PM10'
+        var['var_desc'] = 'Variable PM10'
         return var
 
     def get_clf(self, lay=None):
@@ -207,7 +199,7 @@ class CMAQ(BaseModel):
         weights = array([1, 1, .2])
         var = None
         if 'PM25_CL' in keys:
-            var = self.dset['PM25_CL'][:, lay, :, :].squeeze()
+            var = self.select_layer(self.dset['PM25_CL'], lay=lay)
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
@@ -223,10 +215,7 @@ class CMAQ(BaseModel):
         allvars = array(['ANAI', 'ANAJ', 'ASEACAT', 'ASOIL', 'ACORS'])
         weights = array([1, 1, .2 * 837.3 / 1000., .2 * 62.6 / 1000., .2 * 2.3 / 1000.])
         if 'PM25_NA' in keys:
-            if lay is not None:
-                var = self.dset['PM25_NA'][:, lay, :, :].squeeze()
-            else:
-                var = self.dset['PM25_NA'][:, :, :, :].squeeze()
+            var = self.select_layer(self.dset['PM25_NA'], lay=lay)
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
@@ -242,10 +231,7 @@ class CMAQ(BaseModel):
         allvars = array(['AKI', 'AKJ', 'ASEACAT', 'ASOIL', 'ACORS'])
         weights = array([1, 1, .2 * 31. / 1000., .2 * 24. / 1000., .2 * 17.6 / 1000.])
         if 'PM25_K' in keys:
-            if lay is not None:
-                var = self.dset['PM25_K'][:, lay, :, :].squeeze()
-            else:
-                var = self.dset['PM25_K'][:, :, :, :].squeeze()
+            var = self.select_layer(self.dset['PM25_K'], lay=lay)
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
@@ -262,12 +248,8 @@ class CMAQ(BaseModel):
         allvars = array(['ACAI', 'ACAJ', 'ASEACAT', 'ASOIL', 'ACORS'])
         weights = array([1, 1, .2 * 32. / 1000., .2 * 83.8 / 1000., .2 * 56.2 / 1000.])
         if 'PM25_CA' in keys:
-            if lay is not None:
-                var = self.dset['PM25_CA'][:, lay, :, :].squeeze()
-            else:
-                var = self.dset['PM25_CA'][:, :, :, :].squeeze()
+            var = self.select_layer(self.dset['PM25_CA'], lay=lay)
         else:
-            print('    Computing PM25_NO3...')
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
             neww = weights[index.values]
@@ -282,10 +264,7 @@ class CMAQ(BaseModel):
         allvars = array(['ASO4I', 'ASO4J', 'ASO4K'])
         weights = array([1., 1., .2])
         if 'PM25_SO4' in keys:
-            if lay is not None:
-                var = self.dset['PM25_SO4'][:, lay, :, :].squeeze()
-            else:
-                var = self.dset['PM25_SO4'][:, :, :, :].squeeze()
+            var = self.select_layer(self.dset['PM25_SO4'], lay=lay)
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
@@ -302,10 +281,7 @@ class CMAQ(BaseModel):
         weights = array([1., 1., .2])
         var = None
         if 'PM25_NH4' in keys:
-            if lay is not None:
-                var = self.dset['PM25_NH4'][:, lay, :, :].squeeze()
-            else:
-                var = self.dset['PM25_NH4'][:, :, :, :].squeeze()
+            var = self.select_layer(self.dset['PM25_NH4'], lay=lay)
         else:
             print('    Computing PM25_NH4...')
             index = pd.Series(allvars).isin(keys)
@@ -324,10 +300,7 @@ class CMAQ(BaseModel):
         weights = array([1., 1., .2])
         var = None
         if 'PM25_NO3' in keys:
-            if lay is not None:
-                var = self.dset['PM25_NO3'][:, lay, :, :].squeeze()
-            else:
-                var = self.dset['PM25_NO3'][:, :, :, :].squeeze()
+            var = self.select_layer(self.dset['PM25_NO3'], lay=lay)
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
@@ -344,10 +317,7 @@ class CMAQ(BaseModel):
         weights = array([1., 1.])
         var = None
         if 'PM25_EC' in keys:
-            if lay is not None:
-                var = self.dset['PM25_EC'][:, lay, :, :].squeeze()
-            else:
-                var = self.dset['PM25_EC'][:, :, :, :].squeeze()
+            var = self.select_layer(self.dset['PM25_EC'], lay=lay)
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]

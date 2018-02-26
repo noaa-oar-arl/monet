@@ -29,19 +29,19 @@ def combine(model=None, obs=None, mapping_table=None, lay=None, radius=None):
             # get observation lat and lons
             dfn = obsdf.drop_duplicates(subset=['latitude', 'longitude'])
             factor = check_units(model, obsunit, variable=mapping_table[i][0])
-            # try:
-            if lay is None and Series(['IMPROVE', 'AirNow', 'AQS', 'CRN', 'ISH']).isin([obs.objtype]).max():
-                modelvar = get_model_fields(model, mapping_table[i], lay=0).compute() * factor
-            elif lay is not None:
-                modelvar = get_model_fields(model, mapping_table[i], lay=lay).compute() * factor
-            else:
-                modelvar = get_model_fields(model, mapping_table[i]).compute() * factor
+            try:
+                if lay is None and Series(['IMPROVE', 'AirNow', 'AQS', 'CRN', 'ISH']).isin([obs.objtype]).max():
+                    modelvar = get_model_fields(model, mapping_table[i], lay=0).compute() * factor
+                else:
+                    modelvar = get_model_fields(model, mapping_table[i], lay=lay).compute() * factor
             # except KeyError:
             #     print(i, ' not found... Skipping')
             #     pass
-            mvar_interped = interpo.interp_latlon(modelvar, dfn.latitude.values, dfn.longitude.values, radius=radius)
-            combined_df = merge_obs_and_model(mvar_interped, obsdf, dfn, model_time=modelvar.time.to_index(), daily=obs.daily, obstype=obs.objtype)
-            dfs.append(combined_df)
+                mvar_interped = interpo.interp_latlon(modelvar, dfn.latitude.values, dfn.longitude.values, radius=radius)
+                combined_df = merge_obs_and_model(mvar_interped, obsdf, dfn, model_time=modelvar.time.to_index(), daily=obs.daily, obstype=obs.objtype)
+                dfs.append(combined_df)
+            except KeyError:
+                print(i + ' not in dataset and will not be paired')
         df = concat(dfs)
 
     return df
@@ -67,18 +67,25 @@ def merge_obs_and_model(model, obs, dfn, model_time=None, daily=False, obstype=N
 def get_model_fields(model, findkeys, lay=None, weights=None):
     from numpy import ones
     keys = model.dset.keys()
+    print(findkeys)
     newkeys = Series(findkeys).loc[Series(findkeys).isin(keys)]
     if len(newkeys) > 1:
-        mvar = model.dset[newkeys[0]]
-        for i in newkeys[1:]:
-            mvar = mvar + model.dset[i]
+        mvar = model.select_layer(model.dset[newkeys[0]], lay=lay)
+        for i in newkeys:
+            mvar = mvar + model.select_layer(model.dset[newkeys[0]], lay=lay)
     else:
-        newkeys = findkeys
-        mvar = model.dset[newkeys[0]]
-    if lay is not None and Series(model.dset.dims).isin(['z']).max():
-        mvar = mvar.sel(z=lay)
-    elif lay is not None and Series(model.dset.dims).isin(['levels']).max():  # fix for hysplit temporary
-        mvar = mvar.sel(levels=lay)
+        mvar = model.get_var(findkeys[0], lay=lay)
+    # if len(newkeys) > 1:
+    #     mvar = model.dset[newkeys[0]]
+    #     for i in newkeys[1:]:
+    #         mvar = mvar + model.dset[i]
+    # else:
+    #     newkeys = findkeys
+    #     mvar = model.dset[newkeys[0]]
+    # if lay is not None and Series(model.dset.dims).isin(['z']).max():
+    #     mvar = mvar.sel(z=lay)
+    # elif lay is not None and Series(model.dset.dims).isin(['levels']).max():  # fix for hysplit temporary
+    #     mvar = mvar.sel(levels=lay)
     return mvar
 
 

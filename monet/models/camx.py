@@ -72,17 +72,31 @@ class CAMx(BaseModel):
         else:
             return False
 
-    def get_nox(self, lay=None):
-        if self.check_z('NO'):
-            if lay is not None:
-                var = self.dset['NO'][:, 0, :, :].squeeze().copy()
-                var += self.dset['NO2'][:, 0, :, :].squeeze().copy()
-            else:
-                var = self.dset['NO'][:, :, :, :].copy()
-                var += self.dset['NO2'][:, :, :, :].copy()
+    def add_multiple_fields(self, findkeys, lay=None, weights=None):
+        from numpy import ones
+        keys = self.keys
+        newkeys = pd.Series(findkeys).loc[pd.Series(findkeys).isin(keys)].values
+        if weights is None:
+            w = ones(len(newkeys))
+        var = self.dset[newkeys[0]] * w[0]
+        for i, j in zip(newkeys[1:], w[1:]):
+            var = var + self.dset[i] * j
+        return select_layer(var, lay=lay)
+
+    @staticmethod
+    def select_layer(variable, lay=None):
+        if lay is not None:
+            try:
+                var = variable.sel(z=lay)
+            except ValueError:
+                print('Dimension \'z\' not in Dataset.  Returning Dataset anyway')
+                var = variable
         else:
-            var = self.dset['NO'][:, :, :].copy()
-            var += self.dset['NO2'][:, :, :].copy()
+            var = variable
+        return var
+
+    def get_nox(self, lay=None):
+        var = add_multiple_fields(['NO', 'NO2'], lay=lay)
         return var
 
     def get_pm25(self, lay=None):
@@ -90,19 +104,7 @@ class CAMx(BaseModel):
         allvars = self.fine
         index = pd.Series(allvars).isin(keys)
         newkeys = allvars[index]
-        if self.check_z(newkeys[0]):
-            if lay is not None:
-                var = self.dset[newkeys[0]][:, 0, :, :].squeeze()
-                for i in newkeys[1:]:
-                    var += self.dset[i][:, 0, :, :].squeeze()
-            else:
-                var = self.dset[newkeys[0]][:, :, :, :].squeeze()
-                for i in newkeys[1:]:
-                    var += self.dset[i][:, :, :, :].squeeze()
-        else:
-            var = self.dset[newkeys[0]][:, :, :].copy()
-            for i in newkeys[1:]:
-                var += self.dset[i][:, :, :].squeeze()
+        var = add_multiple_fields(newkeys, lay=lay)
         return var
 
     def get_pm10(self, lay=None):
@@ -110,19 +112,7 @@ class CAMx(BaseModel):
         allvars = self.coarse
         index = pd.Series(allvars).isin(keys)
         newkeys = allvars[index]
-        if self.check_z(newkeys[0]):
-            if lay is not None:
-                var = self.dset[newkeys[0]][:, 0, :, :].squeeze()
-                for i in newkeys[1:]:
-                    var += self.dset[i][:, 0, :, :].squeeze()
-            else:
-                var = self.dset[newkeys[0]][:, :, :, :].squeeze()
-                for i in newkeys[1:]:
-                    var += self.dset[i][:, :, :, :].squeeze()
-        else:
-            var = self.dset[newkeys[0]][:, :, :].copy()
-            for i in newkeys[1:]:
-                var += self.dset[i][:, :, :].squeeze()
+        var = add_multiple_fields(newkeys, lay=lay)
         return var
 
     def get_var(self, param='O3', lay=None):
@@ -138,17 +128,11 @@ class CAMx(BaseModel):
             var = self.get_oc(lay=lay)
         elif p == 'VOC':
             if lay is not None:
-                var = self.dset['VOC'][:, 0, :, :].copy().squeeze()
+                var = selfself.dset['VOC']
             else:
-                var = self.dset['VOC'][:, :, :, :].copy().squeeze()
+                var = self.dset['VOC']
         else:
-            if self.check_z(param):
-                if lay is None:
-                    var = self.dset[param][:, :, :, :].copy()
-                else:
-                    var = self.dset[param][:, lay, :, :].copy().squeeze()
-            else:
-                var = self.dset[param]
+            var = self.select_layer(self.dset[param], lay=lay)
         return var
 
     def load_conus_basemap(self, res='l'):

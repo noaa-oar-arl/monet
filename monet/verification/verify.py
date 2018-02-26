@@ -85,17 +85,17 @@ class VERIFY(object):
         type
             Description of returned object.
 
-        :param param: Species Parameter: Acceptable Species: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
+        :param param: variable Parameter: Acceptable variable: 'OZONE' 'PM2.5' 'CO' 'NOY' 'SO2' 'SO2' 'NOX'
         :param region: EPA Region: 'Northeast', 'Southeast', 'North_Central', 'South_Central', 'Rockies', 'Pacific'
         :param date: If not supplied will plot all time.  Put in 'YYYY-MM-DD HH:MM' for single time
         :return:
         """
         if Obs:
             try:
-                g = df.groupby('Species')
+                g = df.groupby('variable')
                 df2 = g.get_group(param)
             except KeyError:
-                print(param + ' Species not available!!!!')
+                print(param + ' variable not available!!!!')
                 exit
         param = param.upper()
         v = self.model.get_var(param=model_param, lay=lay)
@@ -173,7 +173,7 @@ class VERIFY(object):
         from ..obs.epa_util import get_epa_location_df
         df2, title = get_epa_location_df(self.dset.copy(), param, site=site, city=city, state=state, region=region,
                                          epa_region=epa_region)
-        df2 = df2.groupby('Species').get_group(param)
+        df2 = df2.groupby('variable').get_group(param)
         if timeseries:
             if ax is None:
                 ax = plots.timeseries_param(df2, col='Obs', title=title, label=label, ax=ax,

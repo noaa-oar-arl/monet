@@ -16,7 +16,7 @@ sns.set_context('poster')
 # CMAQ Spatial Plots
 
 
-def make_spatial_plot(cmaqvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
+def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
     # create figure
     f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
     # determine colorbar
@@ -25,16 +25,16 @@ def make_spatial_plot(cmaqvar, m, dpi=None, plotargs={}, ncolors=15, discrete=Fa
     if discrete and 'vmin' in plotargs and 'vmax' in plotargs:
         c, cmap = colorbar_index(ncolors, plotargs['cmap'], minval=plotargs['vmin'], maxval=plotargs['vmax'], basemap=m)
         plotargs['cmap'] = cmap
-        m.imshow(cmaqvar, **plotargs)
+        m.imshow(modelvar, **plotargs)
         vmin, vmax = plotargs['vmin'], plotargs['vmax']
     elif discrete:
-        temp = m.imshow(cmaqvar, **plotargs)
+        temp = m.imshow(modelvar, **plotargs)
         vmin, vmax = temp.get_clim()
         c, cmap = colorbar_index(ncolors, plotargs['cmap'], minval=vmin, maxval=vmax, basemap=m)
         plotargs['cmap'] = cmap
-        m.imshow(cmaqvar, vmin=vmin, vmax=vmax, **plotargs)
+        m.imshow(modelvar, vmin=vmin, vmax=vmax, **plotargs)
     else:
-        temp = m.imshow(cmaqvar, **plotargs)
+        temp = m.imshow(modelvar, **plotargs)
         c = m.colorbar()
         vmin, vmax = temp.get_clim()
         cmap = plotargs['cmap']
@@ -45,7 +45,7 @@ def make_spatial_plot(cmaqvar, m, dpi=None, plotargs={}, ncolors=15, discrete=Fa
     return f, ax, c, cmap, vmin, vmax
 
 
-def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', discrete=True, ncolors=None, dtype='int',
+def make_spatial_contours(modelvar, gridobj, date, m, dpi=None, savename='', discrete=True, ncolors=None, dtype='int',
                           **kwargs):
     fig = plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
@@ -56,12 +56,12 @@ def make_spatial_contours(cmaqvar, gridobj, date, m, dpi=None, savename='', disc
     m.drawcountries()
     x, y = m(lon, lat)
     plt.axis('off')
-    m.contourf(x, y, cmaqvar, **kwargs)
+    m.contourf(x, y, modelvar, **kwargs)
     cmap = kwargs['cmap']
     levels = kwargs['levels']
     if discrete:
         c, cmap = colorbar_index(ncolors, cmap, minval=levels[0], maxval=levels[-1], basemap=m, dtype=dtype)
-    #        m.contourf(x, y, cmaqvar, **kwargs,cmap=cmap)
+    #        m.contourf(x, y, modelvar, **kwargs,cmap=cmap)
     # c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
     else:
         c = m.colorbar()
@@ -105,7 +105,7 @@ def normval(vmin, vmax, cmap):
 
 
 def spatial_scatter(df, m, discrete=False, plotargs={}, create_cbar=True):
-    x, y = m(df.Longitude.values, df.Latitude.values)
+    x, y = m(df.longitude.values, df.Latitude.values)
     s = 20
     if create_cbar:
         if discrete:
@@ -123,7 +123,7 @@ def spatial_scatter(df, m, discrete=False, plotargs={}, create_cbar=True):
 
 def spatial_stat_scatter(df, m, date, stat=mystats.MB, ncolors=15, fact=1.5, cmap='RdYlBu_r'):
     new = df[df.datetime == date]
-    x, y = m(new.Longitude.values, new.Latitude.values)
+    x, y = m(new.longitude.values, new.latitude.values)
     cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
     ss = (new.Obs - new.CMAQ).abs() * fact
@@ -138,7 +138,7 @@ def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename='', ncolors
     diff = (df.CMAQ - df.Obs)
     top = around(score(diff.abs(), per=95))
     new = df[df.datetime == date]
-    x, y = m(new.Longitude.values, new.Latitude.values)
+    x, y = m(new.longitude.values, new.latitude.values)
     c, cmap = colorbar_index(ncolors, cmap, minval=top * -1, maxval=top, basemap=m)
     c.ax.tick_params(labelsize=13)
     #    cmap = cmap_discretize(cmap, ncolors)
@@ -160,7 +160,7 @@ def eight_hr_spatial_scatter(df, m, date, savename=''):
 
     plt.axis('off')
     new = df[df.datetime_local == date]
-    x, y = m(new.Longitude.values, new.Latitude.values)
+    x, y = m(new.longitude.values, new.latitude.values)
     cmap = plt.cm.get_cmap('plasma')
     norm = normval(-40, 40., cmap)
     ss = (new.Obs - new.CMAQ).abs() / top * 100.
