@@ -207,7 +207,7 @@ class crn(object):
         self.change_back()
         self.ftp.close()
 
-    def aggragate_files(self, output=''):
+    def aggregate_files(self, output=''):
         """Short summary.
 
         Parameters

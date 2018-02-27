@@ -70,7 +70,7 @@ class AirNow(object):
         dft['utcoffset'] = dft.utcoffset.astype(int)
         return dft
 
-    def aggragate_files(self):
+    def aggregate_files(self):
         import dask
         import dask.dataframe as dd
 

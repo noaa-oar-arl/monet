@@ -46,7 +46,7 @@ class CEMSEmissions(object):
     def __str__(self):
         return self.info
 
-    def add_data(self, rdate, states=['md'], download=False):
+    def add_data(self, rdate, states=['md'], download=False, verbose=True):
         """gets the ftp url from the retrieve method and then 
            loads the data from the ftp site using the load method.
 
@@ -59,7 +59,8 @@ class CEMSEmissions(object):
            If download=False then retrieve will return the url and load will read directly from ftp site.
            TO DO add loop for adding multiple months.
         """
-        
+        if not rdate:
+           return -1 
         if isinstance(states, str):
            states = [states] 
         if isinstance(rdate, list):
@@ -80,21 +81,31 @@ class CEMSEmissions(object):
         else:
             rdatelist = [rdates]
         for rd in rdatelist: 
-            print('getting data')
-            print(rd)
             for st in states:
-                url = self.retrieve(rd, st, download=download)
-                self.load(url)
+                url = self.retrieve(rd, st, download=download, verbose=verbose)
+                self.load(url, verbose=verbose)
 
-    def get_var(self, varname, loc=None, daterange=None):
+    def get_var(self, varname, loc=None, daterange=None, unitid=-99, verbose=True):
         """returns time series with variable indicated by varname.
            varname may be string or list of strings.
            routine looks for column which contains all strings in varname.
            Currently not case sensitive.
+     
+           loc must be list of FAC_ID's.
 
-           TO DO filter for specified dates.
+           TO DO - each FAC_ID may have several UNIT_ID, each of which
+           corresponds to a different unit at the facility. Need to handle this.
+           Either return separately or add together?
 
            loc must be list of FAC_ID's.
+
+           Each facility may have more than one unit. If unitid=-99 then this
+           method returns sum from all units.
+
+           if a particular unitid is specified then will return values for that unit.
+
+           TO DO if unitid -999 then will return a dictionary where key is the unit and value
+           is a panda time series for that unit.
         """
         if isinstance(varname, str):
            varname = (varname)
@@ -115,11 +126,19 @@ class CEMSEmissions(object):
                    match+=1
             if match == len(varname):
                cmatch = ccc
-        temp.set_index(['datetime'], inplace=True) 
-        #print(temp)
-        return temp[cmatch]              
+        ##create pandas frame with index datetime and columns for value for each unit_id
+        pivot = pd.pivot_table(temp, values=cmatch, index=['datetime'], columns=['UNIT_ID'])
+        pivot = pivot.fillna(value=0)
+        #print('------------------pivot')
+        #print(pivot[0:10])
+        if unitid == -99:
+            pivot['all'] = pivot.sum(axis=1)
+            #print(pivot[0:10])
+            return pivot['all']       
+        else:
+            return pivot['unitid']  
 
-    def retrieve(self, rdate, state, download=True):
+    def retrieve(self, rdate, state, download=True, verbose=False):
         """rdate - datetime object. Uses year and month. Day and hour are not used.
            state - state abbreviation to retrieve data for
            Files are by year month and state.

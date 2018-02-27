@@ -74,7 +74,33 @@ class MONET(object):
             o = self.add_crn(**kwargs)
         if obs.upper() == 'IMPROVE':
             o = self.add_improve(**kwargs)
+        if obs.upper() == 'CEMS':
+            o = self.add_cems(**kwargs)
         return o
+
+    def add_cems(self, dates=None, states=['md'], download=False, verbose=False):
+        """Short summary.
+
+        Parameters
+        ----------
+        dates : type 
+              dates should either be a single datetime object or a list of two datetime objects.
+        states: list of strings
+              states should be a list of two letter state abbreviations. Default is ['md']
+        download: boolean
+              default False. If True then downloads file from epa site.
+        verbose: boolean
+              default False. If True then prints extra information.
+
+        Returns
+        -------
+        CEMSEmissions object.
+
+        """
+        from .obs.cems import CEMSEmissions
+        cems = CEMSEmissions()
+        cems.add_data(dates, states=states, download=download, verbose=verbose)
+        return cems
 
     def add_airnow(self, dates=[]):
         """Short summary.
@@ -93,7 +119,7 @@ class MONET(object):
         from .obs.airnow import AirNow
         airnow = AirNow()
         airnow.dates = dates
-        airnow.aggragate_files()
+        airnow.aggregate_files()
         return airnow
 
     def add_aqs(self, dates=None, param=None, network=None, daily=False, download=False):
