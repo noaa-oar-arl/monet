@@ -72,17 +72,6 @@ def get_model_fields(model, findkeys, lay=None, weights=None):
             mvar = mvar + model.select_layer(model.dset[newkeys[0]], lay=lay)
     else:
         mvar = model.get_var(findkeys[0], lay=lay)
-    # if len(newkeys) > 1:
-    #     mvar = model.dset[newkeys[0]]
-    #     for i in newkeys[1:]:
-    #         mvar = mvar + model.dset[i]
-    # else:
-    #     newkeys = findkeys
-    #     mvar = model.dset[newkeys[0]]
-    # if lay is not None and Series(model.dset.dims).isin(['z']).max():
-    #     mvar = mvar.sel(z=lay)
-    # elif lay is not None and Series(model.dset.dims).isin(['levels']).max():  # fix for hysplit temporary
-    #     mvar = mvar.sel(levels=lay)
     return mvar
 
 

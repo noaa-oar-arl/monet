@@ -14,8 +14,6 @@ sns.set_context('poster')
 
 
 # CMAQ Spatial Plots
-
-
 def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
     # create figure
     f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
@@ -43,6 +41,17 @@ def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
     m.drawcoastlines(linewidth=.3)
     m.drawcountries()
     return f, ax, c, cmap, vmin, vmax
+
+
+def spatial(modelvar, **kwargs):
+    try:
+        if kwargs['ax'] is None:
+            f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
+            kwargs['ax'] = ax
+    except:
+        print 'woops'
+    ax = modelvar.plot(**kwargs)
+    return ax
 
 
 def make_spatial_contours(modelvar, gridobj, date, m, dpi=None, savename='', discrete=True, ncolors=None, dtype='int',
@@ -171,7 +180,7 @@ def eight_hr_spatial_scatter(df, m, date, savename=''):
         plt.close()
 
 
-def timeseries_param(df, col='Obs', ax=None, sample='H', plotargs={}, fillargs={}, title='', label=None):
+def timeseries(df, x='time', y='obs', ax=None, plotargs={}, fillargs={'alpha': .2}, title='', ylabel=None, label=None):
     """Short summary.
 
     Parameters
@@ -206,168 +215,86 @@ def timeseries_param(df, col='Obs', ax=None, sample='H', plotargs={}, fillargs={
 
     sns.set_palette(sns.color_palette(colors))
     sns.set_style('ticks')
-    df.index = df.datetime
-    m = df.groupby(pd.Grouper(freq=sample)).mean()
-    e = df.groupby(pd.Grouper(freq=sample)).std()
-    species = df.Species[0]
-    unit = df.Units[0]
-    upper = m[col] + e[col]
-    lower = m[col] - e[col]
+    df.index = df[x]
+    m = df.groupby('time').mean()  # mean values for each sample time period
+    e = df.groupby('time').std()  # std values for each sample time period
+    variable = df.variable[0]
+    if df.columns.isin(['units']).max():
+        unit = df.units[0]
+    else:
+        unit = 'None'
+    upper = m[y] + e[y]
+    lower = m[y] - e[y]
     lower.loc[lower < 0] = 0
     lower = lower.values
-    if col == 'Obs':
-        plotargs['color'] = 'darkslategrey'
-    if col == 'Obs':
-        fillargs['color'] = 'darkslategrey'
-    if col != 'Obs' and 'color' not in plotargs:
-        plotargs['color'] = None
-
-    m[col].plot(ax=ax, **plotargs)
-    ax.fill_between(m[col].index, lower, upper, **fillargs)
-    if label is None:
-        ax.set_ylabel(species + ' (' + unit + ')')
+    if 'alpha' not in fillargs:
+        fillargs['alpha'] = 0.2
+    if label is not None:
+        m.rename(columns={y: label}, inplace=True)
+    else:
+        label = y
+    tt = m[label].plot(ax=ax, **plotargs)
+    ax.fill_between(m[label].index, lower, upper, **fillargs)
+    if ylabel is None:
+        ax.set_ylabel(variable + ' (' + unit + ')')
     else:
         ax.set_ylabel(label)
-    plt.set_xlabel('')
+    ax.set_xlabel('')
     plt.legend()
     plt.title(title)
     plt.tight_layout()
     return ax
 
 
-def timeseries_error_param(df, col='Obs', ax=None, resample=False, freq='H', plotargs={}, fillargs={}, title='',
-                           label=None):
+def kdeplot(df, title=None, label=None, ax=None, **kwargs):
     """Short summary.
 
     Parameters
     ----------
-    df : pandas DataFrame
-        pandas dataframe with a column labeled datetime
-    col : string
-        Description of parameter `col` (the default is 'Obs').
-    ax : matplotlib axis handle
-        pass a matplotlib axis handle.  Default none creates a new figure and axes handle.
-    resample : bool
-        Set to true or false to resample the dataframe.  (the default is 'H'  plotargs)
-    freq : str
-        String for the default frequency to resample.  See http://pandas.pydata.org/pandas-docs/stable/timeseries.html for more documentation (the default is 'H'  plotargs).
-    fillargs : dictionary
-        (the default is {}).
+    df : type
+        Description of parameter `df`.
+    col : type
+        Description of parameter `col` (the default is 'obs').
     title : type
-        Description of parameter `title` (the default is '').
+        Description of parameter `title` (the default is None).
     label : type
         Description of parameter `label` (the default is None).
+    ax : type
+        Description of parameter `ax` (the default is ax).
+    **kwargs : type
+        Description of parameter `**kwargs`.
 
     Returns
     -------
     type
-        Description of returned object. """
-    import pandas as pd
+        Description of returned object.
+
+    """
+    from scipy.stats import scoreatpercentile as score
+    sns.set_style('ticks')
 
     if ax is None:
+        print 'here'
         f, ax = plt.subplots(figsize=(11, 6), frameon=False)
+        sns.despine()
 
-    sns.set_palette(sns.color_palette(colors))
-    sns.set_style('ticks')
-    df.index = df.datetime
-    m = df.groupby(pd.Grouper(freq=sample)).mean()
-    e = df.groupby(pd.Grouper(freq=sample)).std()
-    species = df.Species[0]
-    unit = df.Units[0]
-    upper = m[col] + e[col]
-    lower = m[col] - e[col]
-    lower.loc[lower < 0] = 0
-    lower = lower.values
-    if col == 'Obs':
-        plotargs['color'] = 'darkslategrey'
-    if col == 'Obs':
-        fillargs['color'] = 'darkslategrey'
-    if col != 'Obs' and 'color' not in plotargs:
-        plotargs['color'] = None
-
-    m[col].plot(ax=ax, **plotargs)
-    ax.fill_between(m[col].index, lower, upper, **fillargs)
-    if label is None:
-        ax.set_ylabel(species + ' (' + unit + ')')
-    else:
-        ax.set_ylabel(label)
-    plt.legend()
-    plt.title(title)
-    plt.tight_layout()
+    ax = sns.kdeplot(df, ax=ax, label=label, **kwargs)
     return ax
 
 
-# def timeseries_error_param(df, title='', fig=None, label=None, footer=True, sample='H'):
-#     """
-#
-#     :param df:
-#     :param title:
-#     :param fig:
-#     :param label:
-#     :param footer:
-#     :param sample:
-#     """
-#     import matplotlib.dates as mdates
-#     from numpy import sqrt
-#     sns.set_style('ticks')
-#
-#     df.index = df.datetime
-#     if fig is None:
-#         plt.figure(figsize=(13, 8))
-#
-#         species = df.Species.unique().astype('|S8')[0]
-#         units = df.Units.unique().astype('|S8')[0]
-#
-#         mb = (df.CMAQ - df.Obs).resample(sample).mean()
-#         rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
-#
-#         a = plt.plot(mb, label='Mean Bias', color='dodgerblue')
-#         ax = plt.gca().axes
-#         ax2 = ax.twinx()
-#         b = ax2.plot(rmse, label='RMSE', color='tomato')
-#         lns = a + b
-#         labs = [l.get_label() for l in lns]
-#         plt.legend(lns, labs, loc='best')
-#
-#         ax.set_xlabel('UTC Time (mm/dd HH)')
-#         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
-#         plt.title(title)
-#         ylabel = species + ' (' + units + ')'
-#         ax.set_ylabel('MB ' + ylabel, color='dodgerblue')
-#         ax2.set_ylabel('RMSE ' + ylabel, color='tomato')
-#         if footer:
-#             footer_text(df)
-#         plt.tight_layout()
-#         plt.grid(alpha=.5)
-#     else:
-#         ax1 = fig.get_axes()[0]
-#         ax2 = fig.get_axes()[1]
-#         mb = (df.CMAQ - df.Obs).resample(sample).mean()
-#         rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
-#         ax1.plot(mb, label=label + ' MB')
-#         ax2.plot(rmse, label=label + ' RMSE')
-#         lns = ax1.get_lines()[:] + ax2.get_lines()[1:]
-#         labs = [l.get_label() for l in lns]
-#         plt.legend(lns, labs, loc='best')
-
-
-def timeseries_rmse_param(df, title='', fig=None, label=None, footer=True, sample='H'):
+def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
     """Short summary.
 
     Parameters
     ----------
     df : type
         Description of parameter `df`.
-    title : type
-        Description of parameter `title` (the default is '').
-    fig : type
-        Description of parameter `fig` (the default is None).
-    label : type
-        Description of parameter `label` (the default is None).
-    footer : type
-        Description of parameter `footer` (the default is True).
-    sample : type
-        Description of parameter `sample` (the default is 'H').
+    x : type
+        Description of parameter `x` (the default is 'obs').
+    y : type
+        Description of parameter `y` (the default is 'model').
+    **kwargs : type
+        Description of parameter `**kwargs`.
 
     Returns
     -------
@@ -375,311 +302,32 @@ def timeseries_rmse_param(df, title='', fig=None, label=None, footer=True, sampl
         Description of returned object.
 
     """
-    import matplotlib.dates as mdates
-    from numpy import sqrt
-    sns.set_style('ticks')
-    df.index = df.datetime
-    if fig is None:
-        plt.figure(figsize=(13, 8))
-        species = df.Species.unique().astype('|S8')[0]
-        units = df.Units.unique().astype('|S8')[0]
-        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
-        plt.plot(rmse, color='dodgerblue', label=label)
-        ylabel = species + ' (' + units + ')'
-        plt.gca().axes.set_ylabel('RMSE ' + ylabel)
-        if footer:
-            footer_text(df)
-        ax = plt.gca().axes
-        ax.set_xlabel('UTC Time (mm/dd HH)')
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
-        plt.tight_layout()
-        plt.grid(alpha=.5)
-    else:
-        ax = fig.get_axes()[0]
-        rmse = sqrt((df.CMAQ - df.Obs) ** 2).resample(sample).mean()
-        ax.plot(rmse, label=label)
-        plt.legend(loc='best')
-
-
-def timeseries_mb_param(df, title='', fig=None, label=None, footer=True, sample='H'):
-    """Short summary.
-
-    Parameters
-    ----------
-    df : type
-        Description of parameter `df`.
-    title : type
-        Description of parameter `title` (the default is '').
-    fig : type
-        Description of parameter `fig` (the default is None).
-    label : type
-        Description of parameter `label` (the default is None).
-    footer : type
-        Description of parameter `footer` (the default is True).
-    sample : type
-        Description of parameter `sample` (the default is 'H').
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    import matplotlib.dates as mdates
-    sns.set_style('ticks')
-    df.index = df.datetime
-    if fig is None:
-        plt.figure(figsize=(13, 8))
-        species = df.Species.unique().astype('|S8')[0]
-        units = df.Units.unique().astype('|S8')[0]
-        mb = (df.CMAQ - df.Obs).resample(sample).mean()
-        plt.plot(mb, color='dodgerblue', label=label)
-        ylabel = species + ' (' + units + ')'
-        plt.gca().axes.set_ylabel('MB ' + ylabel)
-        plt.gca().axes.set_xlabel('UTC Time (mm/dd HH)')
-        plt.gca().axes.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H'))
-        if footer:
-            footer_text(df)
-        plt.tight_layout()
-        plt.grid(alpha=.5)
-    else:
-        ax = fig.get_axes()[0]
-        rmse = (df.CMAQ - df.Obs).resample(sample).mean()
-        ax.plot(rmse, label=label)
-        plt.legend(loc='best')
-
-
-def kdeplots_param(df, title=None, fig=None, label=None, footer=True, cumulative=False):
-    """Short summary.
-
-    Parameters
-    ----------
-    df : type
-        Description of parameter `df`.
-    title : type
-        Description of parameter `title` (the default is None).
-    fig : type
-        Description of parameter `fig` (the default is None).
-    label : type
-        Description of parameter `label` (the default is None).
-    footer : type
-        Description of parameter `footer` (the default is True).
-    cumulative : type
-        Description of parameter `cumulative` (the default is False).
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    from scipy.stats import scoreatpercentile as score
     sns.set_style('ticks')
 
-    if fig is None:
-
-        if cumulative:
-            plt.figure(figsize=(13, 8))
-            sns.kdeplot(df.Obs, color='darkslategrey', cumulative=True, label='Obs')
-            sns.kdeplot(df.CMAQ, color='dodgerblue', cumulative=True, label=label)
-        else:
-            maxval1 = score(df.CMAQ.values, per=99.5)
-            maxval2 = score(df.Obs.values, per=99.5)
-            maxval = max([maxval1, maxval2])
-            plt.figure(figsize=(13, 8))
-            sns.kdeplot(df.Obs, color='darkslategrey')
-            sns.kdeplot(df.CMAQ, color='dodgerblue', label=label)
-
-        sns.despine()
-        if not cumulative:
-            plt.xlim([0, maxval])
-        plt.xlabel(df.Species.unique()[0] + '  (' + df.Units.unique()[0] + ')')
-        plt.title(title)
-        plt.gca().axes.set_ylabel('P(' + df.Species.unique()[0] + ')')
-        if footer:
-            footer_text(df)
-        plt.tight_layout()
-        plt.grid(alpha=.5)
-    else:
-        ax = fig.get_axes()[0]
-        sns.kdeplot(df.CMAQ, ax=ax, label=label, cumulative=cumulative)
+    if ax is None:
+        f, ax = plt.subplots(figsize=(8, 6), frameon=False)
+    print (df.head())
+    print (x, y)
+    ax = sns.regplot(data=df, x=x, y=y, label=label, **kwargs)
+    plt.title(title)
+    return ax
 
 
-def diffpdfs_param(df, title=None, fig=None, label=None, footer=True):
-    """Short summary.
-
-    Parameters
-    ----------
-    df : type
-        Description of parameter `df`.
-    title : type
-        Description of parameter `title` (the default is None).
-    fig : type
-        Description of parameter `fig` (the default is None).
-    label : type
-        Description of parameter `label` (the default is None).
-    footer : type
-        Description of parameter `footer` (the default is True).
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    from scipy.stats import scoreatpercentile as score
-    sns.set_style('ticks')
-
-    maxval = score(df.CMAQ.values - df.Obs.values, per=99.9)
-    minval = score(df.CMAQ.values - df.Obs.values, per=.1)
-    if fig is None:
-        plt.figure(figsize=(10, 7))
-        if label == 'None':
-            label = 'CMAQ - Obs'
-        sns.kdeplot(df.CMAQ.values - df.Obs.values, color='darkslategrey', label=label)
-        sns.despine()
-        plt.xlim([minval, maxval])
-        plt.xlabel(df.Species.unique()[0] + ' Difference (' + df.Units.unique()[0] + ')')
-        plt.title(title)
-        plt.gca().axes.set_ylabel('P( Model - Obs )')
-        if footer:
-            footer_text(df)
-        plt.tight_layout()
-    else:
-        ax = fig.get_axes()[0]
-        sns.kdeplot(df.CMAQ.values - df.Obs.values, ax=ax, label=label)
-
-
-def scatter_param(df, title=None, fig=None, label=None, footer=True):
-    """Short summary.
-
-    Parameters
-    ----------
-    df : type
-        Description of parameter `df`.
-    title : type
-        Description of parameter `title` (the default is None).
-    fig : type
-        Description of parameter `fig` (the default is None).
-    label : type
-        Description of parameter `label` (the default is None).
-    footer : type
-        Description of parameter `footer` (the default is True).
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    from numpy import max, arange, linspace, isnan
-    from scipy.stats import scoreatpercentile as score
-    from scipy.stats import linregress
-    sns.set_style('ticks')
-
-    species, units = df.Species.unique()[0], df.Units.unique()[0]
-    mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
-    maxval1 = score(df.CMAQ.values[mask], per=99.5)
-    maxval2 = score(df.Obs.values[mask], per=99.5)
-    maxval = max([maxval1, maxval2])
-    print maxval
-    if fig is None:
-        plt.figure(figsize=(10, 7))
-
-        plt.scatter(df.Obs, df.CMAQ, c='cornflowerblue', marker='o', edgecolors='w', alpha=.3, label=label)
-        x = arange(0, maxval + 1)
-        if maxval <= 10.:
-            x = linspace(0, maxval, 25)
-        plt.plot(x, x, '--', color='slategrey')
-        tt = linregress(df.Obs.values[mask], df.CMAQ.values[mask])
-        plt.plot(x, tt[0] * x + tt[1], color='tomato')
-
-        plt.xlim([0, maxval])
-        plt.ylim([0, maxval])
-        plt.xlabel('Obs ' + species + ' (' + units + ')')
-        plt.title(title)
-        plt.gca().axes.set_ylabel('Model ' + species + ' (' + units + ')')
-        if footer:
-            footer_text(df)
-        plt.tight_layout()
-        plt.grid(alpha=.5)
-    else:
-        ax = fig.get_axes()[0]
-        l, = ax.scatter(df.Obs, df.CMAQ, marker='o', edgecolors='w', alpha=.3, label=label)
-        tt = linregress(df.Obs.values, df.CMAQ.values)
-        ax.plot(df.Obs.unique(), tt[0] * df.Obs.unique() + tt[1], color=l.get_color())
-        plt.legend(loc='Best')
-
-
-def diffscatter_param(df, title=None, fig=None, label=None, footer=True):
-    """Short summary.
-
-    Parameters
-    ----------
-    df : type
-        Description of parameter `df`.
-    title : type
-        Description of parameter `title` (the default is None).
-    fig : type
-        Description of parameter `fig` (the default is None).
-    label : type
-        Description of parameter `label` (the default is None).
-    footer : type
-        Description of parameter `footer` (the default is True).
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    from scipy.stats import scoreatpercentile as score
-    from numpy import isnan
-    sns.set_style('ticks')
-    df = df.dropna()
-    mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
-    if fig is None:
-        species, units = df.Species.unique()[0], df.Units.unique()[0]
-        maxval = score(df.Obs.values[mask], per=99.9)
-        minvaly = score(df.CMAQ.values[mask] - df.Obs.values[mask], per=.1)
-        maxvaly = score(df.CMAQ.values[mask] - df.Obs.values[mask], per=99.9)
-        plt.figure(figsize=(10, 7))
-
-        plt.scatter(df.Obs.values[mask], df.CMAQ.values[mask] - df.Obs.values[mask], c='cornflowerblue', marker='o',
-                    edgecolors='w', alpha=.3, label=label)
-        plt.plot((0, maxval), (0, 0), '--', color='darkslategrey')
-
-        plt.xlim([0, maxval])
-        plt.ylim([minvaly, maxvaly])
-        plt.xlabel('Obs ' + species + ' (' + units + ')')
-        plt.title(title)
-        plt.gca().axes.set_ylabel('Model - Obs ' + species + ' (' + units + ')')
-        if footer:
-            footer_text(df)
-        plt.tight_layout()
-    else:
-        ax = fig.get_axes()[0]
-        mask = ~isnan(df.Obs.values) & ~isnan(df.CMAQ.values)
-        ax.scatter(df.Obs.values[mask], df.CMAQ.values[mask] - df.Obs.values[mask], marker='o', edgecolors='w',
-                   alpha=.3, label=label)
-        plt.legend(loc='best')
-
-
-def taylordiagram(df, marker='o', label='CMAQ', addon=False, dia=None):
+def taylordiagram(df, marker='o', col1='obs', col2='model', label='CMAQ', addon=False, dia=None):
     from numpy import corrcoef
 
-    df = df.drop_duplicates().dropna(subset=['Obs', 'CMAQ'])
+    df = df.drop_duplicates().dropna(subset=[col1, col2])
 
     if not addon and dia is None:
         f = plt.figure(figsize=(12, 10))
         sns.set_style('ticks')
-        obsstd = df.Obs.std()
+        obsstd = df[col1].std()
 
         dia = td.TaylorDiagram(obsstd, fig=f, rect=111, label='Obs')
         plt.grid(linewidth=1, alpha=.5)
 
-        cc = corrcoef(df.Obs.values, df.CMAQ.values)[0, 1]
-        dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
+        cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
+        dia.add_sample(df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label)
         contours = dia.add_contours(colors='0.5')
         plt.clabel(contours, inline=1, fontsize=10)
         plt.grid(alpha=.5)

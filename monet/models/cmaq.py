@@ -67,8 +67,9 @@ class CMAQ(BaseModel):
 
     def open_files(self, flist=None, grid=None):
         self.set_gridcro2d(grid)
-        for fname in flist:
-            self.add_files(fname)
+        self.add_files(flist)
+        # for fname in flist:
+        #     self.add_files(fname)
 
     def add_files(self, mfile):
         from glob import glob

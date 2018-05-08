@@ -33,7 +33,6 @@ class MONET(object):
          """
         if model.upper() == 'CMAQ':
             from .models.cmaq import CMAQ
-            #m = self.add_cmaq(**kwargs)
             mmm = CMAQ()
         if model.upper() == 'CAMX':
             from .models.camx import CMAQ
@@ -76,7 +75,7 @@ class MONET(object):
             o = self.add_improve(**kwargs)
         return o
 
-    def add_airnow(self, dates=[]):
+    def add_airnow(self, dates=[], **kwargs):
         """Short summary.
 
         Parameters
@@ -93,7 +92,7 @@ class MONET(object):
         from .obs.airnow import AirNow
         airnow = AirNow()
         airnow.dates = dates
-        airnow.aggragate_files()
+        airnow.aggragate_files(**kwargs)
         return airnow
 
     def add_aqs(self, dates=None, param=None, network=None, daily=False, download=False):
@@ -173,6 +172,15 @@ class MONET(object):
     def combine(self, model=None, obs=None, **kwargs):
         """Short summary.
 
+        Parameters
+        ----------
+        model : type
+            Description of parameter `model` (the default is None).
+        obs : type
+            Description of parameter `obs` (the default is None).
+        **kwargs : type
+            Description of parameter `**kwargs`.
+
         Returns
         -------
         type
@@ -187,5 +195,5 @@ class MONET(object):
             else:
                 combined = pair(model=model, obs=obs, **kwargs)
                 from .verification.verify import VERIFY
-                verify = VERIFY(model=model, obs=obs, dset=combined)
+                verify = VERIFY(combined, model=model, obs=obs)
                 return combined, verify

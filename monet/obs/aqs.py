@@ -20,6 +20,39 @@ pbar.register()
 
 
 class AQS(object):
+    """Short summary.
+
+    Attributes
+    ----------
+    baseurl : type
+        Description of attribute `baseurl`.
+    objtype : type
+        Description of attribute `objtype`.
+    baseurl : type
+        Description of attribute `baseurl`.
+    dates : type
+        Description of attribute `dates`.
+    renamedhcols : type
+        Description of attribute `renamedhcols`.
+    renameddcols : type
+        Description of attribute `renameddcols`.
+    savecols : type
+        Description of attribute `savecols`.
+    df : type
+        Description of attribute `df`.
+    monitor_file : type
+        Description of attribute `monitor_file`.
+    __class__ : type
+        Description of attribute `__class__`.
+    monitor_df : type
+        Description of attribute `monitor_df`.
+    daily : type
+        Description of attribute `daily`.
+    d_df : type
+        Description of attribute `d_df`.
+
+    """
+
     def __init__(self):
         #        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
         self.objtype = 'AQS'
@@ -49,6 +82,21 @@ class AQS(object):
         self.d_df = None  # daily dataframe
 
     def load_aqs_file(self, url, network):
+        """Short summary.
+
+        Parameters
+        ----------
+        url : type
+            Description of parameter `url`.
+        network : type
+            Description of parameter `network`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         if 'daily' in url:
             def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
             df = pd.read_csv(url, parse_dates={'time_local': ["Date Local"]},
@@ -76,6 +124,25 @@ class AQS(object):
         return df
 
     def build_url(self, param, year, daily=False, download=False):
+        """Short summary.
+
+        Parameters
+        ----------
+        param : type
+            Description of parameter `param`.
+        year : type
+            Description of parameter `year`.
+        daily : type
+            Description of parameter `daily` (the default is False).
+        download : type
+            Description of parameter `download` (the default is False).
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         if daily:
             beginning = self.baseurl + 'daily_'
             fname = 'daily_'
@@ -89,7 +156,7 @@ class AQS(object):
         elif param.upper() == 'PM2.5_FRM':
             code = '88502_'
         elif param.upper() == 'PM10':
-            code = '88101_'
+            code = '81102_'
         elif param.upper() == 'SO2':
             code = '42401_'
         elif param.upper() == 'NO2':
@@ -108,13 +175,30 @@ class AQS(object):
             code = 'TEMP_'
         elif param.upper() == 'RHDP':
             code = 'RH_DP_'
-        elif param.upper() == 'WIND':
+        elif (param.upper() == 'WIND') | (param.upper() == 'WS') | (param.upper() == 'WDIR'):
             code = 'WIND_'
         url = beginning + code + year + '.zip'
         fname = fname + code + year + '.zip'
         return url, fname
 
     def build_urls(self, params, dates, daily=False):
+        """Short summary.
+
+        Parameters
+        ----------
+        params : type
+            Description of parameter `params`.
+        dates : type
+            Description of parameter `dates`.
+        daily : type
+            Description of parameter `daily` (the default is False).
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         years = pd.DatetimeIndex(dates).year.unique().astype(str)
         urls = []
         fnames = []
@@ -126,21 +210,53 @@ class AQS(object):
         return urls, fnames
 
     def retrieve(self, url, fname):
-        """rdate - datetime object. Uses year and month. Day and hour are not used.
-           state - state abbreviation to retrieve data for
-           Files are by year month and state.
+        """Short summary.
+
+        Parameters
+        ----------
+        url : type
+            Description of parameter `url`.
+        fname : type
+            Description of parameter `fname`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
         """
         import wget
 
         if not os.path.isfile(fname):
-            print('Retrieving: ' + fname)
+            print('\n Retrieving: ' + fname)
             print (url)
             print('\n')
             wget.download(url)
         else:
-            print('File Exists: ' + fname)
+            print('\n File Exists: ' + fname)
 
     def add_data(self, dates, param=None, daily=False, network=None, download=False):
+        """Short summary.
+
+        Parameters
+        ----------
+        dates : type
+            Description of parameter `dates`.
+        param : type
+            Description of parameter `param` (the default is None).
+        daily : type
+            Description of parameter `daily` (the default is False).
+        network : type
+            Description of parameter `network` (the default is None).
+        download : type
+            Description of parameter `download` (the default is False).
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         import dask
         import dask.dataframe as dd
         if param is None:
@@ -174,6 +290,21 @@ class AQS(object):
             self.df['time'] = self.df.time_local - pd.to_timedelta(self.df.gmt_offset, unit='H')
 
     def get_species(self, df, voc=False):
+        """Short summary.
+
+        Parameters
+        ----------
+        df : type
+            Description of parameter `df`.
+        voc : type
+            Description of parameter `voc` (the default is False).
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         pc = df.parameter_code.unique()
         df['variable'] = ''
         if voc:
@@ -351,6 +482,19 @@ class AQS(object):
 
     @staticmethod
     def change_units(df):
+        """Short summary.
+
+        Parameters
+        ----------
+        df : type
+            Description of parameter `df`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         units = df.units.unique()
         for i in units:
             con = df.units == i
