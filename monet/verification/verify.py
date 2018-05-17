@@ -2,14 +2,71 @@ from __future__ import absolute_import, print_function
 
 from builtins import object
 
+import pandas as pd
+
 from ..plots import plots
 
 
 class VERIFY(object):
-    def __init__(self, model=None, obs=None, dset=None):
-        self.model = model
+    def __init__(self, input, obs=None, model=None):
+        self.dset = input
         self.obs = obs
-        self.dset = dset
+        self.model = model
+        self.default_scatter_args = {'s': 20, 'edgecolors': 'w', 'lw': .25}
+
+    def point(self, param, plot_type=None, label=None, title=None, ax=None, plotargs={}, fillargs={'alpha': .2}, marker='o', **kwargs):
+        if isinstance(self.dset, pd.DataFrame):
+            if self.obs.objtype is 'AQS' or self.obs.objtype is 'AirNow':
+                df, title = self.subset_epa(self.dset, param, **kwargs)
+            elif self.obs.objtype is 'CRN' or self.obs.objtype is 'ISH':
+                df, title = self.subset_crn(self.dset, **kwargs)
+            else:
+                df = self.pair
+                if title is not None:
+                    title = ''
+            df.index = df.time
+            print(plot_type)
+            if plot_type.lower() == 'timeseries':
+                ax = self._point_plot(df, col1='model', label=label, title=title, timeseries=True, plotargs=plotargs, fillargs=fillargs, ax=ax)
+                plotargs['color'] = 'darkslategrey'
+                fillargs['color'] = 'darkslategrey'
+                ax = self._point_plot(df, col1='obs', ax=ax, title=title, timeseries=True, plotargs=plotargs, fillargs=fillargs)
+            elif plot_type.lower() == 'scatter':
+                kwargs['x'] = 'obs'
+                kwargs['y'] = 'model'
+                ax = self._point_plot(df, col1='obs', col2='model', label=label, title=title, scatter=True)
+            elif plot_type.lower == 'box':
+                ax = self._point_plot(df, col1='obs', col2='model', label=label, title=title, box=True, plotargs=plotargs)
+            elif plot_type.lower() == 'pdf':
+                ax = self._point_plot(df, col1='model', label=label, title=title, pdf=True, plotargs=plotargs, ax=ax)
+                plotargs['color'] = 'darkslategrey'
+                ax = self._point_plot(df, col1='obs', label=self.obs.objtype, title=title, pdf=True, plotargs=plotargs, ax=ax)
+            elif plot_type.lower() == 'taylor':
+                ax = self._point_plot(df, col1='model', label=label, title=title, taylor=True, plotargs=plotargs, fillargs=fillargs, marker=marker)
+        # elif
+        return ax
+
+    def _point_plot(self, df, label=None, title=None, ax=None, plotargs={}, fillargs={}, timeseries=False, scatter=False, pdf=False, taylor=False, box=False, col1=None, col2=None, marker='o', **kwargs):
+        if timeseries:
+            ax = plots.timeseries(df, y=col1, title=title, label=label, ax=ax, plotargs=plotargs, fillargs=fillargs)
+            return ax
+        if scatter:
+            ax = plots.scatter(df, x=col1, y=col2, title=title, label=label, ax=ax, **kwargs)
+            return ax
+        if pdf:
+            ax = plots.kdeplot(df[col1], title=title, label=label, ax=ax, **plotargs)
+            ax.set_xlabel(df.variable.unique()[0] + ' (' + df.units.unique()[0] + ')')
+            return ax
+        if taylor:
+            if marker is None:
+                marker = 'o'
+            if ax is None:
+                dia = plots.taylordiagram(df, label=label, dia=ax, addon=False, marker=marker)
+                return dia
+            else:
+                dia = plots.taylordiagram(df, label=label, dia=ax, addon=True, marker=marker)
+                plt.legend()
+                return dia
 
     def compare_surface(self, **kwargs):
         """Short summary.
@@ -115,6 +172,17 @@ class VERIFY(object):
             df2 = df2.loc[df2.datetime == dts[index]]
             plots.spatial_scatter(df2, m, plotargs=scatter_args)
             c.set_label(param + ' (' + g.get_group(param).Units.unique()[0] + ')')
+
+    @staticmethod
+    def subset_epa(df, param, site=None, city=None, state=None, region=None, epa_region=None):
+        from ..obs.epa_util import get_epa_location_df
+        if site is None and city is None and state is None and region is None and epa_region is None:
+            df2 = df.copy()
+            title = ' '
+        else:
+            df2, title = get_epa_location_df(df.copy(), param, site=site, city=city, state=state, region=region,
+                                             epa_region=epa_region)
+        return df2, title
 
     def compare_epa(self, param='OZONE', site='', city='', state='', epa_region='', region='', timeseries=False,
                     scatter=False, pdfs=False, diffscatter=False, diffpdfs=False, timeseries_rmse=False,

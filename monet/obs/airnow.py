@@ -193,6 +193,25 @@ class AirNow(object):
         self.df.drop_duplicates(inplace=True)
         self.filter_bad_values()
 
+    def add_data(self, dates, download=False):
+        """Short summary.
+
+        Parameters
+        ----------
+        dates : type
+            Description of parameter `dates`.
+        download : type
+            Description of parameter `download` (the default is False).
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        self.dates = dates
+        self.aggragate_files(download=download)
+
     def filter_bad_values(self):
         """Short summary.
 
