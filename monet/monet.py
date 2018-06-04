@@ -5,195 +5,207 @@ from builtins import object
 # This is the new driver for MONET
 # import verify
 
+#
+# class MONET(object):
+#     def __init__(self):
+#         self.combined = None
+#         self.verify = None
 
-class MONET(object):
-    def __init__(self):
-        self.combined = None
-        self.verify = None
 
-    def add_model(self, model='CMAQ', **kwargs):
-        """Short summary.
+def add_model(self, model='CMAQ', **kwargs):
+    """Short summary.
 
-        Parameters
-        ----------
-        model : type
-            Description of parameter `model` (the default is 'CMAQ').
-        **kwargs : type
-            Description of parameter `**kwargs`.
+    Parameters
+    ----------
+    model : type
+    Description of parameter `model` (the default is 'CMAQ').
+    **kwargs : type
+    Description of parameter `**kwargs`.
 
-        Returns
-        -------
-        type
-            Description of returned object.
+    Returns
+    -------
+    type
+    Description of returned object.
 
-        """
-        """ adds model to monet object
-                 for more information on kwargs see: self.add_cmaq
-                                           self.add_camx
-         """
-        if model.upper() == 'CMAQ':
-            from .models.cmaq import CMAQ
-            mmm = CMAQ()
-        if model.upper() == 'CAMX':
-            from .models.camx import CMAQ
-            mmm = CAMx()
-        if model.upper() == 'HYSPLIT':
-            from .models.hysplit import HYSPLIT
-            mmm = HYSPLIT()
+    """
+    """ adds model to monet object
+    for more information on kwargs see: self.add_cmaq
+    self.add_camx
+    """
+    if model.upper() == 'CMAQ':
+        from .models import cmaq
+        mmm = cmaq
+    if model.upper() == 'CAMX':
+        from .models import camx
+        mmm = camx
+    if model.upper() == 'HYSPLIT':
+        from .models import hysplit
+        mmm = hysplit
         mmm.open_files(**kwargs)
-        return mmm
+    return mmm
 
-    def add_obs(self, obs='AirNOW', **kwargs):
-        """Short summary.
 
-        Parameters
-        ----------
-        obs : type
-            Description of parameter `obs` (the default is 'AirNOW').
-        **kwargs : type
-            Description of parameter `**kwargs`.
+def add_obs(self, obs='AirNOW', **kwargs):
+    """Short summary.
 
-        Returns
-        -------
-        type
-            Description of returned object.
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs` (the default is 'AirNOW').
+    **kwargs : type
+        Description of parameter `**kwargs`.
 
-        """
-        if obs.upper() == 'AIRNOW':
-            o = self.add_airnow(**kwargs)
-        if obs.upper() == 'AERONET':
-            o = self.add_aeronet(**kwargs)
-        if obs.upper() == 'TOLNET':
-            o = self.add_tolnet(**kwargs)
-        if obs.upper() == 'AQS':
-            o = self.add_aqs(**kwargs)
-        if obs.upper() == 'ISH':
-            o = self.add_ish(**kwargs)
-        if obs.upper() == 'CRN':
-            o = self.add_crn(**kwargs)
-        if obs.upper() == 'IMPROVE':
-            o = self.add_improve(**kwargs)
-        return o
+    Returns
+    -------
+    type
+        Description of returned object.
 
-    def add_airnow(self, dates=[], **kwargs):
-        """Short summary.
+    """
+    if obs.upper() == 'AIRNOW':
+        o = add_airnow(**kwargs)
+    if obs.upper() == 'AERONET':
+        o = add_aeronet(**kwargs)
+    if obs.upper() == 'TOLNET':
+        o = add_tolnet(**kwargs)
+    if obs.upper() == 'AQS':
+        o = add_aqs(**kwargs)
+    if obs.upper() == 'ISH':
+        o = add_ish(**kwargs)
+    if obs.upper() == 'CRN':
+        o = add_crn(**kwargs)
+    if obs.upper() == 'IMPROVE':
+        o = add_improve(**kwargs)
+    return o
 
-        Parameters
-        ----------
-        dates : type
-            Description of parameter `dates` (the default is []).
 
-        Returns
-        -------
-        type
-            Description of returned object.
+def add_airnow(self, dates=[], **kwargs):
+    """Short summary.
 
-        """
-        from .obs.airnow import AirNow
-        airnow = AirNow()
-        airnow.dates = dates
-        airnow.aggragate_files(**kwargs)
-        return airnow
+    Parameters
+    ----------
+    dates : type
+        Description of parameter `dates` (the default is []).
 
-    def add_aqs(self, dates=None, param=None, network=None, daily=False, download=False):
-        """Short summary.
+    Returns
+    -------
+    type
+        Description of returned object.
 
-        Parameters
-        ----------
-        dates : type
-            Description of parameter `dates` .
-        daily : type
-            Description of parameter `daily` (the default is False).
+    """
+    from .obs import airnow
+    airnow.dates = dates
+    airnow.aggragate_files(**kwargs)
+    return airnow
 
-        Returns
-        -------
-        type
-            Description of returned object.
 
-        """
-        from .obs.aqs import AQS
-        aqs = AQS()
-        aqs.add_data(dates, param=param, daily=daily, network=network, download=download)
-        return aqs
+def add_aqs(self,
+            dates=None,
+            param=None,
+            network=None,
+            daily=False,
+            download=False):
+    """Short summary.
 
-    def add_aeronet(self, dates=[], latlonbox=None):
-        """Short summary.
+    Parameters
+    ----------
+    dates : type
+        Description of parameter `dates` .
+    daily : type
+        Description of parameter `daily` (the default is False).
 
-        Parameters
-        ----------
-        dates : type
-            Description of parameter `dates` (the default is []).
-        latlonbox : type
-            Description of parameter `latlonbox` (the default is None).
+    Returns
+    -------
+    type
+        Description of returned object.
 
-        Returns
-        -------
-        type
-            Description of returned object.
+    """
+    from .obs import aqs
+    aqs.add_data(
+        dates, param=param, daily=daily, network=network, download=download)
+    return aqs
 
-        """
-        from .obs.aeronet import AERONET
-        aeronet = AERONET()
-        aeronet.dates = dates
-        aeronet.latlonbox = latlonbox
-        aeronet.build_url()
-        aeronet.read_aeronet()
-        return aeronet
 
-    def add_tolnet(self, fname=None):
-        """Short summary.
+def add_aeronet(self, dates=[], latlonbox=None):
+    """Short summary.
 
-        Parameters
-        ----------
-        fname : type
-            Description of parameter `fname` (the default is None).
+    Parameters
+    ----------
+    dates : type
+        Description of parameter `dates` (the default is []).
+    latlonbox : type
+        Description of parameter `latlonbox` (the default is None).
 
-        Returns
-        -------
-        type
-            Description of returned object.
+    Returns
+    -------
+    type
+        Description of returned object.
 
-        """
-        from .obs.tolnet import TOLNET
-        tolnet = TOLNet()
-        if fname is not None:
-            tolnet.open_data(fname)
-        return tolnet
+    """
+    from .obs import aeronet
+    aeronet.dates = dates
+    aeronet.latlonbox = latlonbox
+    aeronet.build_url()
+    aeronet.read_aeronet()
+    return aeronet
 
-    def add_ish(self):
-        print('this is a dummy right now')
 
-    def add_crn(self):
-        print('this is a dummy right now')
+def add_tolnet(self, fname=None):
+    """Short summary.
 
-    def add_improve(self):
-        print('this is a dummy right now')
+    Parameters
+    ----------
+    fname : type
+        Description of parameter `fname` (the default is None).
 
-    def combine(self, model=None, obs=None, **kwargs):
-        """Short summary.
+    Returns
+    -------
+    type
+        Description of returned object.
 
-        Parameters
-        ----------
-        model : type
-            Description of parameter `model` (the default is None).
-        obs : type
-            Description of parameter `obs` (the default is None).
-        **kwargs : type
-            Description of parameter `**kwargs`.
+    """
+    from .obs import tolnet
+    if fname is not None:
+        tolnet.open_data(fname)
+    return tolnet
 
-        Returns
-        -------
-        type
-            Description of returned object.
 
-        """
-        if model is not None and obs is not None:
-            from .verification.combine import combine as pair
-            if obs.objtype == 'TOLNET':
-                dset, combined = pair(model=model, obs=obs, **kwargs)
-                return dset, combined
-            else:
-                combined = pair(model=model, obs=obs, **kwargs)
-                from .verification.verify import VERIFY
-                verify = VERIFY(combined, model=model, obs=obs)
-                return combined, verify
+def add_ish(self):
+    print('this is a dummy right now')
+
+
+def add_crn(self):
+    print('this is a dummy right now')
+
+
+def add_improve(self):
+    print('this is a dummy right now')
+
+
+def combine(self, model=None, obs=None, **kwargs):
+    """Short summary.
+
+    Parameters
+    ----------
+    model : type
+        Description of parameter `model` (the default is None).
+    obs : type
+        Description of parameter `obs` (the default is None).
+    **kwargs : type
+        Description of parameter `**kwargs`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    if model is not None and obs is not None:
+        from .verification.combine import combine as pair
+        if obs.objtype == 'TOLNET':
+            dset, combined = pair(model=model, obs=obs, **kwargs)
+            return dset, combined
+        else:
+            combined = pair(model=model, obs=obs, **kwargs)
+            from .verification.verify import VERIFY
+            verify = VERIFY(combined, model=model, obs=obs)
+            return combined, verify

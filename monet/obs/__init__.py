@@ -1,9 +1,17 @@
 from __future__ import absolute_import, print_function
 
-from . import aeronet, airnow, aqs, crn, epa_util, improve, ish, tolnet
+from . import aeronet, airnow, aqs, crn, epa_util, improve, ish, tolnet, cems
 
 __all__ = [
-    'aeronet', 'airnow', 'aqs', 'crn', 'epa_util', 'improve', 'ish', 'tolnet'
+    'aeronet',
+    'airnow',
+    'aqs',
+    'crn',
+    'epa_util',
+    'improve',
+    'ish',
+    'tolnet',
+    'cems',
 ]
 
 __name__ = 'obs'
