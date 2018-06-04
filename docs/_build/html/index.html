@@ -160,30 +160,28 @@
 <p><strong>MONET</strong> is an open source project and Python package that aims to create a
 common platform for atmospheric composition data analysis for weather and
 air quality models.</p>
+<p>MONET was developed to evaluate the Community Multiscale Air Quality Model (CMAQ)
+for the NOAA National Air Quality Forecast Capability (NAQFC) modeling system. MONET
+is designed to be a modularized Python package for (1) pairing model output to observational
+data in space and time; (2) leveraging the pandas Python package for easy searching
+and grouping; and (3) analyzing and visualizing data. This process introduces a
+convenient method for evaluating model output. MONET processes data that is easily
+searchable and that can be grouped using meta-data found within the observational
+datasets. Common statistical metrics (e.g., bias, correlation, and skill scores),
+plotting routines such as scatter plots, timeseries, spatial plots, and more are
+included in the package. MONET is well modularized and can add further observational
+datasets and different models.</p>
 <p>Our goals is to provide easy tools to retrieve, read and combine datasets in
 order to speed scientific research.  Currently, MONET is able to process
 several models and observations related to air composition and meteorology.</p>
-<p><strong>Supported Models</strong></p>
-<ul class="simple">
-<li><a class="reference external" href="https://www.ready.noaa.gov/HYSPLIT.php/">HYSPLIT</a></li>
-<li><a class="reference external" href="https://www.epa.gov/cmaq/">CMAQ</a></li>
-<li><a class="reference external" href="http://www.camx.com/about/default.aspx/">CAMx</a></li>
-<li>FV3-CHEM (comming soon)</li>
-<li>WRF-CHEM (comming soon)</li>
-</ul>
-<p><strong>Supported Observations</strong></p>
-<ul class="simple">
-<li><a class="reference external" href="https://www.airnow.gov/">AirNow</a></li>
-<li><a class="reference external" href="https://www.epa.gov/aqs/">AQS</a></li>
-<li><a class="reference external" href="https://aeronet.gsfc.nasa.gov/">AERONET</a></li>
-<li><a class="reference external" href="https://www.ncdc.noaa.gov/crn/">CRN</a></li>
-<li><a class="reference external" href="https://www-air.larc.nasa.gov/missions/TOLNet/">TOLNet</a></li>
-<li><a class="reference external" href="https://www.epa.gov/emc/emc-continuous-emission-monitoring-systems/">CEMS</a></li>
-<li><a class="reference external" href="http://vista.cira.colostate.edu/Improve/">IMPROVE</a></li>
-<li><a class="reference external" href="https://www.ncdc.noaa.gov/isd/">ISH</a></li>
-</ul>
+<p>Please site our work.</p>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<p>Baker, Barry; Pan, Li. 2017. “Overview of the Model and Observation
+Evaluation Toolkit (MONET) Version 1.0 for Evaluating Atmospheric
+Transport Models.” Atmosphere 8, no. 11: 210</p>
 <div class="section" id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h3>
 <p><strong>Getting Started</strong></p>
 <ul class="simple">
 <li><a class="reference internal" href="why-monet.html"><span class="doc">Overview: Why MONET?</span></a></li>
@@ -217,15 +215,32 @@ several models and observations related to air composition and meteorology.</p>
 </div>
 </div>
 <div class="section" id="get-in-touch">
-<h2>Get in touch<a class="headerlink" href="#get-in-touch" title="Permalink to this headline">¶</a></h2>
+<h3>Get in touch<a class="headerlink" href="#get-in-touch" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Ask questions, suggest features or view source code <a class="reference external" href="https://github.com/noaa-oar-arl/MONET">on GitHub</a>.</li>
 </ul>
-<div class="section" id="reference">
-<h3>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h3>
-<p>Baker, Barry; Pan, Li. 2017. “Overview of the Model and Observation
-Evaluation Toolkit (MONET) Version 1.0 for Evaluating Atmospheric
-Transport Models.” Atmosphere 8, no. 11: 210</p>
+</div>
+<div class="section" id="supported-datasets">
+<h3>Supported datasets<a class="headerlink" href="#supported-datasets" title="Permalink to this headline">¶</a></h3>
+<p><strong>Supported Models</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.ready.noaa.gov/HYSPLIT.php/">HYSPLIT</a></li>
+<li><a class="reference external" href="https://www.epa.gov/cmaq/">CMAQ</a></li>
+<li><a class="reference external" href="http://www.camx.com/about/default.aspx/">CAMx</a></li>
+<li>FV3-CHEM (comming soon)</li>
+<li>WRF-CHEM (comming soon)</li>
+</ul>
+<p><strong>Supported Observations</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.airnow.gov/">AirNow</a></li>
+<li><a class="reference external" href="https://www.epa.gov/aqs/">AQS</a></li>
+<li><a class="reference external" href="https://aeronet.gsfc.nasa.gov/">AERONET</a></li>
+<li><a class="reference external" href="https://www.ncdc.noaa.gov/crn/">CRN</a></li>
+<li><a class="reference external" href="https://www-air.larc.nasa.gov/missions/TOLNet/">TOLNet</a></li>
+<li><a class="reference external" href="https://www.epa.gov/emc/emc-continuous-emission-monitoring-systems/">CEMS</a></li>
+<li><a class="reference external" href="http://vista.cira.colostate.edu/Improve/">IMPROVE</a></li>
+<li><a class="reference external" href="https://www.ncdc.noaa.gov/isd/">ISH</a></li>
+</ul>
 <p><strong>Help &amp; Reference</strong></p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
