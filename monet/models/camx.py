@@ -33,6 +33,14 @@ class CAMx(BaseModel):
         self.map = None
 
     def get_dates(self):
+        """Short summary.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         print('Reading CAMx dates...')
         print(self.dset)
         tflag1 = array(self.dset['TFLAG'][:, 0], dtype='|S7')
@@ -43,6 +51,19 @@ class CAMx(BaseModel):
         self.dset['time'] = date[indexdates]
 
     def add_files(self, file):
+        """Short summary.
+
+        Parameters
+        ----------
+        file : type
+            Description of parameter `file`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         from glob import glob
         from numpy import sort
         dropset = ['layer', 'longitude_bounds', 'latitude_bounds',
@@ -55,24 +76,54 @@ class CAMx(BaseModel):
         if fname.shape[0] >= 1:
             if self.dset is None:
                 self.dset = xr.open_mfdataset(
-                    fname.tolist(), concat_dim='TSTEP', engine='pnc').drop(dropset).rename(nameset).squeeze()
+                    fname.tolist(), concat_dim='TSTEP', engine='pseudonetcdf').drop(dropset).rename(nameset).squeeze()
                 self.load_conus_basemap(res='l')
                 self.get_dates()
             else:
                 dset = xr.open_mfdataset(fname.tolist(), concat_dim='TSTEP',
-                                         engine='pnc').drop(dropset).rename(nameset).squeeze()
+                                         engine='pseudonetcdf').drop(dropset).rename(nameset).squeeze()
                 self.dset = xr.merge([self.dset, dset])
         else:
             print('Files not found')
         self.keys = list(self.dset.keys())
 
     def check_z(self, varname):
+        """Short summary.
+
+        Parameters
+        ----------
+        varname : type
+            Description of parameter `varname`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         if pd.Series(self.dset[varname].dims).isin('z').max():
             return True
         else:
             return False
 
     def add_multiple_fields(self, findkeys, lay=None, weights=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        findkeys : type
+            Description of parameter `findkeys`.
+        lay : type
+            Description of parameter `lay`.
+        weights : type
+            Description of parameter `weights`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         from numpy import ones
         keys = self.keys
         newkeys = pd.Series(findkeys).loc[pd.Series(findkeys).isin(keys)].values
@@ -85,6 +136,21 @@ class CAMx(BaseModel):
 
     @staticmethod
     def select_layer(variable, lay=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        variable : type
+            Description of parameter `variable`.
+        lay : type
+            Description of parameter `lay`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         if lay is not None:
             try:
                 var = variable.sel(z=lay)
@@ -96,10 +162,36 @@ class CAMx(BaseModel):
         return var
 
     def get_nox(self, lay=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        lay : type
+            Description of parameter `lay`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         var = add_multiple_fields(['NO', 'NO2'], lay=lay)
         return var
 
     def get_pm25(self, lay=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        lay : type
+            Description of parameter `lay`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         keys = list(self.dset.keys())
         allvars = self.fine
         index = pd.Series(allvars).isin(keys)
@@ -108,6 +200,19 @@ class CAMx(BaseModel):
         return var
 
     def get_pm10(self, lay=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        lay : type
+            Description of parameter `lay`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         keys = list(self.dset.keys())
         allvars = self.coarse
         index = pd.Series(allvars).isin(keys)
@@ -116,6 +221,21 @@ class CAMx(BaseModel):
         return var
 
     def get_var(self, param='O3', lay=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        param : type
+            Description of parameter `param`.
+        lay : type
+            Description of parameter `lay`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         p = param.upper()
         print(param)
         if p == 'PM25':
@@ -135,21 +255,21 @@ class CAMx(BaseModel):
             var = self.select_layer(self.dset[param], lay=lay)
         return var
 
-    def load_conus_basemap(self, res='l'):
-        from mpl_toolkits.basemap import Basemap
-        if self.map is None:
-            lat1 = self.dset.P_ALP
-            lat2 = self.dset.P_BET
-            lon1 = self.dset.P_GAM
-            lon0 = self.dset.XCENT
-            lat0 = self.dset.YCENT
-            m = Basemap(projection='lcc', resolution=res, lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0,
-                        lon_1=lon1,
-                        llcrnrlat=self.dset.latitude[0, 0], urcrnrlat=self.dset.latitude[-1, -1],
-                        llcrnrlon=self.dset.longitude[0, 0],
-                        urcrnrlon=self.dset.longitude[-1, -1], rsphere=6371200.,
-                        area_thresh=50.)
-            self.map = m
-        else:
-            m = self.map
-        return self.map
+    # def load_conus_basemap(self, res='l'):
+    #     from mpl_toolkits.basemap import Basemap
+    #     if self.map is None:
+    #         lat1 = self.dset.P_ALP
+    #         lat2 = self.dset.P_BET
+    #         lon1 = self.dset.P_GAM
+    #         lon0 = self.dset.XCENT
+    #         lat0 = self.dset.YCENT
+    #         m = Basemap(projection='lcc', resolution=res, lat_1=lat1, lat_2=lat2, lat_0=lat0, lon_0=lon0,
+    #                     lon_1=lon1,
+    #                     llcrnrlat=self.dset.latitude[0, 0], urcrnrlat=self.dset.latitude[-1, -1],
+    #                     llcrnrlon=self.dset.longitude[0, 0],
+    #                     urcrnrlon=self.dset.longitude[-1, -1], rsphere=6371200.,
+    #                     area_thresh=50.)
+    #         self.map = m
+    #     else:
+    #         m = self.map
+    #     return self.map
