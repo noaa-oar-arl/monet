@@ -15,10 +15,6 @@ class AirNow(object):
 
     Attributes
     ----------
-    datadir : type
-        Description of attribute `datadir`.
-    cwd : type
-        Description of attribute `cwd`.
     url : type
         Description of attribute `url`.
     dates : type
@@ -48,8 +44,10 @@ class AirNow(object):
         self.datadir = '.'
         self.cwd = os.getcwd()
         self.url = None
-        self.dates = [datetime.strptime('2016-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
-                      datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
+        self.dates = [
+            datetime.strptime('2016-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
+            datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')
+        ]
         self.datestr = []
         self.df = None
         self.daily = False
@@ -58,16 +56,18 @@ class AirNow(object):
         self.monitor_file = inspect.getfile(
             self.__class__)[:-16] + '/data/monitoring_site_locations.dat'
         self.monitor_df = None
-        self.savecols = ['time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs', 'time_local', 'latitude', 'longitude', 'cmsa_name', 'msa_code', 'msa_name', 'state_name',
-                         'epa_region']
+        self.savecols = [
+            'time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs',
+            'time_local', 'latitude', 'longitude', 'cmsa_name', 'msa_code',
+            'msa_name', 'state_name', 'epa_region'
+        ]
 
     def convert_dates_tofnames(self):
-        """Short summary.
+        """Helper function to create file names
 
         Returns
         -------
-        type
-            Description of returned object.
+
 
         """
         self.datestr = []
@@ -79,12 +79,10 @@ class AirNow(object):
 
         Returns
         -------
-        type
-            Description of returned object.
+        helper function to build urls
 
         """
         from numpy import empty, where
-        import wget
         import requests
         from glob import glob
 
@@ -108,8 +106,8 @@ class AirNow(object):
 
         Parameters
         ----------
-        fn : type
-            Description of parameter `fn`.
+        fn : string
+            file name to read 
 
         Returns
         -------
@@ -118,11 +116,18 @@ class AirNow(object):
 
         """
         try:
-            dft = pd.read_csv(fn, delimiter='|', header=None, error_bad_lines=False)
-            cols = ['date', 'time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs', 'source']
+            dft = pd.read_csv(
+                fn, delimiter='|', header=None, error_bad_lines=False)
+            cols = [
+                'date', 'time', 'siteid', 'site', 'utcoffset', 'variable',
+                'units', 'obs', 'source'
+            ]
             dft.columns = cols
         except:
-            cols = ['date', 'time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs', 'source']
+            cols = [
+                'date', 'time', 'siteid', 'site', 'utcoffset', 'variable',
+                'units', 'obs', 'source'
+            ]
             dft = pd.DataFrame(columns=cols)
         dft['obs'] = dft.obs.astype(float)
         dft['siteid'] = dft.siteid.str.zfill(9)
@@ -145,13 +150,14 @@ class AirNow(object):
             Description of returned object.
 
         """
-        import wget
+        import requests
 
         if not os.path.isfile(fname):
             print('\n Retrieving: ' + fname)
-            print (url)
+            print(url)
             print('\n')
-            wget.download(url)
+            r = requests.get(url)
+            open(fname, 'wb').write(r.content)
         else:
             print('\n File Exists: ' + fname)
 
@@ -183,7 +189,10 @@ class AirNow(object):
         dff = dd.from_delayed(dfs)
         df = dff.compute()
         df['time'] = pd.to_datetime(
-            df.date + ' ' + df.time, format='%m/%d/%y %H:%M', exact=True, box=False)
+            df.date + ' ' + df.time,
+            format='%m/%d/%y %H:%M',
+            exact=True,
+            box=False)
         df.drop(['date'], axis=1, inplace=True)
         df['time_local'] = df.time + pd.to_timedelta(df.utcoffset, unit='H')
         self.df = df
@@ -211,6 +220,7 @@ class AirNow(object):
         """
         self.dates = dates
         self.aggragate_files(download=download)
+        return self.df
 
     def filter_bad_values(self):
         """Short summary.
@@ -224,7 +234,7 @@ class AirNow(object):
         from numpy import NaN
         self.df.loc[(self.df.obs > 1000) | (self.df.obs < 0), 'obs'] = NaN
 
-    def set_daterange(self, begin='', end=''):
+    def set_daterange(self, **kwargs):
         """Short summary.
 
         Parameters
@@ -240,9 +250,9 @@ class AirNow(object):
             Description of returned object.
 
         """
-        dates = pd.date_range(start=begin, end=end,
-                              freq='H').values.astype('M8[s]').astype('O')
+        dates = pd.date_range(**kwargs)
         self.dates = dates
+        return dates
 
     def get_station_locations(self):
         """Short summary.
@@ -273,6 +283,9 @@ class AirNow(object):
             Description of returned object.
 
         """
-        df = pd.merge(df, self.monitor_df.drop(
-            ['Latitude', 'Longitude'], axis=1), on='siteid', how='left')
+        df = pd.merge(
+            df,
+            self.monitor_df.drop(['Latitude', 'Longitude'], axis=1),
+            on='siteid',
+            how='left')
         return df

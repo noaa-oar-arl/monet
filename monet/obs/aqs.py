@@ -57,23 +57,30 @@ class AQS(object):
         #        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
         self.objtype = 'AQS'
         self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
-        self.dates = [datetime.strptime('2014-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
-                      datetime.strptime('2014-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')]
-        self.renamedhcols = ['time_local', 'time', 'state_code', 'county_code',
-                             'site_num', 'parameter_code', 'poc', 'latitude', 'longitude',
-                             'datum', 'parameter_name', 'obs', 'units',
-                             'mdl', 'uncertainty', 'qualifier', 'method_type', 'method_code',
-                             'method_name', 'state_name', 'county_name', 'date_of_last_change']
-        self.renameddcols = ['time_local', 'state_code', 'county_code', 'site_num',
-                             'parameter_code', 'poc', 'latitude', 'longitude', 'datum',
-                             'parameter_name', 'sample_duration', 'pollutant_standard',
-                             'units', 'event_type', 'observation_Count',
-                             'observation_Percent', 'obs', '1st_max_Value',
-                             '1st_max_hour', 'aqi', 'method_code', 'method_name',
-                             'local_site_name', 'address', 'state_name', 'county_name',
-                             'city_name', 'msa_name', 'date_of_last_change']
-        self.savecols = ['time_local', 'time', 'siteid',
-                         'latitude', 'longitude', 'obs', 'units', 'variable']
+        self.dates = [
+            datetime.strptime('2014-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
+            datetime.strptime('2014-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')
+        ]
+        self.renamedhcols = [
+            'time_local', 'time', 'state_code', 'county_code', 'site_num',
+            'parameter_code', 'poc', 'latitude', 'longitude', 'datum',
+            'parameter_name', 'obs', 'units', 'mdl', 'uncertainty',
+            'qualifier', 'method_type', 'method_code', 'method_name',
+            'state_name', 'county_name', 'date_of_last_change'
+        ]
+        self.renameddcols = [
+            'time_local', 'state_code', 'county_code', 'site_num',
+            'parameter_code', 'poc', 'latitude', 'longitude', 'datum',
+            'parameter_name', 'sample_duration', 'pollutant_standard', 'units',
+            'event_type', 'observation_Count', 'observation_Percent', 'obs',
+            '1st_max_Value', '1st_max_hour', 'aqi', 'method_code',
+            'method_name', 'local_site_name', 'address', 'state_name',
+            'county_name', 'city_name', 'msa_name', 'date_of_last_change'
+        ]
+        self.savecols = [
+            'time_local', 'time', 'siteid', 'latitude', 'longitude', 'obs',
+            'units', 'variable'
+        ]
         self.df = None  # hourly dataframe
         self.monitor_file = inspect.getfile(
             self.__class__)[:-13] + '/data/monitoring_site_locations.dat'
@@ -98,24 +105,35 @@ class AQS(object):
 
         """
         if 'daily' in url:
-            def dateparse(x): return pd.datetime.strptime(x, '%Y-%m-%d')
-            df = pd.read_csv(url, parse_dates={'time_local': ["Date Local"]},
-                             date_parser=dateparse)
+
+            def dateparse(x):
+                return pd.datetime.strptime(x, '%Y-%m-%d')
+
+            df = pd.read_csv(
+                url,
+                parse_dates={'time_local': ["Date Local"]},
+                date_parser=dateparse)
             df.columns = self.renameddcols
             df['pollutant_standard'] = df.pollutant_standard.astype(str)
             self.daily = True
         else:
-            df = pd.read_csv(url, parse_dates={'time': ['Date GMT', 'Time GMT'],
-                                               'time_local': ["Date Local", "Time Local"]},
-                             infer_datetime_format=True)
+            df = pd.read_csv(
+                url,
+                parse_dates={
+                    'time': ['Date GMT', 'Time GMT'],
+                    'time_local': ["Date Local", "Time Local"]
+                },
+                infer_datetime_format=True)
             df.columns = self.renamedhcols
 
         df.loc[:, 'state_code'] = pd.to_numeric(df.state_code, errors='coerce')
         df.loc[:, 'site_num'] = pd.to_numeric(df.site_num, errors='coerce')
         df.loc[:, 'county_code'] = pd.to_numeric(
             df.county_code, errors='coerce')
-        df['siteid'] = array(df['state_code'].values * 1.E7 + df['county_code'].values * 1.E4 + df['site_num'].values,
-                             dtype='int32')
+        df['siteid'] = array(
+            df['state_code'].values * 1.E7 + df['county_code'].values * 1.E4 +
+            df['site_num'].values,
+            dtype='int32')
         df.drop(['state_name', 'county_name'], axis=1, inplace=True)
         df.columns = [i.lower() for i in df.columns]
         if 'daily' not in url:
@@ -175,7 +193,8 @@ class AQS(object):
             code = 'TEMP_'
         elif param.upper() == 'RHDP':
             code = 'RH_DP_'
-        elif (param.upper() == 'WIND') | (param.upper() == 'WS') | (param.upper() == 'WDIR'):
+        elif (param.upper() == 'WIND') | (param.upper() == 'WS') | (
+                param.upper() == 'WDIR'):
             code = 'WIND_'
         url = beginning + code + year + '.zip'
         fname = fname + code + year + '.zip'
@@ -225,17 +244,24 @@ class AQS(object):
             Description of returned object.
 
         """
-        import wget
+        import requests
 
         if not os.path.isfile(fname):
             print('\n Retrieving: ' + fname)
-            print (url)
+            print(url)
             print('\n')
-            wget.download(url)
+            r = requests.get(url)
+            open(fname, 'wb').write(r.content)
         else:
             print('\n File Exists: ' + fname)
 
-    def add_data(self, dates, param=None, daily=False, network=None, download=False):
+    def add_data(self,
+                 dates,
+                 param=None,
+                 daily=False,
+                 network=None,
+                 download=False,
+                 local=False):
         """Short summary.
 
         Parameters
@@ -260,14 +286,23 @@ class AQS(object):
         import dask
         import dask.dataframe as dd
         if param is None:
-            params = ['SPEC', 'PM10', 'PM2.5', 'PM2.5_FRM', 'CO', 'OZONE', 'SO2', 'VOC', 'NONOXNOY', 'WIND', 'TEMP', 'RHDP']
+            params = [
+                'SPEC', 'PM10', 'PM2.5', 'PM2.5_FRM', 'CO', 'OZONE', 'SO2',
+                'VOC', 'NONOXNOY', 'WIND', 'TEMP', 'RHDP'
+            ]
         else:
             params = param
         urls, fnames = self.build_urls(params, dates, daily=daily)
         if download:
             for url, fname in zip(urls, fnames):
                 self.retrieve(url, fname)
-            dfs = [dask.delayed(self.load_aqs_file)(i, network) for i in fnames]
+            dfs = [
+                dask.delayed(self.load_aqs_file)(i, network) for i in fnames
+            ]
+        elif local:
+            dfs = [
+                dask.delayed(self.load_aqs_file)(i, network) for i in fnames
+            ]
         else:
             dfs = [dask.delayed(self.load_aqs_file)(i, network) for i in urls]
         dff = dd.from_delayed(dfs)
@@ -276,18 +311,29 @@ class AQS(object):
         if self.monitor_df is None:
             self.monitor_df = read_monitor_file()
         if daily:
-            monitor_drop = ['msa_name', 'city_name', u'local_site_name', u'address', 'datum']
+            monitor_drop = [
+                'msa_name', 'city_name', u'local_site_name', u'address',
+                'datum'
+            ]
             self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
         else:
             monitor_drop = [u'datum']
             self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
         if network is not None:
-            monitors = self.monitor_df.loc[self.monitor_df.isin([network])].drop_duplicates(subset=['siteid'])
+            monitors = self.monitor_df.loc[self.monitor_df.isin(
+                [network])].drop_duplicates(subset=['siteid'])
         else:
-            monitors = self.monitor_df.drop_duplicates(subset=['siteid', 'latitude', 'longitude'])
-        self.df = pd.merge(self.df, monitors, how='left', on=['siteid', 'latitude', 'longitude'])
+            monitors = self.monitor_df.drop_duplicates(
+                subset=['siteid', 'latitude', 'longitude'])
+        print(self.df.siteid.dtype, monitors.siteid.dtype)
+        self.df = pd.merge(
+            self.df,
+            monitors,
+            how='left',
+            on=['siteid', 'latitude', 'longitude'])
         if daily:
-            self.df['time'] = self.df.time_local - pd.to_timedelta(self.df.gmt_offset, unit='H')
+            self.df['time'] = self.df.time_local - pd.to_timedelta(
+                self.df.gmt_offset, unit='H')
 
     def get_species(self, df, voc=False):
         """Short summary.
