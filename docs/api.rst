@@ -2,14 +2,14 @@
 API
 ***
 
-.. toctree::
-   :maxdepth: 2
-   :caption:
-
-   monet
-   monet.models
-
-
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. toctree::
+   :maxdepth: 4
+   :caption: api
+
+   modules
+   monet
+   monet.models
