@@ -7,9 +7,8 @@ API
 * :ref:`search`
 
 .. toctree::
-   :maxdepth: 4
-   :caption: api
+   :maxdepth: 3
+   :caption: Getting Started
 
-   modules
    monet
-   monet.models
+   
