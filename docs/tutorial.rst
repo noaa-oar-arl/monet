@@ -3,9 +3,9 @@ Tutorial
 ********
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 4
 
     tutorial/loading
-    tutorial/models 
+    tutorial/models
     tutorial/combine
     tutorial/plotting
