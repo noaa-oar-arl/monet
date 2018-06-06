@@ -31,15 +31,6 @@ Evaluation Toolkit (MONET) Version 1.0 for Evaluating Atmospheric
 Transport Models.” Atmosphere 8, no. 11: 210
 
 
-Documentation
--------------
-
-**Getting Started**
-
-* :doc:`why-monet`
-* :doc:`installing`
-* :doc:`observations`
-
 .. toctree::
    :maxdepth: 4
    :caption: Getting Started
