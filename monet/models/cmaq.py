@@ -79,15 +79,13 @@ class CMAQ(BaseModel):
         print('Reading CMAQ dates...')
         idims = len(self.dset.TFLAG.dims)
         if idims == 2:
-            tflag1 = array(self.dset['TFLAG'][:, 0], dtype='|S7')
-            tflag2 = array(
-                old_div(self.dset['TFLAG'][:, 1], 10000), dtype='|S6')
+            tflag1 = array(self.dset['TFLAG'][:, 0], dtype=str)
+            tflag2 = array(int(self.dset['TFLAG'][:, 1] / 10000), dtype=str)
         else:
-            tflag1 = array(self.dset['TFLAG'][:, 0, 0], dtype='|S7')
-            tflag2 = array(
-                old_div(self.dset['TFLAG'][:, 0, 1], 10000), dtype='|S6')
+            tflag1 = array(self.dset['TFLAG'][:, 0, 0], dtype=str)
+            tflag2 = array(array(self.dset['TFLAG'][:, 0, 1] / 10000,dtype=int), dtype=str)
         date = pd.to_datetime(
-            [i + j.zfill(2) for i, j in zip(tflag1, tflag2)], format='%Y%j%H')
+            [i + j.zfill(2).rstrip("0") for i, j in zip(tflag1, tflag2)], format='%Y%j%H')
         indexdates = pd.Series(date).drop_duplicates(keep='last').index.values
         self.dset = self.dset.isel(time=indexdates)
         self.dset['time'] = date[indexdates]
@@ -110,6 +108,7 @@ class CMAQ(BaseModel):
         """
         self.set_gridcro2d(grid)
         self.add_files(flist)
+        return self.dset
         # for fname in flist:
         #     self.add_files(fname)
 
@@ -194,10 +193,12 @@ class CMAQ(BaseModel):
             keys)].values
         if weights is None:
             w = ones(len(newkeys))
+        else:
+            w = weights
         var = self.dset[newkeys[0]] * w[0]
         for i, j in zip(newkeys[1:], w[1:]):
             var = var + self.dset[i] * j
-        return select_layer(var, lay=lay)
+        return self.select_layer(var, lay=lay)
         # if self.check_z(newkeys[0]):
         #     if lay is not None:
         #         var = self.dset[newkeys[0]][:, 0, :, :].squeeze() * w[0]

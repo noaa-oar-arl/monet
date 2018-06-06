@@ -3,7 +3,13 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 
 
-def draw_map(ax=None, natural_earth=False, coastlines=True, states=True, countries=True, state_resolutions='10m', extent=None):
+def draw_map(ax=None,
+             natural_earth=False,
+             coastlines=True,
+             states=False,
+             countries=True,
+             state_resolutions='10m',
+             extent=None):
     """Short summary.
 
     Parameters
@@ -29,8 +35,9 @@ def draw_map(ax=None, natural_earth=False, coastlines=True, states=True, countri
         Description of returned object.
 
     """
-    if axes is None:
-        ax = plt.axes(projection=ccrs.PlateCarree())
+    if ax is None:
+        f, ax = plt.subplots(
+            figsize=(10, 6), subplot_kw={'projection': ccrs.PlateCarree()})
 
     if natural_earth:
         #~ ax.stock_img()
