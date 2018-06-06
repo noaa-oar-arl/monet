@@ -21,7 +21,7 @@ Our goals is to provide easy tools to retrieve, read and combine datasets in
 order to speed scientific research.  Currently, MONET is able to process
 several models and observations related to air composition and meteorology.
 
-Please site our work.  
+Please site our work.
 
 Reference
 ^^^^^^^^^
@@ -47,6 +47,7 @@ Documentation
    why-monet
    installing
    observations
+   tutorial
 
 Get in touch
 ------------
