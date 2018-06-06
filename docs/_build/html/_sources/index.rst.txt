@@ -41,7 +41,7 @@ Documentation
 * :doc:`observations`
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
    :caption: Getting Started
 
    why-monet
