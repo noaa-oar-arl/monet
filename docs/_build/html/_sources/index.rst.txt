@@ -21,7 +21,7 @@ Our goals is to provide easy tools to retrieve, read and combine datasets in
 order to speed scientific research.  Currently, MONET is able to process
 several models and observations related to air composition and meteorology.
 
-Please site our work.  
+Please site our work.
 
 Reference
 ^^^^^^^^^
@@ -31,22 +31,14 @@ Evaluation Toolkit (MONET) Version 1.0 for Evaluating Atmospheric
 Transport Models.” Atmosphere 8, no. 11: 210
 
 
-Documentation
--------------
-
-**Getting Started**
-
-* :doc:`why-monet`
-* :doc:`installing`
-* :doc:`observations`
-
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
    :caption: Getting Started
 
    why-monet
    installing
    observations
+   tutorial
 
 Get in touch
 ------------

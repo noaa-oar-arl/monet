@@ -58,7 +58,10 @@ class AERONET(object):
             else:
                 inv_type = '&AML20=1'
         date_portion = 'year=' + sy + '&month=' + sm + '&day=' + sd + '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed + '&hour2=' + eh
-        product = '&' + self.prod + '=1'
+        if self.inv_type is not '':
+            product = '&product=' + self.prod
+        else:
+            product = '&' + self.prod + '=1'
         time = '&AVG=' + str(self.daily)
         if self.latlonbox is None:
             latlonbox = ''
@@ -112,7 +115,7 @@ class AERONET(object):
                 final.append(i.lower())
         return final
 
-    def open_aeronet(self, dates=None, product='AOD15', latlonbox=None, daily=False, calc_550=True, inv_type=None, freq=None, detect_dust=False):
+    def add_data(self, dates=None, product='AOD15', latlonbox=None, daily=False, calc_550=True, inv_type=None, freq=None, detect_dust=False):
         self.latlonbox = latlonbox
         if dates is None:  # get the current day
             self.dates = pd.date_range(start=pd.to_datetime('today'), end=pd.to_datetime('now'), freq='H')
@@ -135,6 +138,8 @@ class AERONET(object):
             self.dust_detect()
         if calc_550:
             self.calc_550nm()
+        return self.df
+
 
     def calc_550nm(self):
         """Since AOD at 500nm is not calculated we use the extrapolation of
