@@ -5,20 +5,18 @@
 Taylor diagram (Taylor, 2001) test implementation.
 http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm
 """
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
 
-from builtins import zip
-from builtins import map
-from builtins import object
+from builtins import map, object, zip
+
+import matplotlib.pyplot as PLT
+import numpy as NP
+import seaborn as sns
 from past.utils import old_div
 
 __version__ = "Time-stamp: <2012-02-17 20:59:35 ycopin>"
 __author__ = "Yannick Copin <yannick.copin@laposte.net>"
 
-import matplotlib.pyplot as PLT
-import numpy as NP
-import seaborn as sns
 
 colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
 sns.set_palette(sns.color_palette(colors))
@@ -91,8 +89,8 @@ class TaylorDiagram(object):
 
         # Add reference point and stddev contour
         print("Reference std:", self.refstd)
-        l, = self.ax.plot([0], self.refstd, 'k*',
-                          ls='', ms=10, label=label)
+        l, = self.ax.plot([0], self.refstd, 'r*',
+                          ls='', ms=14, label=label, zorder=10)
         t = NP.linspace(0, old_div(NP.pi, 2))
         r = NP.zeros_like(t) + self.refstd
         self.ax.plot(t, r, 'k--', label='_')

@@ -6,6 +6,23 @@ import xarray as xr
 
 
 class TOLNet(object):
+    """Short summary.
+
+    Attributes
+    ----------
+    objtype : type
+        Description of attribute `objtype`.
+    cwd : type
+        Description of attribute `cwd`.
+    dates : type
+        Description of attribute `dates`.
+    dset : type
+        Description of attribute `dset`.
+    daily : type
+        Description of attribute `daily`.
+
+    """
+
     def __init__(self):
         self.objtype = 'TOLNET'
         self.cwd = os.getcwd()
@@ -14,6 +31,19 @@ class TOLNet(object):
         self.daily = False
 
     def open_data(self, fname):
+        """Short summary.
+
+        Parameters
+        ----------
+        fname : type
+            Description of parameter `fname`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         from h5py import File
         f = File(fname)
         atts = f['INSTRUMENT_ATTRIBUTES']
@@ -22,6 +52,21 @@ class TOLNet(object):
 
     @staticmethod
     def make_xarray_dataset(data, atts):
+        """Short summary.
+
+        Parameters
+        ----------
+        data : type
+            Description of parameter `data`.
+        atts : type
+            Description of parameter `atts`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         from numpy import NaN
         # altitude variables
         alt = data['ALT'][:].squeeze()

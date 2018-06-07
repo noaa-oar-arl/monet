@@ -420,6 +420,8 @@ def read_monitor_file(network=None):
         fname = os.path.join(basedir, 'data', 'monitoring_site_locations.hdf')
         print('Monitor File Path: ' + fname)
         s = pd.read_hdf(fname)
+        monitor_drop = ['state_code', u'county_code']
+        s.drop(monitor_drop, axis=1, inplace=True)
     except:
         print('Monitor File Not Found... Reprocessing')
         baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
@@ -456,7 +458,7 @@ def read_monitor_file(network=None):
         # airnow_drop = [u'site_Code', u'site_Name', u'status', u'agency', 'agency_name', 'country_code', u'cmsa_code',
         # 'state_code', u'county_code', u'city_code', u'latitude', u'longitude', 'gmt_offset', 'state_name', 'county_name']
         # airnow_drop = [i.lower() for i in airnow_drop]
-        #airnow.drop(airnow_drop, axis=1, inplace=True)
+        # airnow.drop(airnow_drop, axis=1, inplace=True)
         s = pd.concat([s, airnow], ignore_index=True)
         s = convert_statenames_to_abv(s).dropna(subset=['latitude', 'longitude'])
     if network is not None:

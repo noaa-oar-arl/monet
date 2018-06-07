@@ -25,10 +25,10 @@ class BaseModel(object):
         self.longitude = None
         self.map = None
 
-    def open_files(self, flist=None):
-        """Adds information from files to the dset xarray"""
-        for fname in flist:
-            self.add_files(fname)
+    # def open_files(self, flist=None):
+    #     """Adds information from files to the dset xarray"""
+    #     for fname in flist:
+    #         self.add_files(fname)
 
     def check_z(self, varname):
         if pd.Series(self.dset[varname].dims).isin(['z']).max():
