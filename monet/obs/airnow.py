@@ -49,7 +49,7 @@ class AirNow(object):
             datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')
         ]
         self.datestr = []
-        self.df = None
+        self.df = pd.DataFrame()
         self.daily = False
         self.objtype = 'AirNow'
         self.filelist = None

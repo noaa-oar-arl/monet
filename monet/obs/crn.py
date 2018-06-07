@@ -130,7 +130,7 @@ class crn(object):
         self.dates = None
         self.daily = False
         self.ftp = None
-        self.df = None
+        self.df = pd.DataFrame()
         self.se_states = array(
             ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN',
              'VA', 'WV'], dtype='|S14')
