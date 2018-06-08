@@ -81,7 +81,7 @@ class AQS(object):
             'time_local', 'time', 'siteid', 'latitude', 'longitude', 'obs',
             'units', 'variable'
         ]
-        self.df = pd.DatFrame()  # hourly dataframe
+        self.df = pd.DataFrame()  # hourly dataframe
         self.monitor_file = inspect.getfile(
             self.__class__)[:-13] + '/data/monitoring_site_locations.dat'
         self.monitor_df = None
