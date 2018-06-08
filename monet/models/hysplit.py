@@ -31,7 +31,6 @@ class HYSPLIT(BaseModel):
 
     def __init__(self):
         BaseModel.__init__(self)
-        print 'init for hyspit'
         # self.dset=None
 
     # use open_files method from the BaseModel class.
@@ -68,7 +67,7 @@ class ModelBin(object):
 
     """
 
-    def __init__(self, filename, drange=None, century=None, verbose=False, readwrite='r'):
+    def __init__(self, filename, drange=None, century=None, verbose=False, readwrite='r', fillra=True):
         """
           drange should be a list of two datetime objects.
            The read method will store data from the cdump file for which the sample start is greater thand drange[0] and less than drange[1]
@@ -82,7 +81,7 @@ class ModelBin(object):
         self.zeroconcdates = []  # list of tuples (date1, date2)  of averaging periods with zero concentrations
         self.nonzeroconcdates = []  # list of tuples  of averaging periods with nonzero concentrtations]
         if readwrite == 'r':
-            self.dataflag = self.readfile(filename, drange, verbose, century)
+            self.dataflag = self.readfile(filename, drange, verbose, century, fillra=fillra)
 
     @staticmethod
     def define_struct():
@@ -177,7 +176,7 @@ class ModelBin(object):
 
         return rec1, rec2, rec3, rec4a, rec4b, rec5a, rec5b, rec5c, rec6, rec8a, rec8b, rec8c
 
-    def readfile(self, filename, drange, verbose, century):
+    def readfile(self, filename, drange, verbose, century, fillra=True):
         """Data from the file is stored in an xarray, self.dset
            returns False if all concentrations are zero else returns True.
            INPUTS
@@ -188,6 +187,7 @@ class ModelBin(object):
            century - if None will try to guess the century by looking at the last two digits of the year.
            For python 3 the numpy char4 are read in as a numpy.bytes_ class and need to be converted to a python
            string by using decode('UTF-8').
+           fillra : if True will return complete concentration grid  array with zero cocenctrations filled in
 
         """
         # 8/16/2016 moved species=[]  to before while loop. Added print statements when verbose.
@@ -346,11 +346,29 @@ class ModelBin(object):
                         lon = np.arange(self.llcrnr_lon, self.llcrnr_lon + self.nlon * self.dlon, self.dlon)
 
                         def flat(x): return lat[x - 1]
-
                         def flon(x): return lon[x - 1]
+
+                        ##This block will fill in zero values in the concentration grid.
+                        if fillra:
+                           n1 = np.arange(1, self.nlat+1)
+                           n2 = np.arange(1, self.nlon+1)
+                           concframe['ji'] = zip(concframe['jndx'],concframe['indx'])
+                           concframe.set_index(['ji'],inplace=True)
+                           newi = [(x,y) for x in n1 for y in n2]
+                           concframe = concframe.reindex(newi)
+                           concframe.reset_index(inplace=True)
+                           concframe[['jndx','indx']] = concframe['ji'].tolist()
+                           concframe.fillna(0, inplace=True)
+                           concframe.drop('ji', axis=1, inplace=True)
+                           #print(len(lat))
+                           #print(len(lon))
+                           #print(len(n1), len(n2), n1[-1], n2[-1]) 
+                           #print(self.nlat, self.nlon)
+                           #print(self.llcrnr_lat, self.llcrnr_lon)
+                           #print(concframe[-50:-1])
+                            
                         concframe['latitude'] = concframe['jndx'].apply(flat)
                         concframe['longitude'] = concframe['indx'].apply(flon)
-                        # concframe.reset_index(inplace=True)
                         concframe.drop(['jndx', 'indx'], axis=1, inplace=True)
                         concframe['levels'] = lev_name
                         concframe['time'] = pdate1
