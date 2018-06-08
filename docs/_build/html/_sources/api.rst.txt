@@ -2,9 +2,9 @@
 Get in touch
 ------------
 
-- Ask questions, suggest features or view source code `on GitHub`_.
+Ask questions, suggest features or view source code `on GitHub`_.
 
-.. _on GitHub: https://github.com/noaa-oar-arl/MONET
+If an issue arrises please post on the `GitHub` issues.
 
 
 API
@@ -18,3 +18,7 @@ API
     :maxdepth: 2
 
     source/monet
+    source/modules
+
+
+.. _on GitHub: https://github.com/noaa-oar-arl/MONET

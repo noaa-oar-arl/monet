@@ -13,9 +13,25 @@ composition.  MONET is able to read the output IOAPI output and format it to be
 compatible with it's datastream.
 
 As an example, lets open some CMAQ data from the Hawaiian volcanic eruption in 2018.
+First we will set the path to the data files
+
 
 .. code-block:: python
 
+    import monet
+
+    cmaqfile = monet.__path__ + '/../data/aqm.t12z.aconc.ncf'
+    gridcro2d = monet.__path__ + '/../data/aqm.t12z.grdcro2d.ncf'
+
     from monet.models import *
 
-    c = cmaq.open_files(flist='')
+    c = cmaq.open_files(flist=cmaqfile, grid=gridcro2d)
+
+This will return an :py:class:`~xarray.Dataset`.  The dataset is also still stored
+in the :py:class:`~cmaq` object as :py:class:`~cmaq.dset`.
+
+more here
+
+
+CAMx
+----
