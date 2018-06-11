@@ -167,7 +167,7 @@ class AQS(object):
         else:
             beginning = self.baseurl + 'hourly_'
             fname = 'hourly_'
-        if param.upper() == 'OZONE':
+        if (param.upper() == 'OZONE') | (param.upper() == 'O3'):
             code = '44201_'
         elif param.upper() == 'PM2.5':
             code = '88101_'
@@ -187,6 +187,8 @@ class AQS(object):
             code = 'VOCS_'  # https://aqs.epa.gov/aqsweb/airdata/daily_VOCS_2017.zip
         elif param.upper() == 'SPEC':
             code = 'SPEC_'
+        elif param.upper() == 'PM10SPEC':
+            code = 'PM10SPEC_'
         elif param.upper() == 'WIND':
             code = 'WIND_'
         elif param.upper() == 'TEMP':
