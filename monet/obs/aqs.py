@@ -126,14 +126,18 @@ class AQS(object):
                 infer_datetime_format=True)
             df.columns = self.renamedhcols
 
-        df.loc[:, 'state_code'] = pd.to_numeric(df.state_code, errors='coerce')
-        df.loc[:, 'site_num'] = pd.to_numeric(df.site_num, errors='coerce')
-        df.loc[:, 'county_code'] = pd.to_numeric(
-            df.county_code, errors='coerce')
-        df['siteid'] = array(
-            df['state_code'].values * 1.E7 + df['county_code'].values * 1.E4 +
-            df['site_num'].values,
-            dtype=str)
+        df['state_code'] = df.state_code.astype(str).str.zfill(2)
+        df['county_code'] = df.state_code.astype(str).str.zfill(3)
+        df['site_num'] = df.site_num.astype(str).str.zfill(4)
+        #df.loc[:, 'state_code'] = pd.to_numeric(df.state_code, errors='coerce')
+        # df.loc[:, 'site_num'] = pd.to_numeric(df.site_num, errors='coerce')
+        # df.loc[:, 'county_code'] = pd.to_numeric(
+        #     df.county_code, errors='coerce')
+        # df['siteid'] = array(
+        #     df['state_code'].values * 1.E7 + df['county_code'].values * 1.E4 +
+        #     df['site_num'].values,
+        #     dtype=str)
+        df['siteid'] = df.state_code + df.county_code + df.site_num
         df.drop(['state_name', 'county_name'], axis=1, inplace=True)
         df.columns = [i.lower() for i in df.columns]
         if 'daily' not in url:
