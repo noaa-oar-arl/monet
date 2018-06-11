@@ -61,13 +61,21 @@ def ensure_values_indomain(df, lon, lat):
         Description of returned object.
 
     """
-    con = ((df.Latitude.values > lat.min()) & (df.Latitude.values < lat.max()) & (
-        df.Longitude.values > lon.min()) & (df.Longitude.values < lon.max()))
+    con = ((df.Latitude.values > lat.min()) &
+           (df.Latitude.values < lat.max()) &
+           (df.Longitude.values > lon.min()) &
+           (df.Longitude.values < lon.max()))
     df = df[con].copy()
     return df
 
 
-def write_table(self, df=None, param='OZONE', fname='table', threasholds=[70, 1e5], site=None, city=None,
+def write_table(self,
+                df=None,
+                param='OZONE',
+                fname='table',
+                threasholds=[70, 1e5],
+                site=None,
+                city=None,
                 region=None,
                 state=None,
                 append=False,
@@ -127,18 +135,22 @@ def write_table(self, df=None, param='OZONE', fname='table', threasholds=[70, 1e
                 single = True
                 names = df.get_group('msa_name').dropna().unique()
                 name = [j for j in names if city.upper() in j.upper()]
-                df = df.groupby('variable').get_group(param).groupby('MSA_name').get_group(name[0])
+                df = df.groupby('variable').get_group(param).groupby(
+                    'MSA_name').get_group(name[0])
                 single = True
             except KeyError:
                 print(' City either does not contain montiors for ' + param)
-                print('     or City Name is not valid.  Enter a valid City name: df.msa_name.unique()')
+                print(
+                    '     or City Name is not valid.  Enter a valid City name: df.msa_name.unique()'
+                )
                 return
         elif not isinstance(state, type(None)):
             try:
                 single = True
                 names = df.get_group('State_name').dropna().unique()
                 name = [j for j in names if state.upper() in j.upper()]
-                df = df.groupby('variable').get_group(param).groupby('state_name').get_group(name[0])
+                df = df.groupby('variable').get_group(param).groupby(
+                    'state_name').get_group(name[0])
             except KeyError:
                 print('State not valid. Please enter valid 2 digit state')
                 return
@@ -172,9 +184,17 @@ def write_table(self, df=None, param='OZONE', fname='table', threasholds=[70, 1e
                 except KeyError:
                     pass
         pd.options.display.float_format = '{:,.3f}'.format
-        stats = ['Region', 'Label', 'N', 'Obs', 'Mod', 'MB', 'NMB', 'RMSE', 'R', 'IOA', 'POD', 'FAR']
+        stats = [
+            'Region', 'Label', 'N', 'Obs', 'Mod', 'MB', 'NMB', 'RMSE', 'R',
+            'IOA', 'POD', 'FAR'
+        ]
         if append:
-            dff = pd.read_csv(fname + '.txt', skiprows=3, index_col=0, sep='\s+', names=stats)
+            dff = pd.read_csv(
+                fname + '.txt',
+                skiprows=3,
+                index_col=0,
+                sep='\s+',
+                names=stats)
             dd = pd.concat([dd, dff]).sort_values(by=['Region'])
 
         out = StringIO()
@@ -182,9 +202,11 @@ def write_table(self, df=None, param='OZONE', fname='table', threasholds=[70, 1e
         out.seek(0)
         with open(fname + '.txt', 'w') as f:
             if single:
-                f.write('This is the statistics table for parameter=' + param + ' for area ' + name + '\n')
+                f.write('This is the statistics table for parameter=' + param +
+                        ' for area ' + name + '\n')
             else:
-                f.write('This is the statistics table for parameter=' + param + '\n')
+                f.write('This is the statistics table for parameter=' + param +
+                        '\n')
             f.write('\n')
             f.writelines(out.readlines())
         if html:
@@ -201,7 +223,9 @@ def write_table(self, df=None, param='OZONE', fname='table', threasholds=[70, 1e
             lines = cssstyle.split('\n')
             with open(fname + '.html', 'r') as f:
                 for line in f.readlines():
-                    lines.append(line.replace('class="dataframe"', 'class="GenericTable hoverTable"'))
+                    lines.append(
+                        line.replace('class="dataframe"',
+                                     'class="GenericTable hoverTable"'))
             f.close()
             with open(fname + '.html', 'w') as f:
                 for line in lines:
@@ -227,10 +251,14 @@ def get_region(df):
     from numpy import array, concatenate
     from pandas import DataFrame, merge
     se = array(['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN', 'VA', 'WV'])
-    ne = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'])
+    ne = array([
+        'CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'
+    ])
     nc = array(['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'])
     sc = array(['AR', 'LA', 'OK', 'TX'])
-    r = array(['AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD', 'UT', 'WY'])
+    r = array([
+        'AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD', 'UT', 'WY'
+    ])
     p = array(['CA', 'OR', 'WA'])
     ner = array(['Northeast' for i in ne])
     ser = array(['Southeast' for i in se])
@@ -244,7 +272,13 @@ def get_region(df):
     return merge(df, dd, how='left', on='state_name')
 
 
-def get_epa_location_df(df, param, site='', city='', region='', epa_region='', state=''):
+def get_epa_location_df(df,
+                        param,
+                        site='',
+                        city='',
+                        region='',
+                        epa_region='',
+                        state=''):
     """Short summary.
 
     Parameters
@@ -289,13 +323,16 @@ def get_epa_location_df(df, param, site='', city='', region='', epa_region='', s
         df2 = new[new['msa_name'] == name].copy().drop_duplicates()
         title = name
     elif state != '':
-        df2 = new[new['state_name'].str.upper() == state.upper()].copy().drop_duplicates()
+        df2 = new[new['state_name'].str.upper() ==
+                  state.upper()].copy().drop_duplicates()
         title = 'STATE: ' + state.upper()
     elif region != '':
-        df2 = new[new['Region'].str.upper() == region.upper()].copy().drop_duplicates()
+        df2 = new[new['Region'].str.upper() ==
+                  region.upper()].copy().drop_duplicates()
         title = 'REGION: ' + region.upper()
     elif epa_region != '':
-        df2 = new[new['EPA_region'].str.upper() == epa_region.upper()].copy().drop_duplicates()
+        df2 = new[new['EPA_region'].str.upper() ==
+                  epa_region.upper()].copy().drop_duplicates()
         title = 'EPA_REGION: ' + epa_region.upper()
     else:
         df2 = new
@@ -324,7 +361,8 @@ def regulatory_resample(df, col='model', pollutant_standard=None):
         dfreturn = calc_daily_max(df, rolling_frequency=1)
     else:  # do daily average
         dfn = df.drop_duplicates(subset=['siteid'])
-        df = df.groupby('siteid')[col].resample('D').mean().reset_index().rename(columns={'level_1': 'time_local'})
+        df = df.groupby('siteid')[col].resample(
+            'D').mean().reset_index().rename(columns={'level_1': 'time_local'})
         dfreturn = df.merge(dfn, how='left', on='siteid')
     return dfreturn
 
@@ -338,72 +376,86 @@ def calc_daily_max(df, param=None, rolling_frequency=8):
     temp.index = temp.time_local
     dfn = temp.drop_duplicates(subset=['siteid'])
     if rolling_frequency > 1:
-        g = temp.groupby('siteid')['model', 'gmt_offset'].rolling(rolling_frequency, center=True, win_type='boxcar').mean()
+        g = temp.groupby('siteid')['model', 'gmt_offset'].rolling(
+            rolling_frequency, center=True, win_type='boxcar').mean()
         q = g.reset_index(level=0)
-        k = q.groupby('siteid').resample('D').max().reset_index(level=1).reset_index(drop='siteid').dropna()
+        k = q.groupby('siteid').resample('D').max().reset_index(
+            level=1).reset_index(drop='siteid').dropna()
     else:
-        k = temp.groupby('siteid')['model', 'gmt_offset'].resample('D').max().reset_index().rename({'level_1': 'time_local'})
-    columnstomerge = temp.columns[~temp.columns.isin(k.columns) * (temp.columns != 'time')].append(Index(['siteid']))
+        k = temp.groupby('siteid')['model', 'gmt_offset'].resample(
+            'D').max().reset_index().rename({
+                'level_1': 'time_local'
+            })
+    columnstomerge = temp.columns[~temp.columns.isin(k.columns) *
+                                  (temp.columns != 'time')].append(
+                                      Index(['siteid']))
     if param is None:
-        dff = k.merge(df[columnstomerge], on='siteid', how='left').drop_duplicates(subset=['siteid', 'time_local'])
+        dff = k.merge(
+            df[columnstomerge], on='siteid',
+            how='left').drop_duplicates(subset=['siteid', 'time_local'])
     else:
-        dff = k.merge(df.groupby('variable').get_group(param)[columnstomerge], on='siteid', how='left').drop_duplicates(subset=['siteid', 'time_local'])
+        dff = k.merge(
+            df.groupby('variable').get_group(param)[columnstomerge],
+            on='siteid',
+            how='left').drop_duplicates(subset=['siteid', 'time_local'])
     dff['time'] = dff.time_local - to_timedelta(dff.gmt_offset, unit='H')
     return dff
 
 
 def convert_statenames_to_abv(df):
-    d = {'Alabama': 'AL',
-         'Alaska': 'AK',
-         'Arizona': 'AZ',
-         'Arkansas': 'AR',
-         'California': 'CA',
-         'Colorado': 'CO',
-         'Connecticut': 'CT',
-         'Delaware': 'DE',
-         'Florida': 'FL',
-         'Georgia': 'GA',
-         'Hawaii': 'HI',
-         'Idaho': 'ID',
-         'Illinois': 'IL',
-         'Indiana': 'IN',
-         'Iowa': 'IA',
-         'Kansas': 'KS',
-         'Kentucky': 'KY',
-         'Louisiana': 'LA',
-         'Maine': 'ME',
-         'Maryland': 'MD',
-         'Massachusetts': 'MA',
-         'Michigan': 'MI',
-         'Minnesota': 'MN',
-         'Mississippi': 'MS',
-         'Missouri': 'MO',
-         'Montana': 'MT',
-         'Nebraska': 'NE',
-         'Nevada': 'NV',
-         'New Hampshire': 'NH',
-         'New Jersey': 'NJ',
-         'New Mexico': 'NM',
-         'New York': 'NY',
-         'North Carolina': 'NC',
-         'North Dakota': 'ND',
-         'Ohio': 'OH',
-         'Oklahoma': 'OK',
-         'Oregon': 'OR',
-         'Pennsylvania': 'PA',
-         'Rhode Island': 'RI',
-         'South Carolina': 'SC',
-         'South Dakota': 'SD',
-         'state': 'Postal',
-         'Tennessee': 'TN',
-         'Texas': 'TX',
-         'Utah': 'UT',
-         'Vermont': 'VT',
-         'Virginia': 'VA',
-         'Washington': 'WA',
-         'West Virginia': 'WV',
-         'Wisconsin': 'WI',
-         'Wyoming': 'WY'}
+    d = {
+        'Alabama': 'AL',
+        'Alaska': 'AK',
+        'Arizona': 'AZ',
+        'Arkansas': 'AR',
+        'California': 'CA',
+        'Colorado': 'CO',
+        'Connecticut': 'CT',
+        'Delaware': 'DE',
+        'Florida': 'FL',
+        'Georgia': 'GA',
+        'Hawaii': 'HI',
+        'Idaho': 'ID',
+        'Illinois': 'IL',
+        'Indiana': 'IN',
+        'Iowa': 'IA',
+        'Kansas': 'KS',
+        'Kentucky': 'KY',
+        'Louisiana': 'LA',
+        'Maine': 'ME',
+        'Maryland': 'MD',
+        'Massachusetts': 'MA',
+        'Michigan': 'MI',
+        'Minnesota': 'MN',
+        'Mississippi': 'MS',
+        'Missouri': 'MO',
+        'Montana': 'MT',
+        'Nebraska': 'NE',
+        'Nevada': 'NV',
+        'New Hampshire': 'NH',
+        'New Jersey': 'NJ',
+        'New Mexico': 'NM',
+        'New York': 'NY',
+        'North Carolina': 'NC',
+        'North Dakota': 'ND',
+        'Ohio': 'OH',
+        'Oklahoma': 'OK',
+        'Oregon': 'OR',
+        'Pennsylvania': 'PA',
+        'Rhode Island': 'RI',
+        'South Carolina': 'SC',
+        'South Dakota': 'SD',
+        'state': 'Postal',
+        'Tennessee': 'TN',
+        'Texas': 'TX',
+        'Utah': 'UT',
+        'Vermont': 'VT',
+        'Virginia': 'VA',
+        'Washington': 'WA',
+        'West Virginia': 'WV',
+        'Wisconsin': 'WI',
+        'Wyoming': 'WY'
+    }
     for i in d:
         df['state_name'].loc[df.state_name.isin([i])] = d[i]
     df['state_name'].loc[df.state_name.isin(['Canada'])] = 'CC'
@@ -430,12 +482,24 @@ def read_monitor_file(network=None):
         monitor_url = baseurl + 'aqs_monitors.zip'
         # Airnow monitor file
         monitor_airnow_url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/today/monitoring_site_locations.dat'
-        colsinuse = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                     11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-        airnow = pd.read_csv(monitor_airnow_url, delimiter='|', header=None, usecols=colsinuse, dtype={0: str})
-        airnow.columns = ['siteid', 'Site_Code', 'Site_Name', 'Status', 'Agency', 'Agency_Name', 'EPA_region', 'Latitude',
-                          'Longitude', 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
-                          'MSA_Name', 'state_Code', 'state_Name', 'County_Code', 'County_Name', 'City_Code']
+        colsinuse = [
+            0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21
+        ]
+        airnow = pd.read_csv(
+            monitor_airnow_url,
+            delimiter='|',
+            header=None,
+            usecols=colsinuse,
+            dtype={0: str},
+            encoding="ISO-8859-1")
+        airnow.columns = [
+            'siteid', 'Site_Code', 'Site_Name', 'Status', 'Agency',
+            'Agency_Name', 'EPA_region', 'Latitude', 'Longitude', 'Elevation',
+            'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
+            'MSA_Name', 'state_Code', 'state_Name', 'County_Code',
+            'County_Name', 'City_Code'
+        ]
         airnow.columns = [i.lower() for i in airnow.columns]
         # airnow['siteid'] = pd.to_numeric(airnow.siteid, errors='coerce')
         # Read EPA Site file
@@ -443,16 +507,26 @@ def read_monitor_file(network=None):
         # read epa monitor file
         monitor = pd.read_csv(monitor_url)
         # make siteid column
-        site['siteid'] = site['State Code'].astype(str).str.zfill(2) + site['County Code'].astype(str).str.zfill(3) + site[
-            'Site Number'].astype(str).str.zfill(4)
-        monitor['siteid'] = monitor['State Code'].astype(str).str.zfill(2) + monitor['County Code'].astype(str).str.zfill(
-            3) + monitor['Site Number'].astype(str).str.zfill(4)
+        site['siteid'] = site['State Code'].astype(str).str.zfill(
+            2) + site['County Code'].astype(str).str.zfill(
+                3) + site['Site Number'].astype(str).str.zfill(4)
+        monitor['siteid'] = monitor['State Code'].astype(str).str.zfill(
+            2) + monitor['County Code'].astype(str).str.zfill(
+                3) + monitor['Site Number'].astype(str).str.zfill(4)
         site.columns = [i.replace(' ', '_') for i in site.columns]
-        s = monitor.merge(site[['siteid', 'Land_Use', 'Location_Setting', 'GMT_Offset']], on=['siteid'], how='left')
+        s = monitor.merge(
+            site[['siteid', 'Land_Use', 'Location_Setting', 'GMT_Offset']],
+            on=['siteid'],
+            how='left')
         s.columns = [i.replace(' ', '_').lower() for i in s.columns]
         s['siteid'] = pd.to_numeric(s.siteid, errors='coerce')
-        monitor_drop = ['state_code', u'county_code', u'site_number', 'extraction_date', 'parameter_code', 'parameter_name', 'poc', 'last_sample_date', 'pqao',
-                        'reporting_agency', 'exclusions', u'monitoring_objective', 'last_method_code', 'last_method', u'naaqs_primary_monitor', u'qa_primary_monitor']
+        monitor_drop = [
+            'state_code', u'county_code', u'site_number', 'extraction_date',
+            'parameter_code', 'parameter_name', 'poc', 'last_sample_date',
+            'pqao', 'reporting_agency', 'exclusions', u'monitoring_objective',
+            'last_method_code', 'last_method', u'naaqs_primary_monitor',
+            u'qa_primary_monitor'
+        ]
         s.drop(monitor_drop, axis=1, inplace=True)
         # drop airnow keys for merge
         # airnow_drop = [u'site_Code', u'site_Name', u'status', u'agency', 'agency_name', 'country_code', u'cmsa_code',
@@ -460,7 +534,9 @@ def read_monitor_file(network=None):
         # airnow_drop = [i.lower() for i in airnow_drop]
         # airnow.drop(airnow_drop, axis=1, inplace=True)
         s = pd.concat([s, airnow], ignore_index=True)
-        s = convert_statenames_to_abv(s).dropna(subset=['latitude', 'longitude'])
+        s = convert_statenames_to_abv(s).dropna(
+            subset=['latitude', 'longitude'])
     if network is not None:
-        s = s.loc[s.Networks.isin([network])].drop_duplicates(subset=['siteid'])
+        s = s.loc[s.Networks.isin(
+            [network])].drop_duplicates(subset=['siteid'])
     return s
