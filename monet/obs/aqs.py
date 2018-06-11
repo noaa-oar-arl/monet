@@ -313,11 +313,12 @@ class AQS(object):
         if self.monitor_df is None:
             self.monitor_df = read_monitor_file()
         if daily:
-            monitor_drop = [
-                'msa_name', 'city_name', u'local_site_name', u'address',
-                'datum'
-            ]
-            self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
+            try:
+                monitor_drop = ['msa_name', 'city_name', u'local_site_name',
+                u'address', u'datum']
+                self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
+            except:
+                self.montior_df.drop('datum',axis=1,inplace=True)
         else:
             monitor_drop = [u'datum']
             self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
@@ -327,7 +328,6 @@ class AQS(object):
         else:
             monitors = self.monitor_df.drop_duplicates(
                 subset=['siteid', 'latitude', 'longitude'])
-        print(self.df.siteid.dtype, monitors.siteid.dtype)
         self.df = pd.merge(
             self.df,
             monitors,
