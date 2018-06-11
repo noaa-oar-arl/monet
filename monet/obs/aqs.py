@@ -133,7 +133,7 @@ class AQS(object):
         df['siteid'] = array(
             df['state_code'].values * 1.E7 + df['county_code'].values * 1.E4 +
             df['site_num'].values,
-            dtype='int32')
+            dtype=str)
         df.drop(['state_name', 'county_name'], axis=1, inplace=True)
         df.columns = [i.lower() for i in df.columns]
         if 'daily' not in url:
