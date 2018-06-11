@@ -116,6 +116,7 @@ class AQS(object):
             df.columns = self.renameddcols
             df['pollutant_standard'] = df.pollutant_standard.astype(str)
             self.daily = True
+            #df.rename(columns={'parameter_name':'variable'})
         else:
             df = pd.read_csv(
                 url,
@@ -142,7 +143,11 @@ class AQS(object):
         df.columns = [i.lower() for i in df.columns]
         if 'daily' not in url:
             df.drop(['datum', 'qualifier'], axis=1, inplace=True)
-        df = self.get_species(df)
+        if 'VOC' in url:
+            voc = True
+        else:
+            voc = False
+        df = self.get_species(df,voc=voc)
         return df
 
     def build_url(self, param, year, daily=False, download=False):
@@ -335,11 +340,11 @@ class AQS(object):
         self.df = pd.merge(
             self.df,
             monitors,
-            how='left',
             on=['siteid', 'latitude', 'longitude'])
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
+        return df
 
     def get_species(self, df, voc=False):
         """Short summary.
