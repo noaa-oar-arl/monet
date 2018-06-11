@@ -481,26 +481,26 @@ def read_monitor_file(network=None):
         # has network info (CSN IMPROVE etc....)
         monitor_url = baseurl + 'aqs_monitors.zip'
         # Airnow monitor file
-        monitor_airnow_url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/today/monitoring_site_locations.dat'
-        colsinuse = [
-            0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-            20, 21
-        ]
-        airnow = pd.read_csv(
-            monitor_airnow_url,
-            delimiter='|',
-            header=None,
-            usecols=colsinuse,
-            dtype={0: str},
-            encoding="ISO-8859-1")
-        airnow.columns = [
-            'siteid', 'Site_Code', 'Site_Name', 'Status', 'Agency',
-            'Agency_Name', 'EPA_region', 'Latitude', 'Longitude', 'Elevation',
-            'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
-            'MSA_Name', 'state_Code', 'state_Name', 'County_Code',
-            'County_Name', 'City_Code'
-        ]
-        airnow.columns = [i.lower() for i in airnow.columns]
+        # monitor_airnow_url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/today/monitoring_site_locations.dat'
+        # colsinuse = [
+        #     0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+        #     20, 21
+        # ]
+        # airnow = pd.read_csv(
+        #     monitor_airnow_url,
+        #     delimiter='|',
+        #     header=None,
+        #     usecols=colsinuse,
+        #     dtype={0: str},
+        #     encoding="ISO-8859-1")
+        # airnow.columns = [
+        #     'siteid', 'Site_Code', 'Site_Name', 'Status', 'Agency',
+        #     'Agency_Name', 'EPA_region', 'Latitude', 'Longitude', 'Elevation',
+        #     'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
+        #     'MSA_Name', 'state_Code', 'state_Name', 'County_Code',
+        #     'County_Name', 'City_Code'
+        # ]
+        # airnow.columns = [i.lower() for i in airnow.columns]
         # airnow['siteid'] = pd.to_numeric(airnow.siteid, errors='coerce')
         # Read EPA Site file
         site = pd.read_csv(site_url)
@@ -533,7 +533,7 @@ def read_monitor_file(network=None):
         # 'state_code', u'county_code', u'city_code', u'latitude', u'longitude', 'gmt_offset', 'state_name', 'county_name']
         # airnow_drop = [i.lower() for i in airnow_drop]
         # airnow.drop(airnow_drop, axis=1, inplace=True)
-        s = pd.concat([s, airnow], ignore_index=True)
+        # s = pd.concat([s, airnow], ignore_index=True)
         s = convert_statenames_to_abv(s).dropna(
             subset=['latitude', 'longitude'])
     if network is not None:
