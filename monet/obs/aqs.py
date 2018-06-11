@@ -148,7 +148,7 @@ class AQS(object):
         else:
             voc = False
         df = self.get_species(df,voc=voc)
-        return self.df
+        return df
 
     def build_url(self, param, year, daily=False, download=False):
         """Short summary.
