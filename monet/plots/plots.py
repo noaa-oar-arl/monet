@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import taylordiagram as td
+from . import taylordiagram as td
 from colorbars import colorbar_index
 
 from ..util import mystats
