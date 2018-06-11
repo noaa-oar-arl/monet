@@ -148,7 +148,7 @@ class AQS(object):
         else:
             voc = False
         df = self.get_species(df,voc=voc)
-        return df
+        return self.df
 
     def build_url(self, param, year, daily=False, download=False):
         """Short summary.
@@ -344,7 +344,7 @@ class AQS(object):
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
-        return df
+        return self.df
 
     def get_species(self, df, voc=False):
         """Short summary.
