@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from . import taylordiagram as td
-from colorbars import colorbar_index
+from .colorbars import colorbar_index
 
 from ..util import mystats
 
