@@ -147,7 +147,7 @@ class AQS(object):
             voc = True
         else:
             voc = False
-        df = self.get_species(df,voc=voc)
+        df = self.get_species(df, voc=voc)
         return df
 
     def build_url(self, param, year, daily=False, download=False):
@@ -321,13 +321,18 @@ class AQS(object):
         self.df = self.change_units(self.df)
         if self.monitor_df is None:
             self.monitor_df = read_monitor_file()
+            drop_monitor_cols = True
+        else:
+            drop_monitor_cols = False
         if daily:
-            try:
-                monitor_drop = ['msa_name', 'city_name', u'local_site_name',
-                u'address', u'datum']
+            if drop_monitor_cols:
+                monitor_drop = [
+                    'msa_name', 'city_name', u'local_site_name', u'address',
+                    u'datum'
+                ]
                 self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
-            except:
-                self.montior_df.drop('datum',axis=1,inplace=True)
+            else:
+                self.montior_df.drop('datum', axis=1, inplace=True)
         else:
             monitor_drop = [u'datum']
             self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
@@ -338,9 +343,7 @@ class AQS(object):
             monitors = self.monitor_df.drop_duplicates(
                 subset=['siteid', 'latitude', 'longitude'])
         self.df = pd.merge(
-            self.df,
-            monitors,
-            on=['siteid', 'latitude', 'longitude'])
+            self.df, monitors, on=['siteid', 'latitude', 'longitude'])
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
