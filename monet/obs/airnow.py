@@ -37,7 +37,6 @@ class AirNow(object):
         Description of attribute `monitor_df`.
     savecols : type
         Description of attribute `savecols`.
-
     """
 
     def __init__(self):
@@ -107,7 +106,7 @@ class AirNow(object):
         Parameters
         ----------
         fn : string
-            file name to read 
+            file name to read
 
         Returns
         -------
@@ -219,7 +218,7 @@ class AirNow(object):
 
         """
         self.dates = dates
-        self.aggragate_files(download=download)
+        self.aggregate_files(download=download)
         return self.df
 
     def filter_bad_values(self):
@@ -264,10 +263,11 @@ class AirNow(object):
 
         """
         from .epa_util import read_monitor_file
-        self.monitor_df = read_monitor_file()
+        self.monitor_df = read_monitor_file(airnow=True)
         #self.monitor_df = self.monitor_df.loc[self.monitor_df.siteid.notnull()]
         #self.monitor_df['siteid'] = self.monitor_df.siteid.astype(int).astype(str).str.zfill(9)
-        self.df = pd.merge(self.df, self.monitor_df, on='siteid', how='left')
+        self.df = pd.merge(
+            self.df, self.monitor_df, on='siteid')  #, how='left')
 
     def get_station_locations_remerge(self, df):
         """Short summary.
@@ -286,6 +286,6 @@ class AirNow(object):
         df = pd.merge(
             df,
             self.monitor_df.drop(['Latitude', 'Longitude'], axis=1),
-            on='siteid',
-            how='left')
+            on='siteid')  #,
+        #how='left')
         return df
