@@ -344,7 +344,7 @@ class AQS(object):
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
-        return self.df
+        return self.df.copy()
 
     def get_species(self, df, voc=False):
         """Short summary.
