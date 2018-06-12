@@ -331,8 +331,6 @@ class AQS(object):
                     u'datum'
                 ]
                 self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
-            else:
-                self.montior_df.drop('datum', axis=1, inplace=True)
         else:
             monitor_drop = [u'datum']
             self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
@@ -347,6 +345,7 @@ class AQS(object):
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
+        self.df.rename(columns={'parameter_name': 'variable'})
         return self.df.copy()
 
     def get_species(self, df, voc=False):
