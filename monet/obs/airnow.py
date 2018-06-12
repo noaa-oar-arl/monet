@@ -95,6 +95,7 @@ class AirNow(object):
             fname = i.strftime('HourlyData_%Y%m%d%H.dat')
             furls.append(f)
             fnames.append(fname)
+        #https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/2017/20170108/HourlyData_2016121506.dat
 
         # files needed for comparison
         self.url = pd.Series(furls, index=None)
@@ -116,7 +117,11 @@ class AirNow(object):
         """
         try:
             dft = pd.read_csv(
-                fn, delimiter='|', header=None, error_bad_lines=False)
+                fn,
+                delimiter='|',
+                header=None,
+                error_bad_lines=False,
+                encoding='ISO-8859-1')
             cols = [
                 'date', 'time', 'siteid', 'site', 'utcoffset', 'variable',
                 'units', 'obs', 'source'
