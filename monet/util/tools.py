@@ -81,5 +81,5 @@ def long_to_wide(df):
         values='obs', index=['time', 'siteid'],
         columns='variable').reset_index()
     cols = Series(df.columns)
-    index = ~c.isin(['variable', 'obs'])
+    index = ~cols.isin(['variable', 'obs'])
     return pd.merge(w, df, on=['time', 'siteid'])
