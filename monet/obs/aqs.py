@@ -345,7 +345,8 @@ class AQS(object):
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
-        self.df.rename(columns={'parameter_name': 'variable'})
+        if pd.Series(self.df.columns).isin(['parameter_name']).max():
+            self.df.drop('parameter_name', axis=1, inplace=True)
         return self.df.copy()
 
     def get_species(self, df, voc=False):
