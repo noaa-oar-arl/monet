@@ -77,9 +77,11 @@ def wsdir2uv(ws, wdir):
 
 def long_to_wide(df):
     from pandas import Series, merge
+    from numpy import hstack
     w = df.pivot_table(
         values='obs', index=['time', 'siteid'],
         columns='variable').reset_index()
     cols = Series(df.columns)
-    index = ~cols.isin(['variable', 'obs'])
-    return merge(w, df, on=['time', 'siteid'])
+    index = cols.loc[~cols.isin(['variable', 'obs'])]
+    #mergeon = hstack((index.values, df.variable.unique()))
+    return merge(w, df, on=['siteid', 'time'])
