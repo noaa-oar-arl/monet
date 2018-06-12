@@ -74,10 +74,12 @@ def wsdir2uv(ws, wdir):
     v = -ws * cos(wdir * pi / 180.)
     return u, v
 
+
 def long_to_wide(df):
     from pandas import Series
-    w = df.pivot_table(values='obs',index=['time','siteid'],columns='variable').reset_index()
-    cols =  pd.Series(df.columns)
-    index = ~c.isin(['variable','obs'])
-    return pd.merge(w,df,on=['time','siteid'])
-    
+    w = df.pivot_table(
+        values='obs', index=['time', 'siteid'],
+        columns='variable').reset_index()
+    cols = Series(df.columns)
+    index = ~c.isin(['variable', 'obs'])
+    return pd.merge(w, df, on=['time', 'siteid'])
