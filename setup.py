@@ -25,8 +25,8 @@ setup(
     ],
     description='The Model and Observation Evaluation Toolkit (MONET)',
     install_requires=[
-        'f90nml', 'numpy', 'pandas', 'wget', 'pyresample', 'netcdf4', 'xarray',
-        'dask', 'matplotlib', 'seaborn', 'pseudonetcdf'
+        'numpy', 'pandas', 'pyresample', 'netcdf4', 'xarray', 'dask',
+        'matplotlib', 'seaborn', 'pseudonetcdf', 'cartopy', 'future'
     ],
     dependency_links=[
         "git+ssh://git@github.com/barronh/pseudonetcdf.git@develop",
