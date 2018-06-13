@@ -50,7 +50,7 @@ def draw_map(ax=None,
         states_provinces = cfeature.NaturalEarthFeature(
             category='cultural',
             name='admin_1_states_provinces_lines',
-            scale=state_resolutions,
+            scale=resolution,
             facecolor='none')
         ax.add_feature(states_provinces, edgecolor='black')
 
