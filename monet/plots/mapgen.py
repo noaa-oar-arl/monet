@@ -8,7 +8,7 @@ def draw_map(ax=None,
              coastlines=True,
              states=False,
              countries=True,
-             state_resolutions='10m',
+             resolution='10m',
              extent=None):
     """Short summary.
 
@@ -55,7 +55,7 @@ def draw_map(ax=None,
         ax.add_feature(states_provinces, edgecolor='black')
 
     if coastlines:
-        ax.coastlines()
+        ax.coastlines(resolution)
 
     if countries:
         ax.add_feature(cfeature.BORDERS)
