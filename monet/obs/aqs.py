@@ -331,9 +331,9 @@ class AQS(object):
                     u'datum'
                 ]
                 self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
-        else:
-            monitor_drop = [u'datum']
-            self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
+        # else:
+        #     monitor_drop = [u'datum']
+        #     self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
         if network is not None:
             monitors = self.monitor_df.loc[self.monitor_df.isin(
                 [network])].drop_duplicates(subset=['siteid'])
@@ -341,12 +341,15 @@ class AQS(object):
             monitors = self.monitor_df.drop_duplicates(
                 subset=['siteid', 'latitude', 'longitude'])
         self.df = pd.merge(
-            self.df, monitors, on=['siteid', 'latitude', 'longitude'])
+            self.df,
+            monitors,
+            on=['siteid', 'latitude', 'longitude'],
+            how='left')
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
-        if pd.Series(self.df.columns).isin(['parameter_name']).max():
-            self.df.drop('parameter_name', axis=1, inplace=True)
+        #if pd.Series(self.df.columns).isin(['parameter_name']).max():
+        #self.df.drop('parameter_name', axis=1, inplace=True)
         return self.df.copy()
 
     def get_species(self, df, voc=False):

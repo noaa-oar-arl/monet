@@ -564,7 +564,7 @@ def read_monitor_file(network=None, airnow=False):
             ]
             airnow_drop = [i.lower() for i in airnow_drop]
             airnow.drop(airnow_drop, axis=1, inplace=True)
-            s = pd.concat([s, airnow], ignore_index=True)
+            s = pd.concat([s, airnow], ignore_index=True, sort=True)
             s = convert_statenames_to_abv(s).dropna(
                 subset=['latitude', 'longitude'])
         if network is not None:
