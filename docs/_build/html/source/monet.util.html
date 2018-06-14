@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -87,7 +86,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Loading Point Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
 </ul>
@@ -109,7 +108,16 @@
 <li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html">monet</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet.monet">monet.monet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -598,31 +606,11 @@
 <dl class="function">
 <dt id="monet.util.tools.linregress">
 <code class="descclassname">monet.util.tools.</code><code class="descname">linregress</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.tools.linregress" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the ordinary least squares fit of two 1D arrays, x
-and y using the statsmodels library sm.OLS.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>numpy array</em>) – Array of x values</li>
-<li><strong>y</strong> (<em>numpy array</em>) – Array of Y values</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type [a, b, r^2, std_err]</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="monet.util.tools.long_to_wide">
-<code class="descclassname">monet.util.tools.</code><code class="descname">long_to_wide</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.tools.long_to_wide" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">monet.util.tools.</code><code class="descname">long_to_wide</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.tools.long_to_wide" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -697,10 +685,7 @@ and y using the statsmodels library sm.OLS.</p>
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
