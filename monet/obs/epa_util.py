@@ -552,7 +552,8 @@ def read_monitor_file(network=None, airnow=False):
                 'extraction_date', 'parameter_code', 'parameter_name', 'poc',
                 'last_sample_date', 'pqao', 'reporting_agency', 'exclusions',
                 u'monitoring_objective', 'last_method_code', 'last_method',
-                u'naaqs_primary_monitor', u'qa_primary_monitor'
+                u'naaqs_primary_monitor', u'qa_primary_monitor', 'latitude',
+                'longitude'
             ]
             s.drop(monitor_drop, axis=1, inplace=True)
             # drop airnow keys for merge
