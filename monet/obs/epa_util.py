@@ -529,9 +529,9 @@ def read_monitor_file(network=None, airnow=False):
             airnow.columns = [i.lower() for i in airnow.columns]
             # airnow['siteid'] = pd.to_numeric(airnow.siteid, errors='coerce')
             # Read EPA Site file
-            site = pd.read_csv(site_url)
+            site = pd.read_csv(site_url, encoding='ISO-8859-1')
             # read epa monitor file
-            monitor = pd.read_csv(monitor_url)
+            monitor = pd.read_csv(monitor_url, encoding='ISO-8859-1')
             # make siteid column
             site['siteid'] = site['State Code'].astype(str).str.zfill(
                 2) + site['County Code'].astype(str).str.zfill(
@@ -564,10 +564,10 @@ def read_monitor_file(network=None, airnow=False):
             ]
             airnow_drop = [i.lower() for i in airnow_drop]
             airnow.drop(airnow_drop, axis=1, inplace=True)
-            s = pd.concat([s, airnow], ignore_index=True, sort=True)
-            s = convert_statenames_to_abv(s).dropna(
+            ss = pd.concat([s, airnow], ignore_index=True, sort=True)
+            sss = convert_statenames_to_abv(ss).dropna(
                 subset=['latitude', 'longitude'])
         if network is not None:
-            s = s.loc[s.Networks.isin(
+            sss = sss.loc[sss.Networks.isin(
                 [network])].drop_duplicates(subset=['siteid'])
-        return s
+        return sss

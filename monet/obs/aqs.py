@@ -112,7 +112,13 @@ class AQS(object):
             df = pd.read_csv(
                 url,
                 parse_dates={'time_local': ["Date Local"]},
-                date_parser=dateparse)
+                date_parser=dateparse,
+                dtype={
+                    0: str,
+                    1: str,
+                    2: str
+                },
+                encoding='ISO-8859-1')
             df.columns = self.renameddcols
             df['pollutant_standard'] = df.pollutant_standard.astype(str)
             self.daily = True
@@ -127,9 +133,9 @@ class AQS(object):
                 infer_datetime_format=True)
             df.columns = self.renamedhcols
 
-        df['state_code'] = df.state_code.astype(str).str.zfill(2)
-        df['county_code'] = df.state_code.astype(str).str.zfill(3)
-        df['site_num'] = df.site_num.astype(str).str.zfill(4)
+        # df['state_code'] = df.state_code.astype(str).str.zfill(2)
+        # df['county_code'] = df.state_code.astype(str).str.zfill(3)
+        # df['site_num'] = df.site_num.astype(str).str.zfill(4)
         #df.loc[:, 'state_code'] = pd.to_numeric(df.state_code, errors='coerce')
         # df.loc[:, 'site_num'] = pd.to_numeric(df.site_num, errors='coerce')
         # df.loc[:, 'county_code'] = pd.to_numeric(
@@ -340,11 +346,7 @@ class AQS(object):
         else:
             monitors = self.monitor_df.drop_duplicates(
                 subset=['siteid', 'latitude', 'longitude'])
-        self.df = pd.merge(
-            self.df,
-            monitors,
-            on=['siteid', 'latitude', 'longitude'],
-            how='left')
+        self.df = pd.merge(self.df, monitors, on=['siteid'], how='left')
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
