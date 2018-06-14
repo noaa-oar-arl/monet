@@ -463,7 +463,7 @@ def convert_statenames_to_abv(df):
     return df
 
 
-def read_monitor_file(network=None, airnow=False):
+def read_monitor_file(network=None, airnow=False, drop_latlon=True):
     from numpy import NaN
     import pandas as pd
     import os
@@ -552,8 +552,7 @@ def read_monitor_file(network=None, airnow=False):
                 'extraction_date', 'parameter_code', 'parameter_name', 'poc',
                 'last_sample_date', 'pqao', 'reporting_agency', 'exclusions',
                 u'monitoring_objective', 'last_method_code', 'last_method',
-                u'naaqs_primary_monitor', u'qa_primary_monitor', 'latitude',
-                'longitude'
+                u'naaqs_primary_monitor', u'qa_primary_monitor'
             ]
             s.drop(monitor_drop, axis=1, inplace=True)
             # drop airnow keys for merge
@@ -571,4 +570,7 @@ def read_monitor_file(network=None, airnow=False):
         if network is not None:
             sss = sss.loc[sss.Networks.isin(
                 [network])].drop_duplicates(subset=['siteid'])
-        return sss
+        if drop_latlon:
+            return sss.drop(['latitude', 'longitude'], axis=1)
+        else:
+            return sss
