@@ -344,8 +344,7 @@ class AQS(object):
             monitors = self.monitor_df.loc[self.monitor_df.isin(
                 [network])].drop_duplicates(subset=['siteid'])
         else:
-            monitors = self.monitor_df.drop_duplicates(
-                subset=['siteid', 'latitude', 'longitude'])
+            monitors = self.monitor_df.drop_duplicates(subset=['siteid'])
         self.df = pd.merge(self.df, monitors, on=['siteid'], how='left')
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
