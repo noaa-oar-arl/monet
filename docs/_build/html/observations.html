@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Loading Point Data &mdash; MONET  documentation</title>
+  <title>Observations &mdash; MONET  documentation</title>
   
 
   
@@ -86,7 +86,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="why-monet.html">Overview: Why MONET?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Loading Point Data</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Observations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#airnow">AirNow</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#available-measurements">Available Measurements</a></li>
 </ul>
@@ -162,7 +162,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Loading Point Data</li>
+      <li>Observations</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -181,17 +181,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="loading-point-data">
-<h1>Loading Point Data<a class="headerlink" href="#loading-point-data" title="Permalink to this headline">¶</a></h1>
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="observations">
+<h1>Observations<a class="headerlink" href="#observations" title="Permalink to this headline">¶</a></h1>
 <p>This section will aid in how to use MONET to load observational datasets available.</p>
 <p>First we will import several libraries to aid for in the future.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>          <span class="c1"># numpy</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>         <span class="c1"># pandas</span>
-<span class="kn">from</span> <span class="nn">monet.obs</span> <span class="k">import</span> <span class="o">*</span>     <span class="c1"># observations from MONET</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span> <span class="c1"># plotting</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>       <span class="c1"># better color palettes</span>
-<span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="k">as</span> <span class="nn">ccrs</span>  <span class="c1"># map projections</span>
-<span class="kn">import</span> <span class="nn">cartopy.feature</span> <span class="k">as</span> <span class="nn">cfeature</span> <span class="c1"># politcal and geographic features</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>          <span class="c1"># numpy</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>         <span class="c1"># pandas</span>
+<span class="kn">from</span> <span class="nn">monet.obs</span> <span class="kn">import</span> <span class="o">*</span>     <span class="c1"># observations from MONET</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span> <span class="c1"># plotting</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>       <span class="c1"># better color palettes</span>
+<span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="kn">as</span> <span class="nn">ccrs</span>  <span class="c1"># map projections</span>
+<span class="kn">import</span> <span class="nn">cartopy.feature</span> <span class="kn">as</span> <span class="nn">cfeature</span> <span class="c1"># politcal and geographic features</span>
 </pre></div>
 </div>
 <div class="section" id="airnow">
@@ -203,29 +222,29 @@
 monet.obs.airnow class.  For example,lets say that we want to look at data from
 2018-05-01 to 2018-05-05.</p>
 <p>Now we need to set the dates. We want hourly data so lets set the hourly flag</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2018-05-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2018-05-05&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2018-05-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2018-05-05&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now a simple one stop command to return the pandas <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>
 of the aggregated data on the given dates.  MONET reads the hourly data from AirNow.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">airnow</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">airnow</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This provides a structured <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Some users may want to keep a local copy of the data and not have to retrive the data
 each time they want to access the data.  There is a simple kwarg that can be used to
 download the data, <em>download=True</em>.  By default, <em>download</em> is set to False.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">airnow</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span><span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">airnow</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span><span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This format may be less intuitive.  It is the “long” ASCII format found in the files
 where each index is a single record with a single variable and value.  This may be
 incovinient but there are a helper function in <em>monet.utils.tools</em> to
 assist in reshaping the pandas <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> so that it can be more convenient.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.utils.tools</span> <span class="k">import</span> <span class="n">unstack</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.utils.tools</span> <span class="kn">import</span> <span class="n">unstack</span>
 <span class="n">df2</span> <span class="o">=</span> <span class="n">unstack</span><span class="p">(</span><span class="n">df2</span><span class="p">)</span>
 <span class="n">df2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
@@ -262,7 +281,7 @@ is seperated into yearly files and seperate files for hourly and daily data.  Th
 files are also seperated by which variable is measured.  For instance, hourly ozone files
 for the entire year of 2018 are found in <a class="reference external" href="https://aqs.epa.gov/aqsweb/airdata/hourly_44201_2018.zip">https://aqs.epa.gov/aqsweb/airdata/hourly_44201_2018.zip</a>.
 We will first load a single variable and then add multiple later on.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#first determine the dates</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#first determine the dates</span>
 <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2018-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2018-12-31&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
 <span class="c1"># load the data</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OZONE&#39;</span><span class="p">])</span>
@@ -270,11 +289,11 @@ We will first load a single variable and then add multiple later on.</p>
 </div>
 <p>If you would rather daily data to get the 8HR max ozone concentration or daily maximum
 concentration you can add the <em>daily</em> kwarg.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OZONE&#39;</span><span class="p">],</span> <span class="n">daily</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OZONE&#39;</span><span class="p">],</span> <span class="n">daily</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>As in AirNow you can download the data to the local disk using the <em>download</em></p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OZONE&#39;</span><span class="p">],</span> <span class="n">daily</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OZONE&#39;</span><span class="p">],</span> <span class="n">daily</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="id1">
@@ -299,7 +318,7 @@ concentration you can add the <em>daily</em> kwarg.</p>
 <div class="section" id="loading-multiple-measurements">
 <h3>Loading Multiple Measurements<a class="headerlink" href="#loading-multiple-measurements" title="Permalink to this headline">¶</a></h3>
 <p>Let’s load variables PM10 and OZONE using hourly data to get an idea of how to get multiple variables:</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OZONE&#39;</span><span class="p">,</span><span class="s1">&#39;PM10&#39;</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OZONE&#39;</span><span class="p">,</span><span class="s1">&#39;PM10&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -308,8 +327,8 @@ concentration you can add the <em>daily</em> kwarg.</p>
 <p>Sometimes you may want to load a specific network that is available in the AQS data
 files.  For instance, lets load data from the Chemical Speciation Network (CSN; <a class="reference external" href="https://www3.epa.gov/ttnamti1/speciepg.html">https://www3.epa.gov/ttnamti1/speciepg.html</a>).
 As of writting this tutorial we will load the 2017 data as it is complete.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2017-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2018-01-01&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;SPEC&#39;</span><span class="p">],</span> <span class="n">network</span><span class="o">=</span><span class="s1">&#39;CSN&#39;</span><span class="p">,</span> <span class="n">daily</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2017-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2018-01-01&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;SPEC&#39;</span><span class="p">],</span> <span class="n">network</span><span class="o">=</span><span class="s1">&#39;CSN&#39;</span><span class="p">,</span> <span class="n">daily</span><span class="o">=</span><span class="bp">True</span> <span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -442,25 +461,25 @@ as the inversion products.</p>
 <h3>Loading AOD and SDA<a class="headerlink" href="#loading-aod-and-sda" title="Permalink to this headline">¶</a></h3>
 <p>Aeronet is global data so we are going to look at a single day to speed this along.
 First we need to create a datetime array</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2017-09-25&#39;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;2017-09-26&#39;</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2017-09-25&#39;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;2017-09-26&#39;</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now lets assume that we want to read the Aerosol Optical Depth Level 1.5 data that is
 cloud-screened and quality controlled.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aeroent</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;AOD15&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aeroent</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;AOD15&#39;</span><span class="p">)</span>
 <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Now sometimes you want only data over a specific region.  To do this lets define a
 latitude longitude box <em>[latmin,lonmin,latmax,lonmax]</em> over northern Africa</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aeroent</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;AOD15&#39;</span><span class="p">,</span> <span class="n">latlonbox</span><span class="o">=</span><span class="p">[</span><span class="mf">2.</span><span class="p">,</span><span class="o">-</span><span class="mi">21</span><span class="p">,</span><span class="mi">38</span><span class="p">,</span><span class="mi">37</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aeroent</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;AOD15&#39;</span><span class="p">,</span> <span class="n">latlonbox</span><span class="o">=</span><span class="p">[</span><span class="mf">2.</span><span class="p">,</span><span class="o">-</span><span class="mi">21</span><span class="p">,</span><span class="mi">38</span><span class="p">,</span><span class="mi">37</span><span class="p">])</span>
 <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="s1">&#39;longitude&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>To download inversion products you must supply the <em>inv_type</em> kwarg.  It accepts either
 “ALM15” or “ALM20” from the AERONET web services.  Lets get the size distribution
 from data over northern Africa</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aeroent</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;SIZ&#39;</span><span class="p">,</span> <span class="n">latlonbox</span><span class="o">=</span><span class="p">[</span><span class="mf">2.</span><span class="p">,</span><span class="o">-</span><span class="mi">21</span><span class="p">,</span><span class="mi">38</span><span class="p">,</span><span class="mi">37</span><span class="p">],</span> <span class="n">inv_type</span><span class="o">=</span><span class="s1">&#39;ALM15&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">aeroent</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;SIZ&#39;</span><span class="p">,</span> <span class="n">latlonbox</span><span class="o">=</span><span class="p">[</span><span class="mf">2.</span><span class="p">,</span><span class="o">-</span><span class="mi">21</span><span class="p">,</span><span class="mi">38</span><span class="p">,</span><span class="mi">37</span><span class="p">],</span> <span class="n">inv_type</span><span class="o">=</span><span class="s1">&#39;ALM15&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -540,6 +559,7 @@ from data over northern Africa</p>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

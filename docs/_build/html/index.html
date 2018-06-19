@@ -85,7 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="why-monet.html">Overview: Why MONET?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="observations.html">Loading Point Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="observations.html">Observations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 </ul>
@@ -157,7 +157,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="model-and-observation-evalatution-toolkit-monet">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="model-and-observation-evalatution-toolkit-monet">
 <h1>Model and ObservatioN Evalatution Toolkit (MONET)<a class="headerlink" href="#model-and-observation-evalatution-toolkit-monet" title="Permalink to this headline">¶</a></h1>
 <p><strong>MONET</strong> is an open source project and Python package that aims to create a
 common platform for atmospheric composition data analysis for weather and
@@ -199,7 +218,7 @@ Transport Models.” Atmosphere 8, no. 11: 210</p>
 <li class="toctree-l2"><a class="reference internal" href="installing.html#instructions">Instructions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="observations.html">Loading Point Data</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="observations.html">Observations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="observations.html#airnow">AirNow</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="observations.html#available-measurements">Available Measurements</a></li>
 </ul>
@@ -223,37 +242,14 @@ Transport Models.” Atmosphere 8, no. 11: 210</p>
 <li class="toctree-l2"><a class="reference internal" href="observations.html#integrated-surface-database">Integrated Surface Database</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models.html#cmaq">CMAQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#camx">CAMx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#hysplit">HYSPLIT</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorial/loading.html">Loading Point Data</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/loading.html#airnow">AirNow</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tutorial/loading.html#available-measurements">Available Measurements</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/loading.html#epa-aqs">EPA AQS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tutorial/loading.html#id1">Available Measurements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tutorial/loading.html#loading-multiple-measurements">Loading Multiple Measurements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tutorial/loading.html#loading-specfic-network">Loading Specfic Network</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tutorial/loading.html#available-networks">Available Networks</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/loading.html#aeronet">AERONET</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tutorial/loading.html#id2">Available Measurements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tutorial/loading.html#loading-aod-and-sda">Loading AOD and SDA</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/loading.html#nadp">NADP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/loading.html#openaq">OpenAQ</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/loading.html#cems">CEMS</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/loading.html#climate-reference-network">Climate Reference Network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/loading.html#integrated-surface-database">Integrated Surface Database</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial/models.html">Opening Model Data</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/models.html#cmaq">CMAQ</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial/models.html#camx">CAMx</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/aqs_pams.html">Tutorial - How to read AQS data from PAMS and do a quick analysis</a></li>
 </ul>
 </li>
 </ul>
@@ -353,6 +349,7 @@ Transport Models.” Atmosphere 8, no. 11: 210</p>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

@@ -1,5 +1,5 @@
 ******************
-Loading Point Data
+Observations
 ******************
 
 This section will aid in how to use MONET to load observational datasets available.

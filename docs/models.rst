@@ -1,12 +1,22 @@
-******************
+******
 Models
-******************
+******
 
 MONET is capable of opening output from several different models including CMAQ,
-HYSPLIT and CAMx.  MONET opens all N-Dimensional output in the :py:class:`~xarray.Dataset`.  As an example we will open the CMAQ dataset
-discussed in the :tutorial:`models` page.
+HYSPLIT and CAMx.  MONET opens all N-Dimensional output in the :py:class:`~xarray.Dataset`.
 
-.. code:: python
+CMAQ
+----
+
+CMAQ is a 3D photochemical grid model developed at the U.S. EPA to simulate air
+composition.  MONET is able to read the output IOAPI output and format it to be
+compatible with it's datastream.
+
+As an example, lets open some CMAQ data from the Hawaiian volcanic eruption in 2018.
+First we will set the path to the data files
+
+
+.. code-block:: python
 
     import monet
 
@@ -16,6 +26,7 @@ discussed in the :tutorial:`models` page.
     from monet.models import *
 
     c = cmaq.open_files(flist=cmaqfile, grid=gridcro2d)
+
 
 This will return an :py:class:`~xarray.Dataset`.  The dataset is also still stored
 in the :py:class:`~cmaq` object as :py:class:`~cmaq.dset`.  To view a ncdump style output
@@ -124,3 +135,13 @@ in :py:class:`~monet.plots.mapgen`.
 
   ax = monet.plots.draw_map()
   pm25[10,0,:,:].plot(x='longitude',y='latitude',ax=ax)
+
+CAMx
+----
+
+to do ...
+
+HYSPLIT
+-------
+
+to do ...
