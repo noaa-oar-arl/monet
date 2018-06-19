@@ -6,17 +6,6 @@ import datetime
 import matplotlib.pyplot as plt
 import sys
 
-def ppb2ugm3(ppb, mw, pressure=None, temperature=None):
-    """ppb is value in volume fraction parts per billion.
-       mw is molecular weight in g/ mol
-       if pressure and temperature are not given then standard pressure and temperature are used"""
-    if not temperature:
-       temperature = 293.0 ##Kelvin.
-    if not pressure:
-        standard_press = 101.325 #(kPa)
-    R = 8.3144 #J/ (mol K)  or (L kPa / (mol K)) 
-    return ppb * mw / R / temperature * pressure
-
 
 def lbs2kg(lbs):
     kg = 0.453592 * lbs
@@ -38,7 +27,6 @@ class StationData(object):
 
       #self.efile = None   
       #self.url = None
-      self.lb2kg = 0.453592  #number of kilograms per pound.
       self.info = None
       self.df = df
 
