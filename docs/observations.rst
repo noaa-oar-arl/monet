@@ -257,7 +257,60 @@ from data over northern Africa
 NADP
 ----
 
-to do.....
+NADP is a composed of five regional networks; NTN, AIRMoN, AMoN, AMNet, and MDN.
+MONET allows you to read data from any of the five networks with a single call by
+specifying the wanted network.
+
+To add data from any of the networks it is a simple call using the nadp object.  As
+an example, to load data from the NTN network the call would look like:
+
+.. code:: python
+
+  df = nadp.add_data(dates, network='NTN')
+
+To read data from another network simply replace the network with the name of the
+wanted network.  The network name must be a string but is case insensitive.
+
+NTN
+^^^
+
+    "The NTN is the only network providing a long-term record of precipitation chemistry across the United States.
+
+    Sites predominantly are located away from urban areas and point sources of pollution. Each site has a precipitation
+    chemistry collector and gage. The automated collector ensures that the sample is exposed only during precipitation (wet-only-sampling)."
+    - http://nadp.slh.wisc.edu/NTN/
+
+Available Measurements
+======================
+
+* H+ (ph)
+* Ca2+ (ca)
+* Mg2+ (mg)
+* Na+ (na)
+* K+ (k)
+* SO42- (so4)
+* NO3- (no3)
+* Cl- (cl)
+* NH4+ (nh4)
+
+MDN
+^^^
+
+    "The MDN is the only network providing a longterm record of total mercury (Hg) concentration and deposition in precipitation in the United States and Canada. All MDN sites follow standard procedures and have uniform precipitation chemistry collectors and gages. The automated collector has the same basic design as the NTN collector but is modified to preserve mercury. Modifications include a glass funnel, connecting tube, bottle for collecting samples, and an insulated enclosure to house this sampling train. The funnel and connecting tube reduce sample exposure to the open atmosphere and limit loss of dissolved mercury. As an additional sample preservation measure, the collection bottle is charged with 20 mL of a one percent hydrochloric acid solution."
+    - http://nadp.slh.wisc.edu/MDN/
+
+Available Measurements
+======================
+
+* net concentration of methyl mercury in ng/L (conc)
+* precipitation amount (in inches) reported by the raingage for the entire sampling period. (raingage)
+* Mg2+ (mg)
+* Na+ (na)
+* K+ (k)
+* SO42- (so4)
+* NO3- (no3)
+* Cl- (cl)
+* NH4+ (nh4)
 
 OpenAQ
 ------
