@@ -568,7 +568,7 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
             sss = convert_statenames_to_abv(ss).dropna(
                 subset=['latitude', 'longitude'])
         if network is not None:
-            sss = sss.loc[sss.Networks.isin(
+            sss = sss.loc[sss.networks.isin(
                 [network])].drop_duplicates(subset=['siteid'])
         if drop_latlon:
             return sss.drop(['latitude', 'longitude'], axis=1)

@@ -12,14 +12,28 @@ class IMPROVE(object):
         self.datestr = []
         self.df = None
         self.daily = True
-        self.se_states = array(['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN', 'VA', 'WV'], dtype='|S2')
-        self.ne_states = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'], dtype='|S2')
-        self.nc_states = array(['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'], dtype='|S2')
+        self.se_states = array(
+            ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN', 'VA', 'WV'],
+            dtype='|S2')
+        self.ne_states = array(
+            [
+                'CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA',
+                'RI', 'VT'
+            ],
+            dtype='|S2')
+        self.nc_states = array(
+            ['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'],
+            dtype='|S2')
         self.sc_states = array(['AR', 'LA', 'OK', 'TX'], dtype='|S2')
-        self.r_states = array(['AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD', 'UT', 'WY'], dtype='|S2')
+        self.r_states = array(
+            [
+                'AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD',
+                'UT', 'WY'
+            ],
+            dtype='|S2')
         self.p_states = array(['CA', 'OR', 'WA'], dtype='|S2')
 
-    def open_file(self, fname):
+    def add_data(self, fname, add_meta=False):
         """     This assumes that you have downloaded the data from
                         http://views.cira.colostate.edu/fed/DataWizard/Default.aspx
                 The data is the IMPROVE Aerosol dataset
@@ -43,27 +57,46 @@ class IMPROVE(object):
         """
         from .epa_util import read_monitor_file
 
-        self.df = pd.read_csv(fname, delimiter=',', parse_dates=[2], infer_datetime_format=True)
-        self.df.rename(columns={'EPACode': 'siteid'}, inplace=True)
-        self.df.rename(columns={'Val': 'Obs'}, inplace=True)
-        self.df.rename(columns={'State': 'State_Name'}, inplace=True)
-        self.df.rename(columns={'ParamCode': 'Variable'}, inplace=True)
-        self.df.rename(columns={'SiteCode': 'Site_Code'}, inplace=True)
-        self.df.rename(columns={'Unit': 'Units'}, inplace=True)
-        self.df.rename(columns={'Date': 'siteid'}, inplace=True)
-        self.df.drop('Dataset', axis=1, inplace=True)
-        self.df['time'] = pd.to_datetime(self.df.time, format='%Y%m%d')
-        dropkeys = ['Latitude', 'Longitude', 'POC']
-        self.df.columns = [i.lower() for i in self.df.columns]
-        monitor_df = read_monitor_file(network='IMPROVE').drop(dropkeys, axis=1)
-        self.df = self.df.merge(monitor_df, how='left', on='siteid')
-        self.df = self.df.dropna(subset=['variable', 'gmt_offset']).drop_duplicates()
-        self.df.Variable.loc[self.df.Variable == 'MT'] = 'PM10'
-        self.df.Variable.loc[self.df.Variable == 'MF'] = 'PM2.5'
-        self.df.Obs.loc[self.df.Obs < 0] = NaN
-        self.df.dropna(subset=['obs'], inplace=True)
-        self.df['time_local'] = self.df.time + pd.to_timedelta(self.df.gmt_offset.astype(float), unit='H')
-        return self.df
+        df = pd.read_csv(
+            fname,
+            delimiter=',',
+            parse_dates=[2],
+            infer_datetime_format=True,
+            dtype={'EPACode': str})
+        df.rename(columns={'EPACode': 'epaid'}, inplace=True)
+        df.rename(columns={'Val': 'Obs'}, inplace=True)
+        df.rename(columns={'State': 'state_name'}, inplace=True)
+        df.rename(columns={'ParamCode': 'variable'}, inplace=True)
+        df.rename(columns={'SiteCode': 'siteid'}, inplace=True)
+        df.rename(columns={'Unit': 'Units'}, inplace=True)
+        df.rename(columns={'Date': 'time'}, inplace=True)
+        df.drop('Dataset', axis=1, inplace=True)
+        df['time'] = pd.to_datetime(df.time, format='%Y%m%d')
+        df.columns = [i.lower() for i in df.columns]
+        df['epaid'] = df.epaid.astype(str).str.zfill(9)
+        if add_meta:
+            dropkeys = ['latitude', 'longitude', 'poc']
+
+            monitor_df = read_monitor_file(network='IMPROVE')  #.drop(
+            #dropkeys, axis=1)
+            df = df.merge(
+                monitor_df, how='left', left_on='epaid', right_on='siteid')
+            df.drop(['siteid_y', 'state_name_y'], inplace=True, axis=1)
+            df.rename(
+                columns={
+                    'siteid_x': 'siteid',
+                    'state_name_x': 'state_name'
+                },
+                inplace=True)
+            #df = df.dropna(subset=['variable', 'gmt_offset']).drop_duplicates()
+        #self.df.Variable.loc[self.df.Variable == 'MT'] = 'PM10'
+        #self.df.Variable.loc[self.df.Variable == 'MF'] = 'PM2.5'
+        #self.df.Obs.loc[self.df.Obs < 0] = NaN
+        #self.df.dropna(subset=['obs'], inplace=True)
+        #self.df['time_local'] = self.df.time + pd.to_timedelta(
+        #    self.df.gmt_offset.astype(float), unit='H')
+        self.df = df
+        return df.copy()
 
     def load_hdf(self, fname, dates):
         """Short summary.
@@ -118,5 +151,6 @@ class IMPROVE(object):
             Description of returned object.
 
         """
-        dates = pd.date_range(start=begin, end=end, freq='H').values.astype('M8[s]').astype('O')
+        dates = pd.date_range(
+            start=begin, end=end, freq='H').values.astype('M8[s]').astype('O')
         self.dates = dates
