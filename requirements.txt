@@ -1,0 +1,10 @@
+xarray
+pseudonetcdf
+pandas
+cartopy
+matplotlib
+netcdf4
+seaborn
+pandoc
+nbsphinx
+sphinx
