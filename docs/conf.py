@@ -16,7 +16,6 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
 
-
 # -- Project information -----------------------------------------------------
 
 project = u'MONET'
@@ -28,7 +27,6 @@ version = u''
 # The full version, including alpha/beta/rc tags
 release = u''
 
-
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -39,27 +37,21 @@ release = u''
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.extlinks',
-    'nbsphinx',
-    'sphinx.ext.mathjax'
+    'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.napoleon',
+    'sphinx.ext.extlinks'
 ]
-exclude_patterns = ['_build', '**.ipynb_checkpoints']
+#exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
-extlinks = {'issue': ('https://github.com/noaa-oar-arl/MONET/issues/%s', 'GH'),
-            'pull': ('https://github.com/noaa-oar-arl/MONET/pull/%s', 'PR'),
-            }
+extlinks = {
+    'issue': ('https://github.com/noaa-oar-arl/MONET/issues/%s', 'GH'),
+    'pull': ('https://github.com/noaa-oar-arl/MONET/pull/%s', 'PR'),
+}
 
 autosummary_generate = True
 numpydoc_class_members_toctree = True
 napoleon_google_docstring = False
 napoleon_use_param = False
 napoleon_use_ivar = True
-
-
-
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -87,7 +79,6 @@ exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -117,7 +108,6 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
-
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
@@ -140,7 +130,6 @@ html_theme_options = {
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 html_logo = "_static/noaa.png"
-
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -166,20 +155,15 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'MONET.tex', u'MONET Documentation',
-     u'Barry Baker', 'manual'),
+    (master_doc, 'MONET.tex', u'MONET Documentation', u'Barry Baker',
+     'manual'),
 ]
-
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'monet', u'MONET Documentation',
-     [author], 1)
-]
-
+man_pages = [(master_doc, 'monet', u'MONET Documentation', [author], 1)]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -187,10 +171,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'MONET', u'MONET Documentation',
-     author, 'MONET', 'One line description of project.',
-     'Miscellaneous'),
+    (master_doc, 'MONET', u'MONET Documentation', author, 'MONET',
+     'One line description of project.', 'Miscellaneous'),
 ]
-
 
 # -- Extension configuration -------------------------------------------------
