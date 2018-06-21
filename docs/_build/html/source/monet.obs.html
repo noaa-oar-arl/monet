@@ -188,7 +188,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="monet-obs-package">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="monet-obs-package">
 <h1>monet.obs package<a class="headerlink" href="#monet-obs-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
@@ -1293,6 +1312,41 @@ returns column name which contains all the strings.</p>
 <em class="property">class </em><code class="descclassname">monet.obs.improve.</code><code class="descname">IMPROVE</code><a class="headerlink" href="#monet.obs.improve.IMPROVE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
+<dt id="monet.obs.improve.IMPROVE.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>fname</em>, <em>add_meta=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.improve.IMPROVE.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>This assumes that you have downloaded the data from</dt>
+<dd><blockquote class="first">
+<div><a class="reference external" href="http://views.cira.colostate.edu/fed/DataWizard/Default.aspx">http://views.cira.colostate.edu/fed/DataWizard/Default.aspx</a></div></blockquote>
+<p>The data is the IMPROVE Aerosol dataset
+Any number of sites
+Parameters included are All
+Fields include Dataset,Site,Date,Parameter,POC,Data_value,Unit,Latitude,Longitude,State,EPA Site Code</p>
+<blockquote class="last">
+<div>Options are delimited ‘,’  data only and normalized skinny format</div></blockquote>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite>.</li>
+<li><strong>output</strong> (<em>type</em>) – Description of parameter <cite>output</cite> (the default is ‘’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="monet.obs.improve.IMPROVE.get_date_range">
 <code class="descname">get_date_range</code><span class="sig-paren">(</span><em>dates</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.improve.IMPROVE.get_date_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Short summary.</p>
@@ -1321,41 +1375,6 @@ returns column name which contains all the strings.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite>.</li>
 <li><strong>dates</strong> (<em>type</em>) – Description of parameter <cite>dates</cite>.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="monet.obs.improve.IMPROVE.open_file">
-<code class="descname">open_file</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.improve.IMPROVE.open_file" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>This assumes that you have downloaded the data from</dt>
-<dd><blockquote class="first">
-<div><a class="reference external" href="http://views.cira.colostate.edu/fed/DataWizard/Default.aspx">http://views.cira.colostate.edu/fed/DataWizard/Default.aspx</a></div></blockquote>
-<p>The data is the IMPROVE Aerosol dataset
-Any number of sites
-Parameters included are All
-Fields include Dataset,Site,Date,Parameter,POC,Data_value,Unit,Latitude,Longitude,State,EPA Site Code</p>
-<blockquote class="last">
-<div>Options are delimited ‘,’  data only and normalized skinny format</div></blockquote>
-</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite>.</li>
-<li><strong>output</strong> (<em>type</em>) – Description of parameter <cite>output</cite> (the default is ‘’).</li>
 </ul>
 </td>
 </tr>
@@ -1579,6 +1598,7 @@ Fields include Dataset,Site,Date,Parameter,POC,Data_value,Unit,Latitude,Longitud
       <script type="text/javascript" src="../_static/jquery.js"></script>
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

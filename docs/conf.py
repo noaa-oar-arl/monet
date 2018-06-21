@@ -42,11 +42,11 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
-    'sphinx.ext.extlinks'
-#    'nbsphinx',
-#    'sphinx.ext.mathjax'
+    'sphinx.ext.extlinks',
+    'nbsphinx',
+    'sphinx.ext.mathjax'
 ]
-#exclude_patterns = ['_build', '**.ipynb_checkpoints']
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 extlinks = {'issue': ('https://github.com/noaa-oar-arl/MONET/issues/%s', 'GH'),
             'pull': ('https://github.com/noaa-oar-arl/MONET/pull/%s', 'PR'),

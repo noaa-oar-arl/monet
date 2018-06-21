@@ -163,7 +163,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="tutorial-how-to-read-aqs-data-from-pams-and-do-a-quick-analysis">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="tutorial-how-to-read-aqs-data-from-pams-and-do-a-quick-analysis">
 <h1>Tutorial - How to read AQS data from PAMS and do a quick analysis<a class="headerlink" href="#tutorial-how-to-read-aqs-data-from-pams-and-do-a-quick-analysis" title="Permalink to this headline">¶</a></h1>
 <p>The first tutorial for MONET will load data from the AQS data,
 specifically the PAMS dataset, and show to reshape the dataframe and do
@@ -173,7 +192,7 @@ data. For more examples, please see
 be found on the github page and readthedocs.</p>
 <p>We will first begin by importing monet and a few helper classes for
 later</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>          <span class="c1"># numpy</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>          <span class="c1"># numpy</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>         <span class="c1"># pandas</span>
 <span class="kn">from</span> <span class="nn">monet.obs</span> <span class="k">import</span> <span class="o">*</span>     <span class="c1"># observations from MONET</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span> <span class="c1"># plotting</span>
@@ -191,7 +210,7 @@ call. We will also create this for the year 2015 and 2016. Some
 variables that may be valuable are the VOCS, ozone, NO2, NOX,
 temperature. For all of the measurments available please see
 <a class="reference external" href="https://aqs.epa.gov/aqsweb/airdata/download_files.html">https://aqs.epa.gov/aqsweb/airdata/download_files.html</a></p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2004-01-01&#39;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;2004-12-31&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2004-01-01&#39;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;2004-12-31&#39;</span><span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span><span class="n">daily</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;VOC&#39;</span><span class="p">,</span><span class="s1">&#39;OZONE&#39;</span><span class="p">],</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -229,7 +248,7 @@ temperature. For all of the measurments available please see
 </div>
 <p>Now we have the data in aqs.df and a copy of it in df… just in case. So
 lets take a look at it.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#df.head()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#df.head()</span>
 <span class="n">aqs</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -400,7 +419,7 @@ lets take a look at it.</p>
 <p>5 rows × 46 columns</p>
 </div><p>Notice that in this printed format it obscures some of the dataframe
 columns from view. Lets see what they are!</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">sort</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">sort</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sort</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span> <span class="c1"># loop over the sorted columns and print them</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 </pre></div>
@@ -457,7 +476,7 @@ columns from view. Lets see what they are!</p>
 stacked on variable). Data analysis could be done easier in a wide
 format. So lets use a utility function in MONET to aid with reshaping
 the dataframe.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.util</span> <span class="k">import</span> <span class="n">tools</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.util</span> <span class="k">import</span> <span class="n">tools</span>
 <span class="n">new</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">long_to_wide</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="n">new</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
@@ -630,7 +649,7 @@ the dataframe.</p>
 </div><p>Lets see how many ISOPRENE sites there are. We will drop the NaN values
 along the ISOPRENE column and then find the unique siteid’s and look at
 the shape of them</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ISOPRENE&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">siteid</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ISOPRENE&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">siteid</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">140</span><span class="p">,)</span>
@@ -639,7 +658,7 @@ the shape of them</p>
 <p>Now as you can see we have lots of columns that is sorted by time and
 siteid. But what measurements are included in the dataframe? Let’s see
 all the new columns generated from pivoting the table.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">sort</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">sort</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sort</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 </pre></div>
@@ -807,7 +826,7 @@ all the new columns generated from pivoting the table.</p>
 siteid. This can be very useful as we can now do some direct comparisons
 using the dataframe. Lets get a description of the dataset first so we
 can see some averages and ranges of the different chemical species.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 </pre></div>
 </div>
 <div>
@@ -1050,7 +1069,7 @@ can see some averages and ranges of the different chemical species.</p>
 </div><p>This gives us a format that allows simple statistics and plots using
 pandas, matplotlib, and seaborn. For time series it is often useful to
 have the index as the time. Lets do that</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">time</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">time</span>
 <span class="n">new</span><span class="p">[</span><span class="s1">&#39;OZONE_ppb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">OZONE</span> <span class="o">*</span> <span class="mf">1000.</span>
 <span class="n">new</span><span class="o">.</span><span class="n">OZONE_ppb</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 </pre></div>
@@ -1060,7 +1079,7 @@ have the index as the time. Lets do that</p>
 </div>
 <p>As you can see the data is now indexed with the UTC time. Lets make a
 time series plot of the average ISOPRENE.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span> <span class="c1"># this is so we can control the figure size.</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span> <span class="c1"># this is so we can control the figure size.</span>
 <span class="n">new</span><span class="o">.</span><span class="n">ISOPRENE</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1070,7 +1089,7 @@ time series plot of the average ISOPRENE.</p>
 <img alt="../_images/aqs_pams_20_1.png" src="../_images/aqs_pams_20_1.png" />
 <p>This is quite noisy with the daily data. Lets resample in time to every
 month using the average Isoprene concentration to weekly and monthly.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span> <span class="c1"># this is so we can control the figure size.</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span> <span class="c1"># this is so we can control the figure size.</span>
 <span class="n">new</span><span class="o">.</span><span class="n">ISOPRENE</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span>
 <span class="n">new</span><span class="o">.</span><span class="n">ISOPRENE</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weekly&#39;</span><span class="p">)</span>
 <span class="n">new</span><span class="o">.</span><span class="n">ISOPRENE</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
@@ -1082,7 +1101,7 @@ month using the average Isoprene concentration to weekly and monthly.</p>
 <img alt="../_images/aqs_pams_22_0.png" src="../_images/aqs_pams_22_0.png" />
 <p>Where are these measurements. Lets plot this on a map and see where it
 is. We can use a utility plotting function in monet to generate the plot</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet</span> <span class="k">import</span> <span class="n">plots</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet</span> <span class="k">import</span> <span class="n">plots</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plots</span><span class="o">.</span><span class="n">draw_map</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">130</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">50</span><span class="p">],</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">)</span>
 <span class="c1"># get only where ISOPRENE is not NAN</span>
 <span class="n">isop</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ISOPRENE&#39;</span><span class="p">])</span>
@@ -1100,7 +1119,7 @@ say OZONE and temperature. To do this we will use the statsmodels
 package. It is a robust library for curve fitting. For specific
 information for this module look here
 <a class="reference external" href="https://www.statsmodels.org/stable/index.html">https://www.statsmodels.org/stable/index.html</a></p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span> <span class="c1"># load statsmodels api</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span> <span class="c1"># load statsmodels api</span>
 <span class="c1">#first clean of nan values</span>
 <span class="n">fit_df</span> <span class="o">=</span> <span class="n">new</span><span class="p">[[</span><span class="s1">&#39;ISOPRENE&#39;</span><span class="p">,</span><span class="s1">&#39;OZONE&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">fit_df</span><span class="o">.</span><span class="n">ISOPRENE</span>
@@ -1143,7 +1162,7 @@ information for this module look here
 </div>
 <img alt="../_images/aqs_pams_26_2.png" src="../_images/aqs_pams_26_2.png" />
 <p>Lets save this to a csv file</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;/Users/barry/Desktop/new.csv&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;/Users/barry/Desktop/new.csv&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1201,6 +1220,7 @@ information for this module look here
       <script type="text/javascript" src="../_static/jquery.js"></script>
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
