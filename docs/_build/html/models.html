@@ -163,26 +163,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast,
-.nboutput.nblast {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast + .nbinput {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-</style>
-<div class="section" id="models">
+  <div class="section" id="models">
 <h1>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h1>
 <p>MONET is capable of opening output from several different models including CMAQ,
 HYSPLIT and CAMx.  MONET opens all N-Dimensional output in the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p>
@@ -206,7 +187,7 @@ First we will set the path to the data files</p>
 <p>This will return an <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.  The dataset is also still stored
 in the <code class="xref py py-class docutils literal notranslate"><span class="pre">cmaq</span></code> object as <code class="xref py py-class docutils literal notranslate"><span class="pre">dset</span></code>.  To view a ncdump style output
 of the xarray dataset you can simply print the dataset.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>print(c)
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span>print(c)
 &lt;xarray.Dataset&gt;
 Dimensions:    (DATE-TIME: 2, VAR: 41, time: 45, x: 80, y: 52, z: 1)
 Coordinates:
@@ -296,12 +277,12 @@ Attributes:
 <p>All MONET xarray objects have common coordinate names (latitude and longitude) and dimension names (time, x, y, z).  It retains the
 original attributes of the file and variable names.  For some models, helper functions to get derived variables, such as PM2.5 or NOx,
 a helper function is available to assist in these tasks.  For example, to get NOx from this simulation:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pm25</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">get_var</span><span class="p">(</span><span class="s1">&#39;PM25&#39;</span><span class="p">)</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pm25</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">get_var</span><span class="p">(</span><span class="s1">&#39;PM25&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>where nox is a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code> as it is a single variable.  To quickly plot this on a map we can use the utility function
 in <a class="reference internal" href="source/monet.plots.html#module-monet.plots.mapgen" title="monet.plots.mapgen"><code class="xref py py-class docutils literal notranslate"><span class="pre">mapgen</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">monet</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">draw_map</span><span class="p">()</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">monet</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">draw_map</span><span class="p">()</span>
 <span class="n">pm25</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -369,7 +350,6 @@ in <a class="reference internal" href="source/monet.plots.html#module-monet.plot
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
