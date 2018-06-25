@@ -12,7 +12,7 @@ be found on the github page and readthedocs.
 We will first begin by importing monet and a few helper classes for
 later
 
-.. code:: python
+.. code-block:: python
 
     import numpy as np          # numpy
     import pandas as pd         # pandas
@@ -31,7 +31,7 @@ variables that may be valuable are the VOCS, ozone, NO2, NOX,
 temperature. For all of the measurments available please see
 https://aqs.epa.gov/aqsweb/airdata/download_files.html
 
-.. code:: python
+.. code-block:: python
 
     dates = pd.date_range(start='2004-01-01',end='2004-12-31')
     df = aqs.add_data(dates,daily=True,param=['VOC','OZONE'], download=True)
@@ -77,7 +77,7 @@ https://aqs.epa.gov/aqsweb/airdata/download_files.html
 Now we have the data in aqs.df and a copy of it in df… just in case. So
 lets take a look at it.
 
-.. code:: python
+.. code-block:: python
 
     #df.head()
     aqs.df.head()
@@ -259,7 +259,7 @@ lets take a look at it.
 Notice that in this printed format it obscures some of the dataframe
 columns from view. Lets see what they are!
 
-.. code:: python
+.. code-block:: python
 
     from numpy import sort
     for i in sort(df.columns): # loop over the sorted columns and print them
@@ -321,7 +321,7 @@ stacked on variable). Data analysis could be done easier in a wide
 format. So lets use a utility function in MONET to aid with reshaping
 the dataframe.
 
-.. code:: python
+.. code-block:: python
 
     from monet.util import tools
     new = tools.long_to_wide(df)
@@ -506,7 +506,7 @@ Lets see how many ISOPRENE sites there are. We will drop the NaN values
 along the ISOPRENE column and then find the unique siteid’s and look at
 the shape of them
 
-.. code:: python
+.. code-block:: python
 
     new.dropna(subset=['ISOPRENE']).siteid.unique().shape
 
@@ -523,7 +523,7 @@ Now as you can see we have lots of columns that is sorted by time and
 siteid. But what measurements are included in the dataframe? Let’s see
 all the new columns generated from pivoting the table.
 
-.. code:: python
+.. code-block:: python
 
     from numpy import sort
     for i in sort(new.columns):
@@ -696,7 +696,7 @@ siteid. This can be very useful as we can now do some direct comparisons
 using the dataframe. Lets get a description of the dataset first so we
 can see some averages and ranges of the different chemical species.
 
-.. code:: python
+.. code-block:: python
 
     new.describe()
 
@@ -950,7 +950,7 @@ This gives us a format that allows simple statistics and plots using
 pandas, matplotlib, and seaborn. For time series it is often useful to
 have the index as the time. Lets do that
 
-.. code:: python
+.. code-block:: python
 
     new.index = new.time
     new['OZONE_ppb'] = new.OZONE * 1000.
@@ -968,7 +968,7 @@ have the index as the time. Lets do that
 As you can see the data is now indexed with the UTC time. Lets make a
 time series plot of the average ISOPRENE.
 
-.. code:: python
+.. code-block:: python
 
     f,ax = plt.subplots(figsize=(10,4)) # this is so we can control the figure size.
     new.ISOPRENE.resample('D').mean().plot(ax=ax)
@@ -989,7 +989,7 @@ time series plot of the average ISOPRENE.
 This is quite noisy with the daily data. Lets resample in time to every
 month using the average Isoprene concentration to weekly and monthly.
 
-.. code:: python
+.. code-block:: python
 
     f,ax = plt.subplots(figsize=(10,4)) # this is so we can control the figure size.
     new.ISOPRENE.resample('D').mean().plot(ax=ax, label='daily')
@@ -1007,7 +1007,7 @@ month using the average Isoprene concentration to weekly and monthly.
 Where are these measurements. Lets plot this on a map and see where it
 is. We can use a utility plotting function in monet to generate the plot
 
-.. code:: python
+.. code-block:: python
 
     from monet import plots
     ax = plots.draw_map(states=True, extent=[-130,-60,20,50], resolution='10m')
@@ -1037,7 +1037,7 @@ package. It is a robust library for curve fitting. For specific
 information for this module look here
 https://www.statsmodels.org/stable/index.html
 
-.. code:: python
+.. code-block:: python
 
     import statsmodels.api as sm # load statsmodels api
     #first clean of nan values
@@ -1093,6 +1093,6 @@ https://www.statsmodels.org/stable/index.html
 
 Lets save this to a csv file
 
-.. code:: python
+.. code-block:: python
 
     new.to_csv('/Users/barry/Desktop/new.csv')
