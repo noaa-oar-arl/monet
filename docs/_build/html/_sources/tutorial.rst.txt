@@ -3,6 +3,7 @@ Tutorial
 ********
 
 .. toctree::
-    :maxdepth: 5
+    :maxdepth: 3
 
     tutorial/aqs_pams
+    tutorial/improve_trends_kmeans

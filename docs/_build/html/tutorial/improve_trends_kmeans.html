@@ -1,0 +1,1152 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Loading IMPROVE Data &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Get in touch" href="../api.html" />
+    <link rel="prev" title="Tutorial - How to read AQS data from PAMS and do a quick analysis" href="aqs_pams.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="aqs_pams.html">Tutorial - How to read AQS data from PAMS and do a quick analysis</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Loading IMPROVE Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#trend-analysis">Trend Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#kmeans-clustering-using-scikit-learn">KMEANS Clustering using scikit-learn</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../tutorial.html">Tutorial</a> &raquo;</li>
+        
+      <li>Loading IMPROVE Data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorial/improve_trends_kmeans.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="loading-improve-data">
+<h1>Loading IMPROVE Data<a class="headerlink" href="#loading-improve-data" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will read and load data from the IMPROVE aerosol
+network (<a class="reference external" href="http://vista.cira.colostate.edu/Improve/">http://vista.cira.colostate.edu/Improve/</a>)</p>
+<p>To do this we need to first download the data from the colstate.edu
+website. There are a few format requirements needed to be compatible
+with MONET. First go to
+<a class="reference external" href="http://views.cira.colostate.edu/fed/DataWizard/Default.aspx">http://views.cira.colostate.edu/fed/DataWizard/Default.aspx</a> to download
+data.</p>
+<ul class="simple">
+<li>Select the Raw data</li>
+<li>Datasets is the “IMPROVE aerosol”</li>
+<li>Select any number of sites</li>
+<li>Select your parameters</li>
+<li>Select the dates in question</li>
+<li>Fields<ul>
+<li>Dataset (required)</li>
+<li>Site (required)</li>
+<li>POC (required)</li>
+<li>Date (required)</li>
+<li>Parameter (required)</li>
+<li>Data Value (required)</li>
+<li>Latitude (required)</li>
+<li>Longitude (required)</li>
+<li>State (optional)</li>
+<li>EPACode (optional)</li>
+</ul>
+</li>
+<li>Options<ul>
+<li>skinny format</li>
+<li>delimited (note you will need to pass this onto the open command,
+‘,’ by default)</li>
+</ul>
+</li>
+</ul>
+<p>After downloading we can then read the data. Here we included the
+EPACode and State to add additional meta data stored on the EPA auxilary
+files used in the EPA AQS and AirNow datasets in MONET. Let’s make a few
+imports from monet and some other libraries that will aid us later.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.obs</span> <span class="kn">import</span> <span class="n">improve</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">monet.util</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">monet.plots</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+<p>Now we will load the data (in this case the file is
+‘2018620155016911Q1N0Mq.txt’)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">improve</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="s1">&#39;/Users/barry/Desktop/20186258419212M0xuxu.txt&#39;</span><span class="p">,</span> <span class="n">add_meta</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">NaN</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">obs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">NaN</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pandas</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">indexing</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">189</span><span class="p">:</span> <span class="n">SettingWithCopyWarning</span><span class="p">:</span>
+<span class="n">A</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">trying</span> <span class="n">to</span> <span class="n">be</span> <span class="nb">set</span> <span class="n">on</span> <span class="n">a</span> <span class="n">copy</span> <span class="n">of</span> <span class="n">a</span> <span class="nb">slice</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">DataFrame</span>
+
+<span class="n">See</span> <span class="n">the</span> <span class="n">caveats</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">documentation</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">pandas</span><span class="o">.</span><span class="n">pydata</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">pandas</span><span class="o">-</span><span class="n">docs</span><span class="o">/</span><span class="n">stable</span><span class="o">/</span><span class="n">indexing</span><span class="o">.</span><span class="n">html</span><span class="c1">#indexing-view-versus-copy</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">_setitem_with_indexer</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Lets look at the dataframe</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>siteid</th>
+      <th>poc</th>
+      <th>time</th>
+      <th>variable</th>
+      <th>obs</th>
+      <th>unc</th>
+      <th>mdl</th>
+      <th>units</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>elevation</th>
+      <th>state_name</th>
+      <th>epaid</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>ALf</td>
+      <td>NaN</td>
+      <td>0.00121</td>
+      <td>0.00199</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>ASf</td>
+      <td>NaN</td>
+      <td>0.00014</td>
+      <td>0.00022</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>BRf</td>
+      <td>0.00050</td>
+      <td>0.00011</td>
+      <td>0.00016</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>CAf</td>
+      <td>NaN</td>
+      <td>0.00143</td>
+      <td>0.00234</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>CHLf</td>
+      <td>NaN</td>
+      <td>0.00376</td>
+      <td>0.00744</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>CLf</td>
+      <td>0.00085</td>
+      <td>0.00051</td>
+      <td>0.00081</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>CRf</td>
+      <td>0.00015</td>
+      <td>0.00010</td>
+      <td>0.00015</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>CUf</td>
+      <td>NaN</td>
+      <td>0.00014</td>
+      <td>0.00022</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>ECf</td>
+      <td>0.11758</td>
+      <td>0.01481</td>
+      <td>0.00900</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>EC1f</td>
+      <td>0.15773</td>
+      <td>0.01700</td>
+      <td>0.01270</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>EC2f</td>
+      <td>0.08037</td>
+      <td>0.01439</td>
+      <td>0.00900</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>EC3f</td>
+      <td>NaN</td>
+      <td>0.00450</td>
+      <td>0.00900</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>FEf</td>
+      <td>0.00397</td>
+      <td>0.00088</td>
+      <td>0.00139</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>Kf</td>
+      <td>0.01480</td>
+      <td>0.00069</td>
+      <td>0.00087</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>MF</td>
+      <td>1.38909</td>
+      <td>0.16326</td>
+      <td>0.31570</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>MGf</td>
+      <td>NaN</td>
+      <td>0.00207</td>
+      <td>0.00340</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>MNf</td>
+      <td>NaN</td>
+      <td>0.00020</td>
+      <td>0.00033</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>MT</td>
+      <td>2.80114</td>
+      <td>0.22824</td>
+      <td>0.42441</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>N2f</td>
+      <td>NaN</td>
+      <td>0.02791</td>
+      <td>0.05438</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>ACAD1</td>
+      <td>1</td>
+      <td>2016-01-01</td>
+      <td>NAf</td>
+      <td>NaN</td>
+      <td>0.00257</td>
+      <td>0.00412</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+  </tbody>
+</table>
+</div><p>Now this is in the long pandas format. Lets use the
+monet.util.tools.long_to_wide utility to reformat the dataframe into a
+wide format.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.util</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="n">df1</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">long_to_wide</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">df1</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time</th>
+      <th>siteid</th>
+      <th>ALf</th>
+      <th>ASf</th>
+      <th>BRf</th>
+      <th>CAf</th>
+      <th>CHLf</th>
+      <th>CLf</th>
+      <th>CM_calculated</th>
+      <th>CRf</th>
+      <th>...</th>
+      <th>variable</th>
+      <th>obs</th>
+      <th>unc</th>
+      <th>mdl</th>
+      <th>units</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>elevation</th>
+      <th>state_name</th>
+      <th>epaid</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>ALf</td>
+      <td>NaN</td>
+      <td>0.00121</td>
+      <td>0.00199</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>ASf</td>
+      <td>NaN</td>
+      <td>0.00014</td>
+      <td>0.00022</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>BRf</td>
+      <td>0.0005</td>
+      <td>0.00011</td>
+      <td>0.00016</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>CAf</td>
+      <td>NaN</td>
+      <td>0.00143</td>
+      <td>0.00234</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>CHLf</td>
+      <td>NaN</td>
+      <td>0.00376</td>
+      <td>0.00744</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 65 columns</p>
+</div><p>Lets now plot some of the different measurements with time from a site.
+In this case we will look at the PHOE1 site in Phoenix, Arizona.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">acad1</span> <span class="o">=</span> <span class="n">df1</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df1</span><span class="o">.</span><span class="n">siteid</span> <span class="o">==</span> <span class="s1">&#39;ACAD1&#39;</span><span class="p">]</span>
+<span class="n">acad1</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time</th>
+      <th>siteid</th>
+      <th>ALf</th>
+      <th>ASf</th>
+      <th>BRf</th>
+      <th>CAf</th>
+      <th>CHLf</th>
+      <th>CLf</th>
+      <th>CM_calculated</th>
+      <th>CRf</th>
+      <th>...</th>
+      <th>variable</th>
+      <th>obs</th>
+      <th>unc</th>
+      <th>mdl</th>
+      <th>units</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>elevation</th>
+      <th>state_name</th>
+      <th>epaid</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>ALf</td>
+      <td>NaN</td>
+      <td>0.00121</td>
+      <td>0.00199</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>ASf</td>
+      <td>NaN</td>
+      <td>0.00014</td>
+      <td>0.00022</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>BRf</td>
+      <td>0.0005</td>
+      <td>0.00011</td>
+      <td>0.00016</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>CAf</td>
+      <td>NaN</td>
+      <td>0.00143</td>
+      <td>0.00234</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2016-01-01</td>
+      <td>ACAD1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.0005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.00085</td>
+      <td>1.41205</td>
+      <td>0.00015</td>
+      <td>...</td>
+      <td>CHLf</td>
+      <td>NaN</td>
+      <td>0.00376</td>
+      <td>0.00744</td>
+      <td>ug/m^3 LC</td>
+      <td>44.3771</td>
+      <td>-68.261</td>
+      <td>157.3333</td>
+      <td>ME</td>
+      <td>230090103</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 65 columns</p>
+</div><div class="section" id="trend-analysis">
+<h2>Trend Analysis<a class="headerlink" href="#trend-analysis" title="Permalink to this headline">¶</a></h2>
+<p>Let’s look at SIf as an example from ACAD1.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">acad1</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">acad1</span><span class="o">.</span><span class="n">time</span>
+
+<span class="n">acad1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;SIf&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c286eb4a8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/improve_trends_kmeans_11_1.png" src="../_images/improve_trends_kmeans_11_1.png" />
+<p>Now this is good but lets resample to see if we can see a trend.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">acad1</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;SIf&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;weekly&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">acad1</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;SIf&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/improve_trends_kmeans_13_0.png" src="../_images/improve_trends_kmeans_13_0.png" />
+<p>Simply resampling is fine but lets try to get a signal out using a
+kolmogorov-zerbenko filter. See
+<a class="reference external" href="https://www.tandfonline.com/doi/pdf/10.1080/10473289.2005.10464718">https://www.tandfonline.com/doi/pdf/10.1080/10473289.2005.10464718</a> for
+more information</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="n">acad1</span><span class="o">.</span><span class="n">SIf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">win_type</span><span class="o">=</span><span class="s1">&#39;triang&#39;</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">acad1</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;SIf&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+<span class="n">q</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;KZ Filter&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">Legend</span> <span class="n">at</span> <span class="mh">0x1c290de080</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/improve_trends_kmeans_15_1.png" src="../_images/improve_trends_kmeans_15_1.png" />
+</div>
+<div class="section" id="kmeans-clustering-using-scikit-learn">
+<h2>KMEANS Clustering using scikit-learn<a class="headerlink" href="#kmeans-clustering-using-scikit-learn" title="Permalink to this headline">¶</a></h2>
+<p>Clustering algorithms can be very useful in finding signals within data.
+As an example we are going to use the KMeans algorithm from scikit-learn
+(<a class="reference external" href="http://scikit-learn.org/stable/modules/clustering.html#k-means">http://scikit-learn.org/stable/modules/clustering.html#k-means</a>) to
+analyse dust signals using the improve data. First we need to import
+some tools from sklearn to use in our analysis.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">RobustScaler</span> <span class="c1">#to scale our data</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span> <span class="c1"># clustering algorithm</span>
+</pre></div>
+</div>
+<p>First we want to separate out different variables that may be useful
+such as Si, PM2.5, PM10, Fe, and SOILf. We will also need to drop any
+NaN values so let us go ahead and do that.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dfkm</span> <span class="o">=</span> <span class="n">df1</span><span class="p">[[</span><span class="s1">&#39;SIf&#39;</span><span class="p">,</span><span class="s1">&#39;MF&#39;</span><span class="p">,</span><span class="s1">&#39;MT&#39;</span><span class="p">,</span><span class="s1">&#39;FEf&#39;</span><span class="p">,</span><span class="s1">&#39;SOILf&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">dfkm</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>SIf</th>
+      <th>MF</th>
+      <th>MT</th>
+      <th>FEf</th>
+      <th>SOILf</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.00553</td>
+      <td>1.38909</td>
+      <td>2.80114</td>
+      <td>0.00397</td>
+      <td>0.028611</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.00553</td>
+      <td>1.38909</td>
+      <td>2.80114</td>
+      <td>0.00397</td>
+      <td>0.028611</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.00553</td>
+      <td>1.38909</td>
+      <td>2.80114</td>
+      <td>0.00397</td>
+      <td>0.028611</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.00553</td>
+      <td>1.38909</td>
+      <td>2.80114</td>
+      <td>0.00397</td>
+      <td>0.028611</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.00553</td>
+      <td>1.38909</td>
+      <td>2.80114</td>
+      <td>0.00397</td>
+      <td>0.028611</td>
+    </tr>
+  </tbody>
+</table>
+</div><p>Usually, with sklearn it is better to scale the data first before
+putting it through the algorithm. We will use th RobustScaler to do
+this.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X_scaled</span> <span class="o">=</span> <span class="n">RobustScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dfkm</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">dfkm</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we will define our clustering algorithm to have 2 clusters. You may
+need to adjust this as this is just a starting point for further
+analysis.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">km</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_scaled</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The clusters can be found under km.labels_ . These are integers
+representing the different clusters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">clusters</span> <span class="o">=</span> <span class="n">km</span><span class="o">.</span><span class="n">labels_</span>
+</pre></div>
+</div>
+<p>Lets plot this so that we can see where there is dust.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">dfkm</span><span class="o">.</span><span class="n">SOILf</span><span class="p">,</span><span class="n">dfkm</span><span class="o">.</span><span class="n">MT</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">clusters</span><span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;SOILf&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;PM10&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="s1">&#39;PM10&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/improve_trends_kmeans_27_1.png" src="../_images/improve_trends_kmeans_27_1.png" />
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../api.html" class="btn btn-neutral float-right" title="Get in touch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="aqs_pams.html" class="btn btn-neutral" title="Tutorial - How to read AQS data from PAMS and do a quick analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
