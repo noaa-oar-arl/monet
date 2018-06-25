@@ -40,6 +40,9 @@ class NADP(object):
                 ) + '/annual/' + siteid + network.upper() + '-All-a.csv'
         return url
 
+    def network_names(self):
+        print('Available Networks: AMNET, NTN, MDN, AIRMON, AMON')
+
     def read_ntn(self, url):
         print('Reading NADP-NTN Data...')
         print(url)
@@ -48,7 +51,7 @@ class NADP(object):
         df.columns = [i.lower() for i in df.columns]
         df.rename(
             columns={
-                'dateon': 'time_on',
+                'dateon': 'time',
                 'dateoff': 'time_off'
             }, inplace=True)
         try:
@@ -77,7 +80,7 @@ class NADP(object):
         df.columns = [i.lower() for i in df.columns]
         df.rename(
             columns={
-                'dateon': 'time_on',
+                'dateon': 'time',
                 'dateoff': 'time_off'
             }, inplace=True)
         try:
@@ -100,7 +103,7 @@ class NADP(object):
         df.columns = [i.lower() for i in df.columns]
         df.rename(
             columns={
-                'dateon': 'time_on',
+                'dateon': 'time',
                 'dateoff': 'time_off'
             }, inplace=True)
         try:
@@ -126,10 +129,9 @@ class NADP(object):
         df.columns = [i.lower() for i in df.columns]
         df.rename(
             columns={
-                'startdate': 'time_on',
+                'startdate': 'time',
                 'enddate': 'time_off'
-            },
-            inplace=True)
+            }, inplace=True)
         try:
             meta = pd.read_csv('https://bit.ly/2sJmkCg')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
@@ -149,10 +151,9 @@ class NADP(object):
         df.columns = [i.lower() for i in df.columns]
         df.rename(
             columns={
-                'startdate': 'time_on',
+                'startdate': 'time',
                 'enddate': 'time_off'
-            },
-            inplace=True)
+            }, inplace=True)
         try:
             meta = pd.read_csv('https://bit.ly/2sJmkCg')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
@@ -178,6 +179,8 @@ class NADP(object):
         else:
             df = self.read_amnet(url)
         self.df = df
+        self.df = self.df.loc[(self.df.time >= dates.min())
+                              & (self.df.time_off <= dates.max())]
 
         return df
 

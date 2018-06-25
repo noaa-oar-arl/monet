@@ -65,7 +65,7 @@ class IMPROVE(object):
         lines = f.readlines()
         skiprows = 0
         skip = False
-        for i, line in lines:
+        for i, line in enumerate(lines):
             if line == 'Data\n':
                 skip = True
                 skiprows = i + 1
@@ -114,7 +114,10 @@ class IMPROVE(object):
             #df = df.dropna(subset=['variable', 'gmt_offset']).drop_duplicates()
         #self.df.Variable.loc[self.df.Variable == 'MT'] = 'PM10'
         #self.df.Variable.loc[self.df.Variable == 'MF'] = 'PM2.5'
-        self.df.obs.loc[self.df.obs < 0] = NaN
+        try:
+            df.obs.loc[df.obs < df.mdl] = NaN
+        except:
+            df.obs.loc[df.obs < -900] = NaN
         #self.df.dropna(subset=['obs'], inplace=True)
         #self.df['time_local'] = self.df.time + pd.to_timedelta(
         #    self.df.gmt_offset.astype(float), unit='H')
