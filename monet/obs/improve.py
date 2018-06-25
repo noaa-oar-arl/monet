@@ -8,32 +8,37 @@ from numpy import NaN, array
 
 
 class IMPROVE(object):
+    """Short summary.
+
+    Attributes
+    ----------
+    datestr : type
+        Description of attribute `datestr`.
+    df : type
+        Description of attribute `df`.
+    daily : type
+        Description of attribute `daily`.
+    se_states : type
+        Description of attribute `se_states`.
+    ne_states : type
+        Description of attribute `ne_states`.
+    nc_states : type
+        Description of attribute `nc_states`.
+    sc_states : type
+        Description of attribute `sc_states`.
+    r_states : type
+        Description of attribute `r_states`.
+    p_states : type
+        Description of attribute `p_states`.
+
+    """
+
     def __init__(self):
         self.datestr = []
         self.df = None
         self.daily = True
-        self.se_states = array(
-            ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN', 'VA', 'WV'],
-            dtype='|S2')
-        self.ne_states = array(
-            [
-                'CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA',
-                'RI', 'VT'
-            ],
-            dtype='|S2')
-        self.nc_states = array(
-            ['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'],
-            dtype='|S2')
-        self.sc_states = array(['AR', 'LA', 'OK', 'TX'], dtype='|S2')
-        self.r_states = array(
-            [
-                'AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD',
-                'UT', 'WY'
-            ],
-            dtype='|S2')
-        self.p_states = array(['CA', 'OR', 'WA'], dtype='|S2')
 
-    def add_data(self, fname, add_meta=False):
+    def add_data(self, fname, add_meta=False, delimiter='\t'):
         """     This assumes that you have downloaded the data from
                         http://views.cira.colostate.edu/fed/DataWizard/Default.aspx
                 The data is the IMPROVE Aerosol dataset
@@ -56,13 +61,31 @@ class IMPROVE(object):
 
         """
         from .epa_util import read_monitor_file
-
-        df = pd.read_csv(
-            fname,
-            delimiter=',',
-            parse_dates=[2],
-            infer_datetime_format=True,
-            dtype={'EPACode': str})
+        f = open(fname, 'r')
+        lines = f.readlines()
+        skiprows = 0
+        skip = False
+        for i, line in lines:
+            if line == 'Data\n':
+                skip = True
+                skiprows = i + 1
+                break
+        # if meta data is inlcuded
+        if skip:
+            df = pd.read_csv(
+                fname,
+                delimiter=delimiter,
+                parse_dates=[2],
+                infer_datetime_format=True,
+                dtype={'EPACode': str},
+                skiprows=skiprows)
+        else:
+            df = pd.read_csv(
+                fname,
+                delimiter=delimiter,
+                parse_dates=[2],
+                infer_datetime_format=True,
+                dtype={'EPACode': str})
         df.rename(columns={'EPACode': 'epaid'}, inplace=True)
         df.rename(columns={'Val': 'Obs'}, inplace=True)
         df.rename(columns={'State': 'state_name'}, inplace=True)
@@ -91,7 +114,7 @@ class IMPROVE(object):
             #df = df.dropna(subset=['variable', 'gmt_offset']).drop_duplicates()
         #self.df.Variable.loc[self.df.Variable == 'MT'] = 'PM10'
         #self.df.Variable.loc[self.df.Variable == 'MF'] = 'PM2.5'
-        #self.df.Obs.loc[self.df.Obs < 0] = NaN
+        self.df.obs.loc[self.df.obs < 0] = NaN
         #self.df.dropna(subset=['obs'], inplace=True)
         #self.df['time_local'] = self.df.time + pd.to_timedelta(
         #    self.df.gmt_offset.astype(float), unit='H')
