@@ -6,12 +6,10 @@ import pandas as pd
 import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import array
-from past.utils import old_div
 
 from monet.models.basemodel import BaseModel
 
 # This file is to deal with CAMx code - try to make it general for CAMx 4.7.1 --> 5.1
-
 
 ProgressBar().register()
 
@@ -20,15 +18,18 @@ class CAMx(BaseModel):
     def __init__(self):
         BaseModel.__init__(self)
         self.objtype = 'CAMX'
-        self.coarse = array(
-            ['NA', 'PSO4', 'PNO3', 'PNH4', 'PH2O', 'PCL', 'PEC', 'FPRM', 'FCRS', 'CPRM', 'CCRS', 'SOA1', 'SOA2', 'SOA3',
-             'SOA4'])
-        self.fine = array(
-            ['NA', 'PSO4', 'PNO3', 'PNH4', 'PH2O', 'PCL', 'PEC', 'FPRM', 'FCRS', 'SOA1', 'SOA2', 'SOA3',
-             'SOA4'])
-        self.noy_gas = array(
-            ['NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO',
-             'CRPX', 'OPAN'])
+        self.coarse = array([
+            'NA', 'PSO4', 'PNO3', 'PNH4', 'PH2O', 'PCL', 'PEC', 'FPRM', 'FCRS',
+            'CPRM', 'CCRS', 'SOA1', 'SOA2', 'SOA3', 'SOA4'
+        ])
+        self.fine = array([
+            'NA', 'PSO4', 'PNO3', 'PNH4', 'PH2O', 'PCL', 'PEC', 'FPRM', 'FCRS',
+            'SOA1', 'SOA2', 'SOA3', 'SOA4'
+        ])
+        self.noy_gas = array([
+            'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA',
+            'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
+        ])
         self.poc = array(['SOA1', 'SOA2', 'SOA3', 'SOA4'])
         self.map = None
 
@@ -43,9 +44,11 @@ class CAMx(BaseModel):
         """
         print('Reading CAMx dates...')
         print(self.dset)
-        tflag1 = array(self.dset['TFLAG'][:, 0], dtype='|S7')
-        tflag2 = array(old_div(self.dset['TFLAG'][:, 1], 10000), dtype='|S6')
-        date = pd.to_datetime([i + j.zfill(2) for i, j in zip(tflag1, tflag2)], format='%Y%j%H')
+        tflag1 = pd.Series(self.dset['TFLAG'][:, 0]).astype(str)
+        tflag2 = pd.Series(self.dset['TFLAG'][:, 1]).astype(str).str.zfill(6)
+        date = pd.to_datetime(
+            [i + j.zfill(2) for i, j in zip(tflag1, tflag2)],
+            format='%Y%j%H%M%S')
         indexdates = pd.Series(date).drop_duplicates(keep='last').index.values
         self.dset = self.dset.isel(time=indexdates)
         self.dset['time'] = date[indexdates]
@@ -66,8 +69,10 @@ class CAMx(BaseModel):
         """
         from glob import glob
         from numpy import sort
-        dropset = ['layer', 'longitude_bounds', 'latitude_bounds',
-                   'x', 'y', 'level', 'lambert_conformal_conic']
+        dropset = [
+            'layer', 'longitude_bounds', 'latitude_bounds', 'x', 'y', 'level',
+            'lambert_conformal_conic'
+        ]
         nameset = {'COL': 'x', 'ROW': 'y', 'TSTEP': 'time', 'LAY': 'z'}
         if type(file) == str:
             fname = sort(array(glob(file)))
@@ -76,12 +81,16 @@ class CAMx(BaseModel):
         if fname.shape[0] >= 1:
             if self.dset is None:
                 self.dset = xr.open_mfdataset(
-                    fname.tolist(), concat_dim='TSTEP', engine='pseudonetcdf').drop(dropset).rename(nameset).squeeze()
+                    fname.tolist(), concat_dim='TSTEP',
+                    engine='pseudonetcdf').drop(dropset).rename(
+                        nameset).squeeze()
                 self.load_conus_basemap(res='l')
                 self.get_dates()
             else:
-                dset = xr.open_mfdataset(fname.tolist(), concat_dim='TSTEP',
-                                         engine='pseudonetcdf').drop(dropset).rename(nameset).squeeze()
+                dset = xr.open_mfdataset(
+                    fname.tolist(), concat_dim='TSTEP',
+                    engine='pseudonetcdf').drop(dropset).rename(
+                        nameset).squeeze()
                 self.dset = xr.merge([self.dset, dset])
         else:
             print('Files not found')
@@ -126,7 +135,8 @@ class CAMx(BaseModel):
         """
         from numpy import ones
         keys = self.keys
-        newkeys = pd.Series(findkeys).loc[pd.Series(findkeys).isin(keys)].values
+        newkeys = pd.Series(findkeys).loc[pd.Series(findkeys).isin(
+            keys)].values
         if weights is None:
             w = ones(len(newkeys))
         var = self.dset[newkeys[0]] * w[0]
@@ -155,7 +165,9 @@ class CAMx(BaseModel):
             try:
                 var = variable.sel(z=lay)
             except ValueError:
-                print('Dimension \'z\' not in Dataset.  Returning Dataset anyway')
+                print(
+                    'Dimension \'z\' not in Dataset.  Returning Dataset anyway'
+                )
                 var = variable
         else:
             var = variable

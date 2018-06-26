@@ -8,7 +8,6 @@ import pandas as pd
 import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import array, zeros
-from past.utils import old_div
 
 from monet.models.basemodel import BaseModel
 
@@ -80,12 +79,14 @@ class CMAQ(BaseModel):
         idims = len(self.dset.TFLAG.dims)
         if idims == 2:
             tflag1 = array(self.dset['TFLAG'][:, 0], dtype=str)
-            tflag2 = array(int(self.dset['TFLAG'][:, 1] / 10000), dtype=str)
+            tflag2 = pd.Series(
+                self.dset['TFLAG'][:, 1]).astype(str).str.zfill(6)
         else:
             tflag1 = array(self.dset['TFLAG'][:, 0, 0], dtype=str)
-            tflag2 = array(array(self.dset['TFLAG'][:, 0, 1] / 10000,dtype=int), dtype=str)
+            tflag2 = pd.Series(
+                self.dset['TFLAG'][:, 0, 1]).astype(str).str.zfill(6)
         date = pd.to_datetime(
-            [i + j.zfill(2).rstrip("0") for i, j in zip(tflag1, tflag2)], format='%Y%j%H')
+            [i + j for i, j in zip(tflag1, tflag2)], format='%Y%j%H%M%S')
         indexdates = pd.Series(date).drop_duplicates(keep='last').index.values
         self.dset = self.dset.isel(time=indexdates)
         self.dset['time'] = date[indexdates]
