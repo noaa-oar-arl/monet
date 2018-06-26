@@ -46,7 +46,7 @@ dependencies we recommend usingthe the following command.::
 We recommend using the community maintained `conda-forge <https://conda-forge.github.io/>`_ channel
 if you need difficult\-to\-build dependencies such as cartopy, pynio or PseudoNetCDF::
 
-    $ conda install -c conda-forge xarray pandas matplotlib seaborn cartopy pynio pseudonetcdf
+    $ conda install -c conda-forge xarray pandas matplotlib seaborn cartopy pseudonetcdf
 
 To install MONET currently you must install with pip.  This can be done directly
 from the github page::
