@@ -9,7 +9,8 @@ def draw_map(ax=None,
              states=False,
              countries=True,
              resolution='10m',
-             extent=None):
+             extent=None,
+             **kwargs):
     """Short summary.
 
     Parameters
@@ -38,6 +39,8 @@ def draw_map(ax=None,
     if ax is None:
         f, ax = plt.subplots(
             figsize=(10, 6), subplot_kw={'projection': ccrs.PlateCarree()})
+    else:
+        f, ax = plt.subplots(**kwargs)
 
     if natural_earth:
         #~ ax.stock_img()
