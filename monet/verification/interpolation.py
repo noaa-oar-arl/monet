@@ -1,6 +1,10 @@
 from __future__ import print_function
 
 from builtins import str, zip
+try:
+    from functools import reduce
+except ImportError:
+    pass
 
 
 def interp_latlon(var, lat, lon, radius=12000.):
@@ -82,59 +86,6 @@ def interp_latlon(var, lat, lon, radius=12000.):
     return ii
 
 
-#
-# def interp_to_obs(var, df, lat, lon, radius=12000.):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     var : type
-#         Description of parameter `var`.
-#     df : type
-#         Description of parameter `df`.
-#     lat : type
-#         Description of parameter `lat`.
-#     lon : type
-#         Description of parameter `lon`.
-#     radius : type
-#         Description of parameter `radius` (the default is 12000.).
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#     from numpy import NaN, vstack
-#     from pyresample import geometry, image
-#     from pandas import to_timedelta, DataFrame
-#     # define CMAQ pyresample grid (source)
-#     grid1 = geometry.GridDefinition(lons=lon, lats=lat)
-#     # get unique sites from df
-#     dfn = df.drop_duplicates(subset=['Latitude', 'Longitude'])
-#     # define site grid (target)
-#     lats = dfn.Latitude.values
-#     lons = dfn.Longitude.values
-#     grid2 = geometry.GridDefinition(lons=vstack(lons), lats=vstack(lats))
-#     # Create image container
-#     i = image.ImageContainerNearest(var.transpose('y', 'x', 'time').values, grid1, radius_of_influence=radius,
-#                                     fill_value=NaN)
-#     # resample
-#     ii = i.resample(grid2).image_data.squeeze()
-#     # recombine data
-#     e = DataFrame(ii, index=dfn.SCS, columns=var.time.values)
-#     w = e.stack().reset_index().rename(columns={'level_1': 'datetime', 0: 'model'})
-#     w = w.merge(dfn.drop(['datetime', 'datetime_local', 'Obs'], axis=1), on='SCS', how='left')
-#     w = w.merge(df[['datetime', 'SCS', 'Obs']], on=['SCS', 'datetime'], how='left')
-#     # calculate datetime local
-#
-#     w['datetime_local'] = w.datetime + to_timedelta(w.utcoffset, 'H')
-#
-#     return w
-#
-# # pyresample has started adding xarray support.  Need documentation on this before it is implemented.
-
-
 def find_nearest_latlon_xarray(arr, lat=37.102400, lon=-76.392900,
                                radius=12e3):
     """Short summary.
@@ -158,6 +109,39 @@ def find_nearest_latlon_xarray(arr, lat=37.102400, lon=-76.392900,
     """
     from pyresample import utils, geometry
     from numpy import array, vstack
+    grid1 = geometry.SwathDefinition(lons=arr.longitude, lats=arr.latitude)
+    grid2 = geometry.SwathDefinition(lons=vstack([lon]), lats=vstack([lat]))
+    row, col = utils.generate_nearest_neighbour_linesample_arrays(
+        grid1, grid2, radius)
+    row = row.flatten()
+    col = col.flatten()
+    return arr.sel(x=col).sel(y=row).squeeze()
+
+
+def to_constant_latitude(arr, lat=37.102400, radius=12e3):
+    """Short summary.
+
+    Parameters
+    ----------
+    arr : type
+        Description of parameter `arr`.
+    lat : type
+        Description of parameter `lat` (the default is 37.102400).
+    lon : type
+        Description of parameter `lon` (the default is -76.392900).
+    radius : type
+        Description of parameter `radius` (the default is 12e3).
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    from pyresample import utils, geometry
+    from numpy import arange, vstack, ones
+
+    lons = array()
     grid1 = geometry.SwathDefinition(lons=arr.longitude, lats=arr.latitude)
     grid2 = geometry.SwathDefinition(lons=vstack([lon]), lats=vstack([lat]))
     row, col = utils.generate_nearest_neighbour_linesample_arrays(
