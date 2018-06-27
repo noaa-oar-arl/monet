@@ -82,6 +82,9 @@ def long_to_wide(df):
         values='obs', index=['time', 'siteid'],
         columns='variable').reset_index()
     cols = Series(df.columns)
-    index = cols.loc[~cols.isin(['variable', 'obs'])]
+    g = df.groupby('variable')
+    for name, group in g:
+        w[name + '_unit'] = group.units.unique()[0]
+    index = cols.loc[~cols.isin(['variable', 'obs', 'units'])]
     #mergeon = hstack((index.values, df.variable.unique()))
     return merge(w, df, on=['siteid', 'time'])

@@ -359,7 +359,7 @@ class CMAQ(BaseModel):
         else:
             index = pd.Series(allvars).isin(keys)
             newkeys = allvars[index]
-            neww = weights[index]
+            neww = None
             var = self.add_multiple_fields(newkeys, lay=lay, weights=neww)
         var.name = 'PM10'
         var['long_name'] = 'PM10'
