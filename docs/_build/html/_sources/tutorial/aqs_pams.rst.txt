@@ -1,6 +1,6 @@
 
-Tutorial - How to read AQS data from PAMS and do a quick analysis
------------------------------------------------------------------
+How to read AQS data from PAMS and do a quick analysis
+------------------------------------------------------
 
 The first tutorial for MONET will load data from the AQS data,
 specifically the PAMS dataset, and show to reshape the dataframe and do
@@ -963,7 +963,8 @@ have the index as the time. Lets do that
 
     27.581303457170307
 
-
+Plotting
+^^^^^^^^
 
 As you can see the data is now indexed with the UTC time. Lets make a
 time series plot of the average ISOPRENE.

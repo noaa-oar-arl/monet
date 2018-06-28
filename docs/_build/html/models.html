@@ -281,7 +281,7 @@ a helper function is available to assist in these tasks.  For example, to get NO
 </pre></div>
 </div>
 <p>where nox is a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code> as it is a single variable.  To quickly plot this on a map we can use the utility function
-in <a class="reference internal" href="source/monet.plots.html#module-monet.plots.mapgen" title="monet.plots.mapgen"><code class="xref py py-class docutils literal notranslate"><span class="pre">mapgen</span></code></a>.</p>
+in <code class="xref py py-class docutils literal notranslate"><span class="pre">mapgen</span></code>.</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">monet</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">draw_map</span><span class="p">()</span>
 <span class="n">pm25</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
