@@ -128,7 +128,7 @@ class CEMSEmissions(object):
                 if iii > 100: done = True
                 iii += 1
         else:
-            rdatelist = [rdates]
+            rdatelist = [rdate]
         for rd in rdatelist:
             print('getting data')
             print(rd)
@@ -226,7 +226,7 @@ class CEMSEmissions(object):
             return pivot 
             #return temp[cmatch]
 
-    def retrieve(self, rdate, state, download=True):
+    def retrieve(self, rdate, state, download=True, verbose=False):
         """Short summary.
 
         Parameters
@@ -237,15 +237,18 @@ class CEMSEmissions(object):
             state abbreviation to retrieve data for
         download : boolean
             set to True to download
+            if download FALSE then returns string with url of ftp
+            if download TRUE then returns name of downloaded file
 
         Returns
         -------
-        type string 
+        efile string 
             if download FALSE then returns string with url of ftp
             if download TRUE then returns name of downloaded file
         """
 
-        import requests
+        #import requests
+        #TO DO: requests does not support ftp sites.
         efile = 'empty'
         ftpsite = self.url
         ftpsite += 'hourly/'
@@ -256,12 +259,16 @@ class CEMSEmissions(object):
         print(state)
         fname = rdate.strftime("%Y") + state + rdate.strftime("%m") + '.zip'
         if not download:
-            return ftpsite + fname
+            efile = ftpsite + fname
         if not os.path.isfile(fname):
-            print('retrieving ' + ftpsite + fname)
-            r = requests.get(ftpsite + fname)
-            open(efile, 'wb').write(r.content)
-            print('retrieved ' + ftpsite + fname)
+            #print('retrieving ' + ftpsite + fname)
+            #r = requests.get(ftpsite + fname)
+            #open(efile, 'wb').write(r.content)
+            #print('retrieved ' + ftpsite + fname)
+            efile = ftpsite + fname
+            print('WARNING: Downloading file not supported at this time')
+            print('you may download manually using the following address')
+            print(efile)
         else:
             print('file exists ' + fname)
             efile = fname
