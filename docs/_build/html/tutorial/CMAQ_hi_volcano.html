@@ -1,0 +1,1160 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to Open and View CMAQ simulations - HI Volcano Example &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Get in touch" href="../api.html" />
+    <link rel="prev" title="Loading IMPROVE Data" href="improve_trends_kmeans.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="aqs_pams.html">How to read AQS data from PAMS and do a quick analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="improve_trends_kmeans.html">Loading IMPROVE Data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">How to Open and View CMAQ simulations - HI Volcano Example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plotting-on-a-map">Plotting on a map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finding-nearest-lat-lon-point">Finding nearest lat lon point</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pairing-with-airnow">Pairing with AirNow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#overlaying-observations-on-contour-plots">Overlaying Observations on Contour Plots</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../tutorial.html">Tutorial</a> &raquo;</li>
+        
+      <li>How to Open and View CMAQ simulations - HI Volcano Example</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorial/CMAQ_hi_volcano.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="how-to-open-and-view-cmaq-simulations-hi-volcano-example">
+<h1>How to Open and View CMAQ simulations - HI Volcano Example<a class="headerlink" href="#how-to-open-and-view-cmaq-simulations-hi-volcano-example" title="Permalink to this headline">¶</a></h1>
+<p>In this example, we will learn how to open CMAQ simulations using MONET,
+view the data on a map, view cross sections of the data, and compare to
+surface observations (AirNow) for the May 2018 Hawaiian volcanic
+eruption. First, import MONET and several helper functions for later.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.obs</span> <span class="k">import</span> <span class="n">airnow</span>
+<span class="kn">from</span> <span class="nn">monet.models</span> <span class="k">import</span> <span class="n">cmaq</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">monet.util</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">monet.plots.mapgen</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+<p>Now the data can be downloaded from the MONET github page in the
+MONET/data directory. We will assume you already have this downloaded
+and will proceed. Open the simulation. As of right now we still require
+that a seperate grdcro2d (grddot2d) file be loaded for the mass points
+(dot points) using the <code class="docutils literal notranslate"><span class="pre">grid</span></code> kwarg.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conc</span> <span class="o">=</span> <span class="s1">&#39;/Users/barry/Desktop/MONET/data/aqm.t12z.aconc.ncf&#39;</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="s1">&#39;/Users/barry/Desktop/MONET/data/aqm.t12z.grdcro2d.ncf&#39;</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_files</span><span class="p">(</span><span class="n">flist</span><span class="o">=</span><span class="n">conc</span><span class="p">,</span><span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.6s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.6s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="n">Reading</span> <span class="n">CMAQ</span> <span class="n">dates</span><span class="o">...</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+/anaconda3/lib/python3.6/_collections_abc.py:702: FutureWarning: calling len() on an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Call len() on the Dataset.variables property instead, like <code class="docutils literal notranslate"><span class="pre">len(ds.variables)</span></code>, to preserve existing behavior in a forwards compatible manner.
+  return len(self._mapping)
+/anaconda3/lib/python3.6/_collections_abc.py:720: FutureWarning: iteration over an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Iterate over the Dataset.variables property instead to preserve existing behavior in a forwards compatible manner.
+  yield from self._mapping
+</pre>
+<p>The cmaq object will return a <code class="docutils literal notranslate"><span class="pre">xarray.Dataset</span></code> but it also still lives
+inside of the <code class="docutils literal notranslate"><span class="pre">cmaq</span></code> object in <code class="docutils literal notranslate"><span class="pre">cmaq.dset</span></code>. We may use a combination
+of both the dataset (c) directly and the cmaq calls to gather or
+aggrigate species in the concentration file.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">c</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="o">&gt;</span>
+<span class="n">Dimensions</span><span class="p">:</span>    <span class="p">(</span><span class="n">DATE</span><span class="o">-</span><span class="n">TIME</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="n">VAR</span><span class="p">:</span> <span class="mi">41</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="mi">48</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+  <span class="o">*</span> <span class="n">time</span>       <span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">17</span><span class="n">T12</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">17</span><span class="n">T13</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="o">...</span>
+    <span class="n">latitude</span>   <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">longitude</span>  <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+<span class="n">Dimensions</span> <span class="n">without</span> <span class="n">coordinates</span><span class="p">:</span> <span class="n">DATE</span><span class="o">-</span><span class="n">TIME</span><span class="p">,</span> <span class="n">VAR</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span>
+<span class="n">Data</span> <span class="n">variables</span><span class="p">:</span>
+    <span class="n">TFLAG</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">VAR</span><span class="p">,</span> <span class="n">DATE</span><span class="o">-</span><span class="n">TIME</span><span class="p">)</span> <span class="n">int32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">O3</span>         <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">NO2</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">NO</span>         <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">NO3</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">N2O5</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">HNO3</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">HONO</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">PNA</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">CO</span>         <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">FORM</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ALD2</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">PAN</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">NTR</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">XO2N</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">SO2</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ASO4I</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ASO4J</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ANH4I</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ANH4J</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ANO3I</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ANO3J</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AORGAI</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AORGAJ</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AORGPAI</span>    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AORGPAJ</span>    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AORGBI</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AORGBJ</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AECI</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AECJ</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">A25I</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">A25J</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">NUMATKN</span>    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">NUMACC</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">SRFATKN</span>    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">SRFACC</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AH2OI</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">AH2OJ</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ACLI</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ACLJ</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ANAI</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">ANAJ</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Notice that this looks like the ncdump of the file except that there are
+seperate coordinates including the latitude and longitude and the time
+as numpy.datetime64 objects.</p>
+<div class="section" id="plotting-on-a-map">
+<h2>Plotting on a map<a class="headerlink" href="#plotting-on-a-map" title="Permalink to this headline">¶</a></h2>
+<p>It is often useful to be able to view the data on a map. Let’s view a
+random time slice of SO2 (we will view time 20 hours into the
+simulation).</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">SO2</span><span class="p">[</span><span class="mi">15</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">collections</span><span class="o">.</span><span class="n">QuadMesh</span> <span class="n">at</span> <span class="mh">0x1c27910860</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/CMAQ_hi_volcano_7_2.png" src="../_images/CMAQ_hi_volcano_7_2.png" />
+<p>Now this doesn’t look very pretty. First it isn’t on a map, the color
+scale isn’t good as we cannot really see any of the data. To fix this we
+will add a map and use the <code class="docutils literal notranslate"><span class="pre">robust=True</span></code> kwarg.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">draw_map</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">c</span><span class="o">.</span><span class="n">SO2</span><span class="p">[</span><span class="mi">15</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="s1">&#39;subplot_kw&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;projection&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">PlateCarree</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x1c29bd5fc0</span><span class="o">&gt;</span><span class="p">}}</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">collections</span><span class="o">.</span><span class="n">QuadMesh</span> <span class="n">at</span> <span class="mh">0x1c277f9940</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/CMAQ_hi_volcano_9_2.png" src="../_images/CMAQ_hi_volcano_9_2.png" />
+<p>Better but we can still do much more. There is low concentrations on
+most of this map making it hard to notice the extremely high values and
+the SO2 data is in ppmv and not ppbv as normally viewed as. Also, a
+logscale may be better fo this type of data as it goes from 0-20000 ppbv
+rather than a linear scale.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">draw_map</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="k">import</span> <span class="n">LogNorm</span>
+<span class="c1"># convert to ppbv</span>
+<span class="n">so2</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">SO2</span><span class="p">[</span><span class="mi">15</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span> <span class="o">*</span> <span class="mf">1000.</span>
+<span class="c1">#mask anything &gt; 10 ppbv and plot</span>
+<span class="n">so2</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">so2</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">LogNorm</span><span class="p">(),</span><span class="n">cbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;SO2 (ppbv)&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="s1">&#39;subplot_kw&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;projection&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">PlateCarree</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x1c280473b8</span><span class="o">&gt;</span><span class="p">}}</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">collections</span><span class="o">.</span><span class="n">QuadMesh</span> <span class="n">at</span> <span class="mh">0x1c26997d30</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">matplotlib</span><span class="o">/</span><span class="n">colors</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1031</span><span class="p">:</span> <span class="ne">RuntimeWarning</span><span class="p">:</span> <span class="n">invalid</span> <span class="n">value</span> <span class="n">encountered</span> <span class="ow">in</span> <span class="n">less_equal</span>
+  <span class="n">mask</span> <span class="o">|=</span> <span class="n">resdat</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<img alt="../_images/CMAQ_hi_volcano_11_3.png" src="../_images/CMAQ_hi_volcano_11_3.png" />
+<p>What if we want a horizontal colorbar? add the
+<code class="docutils literal notranslate"><span class="pre">'orientation':'horizontal'</span></code> flag to <code class="docutils literal notranslate"><span class="pre">cbar_kwargs</span></code>.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">draw_map</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mf">10.5</span><span class="p">))</span>
+<span class="n">so2</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">so2</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">norm</span><span class="o">=</span><span class="n">LogNorm</span><span class="p">(),</span><span class="n">cbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;SO2 (ppbv)&#39;</span><span class="p">,</span> <span class="s1">&#39;orientation&#39;</span><span class="p">:</span><span class="s1">&#39;horizontal&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">10.5</span><span class="p">),</span> <span class="s1">&#39;subplot_kw&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;projection&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">PlateCarree</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x1c29e9afc0</span><span class="o">&gt;</span><span class="p">}}</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">collections</span><span class="o">.</span><span class="n">QuadMesh</span> <span class="n">at</span> <span class="mh">0x1c2a71f198</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">matplotlib</span><span class="o">/</span><span class="n">colors</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1031</span><span class="p">:</span> <span class="ne">RuntimeWarning</span><span class="p">:</span> <span class="n">invalid</span> <span class="n">value</span> <span class="n">encountered</span> <span class="ow">in</span> <span class="n">less_equal</span>
+  <span class="n">mask</span> <span class="o">|=</span> <span class="n">resdat</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<img alt="../_images/CMAQ_hi_volcano_13_3.png" src="../_images/CMAQ_hi_volcano_13_3.png" />
+<p>Now let’s us view serveral time slices at once. We will average in time
+(every 8 hours) to give us 6 total subplots.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">so2</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">SO2</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,:,:]</span> <span class="o">*</span> <span class="mf">1000.</span>
+<span class="n">so2_resampled</span> <span class="o">=</span> <span class="n">so2</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="s1">&#39;8H&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sortby</span><span class="p">([</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">],</span><span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">so2_resampled</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span><span class="n">subplot_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;projection&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">()})</span>
+<span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="n">so2</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">so2</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span><span class="n">so2</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span><span class="n">so2</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">flat</span><span class="p">:</span>
+    <span class="n">draw_map</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span><span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+</pre></div>
+</div>
+<img alt="../_images/CMAQ_hi_volcano_15_1.png" src="../_images/CMAQ_hi_volcano_15_1.png" />
+</div>
+<div class="section" id="finding-nearest-lat-lon-point">
+<h2>Finding nearest lat lon point<a class="headerlink" href="#finding-nearest-lat-lon-point" title="Permalink to this headline">¶</a></h2>
+<p>Suppose that we want to find the model data found at a point
+(latitude,longitude). Use the
+<code class="docutils literal notranslate"><span class="pre">monet.verification.interpolation.find_nearest_latlon_xarray</span></code></p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.verification.interpolation</span> <span class="k">import</span> <span class="n">find_nearest_latlon_xarray</span> <span class="k">as</span> <span class="n">fnll</span>
+<span class="n">da</span> <span class="o">=</span> <span class="n">fnll</span><span class="p">(</span><span class="n">so2</span><span class="p">,</span><span class="n">lat</span><span class="o">=</span><span class="mf">20.5</span><span class="p">,</span><span class="n">lon</span><span class="o">=-</span><span class="mf">157.5</span><span class="p">)</span>
+<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">da</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;/Users/barry/Desktop/test.csv&#39;</span><span class="p">)</span>
+<span class="n">da</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x1c2b1d1320</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../_images/CMAQ_hi_volcano_17_2.png" src="../_images/CMAQ_hi_volcano_17_2.png" />
+</div>
+<div class="section" id="pairing-with-airnow">
+<h2>Pairing with AirNow<a class="headerlink" href="#pairing-with-airnow" title="Permalink to this headline">¶</a></h2>
+<p>It is often useful to be able to pair model data with observational
+data. MONET uses the pyresample library
+(<a class="reference external" href="http://pyresample.readthedocs.io/en/latest/">http://pyresample.readthedocs.io/en/latest/</a>) to do a nearest neighbor
+interpolation. First let us get the airnow data for the dates of the
+simulation.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">airnow</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">so2</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">to_index</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Aggregating</span> <span class="n">AIRNOW</span> <span class="n">files</span><span class="o">...</span>
+<span class="n">Building</span> <span class="n">AIRNOW</span> <span class="n">URLs</span><span class="o">...</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  1.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  1.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  1.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  1.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  1.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 12.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 12.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 12.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 12.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 12.6s</span>
+    <span class="n">Adding</span> <span class="ow">in</span> <span class="n">Meta</span><span class="o">-</span><span class="n">data</span>
+</pre></div>
+</div>
+<p>Now let us combine the two. This will return the pandas dataframe with a
+new column (model).</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.verification</span> <span class="k">import</span> <span class="n">combine</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">combine</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">cmaq</span><span class="p">,</span><span class="n">airnow</span><span class="p">,</span><span class="n">mapping_table</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;NOX&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NO&#39;</span><span class="p">,</span><span class="s1">&#39;NO2&#39;</span><span class="p">]})</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pairing</span><span class="p">:</span> <span class="n">OZONE</span>
+<span class="p">[</span><span class="s1">&#39;O3&#39;</span><span class="p">]</span>
+<span class="n">O3</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+/anaconda3/lib/python3.6/_collections_abc.py:702: FutureWarning: calling len() on an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Call len() on the Dataset.variables property instead, like <code class="docutils literal notranslate"><span class="pre">len(ds.variables)</span></code>, to preserve existing behavior in a forwards compatible manner.
+  return len(self._mapping)
+/anaconda3/lib/python3.6/_collections_abc.py:720: FutureWarning: iteration over an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Iterate over the Dataset.variables property instead to preserve existing behavior in a forwards compatible manner.
+  yield from self._mapping
+</pre>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">PM2</span><span class="o">.</span><span class="mi">5</span>
+<span class="p">[</span><span class="s1">&#39;PM25&#39;</span><span class="p">]</span>
+<span class="n">PM25</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.7s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.7s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.8s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.9s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  1.0s</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">NO</span>
+<span class="p">[</span><span class="s1">&#39;NO&#39;</span><span class="p">]</span>
+<span class="n">NO</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+/anaconda3/lib/python3.6/_collections_abc.py:702: FutureWarning: calling len() on an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Call len() on the Dataset.variables property instead, like <code class="docutils literal notranslate"><span class="pre">len(ds.variables)</span></code>, to preserve existing behavior in a forwards compatible manner.
+  return len(self._mapping)
+/anaconda3/lib/python3.6/_collections_abc.py:720: FutureWarning: iteration over an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Iterate over the Dataset.variables property instead to preserve existing behavior in a forwards compatible manner.
+  yield from self._mapping
+</pre>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">NO2</span>
+<span class="p">[</span><span class="s1">&#39;NO2&#39;</span><span class="p">]</span>
+<span class="n">NO2</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">SO2</span>
+<span class="p">[</span><span class="s1">&#39;SO2&#39;</span><span class="p">]</span>
+<span class="n">SO2</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">PM10</span>
+<span class="p">[</span><span class="s1">&#39;PM10&#39;</span><span class="p">]</span>
+<span class="n">PM10</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.6s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.7s</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">CO</span>
+<span class="p">[</span><span class="s1">&#39;CO&#39;</span><span class="p">]</span>
+<span class="n">CO</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+/anaconda3/lib/python3.6/_collections_abc.py:702: FutureWarning: calling len() on an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Call len() on the Dataset.variables property instead, like <code class="docutils literal notranslate"><span class="pre">len(ds.variables)</span></code>, to preserve existing behavior in a forwards compatible manner.
+  return len(self._mapping)
+/anaconda3/lib/python3.6/_collections_abc.py:720: FutureWarning: iteration over an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Iterate over the Dataset.variables property instead to preserve existing behavior in a forwards compatible manner.
+  yield from self._mapping
+</pre>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">TEMP</span>
+<span class="p">[</span><span class="s1">&#39;TEMP2&#39;</span><span class="p">]</span>
+<span class="n">TEMP2</span>
+<span class="n">TEMP</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span> <span class="ow">and</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">paired</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">WS</span>
+<span class="p">[</span><span class="s1">&#39;WSPD10&#39;</span><span class="p">]</span>
+<span class="n">WSPD10</span>
+<span class="n">WS</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span> <span class="ow">and</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">paired</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">WD</span>
+<span class="p">[</span><span class="s1">&#39;WDIR10&#39;</span><span class="p">]</span>
+<span class="n">WDIR10</span>
+<span class="n">WD</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span> <span class="ow">and</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">paired</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">NOY</span>
+<span class="p">[</span><span class="s1">&#39;NO&#39;</span><span class="p">,</span> <span class="s1">&#39;NO2&#39;</span><span class="p">,</span> <span class="s1">&#39;NO3&#39;</span><span class="p">,</span> <span class="s1">&#39;N2O5&#39;</span><span class="p">,</span> <span class="s1">&#39;HONO&#39;</span><span class="p">,</span> <span class="s1">&#39;HNO3&#39;</span><span class="p">,</span> <span class="s1">&#39;PAN&#39;</span><span class="p">,</span> <span class="s1">&#39;PANX&#39;</span><span class="p">,</span> <span class="s1">&#39;PNA&#39;</span><span class="p">,</span> <span class="s1">&#39;NTR&#39;</span><span class="p">,</span> <span class="s1">&#39;CRON&#39;</span><span class="p">,</span> <span class="s1">&#39;CRN2&#39;</span><span class="p">,</span> <span class="s1">&#39;CRNO&#39;</span><span class="p">,</span> <span class="s1">&#39;CRPX&#39;</span><span class="p">,</span> <span class="s1">&#39;OPAN&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="n">Pairing</span><span class="p">:</span> <span class="n">NOX</span>
+<span class="p">[</span><span class="s1">&#39;NO&#39;</span><span class="p">,</span> <span class="s1">&#39;NO2&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+/anaconda3/lib/python3.6/_collections_abc.py:702: FutureWarning: calling len() on an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Call len() on the Dataset.variables property instead, like <code class="docutils literal notranslate"><span class="pre">len(ds.variables)</span></code>, to preserve existing behavior in a forwards compatible manner.
+  return len(self._mapping)
+/anaconda3/lib/python3.6/_collections_abc.py:720: FutureWarning: iteration over an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Iterate over the Dataset.variables property instead to preserve existing behavior in a forwards compatible manner.
+  yield from self._mapping
+</pre>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+</pre></div>
+</div>
+<p>Notice the new column name model here</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>siteid</th>
+      <th>time</th>
+      <th>model</th>
+      <th>site</th>
+      <th>utcoffset</th>
+      <th>variable</th>
+      <th>units</th>
+      <th>obs</th>
+      <th>time_local</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>cmsa_name</th>
+      <th>msa_code</th>
+      <th>msa_name</th>
+      <th>state_name</th>
+      <th>epa_region</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>000010102</td>
+      <td>2018-05-17 12:00:00</td>
+      <td>NaN</td>
+      <td>St. John's</td>
+      <td>-4.0</td>
+      <td>OZONE</td>
+      <td>PPB</td>
+      <td>29.0</td>
+      <td>2018-05-17 08:00:00</td>
+      <td>47.6528</td>
+      <td>-52.8167</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>CC</td>
+      <td>CA</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>000010102</td>
+      <td>2018-05-17 13:00:00</td>
+      <td>NaN</td>
+      <td>St. John's</td>
+      <td>-4.0</td>
+      <td>OZONE</td>
+      <td>PPB</td>
+      <td>35.0</td>
+      <td>2018-05-17 09:00:00</td>
+      <td>47.6528</td>
+      <td>-52.8167</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>CC</td>
+      <td>CA</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>000010102</td>
+      <td>2018-05-17 14:00:00</td>
+      <td>NaN</td>
+      <td>St. John's</td>
+      <td>-4.0</td>
+      <td>OZONE</td>
+      <td>PPB</td>
+      <td>30.0</td>
+      <td>2018-05-17 10:00:00</td>
+      <td>47.6528</td>
+      <td>-52.8167</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>CC</td>
+      <td>CA</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>000010102</td>
+      <td>2018-05-17 15:00:00</td>
+      <td>NaN</td>
+      <td>St. John's</td>
+      <td>-4.0</td>
+      <td>OZONE</td>
+      <td>PPB</td>
+      <td>42.0</td>
+      <td>2018-05-17 11:00:00</td>
+      <td>47.6528</td>
+      <td>-52.8167</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>CC</td>
+      <td>CA</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>000010102</td>
+      <td>2018-05-17 16:00:00</td>
+      <td>NaN</td>
+      <td>St. John's</td>
+      <td>-4.0</td>
+      <td>OZONE</td>
+      <td>PPB</td>
+      <td>43.0</td>
+      <td>2018-05-17 12:00:00</td>
+      <td>47.6528</td>
+      <td>-52.8167</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>CC</td>
+      <td>CA</td>
+    </tr>
+  </tbody>
+</table>
+</div><p>Let’s look at the distributions to see if the two overlap to get a
+general scence of performance.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_so2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">variable</span> <span class="o">==</span> <span class="s1">&#39;SO2&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">state_name</span> <span class="o">==</span> <span class="s1">&#39;HI&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">])</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">df_so2</span><span class="o">.</span><span class="n">obs</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">500</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">df_so2</span><span class="o">.</span><span class="n">model</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">500</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c290e94a8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/CMAQ_hi_volcano_25_1.png" src="../_images/CMAQ_hi_volcano_25_1.png" />
+</div>
+<div class="section" id="overlaying-observations-on-contour-plots">
+<h2>Overlaying Observations on Contour Plots<a class="headerlink" href="#overlaying-observations-on-contour-plots" title="Permalink to this headline">¶</a></h2>
+<p>Now let’s put a time slice on a map. Let’s look back to the time step
+‘2018-05-18 03:00’,</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.plots</span> <span class="k">import</span> <span class="o">*</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">draw_map</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">so2_now</span> <span class="o">=</span> <span class="n">so2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="s1">&#39;2018-05-18 03:00&#39;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">so2_now</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">norm</span><span class="o">=</span><span class="n">LogNorm</span><span class="p">(),</span><span class="n">cbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;SO2 (ppbv)&#39;</span><span class="p">})</span>
+<span class="n">vmin</span><span class="p">,</span><span class="n">vmax</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">get_clim</span><span class="p">()</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">()</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">df_so2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_so2</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="s1">&#39;2018-05-18 03:00&#39;</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">d</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">obs</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span><span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="s1">&#39;subplot_kw&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;projection&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">PlateCarree</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x1c27451d00</span><span class="o">&gt;</span><span class="p">}}</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">collections</span><span class="o">.</span><span class="n">PathCollection</span> <span class="n">at</span> <span class="mh">0x1c2ae207b8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/CMAQ_hi_volcano_27_2.png" src="../_images/CMAQ_hi_volcano_27_2.png" />
+<p>Not bad but again we can do a little better with the scatter plot. It’s
+hard to see the outlines of the observations when there is high
+correlation, the sizes may be a little large</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">draw_map</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+
+<span class="n">so2_now</span> <span class="o">=</span> <span class="n">so2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="s1">&#39;2018-05-18 03:00&#39;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">so2_now</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">norm</span><span class="o">=</span><span class="n">LogNorm</span><span class="p">(),</span><span class="n">cbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;SO2 (ppbv)&#39;</span><span class="p">})</span>
+<span class="n">vmin</span><span class="p">,</span><span class="n">vmax</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">get_clim</span><span class="p">()</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">()</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">df_so2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_so2</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="s1">&#39;2018-05-18 03:00&#39;</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">d</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">obs</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span><span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="n">lw</span><span class="o">=.</span><span class="mi">25</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span><span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="s1">&#39;subplot_kw&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;projection&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">PlateCarree</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x1c2b0ead00</span><span class="o">&gt;</span><span class="p">}}</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.5s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">collections</span><span class="o">.</span><span class="n">PathCollection</span> <span class="n">at</span> <span class="mh">0x1c2b43c5f8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/CMAQ_hi_volcano_29_2.png" src="../_images/CMAQ_hi_volcano_29_2.png" />
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">df_so2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_so2</span><span class="o">.</span><span class="n">obs</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">]</span>
+<span class="n">p</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">61.45120441800254</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../api.html" class="btn btn-neutral float-right" title="Get in touch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="improve_trends_kmeans.html" class="btn btn-neutral" title="Loading IMPROVE Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
