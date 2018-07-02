@@ -4,6 +4,43 @@ from future import standard_library
 
 standard_library.install_aliases()
 
+def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3', inplace=False):
+    """
+    converts ppb to ug/m3 for SO2 in aqs and airnow datasets
+    See 40 CFR Part 50.5, Appendix A-1 to part 50, appendix A=2 to Part 50.
+    to convert from ppb to ug/m3 multiply by 2.6178.
+
+    Also will convert from ug/m3 to ppb.
+
+    Parameters
+    ----------
+    df : pandas dataframe
+         self.df attribute from aqs or airnow class.
+    obscolumn : string
+        name of column with SO2 data in it.
+    unit : string
+        either 'UG/M3' or 'PPB' (not case sensitive)
+        will convert data to this unit.
+    inplace : boolean
+        if TRUE then changes self.df attribute
+
+    Returns
+    -------
+    df : pandas dataframe
+        returns dataframe identical to original but with data converted to new unit.
+    """ 
+    factor = 2.6178
+    ppb = 'ppb'
+    ugm3 = 'ug/m3'
+    if unit.lower()== ugm3:
+        df = df[df['units']==ppb]   #find columns with units of 'ppb'
+        df['units'] = unit.upper() 
+        df[obscolumn] = self.df[obscolumn] * factor
+    elif unit.lower()==ppb:
+        df = df[df['units']==ugm3]   #find columns with units of 'ppb'
+        df[obscolumn] = self.df[obscolumn] / factor
+    return df
+
 
 def check_cmaq_units(df, param='O3', aqs_param='OZONE'):
     """Short summary.
