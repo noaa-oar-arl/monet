@@ -188,7 +188,7 @@ class CEMSEmissions(object):
         type
             Description of returned object.
         """
-        from obs_util import timefilter
+        from .obs_util import timefilter
         if isinstance(varname, str):
             varname = (varname)
         columns = list(self.df.columns.values)
@@ -197,7 +197,7 @@ class CEMSEmissions(object):
             temp = self.df[self.df['orispl_code'].isin(loc)]
         else:
             temp = self.df.copy()
-        temp = timefilter(temp, daterange)
+        if daterange: temp = timefilter(temp, daterange)
         cmatch = self.match_column(varname)
         if 'unit_id' in columns:
             ##create pandas frame with index datetime and columns for value for each unit_id
