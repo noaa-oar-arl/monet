@@ -139,7 +139,7 @@ def summarize(df, verbose=False):
     for ccc in columns:
         print(ccc)
          
-def latlonfilter(df, llcrnr, urcrnr, inplace=True):
+def latlonfilter(df, llcrnr, urcrnr):
     """
      removes rows from self.df with latitude longitude outside of the box
      described by llcrnr (lower left corner) and urcrnr (upper right corner)
