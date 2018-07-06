@@ -4,6 +4,7 @@ from future import standard_library
 
 standard_library.install_aliases()
 
+
 def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3'):
     """
     converts ppb to ug/m3 for SO2 in aqs and airnow datasets
@@ -28,16 +29,16 @@ def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3'):
     -------
     df : pandas dataframe
         returns dataframe identical to original but with data converted to new unit.
-    """ 
+    """
     factor = 2.6178
     ppb = 'ppb'
     ugm3 = 'ug/m3'
-    if unit.lower()== ugm3:
-        df = df[df['units']==ppb]   #find columns with units of 'ppb'
-        df['units'] = unit.upper() 
+    if unit.lower() == ugm3:
+        df = df[df['units'] == ppb]  #find columns with units of 'ppb'
+        df['units'] = unit.upper()
         df[obscolumn] = df[obscolumn] * factor
-    elif unit.lower()==ppb:
-        df = df[df['units']==ugm3]   #find columns with units of 'ppb'
+    elif unit.lower() == ppb:
+        df = df[df['units'] == ugm3]  #find columns with units of 'ppb'
         df[obscolumn] = df[obscolumn] / factor
     return df
 
@@ -529,13 +530,13 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
         return airnow
     else:
         try:
-            basedir = os.path.abspath(os.path.dirname(__file__))[:-10]
+            basedir = os.path.abspath(os.path.dirname(__file__))[:-3]
             fname = os.path.join(basedir, 'data',
                                  'monitoring_site_locations.hdf')
             print('Monitor File Path: ' + fname)
-            s = pd.read_hdf(fname)
-            monitor_drop = ['state_code', u'county_code']
-            s.drop(monitor_drop, axis=1, inplace=True)
+            sss = pd.read_hdf(fname)
+            #monitor_drop = ['state_code', u'county_code']
+            #s.drop(monitor_drop, axis=1, inplace=True)
         except:
             print('Monitor File Not Found... Reprocessing')
             baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
@@ -564,7 +565,6 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
             ]
             airnow['airnow_flag'] = 'AIRNOW'
             airnow.columns = [i.lower() for i in airnow.columns]
-            # airnow['siteid'] = pd.to_numeric(airnow.siteid, errors='coerce')
             # Read EPA Site file
             site = pd.read_csv(site_url, encoding='ISO-8859-1')
             # read epa monitor file
@@ -576,14 +576,12 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
             monitor['siteid'] = monitor['State Code'].astype(str).str.zfill(
                 2) + monitor['County Code'].astype(str).str.zfill(
                     3) + monitor['Site Number'].astype(str).str.zfill(4)
-            #monitor['siteid'] = monitor.siteid.astype(int)
             site.columns = [i.replace(' ', '_') for i in site.columns]
             s = monitor.merge(
                 site[['siteid', 'Land_Use', 'Location_Setting', 'GMT_Offset']],
                 on=['siteid'],
                 how='left')
             s.columns = [i.replace(' ', '_').lower() for i in s.columns]
-            #s['siteid'] = pd.to_numeric(s.siteid, errors='coerce')
             monitor_drop = [
                 'state_code', u'county_code', u'site_number',
                 'extraction_date', 'parameter_code', 'parameter_name', 'poc',
@@ -608,6 +606,7 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
             sss = sss.loc[sss.networks.isin(
                 [network])].drop_duplicates(subset=['siteid'])
         if drop_latlon:
-            return sss.drop(['latitude', 'longitude'], axis=1)
+            return sss.drop(
+                ['latitude', 'longitude'], axis=1).drop_duplicates()
         else:
-            return sss
+            return sss.drop_duplicates()
