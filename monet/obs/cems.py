@@ -188,7 +188,7 @@ class CEMSEmissions(object):
         type
             Description of returned object.
         """
-        from obs_util import timefilter
+        from .obs_util import timefilter
         if isinstance(varname, str):
             varname = (varname)
         columns = list(self.df.columns.values)
@@ -197,7 +197,7 @@ class CEMSEmissions(object):
             temp = self.df[self.df['orispl_code'].isin(loc)]
         else:
             temp = self.df.copy()
-        temp = timefilter(temp, daterange)
+        if daterange: temp = timefilter(temp, daterange)
         cmatch = self.match_column(varname)
         if 'unit_id' in columns:
             ##create pandas frame with index datetime and columns for value for each unit_id
@@ -366,6 +366,55 @@ class CEMSEmissions(object):
            fmt = "%m-%d-%Y %H"
         return fmt
 
+    def add_info(self, dftemp):
+        """
+        -------------Load supplmental data-----------------------
+        Add location (latitude longitude) and time UTC information to dataframe dftemp.
+        cemsinfo.csv contains info on facility id, lat, lon, time offset from UTC.
+        allows transformation from local time to UTC.
+        If not all power stations are found in the cemsinfo.csv file, 
+        then Nan will be written in lat, lon and 'time' column.
+
+        Parameters
+        ----------
+        dftemp: pandas dataframe
+
+        Returns        
+        ----------
+        dftemp: pandas dataframe
+        """
+        basedir = os.path.abspath(os.path.dirname(__file__))[:-10]
+        iname = os.path.join(basedir, 'data', 'cemsinfo.csv')
+        method=1
+        ##TO DO: Having trouble with pytest throwing an error when using the apply on the dataframe.
+        ##runs ok, but pytest fails. Tried several differnt methods.
+        if os.path.isfile(iname):
+           sinfo = pd.read_csv(iname, sep=',',  header=0)
+           dfnew = pd.merge(dftemp, sinfo, how='left'  , left_on=['orispl_code'], right_on=['orispl_code'])
+           #remove stations which do not have a time offset.
+           dfnew.dropna(axis=0, subset=['time_offset'], inplace=True)
+           if method==1:
+               #this runs ok but fails pytest
+               def i2o(x): return(datetime.timedelta(x['time_offset']))
+               dfnew['time_offset']= dfnew.apply(i2o, axis=1)
+               dfnew['time'] = dfnew['time local'] + dfnew['time_offset']
+           elif method==2:
+               #this runs ok but fails pytest
+               def utc(x): return  pd.Timestamp(x['time local']) + datetime.timedelta(hours=x['time_offset'])
+               dfnew['time'] = dfnew.apply(utc, axis=1)
+           elif method==3:
+               #this runs ok but fails pytest
+               def utc(x,y): return  (x + datetime.timedelta(hours=y))
+               dfnew['time'] = dfnew.apply(lambda row: utc(row['time local'], row['time_offset']),axis=1)
+           #remove the time_offset column. 
+           dfnew.drop(['time_offset'], axis=1, inplace=True)
+           mlist = dftemp.columns.values.tolist()
+           dlist = dftemp.columns.values.tolist()
+           #merge the dataframes back together to include rows with no info in the cemsinfo.csv
+           dftemp = pd.merge(dftemp, dfnew, how='left', left_on=mlist, right_on=mlist)
+        return dftemp
+
+
     def load(self, efile, verbose=True):
         """
         loads information found in efile into a pandas dataframe.
@@ -383,7 +432,6 @@ class CEMSEmissions(object):
         columns = self.columns_rename(columns, verbose)
         dftemp.columns = columns
         if verbose: print(columns)
-
         dfmt = self.get_date_fmt(dftemp['date'][0], verbose=verbose)
 
         ##create column with datetime information from column with month-day-year and column with hour.
@@ -391,46 +439,14 @@ class CEMSEmissions(object):
         dftemp = pd.concat([dftime, dftemp], axis=1) 
         dftemp.rename(columns={0:'time local'}, inplace=True)
         dftemp.drop(['date', 'hour'], axis=1, inplace=True)
-
+ 
         #-------------Load supplmental data-----------------------
         #contains info on facility id, lat, lon, time offset from UTC.
         #allows transformation from local time to UTC.
-        #If not all power stations are found in the cemsinfo.csv file, then Nan will be written in lat, lon and 'time' column.
-        basedir = os.path.abspath(os.path.dirname(__file__))[:-10]
-        iname = os.path.join(basedir, 'data', 'cemsinfo.csv')
-        if os.path.isfile(iname):
-           sinfo = pd.read_csv(iname, sep=',',  header=0)
-           dfnew = pd.merge(dftemp, sinfo, how='left'  , left_on=['orispl_code'], right_on=['orispl_code'])
-           #remove stations which do not have a time offset.
-           dfnew.dropna(axis=0, subset=['time_offset'], inplace=True)
-           #Create new 'time' column with UTC time
-           def utc(x): return  pd.Timestamp(x['time local']) + datetime.timedelta(hours=x['time_offset'])
-           dfnew['time'] = dfnew.apply(utc, axis=1)
-           #Remove time_offset column and merge back.
-           dfnew.drop(['time_offset'], axis=1, inplace=True)
-           mlist = dftemp.columns.values.tolist()
-           dlist = dftemp.columns.values.tolist()
-           dftemp = pd.merge(dftemp, dfnew, how='left', left_on=mlist, right_on=mlist)
-        #---------------------------------------------------------
-
-        ##This is a kluge because these dates are when the time change occurs and routine can't handle
-        ## non-existent or ambiguous local times.
-        #dftemp= dftemp.ix[dftemp['time local'] != pd.Timestamp(2016,3,13,2)] 
-        #dftemp= dftemp.ix[dftemp['time local'] != pd.Timestamp(2016,11,6,1)] 
-
-        #tz =  TimezoneFinder()
-        #def timezone(x): return tz.timezone_at(lat=x['latitude'], lng=x['longitude'])
-        #dftemp['timezone'] = dftemp.apply(timezone, axis=1)
-     
-        ##this creates a column with time stamps which are offset-aware.        
-        #def utc(x): return  pd.Timestamp(x['time local'], tz= x['timezone']).tz_convert('UTC')
-        #dftemp['time'] = dftemp.apply(utc, axis=1)
-        #offset = datetime.timedelta(hours=6) 
-        #def utc(x): return  pd.Timestamp(x['time local']) + offset
-        #dftemp['time'] = dftemp.apply(utc, axis=1)
+        dftemp = self.add_info(dftemp)
  
         if ['year'] in columns: dftemp.drop(['year'], axis=1, inplace=True)
-        if self.df is None:
+        if not self.df.empty:
             self.df = dftemp
             if verbose:
                 print('Initializing pandas dataframe. Loading ' + efile)

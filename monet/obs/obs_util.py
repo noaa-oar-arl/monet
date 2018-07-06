@@ -125,7 +125,6 @@ def get_lhash(df, idn):
         pairs = list(set(pairs))
         lhash = dict(pairs)  #key is facility id and value is name.
         print(lhash)
-    self.lhash= lhash
     return lhash
 
 def summarize(df, verbose=False):
@@ -139,7 +138,7 @@ def summarize(df, verbose=False):
     for ccc in columns:
         print(ccc)
          
-def latlonfilter(df, llcrnr, urcrnr, inplace=True):
+def latlonfilter(df, llcrnr, urcrnr):
     """
      removes rows from self.df with latitude longitude outside of the box
      described by llcrnr (lower left corner) and urcrnr (upper right corner)
@@ -179,19 +178,5 @@ def timefilter(df, daterange, inplace=True):
     df = df[df['time'] < daterange[1]]
     return df
 
-def unique(df, cname='Site_Num'): 
-    sites= list(df.df[cname].unique())
-    return sites
    
-def plotloc(df, latlon, var='obs'):
-    dftemp = df[df['latlon'] == latlon]
-    dftemp.set_index('datetime', inplace=True)
-    series = dftemp[var]
-    plt.plot(series, '-b.')
-    plt.title('Site ' + str(latlon[2]) + ' location ' + str(latlon[0]) + ' : ' + str(latlon[1]) )
-    unitlist = dftemp['Units'].unique()
-    #for unit in unitlist:
-    #    unitstr += unit 
-    plt.show()
-
    

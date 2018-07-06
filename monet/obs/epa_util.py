@@ -4,7 +4,7 @@ from future import standard_library
 
 standard_library.install_aliases()
 
-def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3', inplace=False):
+def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3'):
     """
     converts ppb to ug/m3 for SO2 in aqs and airnow datasets
     See 40 CFR Part 50.5, Appendix A-1 to part 50, appendix A=2 to Part 50.
@@ -35,10 +35,10 @@ def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3', inplace=False):
     if unit.lower()== ugm3:
         df = df[df['units']==ppb]   #find columns with units of 'ppb'
         df['units'] = unit.upper() 
-        df[obscolumn] = self.df[obscolumn] * factor
+        df[obscolumn] = df[obscolumn] * factor
     elif unit.lower()==ppb:
         df = df[df['units']==ugm3]   #find columns with units of 'ppb'
-        df[obscolumn] = self.df[obscolumn] / factor
+        df[obscolumn] = df[obscolumn] / factor
     return df
 
 
