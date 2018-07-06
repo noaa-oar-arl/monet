@@ -1,0 +1,664 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>monet.verification package &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="monet" href="modules.html" />
+    <link rel="prev" title="monet.util package" href="monet.util.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html#api">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="monet.models.html">monet.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.obs.html">monet.obs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.plots.html">monet.plots package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.util.html">monet.util package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">monet.verification package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet.monet">monet.monet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet.monet">monet.monet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">Get in touch</a> &raquo;</li>
+        
+          <li><a href="monet.html">monet package</a> &raquo;</li>
+        
+      <li>monet.verification package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/monet.verification.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="monet-verification-package">
+<h1>monet.verification package<a class="headerlink" href="#monet-verification-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-monet.verification.combine">
+<span id="monet-verification-combine-module"></span><h2>monet.verification.combine module<a class="headerlink" href="#module-monet.verification.combine" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.verification.combine.check_units">
+<code class="descclassname">monet.verification.combine.</code><code class="descname">check_units</code><span class="sig-paren">(</span><em>model</em>, <em>obsunit</em>, <em>variable=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.combine.check_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>param</strong> (<em>type</em>) – Description of parameter <cite>param</cite> (the default is ‘O3’).</li>
+<li><strong>aqs_param</strong> (<em>type</em>) – Description of parameter <cite>aqs_param</cite> (the default is ‘OZONE’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.combine.combine">
+<code class="descclassname">monet.verification.combine.</code><code class="descname">combine</code><span class="sig-paren">(</span><em>model=None</em>, <em>obs=None</em>, <em>mapping_table=None</em>, <em>lay=None</em>, <em>radius=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.combine.combine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.combine.combine_model_obs">
+<code class="descclassname">monet.verification.combine.</code><code class="descname">combine_model_obs</code><span class="sig-paren">(</span><em>da</em>, <em>df</em>, <em>radius</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.combine.combine_model_obs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>da</strong> (<em>type</em>) – This is a xarray Dataset or DataArray</li>
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>radius</strong> (<em>type</em>) – Description of parameter <cite>radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.combine.get_mapping_table">
+<code class="descclassname">monet.verification.combine.</code><code class="descname">get_mapping_table</code><span class="sig-paren">(</span><em>model</em>, <em>obs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.combine.get_mapping_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.combine.get_model_fields">
+<code class="descclassname">monet.verification.combine.</code><code class="descname">get_model_fields</code><span class="sig-paren">(</span><em>model</em>, <em>findkeys</em>, <em>lay=None</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.combine.get_model_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.combine.merge_obs_and_model">
+<code class="descclassname">monet.verification.combine.</code><code class="descname">merge_obs_and_model</code><span class="sig-paren">(</span><em>model</em>, <em>obs</em>, <em>dfn</em>, <em>model_time=None</em>, <em>daily=False</em>, <em>obstype=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.combine.merge_obs_and_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-monet.verification.interpolation">
+<span id="monet-verification-interpolation-module"></span><h2>monet.verification.interpolation module<a class="headerlink" href="#module-monet.verification.interpolation" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.verification.interpolation.find_nearest_latlon_xarray">
+<code class="descclassname">monet.verification.interpolation.</code><code class="descname">find_nearest_latlon_xarray</code><span class="sig-paren">(</span><em>arr</em>, <em>lat=37.1024</em>, <em>lon=-76.3929</em>, <em>radius=12000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.interpolation.find_nearest_latlon_xarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>arr</strong> (<em>type</em>) – Description of parameter <cite>arr</cite>.</li>
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite> (the default is 37.102400).</li>
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite> (the default is -76.392900).</li>
+<li><strong>radius</strong> (<em>type</em>) – Description of parameter <cite>radius</cite> (the default is 12e3).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.interpolation.geotiff_meta_to_areadef">
+<code class="descclassname">monet.verification.interpolation.</code><code class="descname">geotiff_meta_to_areadef</code><span class="sig-paren">(</span><em>meta</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.interpolation.geotiff_meta_to_areadef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform (Rasterio) geotiff meta dictionary to pyresample area definition
+Arguments:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>meta (dictionary) <span class="classifier-delimiter">:</span> <span class="classifier">dictionary containing projection and image geometry</span></dt>
+<dd>information (formed by Rasterio)</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>area_def (pyresample.geometry.AreaDefinition) : Area definition object</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.interpolation.geotiff_meta_to_areadef2">
+<code class="descclassname">monet.verification.interpolation.</code><code class="descname">geotiff_meta_to_areadef2</code><span class="sig-paren">(</span><em>meta</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.interpolation.geotiff_meta_to_areadef2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform (Rasterio) geotiff meta dictionary to pyresample area definition
+Arguments:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>meta (dictionary) <span class="classifier-delimiter">:</span> <span class="classifier">dictionary containing projection and image geometry</span></dt>
+<dd>information (formed by Rasterio)</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>area_def (pyresample.geometry.AreaDefinition) : Area definition object</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.interpolation.get_gfs_area_def">
+<code class="descclassname">monet.verification.interpolation.</code><code class="descname">get_gfs_area_def</code><span class="sig-paren">(</span><em>nx=1440</em>, <em>ny=721</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.interpolation.get_gfs_area_def" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nx</strong> (<em>type</em>) – Description of parameter <cite>nx</cite> (the default is 1440).</li>
+<li><strong>ny</strong> (<em>type</em>) – Description of parameter <cite>ny</cite> (the default is 721).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.interpolation.get_grid_def">
+<code class="descclassname">monet.verification.interpolation.</code><code class="descname">get_grid_def</code><span class="sig-paren">(</span><em>lon</em>, <em>lat</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.interpolation.get_grid_def" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite>.</li>
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.interpolation.get_smops_area_def">
+<code class="descclassname">monet.verification.interpolation.</code><code class="descname">get_smops_area_def</code><span class="sig-paren">(</span><em>nx=1440</em>, <em>ny=720</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.interpolation.get_smops_area_def" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nx</strong> (<em>type</em>) – Description of parameter <cite>nx</cite> (the default is 1440).</li>
+<li><strong>ny</strong> (<em>type</em>) – Description of parameter <cite>ny</cite> (the default is 720).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.interpolation.interp_latlon">
+<code class="descclassname">monet.verification.interpolation.</code><code class="descname">interp_latlon</code><span class="sig-paren">(</span><em>var</em>, <em>lat</em>, <em>lon</em>, <em>radius=12000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.interpolation.interp_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>var</strong> (<em>type</em>) – Description of parameter <cite>var</cite>.</li>
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite>.</li>
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite>.</li>
+<li><strong>radius</strong> (<em>type</em>) – Description of parameter <cite>radius</cite> (the default is 12000.).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.verification.interpolation.to_constant_latitude">
+<code class="descclassname">monet.verification.interpolation.</code><code class="descname">to_constant_latitude</code><span class="sig-paren">(</span><em>arr</em>, <em>lat=37.1024</em>, <em>radius=12000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.interpolation.to_constant_latitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>arr</strong> (<em>type</em>) – Description of parameter <cite>arr</cite>.</li>
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite> (the default is 37.102400).</li>
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite> (the default is -76.392900).</li>
+<li><strong>radius</strong> (<em>type</em>) – Description of parameter <cite>radius</cite> (the default is 12e3).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="monet-verification-obsdata-module">
+<h2>monet.verification.obsdata module<a class="headerlink" href="#monet-verification-obsdata-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-monet.verification.verify">
+<span id="monet-verification-verify-module"></span><h2>monet.verification.verify module<a class="headerlink" href="#module-monet.verification.verify" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="monet.verification.verify.VERIFY">
+<em class="property">class </em><code class="descclassname">monet.verification.verify.</code><code class="descname">VERIFY</code><span class="sig-paren">(</span><em>input</em>, <em>obs=None</em>, <em>model=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.verify.VERIFY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="monet.verification.verify.VERIFY.compare_epa">
+<code class="descname">compare_epa</code><span class="sig-paren">(</span><em>param='OZONE'</em>, <em>site=''</em>, <em>city=''</em>, <em>state=''</em>, <em>epa_region=''</em>, <em>region=''</em>, <em>timeseries=False</em>, <em>scatter=False</em>, <em>pdfs=False</em>, <em>diffscatter=False</em>, <em>diffpdfs=False</em>, <em>timeseries_rmse=False</em>, <em>timeseries_mb=False</em>, <em>taylordiagram=False</em>, <em>ax=None</em>, <em>label=None</em>, <em>footer=False</em>, <em>dia=None</em>, <em>marker=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.verify.VERIFY.compare_epa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>param</strong> (<em>type</em>) – Description of parameter <cite>param</cite> (the default is ‘OZONE’).</li>
+<li><strong>site</strong> (<em>type</em>) – Description of parameter <cite>site</cite> (the default is ‘’).</li>
+<li><strong>city</strong> (<em>type</em>) – Description of parameter <cite>city</cite> (the default is ‘’).</li>
+<li><strong>state</strong> (<em>type</em>) – Description of parameter <cite>state</cite> (the default is ‘’).</li>
+<li><strong>epa_region</strong> (<em>type</em>) – Description of parameter <cite>epa_region</cite> (the default is ‘’).</li>
+<li><strong>region</strong> (<em>type</em>) – Description of parameter <cite>region</cite> (the default is ‘’).</li>
+<li><strong>timeseries</strong> (<em>type</em>) – Description of parameter <cite>timeseries</cite> (the default is False).</li>
+<li><strong>scatter</strong> (<em>type</em>) – Description of parameter <cite>scatter</cite> (the default is False).</li>
+<li><strong>pdfs</strong> (<em>type</em>) – Description of parameter <cite>pdfs</cite> (the default is False).</li>
+<li><strong>diffscatter</strong> (<em>type</em>) – Description of parameter <cite>diffscatter</cite> (the default is False).</li>
+<li><strong>diffpdfs</strong> (<em>type</em>) – Description of parameter <cite>diffpdfs</cite> (the default is False).</li>
+<li><strong>timeseries_rmse</strong> (<em>type</em>) – Description of parameter <cite>timeseries_rmse</cite> (the default is False).</li>
+<li><strong>timeseries_mb</strong> (<em>type</em>) – Description of parameter <cite>timeseries_mb</cite> (the default is False).</li>
+<li><strong>taylordiagram</strong> (<em>type</em>) – Description of parameter <cite>taylordiagram</cite> (the default is False).</li>
+<li><strong>ax</strong> (<em>type</em>) – Description of parameter <cite>ax</cite> (the default is None).</li>
+<li><strong>label</strong> (<em>type</em>) – Description of parameter <cite>label</cite> (the default is None).</li>
+<li><strong>footer</strong> (<em>type</em>) – Description of parameter <cite>footer</cite> (the default is False).</li>
+<li><strong>dia</strong> (<em>type</em>) – Description of parameter <cite>dia</cite> (the default is None).</li>
+<li><strong>marker</strong> (<em>type</em>) – Description of parameter <cite>marker</cite> (the default is None).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.verification.verify.VERIFY.compare_epa_spatial">
+<code class="descname">compare_epa_spatial</code><span class="sig-paren">(</span><em>model_param='O3'</em>, <em>param='OZONE'</em>, <em>date=None</em>, <em>imshow_args={}</em>, <em>scatter_args={'edgecolors': 'w'</em>, <em>'lw': 0.25</em>, <em>'s': 20}</em>, <em>barbs_args={}</em>, <em>barbs=False</em>, <em>Obs=True</em>, <em>ncolors=None</em>, <em>discrete=False</em>, <em>lay=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.verify.VERIFY.compare_epa_spatial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model_param</strong> (<em>type</em>) – Description of parameter <cite>model_param</cite> (the default is ‘O3’).</li>
+<li><strong>param</strong> (<em>type</em>) – Description of parameter <cite>param</cite> (the default is ‘OZONE’).</li>
+<li><strong>date</strong> (<em>type</em>) – Description of parameter <cite>date</cite> (the default is None).</li>
+<li><strong>imshow_args</strong> (<em>type</em>) – Description of parameter <cite>imshow_args</cite> (the default is {}).</li>
+<li><strong>scatter_args</strong> (<em>type</em>) – Description of parameter <cite>scatter_args</cite> (the default is {‘s’: 20).</li>
+<li><strong>‘edgecolors’</strong> (<em>‘w’ : type</em>) – Description of parameter <cite>‘edgecolors’: ‘w’</cite>.</li>
+<li><strong>‘lw’</strong> (<em>.25} : type</em>) – Description of parameter <cite>‘lw’: .25}</cite>.</li>
+<li><strong>barbs_args</strong> (<em>type</em>) – Description of parameter <cite>barbs_args</cite> (the default is {}).</li>
+<li><strong>barbs</strong> (<em>type</em>) – Description of parameter <cite>barbs</cite> (the default is False).</li>
+<li><strong>Obs</strong> (<em>type</em>) – Description of parameter <cite>Obs</cite> (the default is True).</li>
+<li><strong>ncolors</strong> (<em>type</em>) – Description of parameter <cite>ncolors</cite> (the default is None).</li>
+<li><strong>discrete</strong> (<em>type</em>) – Description of parameter <cite>discrete</cite> (the default is False).</li>
+<li><strong>lay</strong> (<em>type</em>) – Description of parameter <cite>lay</cite> (the default is None).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>type</em> – Description of returned object.</li>
+<li><em>param param: variable Parameter: Acceptable variable: ‘OZONE’ ‘PM2.5’ ‘CO’ ‘NOY’ ‘SO2’ ‘SO2’ ‘NOX’</em></li>
+<li><em>param region: EPA Region: ‘Northeast’, ‘Southeast’, ‘North_Central’, ‘South_Central’, ‘Rockies’, ‘Pacific’</em></li>
+<li><em>param date: If not supplied will plot all time.  Put in ‘YYYY-MM-DD HH:MM’ for single time</em></li>
+<li><em>return:</em></li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.verification.verify.VERIFY.compare_spatial">
+<code class="descname">compare_spatial</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.verify.VERIFY.compare_spatial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.verification.verify.VERIFY.compare_surface">
+<code class="descname">compare_surface</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.verify.VERIFY.compare_surface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.verification.verify.VERIFY.point">
+<code class="descname">point</code><span class="sig-paren">(</span><em>param</em>, <em>plot_type=None</em>, <em>label=None</em>, <em>title=None</em>, <em>ax=None</em>, <em>plotargs={}</em>, <em>fillargs={'alpha': 0.2}</em>, <em>marker='o'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.verify.VERIFY.point" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="monet.verification.verify.VERIFY.subset_epa">
+<em class="property">static </em><code class="descname">subset_epa</code><span class="sig-paren">(</span><em>df</em>, <em>param</em>, <em>site=None</em>, <em>city=None</em>, <em>state=None</em>, <em>region=None</em>, <em>epa_region=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.verification.verify.VERIFY.subset_epa" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-monet.verification">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-monet.verification" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="modules.html" class="btn btn-neutral float-right" title="monet" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="monet.util.html" class="btn btn-neutral" title="monet.util package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
