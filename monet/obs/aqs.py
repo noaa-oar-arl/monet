@@ -83,7 +83,7 @@ class AQS(object):
         ]
         self.df = pd.DataFrame()  # hourly dataframe
         self.monitor_file = inspect.getfile(
-            self.__class__)[:-13] + '/data/monitoring_site_locations.dat'
+            self.__class__)[:-10] + 'data/monitoring_site_locations.dat'
         self.monitor_df = None
         self.daily = False
         self.d_df = None  # daily dataframe
