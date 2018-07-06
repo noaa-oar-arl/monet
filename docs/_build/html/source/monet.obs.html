@@ -729,6 +729,29 @@ TO DO add loop for adding multiple months.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="monet.obs.cems.CEMSEmissions.add_info">
+<code class="descname">add_info</code><span class="sig-paren">(</span><em>dftemp</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems.CEMSEmissions.add_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>————-Load supplmental data———————–
+Add location (latitude longitude) and time UTC information to dataframe dftemp.
+cemsinfo.csv contains info on facility id, lat, lon, time offset from UTC.
+allows transformation from local time to UTC.
+If not all power stations are found in the cemsinfo.csv file,
+then Nan will be written in lat, lon and ‘time’ column.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dftemp</strong> (<em>pandas dataframe</em>)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>dftemp</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pandas dataframe</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="monet.obs.cems.CEMSEmissions.columns_rename">
 <code class="descname">columns_rename</code><span class="sig-paren">(</span><em>columns</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems.CEMSEmissions.columns_rename" title="Permalink to this definition">¶</a></dt>
 <dd><p>Maps columns with one name to a standard name
@@ -1188,7 +1211,7 @@ if download TRUE then returns name of downloaded file</p>
 
 <dl class="function">
 <dt id="monet.obs.epa_util.convert_epa_unit">
-<code class="descclassname">monet.obs.epa_util.</code><code class="descname">convert_epa_unit</code><span class="sig-paren">(</span><em>df</em>, <em>obscolumn='SO2'</em>, <em>unit='UG/M3'</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.convert_epa_unit" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">convert_epa_unit</code><span class="sig-paren">(</span><em>df</em>, <em>obscolumn='SO2'</em>, <em>unit='UG/M3'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.convert_epa_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>converts ppb to ug/m3 for SO2 in aqs and airnow datasets
 See 40 CFR Part 50.5, Appendix A-1 to part 50, appendix A=2 to Part 50.
 to convert from ppb to ug/m3 multiply by 2.6178.</p>

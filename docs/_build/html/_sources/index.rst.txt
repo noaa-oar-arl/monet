@@ -78,11 +78,7 @@ Supported datasets
 **Help & Reference**
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 10
    :caption: Help * Reference
 
    api
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

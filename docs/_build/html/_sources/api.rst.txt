@@ -15,7 +15,7 @@ API
 * :ref:`search`
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 4
 
     source/monet
     source/modules
