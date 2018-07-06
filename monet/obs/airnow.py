@@ -53,7 +53,7 @@ class AirNow(object):
         self.objtype = 'AirNow'
         self.filelist = None
         self.monitor_file = inspect.getfile(
-            self.__class__)[:-16] + '/data/monitoring_site_locations.dat'
+            self.__class__)[:-13] + 'data/monitoring_site_locations.dat'
         self.monitor_df = None
         self.savecols = [
             'time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs',
