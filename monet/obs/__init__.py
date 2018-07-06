@@ -1,19 +1,20 @@
 from __future__ import absolute_import, print_function
 
-from . import aeronet, airnow, aqs, crn, epa_util, improve, ish, tolnet, cems, nadp
+from . import aeronet_mod, airnow_mod, aqs_mod, crn_mod, epa_util, improve_mod
+from . import ish_mod, tolnet_mod, cems_mod, nadp_mod
 
 __all__ = [
-    'aeronet', 'airnow', 'aqs', 'crn', 'epa_util', 'improve', 'ish', 'tolnet',
-    'cems', 'nadp'
+    'aeronet_mod', 'airnow_mod', 'aqs_mod', 'crn_mod', 'epa_util',
+    'improve_mod', 'ish_mod', 'tolnet_mod', 'cems_mod', 'nadp_mod'
 ]
 
 __name__ = 'obs'
 
-airnow = airnow.AirNow()
-aqs = aqs.AQS()
-aeronet = aeronet.AERONET()
-crn = crn.crn()
-improve = improve.IMPROVE()
-tolnet = tolnet.TOLNet()
-cems = cems.CEMSEmissions()
-nadp = nadp.NADP()
+airnow = airnow_mod.AirNow()
+aqs = aqs_mod.AQS()
+aeronet = aeronet_mod.AERONET()
+crn = crn_mod.crn()
+improve = improve_mod.IMPROVE()
+tolnet = tolnet_mod.TOLNet()
+cems = cems_mod.CEMSEmissions()
+nadp = nadp_mod.NADP()
