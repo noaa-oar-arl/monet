@@ -96,7 +96,8 @@ class IMPROVE(object):
         df.drop('Dataset', axis=1, inplace=True)
         df['time'] = pd.to_datetime(df.time, format='%Y%m%d')
         df.columns = [i.lower() for i in df.columns]
-        df['epaid'] = df.epaid.astype(str).str.zfill(9)
+        if pd.Series(df.keys()).isin(['epaid']).max():
+            df['epaid'] = df.epaid.astype(str).str.zfill(9)
         if add_meta:
             dropkeys = ['latitude', 'longitude', 'poc']
 
