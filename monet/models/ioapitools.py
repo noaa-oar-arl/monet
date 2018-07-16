@@ -1,5 +1,5 @@
 from numpy import array, concatenate
-from pandas import Series
+from pandas import Series, to_datetime
 
 
 def can_do(index):
@@ -7,6 +7,21 @@ def can_do(index):
         return True
     else:
         return False
+
+
+def get_times(d):
+    idims = len(d.TFLAG.dims)
+    if idims == 2:
+        tflag1 = Series(d['TFLAG'][:, 0]).astype(str).str.zfill(7)
+        tflag2 = Series(d['TFLAG'][:, 1]).astype(str).str.zfill(6)
+    else:
+        tflag1 = Series(d['TFLAG'][:, :, 0]).astype(str).str.zfill(7)
+        tflag2 = Series(d['TFLAG'][:, 0, 1]).astype(str).str.zfill(6)
+    date = to_datetime(
+        [i + j for i, j in zip(tflag1, tflag2)], format='%Y%j%H%M%S')
+    indexdates = Series(date).drop_duplicates(keep='last').index.values
+    d = d.isel(time=indexdates)
+    d['time'] = date[indexdates]
 
 
 def add_lazy_pm25(d):
@@ -98,7 +113,7 @@ def add_multiple_lazy(dset, variables, weights=None):
         weights = ones(len(variables))
     new = dset[variables[0]].copy() * weights[0]
     for i, j in zip(variables[1:], weights[1:]):
-        new += dset[i].chunk() * j
+        new = new + dset[i].chunk() * j
     return new
 
 
