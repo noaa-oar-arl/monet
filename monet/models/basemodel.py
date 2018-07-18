@@ -13,6 +13,7 @@ try:
     has_gdal = True
 except ImportError:
     has_gdal = False
+from monet.models.combinetool import *
 
 
 def check_crs(crs):
@@ -144,7 +145,7 @@ def proj_to_cartopy(proj):
     return cl(globe=globe, **kw_proj)
 
 
-def _ioapi_grid_from_dataset(ds):
+def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
     """Get the IOAPI projection out of the file into proj4."""
 
     pargs = dict()
@@ -160,18 +161,19 @@ def _ioapi_grid_from_dataset(ds):
     pargs['center_lon'] = ds.XCENT
     pargs['x0'] = ds.XORIG
     pargs['y0'] = ds.YORIG
+    pargs['r'] = earth_radius
     proj_id = ds.GDTYP
     atol = 1e-4
     if proj_id == 2:
         # Lambert
         p4 = '+proj=lcc +lat_1={lat_1} +lat_2={lat_2} ' \
              '+lat_0={lat_0} +lon_0={lon_0} ' \
-             '+x_0={x0} +y_0={y0} +a=6370000 +b=6370000'
+             '+x_0=0 +y_0=0 +datum=WGS84 +units=m +a={r} +b={r}'
         p4 = p4.format(**pargs)
     elif proj_id == 4:
         # Polar stereo
         p4 = '+proj=stere +lat_ts={lat_1} +lon_0={lon_0} +lat_0=90.0' \
-             '+x_0={x0} +y_0={y0} +a=6370000 +b=6370000'
+             '+x_0=0 +y_0=0 +a={r} +b={r}'
         p4 = p4.format(**pargs)
         # pyproj and WRF do not agree well close to the pole
         atol = 5e-3
@@ -179,7 +181,7 @@ def _ioapi_grid_from_dataset(ds):
         # Mercator
         p4 = '+proj=merc +lat_ts={lat_1} ' \
              '+lon_0={center_lon} ' \
-             '+x_0={x0} +y_0={y0} +a=6370000 +b=6370000'
+             '+x_0={x0} +y_0={y0} +a={r} +b={r}'
         p4 = p4.format(**pargs)
     else:
         raise NotImplementedError('IOAPI proj not implemented yet: '
@@ -188,7 +190,7 @@ def _ioapi_grid_from_dataset(ds):
     return p4
 
 
-def grid_from_dataset(ds):
+def grid_from_dataset(ds, earth_radius=6370000):
     """Find out if the dataset contains enough info for Salem to understand.
 
     ``ds`` can be an xarray dataset
@@ -198,13 +200,13 @@ def grid_from_dataset(ds):
     # maybe its an IOAPI file
     if hasattr(ds, 'IOAPI_VERSION') or hasattr(ds, 'P_ALP'):
         # IOAPI_VERSION
-        return _ioapi_grid_from_dataset(ds)
+        return _ioapi_grid_from_dataset(ds, earth_radius=earth_radius)
 
     # Try out platte carree
     return _lonlat_grid_from_dataset(ds)
 
 
-@xr.register_dataset_accessor('monet')
+@xr.register_dataarray_accessor('monet')
 class BaseModel(object):
     def __init__(self, xray_obj):
         self.obj = xray_obj
@@ -237,11 +239,92 @@ class BaseModel(object):
             """
             print('TODO')
 
+    def interp_constant_lat(self, lat=None, **kwargs):
+        """Interpolates the data array to constant latitude.
+
+        Parameters
+        ----------
+        lat : float
+            Latitude on which to interpolate to
+
+        Returns
+        -------
+        DataArray
+            DataArray of at constant latitude
+
+        """
+        from ..utils.interpolation import to_constant_latitude
+        try:
+            if lat is None:
+                raise RuntimeError
+            return to_constant_latitude(self.obj, lat=lat, **kwargs)
+        except RuntimeError:
+            print('Must enter lat value')
+
+    def interp_constant_lon(self, lon=None, **kwargs):
+        """Interpolates the data array to constant longitude.
+
+            Parameters
+            ----------
+            lon : float
+                Latitude on which to interpolate to
+
+            Returns
+            -------
+            DataArray
+                DataArray of at constant longitude
+
+            """
+        from ..utils.interpolation import to_constant_latitude
+        try:
+            if lat is None:
+                raise RuntimeError
+            return to_constant_latitude(self.obj, lat=lat, **kwargs)
+        except RuntimeError:
+            print('Must enter lat value')
+
+    def nearest_latlon(self, lat=None, lon=None, **kwargs):
+        from ..utils.interpolation import find_nearest_latlon_xarray
+        try:
+            if lat is None or lon is None:
+                raise RuntimeError
+
+            d = find_nearest_latlon_xarray(
+                self.obj, lat=lat, lon=lon, radius=radius)
+            return d
+        except RuntimeError:
+            print('Must provide latitude and longitude')
+
     def cartopy(self):
         """Returns a cartopy.crs.Projection for this dataset."""
         return proj_to_cartopy(self.obj.proj4_srs)
 
-    def combine(d):
+    def combine(self, data, col=None, radius=None):
+
+        #point source data
+        if isinstance(data, pd.DataFrame):
+            try:
+                if col is None:
+                    raise RuntimeError
+                return combine_da_to_df(self.obj, data, col=col, radius=radius)
+            except RuntimeError:
+                print('Must enter col ')
+        elif isinstance(data, xr.Dataset) or isinstance(data, xr.DataArray):
+            print('do spatial transform')
+        else:
+            print('d must be either a pd.DataFrame or xr.DataArray')
+
+
+@xr.register_dataset_accessor('monet')
+class BaseModel(object):
+    def __init__(self, xray_obj):
+        self.obj = xray_obj
+
+    def cartopy(self):
+        """Returns a cartopy.crs.Projection for this dataset."""
+        return proj_to_cartopy(self.obj.proj4_srs)
+
+    def combine(d, mapping_table=None, radius=None):
         #point source data
         if isinstance(d, pd.DataFrame):
             print('do pd.DataFrame thing here')
@@ -249,28 +332,3 @@ class BaseModel(object):
             print('do spatial transform')
         else:
             print('d must be either a pd.DataFrame or xr.DataArray')
-
-
-def get_times(dset):
-    if Series(dset.attrs.keys()).isin(['IOAPI_VERSION']).max():
-        from ioapitools import get_times
-        return get_times(dset)
-
-
-def open_ioapi_dataset(fname):
-    from pandas import Series
-    import ioapitools
-    dset = xr.open_dataset(fname)
-    grid = grid_from_dataset(dset)
-
-    dset = dset.assign_attrs({'proj4_srs': grid})
-    for i in dset.variables:
-        dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
-        for j in dset[i].attrs:
-            dset[i].attrs[j] = dset[i].attrs[j].strip()
-    lazy_vars = Series(dir(ioapitools)).str.contains('add_lazy')
-    for m in Series(dir(ioapitools)).loc[lazy_vars]:
-        print(m)
-        meth = getattr(ioapitools, m)
-        dset = meth(dset)
-    return dset

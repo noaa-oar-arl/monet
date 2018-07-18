@@ -1,5 +1,7 @@
 from numpy import array, concatenate
 from pandas import Series, to_datetime
+from monet.models.basemodel import *
+from inspect import getmembers, isfunction
 
 
 def can_do(index):
@@ -9,19 +11,72 @@ def can_do(index):
         return False
 
 
-def get_times(d):
+def open_files(fname, earth_radius=6370000):
+    dset = xr.open_mfdataset(fname)
+    grid = grid_from_dataset(dset, earth_radius=earth_radius)
+
+    dset = dset.assign_attrs({'proj4_srs': grid})
+    for i in dset.variables:
+        dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
+        for j in dset[i].attrs:
+            dset[i].attrs[j] = dset[i].attrs[j].strip()
+    # add lazy diagnostic variables
+    dset = add_lazy_pm25(dset)
+    dset = add_lazy_pm10(dset)
+    dset = add_lazy_pm_course(dset)
+    dset = add_lazy_clf(dset)
+    dset = add_lazy_naf(dset)
+    dset = add_lazy_caf(dset)
+    dset = add_lazy_noy(dset)
+    dset = add_lazy_nox(dset)
+    dset = add_lazy_no3f(dset)
+    dset = add_lazy_nh4f(dset)
+    dset = add_lazy_so4f(dset)
+    dset = add_lazy_rh(dset)
+
+    #get the times
+    dset = _get_times(dset)
+
+    #get the lat lon
+    dset = _get_latlon(dset)
+
+    # get Predefined mapping tables for observations
+    dset = _predefined_mapping_tables(dset)
+
+    # rename dimensions
+    dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
+
+    return dset
+
+
+def _get_times(d):
     idims = len(d.TFLAG.dims)
     if idims == 2:
         tflag1 = Series(d['TFLAG'][:, 0]).astype(str).str.zfill(7)
         tflag2 = Series(d['TFLAG'][:, 1]).astype(str).str.zfill(6)
     else:
-        tflag1 = Series(d['TFLAG'][:, :, 0]).astype(str).str.zfill(7)
+        tflag1 = Series(d['TFLAG'][:, 0, 0]).astype(str).str.zfill(7)
         tflag2 = Series(d['TFLAG'][:, 0, 1]).astype(str).str.zfill(6)
     date = to_datetime(
         [i + j for i, j in zip(tflag1, tflag2)], format='%Y%j%H%M%S')
     indexdates = Series(date).drop_duplicates(keep='last').index.values
-    d = d.isel(time=indexdates)
-    d['time'] = date[indexdates]
+    d = d.isel(TSTEP=indexdates)
+    d['TSTEP'] = date[indexdates]
+    return d.rename({'TSTEP': 'time'})
+
+
+def _get_latlon(dset):
+    import pyproj
+    from numpy import meshgrid
+    proj = pyproj.Proj(dset.proj4_srs)
+    x = dset.XORIG + dset.COL * dset.XCELL
+    y = dset.YORIG + dset.ROW * dset.YCELL
+    xx, yy = meshgrid(x, y)
+    lon, lat = proj(xx, yy, inverse=True)
+    dset['longitude'] = xr.DataArray(lon, dims=['ROW', 'COL'])
+    dset['latitude'] = xr.DataArray(lat, dims=['ROW', 'COL'])
+    dset = dset.assign_coords(longitude=dset.longitude, latitude=dset.latitude)
+    return dset
 
 
 def add_lazy_pm25(d):
@@ -54,8 +109,7 @@ def add_lazy_pm10(d):
         if can_do(index):
             newkeys = allvars.loc[index]
             d['PM10'] = add_multiple_lazy(d, newkeys)
-            d['PM10'] = add_multiple_lazy(d, newkeys)
-            d['PM10'].assign_attrs({
+            d['PM10'] = d['PM10'].assign_attrs({
                 'name':
                 'PM10',
                 'long_name':
@@ -71,7 +125,7 @@ def add_lazy_pm_course(d):
     if can_do(index):
         newkeys = allvars.loc[index]
         d['PM_COURSE'] = add_multiple_lazy(d, newkeys)
-        d['PM_COURSE'].assign_attrs({
+        d['PM_COURSE'] = d['PM_COURSE'].assign_attrs({
             'name':
             'PM_COURSE',
             'long_name':
@@ -89,7 +143,31 @@ def add_lazy_clf(d):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d['CLf'] = add_multiple_lazy(d, newkeys, weights=neww)
-        d['CLf'].attrs = d[newkeys[0]].attrs
+        d['CLf'] = d['CLf'].assign_attrs({
+            'name':
+            'CLf',
+            'long_name':
+            'Fine Mode particulate Cl'
+        })
+    return d
+
+
+def add_lazy_caf(d):
+    keys = Series([i for i in d.variables])
+    allvars = Series(['ACAI', 'ACAJ', 'ASEACAT', 'ASOIL', 'ACORS'])
+    weights = Series(
+        [1, 1, .2 * 32. / 1000., .2 * 83.8 / 1000., .2 * 56.2 / 1000.])
+    index = allvars.isin(keys)
+    if can_do(index):
+        newkeys = allvars.loc[index]
+        neww = weights.loc[index]
+        d['CAf'] = add_multiple_lazy(d, newkeys, weights=neww)
+        d['CAf'] = d['CAf'].assign_attrs({
+            'name':
+            'CAf',
+            'long_name':
+            'Fine Mode particulate CA'
+        })
     return d
 
 
@@ -103,7 +181,93 @@ def add_lazy_naf(d):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d['NAf'] = add_multiple_lazy(d, newkeys, weights=neww)
-        d['NAf'].assign_attrs({'name': 'NAf', 'long_name': 'NAf'})
+        d['NAf'] = d['NAf'].assign_attrs({'name': 'NAf', 'long_name': 'NAf'})
+    return d
+
+
+def add_lazy_so4f(d):
+    keys = Series([i for i in d.variables])
+    allvars = Series(['ASO4I', 'ASO4J', 'ASO4K'])
+    weights = Series([1., 1., .2])
+    index = allvars.isin(keys)
+    if can_do(index):
+        newkeys = allvars.loc[index]
+        neww = weights.loc[index]
+        d['SO4f'] = add_multiple_lazy(d, newkeys, weights=neww)
+        d['SO4f'] = d['SO4f'].assign_attrs({
+            'name': 'SO4f',
+            'long_name': 'SO4f'
+        })
+    return d
+
+
+def add_lazy_nh4f(d):
+    keys = Series([i for i in d.variables])
+    allvars = Series(['ANH4I', 'ANH4J', 'ANH4K'])
+    weights = Series([1., 1., .2])
+    index = allvars.isin(keys)
+    if can_do(index):
+        newkeys = allvars.loc[index]
+        neww = weights.loc[index]
+        d['NH4f'] = add_multiple_lazy(d, newkeys, weights=neww)
+        d['NH4f'] = d['NH4f'].assign_attrs({
+            'name': 'NH4f',
+            'long_name': 'NH4f'
+        })
+    return d
+
+
+def add_lazy_no3f(d):
+    keys = Series([i for i in d.variables])
+    allvars = Series(['ANO3I', 'ANO3J', 'ANO3K'])
+    weights = Series([1., 1., .2])
+    index = allvars.isin(keys)
+    if can_do(index):
+        newkeys = allvars.loc[index]
+        neww = weights.loc[index]
+        d['NO3f'] = add_multiple_lazy(d, newkeys, weights=neww)
+        d['NO3f'] = d['NO3f'].assign_attrs({
+            'name': 'NO3f',
+            'long_name': 'NO3f'
+        })
+    return d
+
+
+def add_lazy_noy(d):
+    keys = Series([i for i in d.variables])
+    allvars = Series(noy_gas)
+    index = allvars.isin(keys)
+    if can_do(index):
+        newkeys = allvars.loc[index]
+        d['NOy'] = add_multiple_lazy(d, newkeys)
+        d['NOy'] = d['NOy'].assign_attrs({'name': 'NOy', 'long_name': 'NOy'})
+    return d
+
+
+def add_lazy_rh(d):
+    keys = Series([i for i in d.variables])
+    allvars = Series(['TEMP', 'Q', 'PRES'])
+    index = allvars.isin(keys)
+    if can_do(index):
+        import atmos
+        data = {
+            'T': self.dset['TEMP'][:].compute().values,
+            'rv': self.dset['Q'][:].compute().values,
+            'p': self.dset['PRES'][:].compute().values
+        }
+        d['NOx'] = add_multiple_lazy(d, newkeys)
+        d['NOx'] = d['NOx'].assign_attrs({'name': 'NOx', 'long_name': 'NOx'})
+    return d
+
+
+def add_lazy_nox(d):
+    keys = Series([i for i in d.variables])
+    allvars = Series(['NO', 'NOX'])
+    index = allvars.isin(keys)
+    if can_do(index):
+        newkeys = allvars.loc[index]
+        d['NOx'] = add_multiple_lazy(d, newkeys)
+        d['NOx'] = d['NOx'].assign_attrs({'name': 'NOx', 'long_name': 'NOx'})
     return d
 
 
@@ -117,6 +281,109 @@ def add_multiple_lazy(dset, variables, weights=None):
     return new
 
 
+def _predefined_mapping_tables(dset):
+    """Predefined mapping tables for different observational parings used when
+        combining data.
+
+    Returns
+    -------
+    dictionary
+        A dictionary of to map to.
+
+    """
+    to_improve = {}
+    to_nadp = {}
+    to_aqs = {
+        'OZONE': ['O3'],
+        'PM2.5': ['PM25'],
+        'CO': ['CO'],
+        'NOY': ['NOy'],
+        'NOX': ['NOx'],
+        'SO2': ['SO2'],
+        'NOX': ['NOx'],
+        'NO': ['NO'],
+        'NO2': ['NO2'],
+        'SO4f': ['SO4f'],
+        'PM10': ['PM10'],
+        'NO3f': ['NO3f'],
+        'ECf': ['ECf'],
+        'OCf': ['OCf'],
+        'ETHANE': ['ETHA'],
+        'BENZENE': ['BENZENE'],
+        'TOLUENE': ['TOL'],
+        'ISOPRENE': ['ISOP'],
+        'O-XYLENE': ['XYL'],
+        'WS': ['WSPD10'],
+        'TEMP': ['TEMP2'],
+        'WD': ['WDIR10'],
+        'NAf': ['NAf'],
+        'MGf': ['AMGJ'],
+        'TIf': ['ATIJ'],
+        'SIf': ['ASIJ'],
+        'Kf': ['Kf'],
+        'CAf': ['CAf'],
+        'NH4f': ['NH4f'],
+        'FEf': ['AFEJ'],
+        'ALf': ['AALJ'],
+        'MNf': ['AMNJ']
+    }
+    to_airnow = {
+        'OZONE': ['O3'],
+        'PM2.5': ['PM25'],
+        'CO': ['CO'],
+        'NOY': ['NOy'],
+        'NOX': ['NOx'],
+        'SO2': ['SO2'],
+        'NOX': ['NOx'],
+        'NO': ['NO'],
+        'NO2': ['NO2'],
+        'SO4f': ['SO4f'],
+        'PM10': ['PM10'],
+        'NO3f': ['NO3f'],
+        'ECf': ['ECf'],
+        'OCf': ['OCf'],
+        'ETHANE': ['ETHA'],
+        'BENZENE': ['BENZENE'],
+        'TOLUENE': ['TOL'],
+        'ISOPRENE': ['ISOP'],
+        'O-XYLENE': ['XYL'],
+        'WS': ['WSPD10'],
+        'TEMP': ['TEMP2'],
+        'WD': ['WDIR10'],
+        'NAf': ['NAf'],
+        'MGf': ['AMGJ'],
+        'TIf': ['ATIJ'],
+        'SIf': ['ASIJ'],
+        'Kf': ['Kf'],
+        'CAf': ['CAf'],
+        'NH4f': ['NH4f'],
+        'FEf': ['AFEJ'],
+        'ALf': ['AALJ'],
+        'MNf': ['AMNJ']
+    }
+    to_crn = {
+        'SUR_TEMP': ['TEMPG'],
+        'T_HR_AVG': ['TEMP2'],
+        'SOLARAD': ['RGRND'],
+        'SOIL_MOISTURE_5': ['SOIM1'],
+        'SOIL_MOISTURE_10': ['SOIM2']
+    }
+    to_aeronet = {}
+    to_cems = {}
+    mapping_tables = {
+        'improve': to_improve,
+        'aqs': to_aqs,
+        'airnow': to_airnow,
+        'crn': to_crn,
+        'cems': to_cems,
+        'nadp': to_nadp,
+        'aeronet': to_aeronet
+    }
+    dset = dset.assign_attrs({'mapping_tables': mapping_tables})
+    return dset
+
+
+# Arrays for different gasses and pm groupings
 accumulation = array([
     'AALJ', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'ACAJ', 'ACLJ',
     'AECJ', 'AFEJ', 'AISO1J', 'AISO2J', 'AISO3J', 'AKJ', 'AMGJ', 'AMNJ',
