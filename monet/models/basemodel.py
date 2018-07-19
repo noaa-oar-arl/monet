@@ -16,133 +16,21 @@ except ImportError:
 from monet.models.combinetool import *
 
 
-def check_crs(crs):
-    """Checks if the crs represents a valid grid, projection or ESPG string.
-
-    Examples
-    --------
-    >>> p = check_crs('+units=m +init=epsg:26915')
-    >>> p.srs
-    '+units=m +init=epsg:26915 '
-    >>> p = check_crs('wrong')
-    >>> p is None
-    True
-
-    Returns
-    -------
-    A valid crs if possible, otherwise None
-    """
-    import pyproj
-    try:
-        out = pyproj.Proj(crs)
-    except RuntimeError:
-        try:
-            out = pyproj.Proj(init=crs)
-        except RuntimeError:
-            out = None
-
-    return out
-
-
-def proj_to_cartopy(proj):
-    """Converts a pyproj.Proj to a cartopy.crs.Projection
-
-    Parameters
-    ----------
-    proj: pyproj.Proj
-        the projection to convert
-
-    Returns
-    -------
-    a cartopy.crs.Projection object
-
-    """
-
-    import cartopy
-    import cartopy.crs as ccrs
-
-    proj = check_crs(proj)
-
-    if proj.is_latlong():
-        return ccrs.PlateCarree()
-
-    srs = proj.srs
-    if has_gdal:
-        # this is more robust, as srs could be anything (espg, etc.)
-        from osgeo import osr
-        s1 = osr.SpatialReference()
-        s1.ImportFromProj4(proj.srs)
-        srs = s1.ExportToProj4()
-
-    km_proj = {
-        'lon_0': 'central_longitude',
-        'lat_0': 'central_latitude',
-        'x_0': 'false_easting',
-        'y_0': 'false_northing',
-        'lat_ts': 'latitude_true_scale',
-        'k': 'scale_factor',
-        'zone': 'zone',
-    }
-    km_globe = {
-        'a': 'semimajor_axis',
-        'b': 'semiminor_axis',
-    }
-    km_std = {
-        'lat_1': 'lat_1',
-        'lat_2': 'lat_2',
-    }
-    kw_proj = dict()
-    kw_globe = dict()
-    kw_std = dict()
-    for s in srs.split('+'):
-        s = s.split('=')
-        if len(s) != 2:
-            continue
-        k = s[0].strip()
-        v = s[1].strip()
-        try:
-            v = float(v)
-        except:
-            pass
-        if k == 'proj':
-            if v == 'tmerc':
-                cl = ccrs.TransverseMercator
-            if v == 'lcc':
-                cl = ccrs.LambertConformal
-            if v == 'merc':
-                cl = ccrs.Mercator
-            if v == 'utm':
-                cl = ccrs.UTM
-            if v == 'stere':
-                cl = ccrs.Stereographic
-        if k in km_proj:
-            kw_proj[km_proj[k]] = v
-        if k in km_globe:
-            kw_globe[km_globe[k]] = v
-        if k in km_std:
-            kw_std[km_std[k]] = v
-
-    globe = None
-    if kw_globe:
-        globe = ccrs.Globe(ellipse='sphere', **kw_globe)
-    if kw_std:
-        kw_proj['standard_parallels'] = (kw_std['lat_1'], kw_std['lat_2'])
-
-    # mercatoooor
-    if cl.__name__ == 'Mercator':
-        kw_proj.pop('false_easting', None)
-        kw_proj.pop('false_northing', None)
-        if LooseVersion(cartopy.__version__) < LooseVersion('0.15'):
-            kw_proj.pop('latitude_true_scale', None)
-    elif cl.__name__ == 'Stereographic':
-        kw_proj.pop('scale_factor', None)
-        if 'latitude_true_scale' in kw_proj:
-            kw_proj['true_scale_latitude'] = kw_proj['latitude_true_scale']
-            kw_proj.pop('latitude_true_scale', None)
-    else:
-        kw_proj.pop('latitude_true_scale', None)
-
-    return cl(globe=globe, **kw_proj)
+def get_ioapi_pyresample_area_def(ds, proj4_srs):
+    from pyresample import geometry, utils
+    y_size = ds.NROWS
+    x_size = ds.NCOLS
+    projection = utils.proj4_str_to_dict(proj4_srs)
+    proj_id = 'dataset'
+    description = 'IOAPI area_def for pyresample'
+    area_id = 'Unknown'
+    x_ll, y_ll = x_ll, y_ll = ds.XORIG, ds.YORIG
+    x_ur, y_ur = ds.XORIG + (ds.NCOLS * ds.XCELL) + ds.XCELL, ds.YORIG + (
+        ds.YCELL * ds.NROWS) + ds.YCELL
+    area_extent = (x_ll, y_ll, x_ur, y_ur)
+    area_def = geometry.AreaDefinition(area_id, description, proj_id,
+                                       projection, x_size, y_size, area_extent)
+    return area_def
 
 
 def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
@@ -186,8 +74,8 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
     else:
         raise NotImplementedError('IOAPI proj not implemented yet: '
                                   '{}'.format(proj_id))
-
-    return p4
+    #area_def = _get_ioapi_pyresample_area_def(ds)
+    return p4  #, area_def
 
 
 def grid_from_dataset(ds, earth_radius=6370000):
@@ -299,7 +187,44 @@ class BaseModel(object):
         """Returns a cartopy.crs.Projection for this dataset."""
         return proj_to_cartopy(self.obj.proj4_srs)
 
+    def remap_nearest(grid, da):
+        """remaps from another grid to the current grid of self using pyresample.
+        it assumes that the dimensions are ordered in ROW,COL,CHANNEL per pyresample docs
+
+        Parameters
+        ----------
+        grid : pyresample grid
+            Description of parameter `grid`.
+        da : xarray DataArray
+            Description of parameter `dset`.
+
+        Returns
+        -------
+        xarray.DataArray
+            resampled object on current grid.
+
+        """
+        from pyresample import image
+        ndims = ()
+
     def combine(self, data, col=None, radius=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        data : type
+            Description of parameter `data`.
+        col : type
+            Description of parameter `col`.
+        radius : type
+            Description of parameter `radius`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
 
         #point source data
         if isinstance(data, pd.DataFrame):

@@ -1,8 +1,8 @@
 from __future__ import absolute_import, print_function
 
-from . import basemodel, combinetool, ioapitools
+from . import basemodel, combinetool, cmaq
 
-__all__ = ['basemodel', 'combinetool', 'ioapitools']
+__all__ = ['basemodel', 'combinetool', 'cmaq']
 
 __name__ = 'models'
 
