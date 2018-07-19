@@ -185,9 +185,9 @@ class BaseModel(object):
 
     def cartopy(self):
         """Returns a cartopy.crs.Projection for this dataset."""
-        return proj_to_cartopy(self.obj.proj4_srs)
+        return self.obj.area_def.to_cartopy_crs()
 
-    def remap_nearest(grid, da):
+    def remap_nearest(grid, da, radius_of_influence=12e3):
         """remaps from another grid to the current grid of self using pyresample.
         it assumes that the dimensions are ordered in ROW,COL,CHANNEL per pyresample docs
 
@@ -195,8 +195,10 @@ class BaseModel(object):
         ----------
         grid : pyresample grid
             Description of parameter `grid`.
-        da : xarray DataArray
+        da : ndarray or xarray DataArray
             Description of parameter `dset`.
+        radius_of_influence : float or integer
+            radius of influcence for pyresample in meters.
 
         Returns
         -------
@@ -205,7 +207,16 @@ class BaseModel(object):
 
         """
         from pyresample import image
-        ndims = ()
+        #resample the data
+        image_con = image.ImageContainerNearest(da,grid,radius_of_influence=radius_of_influence)
+        result = image_con.resample(self.obj.area_def).image_data
+        #if da is xarray retain attributes and assign new area_def and proj4_srs
+        # from current dataset
+        if isinstance(da,xr.DataArray):
+            xr.dims = 
+
+
+
 
     def combine(self, data, col=None, radius=None):
         """Short summary.
