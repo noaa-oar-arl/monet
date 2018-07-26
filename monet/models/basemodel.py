@@ -13,7 +13,7 @@ try:
     has_gdal = True
 except ImportError:
     has_gdal = False
-from monet.models.combinetool import *
+from .combinetool import combine_da_to_df
 
 
 def get_ioapi_pyresample_area_def(ds, proj4_srs):
@@ -23,10 +23,10 @@ def get_ioapi_pyresample_area_def(ds, proj4_srs):
     projection = utils.proj4_str_to_dict(proj4_srs)
     proj_id = 'dataset'
     description = 'IOAPI area_def for pyresample'
-    area_id = 'Unknown'
-    x_ll, y_ll = x_ll, y_ll = ds.XORIG, ds.YORIG
-    x_ur, y_ur = ds.XORIG + (ds.NCOLS * ds.XCELL) + ds.XCELL, ds.YORIG + (
-        ds.YCELL * ds.NROWS) + ds.YCELL
+    area_id = 'MONET_Object_Grid'
+    x_ll, y_ll = ds.XORIG + ds.XCELL * .5, ds.YORIG + ds.YCELL * .5
+    x_ur, y_ur = ds.XORIG + (ds.NCOLS * ds.XCELL) + .5 * ds.XCELL, ds.YORIG + (
+        ds.YCELL * ds.NROWS) + .5 * ds.YCELL
     area_extent = (x_ll, y_ll, x_ur, y_ur)
     area_def = geometry.AreaDefinition(area_id, description, proj_id,
                                        projection, x_size, y_size, area_extent)
@@ -128,26 +128,32 @@ class BaseModel(object):
             print('TODO')
 
     def interp_constant_lat(self, lat=None, **kwargs):
-        """Interpolates the data array to constant latitude.
+        """Interpolates the data array to constant longitude.
 
-        Parameters
-        ----------
-        lat : float
-            Latitude on which to interpolate to
+            Parameters
+            ----------
+            lon : float
+                Latitude on which to interpolate to
 
-        Returns
-        -------
-        DataArray
-            DataArray of at constant latitude
+            Returns
+            -------
+            DataArray
+                DataArray of at constant longitude
 
-        """
-        from ..utils.interpolation import to_constant_latitude
+            """
+        from ..util.interp_util import constant_lat_swathdefition
+        from ..util.resample import resample_dataset
+        from numpy import linspace
         try:
             if lat is None:
                 raise RuntimeError
-            return to_constant_latitude(self.obj, lat=lat, **kwargs)
         except RuntimeError:
             print('Must enter lat value')
+        longitude = linspace(self.obj.longitude.min(),
+                             self.obj.longitude.max(), len(self.obj.x))
+        target = constant_lat_swathdefition(longitude=longitude, latitude=lat)
+        output = resample_dataset(self.obj, target).squeeze()
+        return output
 
     def interp_constant_lon(self, lon=None, **kwargs):
         """Interpolates the data array to constant longitude.
@@ -163,37 +169,58 @@ class BaseModel(object):
                 DataArray of at constant longitude
 
             """
-        from ..utils.interpolation import to_constant_latitude
+        from ..util.interp_util import constant_lon_swathdefition
+        from ..util.resample import resample_dataset
+        from numpy import linspace
         try:
-            if lat is None:
+            if lon is None:
                 raise RuntimeError
-            return to_constant_latitude(self.obj, lat=lat, **kwargs)
         except RuntimeError:
-            print('Must enter lat value')
+            print('Must enter lon value')
+        latitude = linspace(self.obj.latitude.min(), self.obj.latitude.max(),
+                            len(self.obj.y))
+        target = constant_lon_swathdefition(longitude=lon, latitude=latitude)
+        output = resample_dataset(self.obj, target).squeeze()
+        return output
 
     def nearest_latlon(self, lat=None, lon=None, **kwargs):
-        from ..utils.interpolation import find_nearest_latlon_xarray
+        from ..util.interp_util import nearest_point_swathdefinition
+        from ..util.resample import resample_dataset
         try:
             if lat is None or lon is None:
                 raise RuntimeError
-
-            d = find_nearest_latlon_xarray(
-                self.obj, lat=lat, lon=lon, radius=radius)
-            return d
         except RuntimeError:
             print('Must provide latitude and longitude')
+        target = nearest_point_swathdefinition(longitude=lon, latitude=lat)
+        output = resample_dataset(self.obj, target).squeeze()
+        return output
 
     def cartopy(self):
         """Returns a cartopy.crs.Projection for this dataset."""
-        return self.obj.area_def.to_cartopy_crs()
+        return self.obj.area.to_cartopy_crs()
 
-    def remap_nearest(grid, da, radius_of_influence=12e3):
+    def quick_map(
+            self,
+            map_kwarg={},
+            **kwargs,
+    ):
+        from ..plots.mapgen import draw_map
+        from matplotlib.pyplot import subplots, tight_layout
+        #import cartopy.crs as ccrs
+        #crs = self.obj.monet.cartopy()
+        ax = draw_map(**map_kwarg)
+        self.obj.plot(x='longitude', y='latitude', ax=ax, **kwargs)
+        ax.outline_patch.set_alpha(0)
+        tight_layout()
+        return ax
+
+    def remap_nearest(self, dataarray, grid=None, **kwargs):
         """remaps from another grid to the current grid of self using pyresample.
         it assumes that the dimensions are ordered in ROW,COL,CHANNEL per pyresample docs
 
         Parameters
         ----------
-        grid : pyresample grid
+        grid : pyresample grid (SwathDefinition or AreaDefinition)
             Description of parameter `grid`.
         da : ndarray or xarray DataArray
             Description of parameter `dset`.
@@ -206,19 +233,20 @@ class BaseModel(object):
             resampled object on current grid.
 
         """
-        from pyresample import image
-        #resample the data
-        image_con = image.ImageContainerNearest(da,grid,radius_of_influence=radius_of_influence)
-        result = image_con.resample(self.obj.area_def).image_data
-        #if da is xarray retain attributes and assign new area_def and proj4_srs
-        # from current dataset
-        if isinstance(da,xr.DataArray):
-            xr.dims = 
+        from ..util import resample
+        # check to see if grid is supplied
+        target = self.obj.area
+        if grid is None:  #grid is assumed to be in da.area
+            source = dataarray
+            out = resample.resample_dataset(dataarray.chunk(), target,
+                                            **kwargs)
+        else:
+            dataarray.attrs['area'] = grid
+            out = resample.resample_dataset(dataarray.chunk(), target,
+                                            **kwargs)
+        return out
 
-
-
-
-    def combine(self, data, col=None, radius=None):
+    def combine(self, data, col=None, radius_of_influence=None):
         """Short summary.
 
         Parameters
@@ -236,13 +264,14 @@ class BaseModel(object):
             Description of returned object.
 
         """
-
+        from .combinetool import combine_da_to_df
         #point source data
         if isinstance(data, pd.DataFrame):
             try:
                 if col is None:
                     raise RuntimeError
-                return combine_da_to_df(self.obj, data, col=col, radius=radius)
+                return combine_da_to_df(
+                    self.obj, data, col=col, radius_of_influence=radius)
             except RuntimeError:
                 print('Must enter col ')
         elif isinstance(data, xr.Dataset) or isinstance(data, xr.DataArray):
@@ -256,15 +285,111 @@ class BaseModel(object):
     def __init__(self, xray_obj):
         self.obj = xray_obj
 
+    def remap_nearest(self, data, grid=None, **kwargs):
+        try:
+            if isinstance(data, xr.DataArray):
+                self._remap_dataarray_nearest(data, grid=grid, **kwargs)
+            elif instance(data, xr.Dataset):
+                self._remap_dataset_nearest(data, grid=None, **kwargs)
+            else:
+                raise TypeError
+        except TypeError:
+            print('data must be an xarray.DataArray or xarray.Dataset')
+
+    def _remap_dataset_nearest(self, dset, grid=None, **kwargs):
+        """Resample the entire xarray.Dataset to the current dataset object.
+
+        Parameters
+        ----------
+        dset : xarray.Dataset
+            Description of parameter `dataarray`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        from ..util import resample
+        target = self.obj.area
+        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
+        vars = pd.Series(dset.variables)
+        loop_vars = vars.loc[~vars.isin(skip_keys)]
+        #get the first one in the loop and get the resample_cache data
+        dataarray = dset[loop_vars[0]]
+
+        da, resample_cache = self._remap_dataarray_nearest(
+            dataarray, grid=grid, return_neighbor_info=True, **kwargs)
+        if da.name in self.obj.variables:
+            da.name = da.name + '_y'
+        self.obj[da.name] = da
+        for i in loop_vars[1:]:
+            dataarray = dset[i]
+            da, resample_cache = self._remap_dataarray_nearest(
+                dataarray, grid=grid, resample_cache=resample_cache, **kwargs)
+            if da.name in self.obj.variables:
+                da.name = da.name + '_y'
+            self.obj[da.name] = da
+
+    def _remap_dataarray_nearest(self, dataarray, grid=None, **kwargs):
+        """Resample the DataArray to the dataset object.
+
+        Parameters
+        ----------
+        dataarray : type
+            Description of parameter `dataarray`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        from ..util import resample
+        target = self.obj.area
+        if grid is None:  #grid is assumed to be in da.area
+            out = resample.resample_dataset(dataarray.chunk(), target,
+                                            **kwargs)
+        else:
+            dataarray.attrs['area'] = grid
+            out = resample.resample_dataset(dataarray.chunk(), target,
+                                            **kwargs)
+        if out.name in dset.variables:
+            out.name = out.name + '_y'
+        dset[out.name] = out
+
     def cartopy(self):
         """Returns a cartopy.crs.Projection for this dataset."""
         return proj_to_cartopy(self.obj.proj4_srs)
 
-    def combine(d, mapping_table=None, radius=None):
-        #point source data
-        if isinstance(d, pd.DataFrame):
-            print('do pd.DataFrame thing here')
-        elif isinstance(d, xr.Dataset) or isinstance(d, xr.DataArray):
-            print('do spatial transform')
-        else:
-            print('d must be either a pd.DataFrame or xr.DataArray')
+    def combine_to_df(df, mapping_table=None, radius_of_influence=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        df : type
+            Description of parameter `df`.
+        mapping_table : type
+            Description of parameter `mapping_table`.
+        radius : type
+            Description of parameter `radius`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        from .combinetool import combine_da_to_df
+        try:
+            if ~isinstance(df, pd.DataFrame):
+                raise TypeError
+        except TypeError:
+            print('df must be of type pd.DataFrame')
+        for i in mapping_table:
+            df = combine_da_to_df(
+                self.obj[mapping_table[i]],
+                df,
+                col=i,
+                radius=radius_of_influence)
+        return df

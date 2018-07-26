@@ -1,6 +1,7 @@
 from numpy import array, concatenate
 from pandas import Series, to_datetime
-from monet.models.basemodel import *
+import xarray as xr
+from monet.models.basemodel import BaseModel, grid_from_dataset, get_ioapi_pyresample_area_def
 from inspect import getmembers, isfunction
 
 
@@ -39,8 +40,8 @@ def open_files(fname, earth_radius=6370000):
         dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
         for j in dset[i].attrs:
             dset[i].attrs[j] = dset[i].attrs[j].strip()
-        dset[i] = dset[i].assign_attrs({'area_def': area_def})
-    dset = dset.assign_attrs(area_def=area_def)
+        dset[i] = dset[i].assign_attrs({'area': area_def})
+    dset = dset.assign_attrs(area=area_def)
 
     # add lazy diagnostic variables
     dset = add_lazy_pm25(dset)
@@ -88,14 +89,40 @@ def _get_times(d):
 
 
 def _get_latlon(dset):
-    lon, lat = dset.area_def.get_lonlats()
-    dset['longitude'] = xr.DataArray(lon, dims=['ROW', 'COL'])
-    dset['latitude'] = xr.DataArray(lat, dims=['ROW', 'COL'])
+    """gets the lat and lons from the pyreample.geometry.AreaDefinition
+
+    Parameters
+    ----------
+    dset : xarray.Dataset
+        Description of parameter `dset`.
+
+    Returns
+    -------
+    xarray.Dataset
+        Description of returned object.
+
+    """
+    lon, lat = dset.area.get_lonlats()
+    dset['longitude'] = xr.DataArray(lon[::-1, :], dims=['ROW', 'COL'])
+    dset['latitude'] = xr.DataArray(lat[::-1, :], dims=['ROW', 'COL'])
     dset = dset.assign_coords(longitude=dset.longitude, latitude=dset.latitude)
     return dset
 
 
 def add_lazy_pm25(d):
+    """Short summary.
+
+    Parameters
+    ----------
+    d : type
+        Description of parameter `d`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     keys = Series([i for i in d.variables])
     allvars = Series(concatenate([aitken, accumulation, coarse]))
     weights = Series([
@@ -105,7 +132,7 @@ def add_lazy_pm25(d):
         1., 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2
     ])
     if 'PM25_TOT' in keys:
-        d['PM25'] = d['PM25_TOT'].chunks()
+        d['PM25'] = d['PM25_TOT'].chunk()
     else:
         index = allvars.isin(keys)
         newkeys = allvars.loc[index]
@@ -119,7 +146,7 @@ def add_lazy_pm10(d):
     keys = Series([i for i in d.variables])
     allvars = Series(concatenate([aitken, accumulation, coarse]))
     if 'PM_TOT' in keys:
-        d['PM10'] = d['PM_TOT'].chunks()
+        d['PM10'] = d['PM_TOT'].chunk()
     else:
         index = allvars.isin(keys)
         if can_do(index):
