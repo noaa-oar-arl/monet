@@ -37,7 +37,7 @@ def addmonth(dt):
     return datetime.datetime(year, month, day, hour)
 
 
-class CEMSEmissions(object):
+class CEMS(object):
     """
     Class for data from continuous emission monitoring systems (CEMS).
     Data from power plants can be downloaded from ftp://newftp.epa.gov/DMDNLoad/emissions/
@@ -87,30 +87,23 @@ class CEMSEmissions(object):
            gets the ftp url from the retrieve method and then
            loads the data from the ftp site using the load method.
 
-           rdate should either be a single datetime object or a list of two datetime objects.
-           The first datetime object indicates the month and year of the first file to retrieve.
-           The second datetime object indicates the month and year of the last file to retrieve.
-
-           If download=True then retrieve will download the files and load
-           will read the downloaded files.
-           If download=False then retrieve will return the url and load will read directly from ftp site.
-           TO DO add loop for adding multiple months.
-
         Parameters
         ----------
-        rdate : list of datetime objects
-            Description of parameter `rdate`.
+        rdate : single datetime object of list of datetime objects
+               The first datetime object indicates the month and year of the first file to retrieve.
+               The second datetime object indicates the month and year of the last file to retrieve.
         states : list of strings
              list of two letter state identifications.
         download : boolean
-            Description of parameter `download`.
+               if download=True then retrieve will download the files and load
+               will read the downloaded files.
+               if download=False then retrieve will return the url and load will read directly from ftp site.
         verbose : boolean
-            if TRUE prints out additional information.
+               if TRUE prints out additional information.
         Returns
         -------
-        type
-            Description of returned object.
-
+        boolean True 
+                
         """
         if isinstance(states, str):
             states = [states]
@@ -136,6 +129,7 @@ class CEMSEmissions(object):
             for st in states:
                 url = self.retrieve(rd, st, download=download, verbose=verbose)
                 self.load(url, verbose=verbose)
+        return True
 
     def match_column(self, varname):
         """varname is list of strings.

@@ -8,6 +8,7 @@ from datetime import datetime
 from zipfile import ZipFile
 
 import dask
+import dask.diagnostics
 import dask.dataframe as dd
 import pandas as pd
 import requests
