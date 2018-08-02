@@ -3,7 +3,6 @@ from pandas import Series, to_datetime
 import xarray as xr
 from ..grids import grid_from_dataset, get_ioapi_pyresample_area_def
 
-
 def can_do(index):
     if index.max():
         return True
@@ -28,7 +27,7 @@ def open_files(fname, earth_radius=6370000):
 
     """
     #open the dataset using xarray
-    dset = xr.open_mfdataset(fname)
+    dset = xr.open_mfdataset(fname, engine='pseudonetcdf', backend_kwargs={'format':'uamiv'})
 
     #get the grid information
     grid = grid_from_dataset(dset, earth_radius=earth_radius)
@@ -42,9 +41,6 @@ def open_files(fname, earth_radius=6370000):
         dset[i] = dset[i].assign_attrs({'area': area_def})
     dset = dset.assign_attrs(area=area_def)
 
-    # set log pressure as coordinate
-    if 'PRES' in dset.variables:
-        dset.coords['logp'] = xr.ufuncs.log(dset.PRES.chunk())
     # add lazy diagnostic variables
     dset = add_lazy_pm25(dset)
     dset = add_lazy_pm10(dset)
@@ -342,17 +338,20 @@ def _predefined_mapping_tables(dset):
         'OZONE': ['O3'],
         'PM2.5': ['PM25'],
         'CO': ['CO'],
-        'NOY': ['NOy'],
-        'NOX': ['NOx'],
+        'NOY': [
+            'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX',
+            'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
+        ],
+        'NOX': ['NO', 'NO2'],
         'SO2': ['SO2'],
-        'NOX': ['NOx'],
+        'NOX': ['NO', 'NO2'],
         'NO': ['NO'],
         'NO2': ['NO2'],
-        'SO4f': ['SO4f'],
+        'SO4f': ['PSO4'],
         'PM10': ['PM10'],
-        'NO3f': ['NO3f'],
-        'ECf': ['ECf'],
-        'OCf': ['OCf'],
+        'NO3f': ['PNO3'],
+        'ECf': ['PEC'],
+        'OCf': ['OC'],
         'ETHANE': ['ETHA'],
         'BENZENE': ['BENZENE'],
         'TOLUENE': ['TOL'],
@@ -361,32 +360,27 @@ def _predefined_mapping_tables(dset):
         'WS': ['WSPD10'],
         'TEMP': ['TEMP2'],
         'WD': ['WDIR10'],
-        'NAf': ['NAf'],
-        'MGf': ['AMGJ'],
-        'TIf': ['ATIJ'],
-        'SIf': ['ASIJ'],
-        'Kf': ['Kf'],
-        'CAf': ['CAf'],
-        'NH4f': ['NH4f'],
-        'FEf': ['AFEJ'],
-        'ALf': ['AALJ'],
-        'MNf': ['AMNJ']
+        'NAf': ['NA'],
+        'NH4f': ['PNH4']
     }
     to_airnow = {
         'OZONE': ['O3'],
         'PM2.5': ['PM25'],
         'CO': ['CO'],
-        'NOY': ['NOy'],
-        'NOX': ['NOx'],
+        'NOY': [
+            'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX',
+            'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
+        ],
+        'NOX': ['NO', 'NO2'],
         'SO2': ['SO2'],
-        'NOX': ['NOx'],
+        'NOX': ['NO', 'NO2'],
         'NO': ['NO'],
         'NO2': ['NO2'],
-        'SO4f': ['SO4f'],
+        'SO4f': ['PSO4'],
         'PM10': ['PM10'],
-        'NO3f': ['NO3f'],
-        'ECf': ['ECf'],
-        'OCf': ['OCf'],
+        'NO3f': ['PNO3'],
+        'ECf': ['PEC'],
+        'OCf': ['OC'],
         'ETHANE': ['ETHA'],
         'BENZENE': ['BENZENE'],
         'TOLUENE': ['TOL'],
@@ -395,24 +389,10 @@ def _predefined_mapping_tables(dset):
         'WS': ['WSPD10'],
         'TEMP': ['TEMP2'],
         'WD': ['WDIR10'],
-        'NAf': ['NAf'],
-        'MGf': ['AMGJ'],
-        'TIf': ['ATIJ'],
-        'SIf': ['ASIJ'],
-        'Kf': ['Kf'],
-        'CAf': ['CAf'],
-        'NH4f': ['NH4f'],
-        'FEf': ['AFEJ'],
-        'ALf': ['AALJ'],
-        'MNf': ['AMNJ']
+        'NAf': ['NA'],
+        'NH4f': ['PNH4']
     }
-    to_crn = {
-        'SUR_TEMP': ['TEMPG'],
-        'T_HR_AVG': ['TEMP2'],
-        'SOLARAD': ['RGRND'],
-        'SOIL_MOISTURE_5': ['SOIM1'],
-        'SOIL_MOISTURE_10': ['SOIM2']
-    }
+    to_crn = {}}
     to_aeronet = {}
     to_cems = {}
     mapping_tables = {
@@ -429,36 +409,16 @@ def _predefined_mapping_tables(dset):
 
 
 # Arrays for different gasses and pm groupings
-accumulation = array([
-    'AALJ', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J', 'ACAJ', 'ACLJ',
-    'AECJ', 'AFEJ', 'AISO1J', 'AISO2J', 'AISO3J', 'AKJ', 'AMGJ', 'AMNJ',
-    'ANAJ', 'ANH4J', 'ANO3J', 'AOLGAJ', 'AOLGBJ', 'AORGCJ', 'AOTHRJ', 'APAH1J',
-    'APAH2J', 'APAH3J', 'APNCOMJ', 'APOCJ', 'ASIJ', 'ASO4J', 'ASQTJ', 'ATIJ',
-    'ATOL1J', 'ATOL2J', 'ATOL3J', 'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J',
-    'AXYL3J', 'AORGAJ', 'AORGPAJ', 'AORGBJ'
+coarse = array([
+    'NA', 'PSO4', 'PNO3', 'PNH4', 'PH2O', 'PCL', 'PEC', 'FPRM', 'FCRS', 'CPRM',
+    'CCRS', 'SOA1', 'SOA2', 'SOA3', 'SOA4'
 ])
-aitken = array([
-    'ACLI', 'AECI', 'ANAI', 'ANH4I', 'ANO3I', 'AOTHRI', 'APNCOMI', 'APOCI',
-    'ASO4I', 'AORGAI', 'AORGPAI', 'AORGBI'
+fine = array([
+    'NA', 'PSO4', 'PNO3', 'PNH4', 'PH2O', 'PCL', 'PEC', 'FPRM', 'FCRS', 'SOA1',
+    'SOA2', 'SOA3', 'SOA4'
 ])
-coarse = array(
-    ['ACLK', 'ACORS', 'ANH4K', 'ANO3K', 'ASEACAT', 'ASO4K', 'ASOIL'])
 noy_gas = array([
     'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA', 'NTR',
     'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
 ])
-pec = array(['AECI', 'AECJ'])
-pso4 = array(['ASO4I', 'ASO4J'])
-pno3 = array(['ANO3I', 'ANO3J'])
-pnh4 = array(['ANH4I', 'ANH4J'])
-pcl = array(['ACLI', 'ACLJ'])
-poc = array([
-    'AOTHRI', 'APNCOMI', 'APOCI', 'AORGAI', 'AORGPAI', 'AORGBI', 'ATOL1J',
-    'ATOL2J', 'ATOL3J', 'ATRP1J', 'ATRP2J', 'AXYL1J', 'AXYL2J', 'AXYL3J',
-    'AORGAJ', 'AORGPAJ', 'AORGBJ', 'AOLGAJ', 'AOLGBJ', 'AORGCJ', 'AOTHRJ',
-    'APAH1J', 'APAH2J', 'APAH3J', 'APNCOMJ', 'APOCJ', 'ASQTJ', 'AISO1J',
-    'AISO2J', 'AISO3J', 'AALK1J', 'AALK2J', 'ABNZ1J', 'ABNZ2J', 'ABNZ3J',
-    'AORGAI', 'AORGAJ', 'AORGPAI', 'AORGPAJ', 'AORGBI', 'AORGBJ'
-])
-minerals = array(
-    ['AALJ', 'ACAJ', 'AFEJ', 'AKJ', 'AMGJ', 'AMNJ', 'ANAJ', 'ATIJ', 'ASIJ'])
+poc = array(['SOA1', 'SOA2', 'SOA3', 'SOA4'])
