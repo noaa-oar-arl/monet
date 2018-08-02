@@ -12,10 +12,11 @@ import dask.dataframe as dd
 import pandas as pd
 import requests
 from numpy import arange, array
+from dask.diagnostics import ProgressBar
 
 from .epa_util import read_monitor_file
 
-pbar = dask.diagnostics.ProgressBar()
+pbar = ProgressBar()
 pbar.register()
 
 

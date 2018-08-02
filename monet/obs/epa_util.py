@@ -2,6 +2,8 @@ from __future__ import print_function
 
 from future import standard_library
 
+from dask.diagnostics import ProgressBar
+
 standard_library.install_aliases()
 
 
@@ -606,7 +608,8 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
             sss = sss.loc[sss.networks.isin(
                 [network])].drop_duplicates(subset=['siteid'])
         if drop_latlon:
-            return sss.drop(
-                ['latitude', 'longitude'], axis=1).drop_duplicates()
+            if pd.Series(sss.keys()).isin(['latitude', 'longitude']):
+                return sss.drop(
+                    ['latitude', 'longitude'], axis=1).drop_duplicates()
         else:
             return sss.drop_duplicates()
