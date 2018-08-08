@@ -38,6 +38,7 @@ def find_near(df, latlon, distance=100, sid='site_num', drange=None):
            lhash.pop(key, None) 
     return lhash
 
+
 def write_datem(df, obscolumn='obs', dname = 'datemfile.txt', sitename='1', info=None, drange=None):
     """returns string in datem format (See NOAA ARL).
      datem format has the following columns:
@@ -62,7 +63,7 @@ def write_datem(df, obscolumn='obs', dname = 'datemfile.txt', sitename='1', info
        string in datem format.
     """
     if drange:
-       df = timefilter(drange)
+       df = timefilter(df, drange)
       
     units=df['units'].tolist()
     units = list(set(units))
@@ -91,7 +92,6 @@ def write_datem(df, obscolumn='obs', dname = 'datemfile.txt', sitename='1', info
        sval = [sitename] * len(cval)
     for val in zip(t1, lat, lon, cval, sval):
         runstring += val[0].strftime('%Y  %m  %d  %H%M') +  duration
-        print(runstring)
         try:
             runstring += str(val[1]) + ' ' + str(val[2]) + ' ' 
         except:
@@ -101,7 +101,7 @@ def write_datem(df, obscolumn='obs', dname = 'datemfile.txt', sitename='1', info
             print(type(val[2]))
             sys.exit()
         if isinstance(val[4],str):
-            runstring +=  "{:.3f}".format(val[3]) + val[4] + height + "\n"
+            runstring +=  "{:.3f}".format(val[3]) + ' ' + val[4] + ' ' + height + "\n"
         else:
             runstring +=  "{:.3f}".format(val[3]) + ' ' + "{0:d}".format(val[4]) + ' ' + height + "\n"
 

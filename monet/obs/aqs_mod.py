@@ -58,10 +58,6 @@ class AQS(object):
         #        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
         self.objtype = 'AQS'
         self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
-        self.dates = [
-            datetime.strptime('2014-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
-            datetime.strptime('2014-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')
-        ]
         self.renamedhcols = [
             'time_local', 'time', 'state_code', 'county_code', 'site_num',
             'parameter_code', 'poc', 'latitude', 'longitude', 'datum',
@@ -217,8 +213,8 @@ class AQS(object):
         ----------
         params : type
             Description of parameter `params`.
-        dates : type
-            Description of parameter `dates`.
+        dates : list of datetime objects
+            dates to retrieve data for. Only the years are taken into account.
         daily : type
             Description of parameter `daily` (the default is False).
 
@@ -276,11 +272,11 @@ class AQS(object):
 
         Parameters
         ----------
-        dates : type
+        dates : list of datetime objects
             Description of parameter `dates`.
-        param : type
+        param : list of strings
             Description of parameter `param` (the default is None).
-        daily : type
+        daily : boolean
             Description of parameter `daily` (the default is False).
         network : type
             Description of parameter `network` (the default is None).
