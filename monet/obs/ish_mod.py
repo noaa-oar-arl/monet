@@ -82,6 +82,7 @@ class ISH(object):
                 index = index + w
             yield ','.join(items)
 
+
     def _clean_column(self, series, missing=9999, multiplier=1):
         series = series.apply(float)
         series[series == missing] = np.nan
@@ -140,6 +141,9 @@ class ISH(object):
         latindex = (self.history.latitude >= latmin) & (self.history.latitude <= latmax)
         lonindex = (self.history.longitude >= lonmin) & (self.history.longitude <= lonmax)
         dfloc = self.history.loc[latindex & lonindex, :]
+        print('SUBSET')
+        print(dfloc.latitude.unique())
+        print(dfloc.longitude.unique())
         return dfloc
 
     #def read_sites(self, box=None, country=None, state=None, site=None, resample=True, window='H'):
@@ -180,6 +184,7 @@ class ISH(object):
         elif type(site) is not type(None):
             print('Retrieving Site: ' + site)
             dfloc = self.history.loc[self.history.station_id == site, :]
+        print(dfloc.fname.unique())
         objs = self.get_url_file_objs(dfloc.fname.unique())
         # return objs,size,self.history.fname
         # dfs = []
@@ -198,8 +203,15 @@ class ISH(object):
             print('  Resampling to every ' + window)
             self.df.index = self.df.time
             self.df = self.df.groupby('station_id').resample('H').mean().reset_index()
-        self.df = self.df.merge(self.history[['station_id', 'latitude', 'longitude', 'station name']],
+        #self.df = self.df.merge(self.history[['station_id', 'latitude', 'longitude', 'station name']],
+        #                        on=['station_id'], how='left')
+        try: #this was encoded as byte literal but in dfloc it is a string so could not merge on station_id correctly.
+          self.df['station_id'] = self.df['station_id'].str.decode("utf-8") 
+        except:
+          pass
+        self.df = self.df.merge(dfloc[['station_id', 'latitude', 'longitude', 'station name']],
                                 on=['station_id'], how='left')
+       
         return self.df.copy()
 
     def get_url_file_objs(self, fname):
