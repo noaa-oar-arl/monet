@@ -198,12 +198,18 @@ class CEMS(object):
         else:
             temp = self.df.copy()
         if daterange: temp = timefilter(temp, daterange)
-        cmatch = self.match_column(varname)
+        #cmatch = self.match_column(varname)
+        cmatch=varname
+        #print('CMATCH', cmatch)
+        #print(temp.columns.values)
         if 'unit_id' in columns:
+            if len(temp['unit_id'].unique()) > 0:
+                if verbose: print('UNIT IDs ' , temp['unit_id'].unique())
             ##create pandas frame with index datetime and columns for value for each unit_id
             pivot = pd.pivot_table(
                 temp, values=cmatch, index=['time'], columns=['unit_id'])
             pivot = pivot.fillna(value=0)
+            #print('UNIT IDs ', pivot.columns)
             #print('------------------pivot')
             #print(pivot[0:10])
             if unitid == -99:
@@ -213,6 +219,7 @@ class CEMS(object):
             else:
                 return pivot['unitid']
         else:
+            print('NO UNIT ID')
             #temp.set_index('time', inplace=True)
             ##returns data frame where rows are date and columns are the values of cmatch for each fac_id.
             pivot = pd.pivot_table(
@@ -223,7 +230,6 @@ class CEMS(object):
                 columns = list(pivot.columns.values)
                 for ccc in columns:
                     cnew.append(ldict[ccc])
-
             pivot.columns = cnew
             return pivot
             #return temp[cmatch]
@@ -277,17 +283,30 @@ class CEMS(object):
         self.info += 'File retrieved :' + efile + '\n'
         return efile
 
-    def create_location_dictionary(self):
+    def create_location_dictionary(self, verbose=False):
         if 'latitude' in list(self.df.columns.values):
             dftemp = self.df.copy()
             pairs = zip(dftemp['orispl_code'],
                         zip(dftemp['latitude'], dftemp['longitude']))
             pairs = list(set(pairs))
             lhash = dict(pairs)  #key is facility id and value is name.
-            print(lhash)
+            if verbose: print(lhash)
             return lhash
         else:
             return false
+
+    def create_name_dictionary(self, verbose=False):
+        if 'latitude' in list(self.df.columns.values):
+            dftemp = self.df.copy()
+            pairs = zip(dftemp['orispl_code'],
+                        dftemp['facility_name'])
+            pairs = list(set(pairs))
+            lhash = dict(pairs)  #key is facility id and value is name.
+            if verbose: print(lhash)
+            return lhash
+        else:
+            return false
+
 
     def rename(self, ccc, newname, rcolumn, verbose):
         """
@@ -394,23 +413,30 @@ class CEMS(object):
         """
         basedir = os.path.abspath(os.path.dirname(__file__))[:-3]
         iname = os.path.join(basedir, 'data', 'cemsinfo.csv')
+        #iname = os.path.join(basedir, 'data', 'cem_facility_loc.csv')
         method = 1
         ##TO DO: Having trouble with pytest throwing an error when using the apply on the dataframe.
         ##runs ok, but pytest fails. Tried several differnt methods.
         if os.path.isfile(iname):
             sinfo = pd.read_csv(iname, sep=',', header=0)
+            try:
+               dftemp.drop(['latitude', 'longitude'], axis=1, inplace=True)
+            except:
+               pass
             dfnew = pd.merge(
                 dftemp,
                 sinfo,
                 how='left',
                 left_on=['orispl_code'],
                 right_on=['orispl_code'])
+            #print('---------z-----------')
+            #print(dfnew.columns.values)
             #remove stations which do not have a time offset.
             dfnew.dropna(axis=0, subset=['time_offset'], inplace=True)
             if method == 1:
                 #this runs ok but fails pytest
                 def i2o(x):
-                    return (datetime.timedelta(x['time_offset']))
+                    return (datetime.timedelta(hours=x['time_offset']))
 
                 dfnew['time_offset'] = dfnew.apply(i2o, axis=1)
                 dfnew['time'] = dfnew['time local'] + dfnew['time_offset']
@@ -433,10 +459,14 @@ class CEMS(object):
             dfnew.drop(['time_offset'], axis=1, inplace=True)
             mlist = dftemp.columns.values.tolist()
             dlist = dftemp.columns.values.tolist()
+            #print(mlist)
+            #print(dftemp.columns.values)
+            #print(dfnew.columns.values)
             #merge the dataframes back together to include rows with no info in the cemsinfo.csv
             dftemp = pd.merge(
                 dftemp, dfnew, how='left', left_on=mlist, right_on=mlist)
         return dftemp
+        #return dfnew
 
     def load(self, efile, verbose=True):
         """
@@ -469,7 +499,7 @@ class CEMS(object):
         dftemp = self.add_info(dftemp)
 
         if ['year'] in columns: dftemp.drop(['year'], axis=1, inplace=True)
-        if not self.df.empty:
+        if  self.df.empty:
             self.df = dftemp
             if verbose:
                 print('Initializing pandas dataframe. Loading ' + efile)
@@ -477,5 +507,5 @@ class CEMS(object):
             self.df = self.df.append(dftemp)
             if verbose:
                 print('Appending to pandas dataframe. Loading ' + efile)
-        if verbose: print(dftemp[0:10])
+        #if verbose: print(dftemp[0:10])
         return dftemp
