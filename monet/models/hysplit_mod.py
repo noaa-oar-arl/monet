@@ -28,7 +28,7 @@ ABSTRACT: classes and functions for creating HYSPLIT control and setup files.
 class HYSPLIT(BaseModel):
     def __init__(self):
         BaseModel.__init__(self)
-        # self.dset=None
+        self.dset=None
 
     # use open_files method from the BaseModel class.
 
@@ -39,13 +39,15 @@ class HYSPLIT(BaseModel):
         if self.dset is None:
             self.dset = dset
         else:
-            self.dset = xr.merge([self.dset, dset])
-
+            #self.dset = xr.merge([self.dset, dset])
+            self.dset.combine_first(dset)
+            print(self.dset)
     @staticmethod
-    def select_layer(variable, lay=None):
+
+    def select_layer(variable, layer=None):
         if lay is not None:
             try:
-                var = variable.sel(levels=lay)
+                var = variable.sel(levels=layer)
             except ValueError:
                 print(
                     'Dimension \'levels\' not in Dataset.  Returning Dataset anyway'
@@ -55,8 +57,8 @@ class HYSPLIT(BaseModel):
             var = variable
         return var
 
-    def get_var(self, param, lay=None):
-        return self.select_layer(self.dset[param], lay=lay)
+    def get_var(self, param, layer=None):
+        return self.select_layer(self.dset[param], layer=layer)
 
 
 class ModelBin(object):
@@ -72,7 +74,7 @@ class ModelBin(object):
                  century=None,
                  verbose=False,
                  readwrite='r',
-                 fillra=True):
+                 fillra=False):
         """
           drange should be a list of two datetime objects.
            The read method will store data from the cdump file for which the sample start is greater thand drange[0] and less than drange[1]
