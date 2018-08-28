@@ -23,7 +23,7 @@ def lonlat_to_swathdefinition(longitude=None, latitude=None):
         Description of returned object.
 
     """
-    from pyreample.geometry import SwathDefinition
+    from pyresample.geometry import SwathDefinition
     from numpy import vstack
     if len(longitude.shape) < 2:
         lons = vstack(longitude)
