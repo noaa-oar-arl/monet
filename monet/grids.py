@@ -6,6 +6,40 @@ import os
 path = os.path.abspath(__file__)
 
 
+def _geos_16_grid(dset):
+    from pyresample import geometry
+    from numpy import asarray
+    projection = dset.goes_imager_projection
+    h = projection.perspective_point_height
+    a = projection.semi_major_axis
+    b = projection.semi_minor_axis
+    lon_0 = projection.longitude_of_projection_origin
+    sweep = projection.sweep_angle_axis
+    x = dset.x * h
+    y = dset.y * h
+    x_ll = x[0]  #lower left corner
+    x_ur = x[-1]  #upper right corner
+    y_ll = y[0]  #lower left corner
+    y_ur = y[-1]  #upper right corner
+    x_h = (x_ur - x_ll) / (len(x) - 1.) / 2.  #1/2 grid size
+    y_h = (y_ur - y_ll) / (len(y) - 1.) / 2.  #1/2 grid size
+    area_extent = (x_ll - x_h, y_ll - y_h, x_ur + x_h, y_ur + y_h)
+
+    proj_dict = {
+        'a': float(a),
+        'b': float(b),
+        'lon_0': float(lon_0),
+        'h': float(h),
+        'proj': 'geos',
+        'units': 'm',
+        'sweep': sweep
+    }
+
+    area = geometry.AreaDefinition('GEOS_ABI', 'ABI', 'GOES_ABI', proj_dict,
+                                   len(x), len(y), asarray(area_extent))
+    return area
+
+
 def _get_sinu_grid_df():
     from pandas import read_csv, DataFrame
     import inspect
@@ -50,6 +84,12 @@ def _get_sinu_latlon(x, y):
         '+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m, +R=6371007.181'
     )
     return sinu(xv, yv, inverse=True)
+
+
+def get_sinu_area_extent(lonmin, latmin, lonmax, latmax):
+    xmin, ymin = _get_sinu_xy(lonmin, latmin)
+    xmax, ymax = _get_sinu_xy(lonmax, latmax)
+    return (xmin, ymin, xmax, ymax)
 
 
 def get_modis_latlon_from_swath_hv(h, v, dset):
@@ -103,11 +143,6 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
     """Get the IOAPI projection out of the file into proj4."""
 
     pargs = dict()
-    # Normal WRF file
-    cen_lon = ds.XCENT
-    cen_lat = ds.YCENT
-    dx = ds.XCELL
-    dy = ds.YCELL
     pargs['lat_1'] = ds.P_ALP
     pargs['lat_2'] = ds.P_BET
     pargs['lat_0'] = ds.YCENT
@@ -142,6 +177,23 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
                                   '{}'.format(proj_id))
     #area_def = _get_ioapi_pyresample_area_def(ds)
     return p4  #, area_def
+
+
+def _hysplit_latlon_grid_from_dataset(ds):
+    pargs = dict()
+    dy = ds['Latitude Spacing']
+    dx = ds['Longitude Spacing']
+    pargs['lat_0'] = ds.latitude.mean()
+    pargs['lon_0'] = ds.longitude.mean()
+
+    p4 = '+proj=eqc +lat_ts={lat_0} +lat_0={lat_0} +lon_0={lon_0} +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
+    return p4
+
+
+def get_hysplit_latlon_pyreample_area_def(ds, proj4_srs):
+    from pyresample import geometry
+    return geometry.SwathDefinition(
+        lons=ds.longitude.values, lats=ds.latitude.values)
 
 
 def grid_from_dataset(ds, earth_radius=6370000):
