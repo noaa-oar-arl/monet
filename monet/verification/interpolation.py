@@ -29,6 +29,7 @@ def interp_latlon(var, lat, lon, radius=12000.):
     """
     from numpy import NaN, vstack, dstack, meshgrid
     from pyresample import geometry, image
+    from xarray import DataArray
     if len(lat.shape) < 2:  # need to vstack latitudes
         lat = vstack(lat)
         lon = vstack(lon)
@@ -83,7 +84,20 @@ def interp_latlon(var, lat, lon, radius=12000.):
         data, grid1, radius_of_influence=radius, fill_value=NaN)
     # resample
     ii = icon.resample(grid2).image_data.reshape(datashape).squeeze()
-    return ii
+
+    coords = {
+        'latitude': ('space', lat),
+        'longitude': ('space', lon),
+        'time': var.time
+    }
+    dims = ('space', 'time')
+    da = DataArray(ii, dims=['space', 'time'])
+    da = da.assign_coords(latitude=('space', lat.squeeze()))
+    da = da.assign_coords(longitude=('space', lon.squeeze()))
+    da.name = var.name
+    for i in var.attrs.keys():
+        da = da.assign_attrs({i: var.attrs[i]})
+    return da
 
 
 def find_nearest_latlon_xarray(arr, lat=37.102400, lon=-76.392900,
@@ -119,6 +133,39 @@ def find_nearest_latlon_xarray(arr, lat=37.102400, lon=-76.392900,
 
 
 def to_constant_latitude(arr, lat=37.102400, radius=12e3):
+    """Short summary.
+
+    Parameters
+    ----------
+    arr : type
+        Description of parameter `arr`.
+    lat : type
+        Description of parameter `lat` (the default is 37.102400).
+    lon : type
+        Description of parameter `lon` (the default is -76.392900).
+    radius : type
+        Description of parameter `radius` (the default is 12e3).
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    from pyresample import utils, geometry
+    from numpy import arange, vstack, ones
+
+    lons = array()
+    grid1 = geometry.SwathDefinition(lons=arr.longitude, lats=arr.latitude)
+    grid2 = geometry.SwathDefinition(lons=vstack([lon]), lats=vstack([lat]))
+    row, col = utils.generate_nearest_neighbour_linesample_arrays(
+        grid1, grid2, radius)
+    row = row.flatten()
+    col = col.flatten()
+    return arr.sel(x=col).sel(y=row).squeeze()
+
+
+def to_constant_longitude(arr, lon=37.102400, radius=12e3):
     """Short summary.
 
     Parameters
