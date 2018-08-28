@@ -176,7 +176,10 @@ class MONETAccessor(object):
                 if col is None:
                     raise RuntimeError
                 return combine_da_to_df(
-                    self.obj, data, col=col, radius_of_influence=radius)
+                    self.obj,
+                    data,
+                    col=col,
+                    radius_of_influence=radius_of_influence)
             except RuntimeError:
                 print('Must enter col ')
         elif isinstance(data, xr.Dataset) or isinstance(data, xr.DataArray):
