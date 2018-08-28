@@ -7,7 +7,7 @@ from ..util import interp_util as interpo
 from ..obs import epa_util
 
 
-def combine_da_to_df(da, df, col=None, radius=12e3):
+def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     """This function will combine an xarray data array with spatial information
     point observations in `df`.
 
@@ -38,10 +38,19 @@ def combine_da_to_df(da, df, col=None, radius=12e3):
     unit = dfnn[col + '_unit'].unique()[0]
     target_grid = lonlat_to_swathdefinition(
         longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
-    da_interped = resample_dataset(da, target_grid, radius_of_influence=radius)
+    da_interped = resample_dataset(
+        da.compute(), target_grid, radius_of_influence=radius_of_influence)
     # add model if da.name is the same as column
-    dset[da.name] = da_interped
-    return dset
+    df_interped = da_interped.to_dataframe().reset_index()
+    cols = Series(df_interped.columns)
+    drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
+    df_interped.drop(drop_cols, axis=1, inplace=True)
+    if da.name in df.columns:
+        df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
+        print(df_interped.keys())
+    final_df = df.merge(
+        df_interped, on=['latitude', 'longitude', 'time'], how='left')
+    return final_df
 
 
 def combine_da_to_height_profile(da, dset):
