@@ -3,6 +3,7 @@ from pandas import Series, to_datetime
 import xarray as xr
 from ..grids import grid_from_dataset, get_ioapi_pyresample_area_def
 
+
 def can_do(index):
     if index.max():
         return True
@@ -27,7 +28,8 @@ def open_files(fname, earth_radius=6370000):
 
     """
     #open the dataset using xarray
-    dset = xr.open_mfdataset(fname, engine='pseudonetcdf', backend_kwargs={'format':'uamiv'})
+    dset = xr.open_mfdataset(
+        fname, engine='pseudonetcdf', backend_kwargs={'format': 'uamiv'})
 
     #get the grid information
     grid = grid_from_dataset(dset, earth_radius=earth_radius)
@@ -339,8 +341,8 @@ def _predefined_mapping_tables(dset):
         'PM2.5': ['PM25'],
         'CO': ['CO'],
         'NOY': [
-            'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX',
-            'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
+            'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA',
+            'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
         ],
         'NOX': ['NO', 'NO2'],
         'SO2': ['SO2'],
@@ -368,8 +370,8 @@ def _predefined_mapping_tables(dset):
         'PM2.5': ['PM25'],
         'CO': ['CO'],
         'NOY': [
-            'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX',
-            'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
+            'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA',
+            'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
         ],
         'NOX': ['NO', 'NO2'],
         'SO2': ['SO2'],
@@ -392,7 +394,7 @@ def _predefined_mapping_tables(dset):
         'NAf': ['NA'],
         'NH4f': ['PNH4']
     }
-    to_crn = {}}
+    to_crn = {}
     to_aeronet = {}
     to_cems = {}
     mapping_tables = {

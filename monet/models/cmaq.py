@@ -11,22 +11,25 @@ def can_do(index):
         return False
 
 
-def open_files(fname, earth_radius=6370000):
-    """Short summary.
+def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
+    """Method to open CMAQ IOAPI netcdf files.
 
     Parameters
     ----------
-    fname : type
-        Description of parameter `fname`.
-    earth_radius : type
-        Description of parameter `earth_radius`.
+    fname : string or list
+        fname is the path to the file or files.  It will accept hot keys in strings as well.
+    earth_radius : float
+        The earth radius used for the map projection
+    convert_to_ppb : boolean
+        If true the units of the gas species will be converted to ppbV
 
     Returns
     -------
-    type
-        Description of returned object.
+    xarray.DataSet
+
 
     """
+
     #open the dataset using xarray
     dset = xr.open_mfdataset(fname)
 
@@ -71,6 +74,14 @@ def open_files(fname, earth_radius=6370000):
     # rename dimensions
     dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
 
+    #convert all gas species to ppbv
+    if convert_to_ppb:
+        allpm = concatenate(
+            [aitken, accumulation, coarse, ['time', 'latitude', 'longitude']])
+        for i in dset.variables:
+            if i not in allpm:
+                dset[i] *= 1000.
+                dset[i].attrs['units'] = 'ppbV'
     return dset
 
 
@@ -137,10 +148,11 @@ def add_lazy_pm25(d):
         d['PM25'] = d['PM25_TOT'].chunk()
     else:
         index = allvars.isin(keys)
-        newkeys = allvars.loc[index]
-        newweights = weights.loc[index]
-        d['PM25'] = add_multiple_lazy(d, newkeys, weights=newweights)
-        d['PM25'].assign_attrs({'name': 'PM2.5', 'long_name': 'PM2.5'})
+        if can_do(index):
+            newkeys = allvars.loc[index]
+            newweights = weights.loc[index]
+            d['PM25'] = add_multiple_lazy(d, newkeys, weights=newweights)
+            d['PM25'].assign_attrs({'name': 'PM2.5', 'long_name': 'PM2.5'})
     return d
 
 
