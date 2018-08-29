@@ -4,7 +4,3 @@ linters:
     ignore: I002
 fixers:
   enable: false
-files:
-    ignore:
-        - 'docs/**/*.py'
-        - 'monet/data/*'
