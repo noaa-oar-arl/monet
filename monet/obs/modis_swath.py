@@ -1,4 +1,4 @@
-#MODIS Swath data
+# MODIS Swath data
 """ this will read the modis data"""
 import xarray as xr
 from ..grids import get_modis_latlon_from_swath_hv, get_sinu_area_def
@@ -24,7 +24,7 @@ def open_single_file(fname):
     timestamp = _get_time_from_fname(fname)
     # open the dataset
     dset = xr.open_dataset(fname)
-    #rename  x and y dimensions
+    # rename  x and y dimensions
     dset = dset.rename({'XDim:MOD_Grid_BRDF': 'x', 'YDim:MOD_Grid_BRDF': 'y'})
     # get lat lon from dset and h, v
     dset = get_modis_latlon_from_swath_hv(h, v, dset)

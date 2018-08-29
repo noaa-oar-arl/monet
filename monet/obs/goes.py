@@ -1,4 +1,4 @@
-#MODIS Swath data
+# MODIS Swath data
 """ this will read the modis data"""
 import xarray as xr
 from ..grids import _geos_16_grid
@@ -35,7 +35,7 @@ def _open_single_file(fname):
         dset[i].attrs['proj4_srs'] = area.proj_str
         dset[i].attrs['area'] = area
 
-    #expand dimensions for time
+    # expand dimensions for time
     dset = dset.expand_dims('time')
     return dset
 
@@ -43,7 +43,7 @@ def _open_single_file(fname):
 def open_files(fname):
 
     if isinstance(fname, str):
-        #### single file
+        # single file
         dset = _open_single_file(fname)
     else:
         # loop over dsets and combine
