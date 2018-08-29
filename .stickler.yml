@@ -1,9 +1,10 @@
 linters:
   flake8:
-    fixer: true
+    fixer: false
+    ignore: I002
 fixers:
-  enable: true
+  enable: false
 files:
     ignore:
-        - 'docs/*'
+        - 'docs/**/*.py'
         - 'monet/data/*'
