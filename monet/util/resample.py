@@ -1,4 +1,5 @@
 from pyresample.kd_tree import XArrayResamplerNN
+from pyresample.bilinear.xarr import XArrayResamplerBilinear
 import xarray as xr
 from pyresample.geometry import SwathDefinition, AreaDefinition
 
@@ -26,8 +27,8 @@ def _ensure_swathdef_compatability(defin):
 
 
 def _check_swath_or_area(defin):
-    """Checks for a SwathDefinition or AreaDefinition. If AreaDefinition do nothing
-    else ensure compatability with XArrayResamplerNN
+    """Checks for a SwathDefinition or AreaDefinition. If AreaDefinition do
+    nothing else ensure compatability with XArrayResamplerNN
 
     Parameters
     ----------
@@ -49,7 +50,8 @@ def _check_swath_or_area(defin):
             raise RuntimeError
     except RuntimeError:
         print(
-            'grid definition must be a pyresample SwathDefinition or AreaDefinition'
+            'grid definition must be a pyresample SwathDefinition or '
+            'AreaDefinition'
         )
         return
     return newswath
@@ -86,8 +88,11 @@ def resample_dataset(data,
                      target_grid,
                      radius_of_influence=100e3,
                      resample_cache=None,
-                     return_neighbor_info=False):
-    #first get the source grid definition
+                     return_neighbor_info=False,
+                     neighbours=1,
+                     epsilon=0,
+                     interp='nearest'):
+    # first get the source grid definition
     try:
         if 'area' in data.attrs:
             source_grid = data.attrs['area']
@@ -95,24 +100,28 @@ def resample_dataset(data,
             raise RuntimeError
     except RuntimeError:
         print(
-            'Must include pyresample.gemoetry in the data.attrs area_def or area '
+            'Must include pyresample.gemoetry in the data.attrs area_def or '
+            'area'
         )
         return
 
-    #check for SwathDefinition or AreaDefinition
+    # check for SwathDefinition or AreaDefinition
     # if swath ensure it is xarray.DataArray and not numpy for chunking
     source_grid = _check_swath_or_area(source_grid)
 
-    #set kwargs for XArrayResamplerNN
+    # set kwargs for XArrayResamplerNN
     kwargs = dict(
         source_geo_def=source_grid,
         target_geo_def=target_grid,
         radius_of_influence=radius_of_influence,
-        neighbours=1,
-        epsilon=0)
-    resampler = XArrayResamplerNN(**kwargs)
+        neighbours=neighbours,
+        epsilon=epsilon)
+    if interp is 'nearest':
+        resampler = XArrayResamplerNN(**kwargs)
+    else:
+        resampler = XArrayResamplerBilinear(**kwargs)
 
-    #check if resample cash is none else assume it is a dict with keys
+    # check if resample cash is none else assume it is a dict with keys
     #[valid_input_index, valid_output_index, index_array, distance_array]
     # else generate the data
     if resample_cache is None:
@@ -127,7 +136,7 @@ def resample_dataset(data,
     # now store the resampled data temporarily in temp
     temp = resampler.get_sample_from_neighbour_info(data)
 
-    #reformat data from temp
+    # reformat data from temp
     out = _reformat_resampled_data(data, temp, target_grid)
     if return_neighbor_info:
         resample_cache = dict(

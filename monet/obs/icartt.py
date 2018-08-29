@@ -1,6 +1,7 @@
-""" This module opens data from the ICARTT format and reformats it for use in MONETself.
-The module makes use of Barron Henderson's PseudoNetCDF (https://github.com/barronh/pseudonetcdf)
-and xarray to read the data.  It is not intended to read more than ONE file at a time """
+""" This module opens data from the ICARTT format and reformats it for use in
+MONET. The module makes use of Barron Henderson's PseudoNetCDF
+(https://github.com/barronh/pseudonetcdf)and xarray to read the data.  It is not
+intended to read more than ONE file at a time """
 
 import xarray as xr
 from pandas import Series, Timestamp, to_timedelta
@@ -24,6 +25,6 @@ def add_data(fname, time_label='UTC', lat_label=None, lon_label=None):
         lonvar = vars.loc[vars.isin(possible_lons)][0]
         dset.coords['longitude'] = dset[lonvar]
         dset.coords['latitude'] = dset[latvar]
-    #get the datetimes
+    # get the datetimes
     start = dset.SDATE.replace(', ', '-')
     time = Timestamp(start) + pd.to_timedelta(dset[time_name])

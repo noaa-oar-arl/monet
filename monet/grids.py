@@ -1,5 +1,6 @@
-""" This is a module that will derive the proj4 string and pyesample.geometry.AreaDefinition
-    for any gridded dataset (satellite, models, etc....)
+""" This is a module that will derive the proj4 string and
+    pyesample.geometry.AreaDefinition for any gridded dataset (satellite,
+    models, etc....)
 
     """
 import os
@@ -17,12 +18,12 @@ def _geos_16_grid(dset):
     sweep = projection.sweep_angle_axis
     x = dset.x * h
     y = dset.y * h
-    x_ll = x[0]  #lower left corner
-    x_ur = x[-1]  #upper right corner
-    y_ll = y[0]  #lower left corner
-    y_ur = y[-1]  #upper right corner
-    x_h = (x_ur - x_ll) / (len(x) - 1.) / 2.  #1/2 grid size
-    y_h = (y_ur - y_ll) / (len(y) - 1.) / 2.  #1/2 grid size
+    x_ll = x[0]  # lower left corner
+    x_ur = x[-1]  # upper right corner
+    y_ll = y[0]  # lower left corner
+    y_ur = y[-1]  # upper right corner
+    x_h = (x_ur - x_ll) / (len(x) - 1.) / 2.  # 1/2 grid size
+    y_h = (y_ur - y_ll) / (len(y) - 1.) / 2.  # 1/2 grid size
     area_extent = (x_ll - x_h, y_ll - y_h, x_ur + x_h, y_ur + y_h)
 
     proj_dict = {
@@ -104,7 +105,8 @@ def get_modis_latlon_from_swath_hv(h, v, dset):
     dset.coords['latitude'] = (('x', 'y'), lat)
     dset.attrs['area_extent'] = (x.min(), y.min(), x.max(), y.max())
     dset.attrs[
-        'proj4_srs'] = '+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m'
+        'proj4_srs'] = '+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 ' \
+        '+b=6371007.181 +units=m'
     return dset
 
 
@@ -176,7 +178,7 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
         raise NotImplementedError('IOAPI proj not implemented yet: '
                                   '{}'.format(proj_id))
     #area_def = _get_ioapi_pyresample_area_def(ds)
-    return p4  #, area_def
+    return p4  # , area_def
 
 
 def _hysplit_latlon_grid_from_dataset(ds):
@@ -186,7 +188,8 @@ def _hysplit_latlon_grid_from_dataset(ds):
     pargs['lat_0'] = ds.latitude.mean()
     pargs['lon_0'] = ds.longitude.mean()
 
-    p4 = '+proj=eqc +lat_ts={lat_0} +lat_0={lat_0} +lon_0={lon_0} +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
+    p4 = '+proj=eqc +lat_ts={lat_0} +lat_0={lat_0} +lon_0={lon_0} ' \
+        '+ellps=WGS84 +datum=WGS84 +units=m +no_defs'.format(pargs)
     return p4
 
 

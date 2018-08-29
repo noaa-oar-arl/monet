@@ -30,13 +30,13 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
 
     """
 
-    #open the dataset using xarray
+    # open the dataset using xarray
     dset = xr.open_mfdataset(fname)
 
-    #get the grid information
+    # get the grid information
     grid = grid_from_dataset(dset, earth_radius=earth_radius)
     area_def = get_ioapi_pyresample_area_def(dset, grid)
-    #assign attributes for dataset and all DataArrays
+    # assign attributes for dataset and all DataArrays
     dset = dset.assign_attrs({'proj4_srs': grid})
     for i in dset.variables:
         dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
@@ -62,10 +62,10 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     dset = add_lazy_so4f(dset)
     dset = add_lazy_rh(dset)
 
-    #get the times
+    # get the times
     dset = _get_times(dset)
 
-    #get the lat lon
+    # get the lat lon
     dset = _get_latlon(dset)
 
     # get Predefined mapping tables for observations
@@ -74,7 +74,7 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     # rename dimensions
     dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
 
-    #convert all gas species to ppbv
+    # convert all gas species to ppbv
     if convert_to_ppb:
         allpm = concatenate(
             [aitken, accumulation, coarse, ['time', 'latitude', 'longitude']])
@@ -301,20 +301,20 @@ def add_lazy_noy(d):
     return d
 
 
-def add_lazy_rh(d):
-    keys = Series([i for i in d.variables])
-    allvars = Series(['TEMP', 'Q', 'PRES'])
-    index = allvars.isin(keys)
-    if can_do(index):
-        import atmos
-        data = {
-            'T': self.dset['TEMP'][:].compute().values,
-            'rv': self.dset['Q'][:].compute().values,
-            'p': self.dset['PRES'][:].compute().values
-        }
-        d['NOx'] = add_multiple_lazy(d, newkeys)
-        d['NOx'] = d['NOx'].assign_attrs({'name': 'NOx', 'long_name': 'NOx'})
-    return d
+# def add_lazy_rh(d):
+    # keys = Series([i for i in d.variables])
+    # allvars = Series(['TEMP', 'Q', 'PRES'])
+    # index = allvars.isin(keys)
+    # if can_do(index):
+    #     import atmos
+    #     data = {
+    #         'T': self.dset['TEMP'][:].compute().values,
+    #         'rv': self.dset['Q'][:].compute().values,
+    #         'p': self.dset['PRES'][:].compute().values
+    #     }
+    #     d['NOx'] = add_multiple_lazy(d, newkeys)
+    #     d['NOx'] = d['NOx'].assign_attrs({'name': 'NOx', 'long_name': 'NOx'})
+    # return d
 
 
 def add_lazy_nox(d):

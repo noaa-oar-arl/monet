@@ -1,19 +1,7 @@
 from __future__ import absolute_import, division, print_function
-
-# This file is to deal with CMAQ code - try to make it general for cmaq 4.7.1 --> 5.1
-from builtins import object, zip
-from gc import collect
-
+from builtins import object
 import pandas as pd
 import xarray as xr
-import numpy as np
-from dask.diagnostics import ProgressBar
-try:
-    from osgeo import osr
-    has_gdal = True
-except ImportError:
-    has_gdal = False
-from .models.combinetool import combine_da_to_df
 import stratify
 
 
@@ -24,7 +12,7 @@ class MONETAccessor(object):
 
     def stratify(self, levels, vertical, axis=1):
         result = stratify.interpolate(
-            levels, vertitical.chunk(), self.obj.chunk(), axis=axis)
+            levels, vertical.chunk(), self.obj.chunk(), axis=axis)
         dims = self.obj.dims
         out = xr.DataArray(result, dims=dims)
         for i in dims:
@@ -61,7 +49,7 @@ class MONETAccessor(object):
         longitude = linspace(self.obj.longitude.min(),
                              self.obj.longitude.max(), len(self.obj.x))
         target = constant_lat_swathdefition(longitude=longitude, latitude=lat)
-        output = resample_dataset(self.obj, target).squeeze()
+        output = resample_dataset(self.obj, target, **kwargs).squeeze()
         return output
 
     def interp_constant_lon(self, lon=None, **kwargs):
@@ -89,7 +77,7 @@ class MONETAccessor(object):
         latitude = linspace(self.obj.latitude.min(), self.obj.latitude.max(),
                             len(self.obj.y))
         target = constant_lon_swathdefition(longitude=lon, latitude=latitude)
-        output = resample_dataset(self.obj, target).squeeze()
+        output = resample_dataset(self.obj, target, **kwargs).squeeze()
         return output
 
     def nearest_latlon(self, lat=None, lon=None, **kwargs):
@@ -101,7 +89,7 @@ class MONETAccessor(object):
         except RuntimeError:
             print('Must provide latitude and longitude')
         target = nearest_point_swathdefinition(longitude=lon, latitude=lat)
-        output = resample_dataset(self.obj, target).squeeze()
+        output = resample_dataset(self.obj, target, **kwargs).squeeze()
         return output
 
     def cartopy(self):
@@ -110,7 +98,7 @@ class MONETAccessor(object):
 
     def quick_map(self, map_kwarg={}, **kwargs):
         from .plots.mapgen import draw_map
-        from matplotlib.pyplot import subplots, tight_layout
+        from matplotlib.pyplot import tight_layout
         #import cartopy.crs as ccrs
         #crs = self.obj.monet.cartopy()
         ax = draw_map(**map_kwarg)
@@ -119,7 +107,7 @@ class MONETAccessor(object):
         tight_layout()
         return ax
 
-    def remap_nearest(self, dataarray, grid=None, **kwargs):
+    def remap_data(self, dataarray, grid=None, **kwargs):
         """remaps from another grid to the current grid of self using pyresample.
         it assumes that the dimensions are ordered in ROW,COL,CHANNEL per pyresample docs
 
@@ -141,8 +129,7 @@ class MONETAccessor(object):
         from .util import resample
         # check to see if grid is supplied
         target = self.obj.area
-        if grid is None:  #grid is assumed to be in da.area
-            source = dataarray
+        if grid is None:  # grid is assumed to be in da.area
             out = resample.resample_dataset(dataarray.chunk(), target,
                                             **kwargs)
         else:
@@ -170,7 +157,7 @@ class MONETAccessor(object):
 
         """
         from .models.combinetool import combine_da_to_df
-        #point source data
+        # point source data
         if isinstance(data, pd.DataFrame):
             try:
                 if col is None:
@@ -193,18 +180,18 @@ class MONETAccessor(object):
     def __init__(self, xray_obj):
         self.obj = xray_obj
 
-    def remap_nearest(self, data, grid=None, **kwargs):
+    def remap_data(self, data, grid=None, **kwargs):
         try:
             if isinstance(data, xr.DataArray):
-                self._remap_dataarray_nearest(data, grid=grid, **kwargs)
+                self._remap_dataarray(data, grid=grid, **kwargs)
             elif instance(data, xr.Dataset):
-                self._remap_dataset_nearest(data, grid=None, **kwargs)
+                self._remap_dataset(data, grid=None, **kwargs)
             else:
                 raise TypeError
         except TypeError:
             print('data must be an xarray.DataArray or xarray.Dataset')
 
-    def _remap_dataset_nearest(self, dset, grid=None, **kwargs):
+    def _remap_dataset(self, dset, grid=None, **kwargs):
         """Resample the entire xarray.Dataset to the current dataset object.
 
         Parameters
@@ -223,23 +210,23 @@ class MONETAccessor(object):
         skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
         vars = pd.Series(dset.variables)
         loop_vars = vars.loc[~vars.isin(skip_keys)]
-        #get the first one in the loop and get the resample_cache data
+        # get the first one in the loop and get the resample_cache data
         dataarray = dset[loop_vars[0]]
 
-        da, resample_cache = self._remap_dataarray_nearest(
+        da, resample_cache = self._remap_dataarray(
             dataarray, grid=grid, return_neighbor_info=True, **kwargs)
         if da.name in self.obj.variables:
             da.name = da.name + '_y'
         self.obj[da.name] = da
         for i in loop_vars[1:]:
             dataarray = dset[i]
-            da, resample_cache = self._remap_dataarray_nearest(
+            da, resample_cache = self._remap_dataarray(
                 dataarray, grid=grid, resample_cache=resample_cache, **kwargs)
             if da.name in self.obj.variables:
                 da.name = da.name + '_y'
             self.obj[da.name] = da
 
-    def _remap_dataarray_nearest(self, dataarray, grid=None, **kwargs):
+    def _remap_dataarray(self, dataarray, grid=None, **kwargs):
         """Resample the DataArray to the dataset object.
 
         Parameters
@@ -255,7 +242,7 @@ class MONETAccessor(object):
         """
         from .util import resample
         target = self.obj.area
-        if grid is None:  #grid is assumed to be in da.area
+        if grid is None:  # grid is assumed to be in da.area
             out = resample.resample_dataset(dataarray.chunk(), target,
                                             **kwargs)
         else:

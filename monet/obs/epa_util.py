@@ -2,8 +2,6 @@ from __future__ import print_function
 
 from future import standard_library
 
-from dask.diagnostics import ProgressBar
-
 standard_library.install_aliases()
 
 
@@ -30,17 +28,18 @@ def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3'):
     Returns
     -------
     df : pandas dataframe
-        returns dataframe identical to original but with data converted to new unit.
+        returns dataframe identical to original but with data converted to new
+        unit.
     """
     factor = 2.6178
     ppb = 'ppb'
     ugm3 = 'ug/m3'
     if unit.lower() == ugm3:
-        df = df[df['units'] == ppb]  #find columns with units of 'ppb'
+        df = df[df['units'] == ppb]  # find columns with units of 'ppb'
         df['units'] = unit.upper()
         df[obscolumn] = df[obscolumn] * factor
     elif unit.lower() == ppb:
-        df = df[df['units'] == ugm3]  #find columns with units of 'ppb'
+        df = df[df['units'] == ugm3]  # find columns with units of 'ppb'
         df[obscolumn] = df[obscolumn] / factor
     return df
 

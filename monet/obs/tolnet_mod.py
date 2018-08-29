@@ -101,7 +101,7 @@ class TOLNet(object):
         dataset['t'] = dataset['time']
         dataset = dataset.drop('time').rename({'t': 'time'})
         dataset['z'] = alt
-        #get latlon
+        # get latlon
         a, b = dataset.Location_Latitude.decode('ascii').split()
         if b == 'S':
             dataset['latitude'] = -1 * float(a)
@@ -109,7 +109,7 @@ class TOLNet(object):
             dataset['latitude'] = float(a)
         a, b = dataset.Location_Longitude.decode('ascii').split()
         if b == 'W':
-            dataset['longitude'] = longitude = -1 * float(a)
+            dataset['longitude'] = -1 * float(a)
         else:
             dataset['longitude'] = float(a)
         return dataset
