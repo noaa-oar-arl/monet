@@ -148,31 +148,59 @@ class CEMS(object):
                 cmatch = ccc
         return cmatch
 
+
+    def cemspivot(self,
+                varname,
+                daterange=None,
+                unitid=False,
+                verbose=True):
+
+        """
+        returns dataframe with rows time. Columns are (orispl_code, unit_id).
+        If no unit_id in the file then columns are just orispl_code.
+        if unitid flag set to False then sums over unit_id's that belong to an orispl_code.
+
+        Values are from the column specified by the varname input.
+        
+
+        """
+        from .obs_util import timefilter
+        temp = self.df.copy()
+        if daterange: temp = timefilter(temp, daterange)
+        if 'unit_id' in temp.columns.values and unitid:
+            if len(temp['unit_id'].unique()) > 0:
+                if verbose: print('UNIT IDs ' , temp['unit_id'].unique())
+            ##create pandas frame with index datetime and columns for value for each unit_id,orispl
+            pivot = pd.pivot_table(
+                temp, values=varname, index=['time'], columns=['orispl_code','unit_id'],\
+                aggfunc=np.sum)
+        else:
+            if verbose: print('NO UNIT ID')
+            ##returns data frame where rows are date and columns are the values of cmatch for orispl
+            pivot = pd.pivot_table(
+                temp, values=varname, index=['time'], columns=['orispl_code'], aggfunc=np.sum)
+        return pivot        
+
+
+
     def get_var(self,
                 varname,
-                loc=None,
+                orisp=None,
                 daterange=None,
                 unitid=-99,
                 verbose=True):
-        """returns time series with variable indicated by varname.
+        """
+           returns time series with variable indicated by varname.
            returns data frame where rows are date and columns are the values of cmatch for each fac_id.
 
            routine looks for column which contains all strings in varname.
            Currently not case sensitive.
 
-           loc must be list of ORISPL CODES.
-
-           TO DO - each FAC_ID may have several UNIT_ID, each of which
-           corresponds to a different unit at the facility. Need to handle this.
-           Either return separately or add together?
-
-           Each facility may have more than one unit. If unitid=-99 then this
-           method returns sum from all units.
+           loc and ORISPL CODES.
+           unitid is a unit_id
 
            if a particular unitid is specified then will return values for that unit.
 
-           TO DO if unitid -999 then will return a dictionary where key is the unit and value
-           is a panda time series for that unit.
 
         Parameters
         ----------
@@ -188,51 +216,10 @@ class CEMS(object):
         type
             Description of returned object.
         """
-        from .obs_util import timefilter
-        if isinstance(varname, str):
-            varname = (varname)
-        columns = list(self.df.columns.values)
-
-        if loc:
-            temp = self.df[self.df['orispl_code'].isin(loc)]
-        else:
-            temp = self.df.copy()
-        if daterange: temp = timefilter(temp, daterange)
-        #cmatch = self.match_column(varname)
-        cmatch=varname
-        #print('CMATCH', cmatch)
-        #print(temp.columns.values)
-        if 'unit_id' in columns:
-            if len(temp['unit_id'].unique()) > 0:
-                if verbose: print('UNIT IDs ' , temp['unit_id'].unique())
-            ##create pandas frame with index datetime and columns for value for each unit_id
-            pivot = pd.pivot_table(
-                temp, values=cmatch, index=['time'], columns=['unit_id'])
-            pivot = pivot.fillna(value=0)
-            #print('UNIT IDs ', pivot.columns)
-            #print('------------------pivot')
-            #print(pivot[0:10])
-            if unitid == -99:
-                pivot['all'] = pivot.sum(axis=1)
-                #print(pivot[0:10])
-                return pivot['all']
-            else:
-                return pivot['unitid']
-        else:
-            print('NO UNIT ID')
-            #temp.set_index('time', inplace=True)
-            ##returns data frame where rows are date and columns are the values of cmatch for each fac_id.
-            pivot = pd.pivot_table(
-                temp, values=cmatch, index=['time'], columns=['orispl_code'])
-            ldict = self.create_location_dictionary()
-            if ldict:
-                cnew = []
-                columns = list(pivot.columns.values)
-                for ccc in columns:
-                    cnew.append(ldict[ccc])
-            pivot.columns = cnew
-            return pivot
-            #return temp[cmatch]
+        if unitid==-99: ui=False
+        temp = self.cemspivot(varname, daterange, unitid=ui)
+        if not ui: return(temp[orisp])
+        else: return(temp[orisp,unitid]) 
 
     def retrieve(self, rdate, state, download=True, verbose=False):
         """Short summary.
