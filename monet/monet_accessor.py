@@ -89,7 +89,7 @@ class MONETAccessor(object):
         except RuntimeError:
             print('Must provide latitude and longitude')
         target = nearest_point_swathdefinition(longitude=lon, latitude=lat)
-        output = resample_dataset(self.obj, target, **kwargs).squeeze()
+        output = resample_dataset(self.obj, target, **kwargs)
         return output
 
     def cartopy(self):
@@ -255,21 +255,21 @@ class MONETAccessor(object):
         dset[out.name] = out
 
     def nearest_latlon(self, lat=None, lon=None, **kwargs):
-        vars = pd.Series(dset.variables)
+        vars = pd.Series(self.obj.variables)
         skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
         loop_vars = vars.loc[~vars.isin(skip_keys)]
-        orig = self.obj[loop_vars[0]].nearest_latlon(lat=lat, lon=lon, **kwargs)
+        orig = self.obj[loop_vars.iloc[0]].monet.nearest_latlon(lat=lat, lon=lon, **kwargs)
         dset = orig.to_dataset()
         dset.attrs = self.obj.attrs.copy()
-        for i in loop_vars[1:]:
-            dset[i] = self.obj[i].nearest_latlon(lat=lat, lon=lon, **kwargs)
+        for i in loop_vars[1:].values:
+            dset[i] = self.obj[i].monet.nearest_latlon(lat=lat, lon=lon, **kwargs)
         return dset
 
     def interp_constant_lat(self, lat=None, **kwargs):
-        vars = pd.Series(dset.variables)
+        vars = pd.Series(self.obj.variables)
         skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
         loop_vars = vars.loc[~vars.isin(skip_keys)]
-        orig = self.obj[loop_vars[0]].interp_constant_lat(lat=lat, **kwargs)
+        orig = self.obj[loop_vars.iloc[0]].monet.interp_constant_lat(lat=lat, **kwargs)
         dset = orig.to_dataset()
         dset.attrs = self.obj.attrs.copy()
         for i in loop_vars[1:]:
@@ -277,7 +277,7 @@ class MONETAccessor(object):
         return dset
 
     def interp_constant_lat(self, lon=None, **kwargs):
-        vars = pd.Series(dset.variables)
+        vars = pd.Series(self.obj.variables)
         skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
         loop_vars = vars.loc[~vars.isin(skip_keys)]
         orig = self.obj[loop_vars[0]].interp_constant_lon(lon=lon, **kwargs)
@@ -288,7 +288,7 @@ class MONETAccessor(object):
         return dset
 
     def stratify(self, levels, vertical, axis=1):
-        loop_vars = [i for i in e.variables if 'z' in e[i].dims]
+        loop_vars = [i for i in self.obj.variables if 'z' in e[i].dims]
         orig = self.obj[loop_vars[0]].stratify(levels, vertical, axis=axis)
         dset = orig.to_dataset()
         dset.attrs = self.obj.attrs.copy()
