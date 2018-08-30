@@ -26,11 +26,12 @@ class TOLNet(object):
     def __init__(self):
         self.objtype = 'TOLNET'
         self.cwd = os.getcwd()
-        self.dates = pd.date_range(start='2017-09-25', end='2017-09-26', freq='H')
+        self.dates = pd.date_range(
+            start='2017-09-25', end='2017-09-26', freq='H')
         self.dset = None
         self.daily = False
 
-    def open_data(self, fname):
+    def add_data(self, fname):
         """Short summary.
 
         Parameters
@@ -49,6 +50,7 @@ class TOLNet(object):
         atts = f['INSTRUMENT_ATTRIBUTES']
         data = f['DATA']
         self.dset = self.make_xarray_dataset(data, atts)
+        return self.dset
 
     @staticmethod
     def make_xarray_dataset(data, atts):
@@ -70,7 +72,10 @@ class TOLNet(object):
         from numpy import NaN
         # altitude variables
         alt = data['ALT'][:].squeeze()
-        altvars = ['AirND', 'AirNDUncert', 'ChRange', 'Press', 'Temp', 'TempUncert', 'O3NDResol', 'PressUncert']
+        altvars = [
+            'AirND', 'AirNDUncert', 'ChRange', 'Press', 'Temp', 'TempUncert',
+            'O3NDResol', 'PressUncert'
+        ]
         # time variables
         tseries = pd.Series(data["TIME_MID_UT_UNIX"][:].squeeze())
         time = pd.Series(pd.to_datetime(tseries, unit='ms'), name='time')
@@ -83,7 +88,7 @@ class TOLNet(object):
         dset = {}
         for i in ovars:
             val = data[i][:]
-            val[data[i][:] < -999.] = NaN
+            val[data[i][:] < -1.] = NaN
             dset[i] = (['z', 't'], val)
         for i in altvars:
             dset[i] = (['z'], data[i][:].squeeze())
@@ -96,6 +101,15 @@ class TOLNet(object):
         dataset['t'] = dataset['time']
         dataset = dataset.drop('time').rename({'t': 'time'})
         dataset['z'] = alt
-        dataset.attrs['Latitude'] = float(dataset.Location_Latitude.split(' ')[0])
-        dataset.attrs['Longitude'] = -1. * float(dataset.Location_Longitude.split(' ')[0])
+        # get latlon
+        a, b = dataset.Location_Latitude.decode('ascii').split()
+        if b == 'S':
+            dataset['latitude'] = -1 * float(a)
+        else:
+            dataset['latitude'] = float(a)
+        a, b = dataset.Location_Longitude.decode('ascii').split()
+        if b == 'W':
+            dataset['longitude'] = -1 * float(a)
+        else:
+            dataset['longitude'] = float(a)
         return dataset

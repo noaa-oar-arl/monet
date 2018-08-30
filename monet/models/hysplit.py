@@ -1,21 +1,25 @@
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-import datetime
-import sys
+from numpy import array, concatenate
+from pandas import Series, to_datetime
+#from monet.models.basemodel import *
+from inspect import getmembers, isfunction
+from ..grids import _hysplit_latlon_grid_from_dataset
+from ..grids import get_hysplit_latlon_pyreample_area_def
 
-import numpy as np
-import pandas as pd
-import xarray as xr
-from pylab import matrix
 
-from monet.models.basemodel import BaseModel
-"""
-PGRMMR: Alice Crawford ORG: ARL/CICS
-PYTHON 3
-ABSTRACT: classes and functions for creating HYSPLIT control and setup files.
+def open_files(fname):
+    """Short summary.
 
-   CLASSES
-   ModelBin class for parsing binary HYSPLIT CDUMP file
+    Parameters
+    ----------
+    fname : type
+        Description of parameter `fname`.
+    earth_radius : type
+        Description of parameter `earth_radius`.
 
+    Returns
+    -------
+    type
+        Description of returned object.
 
    CHANGES for PYTHON 3
    For python 3 the numpy char4 are read in as a numpy.bytes_ class and need to be converted to a python
@@ -23,6 +27,26 @@ ABSTRACT: classes and functions for creating HYSPLIT control and setup files.
 
 
 """
+
+# open the dataset using xarray
+binfile = ModelBin(cdump, verbose=False, readwrite='r')
+dset = binfile.dset
+
+# get the grid information
+p4 = _hysplit_latlon_grid_from_dataset(dset)
+swath = get_hysplit_latlon_pyreample_area_def(dset, p4)
+
+# now assign this to the dataset and each dataarray
+dset = dset.assign_attrs({'proj4_srs': p4})
+for i in dset.variables:
+    dset[i] = dset[i].assign_attrs({'proj4_srs': p4})
+    for j in dset[i].attrs:
+        dset[i].attrs[j] = dset[i].attrs[j].strip()
+    dset[i] = dset[i].assign_attrs({'area': swath})
+dset = dset.assign_attrs(area=swath)
+
+# return the dataset
+return dset
 
 
 class HYSPLIT(BaseModel):
@@ -61,10 +85,12 @@ class HYSPLIT(BaseModel):
         return self.select_layer(self.dset[param], layer=layer)
 
 
+
 class ModelBin(object):
     """represents a binary cdump (concentration) output file from HYSPLIT
        methods:
-       readfile - opens and reads contents of cdump file into an xarray self.dset
+       readfile - opens and reads contents of cdump file into an xarray
+       self.dset
 
     """
 
@@ -77,7 +103,8 @@ class ModelBin(object):
                  fillra=False):
         """
           drange should be a list of two datetime objects.
-           The read method will store data from the cdump file for which the sample start is greater thand drange[0] and less than drange[1]
+           The read method will store data from the cdump file for which the
+           sample start is greater thand drange[0] and less than drange[1]
            for which the sample stop is less than drange[1].
 
         """
@@ -95,15 +122,17 @@ class ModelBin(object):
 
     @staticmethod
     def define_struct():
-        """Each record in the fortran binary begins and ends with 4 bytes which specify the length of the record.
-        These bytes are called pad below. They are not used here, but are thrown out.
-        The following block defines a numpy dtype object for each record in the binary file. """
+        """Each record in the fortran binary begins and ends with 4 bytes which
+        specify the length of the record. These bytes are called pad below.
+        They are not used here, but are thrown out. The following block defines
+        a numpy dtype object for each record in the binary file. """
+        from numpy import dtype
         real4 = '>f'
         int4 = '>i'
         int2 = '>i2'
         char4 = '>a4'
 
-        rec1 = np.dtype([
+        rec1 = dtype([
             ('pad1', int4),
             ('model_id', char4),  # meteorological model id
             ('met_year', int4),  # meteorological model starting time
@@ -117,7 +146,7 @@ class ModelBin(object):
         ])
 
         # start_loc in rec1 tell how many rec there are.
-        rec2 = np.dtype([
+        rec2 = dtype([
             ('pad1', int4),
             ('r_year', int4),  # release starting time
             ('r_month', int4),
@@ -130,7 +159,7 @@ class ModelBin(object):
             ('pad2', int4),
         ])
 
-        rec3 = np.dtype([
+        rec3 = dtype([
             ('pad1', int4),
             ('nlat', int4),
             ('nlon', int4),
@@ -141,30 +170,30 @@ class ModelBin(object):
             ('pad2', int4),
         ])
 
-        rec4a = np.dtype([
+        rec4a = dtype([
             ('pad1', int4),
             ('nlev', int4),  # number of vertical levels in concentration grid
         ])
 
-        rec4b = np.dtype([
+        rec4b = dtype([
             ('levht', int4),  # height of each level (meters above ground)
         ])
 
-        rec5a = np.dtype([
+        rec5a = dtype([
             ('pad1', int4),
             ('pad2', int4),
             ('pollnum', int4),  # number of different pollutants
         ])
 
-        rec5b = np.dtype([
+        rec5b = dtype([
             ('pname', char4),  # identification string for each pollutant
         ])
 
-        rec5c = np.dtype([
+        rec5c = dtype([
             ('pad2', int4),
         ])
 
-        rec6 = np.dtype([
+        rec6 = dtype([
             ('pad1', int4),
             ('oyear', int4),  # sample start time.
             ('omonth', int4),
@@ -179,20 +208,20 @@ class ModelBin(object):
 
         # record 8 is pollutant type identification string, output level.
 
-        rec8a = np.dtype([
+        rec8a = dtype([
             ('pad1', int4),
             ('poll', char4),  # pollutant identification string
             ('lev', int4),
             ('ne', int4),  # number of elements
         ])
 
-        rec8b = np.dtype([
+        rec8b = dtype([
             ('indx', int2),  # longitude index
             ('jndx', int2),  # latitude index
             ('conc', real4),
         ])
 
-        rec8c = np.dtype([
+        rec8c = dtype([
             ('pad2', int4),
         ])
 
@@ -212,6 +241,7 @@ class ModelBin(object):
            fillra : if True will return complete concentration grid  array with zero cocenctrations filled in
 
         """
+        from numpy import fromfile, arange
         # 8/16/2016 moved species=[]  to before while loop. Added print statements when verbose.
         self.dset = None
         atthash = {
@@ -228,7 +258,7 @@ class ModelBin(object):
         # start_loc in rec1 tell how many rec there are.
         tempzeroconcdates = []
         # Reads header data. This consists of records 1-5.
-        hdata1 = np.fromfile(fp, dtype=rec1, count=1)
+        hdata1 = fromfile(fp, dtype=rec1, count=1)
         nstartloc = hdata1['start_loc'][0]
         # in python 3 np.fromfile reads the record into a list even if it is just one number.
         # so if the length of this record is greater than one something is wrong.
@@ -237,8 +267,8 @@ class ModelBin(object):
                 'WARNING in ModelBin _readfile - number of starting locations incorrect'
             )
             print(hdata1['start_loc'])
-        hdata2 = np.fromfile(fp, dtype=rec2, count=nstartloc)
-        hdata3 = np.fromfile(fp, dtype=rec3, count=1)
+        hdata2 = fromfile(fp, dtype=rec2, count=nstartloc)
+        hdata3 = fromfile(fp, dtype=rec3, count=1)
         atthash['Number Start Locations'] = nstartloc
 
         # Description of concentration grid
@@ -291,8 +321,8 @@ class ModelBin(object):
             atthash['Source Date'].append(sourcedate)
 
         # read record 4 which gives information about vertical levels.
-        hdata4a = np.fromfile(fp, dtype=rec4a, count=1)  # gets nmber of levels
-        hdata4b = np.fromfile(
+        hdata4a = fromfile(fp, dtype=rec4a, count=1)  # gets nmber of levels
+        hdata4b = fromfile(
             fp, dtype=rec4b, count=hdata4a['nlev'][
                 0])  # reads levels, count is number of levels.
         self.levels = hdata4b['levht']
@@ -300,9 +330,9 @@ class ModelBin(object):
         atthash['Level top heights (m)'] = hdata4b['levht']
 
         # read record 5 which gives information about pollutants / species.
-        hdata5a = np.fromfile(fp, dtype=rec5a, count=1)
-        hdata5b = np.fromfile(fp, dtype=rec5b, count=hdata5a['pollnum'][0])
-        hdata5c = np.fromfile(fp, dtype=rec5c, count=1)
+        hdata5a = fromfile(fp, dtype=rec5a, count=1)
+        hdata5b = fromfile(fp, dtype=rec5b, count=hdata5a['pollnum'][0])
+        hdata5c = fromfile(fp, dtype=rec5c, count=1)
         atthash['Number of Species'] = hdata5a['pollnum'][0]
 
         # Loop to reads records 6-8. Number of loops is equal to number of output times.
@@ -313,8 +343,8 @@ class ModelBin(object):
         imax = 1e3  # Safety valve - will not allow more than 1000 loops to be executed.
         testf = True
         while testf:
-            hdata6 = np.fromfile(fp, dtype=rec6, count=1)
-            hdata7 = np.fromfile(fp, dtype=rec6, count=1)
+            hdata6 = fromfile(fp, dtype=rec6, count=1)
+            hdata7 = fromfile(fp, dtype=rec6, count=1)
             if len(hdata6
                    ) == 0:  # if no data read then break out of the while loop.
                 break
@@ -360,11 +390,11 @@ class ModelBin(object):
                 for pollutant in range(hdata5a['pollnum'][0]):
 
                     # record 8a has the number of elements (ne). If number of elements greater than 0 than there are concentrations.
-                    hdata8a = np.fromfile(fp, dtype=rec8a, count=1)
+                    hdata8a = fromfile(fp, dtype=rec8a, count=1)
                     atthash['Species ID'].append(
                         hdata8a['poll'][0].decode('UTF-8'))
                     if hdata8a['ne'] >= 1:  # if number of elements is nonzero then
-                        hdata8b = np.fromfile(
+                        hdata8b = fromfile(
                             fp, dtype=rec8b,
                             count=hdata8a['ne'][0])  # get rec8 - indx and jndx
                         self.nonzeroconcdates.append(
@@ -375,7 +405,7 @@ class ModelBin(object):
                             pdate1
                         )  # or add sample start time to list of start times with zero conc.
 
-                    hdata8c = np.fromfile(
+                    hdata8c = fromfile(
                         fp, dtype=rec8c, count=1)  # This is just padding.
                     # if savedata is set and nonzero concentrations then save the data in a pandas dataframe
                     if savedata and hdata8a['ne'] >= 1:
@@ -388,10 +418,10 @@ class ModelBin(object):
                         )  # otherwise get endian error.
                         concframe = pd.DataFrame.from_records(ndata)
                         # add latitude longitude columns
-                        lat = np.arange(
+                        lat = arange(
                             self.llcrnr_lat,
                             self.llcrnr_lat + self.nlat * self.dlat, self.dlat)
-                        lon = np.arange(
+                        lon = arange(
                             self.llcrnr_lon,
                             self.llcrnr_lon + self.nlon * self.dlon, self.dlon)
 
@@ -401,10 +431,10 @@ class ModelBin(object):
                         def flon(x):
                             return lon[x - 1]
 
-                        ##This block will fill in zero values in the concentration grid.
+                        # This block will fill in zero values in the concentration grid.
                         if fillra:
-                            n1 = np.arange(1, self.nlat + 1)
-                            n2 = np.arange(1, self.nlon + 1)
+                            n1 = arange(1, self.nlat + 1)
+                            n2 = arange(1, self.nlon + 1)
                             concframe['ji'] = zip(concframe['jndx'],
                                                   concframe['indx'])
                             concframe.set_index(['ji'], inplace=True)
@@ -415,12 +445,12 @@ class ModelBin(object):
                                        'indx']] = concframe['ji'].tolist()
                             concframe.fillna(0, inplace=True)
                             concframe.drop('ji', axis=1, inplace=True)
-                            #print(len(lat))
-                            #print(len(lon))
+                            # print(len(lat))
+                            # print(len(lon))
                             #print(len(n1), len(n2), n1[-1], n2[-1])
                             #print(self.nlat, self.nlon)
                             #print(self.llcrnr_lat, self.llcrnr_lon)
-                            #print(concframe[-50:-1])
+                            # print(concframe[-50:-1])
 
                         concframe['latitude'] = concframe['jndx'].apply(flat)
                         concframe['longitude'] = concframe['indx'].apply(flon)
@@ -444,7 +474,8 @@ class ModelBin(object):
 
                 # END LOOP to go through each pollutant
             # END LOOP to go through each level
-            if ii > imax:  # safety check - will stop sampling time while loop if goes over imax iterations.
+            # safety check - will stop sampling time while loop if goes over imax iterations.
+            if ii > imax:
                 testf = False
             if inc_iii:
                 iii += 1

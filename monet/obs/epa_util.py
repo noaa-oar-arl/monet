@@ -28,17 +28,18 @@ def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3'):
     Returns
     -------
     df : pandas dataframe
-        returns dataframe identical to original but with data converted to new unit.
+        returns dataframe identical to original but with data converted to new
+        unit.
     """
     factor = 2.6178
     ppb = 'ppb'
     ugm3 = 'ug/m3'
     if unit.lower() == ugm3:
-        df = df[df['units'] == ppb]  #find columns with units of 'ppb'
+        df = df[df['units'] == ppb]  # find columns with units of 'ppb'
         df['units'] = unit.upper()
         df[obscolumn] = df[obscolumn] * factor
     elif unit.lower() == ppb:
-        df = df[df['units'] == ugm3]  #find columns with units of 'ppb'
+        df = df[df['units'] == ugm3]  # find columns with units of 'ppb'
         df[obscolumn] = df[obscolumn] / factor
     return df
 
@@ -608,7 +609,8 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
         #Getting error that 'latitude' 'longitude' not contained in axis
         drop_latlon=False
         if drop_latlon:
-            return sss.drop(
-                ['latitude', 'longitude'], axis=1).drop_duplicates()
+            if pd.Series(sss.keys()).isin(['latitude', 'longitude']):
+                return sss.drop(
+                    ['latitude', 'longitude'], axis=1).drop_duplicates()
         else:
             return sss.drop_duplicates()
