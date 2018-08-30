@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 
 def draw_map(ax=None,
+             crs=None,
              natural_earth=False,
              coastlines=True,
              states=False,
@@ -36,17 +37,17 @@ def draw_map(ax=None,
         Description of returned object.
 
     """
-    if ax is None and kwargs is not None:
+    if ax is None and kwargs is not None and crs is None:
         if 'subplot_kw' not in kwargs:
             kwargs['subplot_kw'] = {'projection': ccrs.PlateCarree()}
         elif 'subplot_kw' in kwargs and 'projection' not in kwargs['subplot_kw']:
             kwargs['subplot_kw']['projection'] = ccrs.PlateCarree()
-        print(kwargs)
-        f, ax = plt.subplots(**kwargs)
-    elif ax is None:
+        f, ax = plt.subplots(figsize=(10, 5), **kwargs)
+    elif ax is None and crs is not None:
+        f, ax = plt.subplots(figsize=(10, 5), subplot_kw={'projection': crs})
+    else:
         f, ax = plt.subplots(
-            figsize=(10, 6), subplot_kw={'projection': ccrs.PlateCarree()})
-
+            figsize=(10, 5), subplot_kw={'projection': ccrs.PlateCarree()})
     if natural_earth:
         #~ ax.stock_img()
         ax.add_feature(cfeature.OCEAN)
