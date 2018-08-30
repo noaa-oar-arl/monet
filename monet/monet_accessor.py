@@ -192,7 +192,7 @@ class MONETAccessor(object):
             print('data must be an xarray.DataArray or xarray.Dataset')
 
     def _remap_dataset(self, dset, grid=None, **kwargs):
-        """Resample the entire xarray.Dataset to the current dataset object.
+        """Resample the entire dset (xarray.Dataset) to the current dataset object.
 
         Parameters
         ----------
@@ -245,6 +245,7 @@ class MONETAccessor(object):
         if grid is None:  # grid is assumed to be in da.area
             out = resample.resample_dataset(dataarray.chunk(), target,
                                             **kwargs)
+
         else:
             dataarray.attrs['area'] = grid
             out = resample.resample_dataset(dataarray.chunk(), target,
@@ -252,6 +253,48 @@ class MONETAccessor(object):
         if out.name in dset.variables:
             out.name = out.name + '_y'
         dset[out.name] = out
+
+    def nearest_latlon(self, lat=None, lon=None, **kwargs):
+        vars = pd.Series(dset.variables)
+        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
+        loop_vars = vars.loc[~vars.isin(skip_keys)]
+        orig = self.obj[loop_vars[0]].nearest_latlon(lat=lat, lon=lon, **kwargs)
+        dset = orig.to_dataset()
+        dset.attrs = self.obj.attrs.copy()
+        for i in loop_vars[1:]:
+            dset[i] = self.obj[i].nearest_latlon(lat=lat, lon=lon, **kwargs)
+        return dset
+
+    def interp_constant_lat(self, lat=None, **kwargs):
+        vars = pd.Series(dset.variables)
+        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
+        loop_vars = vars.loc[~vars.isin(skip_keys)]
+        orig = self.obj[loop_vars[0]].interp_constant_lat(lat=lat, **kwargs)
+        dset = orig.to_dataset()
+        dset.attrs = self.obj.attrs.copy()
+        for i in loop_vars[1:]:
+            dset[i] = self.obj[i].interp_constant_lat(lat=lat, **kwargs)
+        return dset
+
+    def interp_constant_lat(self, lon=None, **kwargs):
+        vars = pd.Series(dset.variables)
+        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
+        loop_vars = vars.loc[~vars.isin(skip_keys)]
+        orig = self.obj[loop_vars[0]].interp_constant_lon(lon=lon, **kwargs)
+        dset = orig.to_dataset()
+        dset.attrs = self.obj.attrs.copy()
+        for i in loop_vars[1:]:
+            dset[i] = self.obj[i].interp_constant_lon(lon=lon, **kwargs)
+        return dset
+
+    def stratify(self, levels, vertical, axis=1):
+        loop_vars = [i for i in e.variables if 'z' in e[i].dims]
+        orig = self.obj[loop_vars[0]].stratify(levels, vertical, axis=axis)
+        dset = orig.to_dataset()
+        dset.attrs = self.obj.attrs.copy()
+        for i in loop_vars[1:]:
+            dset[i] = self.obj[i].stratify(levels, vertical, axis=axis)
+        return dset
 
     def cartopy(self):
         """Returns a cartopy.crs.Projection for this dataset."""
