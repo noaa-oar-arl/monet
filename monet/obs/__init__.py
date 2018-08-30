@@ -1,11 +1,12 @@
 from __future__ import absolute_import, print_function
 
 from . import aeronet_mod, airnow_mod, aqs_mod, crn_mod, epa_util, improve_mod
-from . import ish_mod, tolnet_mod, cems_mod, nadp_mod
+from . import ish_mod, tolnet_mod, cems_mod, nadp_mod, modis_swath
 
 __all__ = [
     'aeronet_mod', 'airnow_mod', 'aqs_mod', 'crn_mod', 'epa_util',
-    'improve_mod', 'ish_mod', 'tolnet_mod', 'cems_mod', 'nadp_mod'
+    'improve_mod', 'ish_mod', 'tolnet_mod', 'cems_mod', 'nadp_mod',
+    'modis_swath'
 ]
 
 __name__ = 'obs'
