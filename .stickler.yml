@@ -1,7 +1,9 @@
 linters:
   flake8:
+    python: 3
+    max-line-length: 80
     fixer: false
-    ignore: I002
+    ignore: 'W28'
 fixers:
   enable: false
 review:
