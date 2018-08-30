@@ -4,3 +4,5 @@ linters:
     ignore: I002
 fixers:
   enable: false
+review:
+  fail_on_comments: false
