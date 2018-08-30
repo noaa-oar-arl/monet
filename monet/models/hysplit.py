@@ -21,7 +21,13 @@ def open_files(fname):
     type
         Description of returned object.
 
+   CHANGES for PYTHON 3
+   For python 3 the numpy char4 are read in as a numpy.bytes_ class and need to be converted to a python
+   string by using decode('UTF-8').
+
+
     """
+
     # open the dataset using xarray
     binfile = ModelBin(cdump, verbose=False, readwrite='r')
     dset = binfile.dset
@@ -43,6 +49,43 @@ def open_files(fname):
     return dset
 
 
+class HYSPLIT(BaseModel):
+    def __init__(self):
+        BaseModel.__init__(self)
+        self.dset=None
+
+    # use open_files method from the BaseModel class.
+
+    def add_files(self, cdump, verbose=True):
+        # TO DO dset needs to be made into a regular array.
+        binfile = ModelBin(cdump, verbose=False, readwrite='r')
+        dset = binfile.dset
+        if self.dset is None:
+            self.dset = dset
+        else:
+            #self.dset = xr.merge([self.dset, dset])
+            self.dset.combine_first(dset)
+            print(self.dset)
+    @staticmethod
+
+    def select_layer(variable, layer=None):
+        if lay is not None:
+            try:
+                var = variable.sel(levels=layer)
+            except ValueError:
+                print(
+                    'Dimension \'levels\' not in Dataset.  Returning Dataset anyway'
+                )
+                var = variable
+        else:
+            var = variable
+        return var
+
+    def get_var(self, param, layer=None):
+        return self.select_layer(self.dset[param], layer=layer)
+
+
+
 class ModelBin(object):
     """represents a binary cdump (concentration) output file from HYSPLIT
        methods:
@@ -57,7 +100,7 @@ class ModelBin(object):
                  century=None,
                  verbose=False,
                  readwrite='r',
-                 fillra=True):
+                 fillra=False):
         """
           drange should be a list of two datetime objects.
            The read method will store data from the cdump file for which the

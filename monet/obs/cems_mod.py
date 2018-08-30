@@ -1,19 +1,16 @@
 from __future__ import print_function
 import os
+import datetime
 import pandas as pd
 import numpy as np
-import datetime
-import sys
 
-###NAME: cems.py
-###PGRMMER: Alice Crawford   ORG: ARL
-###This code written at the NOAA air resources laboratory
-###Python 3
-
-##Record of changes
-
-#####################################################################
-
+"""
+NAME: cems_mod.py
+PGRMMER: Alice Crawford   ORG: ARL
+This code written at the NOAA air resources laboratory
+Python 3
+#################################################################
+"""
 
 def getdegrees(degrees, minutes, seconds):
     return degrees + minutes / 60.0 + seconds / 3600.00
@@ -36,11 +33,35 @@ def addmonth(dt):
                 day = 28
     return datetime.datetime(year, month, day, hour)
 
+def get_date_fmt(date, verbose=False):
+    """Determines what format of the date is in.
+    In some files year is first and others it is last.
+    Parameters
+    ----------
+    date: str
+          with format either YYYY-mm-DD or mm-DD-YYYY
+    verbose: boolean
+          if TRUE print extra information
+    Rerturns
+    --------
+    fmt: str
+        string which can be used with datetime object to give format of date string.
+    """
+    if verbose: print('Determining date format')
+    if verbose: print(date)
+    temp = date.split('-')
+    if len(temp[0]) == 4:
+        fmt = "%Y-%m-%d %H"
+    else:
+        fmt = "%m-%d-%Y %H"
+    return fmt
+
 
 class CEMS(object):
     """
     Class for data from continuous emission monitoring systems (CEMS).
-    Data from power plants can be downloaded from ftp://newftp.epa.gov/DMDNLoad/emissions/
+    Data from power plants can be downloaded from
+    ftp://newftp.epa.gov/DMDNLoad/emissions/
 
    Attributes
     ----------
@@ -64,8 +85,6 @@ class CEMS(object):
     retrieve(self, rdate, state, download=True):
     create_location_dictionary(self):
     rename(self, ccc, newname, rcolumn, verbose):
-    columns_rename(self, columns, verbose=False):
-    get_date_fmt(self, date):
     """
 
     def __init__(self):
@@ -97,13 +116,14 @@ class CEMS(object):
         download : boolean
                if download=True then retrieve will download the files and load
                will read the downloaded files.
-               if download=False then retrieve will return the url and load will read directly from ftp site.
+               if download=False then retrieve will return the url and load will read directly
+               from ftp site.
         verbose : boolean
                if TRUE prints out additional information.
         Returns
         -------
-        boolean True 
-                
+        boolean True
+
         """
         if isinstance(states, str):
             states = [states]
@@ -148,31 +168,65 @@ class CEMS(object):
                 cmatch = ccc
         return cmatch
 
+
+    def cemspivot(self, varname, daterange=None, unitid=False, verbose=True):
+        """
+        Parameters
+        ----------
+        varname: string
+            name of column in the cems dataframe
+        daterange: list of two datetime objects
+            define a date range
+        unitid: boolean.
+                 If True and unit id columns exist then these will be kept as separate
+                 columns in the pivot table.
+        verbose: boolean
+                 if true print out extra information.
+        Returns: pandas DataFrame object
+            returns dataframe with rows time. Columns are (orispl_code, unit_id).
+            If no unit_id in the file then columns are just orispl_code.
+            if unitid flag set to False then sums over unit_id's that belong to an orispl_code.
+            Values are from the column specified by the varname input.
+        """
+
+        from .obs_util import timefilter
+        temp = self.df.copy()
+        if daterange: temp = timefilter(temp, daterange)
+        if 'unit_id' in temp.columns.values and unitid:
+            if temp['unit_id'].unique():
+                if verbose: print('UNIT IDs ', temp['unit_id'].unique())
+            ##create pandas frame with index datetime and columns for value for each unit_id,orispl
+            pivot = pd.pivot_table(
+                temp, values=varname, index=['time'], columns=['orispl_code', 'unit_id'],\
+                aggfunc=np.sum)
+        else:
+            if verbose: print('NO UNIT ID')
+            ##returns data frame where rows are date and columns are the values of cmatch for orispl
+            pivot = pd.pivot_table(
+                temp, values=varname, index=['time'], columns=['orispl_code'], aggfunc=np.sum)
+        return pivot
+
+
+
     def get_var(self,
                 varname,
-                loc=None,
+                orisp=None,
                 daterange=None,
                 unitid=-99,
                 verbose=True):
-        """returns time series with variable indicated by varname.
-           returns data frame where rows are date and columns are the values of cmatch for each fac_id.
+        """
+           returns time series with variable indicated by varname.
+           returns data frame where rows are date and columns are the
+           values of cmatch for each fac_id.
 
            routine looks for column which contains all strings in varname.
            Currently not case sensitive.
 
-           loc must be list of ORISPL CODES.
-
-           TO DO - each FAC_ID may have several UNIT_ID, each of which
-           corresponds to a different unit at the facility. Need to handle this.
-           Either return separately or add together?
-
-           Each facility may have more than one unit. If unitid=-99 then this
-           method returns sum from all units.
+           loc and ORISPL CODES.
+           unitid is a unit_id
 
            if a particular unitid is specified then will return values for that unit.
 
-           TO DO if unitid -999 then will return a dictionary where key is the unit and value
-           is a panda time series for that unit.
 
         Parameters
         ----------
@@ -188,51 +242,10 @@ class CEMS(object):
         type
             Description of returned object.
         """
-        from .obs_util import timefilter
-        if isinstance(varname, str):
-            varname = (varname)
-        columns = list(self.df.columns.values)
-
-        if loc:
-            temp = self.df[self.df['orispl_code'].isin(loc)]
-        else:
-            temp = self.df.copy()
-        if daterange: temp = timefilter(temp, daterange)
-        #cmatch = self.match_column(varname)
-        cmatch=varname
-        #print('CMATCH', cmatch)
-        #print(temp.columns.values)
-        if 'unit_id' in columns:
-            if len(temp['unit_id'].unique()) > 0:
-                if verbose: print('UNIT IDs ' , temp['unit_id'].unique())
-            ##create pandas frame with index datetime and columns for value for each unit_id
-            pivot = pd.pivot_table(
-                temp, values=cmatch, index=['time'], columns=['unit_id'])
-            pivot = pivot.fillna(value=0)
-            #print('UNIT IDs ', pivot.columns)
-            #print('------------------pivot')
-            #print(pivot[0:10])
-            if unitid == -99:
-                pivot['all'] = pivot.sum(axis=1)
-                #print(pivot[0:10])
-                return pivot['all']
-            else:
-                return pivot['unitid']
-        else:
-            print('NO UNIT ID')
-            #temp.set_index('time', inplace=True)
-            ##returns data frame where rows are date and columns are the values of cmatch for each fac_id.
-            pivot = pd.pivot_table(
-                temp, values=cmatch, index=['time'], columns=['orispl_code'])
-            ldict = self.create_location_dictionary()
-            if ldict:
-                cnew = []
-                columns = list(pivot.columns.values)
-                for ccc in columns:
-                    cnew.append(ldict[ccc])
-            pivot.columns = cnew
-            return pivot
-            #return temp[cmatch]
+        if unitid == -99: ui = False
+        temp = self.cemspivot(varname, daterange, unitid=ui)
+        if not ui: return temp[orisp]
+        else: return temp[orisp, unitid]
 
     def retrieve(self, rdate, state, download=True, verbose=False):
         """Short summary.
@@ -284,6 +297,9 @@ class CEMS(object):
         return efile
 
     def create_location_dictionary(self, verbose=False):
+        """
+        returns dictionary withe key orispl_code and value  (latitude, longitude) tuple
+        """
         if 'latitude' in list(self.df.columns.values):
             dftemp = self.df.copy()
             pairs = zip(dftemp['orispl_code'],
@@ -293,9 +309,12 @@ class CEMS(object):
             if verbose: print(lhash)
             return lhash
         else:
-            return false
+            return False
 
     def create_name_dictionary(self, verbose=False):
+        """
+        returns dictionary withe key orispl_code and value facility name
+        """
         if 'latitude' in list(self.df.columns.values):
             dftemp = self.df.copy()
             pairs = zip(dftemp['orispl_code'],
@@ -305,27 +324,7 @@ class CEMS(object):
             if verbose: print(lhash)
             return lhash
         else:
-            return false
-
-
-    def rename(self, ccc, newname, rcolumn, verbose):
-        """
-        keeps track of original and new column names in the namehash attribute
-        Parameters:
-        ----------
-        ccc: str
-        newname: str
-        rcolumn: list of str
-        verbose: boolean
-        Returns
-        ------
-        rcolumn: list of str
-        """
-        self.namehash[
-            newname] = ccc  #dictionary with key as the newname and value as the original name
-        rcolumn.append(newname)
-        if verbose: print(ccc + ' to ' + newname)
-        return rcolumn
+            return False
 
     def columns_rename(self, columns, verbose=False):
         """
@@ -371,28 +370,25 @@ class CEMS(object):
                 rcolumn.append(ccc.strip().lower())
         return rcolumn
 
-    def get_date_fmt(self, date, verbose=False):
-        """Determines what format of the date is in.
-        In some files year is first and others it is last.
-        Parameters
-        ----------
-        date: str
-              with format either YYYY-mm-DD or mm-DD-YYYY
-        verbose: boolean
-              if TRUE print extra information
-        Rerturns
-        --------
-        fmt: str
-            string which can be used with datetime object to give format of date string.
+
+    def rename(self, ccc, newname, rcolumn, verbose):
         """
-        if verbose: print('Determining date format')
-        if verbose: print(date)
-        temp = date.split('-')
-        if len(temp[0]) == 4:
-            fmt = "%Y-%m-%d %H"
-        else:
-            fmt = "%m-%d-%Y %H"
-        return fmt
+        keeps track of original and new column names in the namehash attribute
+        Parameters:
+        ----------
+        ccc: str
+        newname: str
+        rcolumn: list of str
+        verbose: boolean
+        Returns
+        ------
+        rcolumn: list of str
+        """
+        self.namehash[
+            newname] = ccc  #dictionary with key as the newname and value as the original name
+        rcolumn.append(newname)
+        if verbose: print(ccc + ' to ' + newname)
+        return rcolumn
 
     def add_info(self, dftemp):
         """
@@ -420,9 +416,9 @@ class CEMS(object):
         if os.path.isfile(iname):
             sinfo = pd.read_csv(iname, sep=',', header=0)
             try:
-               dftemp.drop(['latitude', 'longitude'], axis=1, inplace=True)
+                dftemp.drop(['latitude', 'longitude'], axis=1, inplace=True)
             except:
-               pass
+                pass
             dfnew = pd.merge(
                 dftemp,
                 sinfo,
@@ -436,7 +432,7 @@ class CEMS(object):
             if method == 1:
                 #this runs ok but fails pytest
                 def i2o(x):
-                    return (datetime.timedelta(hours=x['time_offset']))
+                    return datetime.timedelta(hours=x['time_offset'])
 
                 dfnew['time_offset'] = dfnew.apply(i2o, axis=1)
                 dfnew['time'] = dfnew['time local'] + dfnew['time_offset']
@@ -450,7 +446,7 @@ class CEMS(object):
             elif method == 3:
                 #this runs ok but fails pytest
                 def utc(x, y):
-                    return (x + datetime.timedelta(hours=y))
+                    return x + datetime.timedelta(hours=y)
 
                 dfnew['time'] = dfnew.apply(
                     lambda row: utc(row['time local'], row['time_offset']),
@@ -458,10 +454,6 @@ class CEMS(object):
             #remove the time_offset column.
             dfnew.drop(['time_offset'], axis=1, inplace=True)
             mlist = dftemp.columns.values.tolist()
-            dlist = dftemp.columns.values.tolist()
-            #print(mlist)
-            #print(dftemp.columns.values)
-            #print(dfnew.columns.values)
             #merge the dataframes back together to include rows with no info in the cemsinfo.csv
             dftemp = pd.merge(
                 dftemp, dfnew, how='left', left_on=mlist, right_on=mlist)
@@ -482,13 +474,16 @@ class CEMS(object):
         ##pandas read_csv can read either from a file or url.
         dftemp = pd.read_csv(efile, sep=',', index_col=False, header=0)
         columns = list(dftemp.columns.values)
-        columns = self.columns_rename(columns, verbose)
+        columns = columns_rename(columns, verbose)
         dftemp.columns = columns
-        if verbose: print(columns)
-        dfmt = self.get_date_fmt(dftemp['date'][0], verbose=verbose)
+        if verbose:
+            print(columns)
+        dfmt = get_date_fmt(dftemp['date'][0], verbose=verbose)
 
-        ##create column with datetime information from column with month-day-year and column with hour.
-        dftime = dftemp.apply(lambda x:pd.datetime.strptime("{0} {1}".format(x['date'], x['hour'])  , dfmt), axis=1)
+        ##create column with datetime information
+        ##from column with month-day-year and column with hour.
+        dftime = dftemp.apply(lambda x:
+                              pd.datetime.strptime("{0} {1}".format(x['date'], x['hour']), dfmt), axis=1)
         dftemp = pd.concat([dftime, dftemp], axis=1)
         dftemp.rename(columns={0: 'time local'}, inplace=True)
         dftemp.drop(['date', 'hour'], axis=1, inplace=True)
@@ -498,7 +493,8 @@ class CEMS(object):
         #allows transformation from local time to UTC.
         dftemp = self.add_info(dftemp)
 
-        if ['year'] in columns: dftemp.drop(['year'], axis=1, inplace=True)
+        if ['year'] in columns:
+            dftemp.drop(['year'], axis=1, inplace=True)
         if  self.df.empty:
             self.df = dftemp
             if verbose:

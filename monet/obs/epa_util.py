@@ -521,7 +521,7 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
             encoding="ISO-8859-1")
         airnow.columns = [
             'siteid', 'Site_Code', 'Site_Name', 'Status', 'Agency',
-            'Agency_Name', 'EPA_region', 'Latitude', 'Longitude', 'Elevation',
+            'Agency_Name', 'EPA_region', 'latitude', 'longitude', 'Elevation',
             'GMT_Offset', 'Country_Code', 'CMSA_Code', 'CMSA_Name', 'MSA_Code',
             'MSA_Name', 'state_Code', 'state_Name', 'County_Code',
             'County_Name', 'City_Code'
@@ -559,7 +559,7 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
                 encoding="ISO-8859-1")
             airnow.columns = [
                 'siteid', 'Site_Code', 'Site_Name', 'Status', 'Agency',
-                'Agency_Name', 'EPA_region', 'Latitude', 'Longitude',
+                'Agency_Name', 'EPA_region', 'latitude', 'longitude',
                 'Elevation', 'GMT_Offset', 'Country_Code', 'CMSA_Code',
                 'CMSA_Name', 'MSA_Code', 'MSA_Name', 'state_Code',
                 'state_Name', 'County_Code', 'County_Name', 'City_Code'
@@ -606,6 +606,8 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
         if network is not None:
             sss = sss.loc[sss.networks.isin(
                 [network])].drop_duplicates(subset=['siteid'])
+        #Getting error that 'latitude' 'longitude' not contained in axis
+        drop_latlon=False
         if drop_latlon:
             if pd.Series(sss.keys()).isin(['latitude', 'longitude']):
                 return sss.drop(
