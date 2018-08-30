@@ -26,27 +26,27 @@ def open_files(fname):
    string by using decode('UTF-8').
 
 
-"""
+    """
 
-# open the dataset using xarray
-binfile = ModelBin(cdump, verbose=False, readwrite='r')
-dset = binfile.dset
+    # open the dataset using xarray
+    binfile = ModelBin(cdump, verbose=False, readwrite='r')
+    dset = binfile.dset
 
-# get the grid information
-p4 = _hysplit_latlon_grid_from_dataset(dset)
-swath = get_hysplit_latlon_pyreample_area_def(dset, p4)
+    # get the grid information
+    p4 = _hysplit_latlon_grid_from_dataset(dset)
+    swath = get_hysplit_latlon_pyreample_area_def(dset, p4)
 
-# now assign this to the dataset and each dataarray
-dset = dset.assign_attrs({'proj4_srs': p4})
-for i in dset.variables:
-    dset[i] = dset[i].assign_attrs({'proj4_srs': p4})
-    for j in dset[i].attrs:
-        dset[i].attrs[j] = dset[i].attrs[j].strip()
-    dset[i] = dset[i].assign_attrs({'area': swath})
-dset = dset.assign_attrs(area=swath)
+    # now assign this to the dataset and each dataarray
+    dset = dset.assign_attrs({'proj4_srs': p4})
+    for i in dset.variables:
+        dset[i] = dset[i].assign_attrs({'proj4_srs': p4})
+        for j in dset[i].attrs:
+            dset[i].attrs[j] = dset[i].attrs[j].strip()
+        dset[i] = dset[i].assign_attrs({'area': swath})
+    dset = dset.assign_attrs(area=swath)
 
-# return the dataset
-return dset
+    # return the dataset
+    return dset
 
 
 class HYSPLIT(BaseModel):
