@@ -3,30 +3,90 @@ from __future__ import absolute_import, print_function
 from numpy import NaN, sort
 from pandas import DataFrame, Series, concat
 
-from . import interpolation as interpo
+from ..util import interp_util as interpo
 from ..obs import epa_util
 
 
-def combine_model_obs(da, df, radius):
-    """Short summary.
+def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
+    """This function will combine an xarray data array with spatial information
+    point observations in `df`.
 
     Parameters
     ----------
-    da : type
-        This is a xarray Dataset or DataArray
-    df : type
+    da : xr.DataArray
+        Description of parameter `da`.
+    df : pd.DataFrame
         Description of parameter `df`.
-    radius : type
+    lay : iterable, default = [0]
+        Description of parameter `lay`.
+    radius : integer or float, default = 12e3
         Description of parameter `radius`.
 
     Returns
     -------
-    type
-        Description of returned object.
+    pandas.DataFrame
     """
+    from ..util.interp_util import lonlat_to_swathdefinition
+    from ..util.resample import resample_dataset
+    try:
+        if col is None:
+            raise RuntimeError
+    except RuntimeError:
+        print('Must enter column name')
+    dfn = df.dropna(subset=[col])
+    dfnn = dfn.drop_duplicates(subset=['latitude', 'longitude'])
+    unit = dfnn[col + '_unit'].unique()[0]
+    target_grid = lonlat_to_swathdefinition(
+        longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
+    da_interped = resample_dataset(
+        da.compute(), target_grid, radius_of_influence=radius_of_influence)
+    # add model if da.name is the same as column
+    df_interped = da_interped.to_dataframe().reset_index()
+    cols = Series(df_interped.columns)
+    drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
+    df_interped.drop(drop_cols, axis=1, inplace=True)
+    if da.name in df.columns:
+        df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
+        print(df_interped.keys())
+    final_df = df.merge(
+        df_interped, on=['latitude', 'longitude', 'time'], how='left')
+    return final_df
 
 
-def combine(model=None, obs=None, mapping_table=None, lay=None, radius=None):
+def combine_da_to_height_profile(da, dset):
+    """This function will combine an xarray.DataArray to a 2d dataset with dimensions (time,z)
+
+    Parameters
+    ----------
+    da : xarray.DataArray
+        Description of parameter `da`.
+    dset : xarray.Dataset
+        Description of parameter `dset`.
+
+    Returns
+    -------
+    xarray.Dataset
+        returns the xarray.Dataset with the `da` added as an additional variable.
+
+    """
+    from ..util.interp_util import nearest_point_swathdefinition
+    lon, lat = dset.longitude, dset.latitude
+    target_grid = nearest_point_swathdefinition(longitude=lon, latitude=lat)
+    da_interped = da.monet.nearest_latlon(
+        lon=lon, lat=lat, radius_of_influence=radius)
+
+    #FIXME: interp to height here
+
+    dset[da.name] = da_interped
+
+    return dset
+
+
+def combine_to_df(model=None,
+                  obs=None,
+                  mapping_table=None,
+                  lay=None,
+                  radius=None):
     # first get mapping table for obs to model
     if radius is None:
         try:
@@ -160,85 +220,3 @@ def check_units(model, obsunit, variable=None):
     else:
         fac = 1.
     return fac
-
-
-def get_mapping_table(model, obs):
-    if obs.objtype is 'AirNow' or obs.objtype is 'AQS' or objtype is 'IMPROVE':
-        if model.objtype == 'CMAQ':
-            table = {
-                'OZONE': ['O3'],
-                'PM2.5': ['PM25'],
-                'CO': ['CO'],
-                'NOY': [
-                    'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX',
-                    'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
-                ],
-                'NOX': ['NO', 'NO2'],
-                'SO2': ['SO2'],
-                'NOX': ['NO', 'NO2'],
-                'NO': ['NO'],
-                'NO2': ['NO2'],
-                'SO4f': ['SO4f'],
-                'PM10': ['PM10'],
-                'NO3f': ['NO3f'],
-                'ECf': ['ECf'],
-                'OCf': ['OCf'],
-                'ETHANE': ['ETHA'],
-                'BENZENE': ['BENZENE'],
-                'TOLUENE': ['TOL'],
-                'ISOPRENE': ['ISOP'],
-                'O-XYLENE': ['XYL'],
-                'WS': ['WSPD10'],
-                'TEMP': ['TEMP2'],
-                'WD': ['WDIR10'],
-                'NAf': ['NAf'],
-                'MGf': ['AMGJ'],
-                'TIf': ['ATIJ'],
-                'SIf': ['ASIJ'],
-                'Kf': ['Kf'],
-                'CAf': ['CAf'],
-                'NH4f': ['NH4f'],
-                'FEf': ['AFEJ'],
-                'ALf': ['AALJ'],
-                'MNf': ['AMNJ']
-            }
-        elif model.objtype is 'CAMX':
-            table = {
-                'OZONE': ['O3'],
-                'PM2.5': ['PM25'],
-                'CO': ['CO'],
-                'NOY': [
-                    'NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX',
-                    'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN'
-                ],
-                'NOX': ['NO', 'NO2'],
-                'SO2': ['SO2'],
-                'NOX': ['NO', 'NO2'],
-                'NO': ['NO'],
-                'NO2': ['NO2'],
-                'SO4f': ['PSO4'],
-                'PM10': ['PM10'],
-                'NO3f': ['PNO3'],
-                'ECf': ['PEC'],
-                'OCf': ['OC'],
-                'ETHANE': ['ETHA'],
-                'BENZENE': ['BENZENE'],
-                'TOLUENE': ['TOL'],
-                'ISOPRENE': ['ISOP'],
-                'O-XYLENE': ['XYL'],
-                'WS': ['WSPD10'],
-                'TEMP': ['TEMP2'],
-                'WD': ['WDIR10'],
-                'NAf': ['NA'],
-                'NH4f': ['PNH4']
-            }
-    if obs.objtype is 'CRN':
-        if model.objtype is 'CMAQ':
-            table = {
-                'SUR_TEMP': ['TEMPG'],
-                'T_HR_AVG': ['TEMP2'],
-                'SOLARAD': ['RGRND'],
-                'SOIL_MOISTURE_5': ['SOIM1'],
-                'SOIL_MOISTURE_10': ['SOIM2']
-            }
-    return table
