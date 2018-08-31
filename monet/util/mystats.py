@@ -367,7 +367,7 @@ def IOA(obs, mod, axis=None):
         obsmean = np.expand_dims(obsmean, axis=axis)
     return 1.0 - old_div(
         (np.ma.abs(obs - mod)**2).sum(axis=axis),
-        ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean))**
+        ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) **
          2).sum(axis=axis))
 
 
