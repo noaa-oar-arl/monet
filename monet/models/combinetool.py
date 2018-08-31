@@ -75,7 +75,7 @@ def combine_da_to_height_profile(da, dset):
     da_interped = da.monet.nearest_latlon(
         lon=lon, lat=lat, radius_of_influence=radius)
 
-    #FIXME: interp to height here
+    # FIXME: interp to height here
 
     dset[da.name] = da_interped
 

@@ -101,8 +101,8 @@ class IMPROVE(object):
         if add_meta:
             dropkeys = ['latitude', 'longitude', 'poc']
 
-            monitor_df = read_monitor_file(network='IMPROVE')  #.drop(
-            #dropkeys, axis=1)
+            monitor_df = read_monitor_file(network='IMPROVE')  # .drop(
+            # dropkeys, axis=1)
             df = df.merge(
                 monitor_df, how='left', left_on='epaid', right_on='siteid')
             df.drop(['siteid_y', 'state_name_y'], inplace=True, axis=1)
@@ -120,7 +120,7 @@ class IMPROVE(object):
         except:
             df.obs.loc[df.obs < -900] = NaN
         #self.df.dropna(subset=['obs'], inplace=True)
-        #self.df['time_local'] = self.df.time + pd.to_timedelta(
+        # self.df['time_local'] = self.df.time + pd.to_timedelta(
         #    self.df.gmt_offset.astype(float), unit='H')
         self.df = df
         return df.copy()

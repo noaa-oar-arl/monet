@@ -51,7 +51,8 @@ class AERONET(object):
                 inv_type = '&ALM15=1'
             else:
                 inv_type = '&AML20=1'
-        date_portion = 'year=' + sy + '&month=' + sm + '&day=' + sd + '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed + '&hour2=' + eh
+        date_portion = 'year=' + sy + '&month=' + sm + '&day=' + sd + '&hour=' + \
+            sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed + '&hour2=' + eh
         if self.inv_type is not '':
             product = '&product=' + self.prod
         else:

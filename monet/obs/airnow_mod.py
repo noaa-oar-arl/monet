@@ -95,7 +95,7 @@ class AirNow(object):
             fname = i.strftime('HourlyData_%Y%m%d%H.dat')
             furls.append(f)
             fnames.append(fname)
-        #https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/2017/20170108/HourlyData_2016121506.dat
+        # https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/2017/20170108/HourlyData_2016121506.dat
 
         # files needed for comparison
         self.url = pd.Series(furls, index=None)
@@ -272,7 +272,7 @@ class AirNow(object):
         #self.monitor_df = self.monitor_df.loc[self.monitor_df.siteid.notnull()]
         #self.monitor_df['siteid'] = self.monitor_df.siteid.astype(int).astype(str).str.zfill(9)
         self.df = pd.merge(
-            self.df, self.monitor_df, on='siteid')  #, how='left')
+            self.df, self.monitor_df, on='siteid')  # , how='left')
 
     def get_station_locations_remerge(self, df):
         """Short summary.
@@ -291,6 +291,6 @@ class AirNow(object):
         df = pd.merge(
             df,
             self.monitor_df.drop(['Latitude', 'Longitude'], axis=1),
-            on='siteid')  #,
-        #how='left')
+            on='siteid')  # ,
+        # how='left')
         return df

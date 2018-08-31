@@ -52,7 +52,7 @@ def open_files(fname):
 class HYSPLIT(BaseModel):
     def __init__(self):
         BaseModel.__init__(self)
-        self.dset=None
+        self.dset = None
 
     # use open_files method from the BaseModel class.
 
@@ -66,8 +66,8 @@ class HYSPLIT(BaseModel):
             #self.dset = xr.merge([self.dset, dset])
             self.dset.combine_first(dset)
             print(self.dset)
-    @staticmethod
 
+    @staticmethod
     def select_layer(variable, layer=None):
         if lay is not None:
             try:
@@ -83,7 +83,6 @@ class HYSPLIT(BaseModel):
 
     def get_var(self, param, layer=None):
         return self.select_layer(self.dset[param], layer=layer)
-
 
 
 class ModelBin(object):
@@ -418,12 +417,12 @@ class ModelBin(object):
                         )  # otherwise get endian error.
                         concframe = pd.DataFrame.from_records(ndata)
                         # add latitude longitude columns
-                        lat = arange(
-                            self.llcrnr_lat,
-                            self.llcrnr_lat + self.nlat * self.dlat, self.dlat)
-                        lon = arange(
-                            self.llcrnr_lon,
-                            self.llcrnr_lon + self.nlon * self.dlon, self.dlon)
+                        lat = arange(self.llcrnr_lat,
+                                     self.llcrnr_lat + self.nlat * self.dlat,
+                                     self.dlat)
+                        lon = arange(self.llcrnr_lon,
+                                     self.llcrnr_lon + self.nlon * self.dlon,
+                                     self.dlon)
 
                         def flat(x):
                             return lat[x - 1]

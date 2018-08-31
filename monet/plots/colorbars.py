@@ -5,7 +5,12 @@ from matplotlib import cm
 from numpy import arange, linspace, vstack
 
 
-def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype='int', basemap=None):
+def colorbar_index(ncolors,
+                   cmap,
+                   minval=None,
+                   maxval=None,
+                   dtype='int',
+                   basemap=None):
     import matplotlib.cm as cm
     import numpy as np
     cmap = cmap_discretize(cmap, ncolors)
@@ -24,8 +29,8 @@ def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype='int', basemap
         colorbar.set_ticklabels(
             np.around(np.linspace(0, ncolors, ncolors).astype(dtype), 2))
     else:
-        colorbar.set_ticklabels(np.around(np.linspace(
-            minval, maxval, ncolors).astype(dtype), 2))
+        colorbar.set_ticklabels(
+            np.around(np.linspace(minval, maxval, ncolors).astype(dtype), 2))
 
     return colorbar, cmap
 
@@ -65,7 +70,8 @@ def o3cmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.OrRd(linspace(.2, 1, 128))
     colors = vstack((colors1, colors2))
-    return mcolors.LinearSegmentedColormap.from_list('o3cmap', colors), arange(0, 140.5, .5)
+    return mcolors.LinearSegmentedColormap.from_list('o3cmap', colors), arange(
+        0, 140.5, .5)
 
 
 def pm25cmap():
@@ -75,7 +81,8 @@ def pm25cmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.OrRd(linspace(.2, 1, 128))
     colors = vstack((colors1, colors2))
-    cc = mcolors.LinearSegmentedColormap.from_list('pm25cmap', colors), arange(0, 70.2, .2)
+    cc = mcolors.LinearSegmentedColormap.from_list('pm25cmap', colors), arange(
+        0, 70.2, .2)
     return cc
 
 
@@ -86,7 +93,8 @@ def wscmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.OrRd(linspace(.2, 1, 128))
     colors = vstack((colors1, colors2))
-    return mcolors.LinearSegmentedColormap.from_list('wscmap', colors), arange(0, 40.2, .2)
+    return mcolors.LinearSegmentedColormap.from_list('wscmap', colors), arange(
+        0, 40.2, .2)
 
 
 def tempcmap():
@@ -96,7 +104,9 @@ def tempcmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.OrRd(linspace(.2, 1, 128))
     colors = vstack((colors1, colors2))
-    return mcolors.LinearSegmentedColormap.from_list('tempcmap', colors), arange(250, 320.5, .5)
+    return mcolors.LinearSegmentedColormap.from_list('tempcmap',
+                                                     colors), arange(
+                                                         250, 320.5, .5)
 
 
 def sradcmap():
@@ -106,7 +116,9 @@ def sradcmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.plasma(linspace(.2, 1, 128))
     colors = vstack((colors1, colors2))
-    return mcolors.LinearSegmentedColormap.from_list('sradcmap', colors), arange(0, 1410., 10)
+    return mcolors.LinearSegmentedColormap.from_list('sradcmap',
+                                                     colors), arange(
+                                                         0, 1410., 10)
 
 
 def noxcmap():
@@ -116,7 +128,9 @@ def noxcmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.plasma_r(linspace(.042, .75, 128))
     colors = vstack((colors1, colors2))
-    return mcolors.LinearSegmentedColormap.from_list('noxcmap', colors), arange(0, 40.2, .2)
+    return mcolors.LinearSegmentedColormap.from_list('noxcmap',
+                                                     colors), arange(
+                                                         0, 40.2, .2)
 
 
 def rhcmap():
@@ -126,7 +140,9 @@ def rhcmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.plasma_r(linspace(.042, .75, 128))
     colors = vstack((colors1, colors2))
-    return mcolors.LinearSegmentedColormap.from_list('noxcmap', colors), arange(0, 100.5, .5)
+    return mcolors.LinearSegmentedColormap.from_list('noxcmap',
+                                                     colors), arange(
+                                                         0, 100.5, .5)
 
 
 def so2cmap():
@@ -136,7 +152,9 @@ def so2cmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.plasma_r(linspace(.042, .75, 128))
     colors = vstack((colors1, colors2))
-    return mcolors.LinearSegmentedColormap.from_list('noxcmap', colors), arange(0, 14.1, .1)
+    return mcolors.LinearSegmentedColormap.from_list('noxcmap',
+                                                     colors), arange(
+                                                         0, 14.1, .1)
 
 
 def pm10cmap():
@@ -146,4 +164,6 @@ def pm10cmap():
     colors1 = cm.viridis(linspace(0, 1, 128))
     colors2 = cm.plasma_r(linspace(.042, .75, 128))
     colors = vstack((colors1, colors2))
-    return mcolors.LinearSegmentedColormap.from_list('noxcmap', colors), arange(0, 150.5, .5)
+    return mcolors.LinearSegmentedColormap.from_list('noxcmap',
+                                                     colors), arange(
+                                                         0, 150.5, .5)

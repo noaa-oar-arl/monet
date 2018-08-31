@@ -606,8 +606,8 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
         if network is not None:
             sss = sss.loc[sss.networks.isin(
                 [network])].drop_duplicates(subset=['siteid'])
-        #Getting error that 'latitude' 'longitude' not contained in axis
-        drop_latlon=False
+        # Getting error that 'latitude' 'longitude' not contained in axis
+        drop_latlon = False
         if drop_latlon:
             if pd.Series(sss.keys()).isin(['latitude', 'longitude']):
                 return sss.drop(

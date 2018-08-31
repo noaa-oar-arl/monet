@@ -49,10 +49,8 @@ def _check_swath_or_area(defin):
         else:
             raise RuntimeError
     except RuntimeError:
-        print(
-            'grid definition must be a pyresample SwathDefinition or '
-            'AreaDefinition'
-        )
+        print('grid definition must be a pyresample SwathDefinition or '
+              'AreaDefinition')
         return
     return newswath
 
@@ -99,10 +97,8 @@ def resample_dataset(data,
         else:
             raise RuntimeError
     except RuntimeError:
-        print(
-            'Must include pyresample.gemoetry in the data.attrs area_def or '
-            'area'
-        )
+        print('Must include pyresample.gemoetry in the data.attrs area_def or '
+              'area')
         return
 
     # check for SwathDefinition or AreaDefinition

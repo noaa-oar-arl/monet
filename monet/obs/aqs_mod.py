@@ -120,7 +120,7 @@ class AQS(object):
             df.columns = self.renameddcols
             df['pollutant_standard'] = df.pollutant_standard.astype(str)
             self.daily = True
-            #df.rename(columns={'parameter_name':'variable'})
+            # df.rename(columns={'parameter_name':'variable'})
         else:
             df = pd.read_csv(
                 url,
@@ -339,7 +339,7 @@ class AQS(object):
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
-        #if pd.Series(self.df.columns).isin(['parameter_name']).max():
+        # if pd.Series(self.df.columns).isin(['parameter_name']).max():
         #self.df.drop('parameter_name', axis=1, inplace=True)
         return self.df.copy()
 
