@@ -172,8 +172,8 @@ class MONETAccessor(object):
         """
         from .plots.mapgen import draw_map
         from matplotlib.pyplot import tight_layout
-        #import cartopy.crs as ccrs
-        #crs = self.obj.monet.cartopy()
+        # import cartopy.crs as ccrs
+        # crs = self.obj.monet.cartopy()
         ax = draw_map(**map_kwarg)
         self.obj.plot(x='longitude', y='latitude', ax=ax, **kwargs)
         ax.outline_patch.set_alpha(0)
@@ -182,7 +182,8 @@ class MONETAccessor(object):
 
     def remap_data(self, dataarray, grid=None, **kwargs):
         """remaps from another grid to the current grid of self using pyresample.
-        it assumes that the dimensions are ordered in ROW,COL,CHANNEL per pyresample docs
+        it assumes that the dimensions are ordered in ROW,COL,CHANNEL per
+        pyresample docs
 
         Parameters
         ----------
@@ -310,7 +311,7 @@ class MONETAccessorDataset(object):
 
         """
         # from .util import resample
-        #target = self.obj.area
+        # target = self.obj.area
         skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
         vars = pd.Series(dset.variables)
         loop_vars = vars.loc[~vars.isin(skip_keys)]
@@ -407,8 +408,10 @@ class MONETAccessorDataset(object):
         vars = pd.Series(self.obj.variables)
         skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
         loop_vars = vars.loc[~vars.isin(skip_keys)]
+
         orig = self.obj[loop_vars.iloc[0]].monet.interp_constant_lat(
             lat=lat, **kwargs)
+
         dset = orig.to_dataset()
         dset.attrs = self.obj.attrs.copy()
         for i in loop_vars[1:].values:
