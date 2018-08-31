@@ -1,6 +1,6 @@
 """
-Data is taken from the Climate Reference Network.  This is to expand validation of
-    the NOAA ARL model validation leveraging inhouse datasets.
+Data is taken from the Climate Reference Network.  This is to expand validation
+ of the NOAA ARL model validation leveraging inhouse datasets.
 
     Data available at https://www.ncdc.noaa.gov/crn/qcdatasets.html
 
@@ -115,8 +115,6 @@ from __future__ import print_function
 import inspect
 import os
 from builtins import object, zip
-from datetime import datetime
-from urllib3.exceptions import HTTPError
 
 import pandas as pd
 from future import standard_library
@@ -184,11 +182,18 @@ class crn(object):
             'RH_AVG', 'RH_FLAG', 'SOIL_MOISTURE_5', 'SOIL_TEMP_5', 'WETNESS',
             'WET_FLAG', 'WIND', 'WIND_FLAG'
         ]
-        self.citiation = 'Diamond, H. J., T. R. Karl, M. A. Palecki, C. B. Baker, J. E. Bell, R. D. Leeper, D. R. Easterling, J. H. Lawrimore, T. P. Meyers, M. R. Helfert, G. Goodge, and P. W. Thorne, 2013: U.S. Climate Reference Network after one decade of operations: status and assessment. Bull. Amer. Meteor. Soc., 94, 489-498. doi: 10.1175/BAMS-D-12-00170.1'
-        self.citation2 = 'Bell, J. E., M. A. Palecki, C. B. Baker, W. G. Collins, J. H. Lawrimore, R. D. Leeper, M. E. Hall, J. Kochendorfer, T. P. Meyers, T. Wilson, and H. J. Diamond. 2013: U.S. Climate Reference Network soil moisture and temperature observations. J. Hydrometeorol., 14, 977-988. doi: 10.1175/JHM-D-12-0146.1'
+        self.citiation = 'Diamond, H. J., T. R. Karl, M. A. Palecki, C. B. Baker, J. E. Bell, R. D. Leeper, D. R. Easterling, J. H. '
+        ' Lawrimore, T. P. Meyers, M. R. Helfert, G. Goodge, and P. W. Thorne,'
+        ' 2013: U.S. Climate Reference Network after one decade of operations:'
+        ' status and assessment. Bull. Amer. Meteor. Soc., 94, 489-498. '
+        'doi: 10.1175/BAMS-D-12-00170.1'
+        self.citation2 = 'Bell, J. E., M. A. Palecki, C. B. Baker, W. G. '
+        'Collins, J. H. Lawrimore, R. D. Leeper, M. E. Hall, J. Kochendorfer, '
+        'T. P. Meyers, T. Wilson, and H. J. Diamond. 2013: U.S. Climate '
+        'Reference Network soil moisture and temperature observations. J. '
+        'Hydrometeorol., 14, 977-988. doi: 10.1175/JHM-D-12-0146.1'
 
     def load_file(self, url):
-        from numpy import concatenate
         nanvals = [-99999, -9999.0]
         if 'CRND0103' in url:
             cols = self.dcols
@@ -211,7 +216,7 @@ class crn(object):
                     'time_local': ['LST_DATE', 'LST_TIME']
                 },
                 infer_datetime_format=True,
-                na_values=navals)
+                na_values=nanvals)
         else:
             cols = self.hcols
             df = pd.read_csv(

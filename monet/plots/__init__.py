@@ -7,6 +7,4 @@ from .colorbars import *
 
 __all__ = ['colorbars', 'plots', 'taylordiagram', 'mapgen']
 
-__name__ = 'plots'
-
 # This is the driver for all verify objects

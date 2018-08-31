@@ -2,12 +2,12 @@ from __future__ import print_function
 
 import inspect
 import os
-# this is written to retrive airnow data concatenate and add to pandas array for usage
+# this is written to retrive airnow data concatenate and add to pandas array
+# for usage
 from builtins import object
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pandas as pd
-from numpy import array
 
 
 class AirNow(object):
@@ -81,9 +81,6 @@ class AirNow(object):
         helper function to build urls
 
         """
-        from numpy import empty, where
-        import requests
-        from glob import glob
 
         furls = []
         fnames = []
@@ -95,7 +92,7 @@ class AirNow(object):
             fname = i.strftime('HourlyData_%Y%m%d%H.dat')
             furls.append(f)
             fnames.append(fname)
-        #https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/2017/20170108/HourlyData_2016121506.dat
+        # https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/2017/20170108/HourlyData_2016121506.dat
 
         # files needed for comparison
         self.url = pd.Series(furls, index=None)
@@ -127,7 +124,7 @@ class AirNow(object):
                 'units', 'obs', 'source'
             ]
             dft.columns = cols
-        except:
+        except Exception:
             cols = [
                 'date', 'time', 'siteid', 'site', 'utcoffset', 'variable',
                 'units', 'obs', 'source'
@@ -269,10 +266,8 @@ class AirNow(object):
         """
         from .epa_util import read_monitor_file
         self.monitor_df = read_monitor_file(airnow=True)
-        #self.monitor_df = self.monitor_df.loc[self.monitor_df.siteid.notnull()]
-        #self.monitor_df['siteid'] = self.monitor_df.siteid.astype(int).astype(str).str.zfill(9)
         self.df = pd.merge(
-            self.df, self.monitor_df, on='siteid')  #, how='left')
+            self.df, self.monitor_df, on='siteid')  # , how='left')
 
     def get_station_locations_remerge(self, df):
         """Short summary.
@@ -291,6 +286,6 @@ class AirNow(object):
         df = pd.merge(
             df,
             self.monitor_df.drop(['Latitude', 'Longitude'], axis=1),
-            on='siteid')  #,
-        #how='left')
+            on='siteid')  # ,
+        # how='left')
         return df

@@ -2,10 +2,10 @@ linters:
   flake8:
     python: 3
     max-line-length: 80
-    fixer: false
+    fixer: true
     ignore: 'W28'
 fixers:
-  enable: false
+  enable: true
 review:
   fail_on_comments: false
 files:

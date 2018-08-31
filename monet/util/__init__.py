@@ -4,4 +4,4 @@ from . import mystats, tools, interp_util, resample
 
 __all__ = ['mystats', 'tools', 'interp_util', 'resample']
 
-__name__ = 'util'
+#__name__ = 'util'

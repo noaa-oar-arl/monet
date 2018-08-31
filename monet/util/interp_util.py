@@ -1,10 +1,7 @@
+""" Interpolation functions """
 from __future__ import print_function
 
 from builtins import str, zip
-try:
-    from functools import reduce
-except ImportError:
-    pass
 
 
 def lonlat_to_swathdefinition(longitude=None, latitude=None):
@@ -131,6 +128,8 @@ def get_smops_area_def(nx=1440, ny=720):
         Description of returned object.
 
     """
+    from pyproj import Proj
+    from pyresample import utils
     p = Proj(
         proj='eqc',
         lat_ts=0.,
@@ -168,7 +167,10 @@ def get_gfs_area_def(nx=1440, ny=721):
         Description of returned object.
 
     """
-    # proj4_args = '+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m'
+    from pyresample import utils
+    from pyproj import Proj
+    # proj4_args = '+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0
+    # +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m'
     p = Proj(
         proj='eqc',
         lat_ts=0.,
@@ -222,7 +224,7 @@ def geotiff_meta_to_areadef(meta):
     area_def = pyresample.geometry.AreaDefinition(
         area_id, name, proj_id, proj_dict_with_string_values, x_size, y_size,
         area_extent)
-    print(area_extent, xsize, ysize)
+    # print(area_extent, x_size, y_size)
     return area_def
 
 

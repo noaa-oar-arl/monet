@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MONET XArray Accessor &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Observations" href="observations.html" />
+    <link rel="prev" title="Installation" href="installing.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html">
+          
+
+          
+            
+            <img src="_static/noaa.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MONET XArray Accessor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#initiallizing-the-accessor">Initiallizing the Accessor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interpolation-accessors">Interpolation Accessors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#find-nearest-lat-lon-point">Find Nearest Lat lon point</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Get in touch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#api">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>MONET XArray Accessor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/monet-accessor.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="monet-xarray-accessor">
+<h1>MONET XArray Accessor<a class="headerlink" href="#monet-xarray-accessor" title="Permalink to this headline">¶</a></h1>
+<p>MONET can add georeferecing tools to xarray‘s data structures. These tools can be
+accessed via a special .monet attribute, available for both xarray.DataArray and
+xarray.Dataset objects after a simple import monet in your code.</p>
+<div class="section" id="initiallizing-the-accessor">
+<h2>Initiallizing the Accessor<a class="headerlink" href="#initiallizing-the-accessor" title="Permalink to this headline">¶</a></h2>
+<p>All you have to do is import monet after you import xarray.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">xarray</span> <span class="kn">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">monet</span>
+
+<span class="n">cmaqfile</span> <span class="o">=</span> <span class="n">monet</span><span class="o">.</span><span class="n">__path__</span> <span class="o">+</span> <span class="s1">&#39;/../data/aqm.t12z.aconc.ncf&#39;</span>
+
+<span class="kn">from</span> <span class="nn">monet.models</span> <span class="kn">import</span> <span class="n">cmaq</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_files</span><span class="p">(</span><span class="n">cmaqfile</span><span class="p">)</span>
+
+<span class="n">c</span><span class="o">.</span><span class="n">O3</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/o3_example_quickmap.png" src="_images/o3_example_quickmap.png" />
+</div>
+<div class="section" id="interpolation-accessors">
+<h2>Interpolation Accessors<a class="headerlink" href="#interpolation-accessors" title="Permalink to this headline">¶</a></h2>
+<p>The MONET accessor provides several useful interpolation routines including:
+Getting the nearest point to a given latitude and longitude, interpolating to a
+constant latitude or longitude, interpolating to a vertical levels, and remapping
+entire 2D :py:class::<cite>~xarray.DataArray</cite> or :py::class::<cite>xarray.DataSet</cite>.</p>
+<div class="section" id="find-nearest-lat-lon-point">
+<h3>Find Nearest Lat lon point<a class="headerlink" href="#find-nearest-lat-lon-point" title="Permalink to this headline">¶</a></h3>
+<p>To find the nearest latitude longitude point you just need to use the
+.monet.nearest_latlon method. In this example we will continue to use the CMAQ
+test file above.  We will find the closest grid points to lat=20.5, lon=-157.4.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">nearest_latlon</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">20.5</span><span class="p">,</span><span class="n">lon</span><span class="o">=-</span><span class="mf">157.4</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+&lt;xarray.Dataset&gt;
+Dimensions:    (time: 48, x: 1, y: 1, z: 1)
+Coordinates:
+* time       (time) datetime64[ns] 2018-05-17T12:00:00 2018-05-17T13:00:00 ...
+  latitude   (y, x) float64 dask.array&lt;shape=(1, 1), chunksize=(1, 1)&gt;
+  longitude  (y, x) float64 dask.array&lt;shape=(1, 1), chunksize=(1, 1)&gt;
+Dimensions without coordinates: x, y, z
+Data variables:
+  O3         (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NO2        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NO         (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NO3        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  N2O5       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  HNO3       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  HONO       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  PNA        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  CO         (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  FORM       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ALD2       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  PAN        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NTR        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  XO2N       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  SO2        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ASO4I      (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ASO4J      (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ANH4I      (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ANH4J      (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ANO3I      (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ANO3J      (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AORGAI     (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AORGAJ     (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AORGPAI    (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AORGPAJ    (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AORGBI     (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AORGBJ     (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AECI       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AECJ       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  A25I       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  A25J       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NUMATKN    (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NUMACC     (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  SRFATKN    (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  SRFACC     (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AH2OI      (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  AH2OJ      (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ACLI       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ACLJ       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ANAI       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  ANAJ       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  PM25       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  PM10       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  CLf        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NAf        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NOy        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NOx        (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NO3f       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  NH4f       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+  SO4f       (time, z, y, x) float32 dask.array&lt;shape=(48, 1, 1, 1), chunksize=(48, 1, 1, 1)&gt;
+Attributes:
+  IOAPI_VERSION:   $Id: &#64;(#) ioapi library version 3.1 $                   ...
+  EXEC_ID:         ????????????????                                        ...
+  FTYPE:           1
+  CDATE:           2018142
+  CTIME:           135716
+  WDATE:           2018142
+  WTIME:           135716
+  SDATE:           2018137
+  STIME:           120000
+  TSTEP:           10000
+  NTHIK:           1
+  NCOLS:           80
+  NROWS:           52
+  NLAYS:           1
+  NVARS:           41
+  GDTYP:           2
+  P_ALP:           19.0
+  P_BET:           21.0
+  P_GAM:           -157.5
+  XCENT:           -157.5
+  YCENT:           20.53
+  XORIG:           -480000.0
+  YORIG:           -312000.0
+  XCELL:           12000.0
+  YCELL:           12000.0
+  VGTYP:           1
+  VGTOP:           200.0
+  VGLVLS:          [1.       0.089794]
+  GDNAM:           AQF_HI
+  UPNAM:           OPACONC
+  VAR-LIST:        O3              NO2             NO              NO3     ...
+  FILEDESC:        Concentration file output                               ...
+  HISTORY:
+  proj4_srs:       +proj=lcc +lat_1=19.0 +lat_2=21.0 +lat_0=20.53 +lon_0=-1...
+  area:            Area ID: MONET_Object_GridnDescription: IOAPI area_def ...
+  mapping_tables:  {'improve': {}, 'aqs': {'OZONE': ['O3'], 'PM2.5': ['PM25...
+</pre>
+<p>Notice that the length of the dimensions are now (time: 48, x: 1, y: 1, z: 1).
+If you wanted to only find the nearest location for a single variable you can
+use the accessor on the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>.</p>
+<pre class="literal-block">
+&lt;xarray.DataArray 'O3' (time: 48, z: 1, y: 1, x: 1)&gt;
+dask.array&lt;shape=(48, 1, 1, 1), dtype=float32, chunksize=(48, 1, 1, 1)&gt;
+Coordinates:
+ * time       (time) datetime64[ns] 2018-05-17T12:00:00 2018-05-17T13:00:00 ...
+   latitude   (y, x) float64 dask.array&lt;shape=(1, 1), chunksize=(1, 1)&gt;
+   longitude  (y, x) float64 dask.array&lt;shape=(1, 1), chunksize=(1, 1)&gt;
+Dimensions without coordinates: z, y, x
+Attributes:
+   long_name:   O3
+   units:       ppbV
+   var_desc:    Variable O3
+   proj4_srs:   +proj=lcc +lat_1=19.0 +lat_2=21.0 +lat_0=20.53 +lon_0=-157.5...
+   area:        Shape: (1, 1)nLons: [[-157.4]]nLats: [[20.5]]
+   _FillValue:  nan
+</pre>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="observations.html" class="btn btn-neutral float-right" title="Observations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installing.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
