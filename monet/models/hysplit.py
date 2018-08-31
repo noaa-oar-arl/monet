@@ -1,9 +1,8 @@
-from numpy import array, concatenate
-from pandas import Series, to_datetime
-#from monet.models.basemodel import *
-from inspect import getmembers, isfunction
+""" HYPSLIT MODEL READER """
 from ..grids import _hysplit_latlon_grid_from_dataset
 from ..grids import get_hysplit_latlon_pyreample_area_def
+import pandas as pd
+import xarray as xr
 
 
 def open_files(fname):
@@ -22,14 +21,15 @@ def open_files(fname):
         Description of returned object.
 
    CHANGES for PYTHON 3
-   For python 3 the numpy char4 are read in as a numpy.bytes_ class and need to be converted to a python
+   For python 3 the numpy char4 are read in as a numpy.bytes_ class and need to
+    be converted to a python
    string by using decode('UTF-8').
 
 
     """
 
     # open the dataset using xarray
-    binfile = ModelBin(cdump, verbose=False, readwrite='r')
+    binfile = ModelBin(fname, verbose=False, readwrite='r')
     dset = binfile.dset
 
     # get the grid information
@@ -49,41 +49,41 @@ def open_files(fname):
     return dset
 
 
-class HYSPLIT(BaseModel):
-    def __init__(self):
-        BaseModel.__init__(self)
-        self.dset=None
-
-    # use open_files method from the BaseModel class.
-
-    def add_files(self, cdump, verbose=True):
-        # TO DO dset needs to be made into a regular array.
-        binfile = ModelBin(cdump, verbose=False, readwrite='r')
-        dset = binfile.dset
-        if self.dset is None:
-            self.dset = dset
-        else:
-            #self.dset = xr.merge([self.dset, dset])
-            self.dset.combine_first(dset)
-            print(self.dset)
-    @staticmethod
-
-    def select_layer(variable, layer=None):
-        if lay is not None:
-            try:
-                var = variable.sel(levels=layer)
-            except ValueError:
-                print(
-                    'Dimension \'levels\' not in Dataset.  Returning Dataset anyway'
-                )
-                var = variable
-        else:
-            var = variable
-        return var
-
-    def get_var(self, param, layer=None):
-        return self.select_layer(self.dset[param], layer=layer)
-
+# class HYSPLIT(BaseModel):
+#     def __init__(self):
+#         BaseModel.__init__(self)
+#         self.dset = None
+#
+#     # use open_files method from the BaseModel class.
+#
+#     def add_files(self, cdump, verbose=True):
+#         # TO DO dset needs to be made into a regular array.
+#         binfile = ModelBin(cdump, verbose=False, readwrite='r')
+#         dset = binfile.dset
+#         if self.dset is None:
+#             self.dset = dset
+#         else:
+#             #self.dset = xr.merge([self.dset, dset])
+#             self.dset.combine_first(dset)
+#             print(self.dset)
+#
+#     @staticmethod
+#     def select_layer(variable, layer=None):
+#         if lay is not None:
+#             try:
+#                 var = variable.sel(levels=layer)
+#             except ValueError:
+#                 print(
+#                     'Dimension \'levels\' not in Dataset.  Returning Dataset
+#                      anyway'
+#                 )
+#                 var = variable
+#         else:
+#             var = variable
+#         return var
+#
+#     def get_var(self, param, layer=None):
+#         return self.select_layer(self.dset[param], layer=layer)
 
 
 class ModelBin(object):
@@ -112,10 +112,11 @@ class ModelBin(object):
         self.filename = filename
         self.century = century
         self.verbose = verbose
-        self.zeroconcdates = [
-        ]  # list of tuples (date1, date2)  of averaging periods with zero concentrations
-        self.nonzeroconcdates = [
-        ]  # list of tuples  of averaging periods with nonzero concentrtations]
+        # list of tuples (date1, date2)  of averaging periods with zero
+        # concentrations
+        self.zeroconcdates = []
+        # list of tuples  of averaging periods with nonzero concentrtations]
+        self.nonzeroconcdates = []
         if readwrite == 'r':
             self.dataflag = self.readfile(
                 filename, drange, verbose, century, fillra=fillra)
@@ -224,48 +225,63 @@ class ModelBin(object):
         rec8c = dtype([
             ('pad2', int4),
         ])
-
-        return rec1, rec2, rec3, rec4a, rec4b, rec5a, rec5b, rec5c, rec6, rec8a, rec8b, rec8c
+        recs = (rec1, rec2, rec3, rec4a, rec4b, rec5a, rec5b, rec5c, rec6,
+                rec8a, rec8b, rec8c)
+        return recs
 
     def readfile(self, filename, drange, verbose, century, fillra=True):
         """Data from the file is stored in an xarray, self.dset
            returns False if all concentrations are zero else returns True.
            INPUTS
            filename - name of cdump file to open
-           drange - [date1, date2] - range of dates to load data for. if [] then loads all data.
+           drange - [date1, date2] - range of dates to load data for. if []
+                    then loads all data.
                     date1 and date2  should be datetime ojbects.
            verbose - turns on print statements
-           century - if None will try to guess the century by looking at the last two digits of the year.
-           For python 3 the numpy char4 are read in as a numpy.bytes_ class and need to be converted to a python
+           century - if None will try to guess the century by looking
+                    at the last two digits of the year.
+           For python 3 the numpy char4 are read in as a numpy.bytes_
+            class and need to be converted to a python
            string by using decode('UTF-8').
-           fillra : if True will return complete concentration grid  array with zero cocenctrations filled in
+           fillra : if True will return complete concentration grid  array
+           with zero cocenctrations filled in
 
         """
         from numpy import fromfile, arange
-        # 8/16/2016 moved species=[]  to before while loop. Added print statements when verbose.
+        import datetime
+        # 8/16/2016 moved species=[]  to before while loop. Added print
+        # statements when verbose.
         self.dset = None
         atthash = {
         }  # dictionary which will be turned into the dset attributes.
         ahash = {}
         fp = open(filename, 'rb')
 
-        # each record in the fortran binary begins and ends with 4 bytes which specify the length of the record.
-        # These bytes are called pad1 and pad2 below. They are not used here, but are thrown out.
-        # The following block defines a numpy dtype object for each record in the binary file.
-        rec1, rec2, rec3, rec4a, rec4b, rec5a, rec5b, rec5c, rec6, rec8a, rec8b, rec8c = self.define_struct(
-        )
-        rec7 = rec6
+        # each record in the fortran binary begins and ends with 4 bytes which
+        # specify the length of the record.
+        # These bytes are called pad1 and pad2 below. They are not used here,
+        # but are thrown out.
+        # The following block defines a numpy dtype object for each record in
+        # the binary file.
+        recs = self.define_struct()
+        rec1, rec2, rec3, rec4a = recs[0], recs[1], recs[2], recs[3]
+        rec4b, rec5a, rec5b, rec5c = recs[4], recs[5], recs[6], recs[7]
+        rec6, rec8a, rec8b, rec8c = recs[8], recs[9], recs[10], recs[11]
+
+        # rec7 = rec6
         # start_loc in rec1 tell how many rec there are.
         tempzeroconcdates = []
         # Reads header data. This consists of records 1-5.
         hdata1 = fromfile(fp, dtype=rec1, count=1)
         nstartloc = hdata1['start_loc'][0]
-        # in python 3 np.fromfile reads the record into a list even if it is just one number.
-        # so if the length of this record is greater than one something is wrong.
+        # in python 3 np.fromfile reads the record into a list even if it is
+        # just one number.
+        # so if the length of this record is greater than one something is
+        # wrong.
         if len(hdata1['start_loc']) != 1:
             print(
-                'WARNING in ModelBin _readfile - number of starting locations incorrect'
-            )
+                'WARNING in ModelBin _readfile - number of starting locations '
+                'incorrect')
             print(hdata1['start_loc'])
         hdata2 = fromfile(fp, dtype=rec2, count=nstartloc)
         hdata3 = fromfile(fp, dtype=rec3, count=1)
@@ -331,16 +347,21 @@ class ModelBin(object):
 
         # read record 5 which gives information about pollutants / species.
         hdata5a = fromfile(fp, dtype=rec5a, count=1)
-        hdata5b = fromfile(fp, dtype=rec5b, count=hdata5a['pollnum'][0])
-        hdata5c = fromfile(fp, dtype=rec5c, count=1)
+        fromfile(fp, dtype=rec5b, count=hdata5a['pollnum'][0])
+        fromfile(fp, dtype=rec5c, count=1)
+        # hdata5b = fromfile(fp, dtype=rec5b, count=hdata5a['pollnum'][0])
+        # hdata5c = fromfile(fp, dtype=rec5c, count=1)
         atthash['Number of Species'] = hdata5a['pollnum'][0]
 
-        # Loop to reads records 6-8. Number of loops is equal to number of output times.
-        # Only save data for output times within drange. if drange=[] then save all.
+        # Loop to reads records 6-8. Number of loops is equal to number of
+        # output times.
+        # Only save data for output times within drange. if drange=[] then
+        # save all.
         # Loop to go through each sampling time
         ii = 0  # check to make sure don't go above max number of iterations
         iii = 0  # checks to see if some nonzero data was saved in xarray
-        imax = 1e3  # Safety valve - will not allow more than 1000 loops to be executed.
+        # Safety valve - will not allow more than 1000 loops to be executed.
+        imax = 1e3
         testf = True
         while testf:
             hdata6 = fromfile(fp, dtype=rec6, count=1)
@@ -366,7 +387,8 @@ class ModelBin(object):
             # if pdate1 is within drange then save the data.
             # AND if pdate2 is within drange then save the data.
             # if drange[0] > pdate1 then stop looping to look for more data
-            # this block sets savedata to true if data within specified time range or time range not specified
+            # this block sets savedata to true if data within specified time
+            # range or time range not specified
             if drange is None:
                 savedata = True
             elif pdate1 >= drange[0] and pdate1 <= drange[1] and pdate2 <= drange[1]:
@@ -381,7 +403,7 @@ class ModelBin(object):
             if verbose:
                 print(savedata, 'DATES :', pdate1, pdate2)
 
-            datelist = []
+            # datelist = []
             atthash['Species ID'] = []
             inc_iii = False
             # LOOP to go through each level
@@ -389,28 +411,34 @@ class ModelBin(object):
                 # LOOP to go through each pollutant
                 for pollutant in range(hdata5a['pollnum'][0]):
 
-                    # record 8a has the number of elements (ne). If number of elements greater than 0 than there are concentrations.
+                    # record 8a has the number of elements (ne). If number of
+                    # elements greater than 0 than there are concentrations.
                     hdata8a = fromfile(fp, dtype=rec8a, count=1)
                     atthash['Species ID'].append(
                         hdata8a['poll'][0].decode('UTF-8'))
-                    if hdata8a['ne'] >= 1:  # if number of elements is nonzero then
+                    # if number of elements is nonzero then
+                    if hdata8a['ne'] >= 1:
                         hdata8b = fromfile(
                             fp, dtype=rec8b,
                             count=hdata8a['ne'][0])  # get rec8 - indx and jndx
                         self.nonzeroconcdates.append(
                             pdate1
-                        )  # add sample start time to list of start times with non zero conc
+                        )  # add sample start time to list of start times with
+                        # non zero conc
                     else:
                         tempzeroconcdates.append(
                             pdate1
-                        )  # or add sample start time to list of start times with zero conc.
-
-                    hdata8c = fromfile(
-                        fp, dtype=rec8c, count=1)  # This is just padding.
-                    # if savedata is set and nonzero concentrations then save the data in a pandas dataframe
+                        )  # or add sample start time to list of start times
+                        # with zero conc.
+                    # This is just padding.
+                    fromfile(fp, dtype=rec8c, count=1)
+                    # if savedata is set and nonzero concentrations then save
+                    # the data in a pandas dataframe
                     if savedata and hdata8a['ne'] >= 1:
                         self.nonzeroconcdates.append(pdate1)
-                        inc_iii = True  # set to True to indicate that there is data to be saved.
+                        # set to True to indicate that there is data to be
+                        # saved.
+                        inc_iii = True
 
                         lev_name = hdata8a['lev'][0]
                         col_name = hdata8a['poll'][0].decode('UTF-8')
@@ -418,12 +446,12 @@ class ModelBin(object):
                         )  # otherwise get endian error.
                         concframe = pd.DataFrame.from_records(ndata)
                         # add latitude longitude columns
-                        lat = arange(
-                            self.llcrnr_lat,
-                            self.llcrnr_lat + self.nlat * self.dlat, self.dlat)
-                        lon = arange(
-                            self.llcrnr_lon,
-                            self.llcrnr_lon + self.nlon * self.dlon, self.dlon)
+                        lat = arange(self.llcrnr_lat,
+                                     self.llcrnr_lat + self.nlat * self.dlat,
+                                     self.dlat)
+                        lon = arange(self.llcrnr_lon,
+                                     self.llcrnr_lon + self.nlon * self.dlon,
+                                     self.dlon)
 
                         def flat(x):
                             return lat[x - 1]
@@ -431,7 +459,8 @@ class ModelBin(object):
                         def flon(x):
                             return lon[x - 1]
 
-                        # This block will fill in zero values in the concentration grid.
+                        # This block will fill in zero values in the
+                        # concentration grid.
                         if fillra:
                             n1 = arange(1, self.nlat + 1)
                             n2 = arange(1, self.nlon + 1)
@@ -447,9 +476,9 @@ class ModelBin(object):
                             concframe.drop('ji', axis=1, inplace=True)
                             # print(len(lat))
                             # print(len(lon))
-                            #print(len(n1), len(n2), n1[-1], n2[-1])
-                            #print(self.nlat, self.nlon)
-                            #print(self.llcrnr_lat, self.llcrnr_lon)
+                            # print(len(n1), len(n2), n1[-1], n2[-1])
+                            # print(self.nlat, self.nlon)
+                            # print(self.llcrnr_lat, self.llcrnr_lon)
                             # print(concframe[-50:-1])
 
                         concframe['latitude'] = concframe['jndx'].apply(flat)
@@ -465,16 +494,20 @@ class ModelBin(object):
                         concframe.rename(
                             columns={'conc': col_name}, inplace=True)
                         dset = xr.Dataset.from_dataframe(concframe)
-                        if self.dset is None:  # if this is the first time through. create dataframe for first level and pollutant.
+                        # if this is the first time through. create dataframe
+                        # for first level and pollutant.
+                        if self.dset is None:
                             self.dset = dset
-                        else:  # create dataframe for level and pollutant and then merge with main dataframe.
-                            #self.dset = xr.concat([self.dset, dset],'levels')
+                        else:  # create dataframe for level and pollutant and
+                            # then merge with main dataframe.
+                            # self.dset = xr.concat([self.dset, dset],'levels')
                             self.dset = xr.merge([self.dset, dset])
                         ii += 1
 
                 # END LOOP to go through each pollutant
             # END LOOP to go through each level
-            # safety check - will stop sampling time while loop if goes over imax iterations.
+            # safety check - will stop sampling time while loop if goes over
+            #  imax iterations.
             if ii > imax:
                 testf = False
             if inc_iii:

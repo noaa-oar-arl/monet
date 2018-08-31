@@ -86,6 +86,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="why-monet.html">Overview: Why MONET?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monet-accessor.html">MONET XArray Accessor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="observations.html">Observations</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#cmaq">CMAQ</a></li>
@@ -177,11 +178,10 @@ First we will set the path to the data files</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">monet</span>
 
 <span class="n">cmaqfile</span> <span class="o">=</span> <span class="n">monet</span><span class="o">.</span><span class="n">__path__</span> <span class="o">+</span> <span class="s1">&#39;/../data/aqm.t12z.aconc.ncf&#39;</span>
-<span class="n">gridcro2d</span> <span class="o">=</span> <span class="n">monet</span><span class="o">.</span><span class="n">__path__</span> <span class="o">+</span> <span class="s1">&#39;/../data/aqm.t12z.grdcro2d.ncf&#39;</span>
 
-<span class="kn">from</span> <span class="nn">monet.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">monet.models</span> <span class="kn">import</span> <span class="n">cmaq</span><span class="p">,</span> <span class="n">hysplit</span><span class="p">,</span> <span class="n">camx</span>
 
-<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_files</span><span class="p">(</span><span class="n">flist</span><span class="o">=</span><span class="n">cmaqfile</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">gridcro2d</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_files</span><span class="p">(</span><span class="n">cmaqfile</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This will return an <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.  The dataset is also still stored
@@ -275,9 +275,9 @@ Attributes:
 </pre></div>
 </div>
 <p>All MONET xarray objects have common coordinate names (latitude and longitude) and dimension names (time, x, y, z).  It retains the
-original attributes of the file and variable names.  For some models, helper functions to get derived variables, such as PM2.5 or NOx,
-a helper function is available to assist in these tasks.  For example, to get NOx from this simulation:</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pm25</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">get_var</span><span class="p">(</span><span class="s1">&#39;PM25&#39;</span><span class="p">)</span>
+original attributes of the file and variable names.  MONET will precalculate some variables while loading the data in a lazy fashion, i.e. it
+will not actually do the computation (not stored in memory) until needed:</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pm25</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">PM25</span>
 </pre></div>
 </div>
 <p>where nox is a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code> as it is a single variable.  To quickly plot this on a map we can use the utility function

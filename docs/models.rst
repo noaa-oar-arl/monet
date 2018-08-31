@@ -21,11 +21,10 @@ First we will set the path to the data files
     import monet
 
     cmaqfile = monet.__path__ + '/../data/aqm.t12z.aconc.ncf'
-    gridcro2d = monet.__path__ + '/../data/aqm.t12z.grdcro2d.ncf'
 
-    from monet.models import *
+    from monet.models import cmaq, hysplit, camx
 
-    c = cmaq.open_files(flist=cmaqfile, grid=gridcro2d)
+    c = cmaq.open_files(cmaqfile)
 
 
 This will return an :py:class:`~xarray.Dataset`.  The dataset is also still stored
@@ -121,12 +120,12 @@ of the xarray dataset you can simply print the dataset.
       HISTORY:
 
 All MONET xarray objects have common coordinate names (latitude and longitude) and dimension names (time, x, y, z).  It retains the
-original attributes of the file and variable names.  For some models, helper functions to get derived variables, such as PM2.5 or NOx,
-a helper function is available to assist in these tasks.  For example, to get NOx from this simulation:
+original attributes of the file and variable names.  MONET will precalculate some variables while loading the data in a lazy fashion, i.e. it
+will not actually do the computation (not stored in memory) until needed:
 
 .. code:: python
 
-    pm25 = cmaq.get_var('PM25')
+    pm25 = cmaq.PM25
 
 where nox is a :py:class:`~xarray.DataArray` as it is a single variable.  To quickly plot this on a map we can use the utility function
 in :py:class:`~monet.plots.mapgen`.

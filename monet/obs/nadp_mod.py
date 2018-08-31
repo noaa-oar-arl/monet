@@ -1,8 +1,7 @@
+""" READS NAPD DATA """
 from __future__ import division, print_function
 
-# this is written to retrive airnow data concatenate and add to pandas array for usage
-from builtins import object, str
-from datetime import datetime
+from builtins import object
 
 import pandas as pd
 from numpy import NaN
@@ -10,7 +9,6 @@ from numpy import NaN
 
 class NADP(object):
     def __init__(self):
-        from numpy import concatenate, arange
         self.weekly = True
         self.network = None
         self.df = pd.DataFrame()
@@ -31,11 +29,9 @@ class NADP(object):
             url = 'http://nadp.slh.wisc.edu/datalib/AIRMoN/AIRMoN-ALL.csv'
         else:
             if self.weekly:
-                end = '-All-w.csv'
                 url = baseurl + network.lower(
                 ) + '/weekly/' + siteid + network.upper() + '-All-w.csv'
             else:
-                end = '-All-a.csv'
                 url = baseurl + network.lower(
                 ) + '/annual/' + siteid + network.upper() + '-All-a.csv'
         return url
@@ -56,7 +52,7 @@ class NADP(object):
             }, inplace=True)
         try:
             meta = pd.read_csv('https://bit.ly/2sPMvaO')
-        except:
+        except RuntimeError:
             meta = pd.read_csv(self.__path__ + '/../../data/ntn-sites.csv')
         meta.columns = [i.lower() for i in meta.columns]
         meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
@@ -86,7 +82,7 @@ class NADP(object):
         try:
             meta = pd.read_csv('https://bit.ly/2Lq6kgq')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
-        except:
+        except RuntimeError:
             meta = pd.read_csv(self.__path__ + '/../../data/mdn-sites.csv')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
         meta.columns = [i.lower() for i in meta.columns]
@@ -109,7 +105,7 @@ class NADP(object):
         try:
             meta = pd.read_csv('https://bit.ly/2xMlgTW')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
-        except:
+        except RuntimeError:
             meta = pd.read_csv(self.__path__ + '/../../data/airmon-sites.csv')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
         meta.columns = [i.lower() for i in meta.columns]
@@ -135,7 +131,7 @@ class NADP(object):
         try:
             meta = pd.read_csv('https://bit.ly/2sJmkCg')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
-        except:
+        except RuntimeError:
             meta = pd.read_csv(self.__path__ + '/../../data/amon-sites.csv')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
         meta.columns = [i.lower() for i in meta.columns]
@@ -157,7 +153,7 @@ class NADP(object):
         try:
             meta = pd.read_csv('https://bit.ly/2sJmkCg')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
-        except:
+        except RuntimeError:
             meta = pd.read_csv(self.__path__ + '/../../data/amnet-sites.csv')
             meta.drop(['startdate', 'stopdate'], axis=1, inplace=True)
         meta.columns = [i.lower() for i in meta.columns]

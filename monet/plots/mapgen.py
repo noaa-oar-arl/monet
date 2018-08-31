@@ -1,3 +1,4 @@
+""" map utilities """
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
@@ -37,10 +38,11 @@ def draw_map(ax=None,
         Description of returned object.
 
     """
+    con2 = 'subplot_kw' in kwargs and 'projection' not in kwargs['subplot_kw']
     if ax is None and kwargs is not None and crs is None:
         if 'subplot_kw' not in kwargs:
             kwargs['subplot_kw'] = {'projection': ccrs.PlateCarree()}
-        elif 'subplot_kw' in kwargs and 'projection' not in kwargs['subplot_kw']:
+        elif con2:
             kwargs['subplot_kw']['projection'] = ccrs.PlateCarree()
         f, ax = plt.subplots(figsize=(10, 5), **kwargs)
     elif ax is None and crs is not None:
@@ -49,7 +51,7 @@ def draw_map(ax=None,
         f, ax = plt.subplots(
             figsize=(10, 5), subplot_kw={'projection': ccrs.PlateCarree()})
     if natural_earth:
-        #~ ax.stock_img()
+        # ax.stock_img()
         ax.add_feature(cfeature.OCEAN)
         ax.add_feature(cfeature.LAND)
         ax.add_feature(cfeature.LAKES)
