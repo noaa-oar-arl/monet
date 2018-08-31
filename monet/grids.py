@@ -42,8 +42,7 @@ def _geos_16_grid(dset):
 
 
 def _get_sinu_grid_df():
-    from pandas import read_csv, DataFrame
-    import inspect
+    from pandas import read_csv
     """This function finds the modis grid tiles found within
         the defined grid.
         input:
@@ -154,7 +153,6 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
     pargs['y0'] = ds.YORIG
     pargs['r'] = earth_radius
     proj_id = ds.GDTYP
-    atol = 1e-4
     if proj_id == 2:
         # Lambert
         p4 = '+proj=lcc +lat_1={lat_1} +lat_2={lat_2} ' \
@@ -166,8 +164,6 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
         p4 = '+proj=stere +lat_ts={lat_1} +lon_0={lon_0} +lat_0=90.0' \
              '+x_0=0 +y_0=0 +a={r} +b={r}'
         p4 = p4.format(**pargs)
-        # pyproj and WRF do not agree well close to the pole
-        atol = 5e-3
     elif proj_id == 3:
         # Mercator
         p4 = '+proj=merc +lat_ts={lat_1} ' \
@@ -183,8 +179,6 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
 
 def _hysplit_latlon_grid_from_dataset(ds):
     pargs = dict()
-    dy = ds['Latitude Spacing']
-    dx = ds['Longitude Spacing']
     pargs['lat_0'] = ds.latitude.mean()
     pargs['lon_0'] = ds.longitude.mean()
 
@@ -212,4 +206,5 @@ def grid_from_dataset(ds, earth_radius=6370000):
         return _ioapi_grid_from_dataset(ds, earth_radius=earth_radius)
 
     # Try out platte carree
-    return _lonlat_grid_from_dataset(ds)
+
+    # return _lonlat_grid_from_dataset(ds)
