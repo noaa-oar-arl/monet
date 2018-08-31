@@ -1,10 +1,9 @@
 from __future__ import print_function
 
-from builtins import object, zip
-from datetime import datetime
+from builtins import object
 
 import pandas as pd
-from numpy import NaN, array
+from numpy import NaN
 
 
 class IMPROVE(object):
@@ -44,8 +43,9 @@ class IMPROVE(object):
                 The data is the IMPROVE Aerosol dataset
                 Any number of sites
                 Parameters included are All
-                Fields include Dataset,Site,Date,Parameter,POC,Data_value,Unit,Latitude,Longitude,State,EPA Site Code
-                        Options are delimited ','  data only and normalized skinny format
+                Fields include Dataset,Site,Date,Parameter,POC,Data_value,Unit,
+                Latitude,Longitude,State,EPA Site Code Options are delimited
+                ',' data only and normalized skinny format
 
         Parameters
         ----------
@@ -99,8 +99,6 @@ class IMPROVE(object):
         if pd.Series(df.keys()).isin(['epaid']).max():
             df['epaid'] = df.epaid.astype(str).str.zfill(9)
         if add_meta:
-            dropkeys = ['latitude', 'longitude', 'poc']
-
             monitor_df = read_monitor_file(network='IMPROVE')  # .drop(
             # dropkeys, axis=1)
             df = df.merge(
@@ -112,16 +110,11 @@ class IMPROVE(object):
                     'state_name_x': 'state_name'
                 },
                 inplace=True)
-            #df = df.dropna(subset=['variable', 'gmt_offset']).drop_duplicates()
-        #self.df.Variable.loc[self.df.Variable == 'MT'] = 'PM10'
-        #self.df.Variable.loc[self.df.Variable == 'MF'] = 'PM2.5'
+
         try:
             df.obs.loc[df.obs < df.mdl] = NaN
-        except:
+        except Exception:
             df.obs.loc[df.obs < -900] = NaN
-        #self.df.dropna(subset=['obs'], inplace=True)
-        # self.df['time_local'] = self.df.time + pd.to_timedelta(
-        #    self.df.gmt_offset.astype(float), unit='H')
         self.df = df
         return df.copy()
 

@@ -73,7 +73,6 @@ def _reformat_resampled_data(orig, new, target_grid):
         reformated xarray.DataArray
 
     """
-    from pandas import Series
     target_lon, target_lat = target_grid.get_lonlats_dask()
     new.name = orig.name
     new['latitude'] = (('y', 'x'), target_lat)

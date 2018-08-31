@@ -80,9 +80,9 @@ class TOLNet(object):
         tseries = pd.Series(data["TIME_MID_UT_UNIX"][:].squeeze())
         time = pd.Series(pd.to_datetime(tseries, unit='ms'), name='time')
         tseries = pd.Series(data["TIME_START_UT_UNIX"][:].squeeze())
-        stime = pd.to_datetime(tseries, unit='ms')
+        # stime = pd.to_datetime(tseries, unit='ms')
         tseries = pd.Series(data["TIME_STOP_UT_UNIX"][:].squeeze())
-        etime = pd.to_datetime(tseries, unit='ms')
+        # etime = pd.to_datetime(tseries, unit='ms')
         # all other variables
         ovars = ['O3MR', 'O3ND', 'O3NDUncert', 'O3MRUncert', 'Precision']
         dset = {}
@@ -92,7 +92,8 @@ class TOLNet(object):
             dset[i] = (['z', 't'], val)
         for i in altvars:
             dset[i] = (['z'], data[i][:].squeeze())
-        # coords = {'time': time, 'z': alt, 'start_time': stime, 'end_time': etime}
+
+    # coords = {'time': time, 'z': alt, 'start_time': stime, 'end_time': etime}
         attributes = {}
         for i in list(atts.attrs.keys()):
             attributes[i] = atts.attrs[i]

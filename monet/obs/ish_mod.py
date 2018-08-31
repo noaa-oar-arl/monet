@@ -1,9 +1,5 @@
 """Python module for reading NOAA ISH files"""
 from __future__ import division, print_function
-
-import gzip
-import io
-import os
 from builtins import object, zip
 
 import dask
@@ -53,7 +49,8 @@ class ISH(object):
                        ('dpt', 'i2'), ('dpt_quality',
                                        'S1'), ('p', 'i4'), ('p_quality', 'S1')]
         self.NAMES, _ = list(zip(*self.DTYPES))
-        self.history_file = 'https://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.csv'
+        self.history_file = 'https://www1.ncdc.noaa.gov/pub/data/noaa/'
+        'isd-history.csv'
         self.history = None
         self.daily = False
 
@@ -116,9 +113,12 @@ class ISH(object):
         frame = pd.DataFrame.from_records(frame_as_array)
         df = self._clean(frame)
         df.drop(['latitude', 'longitude'], axis=1, inplace=True)
-        #        df.latitude = self.history.groupby('station_id').get_group(df.station_id[0]).LAT.values[0]
-        #        df.longitude = self.history.groupby('station_id').get_group(df.station_id[0]).lon.values[0]
-        #        df['STATION_NAME'] = self.history.groupby('station_id').get_group(df.station_id[0])['STATION NAME'].str.strip().values[0]
+        # df.latitude = self.history.groupby('station_id').get_group(
+        #     df.station_id[0]).LAT.values[0]
+        # df.longitude = self.history.groupby('station_id').get_group(
+        #     df.station_id[0]).lon.values[0]
+        # df['STATION_NAME'] = self.history.groupby('station_id').get_group(
+        #     df.station_id[0])['STATION NAME'].str.strip().values[0]
         index = (df.index >= self.dates.min()) & (df.index <= self.dates.max())
 
         return df.loc[index, :].reset_index()
@@ -162,7 +162,6 @@ class ISH(object):
         print(dfloc.longitude.unique())
         return dfloc
 
-    # def read_sites(self, box=None, country=None, state=None, site=None, resample=True, window='H'):
     def add_data(self,
                  dates,
                  box=None,
@@ -182,9 +181,6 @@ class ISH(object):
         resample : boolean
         window :
         """
-        import urllib.request
-        import urllib.error
-        import urllib.parse
         from numpy import NaN
         self.dates = pd.to_datetime(dates)
         idate = dates[0]
@@ -206,7 +202,7 @@ class ISH(object):
         elif state is not None:
             print('Retrieving State: ' + state)
             dfloc = self.history.loc[self.history.STATE == state, :]
-        elif type(site) is not type(None):
+        elif site is not None:
             print('Retrieving Site: ' + site)
             dfloc = self.history.loc[self.history.station_id == site, :]
         print(dfloc.fname.unique())
@@ -229,11 +225,11 @@ class ISH(object):
             self.df.index = self.df.time
             self.df = self.df.groupby('station_id').resample(
                 'H').mean().reset_index()
-        # self.df = self.df.merge(self.history[['station_id', 'latitude', 'longitude', 'station name']],
-        #                        on=['station_id'], how='left')
-        try:  # this was encoded as byte literal but in dfloc it is a string so could not merge on station_id correctly.
+        # this was encoded as byte literal but in dfloc it is a string so could
+        # not merge on station_id correctly.
+        try:
             self.df['station_id'] = self.df['station_id'].str.decode("utf-8")
-        except:
+        except RuntimeError:
             pass
         self.df = self.df.merge(
             dfloc[['station_id', 'latitude', 'longitude', 'station name']],
@@ -263,16 +259,16 @@ class ISH(object):
                 if r2.status_code != 404:
                     objs.append(fname)
                     with open(fname, 'wb') as fid:
-                        # TO DO. currently shutil writes the file to the hard drive.
-                        # try to find way around this step, so file does not need to
-                        # be written and then read.
+                        # TODO. currently shutil writes the file to the hard
+                        # drive. try to find way around this step, so file does
+                        # not need to be written and then read.
                         gzip_file = gzip.GzipFile(fileobj=r2.raw)
                         shutil.copyfileobj(gzip_file, fid)
                         print('SUCCEEDED REQUEST for ' + iii)
                 else:
                     print('404 message ' + iii)
                 mmm += 1
-            except:
+            except RuntimeError:
                 jjj += 1
                 print('REQUEST FAILED ' + iii)
                 pass

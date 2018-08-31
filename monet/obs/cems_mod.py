@@ -46,7 +46,8 @@ def get_date_fmt(date, verbose=False):
     Rerturns
     --------
     fmt: str
-        string which can be used with datetime object to give format of date string.
+        string which can be used with datetime object to give format of date
+        string.
     """
     if verbose:
         print('Determining date format')
@@ -94,12 +95,13 @@ class CEMS(object):
         self.efile = None
         self.url = "ftp://newftp.epa.gov/DmDnLoad/emissions/"
         self.lb2kg = 0.453592  # number of kilograms per pound.
-        self.info = "Data from continuous emission monitoring systems (CEMS) \n"
+        self.info = "Data from continuous emission monitoring systems (CEMS)\n"
         self.info += self.url + '\n'
         self.df = pd.DataFrame()
         self.namehash = {
         }  # if columns are renamed keeps track of original names.
-        # Each facility may have more than one unit which is specified by the unit id.
+        # Each facility may have more than one unit which is specified by the
+        # unit id.
 
     def __str__(self):
         return self.info
@@ -112,15 +114,17 @@ class CEMS(object):
         Parameters
         ----------
         rdate : single datetime object of list of datetime objects
-               The first datetime object indicates the month and year of the first file to retrieve.
-               The second datetime object indicates the month and year of the last file to retrieve.
+               The first datetime object indicates the month and year of the
+               first file to retrieve.
+               The second datetime object indicates the month and year of the
+               last file to retrieve.
         states : list of strings
              list of two letter state identifications.
         download : boolean
                if download=True then retrieve will download the files and load
                will read the downloaded files.
-               if download=False then retrieve will return the url and load will read directly
-               from ftp site.
+               if download=False then retrieve will return the url and load
+               will read directly from ftp site.
         verbose : boolean
                if TRUE prints out additional information.
         Returns
@@ -162,8 +166,8 @@ class CEMS(object):
         columns = list(self.df.columns.values)
         cmatch = None
         for ccc in columns:
-            #print('-----'  + ccc + '------')
-            #print( temp[ccc].unique())
+            # print('-----'  + ccc + '------')
+            # print( temp[ccc].unique())
             match = 0
             for vstr in varname:
                 if vstr.lower() in ccc.lower():
@@ -181,15 +185,17 @@ class CEMS(object):
         daterange: list of two datetime objects
             define a date range
         unitid: boolean.
-                 If True and unit id columns exist then these will be kept as separate
-                 columns in the pivot table.
+                 If True and unit id columns exist then these will be kept as
+                 separate columns in the pivot table.
         verbose: boolean
                  if true print out extra information.
         Returns: pandas DataFrame object
-            returns dataframe with rows time. Columns are (orispl_code, unit_id).
+            returns dataframe with rows time. Columns are (orispl_code,
+            unit_id).
             If no unit_id in the file then columns are just orispl_code.
-            if unitid flag set to False then sums over unit_id's that belong to an orispl_code.
-            Values are from the column specified by the varname input.
+            if unitid flag set to False then sums over unit_id's that belong to
+             an orispl_code. Values are from the column specified by the
+             varname input.
         """
 
         from .obs_util import timefilter
@@ -200,7 +206,8 @@ class CEMS(object):
             if temp['unit_id'].unique():
                 if verbose:
                     print('UNIT IDs ', temp['unit_id'].unique())
-            # create pandas frame with index datetime and columns for value for each unit_id,orispl
+            # create pandas frame with index datetime and columns for value for
+            # each unit_id,orispl
             pivot = pd.pivot_table(
                 temp,
                 values=varname,
@@ -210,7 +217,8 @@ class CEMS(object):
         else:
             if verbose:
                 print('NO UNIT ID')
-            # returns data frame where rows are date and columns are the values of cmatch for orispl
+            # returns data frame where rows are date and columns are the values
+            # of cmatch for orispl
             pivot = pd.pivot_table(
                 temp,
                 values=varname,
@@ -236,7 +244,8 @@ class CEMS(object):
            loc and ORISPL CODES.
            unitid is a unit_id
 
-           if a particular unitid is specified then will return values for that unit.
+           if a particular unitid is specified then will return values for that
+            unit.
 
 
         Parameters
@@ -281,8 +290,7 @@ class CEMS(object):
             if download FALSE then returns string with url of ftp
             if download TRUE then returns name of downloaded file
         """
-
-        #import requests
+        # import requests
         # TO DO: requests does not support ftp sites.
         efile = 'empty'
         ftpsite = self.url
@@ -296,10 +304,10 @@ class CEMS(object):
         if not download:
             efile = ftpsite + fname
         if not os.path.isfile(fname):
-            #print('retrieving ' + ftpsite + fname)
-            #r = requests.get(ftpsite + fname)
-            #open(efile, 'wb').write(r.content)
-            #print('retrieved ' + ftpsite + fname)
+            # print('retrieving ' + ftpsite + fname)
+            # r = requests.get(ftpsite + fname)
+            # open(efile, 'wb').write(r.content)
+            # print('retrieved ' + ftpsite + fname)
             efile = ftpsite + fname
             print('WARNING: Downloading file not supported at this time')
             print('you may download manually using the following address')
@@ -312,7 +320,8 @@ class CEMS(object):
 
     def create_location_dictionary(self, verbose=False):
         """
-        returns dictionary withe key orispl_code and value  (latitude, longitude) tuple
+        returns dictionary withe key orispl_code and value  (latitude,
+        longitude) tuple
         """
         if 'latitude' in list(self.df.columns.values):
             dftemp = self.df.copy()
@@ -398,8 +407,8 @@ class CEMS(object):
         ------
         rcolumn: list of str
         """
-        self.namehash[
-            newname] = ccc  # dictionary with key as the newname and value as the original name
+        # dictionary with key as the newname and value as the original name
+        self.namehash[newname] = ccc
         rcolumn.append(newname)
         if verbose:
             print(ccc + ' to ' + newname)
@@ -408,8 +417,10 @@ class CEMS(object):
     def add_info(self, dftemp):
         """
         -------------Load supplmental data-----------------------
-        Add location (latitude longitude) and time UTC information to dataframe dftemp.
-        cemsinfo.csv contains info on facility id, lat, lon, time offset from UTC.
+        Add location (latitude longitude) and time UTC information to dataframe
+         dftemp.
+        cemsinfo.csv contains info on facility id, lat, lon, time offset from
+         UTC.
         allows transformation from local time to UTC.
         If not all power stations are found in the cemsinfo.csv file,
         then Nan will be written in lat, lon and 'time' column.
@@ -424,15 +435,16 @@ class CEMS(object):
         """
         basedir = os.path.abspath(os.path.dirname(__file__))[:-3]
         iname = os.path.join(basedir, 'data', 'cemsinfo.csv')
-        #iname = os.path.join(basedir, 'data', 'cem_facility_loc.csv')
+        # iname = os.path.join(basedir, 'data', 'cem_facility_loc.csv')
         method = 1
-        # TO DO: Having trouble with pytest throwing an error when using the apply on the dataframe.
+        # TO DO: Having trouble with pytest throwing an error when using the
+        # apply on the dataframe.
         # runs ok, but pytest fails. Tried several differnt methods.
         if os.path.isfile(iname):
             sinfo = pd.read_csv(iname, sep=',', header=0)
             try:
                 dftemp.drop(['latitude', 'longitude'], axis=1, inplace=True)
-            except:
+            except Exception:
                 pass
             dfnew = pd.merge(
                 dftemp,
@@ -469,7 +481,8 @@ class CEMS(object):
             # remove the time_offset column.
             dfnew.drop(['time_offset'], axis=1, inplace=True)
             mlist = dftemp.columns.values.tolist()
-            # merge the dataframes back together to include rows with no info in the cemsinfo.csv
+            # merge the dataframes back together to include rows with no info
+            # in the cemsinfo.csv
             dftemp = pd.merge(
                 dftemp, dfnew, how='left', left_on=mlist, right_on=mlist)
         return dftemp
@@ -489,7 +502,7 @@ class CEMS(object):
         # pandas read_csv can read either from a file or url.
         dftemp = pd.read_csv(efile, sep=',', index_col=False, header=0)
         columns = list(dftemp.columns.values)
-        columns = columns_rename(columns, verbose)
+        columns = self.columns_rename(columns, verbose)
         dftemp.columns = columns
         if verbose:
             print(columns)
@@ -498,12 +511,14 @@ class CEMS(object):
         # create column with datetime information
         # from column with month-day-year and column with hour.
         dftime = dftemp.apply(lambda x:
-                              pd.datetime.strptime("{0} {1}".format(x['date'], x['hour']), dfmt), axis=1)
+                              pd.datetime.strptime("{0} {1}".format(x['date'],
+                                                                    x['hour']),
+                                                   dfmt), axis=1)
         dftemp = pd.concat([dftime, dftemp], axis=1)
         dftemp.rename(columns={0: 'time local'}, inplace=True)
         dftemp.drop(['date', 'hour'], axis=1, inplace=True)
 
-        #-------------Load supplmental data-----------------------
+        # -------------Load supplmental data-----------------------
         # contains info on facility id, lat, lon, time offset from UTC.
         # allows transformation from local time to UTC.
         dftemp = self.add_info(dftemp)
@@ -518,5 +533,5 @@ class CEMS(object):
             self.df = self.df.append(dftemp)
             if verbose:
                 print('Appending to pandas dataframe. Loading ' + efile)
-        #if verbose: print(dftemp[0:10])
+        # if verbose: print(dftemp[0:10])
         return dftemp

@@ -1,15 +1,15 @@
+""" Obs Utilities """
+
 from __future__ import print_function
-import os
-import pandas as pd
 import numpy as np
 import datetime
-import matplotlib.pyplot as plt
 import sys
 
 
 def find_near(df, latlon, distance=100, sid='site_num', drange=None):
-    """find all values in the df dataframe column sid which are within distance (km) of lat lon point.
-       output dictionary with key as value in column sid and value tuple (latitude, longitude)
+    """find all values in the df dataframe column sid which are within distance
+    (km) of lat lon point. output dictionary with key as value in column sid
+    and value tuple (latitude, longitude)
 
      Parameters
      ----------
@@ -25,7 +25,8 @@ def find_near(df, latlon, distance=100, sid='site_num', drange=None):
      Returns
      --------
      lhash: dictionary
-         key is the value in column sid and value is (latitude, longitude) position.
+         key is the value in column sid and value is (latitude, longitude)
+         position.
     """
     degree2km = 111
     if drange:
@@ -49,7 +50,8 @@ def write_datem(df,
                 drange=None):
     """returns string in datem format (See NOAA ARL).
      datem format has the following columns:
-     Year, Month, Day, Hour, Duration, lat, lon, Concentration (units), site id, height
+     Year, Month, Day, Hour, Duration, lat, lon, Concentration (units), site
+     id, height
 
      Parameters
      ----------
@@ -59,8 +61,9 @@ def write_datem(df,
              name of the output file.
      sitename : string.
              If it is the name of a column in the dataframe then
-             that column will be used to generate the site name column in the datem file.
-             If is not the name of a column, then the string will be used as the site name.
+             that column will be used to generate the site name column in the
+             datem file. If is not the name of a column, then the string will
+             be used as the site name.
      info : string
            will be written to the second line of the header.
      drange : list of two time stamp objects.
@@ -87,7 +90,7 @@ def write_datem(df,
         runstring += info + "\n"
     else:
         runstring += "\n"
-    runstring += "Year, Month, Day, Hour:Minute (UTC), Dur(hhmm) ,  LAT, LON, Concentration (" + \
+    runstring += 'Year, Month, Day, Hour:Minute (UTC), Dur(hhmm) ,  LAT, LON, Concentration (' + \
         ustr + "), sid, height\n"
     lat = df['latitude']
     lon = df['longitude']
@@ -104,7 +107,7 @@ def write_datem(df,
         runstring += val[0].strftime('%Y  %m  %d  %H%M') + duration
         try:
             runstring += str(val[1]) + ' ' + str(val[2]) + ' '
-        except:
+        except RuntimeError:
             print('WARNING1', val[1])
             print(val[2])
             print(type(val[1]))
@@ -129,8 +132,9 @@ def dropna(df, inplace=True):
 
 
 def get_lhash(df, idn):
-    """returns a dictionary with the key as the input column value and the value a tuple of (lat, lon)
-       Useful for getting lat lon locations of different sites in a dataframe.
+    """returns a dictionary with the key as the input column value and the
+        value a tuple of (lat, lon)  Useful for getting lat lon locations of
+        different sites in a dataframe.
     """
     if 'latitude' in list(df.columns.values):
         dftemp = df.copy()
@@ -142,7 +146,8 @@ def get_lhash(df, idn):
 
 
 def summarize(df, verbose=False):
-    """prints list of columns. if verbose prints list of unique values in each column"""
+    """prints list of columns. if verbose prints list of unique values in each
+    column"""
     columns = list(df.columns.values)
     if verbose:
         for ccc in columns:

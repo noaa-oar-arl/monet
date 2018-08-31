@@ -2,12 +2,12 @@ from __future__ import print_function
 
 import inspect
 import os
-# this is written to retrive airnow data concatenate and add to pandas array for usage
+# this is written to retrive airnow data concatenate and add to pandas array
+# for usage
 from builtins import object
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pandas as pd
-from numpy import array
 
 
 class AirNow(object):
@@ -81,9 +81,6 @@ class AirNow(object):
         helper function to build urls
 
         """
-        from numpy import empty, where
-        import requests
-        from glob import glob
 
         furls = []
         fnames = []
@@ -127,7 +124,7 @@ class AirNow(object):
                 'units', 'obs', 'source'
             ]
             dft.columns = cols
-        except:
+        except Exception:
             cols = [
                 'date', 'time', 'siteid', 'site', 'utcoffset', 'variable',
                 'units', 'obs', 'source'
@@ -269,8 +266,6 @@ class AirNow(object):
         """
         from .epa_util import read_monitor_file
         self.monitor_df = read_monitor_file(airnow=True)
-        #self.monitor_df = self.monitor_df.loc[self.monitor_df.siteid.notnull()]
-        #self.monitor_df['siteid'] = self.monitor_df.siteid.astype(int).astype(str).str.zfill(9)
         self.df = pd.merge(
             self.df, self.monitor_df, on='siteid')  # , how='left')
 

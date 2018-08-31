@@ -17,7 +17,8 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     Parameters
     ----------
     fname : string or list
-        fname is the path to the file or files.  It will accept hot keys in strings as well.
+        fname is the path to the file or files.  It will accept hot keys in
+        strings as well.
     earth_radius : float
         The earth radius used for the map projection
     convert_to_ppb : boolean
@@ -76,12 +77,6 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
 
     # convert all gas species to ppbv
     if convert_to_ppb:
-        allpm = concatenate([
-            aitken, accumulation, coarse, [
-                'time', 'TFLAG', 'latitude', 'longitude', 'PM25', 'PM10',
-                'PM25_TOT', 'PM_TOT'
-            ]
-        ])
         for i in dset.variables:
             if 'units' in dset[i].attrs:
                 if 'ppmV' in dset[i].attrs['units']:
@@ -334,18 +329,18 @@ def add_lazy_noy(d):
 
 
 def add_lazy_rh(d):
-    keys = Series([i for i in d.variables])
-    allvars = Series(['TEMP', 'Q', 'PRES'])
-    index = allvars.isin(keys)
-    if can_do(index):
-        import atmos
-        data = {
-            'T': self.dset['TEMP'][:].compute().values,
-            'rv': self.dset['Q'][:].compute().values,
-            'p': self.dset['PRES'][:].compute().values
-        }
-        d['NOx'] = add_multiple_lazy(d, newkeys)
-        d['NOx'] = d['NOx'].assign_attrs({'name': 'NOx', 'long_name': 'NOx'})
+    # keys = Series([i for i in d.variables])
+    # allvars = Series(['TEMP', 'Q', 'PRES'])
+    # index = allvars.isin(keys)
+    # if can_do(index):
+    #     import atmos
+    #     data = {
+    #         'T': dset['TEMP'][:].compute().values,
+    #         'rv': dset['Q'][:].compute().values,
+    #         'p': dset['PRES'][:].compute().values
+    #     }
+    #     d['NOx'] = add_multiple_lazy(d, newkeys)
+    #     d['NOx'] = d['NOx'].assign_attrs({'name': 'NOx', 'long_name': 'NOx'})
     return d
 
 

@@ -41,7 +41,7 @@ def MdnNE(obs, mod, axis=None):
         axis=axis) * 100.
 
 
-def NMdnE(obs, mod, axis=None):
+def NMdnGE(obs, mod, axis=None):
     """ Normalized Median Gross Error (%)"""
     return np.ma.masked_invalid(
         old_div(np.ma.abs(mod - obs).mean(axis=axis),

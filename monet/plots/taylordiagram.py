@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Copyright: This document has been placed in the public domain.
 """
 Taylor diagram (Taylor, 2001) test implementation.
 http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm
