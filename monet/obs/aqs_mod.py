@@ -3,16 +3,8 @@ from __future__ import print_function
 import inspect
 import os
 # this is a class to deal with aqs data
-from builtins import object, range, zip
-from datetime import datetime
-from zipfile import ZipFile
-
-import dask
-import dask.diagnostics
-import dask.dataframe as dd
+from builtins import object, zip
 import pandas as pd
-import requests
-from numpy import arange, array
 from dask.diagnostics import ProgressBar
 
 from .epa_util import read_monitor_file
@@ -120,7 +112,7 @@ class AQS(object):
             df.columns = self.renameddcols
             df['pollutant_standard'] = df.pollutant_standard.astype(str)
             self.daily = True
-            #df.rename(columns={'parameter_name':'variable'})
+            # df.rename(columns={'parameter_name':'variable'})
         else:
             df = pd.read_csv(
                 url,
@@ -134,7 +126,7 @@ class AQS(object):
         df['siteid'] = df.state_code.astype(str).str.zfill(
             2) + df.county_code.astype(str).str.zfill(3) + df.site_num.astype(
                 str).str.zfill(4)
-        #df['siteid'] = df.state_code + df.county_code + df.site_num
+        # df['siteid'] = df.state_code + df.county_code + df.site_num
         df.drop(['state_name', 'county_name'], axis=1, inplace=True)
         df.columns = [i.lower() for i in df.columns]
         if 'daily' not in url:
@@ -189,7 +181,8 @@ class AQS(object):
         elif param.upper() == 'NONOxNOy'.upper():
             code = 'NONOxNOy_'
         elif param.upper() == 'VOC':
-            code = 'VOCS_'  # https://aqs.epa.gov/aqsweb/airdata/daily_VOCS_2017.zip
+            # https://aqs.epa.gov/aqsweb/airdata/daily_VOCS_2017.zip
+            code = 'VOCS_'
         elif param.upper() == 'SPEC':
             code = 'SPEC_'
         elif param.upper() == 'PM10SPEC':
@@ -339,8 +332,8 @@ class AQS(object):
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
-        #if pd.Series(self.df.columns).isin(['parameter_name']).max():
-        #self.df.drop('parameter_name', axis=1, inplace=True)
+        # if pd.Series(self.df.columns).isin(['parameter_name']).max():
+        # self.df.drop('parameter_name', axis=1, inplace=True)
         return self.df.copy()
 
     def get_species(self, df, voc=False):

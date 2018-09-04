@@ -1,10 +1,9 @@
+"""plotting routines"""
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from . import taylordiagram as td
 from .colorbars import colorbar_index
-
-from ..util import mystats
 
 # colors = ['#1e90ff','#045C5C','#00A847','#DB4291','#BB7E5D']
 colors = ['#1e90ff', '#DA70D6', '#228B22', '#FA8072', '#FF1493']
@@ -20,12 +19,14 @@ def make_spatial_plot(modelvar,
                       plotargs={},
                       ncolors=15,
                       discrete=False):
+
     # create figure
     f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
     # determine colorbar
     if 'cmap' not in plotargs:
         plotargs['cmap'] = 'viridis'
     if discrete and 'vmin' in plotargs and 'vmax' in plotargs:
+
         c, cmap = colorbar_index(
             ncolors,
             plotargs['cmap'],
@@ -53,7 +54,6 @@ def make_spatial_plot(modelvar,
     m.drawcountries()
     return f, ax, c, cmap, vmin, vmax
 
-
 def spatial(modelvar, **kwargs):
     if kwargs['ax'] is None:
         f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
@@ -72,7 +72,7 @@ def make_spatial_contours(modelvar,
                           ncolors=None,
                           dtype='int',
                           **kwargs):
-    fig = plt.figure(figsize=(11, 6), frameon=False)
+    plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
     # define map and draw boundries
@@ -92,8 +92,6 @@ def make_spatial_contours(modelvar,
             maxval=levels[-1],
             basemap=m,
             dtype=dtype)
-    #        m.contourf(x, y, modelvar, **kwargs,cmap=cmap)
-    # c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
     else:
         c = m.colorbar()
     titstring = date.strftime('%B %d %Y %H')
@@ -107,7 +105,8 @@ def make_spatial_contours(modelvar,
 
 
 def wind_quiver(ws, wdir, gridobj, m, **kwargs):
-    import tools
+    from . import tools
+
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
     # define map and draw boundries
@@ -136,36 +135,35 @@ def normval(vmin, vmax, cmap):
     norm = BoundaryNorm(boundaries=bounds, ncolors=cmap.N)
     return norm
 
+# def spatial_scatter(df, m, discrete=False, plotargs={}, create_cbar=True):
+#     from .colorbars import cmap_discretize
+#     x, y = m(df.longitude.values, df.Latitude.values)
+#     s = 20
+#     if create_cbar:
+#         if discrete:
+#             cmap = cmap_discretize(cmap, ncolors)
+#             # s = 20
+#           if (type(plotargs(vmin)) == None) | (type(plotargs(vmax)) == None):
+#                 plt.scatter(x, y, c=df['Obs'].values, **plotargs)
+#             else:
+#                 plt.scatter(x, y, c=df['Obs'].values, **plotargs)
+#         else:
+#             plt.scatter(x, y, c=df['Obs'].values, **plotargs)
+#     else:
+#         plt.scatter(x, y, c=df['Obs'].values, **plotargs)
 
-def spatial_scatter(df, m, discrete=False, plotargs={}, create_cbar=True):
-    x, y = m(df.longitude.values, df.Latitude.values)
-    s = 20
-    if create_cbar:
-        if discrete:
-            cmap = cmap_discretize(cmap, ncolors)
-            # s = 20
-            if (type(plotargs(vmin)) == None) | (type(plotargs(vmax)) == None):
-                plt.scatter(x, y, c=df['Obs'].values, **plotargs)
-            else:
-                plt.scatter(x, y, c=df['Obs'].values, **plotargs)
-        else:
-            plt.scatter(x, y, c=df['Obs'].values, **plotargs)
-    else:
-        plt.scatter(x, y, c=df['Obs'].values, **plotargs)
-
-
-def spatial_stat_scatter(df,
-                         m,
-                         date,
-                         stat=mystats.MB,
-                         ncolors=15,
-                         fact=1.5,
-                         cmap='RdYlBu_r'):
-    new = df[df.datetime == date]
-    x, y = m(new.longitude.values, new.latitude.values)
-    cmap = cmap_discretize(cmap, ncolors)
-    colors = new.CMAQ - new.Obs
-    ss = (new.Obs - new.CMAQ).abs() * fact
+# def spatial_stat_scatter(df,
+#                          m,
+#                          date,
+#                          stat=mystats.MB,
+#                          ncolors=15,
+#                          fact=1.5,
+#                          cmap='RdYlBu_r'):
+#     new = df[df.datetime == date]
+#     x, y = m(new.longitude.values, new.latitude.values)
+#     cmap = cmap_discretize(cmap, ncolors)
+#     colors = new.CMAQ - new.Obs
+#     ss = (new.Obs - new.CMAQ).abs() * fact
 
 
 def spatial_bias_scatter(df,
@@ -177,6 +175,7 @@ def spatial_bias_scatter(df,
                          ncolors=15,
                          fact=1.5,
                          cmap='RdBu_r'):
+
     from scipy.stats import scoreatpercentile as score
     from numpy import around
     #    plt.figure(figsize=(11, 6), frameon=False)
@@ -188,6 +187,7 @@ def spatial_bias_scatter(df,
     x, y = m(new.longitude.values, new.latitude.values)
     c, cmap = colorbar_index(
         ncolors, cmap, minval=top * -1, maxval=top, basemap=m)
+
     c.ax.tick_params(labelsize=13)
     #    cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
@@ -204,29 +204,29 @@ def spatial_bias_scatter(df,
         edgecolors='k',
         linewidths=.25,
         alpha=.7)
+
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
     return f, ax, c
 
-
-def eight_hr_spatial_scatter(df, m, date, savename=''):
-    fig = plt.figure(figsize=(11, 6), frameon=False)
-    m.drawcoastlines(linewidth=.3)
-    m.drawstates()
-    m.drawcountries()
-
-    plt.axis('off')
-    new = df[df.datetime_local == date]
-    x, y = m(new.longitude.values, new.latitude.values)
-    cmap = plt.cm.get_cmap('plasma')
-    norm = normval(-40, 40., cmap)
-    ss = (new.Obs - new.CMAQ).abs() / top * 100.
-    colors = new.Obs - new.CMAQ
-    m.scatter(x, y, s=ss, c=colors, norm=norm, cmap=cmap)
-    if savename != '':
-        plt.savefig(savename + date + '.jpg', dpi=75.)
-        plt.close()
+# def eight_hr_spatial_scatter(df, m, date, savename=''):
+#     fig = plt.figure(figsize=(11, 6), frameon=False)
+#     m.drawcoastlines(linewidth=.3)
+#     m.drawstates()
+#     m.drawcountries()
+#
+#     plt.axis('off')
+#     new = df[df.datetime_local == date]
+#     x, y = m(new.longitude.values, new.latitude.values)
+#     cmap = plt.cm.get_cmap('plasma')
+#     norm = normval(-40, 40., cmap)
+#     ss = (new.Obs - new.CMAQ).abs() / top * 100.
+#     colors = new.Obs - new.CMAQ
+#     m.scatter(x, y, s=ss, c=colors, norm=norm, cmap=cmap)
+#     if savename != '':
+#         plt.savefig(savename + date + '.jpg', dpi=75.)
+#         plt.close()
 
 
 def timeseries(df,
@@ -265,8 +265,6 @@ def timeseries(df,
         Description of returned object.
 
     """
-    import pandas as pd
-
     if ax is None:
         f, ax = plt.subplots(figsize=(11, 6), frameon=False)
 
@@ -290,7 +288,7 @@ def timeseries(df,
         m.rename(columns={y: label}, inplace=True)
     else:
         label = y
-    tt = m[label].plot(ax=ax, **plotargs)
+    m[label].plot(ax=ax, **plotargs)
     ax.fill_between(m[label].index, lower, upper, **fillargs)
     if ylabel is None:
         ax.set_ylabel(variable + ' (' + unit + ')')
@@ -301,7 +299,6 @@ def timeseries(df,
     plt.title(title)
     plt.tight_layout()
     return ax
-
 
 def kdeplot(df, title=None, label=None, ax=None, **kwargs):
     """Short summary.
@@ -327,7 +324,6 @@ def kdeplot(df, title=None, label=None, ax=None, **kwargs):
         Description of returned object.
 
     """
-    from scipy.stats import scoreatpercentile as score
     sns.set_style('ticks')
 
     if ax is None:
@@ -385,7 +381,6 @@ def taylordiagram(df,
 
         dia = td.TaylorDiagram(obsstd, fig=f, rect=111, label='Obs')
         plt.grid(linewidth=1, alpha=.5)
-
         cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
         dia.add_sample(
             df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label)
@@ -396,13 +391,11 @@ def taylordiagram(df,
         plt.tight_layout()
 
     elif not addon and dia is not None:
-        print(
-            'Do you want to add this on? if so please turn the addon keyword to True'
-        )
+        print('Do you want to add this on? if so please turn '
+              'the addon keyword to True')
     elif addon and dia is None:
-        print(
-            'Please pass the previous Taylor Diagram Instance with dia keyword...'
-        )
+        print('Please pass the previous Taylor Diagram Instance with dia '
+              'keyword...')
     else:
         cc = corrcoef(df.Obs.values, df.CMAQ.values)[0, 1]
         dia.add_sample(

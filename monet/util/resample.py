@@ -49,10 +49,8 @@ def _check_swath_or_area(defin):
         else:
             raise RuntimeError
     except RuntimeError:
-        print(
-            'grid definition must be a pyresample SwathDefinition or '
-            'AreaDefinition'
-        )
+        print('grid definition must be a pyresample SwathDefinition or '
+              'AreaDefinition')
         return
     return newswath
 
@@ -75,7 +73,6 @@ def _reformat_resampled_data(orig, new, target_grid):
         reformated xarray.DataArray
 
     """
-    from pandas import Series
     target_lon, target_lat = target_grid.get_lonlats_dask()
     new.name = orig.name
     new['latitude'] = (('y', 'x'), target_lat)
@@ -99,10 +96,8 @@ def resample_dataset(data,
         else:
             raise RuntimeError
     except RuntimeError:
-        print(
-            'Must include pyresample.gemoetry in the data.attrs area_def or '
-            'area'
-        )
+        print('Must include pyresample.gemoetry in the data.attrs area_def or '
+              'area')
         return
 
     # check for SwathDefinition or AreaDefinition

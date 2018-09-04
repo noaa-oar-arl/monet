@@ -1,9 +1,9 @@
 from __future__ import print_function
-
+from ..util import mystats
 from future import standard_library
+import pandas as pd
 
 standard_library.install_aliases()
-
 
 def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3'):
     """
@@ -43,7 +43,6 @@ def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3'):
         df[obscolumn] = df[obscolumn] / factor
     return df
 
-
 def check_cmaq_units(df, param='O3', aqs_param='OZONE'):
     """Short summary.
 
@@ -63,6 +62,7 @@ def check_cmaq_units(df, param='O3', aqs_param='OZONE'):
 
     """
     aunit = df[df.variable == aqs_param].Units.unique()[0]
+
     if aunit == 'UG/M3':
         fac = 1.
     elif aunit == 'PPB':
@@ -104,8 +104,10 @@ def ensure_values_indomain(df, lon, lat):
            (df.Latitude.values < lat.max()) &
            (df.Longitude.values > lon.min()) &
            (df.Longitude.values < lon.max()))
+
     df = df[con].copy()
     return df
+
 
 
 def write_table(self,
@@ -180,8 +182,8 @@ def write_table(self,
             except KeyError:
                 print(' City either does not contain montiors for ' + param)
                 print(
-                    '     or City Name is not valid.  Enter a valid City name: df.msa_name.unique()'
-                )
+                    '    or City Name is not valid.  Enter a valid City name: '
+                    'df.msa_name.unique()')
                 return
         elif not isinstance(state, type(None)):
             try:
@@ -343,11 +345,6 @@ def get_epa_location_df(df,
         Description of returned object.
 
     """
-    cityname = True
-    if 'msa_name' in df.columns:
-        cityname = True
-    else:
-        cityname = False
     new = df.groupby('variable').get_group(param)
     if site != '':
         if site in new.siteid.unique():
@@ -377,7 +374,6 @@ def get_epa_location_df(df,
         df2 = new
         title = 'Domain'
     return df2, title
-
 
 def regulatory_resample(df, col='model', pollutant_standard=None):
     from pandas import to_timedelta, concat
@@ -413,7 +409,6 @@ def calc_daily_max(df, param=None, rolling_frequency=8):
     else:
         temp = df.groupby('variable').get_group(param)
     temp.index = temp.time_local
-    dfn = temp.drop_duplicates(subset=['siteid'])
     if rolling_frequency > 1:
         g = temp.groupby('siteid')['model', 'gmt_offset'].rolling(
             rolling_frequency, center=True, win_type='boxcar').mean()
@@ -503,7 +498,6 @@ def convert_statenames_to_abv(df):
 
 
 def read_monitor_file(network=None, airnow=False, drop_latlon=True):
-    from numpy import NaN
     import pandas as pd
     import os
     if airnow:
@@ -536,9 +530,9 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
                                  'monitoring_site_locations.hdf')
             print('Monitor File Path: ' + fname)
             sss = pd.read_hdf(fname)
-            #monitor_drop = ['state_code', u'county_code']
-            #s.drop(monitor_drop, axis=1, inplace=True)
-        except:
+            # monitor_drop = ['state_code', u'county_code']
+            # s.drop(monitor_drop, axis=1, inplace=True)
+        except Exception:
             print('Monitor File Not Found... Reprocessing')
             baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
             site_url = baseurl + 'aqs_sites.zip'
@@ -606,8 +600,8 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
         if network is not None:
             sss = sss.loc[sss.networks.isin(
                 [network])].drop_duplicates(subset=['siteid'])
-        #Getting error that 'latitude' 'longitude' not contained in axis
-        drop_latlon=False
+        # Getting error that 'latitude' 'longitude' not contained in axis
+        drop_latlon = False
         if drop_latlon:
             if pd.Series(sss.keys()).isin(['latitude', 'longitude']):
                 return sss.drop(

@@ -1,4 +1,3 @@
-# MODIS Swath data
 """ this will read the modis data"""
 import xarray as xr
 from ..grids import _geos_16_grid

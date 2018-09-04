@@ -11,7 +11,7 @@ except:
 
 setup(
     name='monet',
-    version='1.2',
+    version='2.0',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
     author='Barry D. Baker',
@@ -30,6 +30,5 @@ setup(
         'pandoc'
     ],
     dependency_links=[
-        "git+ssh://git@github.com/barronh/pseudonetcdf.git@develop",
-        "git+ssh://git@github.com/barronh/xarray.git@pnc-backend"
+        "git+ssh://git@github.com/barronh/pseudonetcdf.git",
     ])

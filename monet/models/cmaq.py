@@ -1,3 +1,4 @@
+""" CMAQ File Reader """
 from numpy import array, concatenate
 from pandas import Series, to_datetime
 import xarray as xr
@@ -17,7 +18,8 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     Parameters
     ----------
     fname : string or list
-        fname is the path to the file or files.  It will accept hot keys in strings as well.
+        fname is the path to the file or files.  It will accept hot keys in
+        strings as well.
     earth_radius : float
         The earth radius used for the map projection
     convert_to_ppb : boolean
@@ -32,18 +34,6 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
 
     # open the dataset using xarray
     dset = xr.open_mfdataset(fname)
-
-    # get the grid information
-    grid = grid_from_dataset(dset, earth_radius=earth_radius)
-    area_def = get_ioapi_pyresample_area_def(dset, grid)
-    # assign attributes for dataset and all DataArrays
-    dset = dset.assign_attrs({'proj4_srs': grid})
-    for i in dset.variables:
-        dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
-        for j in dset[i].attrs:
-            dset[i].attrs[j] = dset[i].attrs[j].strip()
-        dset[i] = dset[i].assign_attrs({'area': area_def})
-    dset = dset.assign_attrs(area=area_def)
 
     # set log pressure as coordinate
     if 'PRES' in dset.variables:
@@ -62,6 +52,18 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     dset = add_lazy_so4f(dset)
     dset = add_lazy_rh(dset)
 
+    # get the grid information
+    grid = grid_from_dataset(dset, earth_radius=earth_radius)
+    area_def = get_ioapi_pyresample_area_def(dset, grid)
+    # assign attributes for dataset and all DataArrays
+    dset = dset.assign_attrs({'proj4_srs': grid})
+    for i in dset.variables:
+        dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
+        for j in dset[i].attrs:
+            dset[i].attrs[j] = dset[i].attrs[j].strip()
+        dset[i] = dset[i].assign_attrs({'area': area_def})
+    dset = dset.assign_attrs(area=area_def)
+
     # get the times
     dset = _get_times(dset)
 
@@ -76,12 +78,18 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
 
     # convert all gas species to ppbv
     if convert_to_ppb:
-        allpm = concatenate(
-            [aitken, accumulation, coarse, ['time', 'latitude', 'longitude']])
         for i in dset.variables:
-            if i not in allpm:
-                dset[i] *= 1000.
-                dset[i].attrs['units'] = 'ppbV'
+            if 'units' in dset[i].attrs:
+                if 'ppmV' in dset[i].attrs['units']:
+                    dset[i] *= 1000.
+                    dset[i].attrs['units'] = 'ppbV'
+
+    # convert 'micrograms to \mu g'
+    for i in dset.variables:
+        if 'units' in dset[i].attrs:
+            if 'micrograms' in dset[i].attrs['units']:
+                dset[i].attrs['units'] = '$\mu g m^{-3}$'
+
     return dset
 
 
@@ -146,13 +154,18 @@ def add_lazy_pm25(d):
     ])
     if 'PM25_TOT' in keys:
         d['PM25'] = d['PM25_TOT'].chunk()
+
     else:
         index = allvars.isin(keys)
         if can_do(index):
             newkeys = allvars.loc[index]
             newweights = weights.loc[index]
             d['PM25'] = add_multiple_lazy(d, newkeys, weights=newweights)
-            d['PM25'].assign_attrs({'name': 'PM2.5', 'long_name': 'PM2.5'})
+    d['PM25'] = d['PM25'].assign_attrs({
+        'units': '$\mu g m^{-3}$',
+        'name': 'PM2.5',
+        'long_name': 'PM2.5'
+    })
     return d
 
 
@@ -166,12 +179,14 @@ def add_lazy_pm10(d):
         if can_do(index):
             newkeys = allvars.loc[index]
             d['PM10'] = add_multiple_lazy(d, newkeys)
-            d['PM10'] = d['PM10'].assign_attrs({
-                'name':
-                'PM10',
-                'long_name':
-                'Particulate Matter < 10 microns'
-            })
+    d['PM10'] = d['PM10'].assign_attrs({
+        'units':
+        '$\mu g m^{-3}$',
+        'name':
+        'PM10',
+        'long_name':
+        'Particulate Matter < 10 microns'
+    })
     return d
 
 
@@ -183,6 +198,8 @@ def add_lazy_pm_course(d):
         newkeys = allvars.loc[index]
         d['PM_COURSE'] = add_multiple_lazy(d, newkeys)
         d['PM_COURSE'] = d['PM_COURSE'].assign_attrs({
+            'units':
+            '$\mu g m^{-3}$',
             'name':
             'PM_COURSE',
             'long_name':
@@ -201,6 +218,8 @@ def add_lazy_clf(d):
         neww = weights.loc[index]
         d['CLf'] = add_multiple_lazy(d, newkeys, weights=neww)
         d['CLf'] = d['CLf'].assign_attrs({
+            'units':
+            '$\mu g m^{-3}$',
             'name':
             'CLf',
             'long_name':
@@ -220,6 +239,8 @@ def add_lazy_caf(d):
         neww = weights.loc[index]
         d['CAf'] = add_multiple_lazy(d, newkeys, weights=neww)
         d['CAf'] = d['CAf'].assign_attrs({
+            'units':
+            '$\mu g m^{-3}$',
             'name':
             'CAf',
             'long_name':
@@ -238,7 +259,11 @@ def add_lazy_naf(d):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d['NAf'] = add_multiple_lazy(d, newkeys, weights=neww)
-        d['NAf'] = d['NAf'].assign_attrs({'name': 'NAf', 'long_name': 'NAf'})
+        d['NAf'] = d['NAf'].assign_attrs({
+            'units': '$\mu g m^{-3}$',
+            'name': 'NAf',
+            'long_name': 'NAf'
+        })
     return d
 
 
@@ -252,6 +277,7 @@ def add_lazy_so4f(d):
         neww = weights.loc[index]
         d['SO4f'] = add_multiple_lazy(d, newkeys, weights=neww)
         d['SO4f'] = d['SO4f'].assign_attrs({
+            'units': '$\mu g m^{-3}$',
             'name': 'SO4f',
             'long_name': 'SO4f'
         })
@@ -268,6 +294,7 @@ def add_lazy_nh4f(d):
         neww = weights.loc[index]
         d['NH4f'] = add_multiple_lazy(d, newkeys, weights=neww)
         d['NH4f'] = d['NH4f'].assign_attrs({
+            'units': '$\mu g m^{-3}$',
             'name': 'NH4f',
             'long_name': 'NH4f'
         })
@@ -284,6 +311,7 @@ def add_lazy_no3f(d):
         neww = weights.loc[index]
         d['NO3f'] = add_multiple_lazy(d, newkeys, weights=neww)
         d['NO3f'] = d['NO3f'].assign_attrs({
+            'units': '$\mu g m^{-3}$',
             'name': 'NO3f',
             'long_name': 'NO3f'
         })
@@ -301,20 +329,20 @@ def add_lazy_noy(d):
     return d
 
 
-# def add_lazy_rh(d):
+def add_lazy_rh(d):
     # keys = Series([i for i in d.variables])
     # allvars = Series(['TEMP', 'Q', 'PRES'])
     # index = allvars.isin(keys)
     # if can_do(index):
     #     import atmos
     #     data = {
-    #         'T': self.dset['TEMP'][:].compute().values,
-    #         'rv': self.dset['Q'][:].compute().values,
-    #         'p': self.dset['PRES'][:].compute().values
+    #         'T': dset['TEMP'][:].compute().values,
+    #         'rv': dset['Q'][:].compute().values,
+    #         'p': dset['PRES'][:].compute().values
     #     }
     #     d['NOx'] = add_multiple_lazy(d, newkeys)
     #     d['NOx'] = d['NOx'].assign_attrs({'name': 'NOx', 'long_name': 'NOx'})
-    # return d
+    return d
 
 
 def add_lazy_nox(d):

@@ -1,6 +1,7 @@
 from __future__ import division, print_function
 
-# this is written to retrive airnow data concatenate and add to pandas array for usage
+# this is written to retrive airnow data concatenate and add to pandas array
+# for usage
 from builtins import object, str
 from datetime import datetime
 
@@ -27,7 +28,8 @@ class AERONET(object):
         self.inv_type = None
         self.objtype = 'AERONET'
         self.usecols = concatenate((arange(30), arange(65, 83)))
-        self.latlonbox = None  # [21.1,-131.6686,53.04,-58.775] #[latmin,lonmin,latmax,lonmax]
+        # [21.1,-131.6686,53.04,-58.775] #[latmin,lonmin,latmax,lonmax]
+        self.latlonbox = None
         self.url = None
 
     def build_url(self):
@@ -51,7 +53,9 @@ class AERONET(object):
                 inv_type = '&ALM15=1'
             else:
                 inv_type = '&AML20=1'
-        date_portion = 'year=' + sy + '&month=' + sm + '&day=' + sd + '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed + '&hour2=' + eh
+        date_portion = 'year=' + sy + '&month=' + sm + '&day=' + sd + \
+            '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed +\
+            '&hour2=' + eh
         if self.inv_type is not '':
             product = '&product=' + self.prod
         else:
@@ -64,8 +68,10 @@ class AERONET(object):
             lon1 = str(self.latlonbox[1])
             lat2 = str(self.latlonbox[2])
             lon2 = str(self.latlonbox[3])
-            latlonbox = '&lat1=' + lat1 + '&lat2=' + lat2 + '&lon1=' + lon1 + '&lon2=' + lon2
-        self.url = base_url + date_portion + product + inv_type + time + '&if_no_html=1'
+            latlonbox = '&lat1=' + lat1 + '&lat2=' + \
+                lat2 + '&lon1=' + lon1 + '&lon2=' + lon2
+        self.url = base_url + date_portion + product + inv_type + time +\
+            '&if_no_html=1'
         #
         # self.url = 'https://aeronet.gsfc.nasa.gov/cgi-bin/print_web_data_v3?year=' + sy + '&month=' + sm + '&day=' + sd + \
         #            '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed + '&hour2=' + eh + '&AOD15=1&AVG=10&if_no_html=1'
@@ -85,7 +91,7 @@ class AERONET(object):
             parse_dates={'time': [1, 2]},
             date_parser=dateparse,
             na_values=-999)
-        #df.rename(columns={'date_time': 'time'}, inplace=True)
+        # df.rename(columns={'date_time': 'time'}, inplace=True)
         columns = self.get_columns()
         df.columns = columns  # self.get_columns()
         df.index = df.time
