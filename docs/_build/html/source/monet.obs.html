@@ -1,0 +1,479 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>monet.obs package &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="monet.plots package" href="monet.plots.html" />
+    <link rel="prev" title="monet.models package" href="monet.models.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet-accessor.html">MONET XArray Accessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html#api">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="monet.models.html">monet.models package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">monet.obs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.plots.html">monet.plots package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.util.html">monet.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.verification.html">monet.verification package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">Get in touch</a> &raquo;</li>
+        
+          <li><a href="monet.html">monet package</a> &raquo;</li>
+        
+      <li>monet.obs package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/monet.obs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="monet-obs-package">
+<h1>monet.obs package<a class="headerlink" href="#monet-obs-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-obs-aeronet-module">
+<h2>monet.obs.aeronet module<a class="headerlink" href="#monet-obs-aeronet-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-obs-airnow-module">
+<h2>monet.obs.airnow module<a class="headerlink" href="#monet-obs-airnow-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-obs-aqs-module">
+<h2>monet.obs.aqs module<a class="headerlink" href="#monet-obs-aqs-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-obs-cems-module">
+<h2>monet.obs.cems module<a class="headerlink" href="#monet-obs-cems-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-obs-crn-module">
+<h2>monet.obs.crn module<a class="headerlink" href="#monet-obs-crn-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-monet.obs.epa_util">
+<span id="monet-obs-epa-util-module"></span><h2>monet.obs.epa_util module<a class="headerlink" href="#module-monet.obs.epa_util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.obs.epa_util.calc_daily_max">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">calc_daily_max</code><span class="sig-paren">(</span><em>df</em>, <em>param=None</em>, <em>rolling_frequency=8</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.calc_daily_max" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.epa_util.check_cmaq_units">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">check_cmaq_units</code><span class="sig-paren">(</span><em>df</em>, <em>param='O3'</em>, <em>aqs_param='OZONE'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.check_cmaq_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>param</strong> (<em>type</em>) – Description of parameter <cite>param</cite> (the default is ‘O3’).</li>
+<li><strong>aqs_param</strong> (<em>type</em>) – Description of parameter <cite>aqs_param</cite> (the default is ‘OZONE’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.epa_util.convert_epa_unit">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">convert_epa_unit</code><span class="sig-paren">(</span><em>df</em>, <em>obscolumn='SO2'</em>, <em>unit='UG/M3'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.convert_epa_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>converts ppb to ug/m3 for SO2 in aqs and airnow datasets
+See 40 CFR Part 50.5, Appendix A-1 to part 50, appendix A=2 to Part 50.
+to convert from ppb to ug/m3 multiply by 2.6178.</p>
+<p>Also will convert from ug/m3 to ppb.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>pandas dataframe</em>) – self.df attribute from aqs or airnow class.</li>
+<li><strong>obscolumn</strong> (<em>string</em>) – name of column with SO2 data in it.</li>
+<li><strong>unit</strong> (<em>string</em>) – either ‘UG/M3’ or ‘PPB’ (not case sensitive)
+will convert data to this unit.</li>
+<li><strong>inplace</strong> (<em>boolean</em>) – if TRUE then changes self.df attribute</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>df</strong> – returns dataframe identical to original but with data converted to new
+unit.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas dataframe</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.epa_util.convert_statenames_to_abv">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">convert_statenames_to_abv</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.convert_statenames_to_abv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.epa_util.ensure_values_indomain">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">ensure_values_indomain</code><span class="sig-paren">(</span><em>df</em>, <em>lon</em>, <em>lat</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.ensure_values_indomain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite>.</li>
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.epa_util.get_epa_location_df">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">get_epa_location_df</code><span class="sig-paren">(</span><em>df</em>, <em>param</em>, <em>site=''</em>, <em>city=''</em>, <em>region=''</em>, <em>epa_region=''</em>, <em>state=''</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.get_epa_location_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>param</strong> (<em>type</em>) – Description of parameter <cite>param</cite>.</li>
+<li><strong>site</strong> (<em>type</em>) – Description of parameter <cite>site</cite> (the default is ‘’).</li>
+<li><strong>city</strong> (<em>type</em>) – Description of parameter <cite>city</cite> (the default is ‘’).</li>
+<li><strong>region</strong> (<em>type</em>) – Description of parameter <cite>region</cite> (the default is ‘’).</li>
+<li><strong>epa_region</strong> (<em>type</em>) – Description of parameter <cite>epa_region</cite> (the default is ‘’).</li>
+<li><strong>state</strong> (<em>type</em>) – Description of parameter <cite>state</cite> (the default is ‘’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.epa_util.get_region">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">get_region</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.get_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.epa_util.read_monitor_file">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">read_monitor_file</code><span class="sig-paren">(</span><em>network=None</em>, <em>airnow=False</em>, <em>drop_latlon=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.read_monitor_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.epa_util.regulatory_resample">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">regulatory_resample</code><span class="sig-paren">(</span><em>df</em>, <em>col='model'</em>, <em>pollutant_standard=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.regulatory_resample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.epa_util.write_table">
+<code class="descclassname">monet.obs.epa_util.</code><code class="descname">write_table</code><span class="sig-paren">(</span><em>self, df=None, param='OZONE', fname='table', threasholds=[70, 100000.0], site=None, city=None, region=None, state=None, append=False, label='CMAQ', html=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.epa_util.write_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite> (the default is None).</li>
+<li><strong>param</strong> (<em>type</em>) – Description of parameter <cite>param</cite> (the default is ‘OZONE’).</li>
+<li><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite> (the default is ‘table’).</li>
+<li><strong>threasholds</strong> (<em>type</em>) – Description of parameter <cite>threasholds</cite> (the default is [70).</li>
+<li><strong>1e5]</strong> (<em>type</em>) – Description of parameter <cite>1e5]</cite>.</li>
+<li><strong>site</strong> (<em>type</em>) – Description of parameter <cite>site</cite> (the default is None).</li>
+<li><strong>city</strong> (<em>type</em>) – Description of parameter <cite>city</cite> (the default is None).</li>
+<li><strong>region</strong> (<em>type</em>) – Description of parameter <cite>region</cite> (the default is None).</li>
+<li><strong>state</strong> (<em>type</em>) – Description of parameter <cite>state</cite> (the default is None).</li>
+<li><strong>append</strong> (<em>type</em>) – Description of parameter <cite>append</cite> (the default is False).</li>
+<li><strong>label</strong> (<em>type</em>) – Description of parameter <cite>label</cite> (the default is ‘CMAQ’).</li>
+<li><strong>html</strong> (<em>type</em>) – Description of parameter <cite>html</cite> (the default is False).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="monet-obs-improve-module">
+<h2>monet.obs.improve module<a class="headerlink" href="#monet-obs-improve-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-obs-ish-module">
+<h2>monet.obs.ish module<a class="headerlink" href="#monet-obs-ish-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-obs-nadp-module">
+<h2>monet.obs.nadp module<a class="headerlink" href="#monet-obs-nadp-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-obs-tolnet-module">
+<h2>monet.obs.tolnet module<a class="headerlink" href="#monet-obs-tolnet-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-monet.obs">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-monet.obs" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="monet.plots.html" class="btn btn-neutral float-right" title="monet.plots package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="monet.models.html" class="btn btn-neutral" title="monet.models package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

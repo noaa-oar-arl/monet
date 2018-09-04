@@ -1,5 +1,18 @@
 linters:
   flake8:
+    python: 3
+    max-line-length: 80
     fixer: true
+    ignore: 'W28'
 fixers:
   enable: true
+review:
+  fail_on_comments: false
+files:
+    # Ignore the files that match these glob patterns.
+    # Be careful to quote strings as `*` has special
+    # meaning in YAML files.
+    ignore:
+        - 'docs/**/*'
+        - 'monet/data/*'
+

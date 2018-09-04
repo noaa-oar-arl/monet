@@ -1,24 +1,18 @@
-#!/usr/bin/env python
-# Copyright: This document has been placed in the public domain.
-
 """
 Taylor diagram (Taylor, 2001) test implementation.
 http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm
 """
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
 
-from builtins import zip
-from builtins import map
-from builtins import object
-from past.utils import old_div
-
-__version__ = "Time-stamp: <2012-02-17 20:59:35 ycopin>"
-__author__ = "Yannick Copin <yannick.copin@laposte.net>"
+from builtins import map, object, zip
 
 import matplotlib.pyplot as PLT
 import numpy as NP
 import seaborn as sns
+from past.utils import old_div
+
+__version__ = "Time-stamp: <2012-02-17 20:59:35 ycopin>"
+__author__ = "Yannick Copin <yannick.copin@laposte.net>"
 
 colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
 sns.set_palette(sns.color_palette(colors))
@@ -53,13 +47,16 @@ class TaylorDiagram(object):
         # Standard deviation axis extent
         self.smin = 0
         self.smax = 1.5 * self.refstd
-
-        ghelper = FA.GridHelperCurveLinear(tr,
-                                           extremes=(0, old_div(NP.pi, 2),  # 1st quadrant
-                                                     self.smin, self.smax),
-                                           grid_locator1=gl1,
-                                           tick_formatter1=tf1,
-                                           )
+        ghelper = FA.GridHelperCurveLinear(
+            tr,
+            extremes=(
+                0,
+                old_div(NP.pi, 2),  # 1st quadrant
+                self.smin,
+                self.smax),
+            grid_locator1=gl1,
+            tick_formatter1=tf1,
+        )
 
         if fig is None:
             fig = PLT.figure()
@@ -91,8 +88,8 @@ class TaylorDiagram(object):
 
         # Add reference point and stddev contour
         print("Reference std:", self.refstd)
-        l, = self.ax.plot([0], self.refstd, 'k*',
-                          ls='', ms=10, label=label)
+        l, = self.ax.plot(
+            [0], self.refstd, 'r*', ls='', ms=14, label=label, zorder=10)
         t = NP.linspace(0, old_div(NP.pi, 2))
         r = NP.zeros_like(t) + self.refstd
         self.ax.plot(t, r, 'k--', label='_')
@@ -104,9 +101,8 @@ class TaylorDiagram(object):
         """Add sample (stddev,corrcoeff) to the Taylor diagram. args
         and kwargs are directly propagated to the Figure.plot
         command."""
-
-        l, = self.ax.plot(NP.arccos(corrcoef), stddev,
-                          *args, **kwargs)  # (theta,radius)
+        l, = self.ax.plot(NP.arccos(corrcoef), stddev, *args,
+                          **kwargs)  # (theta,radius)
         self.samplePoints.append(l)
 
         return l
@@ -114,10 +110,12 @@ class TaylorDiagram(object):
     def add_contours(self, levels=5, **kwargs):
         """Add constant centered RMS difference contours."""
 
-        rs, ts = NP.meshgrid(NP.linspace(self.smin, self.smax),
-                             NP.linspace(0, old_div(NP.pi, 2)))
+        rs, ts = NP.meshgrid(
+            NP.linspace(self.smin, self.smax), NP.linspace(
+                0, old_div(NP.pi, 2)))
         # Compute centered RMS difference
-        rms = NP.sqrt(self.refstd ** 2 + rs ** 2 - 2 * self.refstd * rs * NP.cos(ts))
+        rms = NP.sqrt(self.refstd**2 + rs**2 -
+                      2 * self.refstd * rs * NP.cos(ts))
 
         contours = self.ax.contour(ts, rs, rms, levels, **kwargs)
 

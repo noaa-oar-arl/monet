@@ -1,0 +1,313 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MONET XArray Accessor" href="monet-accessor.html" />
+    <link rel="prev" title="Overview: Why MONET?" href="why-monet.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html">
+          
+
+          
+            
+            <img src="_static/noaa.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#required-dependencies">Required dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#for-parallel-computing">For parallel computing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#for-plotting">For plotting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#instructions">Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="monet-accessor.html">MONET XArray Accessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Get in touch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#api">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="required-dependencies">
+<h2>Required dependencies<a class="headerlink" href="#required-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Python 2.7 <a class="footnote-reference" href="#id2" id="id1">[1]</a>, 3.4, 3.5, or 3.6</li>
+<li><a class="reference external" href="http://www.numpy.org/">numpy</a> (1.11 or later)</li>
+<li><a class="reference external" href="http://pandas.pydata.org/">pandas</a> (0.18.0 or later)</li>
+<li><a class="reference external" href="http://xarray.pydata.org/">xarray</a> (0.10 or later)</li>
+<li><a class="reference external" href="http://dask.pydata.org/">dask</a></li>
+<li><a class="reference external" href="https://github.com/barronh/pseudonetcdf/">pseudonetcdf</a></li>
+<li><a class="reference external" href="https://github.com/pytroll/pyresample/">pyresample</a> (1.9.0 or later)</li>
+<li><a class="reference external" href="http://unidata.github.io/netcdf4-python/">netcdf4</a></li>
+<li><a class="reference external" href="https://matplotlib.org/">matplotlib</a></li>
+<li><a class="reference external" href="https://seaborn.pydata.org/">seaborn</a></li>
+<li><a class="reference external" href="https://scitools.org.uk/cartopy/docs/latest/">cartopy</a></li>
+</ul>
+<div class="section" id="for-parallel-computing">
+<h3>For parallel computing<a class="headerlink" href="#for-parallel-computing" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://dask.pydata.org">dask.array</a> (0.9.0 or later): required for</li>
+</ul>
+</div>
+<div class="section" id="for-plotting">
+<h3>For plotting<a class="headerlink" href="#for-plotting" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://matplotlib.org/">matplotlib</a>: required for <span class="xref std std-ref">plotting</span></li>
+<li><a class="reference external" href="http://scitools.org.uk/cartopy/">cartopy</a>: recommended for
+<span class="xref std std-ref">plot-maps</span></li>
+<li><a class="reference external" href="https://stanford.edu/~mwaskom/software/seaborn/">seaborn</a>: for better
+color palettes</li>
+</ul>
+</div>
+</div>
+<div class="section" id="instructions">
+<h2>Instructions<a class="headerlink" href="#instructions" title="Permalink to this headline">¶</a></h2>
+<p>MONET itself is a pure Python package, but some of it’s dependencies may not be.
+The easiest way to install it’s dependencies is to use <a class="reference external" href="http://conda.io/">conda</a>. To install the
+dependencies we recommend usingthe the following command.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install xarray dask netCDF4 bottleneck pseudonetcdf seaborn matplotlib numpy pandas cartopy pyresample
+</pre></div>
+</div>
+<p>We recommend using the community maintained <a class="reference external" href="https://conda-forge.github.io/">conda-forge</a> channel
+if you need difficult-to-build dependencies such as cartopy, pynio or PseudoNetCDF:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge xarray pandas matplotlib seaborn cartopy pseudonetcdf
+</pre></div>
+</div>
+<p>To install MONET currently you must install with pip.  This can be done directly
+from the github page:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install git+https://github.com/noaa-oar-arl/MONET.git
+</pre></div>
+</div>
+<p>or you can manually download it from GitHub and install it using the setup.py:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/noaa-oar-arl/MONET.git
+$ cd MONET
+$ pip install setup.py
+</pre></div>
+</div>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><p class="first">MONET plans to drop support for python 2.7 sometime in 2019. This
+means that new releases of xarray published after this date will only be
+installable on python 3+ environments, but older versions of xarray will
+always be available to python 2.7 users. For more information see the
+following references:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><a class="reference external" href="http://www.python3statement.org/">Python 3 Statement</a></li>
+<li><a class="reference external" href="https://docs.python.org/3/howto/pyporting.html">Tips on porting to Python 3</a></li>
+</ul>
+</div></blockquote>
+</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="monet-accessor.html" class="btn btn-neutral float-right" title="MONET XArray Accessor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="why-monet.html" class="btn btn-neutral" title="Overview: Why MONET?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -3,7 +3,6 @@ from __future__ import division
 from builtins import range
 
 import numpy as np
-from past.utils import old_div
 
 __author__ = 'barry'
 
@@ -74,3 +73,16 @@ def wsdir2uv(ws, wdir):
     u = -ws * sin(wdir * pi / 180.)
     v = -ws * cos(wdir * pi / 180.)
     return u, v
+
+def long_to_wide(df):
+    from pandas import Series, merge
+    w = df.pivot_table(
+        values='obs', index=['time', 'siteid'],
+        columns='variable').reset_index()
+    cols = Series(df.columns)
+    g = df.groupby('variable')
+    for name, group in g:
+        w[name + '_unit'] = group.units.unique()[0]
+    #mergeon = hstack((index.values, df.variable.unique()))
+    return merge(w, df, on=['siteid', 'time'])
+

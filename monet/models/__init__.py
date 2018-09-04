@@ -1,9 +1,5 @@
-from __future__ import absolute_import, print_function
+from . import cmaq, hysplit, camx
 
-from . import camx, cmaq
-
-__all__ = ['camx', 'cmaq']
+__all__ = ['cmaq', 'hysplit', 'camx']
 
 __name__ = 'models'
-
-#

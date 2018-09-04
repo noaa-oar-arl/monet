@@ -1,0 +1,1504 @@
+,Facility Name,orispl_code,Gross Load (MW-h),EPA Region,latitude,longitude,State,County,timezone,time_offset
+0,AMEA Sylacauga Plant,56018,8237.0,4,33.1661,-86.2825,AL,Talladega,America/Chicago,6.0
+1,Ascend (Decatur Plant),880041,,4,34.6339,-87.0244,AL,Morgan,America/Chicago,6.0
+2,Barry,3,14132317.25,4,31.0069,-88.0103,AL,Mobile,America/Chicago,6.0
+3,Calhoun Energy Center,55409,191515.35,4,33.5883,-85.9731,AL,Calhoun,America/Chicago,6.0
+4,Charles R Lowman,56,2119928.08,4,31.4858,-87.9106,AL,Washington,America/Chicago,6.0
+5,Colbert,47,3686968.83,4,34.7439,-87.8486,AL,Colbert,America/Chicago,6.0
+6,Decatur Energy Center,55292,3289365.33,4,34.6292,-87.0214,AL,Morgan,America/Chicago,6.0
+7,E B Harris Generating Plant,7897,6663291.25,4,32.3814,-86.5736,AL,Autauga,America/Chicago,6.0
+8,E C Gaston,26,8757199.0,4,33.2442,-86.4567,AL,Shelby,America/Chicago,6.0
+9,Gadsden,7,,4,34.0128,-85.9708,AL,Etowah,America/Chicago,6.0
+10,Gorgas,8,3357289.25,4,33.6446,-87.2003,AL,Walker,America/Chicago,6.0
+11,Greene County,10,2270301.5,4,32.6017,-87.7811,AL,Greene,America/Chicago,6.0
+12,Hillabee Energy Center,55411,3279353.29,4,33.0,-85.9031,AL,Tallapoosa,America/Chicago,6.0
+13,Hog Bayou Energy Center,55241,1143568.55,4,30.7478,-88.0575,AL,Mobile,America/Chicago,6.0
+14,"Indorama Ventures Xylenes and PTA, LLC",880075,,4,34.64,-87.0583,AL,Morgan,America/Chicago,6.0
+15,International Paper-Courtland Mill,50245,74235.62,4,34.735,-87.3108,AL,Lawrence,America/Chicago,6.0
+16,International Paper-Prattville Mill,52140,,4,32.4167,-86.4667,AL,Autauga,America/Chicago,6.0
+17,International Paper-Riverdale Mill,54096,101627.37,4,32.425,-86.8694,AL,Dallas,America/Chicago,6.0
+18,James H Miller Jr,6002,18831544.0,4,33.6319,-87.0597,AL,Jefferson,America/Chicago,6.0
+19,McIntosh (7063),7063,179544.52,4,31.2546,-88.0299,AL,Washington,America/Chicago,6.0
+20,McWilliams,533,2144169.57,4,31.4001,-86.4767,AL,Covington,America/Chicago,6.0
+21,"MeadWestvaco Coated Board, LLC",54802,73365.58,4,32.175,-85.0311,AL,Russell,America/Chicago,6.0
+22,Morgan Energy Center,55293,4199397.5,4,34.6397,-87.0639,AL,Morgan,America/Chicago,6.0
+23,Plant H. Allen Franklin,7710,11136697.0,4,32.6094,-85.0961,AL,Lee,America/New_York,5.0
+24,Resolute FP - Coosa Pines Mill,54216,,4,33.3278,-86.3583,AL,Talladega,America/Chicago,6.0
+25,SABIC Innovative Plastics - Burkville,7698,912079.0,4,32.3102,-86.5242,AL,Lowndes,America/Chicago,6.0
+26,Tenaska Central Alabama Gen Station,55440,6209991.7,4,32.6503,-86.7386,AL,Autauga,America/Chicago,6.0
+27,Tenaska Lindsay Hill Generating Station,55271,3006292.64,4,32.6514,-86.7386,AL,Autauga,America/Chicago,6.0
+28,Theodore Cogeneration,7721,1894337.5,4,30.5248,-88.1289,AL,Mobile,America/Chicago,6.0
+29,US Steel (Fairfield Works),50730,,4,33.4833,-86.9261,AL,Jefferson,America/Chicago,6.0
+30,Walton Discover Power Facility,55138,17681.22,4,32.5412,-85.0384,AL,Lee,America/New_York,5.0
+31,Washington County Cogen (Olin),7697,1227368.5,4,31.2622,-88.0052,AL,Washington,America/Chicago,6.0
+32,Widows Creek,50,4791280.75,4,34.8825,-85.7547,AL,Jackson,America/Chicago,6.0
+33,Carl Bailey,202,,6,35.2597,-91.3631,AR,Woodruff,America/Chicago,6.0
+34,Cecil Lynch,167,3466.56,6,34.7535,-92.1987,AR,Pulaski,America/Chicago,6.0
+35,City Water & Light - City of Jonesboro,56505,171833.0,6,35.8481,-90.7257,AR,Craighead,America/Chicago,6.0
+36,Dell Power Plant,55340,721042.9,6,35.8619,-90.0253,AR,Mississippi,America/Chicago,6.0
+37,Flint Creek Power Plant,6138,4015502.98,6,36.2561,-94.5241,AR,Benton,America/Chicago,6.0
+38,Fulton,7825,54428.2,6,33.6094,-93.7924,AR,Hempstead,America/Chicago,6.0
+39,Hamilton Moses,168,,6,34.9806,-90.8722,AR,Saint Francis,America/Chicago,6.0
+40,Harry D. Mattison Power Plant,56328,104663.54,6,36.1855,-94.2841,AR,Washington,America/Chicago,6.0
+41,Harvey Couch,169,,6,33.3592,-93.4649,AR,Lafayette,America/Chicago,6.0
+42,Hot Spring  Energy Facility,55418,537621.17,6,34.2963,-92.8683,AR,Hot Spring,America/Chicago,6.0
+43,Independence,6641,10898693.96,6,35.6733,-91.4083,AR,Independence,America/Chicago,6.0
+44,John W. Turk Jr. Power Plant,56564,205317.07,6,33.6497,-93.8119,AR,Hempstead,America/Chicago,6.0
+45,Lake Catherine,170,655183.69,6,34.4341,-92.9046,AR,Hot Spring,America/Chicago,6.0
+46,Magnet Cove Generating Station,55714,2824540.66,6,34.4304,-92.8333,AR,Hot Spring,America/Chicago,6.0
+47,McClellan,203,,6,33.5648,-92.7917,AR,Ouachita,America/Chicago,6.0
+48,Oswald Generating Station,55221,369025.83,6,34.5923,-92.2166,AR,Pulaski,America/Chicago,6.0
+49,Pine Bluff Energy Center,55075,2105813.74,6,34.2181,-91.9025,AR,Jefferson,America/Chicago,6.0
+50,Plum Point Energy Station,56456,4763442.89,6,35.6626,-89.9469,AR,Mississippi,America/Chicago,6.0
+51,Robert E Ritchie,173,,6,34.4629,-90.5987,AR,Phillips,America/Chicago,6.0
+52,Thomas Fitzhugh,201,117362.29,6,35.4617,-93.8053,AR,Franklin,America/Chicago,6.0
+53,Union Power Station,55380,8995217.87,6,33.2961,-92.5933,AR,Union,America/Chicago,6.0
+54,White Bluff,6009,9920444.93,6,34.4236,-92.1392,AR,Jefferson,America/Chicago,6.0
+55,APS Saguaro Power Plant,118,14620.44,9,32.5517,-111.3,AZ,Pinal,America/Phoenix,7.0
+56,APS West Phoenix Power Plant,117,2144333.78,9,33.4417,-112.1583,AZ,Maricopa,America/Phoenix,7.0
+57,Agua Fria Generating Station,141,68081.33,9,33.5542,-112.2161,AZ,Maricopa,America/Phoenix,7.0
+58,Apache Station,160,1835195.92,9,32.0619,-109.8931,AZ,Cochise,America/Phoenix,7.0
+59,Arlington Valley Energy Facility,55282,1795195.82,9,33.3417,-112.8897,AZ,Maricopa,America/Phoenix,7.0
+60,Black Mountain Generating Station,56482,77046.7,9,35.0361,-114.1594,AZ,Mohave,America/Phoenix,7.0
+61,Cholla,113,7702659.35,9,34.9394,-110.3033,AZ,Navajo,America/Phoenix,7.0
+62,Coolidge Generating Station,56948,320751.25,9,32.9175,-111.5041,AZ,Pinal,America/Phoenix,7.0
+63,Coronado Generating Station,6177,6311242.66,9,34.5778,-109.2717,AZ,Apache,America/Phoenix,7.0
+64,De Moss Petrie Generating Station,124,6599.24,9,32.2511,-110.9889,AZ,Pima,America/Phoenix,7.0
+65,Desert Basin Generating Station,55129,1158150.9,9,32.9042,-111.7889,AZ,Pinal,America/Phoenix,7.0
+66,Gila River Power Station,55306,5670940.54,9,32.9761,-112.694,AZ,Maricopa,America/Phoenix,7.0
+67,Griffith Energy Project,55124,1640807.83,9,35.0517,-114.1334,AZ,Mohave,America/Phoenix,7.0
+68,Irvington Generating Station,126,868150.42,9,32.16,-110.9047,AZ,Pima,America/Phoenix,7.0
+69,Kyrene Generating Station,147,1173109.69,9,33.3544,-111.9364,AZ,Maricopa,America/Phoenix,7.0
+70,Mesquite Generating Station,55481,6094916.3,9,33.3451,-112.8638,AZ,Maricopa,America/Phoenix,7.0
+71,Navajo Generating Station,4941,17364176.61,9,36.9047,-111.3886,AZ,Coconino,America/Denver,7.0
+72,"New Harquahala Generating Company, LLC",55372,944286.89,9,33.4759,-113.1133,AZ,Maricopa,America/Phoenix,7.0
+73,Ocotillo Power Plant,116,76265.28,9,33.4225,-111.9122,AZ,Maricopa,America/Phoenix,7.0
+74,Redhawk Generating Facility,55455,4840573.33,9,33.33,-112.84,AZ,Maricopa,America/Phoenix,7.0
+75,Santan,8068,2606404.75,9,33.3333,-111.751,AZ,Maricopa,America/Phoenix,7.0
+76,"South Point Energy Center, LLC",55177,1442555.53,9,34.8678,-114.5317,AZ,Mohave,America/Phoenix,7.0
+77,Springerville Generating Station,8223,11244281.34,9,34.3186,-109.1636,AZ,Apache,America/Phoenix,7.0
+78,Sundance Power Plant,55522,137781.84,9,32.9285,-111.5899,AZ,Pinal,America/Phoenix,7.0
+79,Yucca Power Plant,120,245273.08,9,32.7214,-114.7097,AZ,Yuma,America/Phoenix,7.0
+80,AES Alamitos,315,1533955.0,9,33.7688,-118.1009,CA,Los Angeles,America/Los_Angeles,8.0
+81,AES Huntington Beach,335,1202987.0,9,33.6436,-117.9788,CA,Orange,America/Los_Angeles,8.0
+82,AES Redondo Beach,356,587671.0,9,33.8504,-118.395,CA,Los Angeles,America/Los_Angeles,8.0
+83,Agua Mansa Power,55951,45881.25,9,34.0414,-117.3603,CA,San Bernardino,America/Los_Angeles,8.0
+84,Almond Power Plant,7315,144769.47,9,37.5739,-120.9854,CA,Stanislaus,America/Los_Angeles,8.0
+85,Anaheim Combustion Turbine,7693,66104.5,9,33.8539,-117.8561,CA,Orange,America/Los_Angeles,8.0
+86,Barre Generating Station,56474,27403.16,9,33.8073,-117.9833,CA,Orange,America/Los_Angeles,8.0
+87,Blythe Energy,55295,1175861.43,9,33.6157,-114.6865,CA,Riverside,America/Los_Angeles,8.0
+88,Broadway,420,134367.33,9,34.1263,-118.1494,CA,Los Angeles,America/Los_Angeles,8.0
+89,Cabrillo Power I Encina Power Station,302,1507406.21,9,33.1408,-117.3342,CA,San Diego,America/Los_Angeles,8.0
+90,CalPeak Power - Border,55510,17057.28,9,32.5622,-116.9433,CA,San Diego,America/Los_Angeles,8.0
+91,CalPeak Power - Enterprise,55513,17866.16,9,33.1221,-117.117,CA,San Diego,America/Los_Angeles,8.0
+92,CalPeak Power - Panoche,55508,9150.84,9,36.6531,-120.5797,CA,Fresno,America/Los_Angeles,8.0
+93,CalPeak Power - Vaca Dixon,55499,11797.53,9,38.3989,-121.9239,CA,Solano,America/Los_Angeles,8.0
+94,"Calpine Gilroy Cogen, LP",10034,248469.57,9,37.0001,-121.5367,CA,Santa Clara,America/Los_Angeles,8.0
+95,Calpine Sutter Energy Center,55112,1334052.81,9,39.0531,-121.6939,CA,Sutter,America/Los_Angeles,8.0
+96,Canyon Power Plant,57027,106271.68,9,33.8581,-117.8616,CA,Orange,America/Los_Angeles,8.0
+97,Carson Cogeneration,7527,405959.3,9,38.4461,-121.4614,CA,Sacramento,America/Los_Angeles,8.0
+98,Carson Cogeneration Company,10169,425212.97,9,33.8759,-118.2491,CA,Los Angeles,America/Los_Angeles,8.0
+99,Center Generating Station,56475,26798.05,9,33.9297,-118.1047,CA,Los Angeles,America/Los_Angeles,8.0
+100,Chula Vista Energy Center,55540,2535.08,9,32.5914,-117.0586,CA,San Diego,America/Los_Angeles,8.0
+101,Coalinga Cogeneration Facility,50131,281688.78,9,36.1807,-120.3885,CA,Fresno,America/Los_Angeles,8.0
+102,Colusa Generating Station,56532,2734378.75,9,39.3648,-122.26799999999999,CA,Colusa,America/Los_Angeles,8.0
+103,Contra Costa Generating Station,228,145107.75,9,38.0184,-121.76100000000001,CA,Contra Costa,America/Los_Angeles,8.0
+104,Coolwater Generating Station,329,516162.63,9,34.8622,-116.854,CA,San Bernardino,America/Los_Angeles,8.0
+105,Cosumnes Power Plant,55970,3728086.61,9,38.3383,-121.1239,CA,Sacramento,America/Los_Angeles,8.0
+106,Creed Energy Center,55625,11008.05,9,38.2419,-121.8551,CA,Solano,America/Los_Angeles,8.0
+107,Cuyamaca Peak Energy,55512,48012.28,9,32.7971,-116.97200000000001,CA,San Diego,America/Los_Angeles,8.0
+108,"Delta Energy Center, LLC",55333,5875450.09,9,38.0167,-121.8439,CA,Contra Costa,America/Los_Angeles,8.0
+109,Donald Von Raesfeld,56026,941927.65,9,37.3767,-121.9508,CA,Santa Clara,America/Los_Angeles,8.0
+110,El Cajon Energy Center,57001,45145.6,9,32.7971,-116.97200000000001,CA,San Diego,America/Los_Angeles,8.0
+111,El Centro,389,991152.38,9,32.8022,-115.54,CA,Imperial,America/Los_Angeles,8.0
+112,El Segundo,330,636854.5,9,33.9106,-118.425,CA,Los Angeles,America/Los_Angeles,8.0
+113,Elk Hills Power,55400,3554823.81,9,35.2802,-119.4699,CA,Kern,America/Los_Angeles,8.0
+114,"Escondido Energy Center, LLC",55538,1427.36,9,33.1261,-117.1172,CA,San Diego,America/Los_Angeles,8.0
+115,Etiwanda Generating Station,331,272667.66,9,34.0911,-117.5256,CA,San Bernardino,America/Los_Angeles,8.0
+116,Feather River Energy Center,55847,38716.33,9,39.1088,-121.6133,CA,Sutter,America/Los_Angeles,8.0
+117,"Fresno Cogeneration Partners, LP",10156,19934.04,9,36.6183,-120.1,CA,Fresno,America/Los_Angeles,8.0
+118,Gateway Generating Station,56476,3271275.32,9,38.0167,-121.7592,CA,Contra Costa,America/Los_Angeles,8.0
+119,"Gilroy Energy Center, LLC",55810,70441.66,9,36.999,-121.5363,CA,Santa Clara,America/Los_Angeles,8.0
+120,"Gilroy Energy Center, LLC for King City",10294,12569.36,9,36.225,-121.1278,CA,Monterey,America/Los_Angeles,8.0
+121,Glenarm,422,79621.64,9,34.1256,-118.1474,CA,Los Angeles,America/Los_Angeles,8.0
+122,Goose Haven Energy Center,55627,10678.48,9,38.2271,-121.844,CA,Solano,America/Los_Angeles,8.0
+123,Grapeland Generating Station,56472,23102.09,9,34.09,-117.53399999999999,CA,San Bernardino,America/Los_Angeles,8.0
+124,Grayson Power Plant,377,148592.74,9,34.1556,-118.2782,CA,Los Angeles,America/Los_Angeles,8.0
+125,Greenleaf One,10350,59512.2,9,39.0536,-121.6942,CA,Sutter,America/Los_Angeles,8.0
+126,Hanford Energy Park Peaker,55698,79697.5,9,36.2689,-119.6469,CA,Kings,America/Los_Angeles,8.0
+127,Harbor Generating Station,399,130444.56,9,33.7691,-118.2662,CA,Los Angeles,America/Los_Angeles,8.0
+128,Haynes Generating Station,400,3202015.09,9,33.7639,-118.0942,CA,Los Angeles,America/Los_Angeles,8.0
+129,Henrietta Peaker Plant,55807,39935.75,9,36.2397,-119.9044,CA,Kings,America/Los_Angeles,8.0
+130,High Desert Power Project,55518,3214932.44,9,34.5953,-117.3647,CA,San Bernardino,America/Los_Angeles,8.0
+131,Indigo Generation Facility,55541,64982.03,9,33.9114,-116.5533,CA,Riverside,America/Los_Angeles,8.0
+132,Inland Empire Energy Center,55853,3630085.51,9,33.7393,-117.1701,CA,Riverside,America/Los_Angeles,8.0
+133,Kingsburg Cogen Facility,10405,29258.68,9,36.547,-119.57799999999999,CA,Fresno,America/Los_Angeles,8.0
+134,La Paloma Generating Plant,55151,5634363.39,9,35.2956,-119.5919,CA,Kern,America/Los_Angeles,8.0
+135,Lake,7987,12415.57,9,34.1775,-118.3147,CA,Los Angeles,America/Los_Angeles,8.0
+136,Lambie Energy Center,55626,10259.78,9,38.2216,-121.8683,CA,Solano,America/Los_Angeles,8.0
+137,Larkspur Energy Faciity,55542,71738.83,9,32.5672,-116.9444,CA,San Diego,America/Los_Angeles,8.0
+138,Lodi Energy Center,57978,113780.81,9,38.088,-121.3867,CA,San Joaquin,America/Los_Angeles,8.0
+139,Long Beach Generating Station,341,101504.77,9,33.7641,-118.2248,CA,Los Angeles,America/Los_Angeles,8.0
+140,Los Esteros Critical Energy Facility,55748,,9,37.425,-121.9319,CA,Santa Clara,America/Los_Angeles,8.0
+141,"Los Medanos Energy Center, LLC",55217,3997648.54,9,38.03,-121.8708,CA,Contra Costa,America/Los_Angeles,8.0
+142,Magnolia,56046,1472945.36,9,34.1788,-118.3153,CA,Los Angeles,America/Los_Angeles,8.0
+143,Malaga Power,56239,120274.28,9,36.6894,-119.7399,CA,Fresno,America/Los_Angeles,8.0
+144,Malburg Generating Station,56041,725920.44,9,33.9983,-118.2219,CA,Los Angeles,America/Los_Angeles,8.0
+145,Mandalay Generating Station,345,226409.27,9,34.2072,-119.2511,CA,Ventura,America/Los_Angeles,8.0
+146,Mariposa Energy Project,57483,18474.54,9,37.7965,-121.6049,CA,Alameda,America/Los_Angeles,8.0
+147,McGrath Generating Station,56471,1153.34,9,34.2054,-119.2478,CA,Ventura,America/Los_Angeles,8.0
+148,Metcalf Energy Center,55393,2867135.43,9,37.2169,-121.7439,CA,Santa Clara,America/Los_Angeles,8.0
+149,Midway Peaking,56639,30102.26,9,36.654,-120.5797,CA,Fresno,America/Los_Angeles,8.0
+150,Mira Loma Generating Station,56473,23238.38,9,34.0054,-117.5604,CA,San Bernardino,America/Los_Angeles,8.0
+151,Miramar Energy Facility,56232,184411.6,9,32.8769,-117.1664,CA,San Diego,America/Los_Angeles,8.0
+152,"Morro Bay Power Plant, LLC",259,218225.57,9,35.3747,-120.8578,CA,San Luis Obispo,America/Los_Angeles,8.0
+153,Moss Landing,260,5189533.83,9,36.8042,-121.7775,CA,Monterey,America/Los_Angeles,8.0
+154,Mountainview Generating Station,358,6878235.77,9,34.0836,-117.2408,CA,San Bernardino,America/Los_Angeles,8.0
+155,NCPA Combustion Turbine Project #2,7449,2394.9,9,38.088,-121.3871,CA,San Joaquin,America/Los_Angeles,8.0
+156,Niland Gas Turbine Plant,56569,75461.34,9,33.2432,-115.49799999999999,CA,Imperial,America/Los_Angeles,8.0
+157,North Island,10812,,9,32.705,-117.189,CA,San Diego,America/Los_Angeles,8.0
+158,Olive,6013,4021.91,9,34.1775,-118.3147,CA,Los Angeles,America/Los_Angeles,8.0
+159,Orange Grove Project,56914,97171.33,9,33.359,-117.111,CA,San Diego,America/Los_Angeles,8.0
+160,Ormond Beach Generating Station,350,255894.3,9,34.1292,-119.1689,CA,Ventura,America/Los_Angeles,8.0
+161,"Otay Mesa Energy Center, LLC",55345,3960799.19,9,32.5733,-116.9153,CA,San Diego,America/Los_Angeles,8.0
+162,Palomar Energy Center,55985,2842541.72,9,33.1192,-117.118,CA,San Diego,America/Los_Angeles,8.0
+163,Panoche Energy Center,56803,317940.4,9,36.6513,-120.5833,CA,Fresno,America/Los_Angeles,8.0
+164,Pastoria Energy Facility,55656,4530796.22,9,34.9556,-118.844,CA,Kern,America/Los_Angeles,8.0
+165,Pittsburg Generating Station (CA),271,242664.25,9,38.0392,-121.89399999999999,CA,Contra Costa,America/Los_Angeles,8.0
+166,Redding Power Plant,7307,53427.5,9,40.5083,-122.4253,CA,Shasta,America/Los_Angeles,8.0
+167,Ripon Generation Station,56135,29260.63,9,37.7315,-121.116,CA,Stanislaus,America/Los_Angeles,8.0
+168,Riverside Energy Resource Center,56143,81255.5,9,33.9636,-117.4528,CA,Riverside,America/Los_Angeles,8.0
+169,Riverview Energy Center,55963,20050.41,9,38.0145,-121.7901,CA,Contra Costa,America/Los_Angeles,8.0
+170,Roseville Energy Park,56298,593818.49,9,38.7926,-121.3823,CA,Placer,America/Los_Angeles,8.0
+171,SCA Cogen II,7551,740465.76,9,38.5306,-121.399,CA,Sacramento,America/Los_Angeles,8.0
+172,Sacramento Power Authority Cogen,7552,606916.19,9,38.510999999999996,-121.4735,CA,Sacramento,America/Los_Angeles,8.0
+173,Salinas River Cogeneration Facility,50865,286559.43,9,35.9515,-120.8679,CA,Monterey,America/Los_Angeles,8.0
+174,Sargent Canyon Cogen Facility,50864,262964.05,9,35.9359,-120.8405,CA,Monterey,America/Los_Angeles,8.0
+175,Scattergood Generating Station,404,1172904.06,9,33.9175,-118.4258,CA,Los Angeles,America/Los_Angeles,8.0
+176,Sunrise Power Company,55182,2249175.7,9,35.2097,-119.585,CA,Kern,America/Los_Angeles,8.0
+177,Tracy Combined Cycle Power Plant,55933,225521.5,9,37.7107,-121.4906,CA,San Joaquin,America/Los_Angeles,8.0
+178,Valley Generating Station,408,3321461.45,9,34.2481,-118.3903,CA,Los Angeles,America/Los_Angeles,8.0
+179,Walnut Energy Center,56078,1506462.09,9,37.4878,-120.8956,CA,Stanislaus,America/Los_Angeles,8.0
+180,"Wellhead Power Gates, LLC",55875,2639.6,9,36.1522,-120.1481,CA,Fresno,America/Los_Angeles,8.0
+181,Wolfskill Energy Center,55855,17834.39,9,38.2282,-122.07600000000001,CA,Solano,America/Los_Angeles,8.0
+182,Woodland Generation Station,7266,394466.44,9,37.6528,-121.0172,CA,Stanislaus,America/Los_Angeles,8.0
+183,Yuba City Energy Center,10349,47566.38,9,39.1365,-121.6397,CA,Sutter,America/Los_Angeles,8.0
+184,Arapahoe,465,875204.66,8,39.67,-105.0028,CO,Denver,America/Denver,7.0
+185,Arapahoe Combustion Turbine Facility,55200,97918.01,8,39.6692,-105.0018,CO,Denver,America/Denver,7.0
+186,Blue Spruce Energy Center,55645,156227.13,8,39.7436,-104.68,CO,Adams,America/Denver,7.0
+187,Brush Power Projects,10682,33642.08,8,40.2415,-103.631,CO,Morgan,America/Denver,7.0
+188,Cherokee,469,3347122.16,8,39.8078,-104.9648,CO,Adams,America/Denver,7.0
+189,Comanche (470),470,9925586.35,8,38.2081,-104.5747,CO,Pueblo,America/Denver,7.0
+190,Craig,6021,9874824.79,8,40.4627,-107.5912,CO,Moffat,America/Denver,7.0
+191,Fort St. Vrain,6112,3509026.04,8,40.2461,-104.8742,CO,Weld,America/Denver,7.0
+192,Fountain Valley Power Plant,55453,251628.65,8,38.5569,-104.6875,CO,El Paso,America/Denver,7.0
+193,Frank Knutson Station,55505,9887.2,8,39.9414,-104.6817,CO,Adams,America/Denver,7.0
+194,Front Range Power Plant,55283,1355026.91,8,38.6281,-104.7069,CO,El Paso,America/Denver,7.0
+195,Hayden,525,2702808.92,8,40.4856,-107.185,CO,Routt,America/Denver,7.0
+196,J M Shafer,50707,624436.08,8,40.0979,-104.7745,CO,Weld,America/Denver,7.0
+197,Lamar,508,,8,38.0921,-102.6148,CO,Prowers,America/Denver,7.0
+198,Limon Generating Station,55504,143499.27,8,39.2038,-103.7005,CO,Lincoln,America/Denver,7.0
+199,Manchief Generating Station,55127,178921.27,8,40.2201,-103.679,CO,Morgan,America/Denver,7.0
+200,Martin Drake,492,1523702.26,8,38.8244,-104.8331,CO,El Paso,America/Denver,7.0
+201,Nucla,527,628041.18,8,38.2387,-108.5083,CO,Montrose,America/Denver,7.0
+202,Pawnee,6248,3480731.02,8,40.2217,-103.6803,CO,Morgan,America/Denver,7.0
+203,Pueblo Airport Generating Station,56998,606712.2,8,38.321999999999996,-104.53299999999999,CO,Pueblo,America/Denver,7.0
+204,Rawhide Energy Station,6761,2335484.58,8,40.8611,-105.0206,CO,Larimer,America/Denver,7.0
+205,Ray D Nixon,8219,1620995.03,8,38.6306,-104.7056,CO,El Paso,America/Denver,7.0
+206,Rocky Mountain Energy Center,55835,2534688.96,8,40.0911,-104.5947,CO,Weld,America/Denver,7.0
+207,Spindle Hill Energy Center,56445,287553.47,8,40.0914,-104.8819,CO,Weld,America/Denver,7.0
+208,Valmont,477,1077964.11,8,40.0195,-105.20200000000001,CO,Boulder,America/Denver,7.0
+209,Valmont Combustion Turbine Facility,55207,1562.66,8,40.0197,-105.20200000000001,CO,Boulder,America/Denver,7.0
+210,Zuni,478,,8,39.7369,-105.0169,CO,Denver,America/Denver,7.0
+211,Alfred L Pierce Generating Station,6635,6636.34,1,41.4485,-72.834,CT,New Haven,America/New_York,5.0
+212,"Algonquin Power Windsor Locks, LLC",10567,90458.75,1,41.9227,-72.6255,CT,Hartford,America/New_York,5.0
+213,Branford,540,140.71,1,41.2925,-72.7942,CT,New Haven,America/New_York,5.0
+214,Bridgeport Energy,55042,2965766.4,1,41.1692,-73.1844,CT,Fairfield,America/New_York,5.0
+215,Bridgeport Harbor Station,568,129490.79,1,41.1706,-73.1843,CT,Fairfield,America/New_York,5.0
+216,Capitol District Energy Center,50498,25409.27,1,41.7639,-72.6925,CT,Hartford,America/New_York,5.0
+217,Cos Cob,542,1280.55,1,41.0289,-73.5989,CT,Fairfield,America/New_York,5.0
+218,Devon,544,7340.27,1,41.2083,-73.1092,CT,New Haven,America/New_York,5.0
+219,EmpireCo Sterling Energy Facility,50736,,1,41.7132,-71.8223,CT,Windham,America/New_York,5.0
+220,Franklin Drive,561,97.06,1,41.7994,-73.1156,CT,Litchfield,America/New_York,5.0
+221,Fusion Paperboard Connecticut LLC,54657,,1,41.6242,-72.0417,CT,New London,America/New_York,5.0
+222,Kleen Energy Systems Project,56798,4184459.2,1,41.5526,-72.597,CT,Middlesex,America/New_York,5.0
+223,Lake Road Generating Company,55149,3036442.08,1,41.8736,-71.8947,CT,Windham,America/New_York,5.0
+224,Middletown,562,195951.31,1,41.5544,-72.5793,CT,Middlesex,America/New_York,5.0
+225,Milford Power Company LLC,55126,3739705.59,1,41.2239,-73.1,CT,New Haven,America/New_York,5.0
+226,Montville,546,31752.46,1,41.4281,-72.1019,CT,New London,America/New_York,5.0
+227,New Haven Harbor,6156,146586.03,1,41.2836,-72.9042,CT,New Haven,America/New_York,5.0
+228,Norwalk Harbor Station,548,25749.4,1,41.0732,-73.4098,CT,Fairfield,America/New_York,5.0
+229,Norwich,581,42.62,1,41.5269,-72.0631,CT,New London,America/New_York,5.0
+230,Pfizer,54236,,1,41.3319,-72.0792,CT,New London,America/New_York,5.0
+231,"Pratt & Whitney, East Hartford",54605,47967.87,1,41.75,-72.6347,CT,Hartford,America/New_York,5.0
+232,South Meadow Station,563,1609.93,1,41.7495,-72.6524,CT,Hartford,America/New_York,5.0
+233,Torrington Terminal,565,168.32,1,41.7761,-73.1219,CT,Litchfield,America/New_York,5.0
+234,Tunnel,557,33.09,1,41.5553,-72.0419,CT,New London,America/New_York,5.0
+235,"Wallingford Energy, LLC",55517,115784.66,1,41.4486,-72.8358,CT,New Haven,America/New_York,5.0
+236,Waterbury Generation,56629,43428.83,1,41.5444,-73.0416,CT,New Haven,America/New_York,5.0
+237,"Waterside Power, LLC",56189,,1,41.0372,-73.5564,CT,Fairfield,America/New_York,5.0
+238,Benning Generation Station,603,2910.69,3,38.8994,-76.9592,DC,District of Columbia,America/New_York,5.0
+239,GSA Central Heating,880004,,3,38.8856,-77.0244,DC,District of Columbia,America/New_York,5.0
+240,Christiana Substation,591,185.7,3,39.7302,-75.5371,DE,New Castle,America/New_York,5.0
+241,Delaware City,592,71.5,3,39.5959,-75.6324,DE,New Castle,America/New_York,5.0
+242,Delaware City Refinery,52193,,3,39.5936,-75.6337,DE,New Castle,America/New_York,5.0
+243,Edge Moor,593,1153734.03,3,39.7372,-75.5033,DE,New Castle,America/New_York,5.0
+244,Hay Road,7153,3534668.23,3,39.7436,-75.5072,DE,New Castle,America/New_York,5.0
+245,Indian River,594,1607838.27,3,38.5857,-75.2341,DE,Sussex,America/New_York,5.0
+246,McKee Run,599,25470.86,3,39.1748,-75.5455,DE,Kent,America/New_York,5.0
+247,NRG Energy Center Dover,10030,37524.06,3,39.1467,-75.5461,DE,Kent,America/New_York,5.0
+248,Van Sant,7318,719.3,3,39.15,-75.5466,DE,Kent,America/New_York,5.0
+249,Warren F. Sam Beasley Pwr Station,7962,13245.21,3,39.2798,-75.6246,DE,Kent,America/New_York,5.0
+250,West Substation,597,40.4,3,39.7283,-75.6289,DE,New Castle,America/New_York,5.0
+251,Anclote,8048,1839647.04,4,28.1844,-82.7887,FL,Pasco,America/New_York,5.0
+252,Arvah B Hopkins,688,1478683.79,4,30.4522,-84.4,FL,Leon,America/New_York,5.0
+253,Auburndale Peaker Energy Center,55833,27463.86,4,28.0534,-81.8059,FL,Polk,America/New_York,5.0
+254,Avon Park,624,477.22,4,27.5792,-81.4925,FL,Highlands,America/New_York,5.0
+255,Bayboro,627,5002.42,4,27.7578,-82.6369,FL,Pinellas,America/New_York,5.0
+256,Bayside Power Station,7873,4784645.5,4,27.9072,-82.4231,FL,Hillsborough,America/New_York,5.0
+257,Big Bend,645,10286924.92,4,27.7944,-82.4036,FL,Hillsborough,America/New_York,5.0
+258,Brandy Branch,7846,2598387.95,4,30.3206,-81.9486,FL,Duval,America/New_York,5.0
+259,C D McIntosh Jr Power Plant,676,2999739.55,4,28.0809,-81.9256,FL,Polk,America/New_York,5.0
+260,Cane Island,7238,2822941.85,4,28.2764,-81.533,FL,Osceola,America/New_York,5.0
+261,Cedar Bay Generating Co. LP,10672,,4,30.4219,-81.6079,FL,Duval,America/New_York,5.0
+262,Central Power and Lime,10333,,4,28.5814,-82.4303,FL,Hernando,America/New_York,5.0
+263,Charles Larsen Memorial Power Plant,675,30335.6,4,28.0491,-81.9238,FL,Polk,America/New_York,5.0
+264,Crist Electric Generating Plant,641,3178090.0,4,30.5661,-87.2289,FL,Escambia,America/Chicago,6.0
+265,Crystal River,628,10993173.89,4,28.9594,-82.7003,FL,Citrus,America/New_York,5.0
+266,Curtis H. Stanton Energy Center,564,4810358.37,4,28.4836,-81.1686,FL,Orange,America/New_York,5.0
+267,Cutler,610,,4,25.6321,-80.2989,FL,Miami-Dade,America/New_York,5.0
+268,Debary,6046,53056.26,4,28.9047,-81.3319,FL,Volusia,America/New_York,5.0
+269,Deerhaven,663,1153161.5,4,29.7586,-82.3883,FL,Alachua,America/New_York,5.0
+270,Desoto County Energy Park,55422,306978.75,4,27.2272,-81.8092,FL,DeSoto,America/New_York,5.0
+271,Fort Myers,612,6159721.1,4,26.6967,-81.7831,FL,Lee,America/New_York,5.0
+272,G E Turner,629,14524.01,4,28.8689,-81.2728,FL,Volusia,America/New_York,5.0
+273,Greenland Energy Center,56799,134992.99,4,30.1603,-81.5164,FL,Duval,America/New_York,5.0
+274,Hardee Power Station,50949,420512.0,4,27.6364,-81.9636,FL,Hardee,America/New_York,5.0
+275,Higgins,630,834.94,4,28.0037,-82.6626,FL,Pinellas,America/New_York,5.0
+276,Hines Energy Complex,7302,8407073.55,4,27.7886,-81.8694,FL,Polk,America/New_York,5.0
+277,Indian River (55318),55318,,4,28.4933,-80.7825,FL,Brevard,America/New_York,5.0
+278,Indian River (683),683,16139.0,4,28.4933,-80.7825,FL,Brevard,America/New_York,5.0
+279,"Indiantown Cogeneration, LP",50976,,4,27.0393,-80.5144,FL,Martin,America/New_York,5.0
+280,Intercession City,8049,306722.79,4,28.2628,-81.5486,FL,Osceola,America/New_York,5.0
+281,J D Kennedy,666,121421.86,4,30.3644,-81.6236,FL,Duval,America/New_York,5.0
+282,J R Kelly,664,365224.25,4,29.6467,-82.3219,FL,Alachua,America/New_York,5.0
+283,Lansing Smith Generating Plant,643,4790316.1,4,30.2689,-85.7003,FL,Bay,America/Chicago,6.0
+284,Lauderdale,613,4589214.78,4,26.0681,-80.1983,FL,Broward,America/New_York,5.0
+285,Manatee,6042,8993926.05,4,27.6058,-82.3456,FL,Manatee,America/New_York,5.0
+286,Martin,6043,14689913.13,4,27.0536,-80.5628,FL,Martin,America/New_York,5.0
+287,Midulla Generating Station,7380,1966190.42,4,27.6417,-81.9625,FL,Hardee,America/New_York,5.0
+288,Mulberry Cogeneration Facility,54426,441866.89,4,27.8489,-81.8775,FL,Polk,America/New_York,5.0
+289,Northside,667,2658988.17,4,30.4172,-81.5525,FL,Duval,America/New_York,5.0
+290,Oleander Power Project,55286,208206.82,4,28.3661,-80.7947,FL,Brevard,America/New_York,5.0
+291,Orange Cogeneration Facility,54365,343176.01,4,27.8708,-81.8253,FL,Polk,America/New_York,5.0
+292,Orlando CoGen,54466,822758.0,4,28.4422,-81.4119,FL,Orange,America/New_York,5.0
+293,Osceola,55192,383837.17,4,28.1289,-81.0978,FL,Osceola,America/New_York,5.0
+294,Osprey Energy Center,55412,3202691.7,4,28.0525,-81.8083,FL,Polk,America/New_York,5.0
+295,P L Bartow,634,6866291.61,4,27.8613,-82.6012,FL,Pinellas,America/New_York,5.0
+296,Polk,7242,1388358.25,4,27.7286,-81.9897,FL,Polk,America/New_York,5.0
+297,Port Everglades,617,1170814.02,4,26.0856,-80.1253,FL,Broward,America/New_York,5.0
+298,Putnam,6246,990903.89,4,29.6283,-81.5856,FL,Putnam,America/New_York,5.0
+299,"Quantum Auburndale Power, LP",54658,923727.96,4,28.0542,-81.8058,FL,Polk,America/New_York,5.0
+300,"Quantum Lake Power, LP",54423,508748.29,4,28.9158,-81.676,FL,Lake,America/New_York,5.0
+301,"Quantum Pasco Power, LP",54424,245173.2,4,28.3744,-82.1892,FL,Pasco,America/New_York,5.0
+302,Reedy Creek,7254,353846.25,4,28.4272,-81.5803,FL,Orange,America/New_York,5.0
+303,Roy E Hansel Power Plant,672,42771.31,4,28.2908,-81.4069,FL,Osceola,America/New_York,5.0
+304,S O Purdom,689,710088.0,4,30.1619,-84.2014,FL,Wakulla,America/New_York,5.0
+305,Sanford,620,8076765.54,4,28.8419,-81.3256,FL,Volusia,America/New_York,5.0
+306,Santa Rosa Energy Center,55242,889751.34,4,30.5661,-87.115,FL,Santa Rosa,America/Chicago,6.0
+307,Scholz Electric Generating Plant,642,6976.0,4,30.6689,-84.8869,FL,Jackson,America/Chicago,6.0
+308,Seminole (136),136,8156590.49,4,29.7333,-81.6339,FL,Putnam,America/New_York,5.0
+309,Shady Hills,55414,781069.28,4,28.3665,-82.5591,FL,Pasco,America/New_York,5.0
+310,St. Johns River Power,207,6689841.29,4,30.4311,-81.5508,FL,Duval,America/New_York,5.0
+311,Stanton A,55821,2268272.0,4,28.4881,-81.1675,FL,Orange,America/New_York,5.0
+312,Stock Island,6584,621.47,4,24.5636,-81.7342,FL,Monroe,America/New_York,5.0
+313,Suwannee River,638,569158.17,4,30.3764,-83.1806,FL,Suwannee,America/New_York,5.0
+314,Tiger Bay,7699,836128.1,4,27.7447,-81.85,FL,Polk,America/New_York,5.0
+315,Tom G Smith,673,222.25,4,26.6125,-80.0678,FL,Palm Beach,America/New_York,5.0
+316,Treasure Coast Energy Center,56400,1948751.76,4,27.3839,-80.3775,FL,Saint Lucie,America/New_York,5.0
+317,Turkey Point,621,7437614.26,4,25.4356,-80.3308,FL,Miami-Dade,America/New_York,5.0
+318,University of Florida,7345,,4,29.6397,-82.3486,FL,Alachua,America/New_York,5.0
+319,Vandolah Power Project,55415,541844.43,4,27.5242,-81.9236,FL,Hardee,America/New_York,5.0
+320,Vero Beach Municipal,693,19716.24,4,27.6311,-80.3758,FL,Indian River,America/New_York,5.0
+321,West County Energy Center,56407,25400308.15,4,26.6986,-80.3747,FL,Palm Beach,America/New_York,5.0
+322,AL Sandersville Energy Facility,55672,33019.55,4,33.1189,-82.8608,GA,Washington,America/New_York,5.0
+323,Allen B Wilson Combustion Turbine Plant,6258,2729.48,4,33.138000000000005,-81.748,GA,Burke,America/New_York,5.0
+324,Baconton Power,55304,199373.77,4,31.3869,-84.0819,GA,Mitchell,America/New_York,5.0
+325,Bowen,703,10426204.61,4,34.1256,-84.9192,GA,Bartow,America/New_York,5.0
+326,Chattahoochee Energy Facility,7917,1855580.0,4,33.407,-85.0387,GA,Heard,America/New_York,5.0
+327,Dahlberg (Jackson County),7765,372559.25,4,34.0386,-83.3972,GA,Jackson,America/New_York,5.0
+328,Doyle Energy Facility,55244,70274.29,4,33.8376,-83.6996,GA,Walton,America/New_York,5.0
+329,Edward L Addison Generating Plant,55267,390186.56,4,32.911,-84.3059,GA,Upson,America/New_York,5.0
+330,"Effingham County Power, LLC",55406,1596506.5,4,32.2792,-81.2842,GA,Effingham,America/New_York,5.0
+331,Hammond,708,1582347.0,4,34.2533,-85.3456,GA,Floyd,America/New_York,5.0
+332,Harllee Branch,709,2285230.5,4,33.1942,-83.2994,GA,Putnam,America/New_York,5.0
+333,Hartwell Energy Facility,70454,71395.44,4,34.3387,-82.8207,GA,Hart,America/New_York,5.0
+334,Hawk Road Energy Facility,55141,258850.7,4,33.3577,-84.9912,GA,Heard,America/New_York,5.0
+335,Jack McDonough,710,12068352.0,4,33.8244,-84.475,GA,Cobb,America/New_York,5.0
+336,Kraft,733,683231.0,4,32.1486,-81.1458,GA,Chatham,America/New_York,5.0
+337,MPC Generating,7764,59308.0,4,33.8122,-83.6954,GA,Walton,America/New_York,5.0
+338,McIntosh (6124),6124,27735.0,4,32.3558,-81.1683,GA,Effingham,America/New_York,5.0
+339,McIntosh Combined Cycle Facility,56150,7576919.25,4,32.3478,-81.1828,GA,Effingham,America/New_York,5.0
+340,McManus,715,2743.79,4,31.2125,-81.5458,GA,Glynn,America/New_York,5.0
+341,Mid-Georgia Cogeneration,55040,392827.88,4,32.4853,-83.6036,GA,Houston,America/New_York,5.0
+342,Mitchell (GA),727,3468.89,4,31.4444,-84.1322,GA,Dougherty,America/New_York,5.0
+343,Robins,7348,2876.0,4,32.5806,-83.5831,GA,Houston,America/New_York,5.0
+344,Scherer,6257,21680205.0,4,33.0583,-83.8072,GA,Monroe,America/New_York,5.0
+345,Sewell Creek Energy,7813,294254.0,4,33.9486,-85.2769,GA,Polk,America/New_York,5.0
+346,Smarr Energy Facility,7829,132778.25,4,32.9856,-83.8464,GA,Monroe,America/New_York,5.0
+347,Sowega Power Project,7768,118678.49,4,31.3869,-84.0814,GA,Mitchell,America/New_York,5.0
+348,Talbot Energy Facility,7916,381367.12,4,32.5892,-84.6917,GA,Talbot,America/New_York,5.0
+349,Tenaska Georgia Generating Station,55061,347406.75,4,33.3516,-84.9996,GA,Heard,America/New_York,5.0
+350,Thomas A. Smith Energy Facility,55382,4172274.5,4,34.7094,-84.9182,GA,Murray,America/New_York,5.0
+351,Walton Bainbridge Power Facility,56015,166.12,4,30.9111,-84.5472,GA,Decatur,America/New_York,5.0
+352,Walton County Power,55128,400961.07,4,33.8147,-83.6969,GA,Walton,America/New_York,5.0
+353,Wansley (6052),6052,5395200.57,4,33.4124,-85.0345,GA,Heard,America/New_York,5.0
+354,Wansley (7946),7946,1278942.0,4,33.4082,-85.0399,GA,Heard,America/New_York,5.0
+355,Wansley CC (55965),55965,6946949.0,4,33.4063,-85.0373,GA,Heard,America/New_York,5.0
+356,Washington County Power,55332,281955.73,4,33.0917,-82.9803,GA,Washington,America/New_York,5.0
+357,Yates,728,2589660.25,4,33.4622,-84.8986,GA,Coweta,America/New_York,5.0
+358,Ames,1122,361097.0,7,42.0247,-93.6069,IA,Story,America/Chicago,6.0
+359,Burlington (IA),1104,1250978.05,7,40.7412,-91.1168,IA,Des Moines,America/Chicago,6.0
+360,Centerville,1105,2843.0,7,40.7478,-92.8731,IA,Appanoose,America/Chicago,6.0
+361,Dayton Avenue Substation,6463,453.0,7,42.0269,-93.5828,IA,Story,America/Chicago,6.0
+362,Dubuque,1046,92732.13,7,42.506,-90.6527,IA,Dubuque,America/Chicago,6.0
+363,Earl F Wisdom,1217,12517.17,7,43.1606,-95.2569,IA,Clay,America/Chicago,6.0
+364,Electrifarm,6063,37745.0,7,42.4407,-92.4205,IA,Black Hawk,America/Chicago,6.0
+365,Emery Station,8031,901612.39,7,43.093999999999994,-93.2922,IA,Cerro Gordo,America/Chicago,6.0
+366,Exira Station,56013,46424.59,7,41.5131,-94.9189,IA,Audubon,America/Chicago,6.0
+367,Fair Station,1218,87896.59,7,41.4569,-90.8233,IA,Muscatine,America/Chicago,6.0
+368,George Neal North,1091,4491477.25,7,42.3251,-96.3797,IA,Woodbury,America/Chicago,6.0
+369,George Neal South,7343,4620111.0,7,42.3022,-96.3622,IA,Woodbury,America/Chicago,6.0
+370,Greater Des Moines Energy Center,7985,361220.85,7,41.5563,-93.5283,IA,Polk,America/Chicago,6.0
+371,Grinnell,7137,1912.0,7,41.7529,-92.7488,IA,Poweshiek,America/Chicago,6.0
+372,Lansing,1047,1241001.41,7,43.3359,-91.1672,IA,Allamakee,America/Chicago,6.0
+373,Lime Creek,7155,1819.69,7,43.2481,-93.2046,IA,Cerro Gordo,America/Chicago,6.0
+374,Louisa,6664,5539061.1,7,41.3153,-91.0936,IA,Louisa,America/Chicago,6.0
+375,Marshalltown CTs,1068,30778.51,7,42.0474,-92.8594,IA,Marshall,America/Chicago,6.0
+376,Milton L Kapp,1048,610467.15,7,41.8081,-90.2345,IA,Clinton,America/Chicago,6.0
+377,Muscatine,1167,977664.61,7,41.3917,-91.0569,IA,Muscatine,America/Chicago,6.0
+378,Ottumwa,6254,3130607.0,7,41.0961,-92.5556,IA,Wapello,America/Chicago,6.0
+379,Pella,1175,,7,41.3981,-92.9144,IA,Marion,America/Chicago,6.0
+380,Pleasant Hill Energy Center,7145,30761.46,7,41.5572,-93.5242,IA,Polk,America/Chicago,6.0
+381,Prairie Creek,1073,,7,41.9439,-91.6386,IA,Linn,America/Chicago,6.0
+382,Riverside (1081),1081,663012.3,7,41.5404,-90.4483,IA,Scott,America/Chicago,6.0
+383,Streeter Station,1131,11929.45,7,42.5267,-92.4394,IA,Black Hawk,America/Chicago,6.0
+384,Summit Lake,1206,22280.42,7,41.1141,-94.3499,IA,Union,America/Chicago,6.0
+385,Sutherland,1077,,7,42.0472,-92.8627,IA,Marshall,America/Chicago,6.0
+386,Sycamore Combustion Turbine,8029,10738.89,7,41.6722,-93.6769,IA,Polk,America/Chicago,6.0
+387,Walter Scott Jr. Energy Center,1082,12329624.0,7,41.18,-95.8408,IA,Pottawattamie,America/Chicago,6.0
+388,Bennett Mountain Power Project,55733,54858.12,10,43.147,-115.6671,ID,Elmore,America/Boise,7.0
+389,Evander Andrews Power Complex,7953,74272.65,10,43.1794,-115.7328,ID,Elmore,America/Boise,7.0
+390,Langley Gulch Power Plant,57028,496841.43,10,43.9046,-116.8181,ID,Payette,America/Boise,7.0
+391,Rathdrum Combustion Turbine Project,7456,7779.17,10,47.8034,-116.869,ID,Kootenai,America/Los_Angeles,8.0
+392,"Rathdrum Power, LLC",55179,1233616.12,10,47.7861,-116.9214,ID,Kootenai,America/Los_Angeles,8.0
+393,Alsey Station,7818,6138.1,5,39.5697,-90.4362,IL,Scott,America/Chicago,6.0
+394,Archer Daniels Midland Co.,10865,,5,39.8675,-88.885,IL,Macon,America/Chicago,6.0
+395,Archer Daniels Midland Co. - Peoria,10866,,5,40.6776,-89.6069,IL,Peoria,America/Chicago,6.0
+396,Aurora,55279,85092.99,5,41.8151,-88.2265,IL,DuPage,America/Chicago,6.0
+397,Baldwin Energy Complex,889,13240315.32,5,38.205,-89.855,IL,Randolph,America/Chicago,6.0
+398,"Calumet Energy Team, LLC",55296,53911.07,5,41.6835,-87.5563,IL,Cook,America/Chicago,6.0
+399,Coffeen,861,5565493.81,5,39.0586,-89.4031,IL,Montgomery,America/Chicago,6.0
+400,Cordova Energy Company,55188,4715.53,5,41.7146,-90.2802,IL,Rock Island,America/Chicago,6.0
+401,Crawford,867,1390640.25,5,41.8278,-87.7236,IL,Cook,America/Chicago,6.0
+402,Crete Energy Park,55253,29710.63,5,41.4297,-87.6187,IL,Will,America/Chicago,6.0
+403,Dallman,963,2289007.3,5,39.7539,-89.6011,IL,Sangamon,America/Chicago,6.0
+404,Duck Creek,6016,3075539.42,5,40.4663,-89.9841,IL,Fulton,America/Chicago,6.0
+405,"Dynegy Lee II, LLC",55236,106898.4,5,41.8287,-89.4054,IL,Lee,America/Chicago,6.0
+406,E D Edwards,856,4594203.61,5,40.5958,-89.6631,IL,Peoria,America/Chicago,6.0
+407,"Elgin Energy Center, LLC",55438,118370.21,5,41.9997,-88.2445,IL,Cook,America/Chicago,6.0
+408,Elwood Energy Facility,55199,820959.78,5,41.4388,-88.1236,IL,Will,America/Chicago,6.0
+409,Exxonmobil Oil Corporation,50627,49138.0,5,41.4167,-88.1833,IL,Will,America/Chicago,6.0
+410,Factory Gas Turbine,8016,775.0,5,39.8266,-89.6368,IL,Sangamon,America/Chicago,6.0
+411,Fisk,886,970177.0,5,41.8508,-87.6533,IL,Cook,America/Chicago,6.0
+412,"Flint Hills Resources, - Joliet Plant",880089,,5,41.4417,-88.1728,IL,Will,America/Chicago,6.0
+413,Freedom Power Project,7842,5802.49,5,39.1025,-88.8589,IL,Fayette,America/Chicago,6.0
+414,"Gibson City Energy Center, LLC",55201,67651.09,5,40.4705,-88.3987,IL,Ford,America/Chicago,6.0
+415,Goose Creek Power Plant,55496,65059.85,5,40.1083,-88.5986,IL,Piatt,America/Chicago,6.0
+416,"Grand Tower Energy Center, LLC",862,1301987.51,5,37.6578,-89.5119,IL,Jackson,America/Chicago,6.0
+417,Havana,891,3023729.33,5,40.2797,-90.0775,IL,Mason,America/Chicago,6.0
+418,Hennepin Power Station,892,2323325.68,5,41.3017,-89.3136,IL,Putnam,America/Chicago,6.0
+419,Holland Energy Facility,55334,1089732.55,5,39.2242,-88.7594,IL,Shelby,America/Chicago,6.0
+420,Ingredion Incorporated Argo Plant,54556,,5,41.7775,-87.8233,IL,Cook,America/Chicago,6.0
+421,Interstate,7425,7629.01,5,39.8233,-89.5888,IL,Sangamon,America/Chicago,6.0
+422,Joliet 29,384,5439094.25,5,41.4947,-88.125,IL,Will,America/Chicago,6.0
+423,Joliet 9,874,1104453.0,5,41.4947,-88.125,IL,Will,America/Chicago,6.0
+424,Joppa Steam,887,7000739.37,5,37.2103,-88.8606,IL,Massac,America/Chicago,6.0
+425,Kendall Energy Facility,55131,4950614.6,5,41.4797,-88.2581,IL,Kendall,America/Chicago,6.0
+426,Kincaid Generating Station,876,5652303.81,5,39.5906,-89.4964,IL,Christian,America/Chicago,6.0
+427,Kinmundy Power Plant,55204,17816.3,5,38.7619,-89.0128,IL,Marion,America/Chicago,6.0
+428,"LSP University Park, LLC",55640,162209.72,5,41.4426,-87.7515,IL,Will,America/Chicago,6.0
+429,Lemont Refinery,880076,,5,41.6439,-88.0467,IL,Will,America/Chicago,6.0
+430,Lincoln Generating Facility,55222,58253.61,5,41.3937,-87.9437,IL,Will,America/Chicago,6.0
+431,MEPI GT Facility,7858,21635.95,5,37.2175,-88.8658,IL,Massac,America/Chicago,6.0
+432,Marathon Petroleum Company LP,880088,,5,39.0,-87.7222,IL,Crawford,America/Chicago,6.0
+433,Marion,976,1902218.31,5,37.6206,-88.955,IL,Williamson,America/Chicago,6.0
+434,"Morris Cogeneration, LLC",55216,278018.47,5,41.4092,-88.3292,IL,Grundy,America/Chicago,6.0
+435,Newton,6017,5898531.66,5,38.9361,-88.2778,IL,Jasper,America/Chicago,6.0
+436,"Pacific Ethanol Pekin, Inc.",880086,,5,40.555,-89.6628,IL,Tazewell,America/Chicago,6.0
+437,Pinckneyville Power Plant,55202,100081.07,5,38.1114,-89.3467,IL,Perry,America/Chicago,6.0
+438,Powerton,879,8821734.75,5,40.5408,-89.6786,IL,Tazewell,America/Chicago,6.0
+439,Prairie State Generating Station,55856,4809965.43,5,38.2792,-89.667,IL,Washington,America/Chicago,6.0
+440,Raccoon Creek Power Plant,55417,20899.53,5,38.6996,-88.5392,IL,Clay,America/Chicago,6.0
+441,Rockford Energy Center,55238,48143.1,5,42.2403,-89.1025,IL,Winnebago,America/Chicago,6.0
+442,Rockford II Energy Center,55936,39157.93,5,42.2383,-89.1014,IL,Winnebago,America/Chicago,6.0
+443,"Rocky Road Power, LLC",55109,98935.58,5,42.0931,-88.2397,IL,Kane,America/Chicago,6.0
+444,Shelby County,55237,52930.86,5,39.2794,-88.4772,IL,Shelby,America/Chicago,6.0
+445,Southeast Chicago Energy Project,55281,31893.79,5,41.7181,-87.5449,IL,Cook,America/Chicago,6.0
+446,Tate & Lyle,10867,,5,39.8466,-88.9261,IL,Macon,America/Chicago,6.0
+447,Tilton Power Station,7760,118941.93,5,40.1063,-87.6539,IL,Vermilion,America/Chicago,6.0
+448,Tuscola Plant,55245,,5,39.7983,-88.3501,IL,Douglas,America/Chicago,6.0
+449,University Park Energy,55250,132660.0,5,41.4405,-87.7528,IL,Will,America/Chicago,6.0
+450,Venice,913,186908.49,5,38.6642,-90.1764,IL,Madison,America/Chicago,6.0
+451,Waukegan,883,3596551.75,5,42.3833,-87.8133,IL,Lake,America/Chicago,6.0
+452,Will County,884,3477332.0,5,41.6334,-88.0626,IL,Will,America/Chicago,6.0
+453,Wood River Power Station,898,2933949.07,5,38.8639,-90.1325,IL,Madison,America/Chicago,6.0
+454,Wood River Refinery,880067,,5,38.8375,-90.0675,IL,Madison,America/Chicago,6.0
+455,Zion Energy Center,55392,135635.54,5,42.4776,-87.895,IL,Lake,America/Chicago,6.0
+456,A B Brown Generating Station,6137,2653410.11,5,37.9053,-87.715,IN,Posey,America/Chicago,6.0
+457,Alcoa Allowance Management Inc,6705,5767974.94,5,37.915,-87.3328,IN,Warrick,America/Chicago,6.0
+458,Anderson,7336,18884.5,5,40.0529,-85.7389,IN,Madison,America/Indiana/Indianapolis,5.0
+459,ArcelorMittal USA - Indiana Harbor East,10474,,5,41.68,-87.4264,IN,Lake,America/Chicago,6.0
+460,BP Whiting Business Unit,52130,,5,41.6703,-87.4803,IN,Lake,America/Chicago,6.0
+461,Bailly Generating Station,995,2132626.69,5,41.6433,-87.1225,IN,Porter,America/Chicago,6.0
+462,Broadway Avenue Generating Station,1011,10897.37,5,37.9694,-87.6044,IN,Vanderburgh,America/Chicago,6.0
+463,C. C. Perry K Steam Plant,992,,5,39.7622,-86.1667,IN,Marion,America/Indiana/Indianapolis,5.0
+464,Cayuga,1001,5331551.89,5,39.9239,-87.4272,IN,Vermillion,America/Indiana/Indianapolis,5.0
+465,Clifty Creek,983,6444767.47,5,38.7383,-85.4192,IN,Jefferson,America/Indiana/Indianapolis,5.0
+466,Connersville Peaking Station,1002,254.84,5,39.6561,-85.1758,IN,Fayette,America/Indiana/Indianapolis,5.0
+467,Edwardsport Generating Station,1004,197231.31,5,38.8067,-87.2472,IN,Knox,America/Indiana/Vincennes,5.0
+468,F B Culley Generating Station,1012,1856465.99,5,37.91,-87.3267,IN,Warrick,America/Chicago,6.0
+469,Frank E Ratts,1043,521781.93,5,38.5201,-87.2662,IN,Pike,America/Indiana/Petersburg,5.0
+470,Georgetown Substation,7759,155309.66,5,39.9022,-86.2439,IN,Marion,America/Indiana/Indianapolis,5.0
+471,Gibson,6113,20265007.45,5,38.3722,-87.7661,IN,Gibson,America/Chicago,6.0
+472,Henry County Generating Station,7763,79517.21,5,39.9528,-85.5039,IN,Henry,America/Indiana/Indianapolis,5.0
+473,Hoosier Energy Lawrence Co Station,7948,68580.81,5,38.8003,-86.4511,IN,Lawrence,America/Indiana/Indianapolis,5.0
+474,IPL - Eagle Valley Generating Station,991,350211.29,5,39.4851,-86.4176,IN,Morgan,America/Indiana/Indianapolis,5.0
+475,IPL - Harding Street Station (EW Stout),990,4135981.77,5,39.7119,-86.1975,IN,Marion,America/Indiana/Indianapolis,5.0
+476,IPL - Petersburg Generating Station,994,10595937.99,5,38.5267,-87.2525,IN,Pike,America/Indiana/Petersburg,5.0
+477,Lawrenceburg Energy Facility,55502,6778247.66,5,39.0913,-84.8667,IN,Dearborn,America/New_York,5.0
+478,Merom,6213,5882734.27,5,39.0694,-87.5108,IN,Sullivan,America/Indiana/Indianapolis,5.0
+479,Michigan City Generating Station,997,2498441.79,5,41.7203,-86.9097,IN,LaPorte,America/Chicago,6.0
+480,Montpelier Electric Gen Station,55229,157128.16,5,40.6206,-85.3057,IN,Wells,America/Indiana/Indianapolis,5.0
+481,"Noble Americas South Bend Ethanol, LLC.",880087,,5,41.6552,-86.2962,IN,Saint Joseph,America/Indiana/Indianapolis,5.0
+482,Noblesville,1007,592299.39,5,40.0969,-85.9714,IN,Hamilton,America/Indiana/Indianapolis,5.0
+483,Portside Energy,55096,100718.8,5,41.6317,-87.1728,IN,Porter,America/Chicago,6.0
+484,Purdue University-Wade Utility,50240,,5,40.4172,-86.9117,IN,Tippecanoe,America/Indiana/Indianapolis,5.0
+485,R Gallagher,1008,286458.58,5,38.2636,-85.8381,IN,Floyd,America/Kentucky/Louisville,5.0
+486,R M Schahfer Generating Station,6085,6725847.0,5,41.2175,-87.0239,IN,Jasper,America/Chicago,6.0
+487,Richmond (IN),7335,4025.75,5,39.8383,-84.9665,IN,Wayne,America/Indiana/Indianapolis,5.0
+488,Rockport,6166,19717921.29,5,37.9256,-87.0372,IN,Spencer,America/Chicago,6.0
+489,State Line Generating Station (IN),981,596249.62,5,41.7072,-87.5217,IN,Lake,America/Chicago,6.0
+490,Sugar Creek Generating Station,55364,3205088.65,5,39.3922,-87.5103,IN,Vigo,America/Indiana/Indianapolis,5.0
+491,Tanners Creek,988,3043226.04,5,39.0831,-84.8581,IN,Dearborn,America/New_York,5.0
+492,US Steel Corp - Gary Works,50733,,5,41.6133,-87.3281,IN,Lake,America/Chicago,6.0
+493,Vermillion Generating Station,55111,96675.39,5,39.9208,-87.445,IN,Vermillion,America/Indiana/Indianapolis,5.0
+494,Wabash River Gen Station,1010,1842031.29,5,39.53,-87.4247,IN,Vigo,America/Indiana/Indianapolis,5.0
+495,Wheatland Generating Facility LLC,55224,104952.24,5,38.6716,-87.2931,IN,Knox,America/Indiana/Vincennes,5.0
+496,Whitewater Valley,1040,30060.79,5,39.8028,-84.8953,IN,Wayne,America/Indiana/Indianapolis,5.0
+497,"Whiting Clean Energy, Inc.",55259,1645741.82,5,41.6739,-87.4778,IN,Lake,America/Chicago,6.0
+498,Worthington Generation,55148,18391.84,5,39.0717,-87.0128,IN,Greene,America/Indiana/Indianapolis,5.0
+499,Chanute 2,1268,7042.25,7,37.6953,-95.4586,KS,Neosho,America/Chicago,6.0
+500,Cimarron River,1230,188988.91,7,37.1611,-100.7619,KS,Seward,America/Chicago,6.0
+501,Coffeyville,1271,35373.88,7,37.0456,-95.6076,KS,Montgomery,America/Chicago,6.0
+502,East 12th Street,7013,10103.0,7,37.2376,-96.9619,KS,Cowley,America/Chicago,6.0
+503,Emporia Energy Center,56502,571447.0,7,38.4464,-96.0651,KS,Lyon,America/Chicago,6.0
+504,Fort Dodge aka Judson Large,1233,468263.51,7,37.7328,-99.9497,KS,Ford,America/Chicago,6.0
+505,Garden City,1336,128020.67,7,37.9703,-100.8956,KS,Finney,America/Chicago,6.0
+506,Gordon Evans Energy Center,1240,642541.56,7,37.7903,-97.5217,KS,Sedgwick,America/Chicago,6.0
+507,Great Bend Station aka Arthur Mullergren,1235,156399.11,7,38.41,-98.8689,KS,Barton,America/Chicago,6.0
+508,Holcomb,108,2141507.66,7,37.9306,-100.9725,KS,Finney,America/Chicago,6.0
+509,Hutchinson Energy Center,1248,69542.07,7,38.0906,-97.8747,KS,Reno,America/Chicago,6.0
+510,Jeffrey Energy Center,6068,12784411.93,7,39.2825,-96.1153,KS,Pottawatomie,America/Chicago,6.0
+511,La Cygne,1241,9262519.47,7,38.3472,-94.6389,KS,Linn,America/Chicago,6.0
+512,Lawrence Energy Center,1250,3306943.22,7,39.0072,-95.2692,KS,Douglas,America/Chicago,6.0
+513,McPherson Municipal Power Plant #3,7515,4810.15,7,38.3864,-97.61,KS,McPherson,America/Chicago,6.0
+514,Murray Gill Energy Center,1242,185822.73,7,37.5956,-97.4131,KS,Sedgwick,America/Chicago,6.0
+515,Nearman Creek,6064,1109086.85,7,39.1714,-94.6958,KS,Wyandotte,America/Chicago,6.0
+516,Neosho Energy Center,1243,,7,37.3062,-95.1118,KS,Labette,America/Chicago,6.0
+517,Osawatomie Generating Station,7928,11354.99,7,38.5325,-94.9042,KS,Miami,America/Chicago,6.0
+518,Quindaro,1295,985690.22,7,39.1486,-94.6405,KS,Wyandotte,America/Chicago,6.0
+519,Riverton,1239,323361.97,7,37.0719,-94.6986,KS,Cherokee,America/Chicago,6.0
+520,Tecumseh Energy Center,1252,1330063.49,7,39.0522,-95.5669,KS,Shawnee,America/Chicago,6.0
+521,West Gardner Generating Station,7929,62615.08,7,38.7878,-94.985,KS,Johnson,America/Chicago,6.0
+522,Big Sandy,1353,2796220.1,4,38.1707,-82.6176,KY,Lawrence,America/New_York,5.0
+523,Bluegrass Generating Station,55164,57446.01,4,38.3902,-85.4133,KY,Oldham,America/New_York,5.0
+524,Cane Run,1363,2953110.11,4,38.1828,-85.8894,KY,Jefferson,America/Kentucky/Louisville,5.0
+525,Coleman,1381,3394859.75,4,37.9628,-86.7917,KY,Hancock,America/Chicago,6.0
+526,D B Wilson,6823,3284474.75,4,37.4497,-87.0803,KY,Ohio,America/Chicago,6.0
+527,"DTE Calvert City, LLC",55308,86989.36,4,37.0467,-88.3506,KY,Marshall,America/Chicago,6.0
+528,E W Brown,1355,2945922.57,4,37.7889,-84.7139,KY,Mercer,America/New_York,5.0
+529,East Bend,6018,3514682.46,4,38.9031,-84.8511,KY,Boone,America/New_York,5.0
+530,Elmer Smith,1374,2688490.3,4,37.7958,-87.0597,KY,Daviess,America/Chicago,6.0
+531,Ghent,1356,13441331.81,4,38.7497,-85.035,KY,Carroll,America/New_York,5.0
+532,Green River,1357,975396.47,4,37.3636,-87.1214,KY,Muhlenberg,America/Chicago,6.0
+533,H L Spurlock,6041,9022580.73,4,38.7,-83.8175,KY,Mason,America/New_York,5.0
+534,HMP&L Station 2,1382,2227050.5,4,37.6472,-87.5028,KY,Henderson,America/Chicago,6.0
+535,John S. Cooper,1384,1587365.78,4,37.0,-84.5917,KY,Pulaski,America/New_York,5.0
+536,Marshall,55232,132253.11,4,37.0286,-88.3958,KY,Marshall,America/Chicago,6.0
+537,Mill Creek,1364,9292542.57,4,38.0531,-85.91,KY,Jefferson,America/Kentucky/Louisville,5.0
+538,Paddy's Run,1366,57358.26,4,38.2147,-85.8453,KY,Jefferson,America/Kentucky/Louisville,5.0
+539,Paducah Power Systems Plant 1,56556,8109.37,4,37.0339,-88.6161,KY,McCracken,America/Chicago,6.0
+540,Paradise,1378,15967981.44,4,37.2608,-86.9783,KY,Muhlenberg,America/Chicago,6.0
+541,R D Green,6639,3216402.25,4,37.6467,-87.5006,KY,Webster,America/Chicago,6.0
+542,Riverside Generating Company,55198,240956.03,4,38.1933,-82.6042,KY,Lawrence,America/New_York,5.0
+543,Robert Reid,1383,36058.0,4,37.6467,-87.5033,KY,Webster,America/Chicago,6.0
+544,Shawnee,1379,7605134.7,4,37.1517,-88.775,KY,McCracken,America/Chicago,6.0
+545,Smith Generating Facility,54,922918.02,4,37.8824,-84.1025,KY,Clark,America/New_York,5.0
+546,Trimble County,6071,8893304.77,4,38.5847,-85.4117,KY,Trimble,America/New_York,5.0
+547,Tyrone,1361,,4,38.0478,-84.8483,KY,Woodford,America/New_York,5.0
+548,Wickliffe Paper Company,880065,,4,36.9461,-89.0792,KY,Ballard,America/Chicago,6.0
+549,William C. Dale,1385,265033.91,4,37.8807,-84.2634,KY,Clark,America/New_York,5.0
+550,Acadia Power Station,55173,4913778.37,6,30.4284,-92.4112,LA,Acadia,America/Chicago,6.0
+551,Arsenal Hill Power Plant,1416,2352082.17,6,32.5181,-93.7611,LA,Caddo,America/Chicago,6.0
+552,Bayou Cove Peaking Power Plant,55433,129739.56,6,30.2825,-92.5994,LA,Acadia,America/Chicago,6.0
+553,Big Cajun 1,1464,106480.01,6,30.6736,-91.3525,LA,Pointe Coupee,America/Chicago,6.0
+554,Big Cajun 2,6055,10918503.47,6,30.7261,-91.3669,LA,Pointe Coupee,America/Chicago,6.0
+555,Brame Energy Center,6190,5869725.49,6,31.395,-92.7167,LA,Rapides,America/Chicago,6.0
+556,Calcasieu Plant,55165,257140.82,6,30.1603,-93.3458,LA,Calcasieu,America/Chicago,6.0
+557,Carville Energy Center,55404,3125926.39,6,30.2292,-91.065,LA,Iberville,America/Chicago,6.0
+558,Coughlin Power Station,1396,1467072.98,6,30.8442,-92.2606,LA,Evangeline,America/Chicago,6.0
+559,D G Hunter,6558,2165.05,6,31.320999999999998,-92.4626,LA,Rapides,America/Chicago,6.0
+560,Doc Bonin,1443,374018.71,6,30.2368,-92.0476,LA,Lafayette,America/Chicago,6.0
+561,Dolet Hills Power Station,51,4991767.84,6,32.0306,-93.5692,LA,De Soto,America/Chicago,6.0
+562,Hargis-Hebert Electric Generating Statio,56283,21992.86,6,30.1694,-91.9923,LA,Lafayette,America/Chicago,6.0
+563,Houma,1439,44049.79,6,29.5808,-90.7222,LA,Terrebonne,America/Chicago,6.0
+564,Lieberman Power Plant,1417,100683.88,6,32.7047,-93.9597,LA,Caddo,America/Chicago,6.0
+565,Little Gypsy,1402,1999979.21,6,30.0033,-90.4611,LA,Saint Charles,America/Chicago,6.0
+566,Louisiana 1,1391,2797395.73,6,30.4903,-91.1875,LA,East Baton Rouge,America/Chicago,6.0
+567,Michoud,1409,2436790.8,6,30.0081,-89.9372,LA,Orleans,America/Chicago,6.0
+568,Morgan City Electrical Gen Facility,1449,59462.59,6,29.6916,-91.1887,LA,Saint Mary,America/Chicago,6.0
+569,Nelson Industrial Steam Company,50030,,6,30.2861,-93.2917,LA,Calcasieu,America/Chicago,6.0
+570,Ninemile Point,1403,4214771.87,6,29.9472,-90.1458,LA,Jefferson,America/Chicago,6.0
+571,Ouachita Plant,55467,1643643.53,6,32.7056,-92.0697,LA,Ouachita,America/Chicago,6.0
+572,Perryville Power Station,55620,2119428.38,6,32.6914,-92.0192,LA,Ouachita,America/Chicago,6.0
+573,Plaquemine Cogen Facility,55419,9907416.19,6,30.3215,-91.2392,LA,Iberville,America/Chicago,6.0
+574,R S Cogen LLC,55117,3029469.92,6,30.221,-93.2826,LA,Calcasieu,America/Chicago,6.0
+575,R S Nelson,1393,4866746.47,6,30.2861,-93.2917,LA,Calcasieu,America/Chicago,6.0
+576,Sterlington,1404,6665.29,6,32.7047,-92.0792,LA,Ouachita,America/Chicago,6.0
+577,T J Labbe Electric Generating Station,56108,50909.1,6,30.2554,-92.0433,LA,Lafayette,America/Chicago,6.0
+578,Taft Cogeneration Facility,55089,3520350.48,6,29.9861,-90.4575,LA,Saint Charles,America/Chicago,6.0
+579,Teche Power Station,1400,982264.19,6,29.8223,-91.5427,LA,Saint Mary,America/Chicago,6.0
+580,Waterford 1 & 2,8056,762695.78,6,29.9994,-90.4758,LA,Saint Charles,America/Chicago,6.0
+581,Willow Glen,1394,1597143.46,6,30.2743,-91.1164,LA,Iberville,America/Chicago,6.0
+582,"ANP Bellingham Energy Company, LLC",55211,1179172.37,1,42.1113,-71.4529,MA,Norfolk,America/New_York,5.0
+583,"ANP Blackstone Energy Company, LLC",55212,1410490.57,1,42.0575,-71.5172,MA,Worcester,America/New_York,5.0
+584,Bellingham,10307,289257.02,1,42.0925,-71.4833,MA,Norfolk,America/New_York,5.0
+585,Berkshire Power,55041,781950.09,1,42.0476,-72.6478,MA,Hampden,America/New_York,5.0
+586,Blackstone,1594,,1,42.3636,-71.1161,MA,Middlesex,America/New_York,5.0
+587,Brayton Point,1619,2193851.25,1,41.7125,-71.1914,MA,Bristol,America/New_York,5.0
+588,Canal Station,1599,45999.65,1,41.7694,-70.5097,MA,Barnstable,America/New_York,5.0
+589,Cleary Flood,1682,88262.84,1,41.8653,-71.1061,MA,Bristol,America/New_York,5.0
+590,Dartmouth Power,52026,146443.18,1,41.6728,-70.9989,MA,Bristol,America/New_York,5.0
+591,Deer Island Treatment,10823,2117.48,1,42.3497,-70.9601,MA,Suffolk,America/New_York,5.0
+592,Dighton,55026,664585.47,1,41.8312,-71.1239,MA,Bristol,America/New_York,5.0
+593,Doreen,1631,168.85,1,42.4431,-73.2061,MA,Berkshire,America/New_York,5.0
+594,Exelon L Street Generating Station,1587,50.93,1,42.3406,-71.035,MA,Suffolk,America/New_York,5.0
+595,Fore River Energy Center,55317,4133788.93,1,42.2417,-70.9653,MA,Norfolk,America/New_York,5.0
+596,Framingham Station,1586,124.85,1,42.2672,-71.3983,MA,Middlesex,America/New_York,5.0
+597,General Electric Aircraft,10029,,1,42.45,-70.9739,MA,Essex,America/New_York,5.0
+598,Kendall Green Energy LLC,1595,1776295.77,1,42.3633,-71.0792,MA,Middlesex,America/New_York,5.0
+599,Kneeland Station,880023,,1,42.35,-71.0583,MA,Suffolk,America/New_York,5.0
+600,Lowell Cogeneration Company,10802,3916.66,1,42.64,-71.32300000000001,MA,Middlesex,America/New_York,5.0
+601,MASSPOWER,10726,620912.75,1,42.156000000000006,-72.5292,MA,Hampden,America/New_York,5.0
+602,MIT Central Utility Plant,54907,268837.39,1,42.3611,-71.0934,MA,Middlesex,America/New_York,5.0
+603,Medway Station,1592,1026.65,1,42.1364,-71.4478,MA,Norfolk,America/New_York,5.0
+604,"Milford Power, LLC",54805,288718.25,1,42.1292,-71.5122,MA,Worcester,America/New_York,5.0
+605,Millennium Power Partners,55079,1359151.53,1,42.1127,-72.0152,MA,Worcester,America/New_York,5.0
+606,Mount Tom,1606,121786.0,1,42.2814,-72.6053,MA,Hampden,America/New_York,5.0
+607,Mystic,1588,8820680.14,1,42.3917,-71.0667,MA,Middlesex,America/New_York,5.0
+608,Pittsfield Generating,50002,208845.89,1,42.4564,-73.2181,MA,Berkshire,America/New_York,5.0
+609,Potter,1660,68961.91,1,42.235,-70.9672,MA,Norfolk,America/New_York,5.0
+610,Salem Harbor Station,1626,276564.46,1,42.5267,-70.8792,MA,Essex,America/New_York,5.0
+611,South Boston Combustion Turbines,10176,784.14,1,42.3414,-71.0311,MA,Suffolk,America/New_York,5.0
+612,Stony Brook,6081,93567.0,1,42.1977,-72.5103,MA,Hampden,America/New_York,5.0
+613,"Tanner Street Generation, LLC",54586,155126.87,1,42.6308,-71.3133,MA,Middlesex,America/New_York,5.0
+614,Waters River,1678,12695.0,1,42.5428,-70.9236,MA,Essex,America/New_York,5.0
+615,West Springfield,1642,99845.85,1,42.0956,-72.5958,MA,Hampden,America/New_York,5.0
+616,Woodland Road,1643,111.72,1,42.3362,-73.2352,MA,Berkshire,America/New_York,5.0
+617,AES Warrior Run,10678,1322780.08,3,39.5944,-78.7456,MD,Allegany,America/New_York,5.0
+618,Brandon Shores,602,5266370.81,3,39.1792,-76.5383,MD,Anne Arundel,America/New_York,5.0
+619,Brandywine Power Facility,54832,703113.25,3,38.6681,-76.8678,MD,Prince George's,America/New_York,5.0
+620,C P Crane,1552,792002.46,3,39.3269,-76.365,MD,Baltimore,America/New_York,5.0
+621,Chalk Point,1571,5005395.34,3,38.5444,-76.6861,MD,Prince George's,America/New_York,5.0
+622,Dickerson,1572,1307961.83,3,39.2086,-77.4644,MD,Montgomery,America/New_York,5.0
+623,Gould Street,1553,43025.82,3,39.2661,-76.6042,MD,Baltimore (City),America/New_York,5.0
+624,Herbert A Wagner,1554,1314698.94,3,39.1781,-76.5268,MD,Anne Arundel,America/New_York,5.0
+625,Luke Paper Company,50282,,3,39.4722,-79.0575,MD,Allegany,America/New_York,5.0
+626,Morgantown,1573,5632484.15,3,38.3592,-76.9767,MD,Charles,America/New_York,5.0
+627,Perryman,1556,100978.16,3,39.4422,-76.2208,MD,Harford,America/New_York,5.0
+628,R. Paul Smith Power Station,1570,90572.82,3,39.595,-77.8269,MD,Washington,America/New_York,5.0
+629,Riverside,1559,26427.48,3,39.2369,-76.5133,MD,Baltimore,America/New_York,5.0
+630,Rock Springs Generating Facility,7835,401200.04,3,39.7183,-76.1606,MD,Cecil,America/New_York,5.0
+631,Severstal Sparrows Point LLC,10485,,3,39.2135,-76.4727,MD,Baltimore,America/New_York,5.0
+632,Vienna,1564,4553.5,3,38.4878,-75.8208,MD,Dorchester,America/New_York,5.0
+633,Westport,1560,8861.37,3,39.2719,-76.6186,MD,Baltimore (City),America/New_York,5.0
+634,Androscoggin Energy,55031,496983.38,1,44.5047,-70.2403,ME,Franklin,America/New_York,5.0
+635,Bucksport Generation LLC,50243,1399564.25,1,44.5739,-68.8033,ME,Hancock,America/New_York,5.0
+636,Maine Independence Station,55068,767401.57,1,44.8236,-68.7106,ME,Penobscot,America/New_York,5.0
+637,Rumford Power,55100,380483.68,1,44.5303,-70.5219,ME,Oxford,America/New_York,5.0
+638,Westbrook Energy Center,55294,2587682.35,1,43.6576,-70.3772,ME,Cumberland,America/New_York,5.0
+639,William F Wyman,1507,75870.07,1,43.75,-70.1569,ME,Cumberland,America/New_York,5.0
+640,48th Street Peaking Station,7258,49278.97,5,42.7553,-86.0853,MI,Allegan,America/Detroit,5.0
+641,B C Cobb,1695,1706358.08,5,43.2542,-86.2417,MI,Muskegon,America/Detroit,5.0
+642,Belle River,6034,8077599.34,5,42.7748,-82.4945,MI,Saint Clair,America/Detroit,5.0
+643,Cadillac Renewable Energy,54415,156750.05,5,44.2634,-85.4348,MI,Wexford,America/Detroit,5.0
+644,Conners Creek,1726,,5,42.3597,-82.9611,MI,Wayne,America/Detroit,5.0
+645,DTE East China,55718,124530.03,5,42.773999999999994,-82.4818,MI,Saint Clair,America/Detroit,5.0
+646,DTE Pontiac North LLC,10111,,5,42.6603,-83.2983,MI,Oakland,America/Detroit,5.0
+647,Dan E Karn,1702,2422772.99,5,43.6425,-83.8431,MI,Bay,America/Detroit,5.0
+648,Dearborn Industrial Generation,55088,1947724.25,5,42.3026,-83.154,MI,Wayne,America/Detroit,5.0
+649,Delray,1728,46562.9,5,42.2947,-83.1019,MI,Wayne,America/Detroit,5.0
+650,Eckert Station,1831,997548.53,5,42.7183,-84.5586,MI,Ingham,America/Detroit,5.0
+651,Endicott Generating,4259,267670.79,5,42.0317,-84.755,MI,Hillsdale,America/Detroit,5.0
+652,Erickson,1832,750098.52,5,42.6919,-84.6572,MI,Eaton,America/Detroit,5.0
+653,Genesee Power Station,54751,99120.0,5,43.0841,-83.6743,MI,Genesee,America/Detroit,5.0
+654,"Graphic Packaging International, Inc.",10698,,5,42.3049,-85.5783,MI,Kalamazoo,America/Detroit,5.0
+655,Grayling Generating Station,10822,,5,44.6062,-84.6901,MI,Crawford,America/Detroit,5.0
+656,Greenwood,6035,786506.14,5,43.1056,-82.6964,MI,Saint Clair,America/Detroit,5.0
+657,Hancock Peakers,1730,1914.22,5,42.5497,-83.4425,MI,Oakland,America/Detroit,5.0
+658,Harbor Beach,1731,87962.22,5,43.8519,-82.6436,MI,Huron,America/Detroit,5.0
+659,J B Sims,1825,281245.1,5,43.0722,-86.2342,MI,Ottawa,America/Detroit,5.0
+660,J C Weadock,1720,1707800.97,5,43.6425,-83.8431,MI,Bay,America/Detroit,5.0
+661,J H Campbell,1710,8274454.55,5,42.9103,-86.2036,MI,Ottawa,America/Detroit,5.0
+662,J R Whiting,1723,1452654.94,5,41.7917,-83.4486,MI,Monroe,America/Detroit,5.0
+663,Jackson Generating Station,55270,1742592.34,5,42.2488,-84.3767,MI,Jackson,America/Detroit,5.0
+664,James De Young,1830,11573.03,5,42.7956,-86.1133,MI,Ottawa,America/Detroit,5.0
+665,Kalamazoo River Generating Station,55101,7129.38,5,42.2797,-85.4922,MI,Kalamazoo,America/Detroit,5.0
+666,Kalkaska CT Project #1,7984,45658.19,5,44.6889,-85.2019,MI,Kalkaska,America/Detroit,5.0
+667,Livingston Generating Station,55102,16426.54,5,45.0291,-84.7332,MI,Otsego,America/Detroit,5.0
+668,Michigan Power Limited Partnership,54915,1019458.46,5,43.94,-86.4247,MI,Mason,America/Detroit,5.0
+669,Midland Cogeneration Venture,10745,5128394.75,5,43.5861,-84.2242,MI,Midland,America/Detroit,5.0
+670,Mistersky,1822,225.7,5,42.3038,-83.0904,MI,Wayne,America/Detroit,5.0
+671,Monroe,1733,16668343.9,5,41.8917,-83.3461,MI,Monroe,America/Detroit,5.0
+672,New Covert Generating Project,55297,4164736.53,5,42.3231,-86.2925,MI,Van Buren,America/Detroit,5.0
+673,"Otsego Paper, Inc.",55799,32833.25,5,42.4641,-85.6941,MI,Allegan,America/Detroit,5.0
+674,Presque Isle,1769,2120770.95,5,46.5789,-87.395,MI,Marquette,America/Detroit,5.0
+675,Renaissance Power,55402,524929.89,5,43.1864,-84.8429,MI,Montcalm,America/Detroit,5.0
+676,River Rouge,1740,,5,42.2733,-83.1131,MI,Wayne,America/Detroit,5.0
+677,Shiras,1843,297728.0,5,46.5314,-87.3917,MI,Marquette,America/Detroit,5.0
+678,St. Clair,1743,5985025.71,5,42.7642,-82.4719,MI,Saint Clair,America/Detroit,5.0
+679,Sumpter Plant,7972,109611.61,5,42.167,-83.5318,MI,Wayne,America/Detroit,5.0
+680,T B Simon Power Plant,10328,,5,42.7178,-84.4836,MI,Ingham,America/Detroit,5.0
+681,TES Filer City Station,50835,,5,44.217,-86.2906,MI,Manistee,America/Detroit,5.0
+682,The Dow Chemical Company,880031,,5,43.6025,-84.2404,MI,Midland,America/Detroit,5.0
+683,Thetford,1719,597.0,5,43.1568,-83.6285,MI,Genesee,America/Detroit,5.0
+684,Trenton Channel,1745,,5,42.1236,-83.1811,MI,Wayne,America/Detroit,5.0
+685,University of Michigan,880045,,5,42.2808,-83.7342,MI,Washtenaw,America/Detroit,5.0
+686,Wyandotte,1866,,5,42.2081,-83.1453,MI,Wayne,America/Detroit,5.0
+687,Zeeland Generating Station,55087,2091978.28,5,42.82,-85.9988,MI,Ottawa,America/Detroit,5.0
+688,Allen S King,1915,3681980.19,5,45.03,-92.7786,MN,Washington,America/Chicago,6.0
+689,Benson Power Biomass Plant,55867,490006.31,5,45.2996,-95.5604,MN,Swift,America/Chicago,6.0
+690,Black Dog,1904,1501998.64,5,44.8108,-93.2501,MN,Dakota,America/Chicago,6.0
+691,Blue Lake Generating Plant,8027,248759.14,5,44.7855,-93.4315,MN,Scott,America/Chicago,6.0
+692,Boswell Energy Center,1893,7910109.36,5,47.2603,-93.6531,MN,Itasca,America/Chicago,6.0
+693,Cambridge Station,2038,89659.17,5,45.601000000000006,-93.2081,MN,Isanti,America/Chicago,6.0
+694,Cannon Falls Energy Center,56241,122519.89,5,44.5364,-92.9147,MN,Goodhue,America/Chicago,6.0
+695,Cascade Creek,6058,16770.73,5,44.0322,-92.4908,MN,Olmsted,America/Chicago,6.0
+696,Cottage Grove Cogeneration,55010,615004.75,5,44.7956,-92.9119,MN,Washington,America/Chicago,6.0
+697,Elk River,2039,106660.23,5,45.2958,-93.5542,MN,Sherburne,America/Chicago,6.0
+698,Faribault Energy Park,56164,788497.77,5,44.3353,-93.2894,MN,Rice,America/Chicago,6.0
+699,Fox Lake,1888,22243.98,5,43.6728,-94.7074,MN,Martin,America/Chicago,6.0
+700,Hibbard Energy Center,1897,,5,46.7356,-92.1531,MN,Saint Louis,America/Chicago,6.0
+701,High Bridge,1912,1891726.68,5,44.9331,-93.1075,MN,Ramsey,America/Chicago,6.0
+702,Hoot Lake,1943,692951.75,5,46.29,-96.0428,MN,Otter Tail,America/Chicago,6.0
+703,Hutchinson - Plant 2,6358,19001.0,5,44.8889,-94.35,MN,McLeod,America/Chicago,6.0
+704,Lakefield Junction Generating,7925,153248.77,5,43.7984,-94.8415,MN,Martin,America/Chicago,6.0
+705,Laskin Energy Center,1891,412255.83,5,47.5306,-92.1619,MN,Saint Louis,America/Chicago,6.0
+706,Mankato Energy Center,56104,521640.96,5,44.1965,-94.0099,MN,Blue Earth,America/Chicago,6.0
+707,Minnesota River Station,7844,6140.11,5,44.795,-93.5808,MN,Carver,America/Chicago,6.0
+708,Northeast Station,1961,10746.71,5,43.7014,-92.9626,MN,Mower,America/Chicago,6.0
+709,Pleasant Valley Station,7843,172837.07,5,43.7997,-92.6819,MN,Mower,America/Chicago,6.0
+710,Riverside (1927),1927,1986141.92,5,45.0203,-93.2753,MN,Hennepin,America/Chicago,6.0
+711,Sherburne County,6090,8976017.76,5,45.3792,-93.8958,MN,Sherburne,America/Chicago,6.0
+712,Silver Lake,2008,7392.28,5,44.0281,-92.4597,MN,Olmsted,America/Chicago,6.0
+713,Solway Plant,7947,55013.75,5,47.5444,-95.1297,MN,Beltrami,America/Chicago,6.0
+714,Taconite Harbor Energy Center,10075,949021.32,5,47.5314,-90.9111,MN,Cook,America/Chicago,6.0
+715,Asbury,2076,1279415.34,7,37.3596,-94.5913,MO,Jasper,America/Chicago,6.0
+716,Audrain Power Plant,55234,66615.42,7,39.3092,-91.5369,MO,Audrain,America/Chicago,6.0
+717,Blue Valley,2132,39148.93,7,39.0919,-94.3261,MO,Jackson,America/Chicago,6.0
+718,Chamois Power Plant,2169,305321.1,7,38.6853,-91.7556,MO,Osage,America/Chicago,6.0
+719,Chillicothe,2122,408.0,7,39.784,-93.56200000000001,MO,Livingston,America/Chicago,6.0
+720,Columbia,2123,,7,38.9658,-92.3175,MO,Boone,America/Chicago,6.0
+721,Columbia Energy Center (MO),55447,12020.36,7,39.0183,-92.2633,MO,Boone,America/Chicago,6.0
+722,Dogwood Energy Facility,55178,1581896.5,7,38.7931,-94.3006,MO,Cass,America/Chicago,6.0
+723,Empire District Elec Co Energy Ctr,6223,78557.95,7,37.1385,-94.1041,MO,Jasper,America/Chicago,6.0
+724,Essex Power Plant,7749,30194.44,7,36.8678,-89.8397,MO,Stoddard,America/Chicago,6.0
+725,Fairgrounds,2082,1039.41,7,38.5935,-92.2203,MO,Cole,America/Chicago,6.0
+726,Greenwood Energy Center,6074,10652.53,7,38.8615,-94.2982,MO,Jackson,America/Chicago,6.0
+727,Hawthorn,2079,4145795.61,7,39.1306,-94.4778,MO,Jackson,America/Chicago,6.0
+728,Higginsville Municipal Power Plant,2131,3506.13,7,39.0721,-93.721,MO,Lafayette,America/Chicago,6.0
+729,Holden Power Plant,7848,117928.06,7,38.7538,-93.9983,MO,Johnson,America/Chicago,6.0
+730,Howard Bend,2102,90.38,7,38.6818,-90.5403,MO,Saint Louis,America/Chicago,6.0
+731,Iatan,6065,12581106.96,7,39.4472,-94.98,MO,Platte,America/Chicago,6.0
+732,James River,2161,742467.99,7,37.1086,-93.2592,MO,Greene,America/Chicago,6.0
+733,John Twitty Energy Center,6195,2197445.17,7,37.1519,-93.3892,MO,Greene,America/Chicago,6.0
+734,Labadie,2103,16164542.95,7,38.5583,-90.8361,MO,Franklin,America/Chicago,6.0
+735,Lake Road,2098,416696.63,7,39.7246,-94.8773,MO,Buchanan,America/Chicago,6.0
+736,McCartney Generating Station,7903,54068.23,7,37.2479,-93.1709,MO,Greene,America/Chicago,6.0
+737,Meramec,2104,4384102.98,7,38.4017,-90.3358,MO,Saint Louis,America/Chicago,6.0
+738,Mexico,6650,787.08,7,39.1481,-91.8306,MO,Audrain,America/Chicago,6.0
+739,Moberly,6651,1621.57,7,39.4244,-92.4837,MO,Randolph,America/Chicago,6.0
+740,Montrose,2080,1958396.73,7,38.3108,-93.9331,MO,Henry,America/Chicago,6.0
+741,Moreau,6652,1080.41,7,38.5553,-92.102,MO,Cole,America/Chicago,6.0
+742,New Madrid Power Plant,2167,7961838.51,7,36.5147,-89.5617,MO,New Madrid,America/Chicago,6.0
+743,Nodaway Power Plant,7754,19405.8,7,40.2877,-94.7913,MO,Nodaway,America/Chicago,6.0
+744,Northeast Generating Station,2081,1421.6,7,39.1231,-94.5605,MO,Jackson,America/Chicago,6.0
+745,Peno Creek Energy Center,7964,83546.55,7,39.3531,-91.2295,MO,Pike,America/Chicago,6.0
+746,Ralph Green Station,2092,483.01,7,38.7865,-94.2768,MO,Cass,America/Chicago,6.0
+747,Rush Island,6155,8552038.52,7,38.1306,-90.2625,MO,Jefferson,America/Chicago,6.0
+748,Sibley,2094,2335710.58,7,39.1778,-94.1861,MO,Jackson,America/Chicago,6.0
+749,Sikeston,6768,1678592.8,7,36.8791,-89.6209,MO,Scott,America/Chicago,6.0
+750,Sioux,2107,5329154.09,7,38.9158,-90.2917,MO,Saint Charles,America/Chicago,6.0
+751,South Harper Peaking Facility,56151,144473.05,7,38.6803,-94.4824,MO,Cass,America/Chicago,6.0
+752,St. Francis Power Plant,7604,1239314.98,7,36.5852,-90.1779,MO,Dunklin,America/Chicago,6.0
+753,State Line (MO),7296,1786781.82,7,37.0659,-94.61399999999999,MO,Jasper,America/Chicago,6.0
+754,Thomas Hill Energy Center,2168,7507337.31,7,39.5531,-92.6392,MO,Randolph,America/Chicago,6.0
+755,Ackerman Combined Cycle,55694,3059167.51,4,33.3806,-89.2039,MS,Choctaw,America/Chicago,6.0
+756,Attala Generating Plant,55220,1219394.65,4,33.0142,-89.6758,MS,Attala,America/Chicago,6.0
+757,Batesville Generation Facility,55063,3219330.98,4,34.3345,-89.9272,MS,Panola,America/Chicago,6.0
+758,Baxter Wilson,2050,2954956.33,4,32.2831,-90.9306,MS,Warren,America/Chicago,6.0
+759,Caledonia,55197,4621178.5,4,33.6464,-88.2717,MS,Lowndes,America/Chicago,6.0
+760,Chevron Cogenerating Station,2047,610059.25,4,30.34,-88.492,MS,Jackson,America/Chicago,6.0
+761,Choctaw County Gen,55706,568639.99,4,33.2881,-89.4201,MS,Choctaw,America/Chicago,6.0
+762,Crossroads Energy Center (CPU),55395,86353.9,4,34.183,-90.5621,MS,Coahoma,America/Chicago,6.0
+763,Daniel Electric Generating Plant,6073,7194477.5,4,30.5335,-88.5574,MS,Jackson,America/Chicago,6.0
+764,Delta,2051,,4,33.7947,-90.7139,MS,Bolivar,America/Chicago,6.0
+765,Gerald Andrus,8054,1478678.86,4,33.3503,-91.1181,MS,Washington,America/Chicago,6.0
+766,Hinds Energy Facility,55218,559006.69,4,32.3781,-90.2169,MS,Hinds,America/Chicago,6.0
+767,Kemper County,7960,329240.11,4,32.7976,-88.6057,MS,Kemper,America/Chicago,6.0
+768,Magnolia Facility,55451,4636130.53,4,34.8358,-89.2017,MS,Benton,America/Chicago,6.0
+769,Moselle Generating Plant,2070,839799.97,4,31.5289,-89.2992,MS,Jones,America/Chicago,6.0
+770,R D Morrow Senior Generating Plant,6061,1198420.9,4,31.2194,-89.3933,MS,Lamar,America/Chicago,6.0
+771,Red Hills Generation Facility,55076,,4,33.3761,-89.2183,MS,Choctaw,America/Chicago,6.0
+772,Rex Brown,2053,184297.85,4,32.3564,-90.2125,MS,Hinds,America/Chicago,6.0
+773,Silver Creek Generating Plant,7988,30868.3,4,31.6004,-89.9468,MS,Jefferson Davis,America/Chicago,6.0
+774,Southaven Combined Cycle,55269,4448541.92,4,34.9939,-90.039,MS,DeSoto,America/Chicago,6.0
+775,Sweatt Electric Generating Plant,2048,1096.75,4,32.2925,-88.7461,MS,Lauderdale,America/Chicago,6.0
+776,Sylvarena Generating Plant,7989,64977.38,4,31.9842,-89.4131,MS,Smith,America/Chicago,6.0
+777,Watson Electric Generating Plant,2049,2118466.35,4,30.4408,-89.0265,MS,Harrison,America/Chicago,6.0
+778,Colstrip,6076,13503507.7,8,45.8831,-106.61399999999999,MT,Rosebud,America/Denver,7.0
+779,Culbertson Station,56606,66678.85,8,48.2104,-104.3919,MT,Roosevelt,America/Denver,7.0
+780,Glendive Generating Station,2176,8826.52,8,47.0539,-104.74,MT,Dawson,America/Denver,7.0
+781,Hardin Generating Station,55749,526554.69,8,45.7578,-107.6,MT,Big Horn,America/Denver,7.0
+782,J E Corette,2187,765068.06,8,45.7747,-108.4803,MT,Yellowstone,America/Denver,7.0
+783,Lewis & Clark,6089,277381.69,8,47.6788,-104.1569,MT,Richland,America/Denver,7.0
+784,Mill Creek Generating Station,56908,360768.37,8,46.1066,-112.8755,MT,Deer Lodge,America/Denver,7.0
+785,Asheville,2706,2252357.4,4,35.4714,-82.5431,NC,Buncombe,America/New_York,5.0
+786,Belews Creek,8042,14766539.8,4,36.2811,-80.0603,NC,Stokes,America/New_York,5.0
+787,Blewett,2707,0.0,4,34.9815,-79.8771,NC,Anson,America/New_York,5.0
+788,Blue Ridge Paper Products Inc.,50244,,4,35.535,-82.8411,NC,Haywood,America/New_York,5.0
+789,Buck,2720,4486002.13,4,35.7133,-80.3767,NC,Rowan,America/New_York,5.0
+790,Butler-Warner Generation Plant,1016,26312.0,4,35.0986,-78.8294,NC,Cumberland,America/New_York,5.0
+791,CPI USA North Carolina Roxboro,10379,,4,36.435,-78.9619,NC,Person,America/New_York,5.0
+792,CPI USA North Carolina Southport,10378,,4,33.9444,-78.0125,NC,Brunswick,America/New_York,5.0
+793,Cape Fear,2708,524533.75,4,35.595,-79.0492,NC,Chatham,America/New_York,5.0
+794,Cleveland County Generating Facility,57029,26980.0,4,35.1706,-81.4161,NC,Cleveland,America/New_York,5.0
+795,Cliffside,2721,1462393.87,4,35.22,-81.7594,NC,Cleveland,America/New_York,5.0
+796,Coastal Carolina Clean Power LLC,10381,,4,35.0225,-77.8575,NC,Duplin,America/New_York,5.0
+797,Craven County Wood Energy,10525,412255.36,4,35.1285,-77.17,NC,Craven,America/New_York,5.0
+798,Dan River,2723,110118.42,4,36.4862,-79.7208,NC,Rockingham,America/New_York,5.0
+799,"Edgecombe Genco, LLC",10384,,4,36.0378,-77.7542,NC,Edgecombe,America/New_York,5.0
+800,G G Allen,2718,2206904.48,4,35.1897,-81.0122,NC,Gaston,America/New_York,5.0
+801,H F Lee Steam Electric Plant,2709,1739423.13,4,35.3775,-78.0875,NC,Wayne,America/New_York,5.0
+802,KapStone Paper and Packaging Corp,50254,,4,36.4769,-77.6414,NC,Halifax,America/New_York,5.0
+803,L V Sutton,2713,1376962.75,4,34.2824,-77.9864,NC,New Hanover,America/New_York,5.0
+804,Lincoln,7277,35822.37,4,35.4317,-81.0347,NC,Lincoln,America/New_York,5.0
+805,Marshall,2727,10240007.05,4,35.5975,-80.9658,NC,Catawba,America/New_York,5.0
+806,Mayo,6250,,4,36.5278,-78.8917,NC,Person,America/New_York,5.0
+807,NC Renewable Power - Elizabethtown,10380,,4,34.6474,-78.6407,NC,Bladen,America/New_York,5.0
+808,NC Renewable Power - Lumberton LLC,10382,,4,34.59,-78.9968,NC,Robeson,America/New_York,5.0
+809,NCEMC Anson Plant,56249,298334.44,4,34.9708,-79.9208,NC,Anson,America/New_York,5.0
+810,NCEMC Hamlet Plant,56292,247219.31,4,34.8422,-79.7367,NC,Richmond,America/New_York,5.0
+811,Plant Rowan County,7826,2195533.0,4,35.7325,-80.6019,NC,Rowan,America/New_York,5.0
+812,Richmond County Plant,7805,8399779.23,4,34.8422,-79.7444,NC,Richmond,America/New_York,5.0
+813,Riverbend,2732,185268.55,4,35.36,-80.9742,NC,Gaston,America/New_York,5.0
+814,Rockingham County Combustion Turbine,55116,706563.65,4,36.3297,-79.8297,NC,Rockingham,America/New_York,5.0
+815,Rosemary Power Station,50555,63746.36,4,36.4525,-77.6594,NC,Halifax,America/New_York,5.0
+816,Roxboro,2712,6645307.99,4,36.4833,-79.0731,NC,Person,America/New_York,5.0
+817,University of NC Chapel Hill,54276,,4,35.9069,-79.0617,NC,Orange,America/New_York,5.0
+818,W H Weatherspoon,2716,0.0,4,34.5889,-78.975,NC,Robeson,America/New_York,5.0
+819,Westmoreland Partners Roanoke Valley I,54035,,4,36.4364,-77.6167,NC,Halifax,America/New_York,5.0
+820,Westmoreland Partners Roanoke Valley II,54755,,4,36.4364,-77.6167,NC,Halifax,America/New_York,5.0
+821,Weyerhaeuser - New Bern,50188,,4,35.2081,-77.1242,NC,Craven,America/New_York,5.0
+822,Antelope Valley,6469,6820634.88,8,47.3714,-101.8344,ND,Mercer,America/North_Dakota/Beulah,7.0
+823,Coal Creek,6030,9939065.7,8,47.3761,-101.1567,ND,McLean,America/Chicago,6.0
+824,Coyote,8222,2439038.28,8,47.2217,-101.8139,ND,Mercer,America/North_Dakota/Beulah,7.0
+825,Leland Olds,2817,3727051.9,8,47.2819,-101.3194,ND,Mercer,America/North_Dakota/Beulah,7.0
+826,Milton R Young,2823,5696110.05,8,47.0664,-101.2139,ND,Oliver,America/North_Dakota/Center,6.0
+827,R M Heskett,2790,440038.54,8,46.8669,-100.8839,ND,Morton,America/North_Dakota/New_Salem,6.0
+828,Stanton,2824,,8,47.2872,-101.3314,ND,Mercer,America/North_Dakota/Beulah,7.0
+829,Beatrice,8000,292532.81,7,40.3286,-96.8067,NE,Gage,America/Chicago,6.0
+830,C W Burdick,2241,5678.76,7,40.9228,-98.3269,NE,Hall,America/Chicago,6.0
+831,Canaday,2226,42144.0,7,40.6941,-99.7005,NE,Gosper,America/Chicago,6.0
+832,Cass County Station,55972,114594.76,7,40.9472,-95.9667,NE,Cass,America/Chicago,6.0
+833,Gerald Gentleman Station,6077,9397958.0,7,41.0808,-101.1408,NE,Lincoln,America/Chicago,6.0
+834,Gerald Whelan Energy Center,60,1505420.93,7,40.5806,-98.3106,NE,Adams,America/Chicago,6.0
+835,Lon D Wright Power Plant,2240,403081.02,7,41.4275,-96.4619,NE,Dodge,America/Chicago,6.0
+836,Nebraska City Station,6096,10276573.54,7,40.6215,-95.7765,NE,Otoe,America/Chicago,6.0
+837,North Omaha Station,2291,3305317.04,7,41.3297,-95.9458,NE,Douglas,America/Chicago,6.0
+838,Platte,59,490708.08,7,40.8538,-98.3481,NE,Hall,America/Chicago,6.0
+839,Rokeby,6373,23728.01,7,40.7316,-96.7364,NE,Lancaster,America/Chicago,6.0
+840,Sarpy County Station,2292,81482.68,7,41.1706,-95.9692,NE,Sarpy,America/Chicago,6.0
+841,Sheldon,2277,1149389.21,7,40.5589,-96.7842,NE,Lancaster,America/Chicago,6.0
+842,Terry Bundy Generating Station,7887,144916.24,7,40.9108,-96.6147,NE,Lancaster,America/Chicago,6.0
+843,Granite Ridge Energy,55170,3200863.4,1,42.9043,-71.4251,NH,Rockingham,America/New_York,5.0
+844,Merrimack,2364,1293757.06,1,43.1411,-71.4692,NH,Merrimack,America/New_York,5.0
+845,Newington,8002,78081.98,1,43.0974,-70.7834,NH,Rockingham,America/New_York,5.0
+846,Newington Energy,55661,2173305.5,1,43.1047,-70.8044,NH,Rockingham,America/New_York,5.0
+847,Schiller,2367,481390.81,1,43.0978,-70.7842,NH,Rockingham,America/New_York,5.0
+848,B L England,2378,192513.22,2,39.29,-74.6339,NJ,Cape May,America/New_York,5.0
+849,Bayonne Energy Center,56964,532755.12,2,40.6529,-74.0916,NJ,Hudson,America/New_York,5.0
+850,"Bayonne Plant Holding, LLC",50497,410662.93,2,40.6553,-74.1124,NJ,Hudson,America/New_York,5.0
+851,Bergen,2398,3964338.18,2,40.8375,-74.0244,NJ,Bergen,America/New_York,5.0
+852,Burlington Generating Station,2399,106778.68,2,40.0753,-74.8781,NJ,Burlington,America/New_York,5.0
+853,"Camden Plant Holding, LLC",10751,537358.48,2,39.9175,-75.1192,NJ,Camden,America/New_York,5.0
+854,Carlls Corner Energy Center,2379,23947.0,2,39.4547,-75.2011,NJ,Cumberland,America/New_York,5.0
+855,Carneys Point,10566,,2,39.6928,-75.4867,NJ,Salem,America/New_York,5.0
+856,Cedar Energy Station,2380,1828.0,2,39.6893,-74.2618,NJ,Ocean,America/New_York,5.0
+857,Cumberland Energy Center,5083,44558.52,2,39.3757,-74.9654,NJ,Cumberland,America/New_York,5.0
+858,Deepwater,2384,112581.55,2,39.6747,-75.5015,NJ,Salem,America/New_York,5.0
+859,"E F Kenilworth, Inc.",10805,151859.25,2,40.6781,-74.2744,NJ,Union,America/New_York,5.0
+860,"EFS Parlin Holdings, LLC",50799,164645.53,2,40.4586,-74.3327,NJ,Middlesex,America/New_York,5.0
+861,Eagle Point Power Generation,50561,99923.66,2,39.8746,-75.1592,NJ,Gloucester,America/New_York,5.0
+862,Edison,2400,35680.0,2,40.4911,-74.3958,NJ,Middlesex,America/New_York,5.0
+863,Elmwood Park Power - LLC,50852,50585.85,2,40.9056,-74.1308,NJ,Bergen,America/New_York,5.0
+864,Essex,2401,61337.91,2,40.7375,-74.1211,NJ,Essex,America/New_York,5.0
+865,Forked River Power,7138,1867.44,2,39.8154,-74.2098,NJ,Ocean,America/New_York,5.0
+866,Gilbert Generating Station,2393,42313.54,2,40.5661,-75.165,NJ,Hunterdon,America/New_York,5.0
+867,Howard M Down,2434,28023.28,2,39.4889,-75.0347,NJ,Cumberland,America/New_York,5.0
+868,Hudson Generating Station,2403,962998.35,2,40.7478,-74.0719,NJ,Hudson,America/New_York,5.0
+869,Kearny Generating Station,2404,165609.79,2,40.7375,-74.1,NJ,Hudson,America/New_York,5.0
+870,Lakewood,54640,402582.73,2,40.0613,-74.1686,NJ,Ocean,America/New_York,5.0
+871,Linden Cogeneration Facility,50006,5360034.22,2,40.6322,-74.2156,NJ,Union,America/New_York,5.0
+872,Linden Generating Station,2406,3647812.36,2,40.6225,-74.2097,NJ,Union,America/New_York,5.0
+873,Logan Generating Plant,10043,,2,39.7914,-75.4081,NJ,Gloucester,America/New_York,5.0
+874,Mercer Generating Station,2408,439058.96,2,40.1797,-74.7325,NJ,Mercer,America/New_York,5.0
+875,Mickleton Energy Center,8008,4005.0,2,39.8139,-75.2508,NJ,Gloucester,America/New_York,5.0
+876,Middle Energy Center,2382,531.5,2,39.0267,-74.8769,NJ,Cape May,America/New_York,5.0
+877,Missouri Avenue Energy Center,2383,717.55,2,39.3628,-74.4428,NJ,Atlantic,America/New_York,5.0
+878,National Park,2409,31.0,2,39.8617,-75.1836,NJ,Gloucester,America/New_York,5.0
+879,Newark Bay Cogen,50385,860935.13,2,40.7197,-74.13,NJ,Essex,America/New_York,5.0
+880,North Jersey Energy Associates,10308,1646282.33,2,40.439,-74.3444,NJ,Middlesex,America/New_York,5.0
+881,Ocean Peaking Power,55938,288425.22,2,40.0606,-74.1672,NJ,Ocean,America/New_York,5.0
+882,Paulsboro Refining Company LLC,50628,343091.5,2,39.84,-75.2583,NJ,Gloucester,America/New_York,5.0
+883,Pedricktown Cogeneration Plant,10099,428861.22,2,39.7661,-75.4242,NJ,Salem,America/New_York,5.0
+884,"Red Oak Power, LLC",55239,3406104.35,2,40.4481,-74.3497,NJ,Middlesex,America/New_York,5.0
+885,Salem Generating Station,2410,175.0,2,39.4625,-75.5333,NJ,Salem,America/New_York,5.0
+886,Sayreville,2390,5633.0,2,40.4753,-74.3552,NJ,Middlesex,America/New_York,5.0
+887,Sewaren Generating Station,2411,88791.45,2,40.5564,-74.2461,NJ,Middlesex,America/New_York,5.0
+888,Sherman Avenue,7288,30019.5,2,39.451,-75.0578,NJ,Cumberland,America/New_York,5.0
+889,"Sunoco, Inc. Eagle Point Facility",55113,,2,39.8743,-75.1595,NJ,Gloucester,America/New_York,5.0
+890,Werner,2385,1335.0,2,40.4906,-74.2814,NJ,Middlesex,America/New_York,5.0
+891,West Station,6776,1160.72,2,39.4903,-75.0486,NJ,Cumberland,America/New_York,5.0
+892,Afton Generating Station,55210,498910.0,6,32.1134,-106.848,NM,Dona Ana,America/Denver,7.0
+893,Bluffview Power Plant,55977,435827.96,6,36.7164,-108.2153,NM,San Juan,America/Denver,7.0
+894,Cunningham,2454,1094473.9,6,32.7131,-103.3533,NM,Lea,America/Denver,7.0
+895,Escalante ,87,1208594.4,6,35.4159,-108.08200000000001,NM,McKinley,America/Denver,7.0
+896,Four Corners Steam Elec Station,2442,14777882.75,6,36.69,-108.4814,NM,San Juan,America/Denver,7.0
+897,Hobbs Generating Station,56458,3017077.14,6,32.7282,-103.3095,NM,Lea,America/Denver,7.0
+898,Lordsburg Generating Station,7967,18329.0,6,32.3494,-108.6975,NM,Hidalgo,America/Denver,7.0
+899,Luna Energy Facility,55343,1875262.03,6,32.2983,-107.78,NM,Luna,America/Denver,7.0
+900,Maddox,2446,477175.27,6,32.7131,-103.31,NM,Lea,America/Denver,7.0
+901,Milagro Cogeneration and Gas Plant,54814,558844.99,6,36.7367,-107.9417,NM,San Juan,America/Denver,7.0
+902,Pyramid Generating Station,7975,170932.3,6,32.2363,-108.5494,NM,Hidalgo,America/Denver,7.0
+903,Reeves Generating Station,2450,73377.53,6,35.1716,-106.6019,NM,Bernalillo,America/Denver,7.0
+904,Rio Bravo Generating Station,55039,8820.24,6,35.025999999999996,-106.64399999999999,NM,Bernalillo,America/Denver,7.0
+905,Rio Grande,2444,813914.09,6,31.8047,-106.5472,NM,Dona Ana,America/Denver,7.0
+906,San Juan,2451,11341944.77,6,36.8006,-108.4386,NM,San Juan,America/Denver,7.0
+907,Valencia Power Plant,55802,52131.46,6,34.6063,-106.73200000000001,NM,Valencia,America/Denver,7.0
+908,Apex Generating Station,55514,1355747.37,9,36.4178,-114.9622,NV,Clark,America/Los_Angeles,8.0
+909,Chuck Lenzie Generating Station,55322,6575226.94,9,36.3853,-114.9228,NV,Clark,America/Los_Angeles,8.0
+910,Clark,2322,83359.44,9,36.0875,-115.0507,NV,Clark,America/Los_Angeles,8.0
+911,Desert Star Energy Center,55077,2539144.86,9,35.7867,-114.9928,NV,Clark,America/Los_Angeles,8.0
+912,Fort Churchill,2330,271502.92,9,39.1281,-119.1319,NV,Lyon,America/Los_Angeles,8.0
+913,Harry Allen,7082,3535257.67,9,36.425,-114.9,NV,Clark,America/Los_Angeles,8.0
+914,Las Vegas Generating Station,10761,394944.71,9,36.2317,-115.1235,NV,Clark,America/Los_Angeles,8.0
+915,North Valmy,8224,1814804.2,9,40.8831,-117.1542,NV,Humboldt,America/Los_Angeles,8.0
+916,Reid Gardner,2324,1610223.35,9,36.6531,-114.6364,NV,Clark,America/Los_Angeles,8.0
+917,Silverhawk,55841,1834555.48,9,36.4078,-114.9603,NV,Clark,America/Los_Angeles,8.0
+918,TS Power Plant,56224,1238207.53,9,40.7458,-116.5297,NV,Eureka,America/Los_Angeles,8.0
+919,Tracy,2336,3828249.93,9,39.5625,-119.525,NV,Storey,America/Los_Angeles,8.0
+920,Tri-Center Naniwa Energy,55494,,9,39.5617,-119.5175,NV,Storey,America/Los_Angeles,8.0
+921,Walter M. Higgins III Generating Station,55687,2722063.69,9,35.6139,-115.3561,NV,Clark,America/Los_Angeles,8.0
+922,23rd and 3rd,7910,130986.72,2,40.663000000000004,-74.0,NY,Kings,America/New_York,5.0
+923,59th Street,2503,215.6,2,40.7711,-73.9911,NY,New York,America/New_York,5.0
+924,74th Street,2504,373.94,2,40.768,-73.9515,NY,New York,America/New_York,5.0
+925,AG - Energy,10803,,2,44.7258,-75.4417,NY,Saint Lawrence,America/New_York,5.0
+926,Allegany Station No. 133,10619,83646.06,2,42.5083,-78.0661,NY,Allegany,America/New_York,5.0
+927,Arthur Kill,2490,1745292.25,2,40.5915,-74.2027,NY,Richmond,America/New_York,5.0
+928,Astoria Energy,55375,7024803.32,2,40.7825,-73.8964,NY,Queens,America/New_York,5.0
+929,Astoria Gas Turbine Power,55243,129982.75,2,40.7864,-73.9133,NY,Queens,America/New_York,5.0
+930,Astoria Generating Station,8906,2864583.54,2,40.7869,-73.9122,NY,Queens,America/New_York,5.0
+931,Athens Generating Company,55405,5848703.33,2,42.2728,-73.8492,NY,Greene,America/New_York,5.0
+932,Batavia Energy,54593,73257.5,2,42.9828,-78.1592,NY,Genesee,America/New_York,5.0
+933,Bayswater Peaking Facility,55699,148285.28,2,40.6106,-73.7614,NY,Queens,America/New_York,5.0
+934,"Beaver Falls, LLC",10617,4801.41,2,43.8861,-75.4342,NY,Lewis,America/New_York,5.0
+935,Bethlehem Energy Center (Albany),2539,3343915.09,2,42.5905,-73.7636,NY,Albany,America/New_York,5.0
+936,Bethpage Energy Center,50292,588734.28,2,40.7469,-73.4994,NY,Nassau,America/New_York,5.0
+937,Binghamton Cogen Plant,55600,,2,42.1073,-75.9283,NY,Broome,America/New_York,5.0
+938,"Black River Generation, LLC",10464,,2,44.0361,-75.7712,NY,Jefferson,America/New_York,5.0
+939,Bowline Generating Station,2625,425759.1,2,41.2044,-73.9689,NY,Rockland,America/New_York,5.0
+940,Brentwood,7912,75379.23,2,40.787,-73.2933,NY,Suffolk,America/New_York,5.0
+941,Brooklyn Navy Yard Cogeneration,54914,1333033.5,2,40.6994,-73.9758,NY,Kings,America/New_York,5.0
+942,Caithness Long Island Energy Center,56234,2315551.76,2,40.8142,-72.9403,NY,Suffolk,America/New_York,5.0
+943,Carr Street Generating Station,50978,52512.15,2,43.0611,-76.0819,NY,Onondaga,America/New_York,5.0
+944,Carthage Energy,10620,24773.54,2,43.9842,-75.6225,NY,Jefferson,America/New_York,5.0
+945,"Castleton Power, LLC",10190,147470.06,2,42.5375,-73.7433,NY,Rensselaer,America/New_York,5.0
+946,"Cayuga Operating Company, LLC",2535,534010.34,2,42.6028,-76.6336,NY,Tompkins,America/New_York,5.0
+947,Cornell University Ithaca Campus,50368,,2,42.4428,-76.4764,NY,Tompkins,America/New_York,5.0
+948,Covanta Niagara,50472,,2,43.0839,-79.0056,NY,Niagara,America/New_York,5.0
+949,Danskammer Generating Station,2480,303269.36,2,41.573,-73.9646,NY,Orange,America/New_York,5.0
+950,E F Barrett,2511,1214492.0,2,40.6169,-73.6486,NY,Nassau,America/New_York,5.0
+951,East Hampton Facility,2512,6557.82,2,40.9619,-72.2095,NY,Suffolk,America/New_York,5.0
+952,East River,2493,2503163.0,2,40.7281,-73.9742,NY,New York,America/New_York,5.0
+953,Edgewood Energy,55786,208329.06,2,40.7861,-73.2931,NY,Suffolk,America/New_York,5.0
+954,Empire Generating Company LLC,56259,3796074.1,2,42.6296,-73.749,NY,Rensselaer,America/New_York,5.0
+955,Equus  Power I,56032,66433.25,2,40.6447,-73.5683,NY,Nassau,America/New_York,5.0
+956,Far Rockaway,2513,158258.5,2,40.6111,-73.7611,NY,Queens,America/New_York,5.0
+957,Fortistar North Tonawanda Inc,54131,55698.5,2,43.0483,-78.8539,NY,Niagara,America/New_York,5.0
+958,Freeport Power Plant No. 2,2679,49027.75,2,40.6447,-73.5683,NY,Nassau,America/New_York,5.0
+959,GMMM Westover,2526,,2,42.1117,-75.9747,NY,Broome,America/New_York,5.0
+960,Glenwood,2514,164468.75,2,40.8269,-73.6479,NY,Nassau,America/New_York,5.0
+961,Glenwood Landing Energy Center,7869,140703.75,2,40.8275,-73.6478,NY,Nassau,America/New_York,5.0
+962,Gowanus Generating Station,2494,40471.0,2,40.6635,-74.0051,NY,Kings,America/New_York,5.0
+963,Greenidge Generation LLC,2527,,2,42.6789,-76.9483,NY,Yates,America/New_York,5.0
+964,Harlem River Yard,7914,51100.59,2,40.7989,-73.9147,NY,Bronx,America/New_York,5.0
+965,"Hawkeye Energy Greenport, LLC",55969,21411.5,2,41.1056,-72.3767,NY,Suffolk,America/New_York,5.0
+966,Hell Gate,7913,58836.8,2,40.7988,-73.9093,NY,Bronx,America/New_York,5.0
+967,Hillburn,2628,258.75,2,41.1269,-74.1653,NY,Rockland,America/New_York,5.0
+968,Holcim US Inc,880043,,2,42.1631,-73.9003,NY,Greene,America/New_York,5.0
+969,Holtsville Facility,8007,53416.0,2,40.8153,-73.0664,NY,Suffolk,America/New_York,5.0
+970,Hudson Avenue,2496,715.12,2,40.7052,-73.9807,NY,Kings,America/New_York,5.0
+971,Huntley Power,2549,739755.99,2,42.97,-78.93,NY,Erie,America/New_York,5.0
+972,Indeck-Corinth Energy Center,50458,662862.75,2,43.25,-73.8125,NY,Saratoga,America/New_York,5.0
+973,Indeck-Olean Energy Center,54076,134621.75,2,42.0875,-78.4578,NY,Cattaraugus,America/New_York,5.0
+974,Indeck-Oswego Energy Center,50450,26160.75,2,43.4682,-76.4965,NY,Oswego,America/New_York,5.0
+975,Indeck-Silver Springs Energy Center,50449,67747.0,2,42.6544,-78.0772,NY,Wyoming,America/New_York,5.0
+976,Indeck-Yerkes Energy Center,50451,56470.0,2,42.9671,-78.9182,NY,Erie,America/New_York,5.0
+977,Independence,54547,5473676.57,2,43.495,-76.4508,NY,Oswego,America/New_York,5.0
+978,KIAC Cogeneration,54114,613106.36,2,40.6417,-73.7778,NY,Queens,America/New_York,5.0
+979,"Lafarge Building Materials, Inc.",880044,,2,42.4833,-73.8167,NY,Albany,America/New_York,5.0
+980,Lehigh Northeast Cement Company,880052,,2,43.3064,-73.6208,NY,Warren,America/New_York,5.0
+981,Lockport,54041,190727.0,2,43.1622,-78.7453,NY,Niagara,America/New_York,5.0
+982,Massena Energy Facility,54592,4112.19,2,44.9503,-74.8928,NY,Saint Lawrence,America/New_York,5.0
+983,Momentive Performance Materials,880024,,2,42.8158,-73.6728,NY,Saratoga,America/New_York,5.0
+984,NRG Dunkirk Power,2554,665765.12,2,42.49,-79.35,NY,Chautauqua,America/New_York,5.0
+985,Narrows Generating Station,2499,91766.0,2,40.6486,-74.0209,NY,Kings,America/New_York,5.0
+986,Nassau Energy Corporation,52056,342795.18,2,40.7259,-73.5885,NY,Nassau,America/New_York,5.0
+987,"Niagara Generation, LLC",50202,138482.9,2,43.0804,-79.0082,NY,Niagara,America/New_York,5.0
+988,Nissequogue Energy Center,54149,322880.79,2,40.9168,-73.1292,NY,Suffolk,America/New_York,5.0
+989,North 1st,7915,51912.34,2,40.7168,-73.9665,NY,Kings,America/New_York,5.0
+990,Northport,2516,3526021.5,2,40.9231,-73.3417,NY,Suffolk,America/New_York,5.0
+991,Oswego Harbor Power,2594,68515.42,2,43.46,-76.53,NY,Oswego,America/New_York,5.0
+992,Pinelawn Power,56188,336409.0,2,40.7358,-73.3881,NY,Suffolk,America/New_York,5.0
+993,Poletti 500 MW CC,56196,3199875.8,2,40.7881,-73.9056,NY,Queens,America/New_York,5.0
+994,Port Jefferson Energy Center,2517,602429.75,2,40.9503,-73.0786,NY,Suffolk,America/New_York,5.0
+995,Pouch Terminal,8053,102124.96,2,40.6188,-74.069,NY,Richmond,America/New_York,5.0
+996,"RED-Rochester, LLC-Eastman Business Park",10025,,2,43.1969,-77.6289,NY,Monroe,America/New_York,5.0
+997,Ravenswood Generating Station,2500,4631214.89,2,40.7585,-73.9451,NY,Queens,America/New_York,5.0
+998,Ravenswood Steam Plant,880100,,2,40.76,-73.75,NY,Queens,America/New_York,5.0
+999,Rensselaer Cogen,54034,70125.91,2,42.63,-73.75,NY,Rensselaer,America/New_York,5.0
+1000,Richard M Flynn (Holtsville),7314,817460.57,2,40.8153,-73.0644,NY,Suffolk,America/New_York,5.0
+1001,Riverbay Corp. - Co-Op City,52168,37562.25,2,40.8697,-73.8258,NY,Bronx,America/New_York,5.0
+1002,Roseton Generating LLC,8006,449217.21,2,41.5711,-73.9739,NY,Orange,America/New_York,5.0
+1003,S A Carlson,2682,185535.75,2,42.0917,-79.2417,NY,Chautauqua,America/New_York,5.0
+1004,"Saranac Power Partners, LP",54574,462748.98,2,44.7132,-73.4557,NY,Clinton,America/New_York,5.0
+1005,Selkirk Cogen Partners,10725,1769788.66,2,42.5744,-73.8592,NY,Albany,America/New_York,5.0
+1006,Shoemaker,2632,800.5,2,41.4278,-74.4186,NY,Orange,America/New_York,5.0
+1007,Shoreham Energy,55787,21868.39,2,40.9572,-72.8664,NY,Suffolk,America/New_York,5.0
+1008,Somerset Operating Company  (Kintigh),6082,2194135.3,2,43.3561,-78.6039,NY,Niagara,America/New_York,5.0
+1009,Sterling Power Plant,50744,26517.0,2,43.0803,-75.6003,NY,Oneida,America/New_York,5.0
+1010,Syracuse Energy Corporation,50651,,2,43.0653,-76.2086,NY,Onondaga,America/New_York,5.0
+1011,"Syracuse, LLC",10621,11925.01,2,43.0667,-76.2246,NY,Onondaga,America/New_York,5.0
+1012,Ticonderoga Mill,54099,,2,43.8914,-73.3961,NY,Essex,America/New_York,5.0
+1013,Vernon Boulevard,7909,74756.72,2,40.7539,-73.9506,NY,Queens,America/New_York,5.0
+1014,Wading River Facility,7146,54569.5,2,40.9569,-72.8774,NY,Suffolk,America/New_York,5.0
+1015,West Babylon Facility,2521,1915.0,2,40.6953,-73.3497,NY,Suffolk,America/New_York,5.0
+1016,AK Steel Corporation - Middletown,880042,,5,39.4968,-84.3901,OH,Butler,America/New_York,5.0
+1017,AMP-Ohio Gas Turbines Bowling Green,55262,1318.25,5,41.3989,-83.6411,OH,Wood,America/New_York,5.0
+1018,AMP-Ohio Gas Turbines Galion ,55263,1283.0,5,40.7167,-82.789,OH,Crawford,America/New_York,5.0
+1019,AMP-Ohio Gas Turbines Napoleon,55264,1249.25,5,41.4077,-84.1092,OH,Henry,America/New_York,5.0
+1020,ArcelorMittal Cleveland LLC,10398,,5,41.4739,-81.6728,OH,Cuyahoga,America/New_York,5.0
+1021,ArcelorMittal Warren,54207,,5,41.2119,-80.8176,OH,Trumbull,America/New_York,5.0
+1022,Ashtabula,2835,305683.71,5,41.9086,-80.7697,OH,Ashtabula,America/New_York,5.0
+1023,Avon Lake Power Plant,2836,2756712.85,5,41.5042,-82.05,OH,Lorain,America/New_York,5.0
+1024,BP Husky Refining LLC,880030,,5,41.6786,-83.4539,OH,Lucas,America/New_York,5.0
+1025,Bay Shore,2878,425551.22,5,41.6925,-83.4375,OH,Lucas,America/New_York,5.0
+1026,Cardinal,2828,7916182.09,5,40.2522,-80.6486,OH,Jefferson,America/New_York,5.0
+1027,Cargill Incorporated,880039,,5,39.8242,-84.1747,OH,Montgomery,America/New_York,5.0
+1028,Conesville,2840,6314707.86,5,40.1842,-81.8811,OH,Coshocton,America/New_York,5.0
+1029,Darby Electric Generating Station,55247,77794.17,5,39.7139,-83.1778,OH,Pickaway,America/New_York,5.0
+1030,Dresden Energy Facility,55350,2220038.96,5,40.0935,-82.0267,OH,Muskingum,America/New_York,5.0
+1031,"Dynegy Dicks Creek, LLC",2831,247.48,5,39.465,-84.3775,OH,Butler,America/New_York,5.0
+1032,"Dynegy Hanging Rock II, LLC",55736,8776043.3,5,38.5731,-82.7833,OH,Lawrence,America/New_York,5.0
+1033,"Dynegy Washington II, LLC",55397,4397187.3,5,39.5798,-81.6571,OH,Washington,America/New_York,5.0
+1034,Eastlake,2837,4868061.56,5,41.6713,-81.4432,OH,Lake,America/New_York,5.0
+1035,"Emery Oleochemicals, LLC",880033,,5,39.1792,-84.5053,OH,Hamilton,America/New_York,5.0
+1036,Frank M Tait Station,2847,53899.02,5,39.7281,-84.2103,OH,Montgomery,America/New_York,5.0
+1037,Fremont Energy Center,55701,2477771.34,5,41.3781,-83.1647,OH,Sandusky,America/New_York,5.0
+1038,Gen J M Gavin,8102,18595366.87,5,38.9347,-82.1158,OH,Gallia,America/New_York,5.0
+1039,Greenville Electric Gen Station,55228,65407.64,5,40.0747,-84.6147,OH,Darke,America/New_York,5.0
+1040,Hamilton Municipal Power Plant,2917,96720.49,5,39.4099,-84.5544,OH,Butler,America/New_York,5.0
+1041,J M Stuart,2850,12610597.0,5,38.6361,-83.6939,OH,Adams,America/New_York,5.0
+1042,Killen Station,6031,4066542.3,5,38.6903,-83.4803,OH,Adams,America/New_York,5.0
+1043,Kyger Creek,2876,5168054.2,5,38.9161,-82.1281,OH,Gallia,America/New_York,5.0
+1044,Lake Shore,2838,190026.9,5,41.5356,-81.6419,OH,Cuyahoga,America/New_York,5.0
+1045,Lima Refinery,880083,,5,40.7234,-84.1133,OH,Allen,America/New_York,5.0
+1046,Mad River,2860,,5,39.9239,-83.8508,OH,Clark,America/New_York,5.0
+1047,Madison Generating Station,55110,197357.24,5,39.4522,-84.465,OH,Butler,America/New_York,5.0
+1048,Miami Fort Power Station,2832,9007809.79,5,39.1131,-84.8031,OH,Hamilton,America/New_York,5.0
+1049,Muskingum River,2872,1890167.87,5,39.5908,-81.6797,OH,Washington,America/New_York,5.0
+1050,Niles,2861,56994.94,5,41.1667,-80.75,OH,Trumbull,America/New_York,5.0
+1051,O H Hutchings,2848,59524.17,5,39.6094,-84.2931,OH,Montgomery,America/New_York,5.0
+1052,Omega JV2 Bowling Green,7783,3573.5,5,41.3883,-83.6406,OH,Wood,America/New_York,5.0
+1053,Omega JV2 Hamilton,7782,1739.75,5,39.3528,-84.5183,OH,Butler,America/New_York,5.0
+1054,P H Glatfelter Company - Chillicothe Fac,10244,,5,39.3265,-82.9744,OH,Ross,America/New_York,5.0
+1055,Picway,2843,4053.89,5,39.7933,-83.0097,OH,Pickaway,America/New_York,5.0
+1056,Procter & Gamble Company - Ivorydale,880028,,5,39.1756,-84.5022,OH,Hamilton,America/New_York,5.0
+1057,R E Burger,2864,,5,39.9094,-80.7608,OH,Belmont,America/New_York,5.0
+1058,Richland Peaking Station,2880,173198.16,5,41.3033,-84.3386,OH,Defiance,America/New_York,5.0
+1059,Robert P Mone,7872,83843.15,5,40.9297,-84.7392,OH,Van Wert,America/New_York,5.0
+1060,Rolling Hills Generating LLC,55401,139492.28,5,39.0839,-82.3328,OH,Vinton,America/New_York,5.0
+1061,Smart Papers LLC,50247,,5,39.4086,-84.5622,OH,Butler,America/New_York,5.0
+1062,Tait Electric Generating Station,55248,101813.24,5,39.7286,-84.2106,OH,Montgomery,America/New_York,5.0
+1063,The Ohio State University,50044,,5,40.0008,-83.0158,OH,Franklin,America/New_York,5.0
+1064,"Troy Energy, LLC",55348,93068.37,5,41.4774,-83.4616,OH,Wood,America/New_York,5.0
+1065,W H Sammis,2866,9806974.35,5,40.5308,-80.6311,OH,Jefferson,America/New_York,5.0
+1066,W H Zimmer Generating Station,6019,5273005.24,5,38.8689,-84.2286,OH,Clermont,America/New_York,5.0
+1067,Walter C Beckjord Generating Station,2830,3563247.49,5,38.9917,-84.2981,OH,Clermont,America/New_York,5.0
+1068,Waterford Plant,55503,5166763.19,5,39.5314,-81.7172,OH,Washington,America/New_York,5.0
+1069,West Lorain,2869,217907.49,5,41.4297,-82.2633,OH,Lorain,America/New_York,5.0
+1070,Woodsdale,7158,18470.16,5,39.4492,-84.4611,OH,Butler,America/New_York,5.0
+1071,Anadarko,3006,36898.45,6,35.0847,-98.23,OK,Caddo,America/Chicago,6.0
+1072,Chouteau Power Plant,7757,3300744.29,6,36.2206,-95.2756,OK,Mayes,America/Chicago,6.0
+1073,Comanche (8059),8059,617246.26,6,34.5431,-98.3244,OK,Comanche,America/Chicago,6.0
+1074,Grand River Dam Authority,165,5437272.51,6,36.1906,-95.2889,OK,Mayes,America/Chicago,6.0
+1075,"Green Country Energy, LLC",55146,3981270.32,6,35.9833,-95.9346,OK,Tulsa,America/Chicago,6.0
+1076,Horseshoe Lake,2951,1164404.99,6,35.5089,-97.1789,OK,Oklahoma,America/Chicago,6.0
+1077,Hugo,6772,2703013.26,6,34.0158,-95.3206,OK,Choctaw,America/Chicago,6.0
+1078,McClain Energy Facility,55457,2483441.31,6,35.2979,-97.5896,OK,McClain,America/Chicago,6.0
+1079,Mooreland,3008,363283.63,6,36.4375,-99.2208,OK,Woodward,America/Chicago,6.0
+1080,Muskogee,2952,8597983.15,6,35.7617,-95.2847,OK,Muskogee,America/Chicago,6.0
+1081,Mustang,2953,568120.44,6,35.4711,-97.6733,OK,Canadian,America/Chicago,6.0
+1082,Northeastern,2963,8663634.25,6,36.4317,-95.7008,OK,Rogers,America/Chicago,6.0
+1083,Oneta Energy Center,55225,3445504.51,6,36.0119,-95.6967,OK,Wagoner,America/Chicago,6.0
+1084,Ponca,762,66620.67,6,36.7205,-97.0868,OK,Kay,America/Chicago,6.0
+1085,Redbud Power Plant,55463,6686455.28,6,35.6853,-97.2242,OK,Oklahoma,America/Chicago,6.0
+1086,Riverside (4940),4940,1927987.8,6,35.9978,-95.9567,OK,Tulsa,America/Chicago,6.0
+1087,Seminole (2956),2956,3273178.64,6,34.9678,-96.7242,OK,Seminole,America/Chicago,6.0
+1088,Sooner,6095,6131315.05,6,36.4537,-97.0527,OK,Noble,America/Chicago,6.0
+1089,Southwestern,2964,950895.56,6,35.1009,-98.3524,OK,Caddo,America/Chicago,6.0
+1090,Spring Creek Power Plant,55651,138756.54,6,35.7422,-97.655,OK,Logan,America/Chicago,6.0
+1091,Tenaska Kiamichi Generating Station,55501,4571418.13,6,34.6831,-95.9349,OK,Pittsburg,America/Chicago,6.0
+1092,Tulsa,2965,286980.61,6,36.1125,-95.9917,OK,Tulsa,America/Chicago,6.0
+1093,Boardman,6106,2785404.35,10,45.6933,-119.8056,OR,Morrow,America/Los_Angeles,8.0
+1094,Coyote Springs,7350,2012913.03,10,45.8486,-119.6744,OR,Morrow,America/Los_Angeles,8.0
+1095,Hermiston,54761,1851396.0,10,45.8042,-119.37,OR,Umatilla,America/Los_Angeles,8.0
+1096,Hermiston Power Plant,55328,2967914.4,10,45.7931,-119.3117,OR,Umatilla,America/Los_Angeles,8.0
+1097,Klamath Cogeneration Project,55103,2268963.93,10,42.174,-121.8112,OR,Klamath,America/Los_Angeles,8.0
+1098,Klamath Generation Peakers,55544,15946.7,10,42.1727,-121.8144,OR,Klamath,America/Los_Angeles,8.0
+1099,Port Westward,56227,1769082.39,10,46.1792,-123.1717,OR,Columbia,America/Los_Angeles,8.0
+1100,AES Beaver Valley LLC,10676,,3,40.6558,-80.3556,PA,Beaver,America/New_York,5.0
+1101,Allegheny Energy Units 1 & 2,55196,34000.7,3,40.5447,-79.7678,PA,Allegheny,America/New_York,5.0
+1102,"Allegheny Energy Units 3, 4 & 5",55710,2087218.55,3,40.5456,-79.7669,PA,Allegheny,America/New_York,5.0
+1103,Allegheny Energy Units 8 & 9,55377,33454.9,3,39.7475,-79.8388,PA,Fayette,America/New_York,5.0
+1104,Armagh Compressor Station,880071,,3,40.4319,-79.085,PA,Indiana,America/New_York,5.0
+1105,Armstrong Power Station,3178,373714.39,3,40.9289,-79.4658,PA,Armstrong,America/New_York,5.0
+1106,"Armstrong Power, LLC",55347,188119.65,3,40.6383,-79.3503,PA,Armstrong,America/New_York,5.0
+1107,Bernville Station,880049,,3,40.4092,-76.1511,PA,Berks,America/New_York,5.0
+1108,Bethlehem Power Plant,55690,5981807.45,3,40.6175,-75.3147,PA,Northampton,America/New_York,5.0
+1109,Bruce Mansfield,6094,19437921.26,3,40.6344,-80.42,PA,Beaver,America/New_York,5.0
+1110,"Brunner Island, LLC",3140,6531944.51,3,40.097,-76.6962,PA,York,America/New_York,5.0
+1111,Brunot Island Power Station,3096,21254.04,3,40.4638,-80.044,PA,Allegheny,America/New_York,5.0
+1112,Cambria Cogen,10641,,3,40.4748,-78.7021,PA,Cambria,America/New_York,5.0
+1113,Chambersburg Units 12 & 13,55654,50631.06,3,39.8668,-77.6859,PA,Franklin,America/New_York,5.0
+1114,Cheswick,8226,2652930.94,3,40.5383,-79.7906,PA,Allegheny,America/New_York,5.0
+1115,Colver Power Project,10143,1002004.33,3,40.55,-78.8,PA,Cambria,America/New_York,5.0
+1116,Conemaugh,3118,11376057.55,3,40.3842,-79.0611,PA,Indiana,America/New_York,5.0
+1117,Croydon Generating Station,8012,4372.29,3,40.08,-74.8917,PA,Bucks,America/New_York,5.0
+1118,"Domtar Paper Company, LLC",54638,,3,41.4908,-78.6767,PA,Elk,America/New_York,5.0
+1119,"Dynegy Fayette II, LLC",55516,4425323.04,3,39.8592,-79.9182,PA,Fayette,America/New_York,5.0
+1120,Ebensburg Power Company,10603,492877.13,3,40.455,-78.7472,PA,Cambria,America/New_York,5.0
+1121,Eddystone Generating Station,3161,93399.1,3,39.858000000000004,-75.32300000000001,PA,Delaware,America/New_York,5.0
+1122,Elrama,3098,107586.76,3,40.2525,-79.9183,PA,Washington,America/New_York,5.0
+1123,Entriken Compressor Station,880072,,3,40.3086,-78.1389,PA,Huntingdon,America/New_York,5.0
+1124,"Fairless Energy, LLC",55298,8529260.17,3,40.1464,-74.7406,PA,Bucks,America/New_York,5.0
+1125,Fairless Hills Generating Station,7701,,3,40.1405,-74.7506,PA,Bucks,America/New_York,5.0
+1126,Gilberton Power Company,10113,,3,40.79,-76.1984,PA,Schuylkill,America/New_York,5.0
+1127,Grays Ferry Cogen Partnership,54785,664630.67,3,39.9417,-75.1883,PA,Philadelphia,America/New_York,5.0
+1128,Handsome Lake Energy,55233,117798.0,3,41.2908,-79.8061,PA,Venango,America/New_York,5.0
+1129,Hatfield's Ferry Power Station,3179,10495729.16,3,39.8562,-79.9274,PA,Greene,America/New_York,5.0
+1130,Hazleton Generation,10870,2520.85,3,40.9282,-76.0416,PA,Luzerne,America/New_York,5.0
+1131,Helix Ironwood LLC,55337,2962071.81,3,40.3509,-76.3658,PA,Lebanon,America/New_York,5.0
+1132,Homer City,3122,10568174.55,3,40.510999999999996,-79.1968,PA,Indiana,America/New_York,5.0
+1133,Honeywell Resins & Chemicals LLC,880007,,3,40.0067,-75.0686,PA,Philadelphia,America/New_York,5.0
+1134,Hunlock Creek Energy Center,3176,370307.39,3,41.2033,-76.0683,PA,Luzerne,America/New_York,5.0
+1135,Hunlock Unit 4,56397,3935.54,3,41.2033,-76.0683,PA,Luzerne,America/New_York,5.0
+1136,Hunterstown Combined Cycle,55976,2915332.55,3,39.8725,-77.1672,PA,Adams,America/New_York,5.0
+1137,Keystone,3136,10222266.29,3,40.6604,-79.3411,PA,Armstrong,America/New_York,5.0
+1138,Kimberly-Clark Tissue Company,50410,,3,39.8439,-75.3575,PA,Delaware,America/New_York,5.0
+1139,Liberty Electric Power Plant,55231,2681761.25,3,39.8622,-75.3361,PA,Delaware,America/New_York,5.0
+1140,"Lower Mount Bethel Energy, LLC",55667,3458516.28,3,40.8011,-75.105,PA,Northampton,America/New_York,5.0
+1141,"MARCUS HOOK 50, L.P.",50074,220.91,3,39.8103,-75.4281,PA,Delaware,America/New_York,5.0
+1142,"Marcus Hook Energy, LP",55801,3159660.87,3,39.8083,-75.4225,PA,Delaware,America/New_York,5.0
+1143,"Martins Creek, LLC",3148,1749765.46,3,40.796,-75.107,PA,Northampton,America/New_York,5.0
+1144,Merck & Company - West Point,52149,274108.32,3,40.2128,-75.3022,PA,Montgomery,America/New_York,5.0
+1145,Mitchell Power Station,3181,1268824.56,3,40.2207,-79.9682,PA,Washington,America/New_York,5.0
+1146,"Montour, LLC",3149,8549004.1,3,41.0714,-76.6672,PA,Montour,America/New_York,5.0
+1147,Mountain,3111,6046.0,3,40.1219,-77.1761,PA,Cumberland,America/New_York,5.0
+1148,Mt. Carmel Cogeneration,10343,286278.48,3,40.8092,-76.4539,PA,Northumberland,America/New_York,5.0
+1149,New Castle,3138,412522.23,3,40.9378,-80.3681,PA,Lawrence,America/New_York,5.0
+1150,North East Cogeneration Plant,54571,,3,42.202,-79.8425,PA,Erie,America/New_York,5.0
+1151,Northampton Generating Plant,50888,901112.34,3,40.6917,-75.4792,PA,Northampton,America/New_York,5.0
+1152,Northeastern Power Company,50039,412911.46,3,40.8737,-75.9936,PA,Schuylkill,America/New_York,5.0
+1153,Ontelaunee Energy Center,55193,3637354.0,3,40.4219,-75.9353,PA,Berks,America/New_York,5.0
+1154,P H Glatfelter Company,50397,,3,39.8717,-76.8664,PA,York,America/New_York,5.0
+1155,PEI Power Corporation,50279,19960.51,3,41.4844,-75.5403,PA,Lackawanna,America/New_York,5.0
+1156,Panther Creek Energy Facility,50776,,3,40.8556,-75.8781,PA,Carbon,America/New_York,5.0
+1157,Philadelphia Refinery,52106,,3,39.9058,-75.2122,PA,Philadelphia,America/New_York,5.0
+1158,Piney Creek Power Plant,54144,304550.67,3,41.1776,-79.4418,PA,Clarion,America/New_York,5.0
+1159,Portland,3113,173915.03,3,40.91,-75.0789,PA,Northampton,America/New_York,5.0
+1160,Procter & Gamble Paper Products,50463,402435.61,3,41.573,-76.0426,PA,Wyoming,America/New_York,5.0
+1161,Richmond,3168,1632.17,3,39.9853,-75.0733,PA,Philadelphia,America/New_York,5.0
+1162,Schuylkill,3169,457.68,3,39.9425,-75.1883,PA,Philadelphia,America/New_York,5.0
+1163,Scrubgrass Generating Plant,50974,,3,41.2678,-79.8114,PA,Venango,America/New_York,5.0
+1164,Seward,3130,,3,40.4081,-79.0339,PA,Indiana,America/New_York,5.0
+1165,Shawville,3131,1509192.41,3,41.067,-78.3656,PA,Clearfield,America/New_York,5.0
+1166,Shermans Dale Station,880050,,3,40.3439,-77.1628,PA,Perry,America/New_York,5.0
+1167,St. Nicholas Cogeneration Project,54634,,3,40.8222,-76.1736,PA,Schuylkill,America/New_York,5.0
+1168,Sunbury,3152,,3,40.8361,-76.825,PA,Snyder,America/New_York,5.0
+1169,Titus,3115,108646.07,3,40.3061,-75.9081,PA,Berks,America/New_York,5.0
+1170,Tolna,3116,1102.0,3,39.7636,-76.6345,PA,York,America/New_York,5.0
+1171,Trainer Refinery,880025,,3,39.8228,-75.4033,PA,Delaware,America/New_York,5.0
+1172,US Steel (Clairton Coke),50729,,3,40.3097,-79.8819,PA,Allegheny,America/New_York,5.0
+1173,US Steel (Edgar Thomson),50732,,3,40.3925,-79.8564,PA,Allegheny,America/New_York,5.0
+1174,Veolia Energy Philadelphia - Edison Sta,880006,,3,39.949,-75.1557,PA,Philadelphia,America/New_York,5.0
+1175,Veolia Energy Philadelphia - Schuylkill ,50607,,3,39.9422,-75.1875,PA,Philadelphia,America/New_York,5.0
+1176,"WPS Westwood Generation, LLC",50611,227229.32,3,40.6191,-76.45,PA,Schuylkill,America/New_York,5.0
+1177,Warren,3132,6825.0,3,41.8358,-79.19,PA,Warren,America/New_York,5.0
+1178,Wheelabrator - Frackville,50879,,3,40.7817,-76.1781,PA,Schuylkill,America/New_York,5.0
+1179,York Energy Center,55524,2337925.18,3,39.738,-76.3072,PA,York,America/New_York,5.0
+1180,Manchester Street,3236,1743836.0,1,41.8167,-71.4042,RI,Providence,America/New_York,5.0
+1181,Ocean State Power,51030,587202.9,1,42.0099,-71.6701,RI,Providence,America/New_York,5.0
+1182,Ocean State Power II,54324,465610.75,1,42.0099,-71.6701,RI,Providence,America/New_York,5.0
+1183,"Pawtucket Power Associates, LP",54056,6772.76,1,41.861000000000004,-71.407,RI,Providence,America/New_York,5.0
+1184,Rhode Island State Energy Center,55107,2458933.03,1,41.8017,-71.5186,RI,Providence,America/New_York,5.0
+1185,"Tiverton Power, LLC",55048,1650023.56,1,41.6417,-71.17,RI,Newport,America/New_York,5.0
+1186,AbiBow US Inc. - Catawba Operations,2440,,4,34.8456,-80.8942,SC,York,America/New_York,5.0
+1187,BP Amoco Chemical Company CR Plant,880092,,4,32.9701,-79.8905,SC,Berkeley,America/New_York,5.0
+1188,Broad River Energy Center,55166,1072863.75,4,35.0786,-81.575,SC,Cherokee,America/New_York,5.0
+1189,Canadys Steam,3280,1757225.96,4,33.0647,-80.6228,SC,Colleton,America/New_York,5.0
+1190,Cherokee County Cogen,55043,463753.59,4,35.0727,-81.613,SC,Cherokee,America/New_York,5.0
+1191,Columbia Energy Center (SC),55386,62967.33,4,33.8692,-81.0183,SC,Calhoun,America/New_York,5.0
+1192,Cope Station,7210,2110947.67,4,33.3642,-81.03,SC,Orangeburg,America/New_York,5.0
+1193,Cross,130,13905798.47,4,33.3692,-80.1119,SC,Berkeley,America/New_York,5.0
+1194,Darlington County,3250,97494.85,4,34.4185,-80.1657,SC,Darlington,America/New_York,5.0
+1195,Dolphus M Grainger,3317,,4,33.8253,-79.0528,SC,Horry,America/New_York,5.0
+1196,H B Robinson,3251,239474.5,4,34.4017,-80.1589,SC,Darlington,America/New_York,5.0
+1197,Hagood,3285,35407.42,4,32.8265,-79.9634,SC,Charleston,America/New_York,5.0
+1198,Hilton Head Gas Turbine Site,3318,496.0,4,32.2089,-80.6994,SC,Beaufort,America/New_York,5.0
+1199,INVISTA S.a.r.l. Camden Plant,880057,,4,34.2337,-80.658,SC,Kershaw,America/New_York,5.0
+1200,International Paper-Eastover Mill,52151,,4,33.8872,-80.6397,SC,Richland,America/New_York,5.0
+1201,Jasper County Generating Facility,55927,3291511.74,4,32.3592,-81.1236,SC,Jasper,America/New_York,5.0
+1202,Jefferies,3319,356565.76,4,33.2422,-79.9875,SC,Berkeley,America/New_York,5.0
+1203,John S. Rainey Generating Station,7834,3537303.04,4,34.3477,-82.77600000000001,SC,Anderson,America/New_York,5.0
+1204,"KapStone Charleston Kraft, LLC",7737,,4,32.8994,-79.9694,SC,Charleston,America/New_York,5.0
+1205,Marlboro Paper Mill,880074,,4,34.605,-79.785,SC,Marlboro,America/New_York,5.0
+1206,McMeekin,3287,637426.17,4,34.0533,-81.2178,SC,Lexington,America/New_York,5.0
+1207,Mill Creek Combustion Turbine Sta,7981,126276.02,4,35.1597,-81.4306,SC,Cherokee,America/New_York,5.0
+1208,Myrtle Beach Gas Turbine Site,3320,220.0,4,33.7089,-78.9233,SC,Horry,America/New_York,5.0
+1209,Sonoco Products Company,880078,,4,34.387,-80.0663,SC,Darlington,America/New_York,5.0
+1210,Urquhart,3295,2104460.17,4,33.435,-81.9111,SC,Aiken,America/New_York,5.0
+1211,W S Lee,3264,209111.49,4,34.6022,-82.435,SC,Anderson,America/New_York,5.0
+1212,Wateree,3297,4046621.21,4,33.8264,-80.6218,SC,Richland,America/New_York,5.0
+1213,"WestRock CP, LLC Florence Mill",50806,,4,34.1519,-79.5587,SC,Florence,America/New_York,5.0
+1214,Williams,3298,4013385.76,4,33.0163,-79.9285,SC,Berkeley,America/New_York,5.0
+1215,Winyah,6249,2870771.3,4,33.3303,-79.3611,SC,Georgetown,America/New_York,5.0
+1216,Aberdeen Generating Station,3338,5114.51,8,45.4287,-98.4932,SD,Brown,America/Chicago,6.0
+1217,Angus Anson,7237,118504.34,8,43.6033,-96.6369,SD,Minnehaha,America/Chicago,6.0
+1218,Big Stone,6098,2973557.1,8,45.3047,-96.5103,SD,Grant,America/Chicago,6.0
+1219,Deer Creek Station,56610,29764.86,8,44.3961,-96.5333,SD,Brown,America/Chicago,6.0
+1220,Groton Generating Station,56238,58126.54,8,45.3718,-98.1032,SD,Brown,America/Chicago,6.0
+1221,Huron,3344,1051.0,8,44.3696,-98.17,SD,Beadle,America/Chicago,6.0
+1222,Lange,55478,14766.37,8,44.1212,-103.2608,SD,Pennington,America/Denver,7.0
+1223,Allen,3393,4526622.49,4,35.0742,-90.1439,TN,Shelby,America/Chicago,6.0
+1224,Brownsville CT,55081,384127.52,4,35.5438,-89.198,TN,Haywood,America/Chicago,6.0
+1225,Bull Run,3396,2068767.06,4,36.0211,-84.1567,TN,Anderson,America/New_York,5.0
+1226,Cargill Corn Milling,10729,,4,35.0828,-90.1372,TN,Shelby,America/Chicago,6.0
+1227,Cumberland,3399,15375732.15,4,36.3903,-87.6539,TN,Stewart,America/Chicago,6.0
+1228,Eastman Chemical Company,50481,,4,36.5192,-82.535,TN,Sullivan,America/New_York,5.0
+1229,Gallatin,3403,7101440.54,4,36.3156,-86.4006,TN,Sumner,America/Chicago,6.0
+1230,Gleason Generating Facility,55251,32261.8,4,36.2454,-88.61200000000001,TN,Weakley,America/Chicago,6.0
+1231,John Sevier,3405,4217879.71,4,36.3767,-82.9639,TN,Hawkins,America/New_York,5.0
+1232,Johnsonville,3406,3866576.7,4,36.0278,-87.9861,TN,Humphreys,America/Chicago,6.0
+1233,Kingston,3407,4416984.92,4,35.8992,-84.5194,TN,Roane,America/New_York,5.0
+1234,Lagoon Creek,7845,3809958.32,4,35.6578,-89.3964,TN,Haywood,America/Chicago,6.0
+1235,Packaging Corporation of America,50296,,4,35.0442,-88.2652,TN,Hardin,America/Chicago,6.0
+1236,Resolute Forest Products - Calhoun Ops,50956,,4,35.2964,-84.7569,TN,McMinn,America/New_York,5.0
+1237,Tate & Lyle-Loudon,880079,,4,35.7433,-84.3208,TN,Loudon,America/New_York,5.0
+1238,"AES Deepwater, Inc.",10670,64226.0,6,29.7192,-95.2278,TX,Harris,America/Chicago,6.0
+1239,Air Liquide Bayport Complex,10298,1891334.62,6,29.6225,-95.0458,TX,Harris,America/Chicago,6.0
+1240,Alex Ty Cooke Generating Station,3602,182076.51,6,33.5211,-101.7906,TX,Lubbock,America/Chicago,6.0
+1241,Barney M. Davis,4939,2744560.51,6,27.6067,-97.3119,TX,Nueces,America/Chicago,6.0
+1242,Bastrop Clean Energy Center,55168,2951751.4,6,30.1458,-97.55,TX,Bastrop,America/Chicago,6.0
+1243,Baytown Energy Center,55327,4414260.67,6,29.7731,-94.9019,TX,Chambers,America/Chicago,6.0
+1244,Big Brown,3497,7783530.04,6,31.8206,-96.0561,TX,Freestone,America/Chicago,6.0
+1245,Blackhawk Station,55064,1909236.41,6,35.6957,-101.36,TX,Hutchinson,America/Chicago,6.0
+1246,Bosque County Power Plant,55172,1376802.8,6,31.8594,-97.3586,TX,Bosque,America/Chicago,6.0
+1247,"Brazos Valley Energy, LP",55357,3469934.98,6,29.4731,-95.6244,TX,Fort Bend,America/Chicago,6.0
+1248,C. R. Wing Cogeneration Plant,52176,237768.87,6,32.2722,-101.4222,TX,Howard,America/Chicago,6.0
+1249,Calpine Hidalgo Energy Center,7762,2753155.46,6,26.3389,-98.1708,TX,Hidalgo,America/Chicago,6.0
+1250,Cedar Bayou,3460,1309354.17,6,29.7483,-94.9272,TX,Chambers,America/Chicago,6.0
+1251,Cedar Bayou 4,56806,1175943.88,6,29.752,-94.92299999999999,TX,Chambers,America/Chicago,6.0
+1252,Channel Energy Center,55299,3107344.78,6,29.7189,-95.2319,TX,Harris,America/Chicago,6.0
+1253,Channelview Cogeneration Facility,55187,7865939.33,6,29.8356,-95.1242,TX,Harris,America/Chicago,6.0
+1254,Clear Lake Cogeneration,10741,526234.67,6,29.6255,-95.06700000000001,TX,Harris,America/Chicago,6.0
+1255,Coleto Creek,6178,5618819.83,6,28.7128,-97.2142,TX,Goliad,America/Chicago,6.0
+1256,Colorado Bend Energy Center,56350,2083898.34,6,29.2878,-96.0683,TX,Wharton,America/Chicago,6.0
+1257,Copper Station,9,41035.9,6,31.7569,-106.375,TX,El Paso,America/Denver,7.0
+1258,Corpus Christi Energy Center,55206,2872054.64,6,27.8139,-97.4283,TX,Nueces,America/Chicago,6.0
+1259,Cottonwood Energy Project,55358,6797824.25,6,30.2588,-93.7353,TX,Newton,America/Chicago,6.0
+1260,Decker Creek,3548,1109554.53,6,30.3036,-97.6128,TX,Travis,America/Chicago,6.0
+1261,Decordova,8063,23572.78,6,32.4033,-97.6986,TX,Hood,America/Chicago,6.0
+1262,Deer Park Energy Center,55464,9689614.58,6,29.7153,-95.1361,TX,Harris,America/Chicago,6.0
+1263,Eastman Cogeneration Facility,55176,2137910.84,6,32.4472,-94.6917,TX,Harrison,America/Chicago,6.0
+1264,"Ennis Power Company, LLC",55223,2025767.68,6,32.3194,-96.6739,TX,Ellis,America/Chicago,6.0
+1265,Exelon Laporte Generating Station,55365,94820.11,6,29.701999999999998,-95.071,TX,Harris,America/Chicago,6.0
+1266,ExxonMobil Beaumont Refinery,50625,6041369.94,6,30.0639,-94.0703,TX,Jefferson,America/Chicago,6.0
+1267,Forney Power Plant,55480,6434546.7,6,32.7563,-96.4916,TX,Kaufman,America/Chicago,6.0
+1268,Freestone Power Generation,55226,5447724.38,6,31.8907,-96.1128,TX,Freestone,America/Chicago,6.0
+1269,Frontera Generation Facility,55098,3078916.88,6,26.208000000000002,-98.3992,TX,Hidalgo,America/Chicago,6.0
+1270,Gibbons Creek Steam Electric Station,6136,1628226.4,6,30.6167,-96.0778,TX,Grimes,America/Chicago,6.0
+1271,Graham,3490,215748.99,6,33.135,-98.6117,TX,Young,America/Chicago,6.0
+1272,Greens Bayou,3464,110580.46,6,29.8208,-95.2194,TX,Harris,America/Chicago,6.0
+1273,Gregory Power Facility,55086,4204360.72,6,27.8881,-97.2572,TX,San Patricio,America/Chicago,6.0
+1274,Guadalupe Generating Station,55153,1522626.5,6,29.6237,-98.1395,TX,Guadalupe,America/Chicago,6.0
+1275,H W Pirkey Power Plant,7902,4662623.05,6,32.4607,-94.4852,TX,Harrison,America/Chicago,6.0
+1276,Handley Generating Station,3491,893246.93,6,32.7278,-97.2186,TX,Tarrant,America/Chicago,6.0
+1277,Hardin County Peaking Facility,56604,115757.37,6,30.3039,-94.2527,TX,Hardin,America/Chicago,6.0
+1278,Harrington Station,6193,6603279.41,6,35.2972,-101.7475,TX,Potter,America/Chicago,6.0
+1279,Harrison County Power Project,55664,708589.78,6,32.3958,-94.4361,TX,Harrison,America/Chicago,6.0
+1280,Hays Energy Facility,55144,1965701.09,6,29.7806,-97.9894,TX,Hays,America/Chicago,6.0
+1281,J K Spruce,7097,9776039.25,6,29.3091,-98.3205,TX,Bexar,America/Chicago,6.0
+1282,J Robert Massengale Generating Station,3604,145453.22,6,33.6039,-101.8408,TX,Lubbock,America/Chicago,6.0
+1283,J T Deely,6181,3773568.0,6,29.3072,-98.3228,TX,Bexar,America/Chicago,6.0
+1284,Jack County Generation Facility,55230,5740115.54,6,33.101,-97.9574,TX,Jack,America/Chicago,6.0
+1285,Johnson County Generation Facility,54817,911737.29,6,32.3994,-97.4078,TX,Johnson,America/Chicago,6.0
+1286,Jones Station,3482,1909706.6,6,33.5239,-101.7392,TX,Lubbock,America/Chicago,6.0
+1287,Knox Lee Power Plant,3476,647469.53,6,32.3766,-94.6415,TX,Gregg,America/Chicago,6.0
+1288,Lake Creek,3502,,6,31.4647,-96.985,TX,McLennan,America/Chicago,6.0
+1289,Lake Hubbard,3452,203886.06,6,32.8364,-96.5464,TX,Dallas,America/Chicago,6.0
+1290,Lamar Power Plant,55097,4572169.99,6,33.6314,-95.589,TX,Lamar,America/Chicago,6.0
+1291,Laredo,3439,199415.75,6,27.5667,-99.5083,TX,Webb,America/Chicago,6.0
+1292,Leon Creek,3609,104133.25,6,29.3511,-98.5753,TX,Bexar,America/Chicago,6.0
+1293,Lewis Creek,3457,1546999.27,6,30.4364,-95.5215,TX,Montgomery,America/Chicago,6.0
+1294,Limestone,298,12252756.5,6,31.4219,-96.2525,TX,Limestone,America/Chicago,6.0
+1295,Lone Star Power Plant,3477,22613.04,6,32.9217,-94.7158,TX,Morris,America/Chicago,6.0
+1296,Lost Pines 1,55154,2367281.25,6,30.1478,-97.27,TX,Bastrop,America/Chicago,6.0
+1297,Magic Valley Generating Station,55123,4613567.2,6,26.3403,-98.19,TX,Hidalgo,America/Chicago,6.0
+1298,Martin Lake,6146,15985626.69,6,32.2597,-94.5703,TX,Rusk,America/Chicago,6.0
+1299,Midlothian Energy,55091,5059156.35,6,32.4302,-97.0537,TX,Ellis,America/Chicago,6.0
+1300,Monticello,6147,8016596.77,6,33.0917,-95.0417,TX,Titus,America/Chicago,6.0
+1301,Moore County Station,3483,56650.32,6,35.9667,-101.865,TX,Moore,America/Chicago,6.0
+1302,Morgan Creek,3492,35864.07,6,32.3358,-100.9158,TX,Mitchell,America/Chicago,6.0
+1303,Mountain Creek Generating Station,3453,875461.0,6,32.7253,-96.9361,TX,Dallas,America/Chicago,6.0
+1304,Mustang Station,55065,2671837.49,6,32.9728,-102.7417,TX,Yoakum,America/Chicago,6.0
+1305,Mustang Station (56326),56326,167573.31,6,32.9748,-102.7432,TX,Yoakum,America/Chicago,6.0
+1306,Nacogdoches Power LLC,55708,124379.5,6,31.8326,-94.9006,TX,Nacogdoches,America/Chicago,6.0
+1307,New Gulf Power Facility,50137,2646.72,6,29.2639,-95.8997,TX,Wharton,America/Chicago,6.0
+1308,Newman,3456,2635544.78,6,31.9858,-106.4322,TX,El Paso,America/Denver,7.0
+1309,Nichols Station,3484,1262406.0,6,35.2825,-101.7458,TX,Potter,America/Chicago,6.0
+1310,Nueces Bay,3441,2613152.7,6,27.8182,-97.4189,TX,Nueces,America/Chicago,6.0
+1311,O W Sommers,3611,705079.0,6,29.3078,-98.3244,TX,Bexar,America/Chicago,6.0
+1312,Oak Grove,6180,11931205.34,6,31.185,-96.4853,TX,Robertson,America/Chicago,6.0
+1313,Odessa Ector Generating Station,55215,2452188.41,6,31.8378,-102.3278,TX,Ector,America/Chicago,6.0
+1314,Oklaunion Power Station,127,3344170.34,6,34.0825,-99.1753,TX,Wilbarger,America/Chicago,6.0
+1315,"Optim Energy Altura Cogen, LLC",50815,2839176.79,6,29.8169,-95.1086,TX,Harris,America/Chicago,6.0
+1316,Paris Energy Center,50109,412304.63,6,33.6968,-95.5577,TX,Lamar,America/Chicago,6.0
+1317,Pasadena Power Plant,55047,5263474.15,6,29.7233,-95.1769,TX,Harris,America/Chicago,6.0
+1318,Permian Basin,3494,542132.38,6,31.5839,-102.9636,TX,Ward,America/Chicago,6.0
+1319,Plant X,3485,1660094.64,6,34.1661,-102.4114,TX,Lamb,America/Chicago,6.0
+1320,Power Lane Steam Plant,4195,23143.0,6,33.1707,-96.1264,TX,Hunt,America/Chicago,6.0
+1321,Quail Run Energy Center,56349,441962.54,6,31.8414,-102.315,TX,Ector,America/Chicago,6.0
+1322,R W Miller,3628,323882.91,6,32.6581,-98.3103,TX,Palo Pinto,America/Chicago,6.0
+1323,Ray Olinger,3576,112080.25,6,33.0667,-96.4519,TX,Collin,America/Chicago,6.0
+1324,"Rio Nogales Power Project, LP",55137,3007687.68,6,29.5932,-97.9724,TX,Guadalupe,America/Chicago,6.0
+1325,Roland C. Dansby Power Plant,6243,163716.11,6,30.7217,-96.4599,TX,Brazos,America/Chicago,6.0
+1326,SRW Cogen Limited Partnership,55120,3406192.18,6,30.0561,-93.7539,TX,Orange,America/Chicago,6.0
+1327,Sabine,3459,3932989.72,6,30.0242,-93.875,TX,Orange,America/Chicago,6.0
+1328,Sabine Cogeneration Facility,55104,662455.56,6,30.0444,-93.7716,TX,Orange,America/Chicago,6.0
+1329,Sam Bertron,3468,168280.16,6,29.7268,-95.06,TX,Harris,America/Chicago,6.0
+1330,Sam Rayburn Plant,3631,180084.87,6,28.8947,-97.1347,TX,Victoria,America/Chicago,6.0
+1331,Sam Seymour,6179,8957943.35,6,29.9172,-96.7506,TX,Fayette,America/Chicago,6.0
+1332,San Jacinto County Peaking Facility,56603,150848.89,6,30.42,-95.0114,TX,San Jacinto,America/Chicago,6.0
+1333,San Jacinto Steam Electric Station,7325,897660.86,6,29.6967,-95.0411,TX,Harris,America/Chicago,6.0
+1334,San Miguel,6183,3234179.25,6,28.7044,-98.4781,TX,Atascosa,America/Chicago,6.0
+1335,Sand Hill Energy Center,7900,1669866.71,6,30.2091,-97.6139,TX,Travis,America/Chicago,6.0
+1336,Sandow,6648,4768397.36,6,30.5642,-97.0639,TX,Milam,America/Chicago,6.0
+1337,Sandow Station,52071,4838300.95,6,30.5681,-97.0614,TX,Milam,America/Chicago,6.0
+1338,Sandy Creek Energy Station,56611,110438.0,6,31.4753,-96.9564,TX,McLennan,America/Chicago,6.0
+1339,Silas Ray,3559,72370.66,6,25.9131,-97.5214,TX,Cameron,America/Chicago,6.0
+1340,Sim Gideon,3601,326318.02,6,30.1456,-97.2708,TX,Bastrop,America/Chicago,6.0
+1341,South Houston Green Power Site,55470,1269584.43,6,29.3775,-94.9328,TX,Galveston,America/Chicago,6.0
+1342,Spencer,4266,31697.0,6,33.1978,-97.1067,TX,Denton,America/Chicago,6.0
+1343,Stryker Creek,3504,260887.25,6,31.9381,-94.9883,TX,Cherokee,America/Chicago,6.0
+1344,Sweeny Cogeneration Facility,55015,3613881.44,6,29.0728,-95.745,TX,Brazoria,America/Chicago,6.0
+1345,Sweetwater Generating Plant,50615,,6,32.4925,-100.3628,TX,Nolan,America/Chicago,6.0
+1346,T C Ferguson Power Plant,4937,274363.27,6,30.558000000000003,-98.3705,TX,Llano,America/Chicago,6.0
+1347,T H Wharton,3469,406452.1,6,29.9414,-95.5333,TX,Harris,America/Chicago,6.0
+1348,Tenaska Frontier Generating Station,55062,5054193.28,6,30.5924,-95.9178,TX,Grimes,America/Chicago,6.0
+1349,Tenaska Gateway Generating Station,55132,4261219.3,6,32.0164,-94.6189,TX,Rusk,America/Chicago,6.0
+1350,Texas City Cogeneration,52088,1289703.96,6,29.3787,-94.944,TX,Galveston,America/Chicago,6.0
+1351,Tolk Station,6194,7966833.77,6,34.1847,-102.5686,TX,Lamb,America/Chicago,6.0
+1352,Tradinghouse,3506,,6,31.5733,-96.9642,TX,McLennan,America/Chicago,6.0
+1353,Trinidad,3507,56881.94,6,32.1264,-96.1014,TX,Henderson,America/Chicago,6.0
+1354,Twin Oaks,7030,1742563.04,6,31.0932,-96.6965,TX,Robertson,America/Chicago,6.0
+1355,V H Braunig,3612,2013867.75,6,29.2575,-98.3828,TX,Bexar,America/Chicago,6.0
+1356,Valley (TXU),3508,,6,33.6281,-96.3678,TX,Fannin,America/Chicago,6.0
+1357,Victoria Power Station,3443,721316.59,6,28.7883,-97.01,TX,Victoria,America/Chicago,6.0
+1358,W A Parish,3470,15412135.86,6,29.4783,-95.6358,TX,Fort Bend,America/Chicago,6.0
+1359,Welsh Power Plant,6139,10774971.94,6,33.0583,-94.844,TX,Titus,America/Chicago,6.0
+1360,Wilkes Power Plant,3478,1281343.11,6,32.8486,-94.5469,TX,Marion,America/Chicago,6.0
+1361,Winchester Power Park,56674,47492.49,6,30.0253,-96.9945,TX,Fayette,America/Chicago,6.0
+1362,"Wise County Power Company, LLC",55320,4141177.54,6,33.0583,-97.9103,TX,Wise,America/Chicago,6.0
+1363,Wolf Hollow Generating Station,55139,1746280.71,6,32.3347,-97.7344,TX,Hood,America/Chicago,6.0
+1364,Bonanza,7790,3259179.75,8,40.0864,-109.2844,UT,Uintah,America/Denver,7.0
+1365,Carbon,3644,1380198.06,8,39.7272,-110.8644,UT,Carbon,America/Denver,7.0
+1366,Currant Creek Power Project,56102,2190781.67,8,39.8223,-111.89399999999999,UT,Juab,America/Denver,7.0
+1367,Gadsby,3648,249811.67,8,40.7686,-111.9289,UT,Salt Lake,America/Denver,7.0
+1368,Hunter,6165,9809595.55,8,39.1747,-111.0289,UT,Emery,America/Denver,7.0
+1369,Huntington,8069,7165814.14,8,39.3792,-111.0781,UT,Emery,America/Denver,7.0
+1370,Intermountain,6481,10454727.75,8,39.5035,-112.5811,UT,Millard,America/Denver,7.0
+1371,Lake Side Power Plant,56237,2969405.77,8,40.3311,-111.7547,UT,Utah,America/Denver,7.0
+1372,Millcreek Power,56253,97866.08,8,37.1124,-113.5155,UT,Washington,America/Denver,7.0
+1373,Nebo Power Station,56177,440943.07,8,40.0614,-111.7294,UT,Utah,America/Denver,7.0
+1374,West Valley Power Plant,55622,287181.24,8,40.6663,-112.031,UT,Salt Lake,America/Denver,7.0
+1375,Altavista Power Station,10773,,3,37.1183,-79.2726,VA,Campbell,America/New_York,5.0
+1376,Bear Garden Generating Station,56807,4177190.18,3,37.6961,-78.2848,VA,Buckingham,America/New_York,5.0
+1377,Bellemeade Power Station,50966,1208479.53,3,37.4964,-77.4319,VA,Richmond (City),America/New_York,5.0
+1378,Birchwood Power Facility,54304,447864.21,3,38.2667,-77.3147,VA,King George,America/New_York,5.0
+1379,Bremo Power Station,3796,383407.36,3,37.7089,-78.2878,VA,Fluvanna,America/New_York,5.0
+1380,Buchanan Units 1 & 2,55738,21430.98,3,37.1753,-81.9617,VA,Buchanan,America/New_York,5.0
+1381,Celanese Acetate LLC,52089,,3,37.3451,-80.764,VA,Giles,America/New_York,5.0
+1382,Chesapeake Energy Center,3803,1486785.83,3,36.7711,-76.3019,VA,Chesapeake (City),America/New_York,5.0
+1383,Chesterfield Power Station,3797,6689348.55,3,37.3822,-77.3833,VA,Chesterfield,America/New_York,5.0
+1384,City Point Energy Center,10377,,3,37.2939,-77.2697,VA,Hopewell (City),America/New_York,5.0
+1385,Clinch River,3775,896618.42,3,36.9333,-82.1997,VA,Russell,America/New_York,5.0
+1386,Clover Power Station,7213,4769393.08,3,36.8692,-78.7046,VA,Halifax,America/New_York,5.0
+1387,Commonwealth Chesapeake,55381,80893.75,3,37.9892,-75.54,VA,Accomack,America/New_York,5.0
+1388,Darbytown Combustion Turbine,7212,108450.83,3,37.4978,-77.368,VA,Henrico,America/New_York,5.0
+1389,Doswell Limited Partnership,52019,3512299.2,3,37.8181,-77.4478,VA,Hanover,America/New_York,5.0
+1390,Elizabeth River Combustion Turbine Sta,52087,120502.15,3,36.7743,-76.3119,VA,Chesapeake (City),America/New_York,5.0
+1391,"GP Big Island, LLC",50479,,3,37.534,-79.357,VA,Bedford,America/New_York,5.0
+1392,Glen Lyn,3776,82143.7,3,37.3704,-80.8639,VA,Giles,America/New_York,5.0
+1393,Gordonsville Power Station,54844,1318604.67,3,38.1245,-78.2031,VA,Louisa,America/New_York,5.0
+1394,Gravel Neck Combustion Turbine,7032,68610.65,3,37.1575,-76.6911,VA,Surry,America/New_York,5.0
+1395,Hopewell Cogeneration Facility,10633,1005543.75,3,37.2914,-77.2821,VA,Hopewell (City),America/New_York,5.0
+1396,Hopewell Power Station,10771,,3,37.2969,-77.2833,VA,Hopewell (City),America/New_York,5.0
+1397,International Paper-Franklin Mill,52152,,3,36.6803,-76.9128,VA,Isle of Wight,America/New_York,5.0
+1398,Ladysmith Combustion Turbine Sta,7839,584396.65,3,38.0725,-77.5141,VA,Caroline,America/New_York,5.0
+1399,Louisa Generation Facility,7837,73295.48,3,38.1181,-78.2139,VA,Louisa,America/New_York,5.0
+1400,Marsh Run Generation Facility,7836,116778.19,3,38.5283,-77.7681,VA,Fauquier,America/New_York,5.0
+1401,"MeadWestvaco of Virginia, Covington",50900,,3,37.7997,-79.9946,VA,Alleghany,America/New_York,5.0
+1402,Mecklenburg Power Station,52007,,3,36.6009,-78.53,VA,Mecklenburg,America/New_York,5.0
+1403,Possum Point Power Station,3804,4294607.24,3,38.5367,-77.2806,VA,Prince William,America/New_York,5.0
+1404,Potomac River,3788,360981.51,3,38.8203,-77.0411,VA,Alexandria (City),America/New_York,5.0
+1405,Remington Combustion Turbine Station,7838,299484.35,3,38.5447,-77.7707,VA,Fauquier,America/New_York,5.0
+1406,RockTenn West Point Mill,10017,,3,37.5392,-76.8053,VA,King William,America/New_York,5.0
+1407,Southampton Power Station,10774,,3,36.6525,-76.9953,VA,Southampton,America/New_York,5.0
+1408,"Spruance Genco, LLC",54081,,3,37.4556,-77.4308,VA,Richmond (City),America/New_York,5.0
+1409,Tasley Energy Center,3785,269.0,3,37.7061,-75.7031,VA,Accomack,America/New_York,5.0
+1410,Tenaska Virginia Generating Station,55439,5344671.2,3,37.8667,-78.3813,VA,Fluvanna,America/New_York,5.0
+1411,Virginia City Hybrid Energy Center,56808,,3,36.9161,-82.3381,VA,Wise,America/New_York,5.0
+1412,Virginia Renewable Power-Portsmouth LLC,10071,,3,36.8703,-76.3519,VA,Portsmouth (City),America/New_York,5.0
+1413,Wolf Hills Energy,55285,68244.0,3,36.6644,-82.1044,VA,Washington,America/New_York,5.0
+1414,Yorktown Power Station,3809,817648.78,3,37.2144,-76.4611,VA,York,America/New_York,5.0
+1415,Berlin 5,3734,,1,44.2498,-72.6035,VT,Washington,America/New_York,5.0
+1416,J C McNeil,589,257172.5,1,44.4917,-73.2081,VT,Chittenden,America/New_York,5.0
+1417,Penny Lane Gas Turbine ,3754,,1,44.4817,-73.2241,VT,Chittenden,America/New_York,5.0
+1418,Centralia,3845,3996516.19,10,46.7559,-122.8578,WA,Lewis,America/Los_Angeles,8.0
+1419,Chehalis Generation Facility,55662,900718.11,10,46.6226,-122.9145,WA,Lewis,America/Los_Angeles,8.0
+1420,Encogen Generating Station,7870,80583.44,10,48.746,-122.486,WA,Whatcom,America/Los_Angeles,8.0
+1421,Ferndale Generating Station,54537,21502.41,10,48.8283,-122.6853,WA,Whatcom,America/Los_Angeles,8.0
+1422,Frederickson Power LP,55818,357994.28,10,47.0864,-122.3644,WA,Pierce,America/Los_Angeles,8.0
+1423,Fredonia Generating Station,607,26512.52,10,48.4553,-122.435,WA,Skagit,America/Los_Angeles,8.0
+1424,Goldendale Generating Station,55482,905495.34,10,45.8114,-120.833,WA,Klickitat,America/Los_Angeles,8.0
+1425,Grays Harbor Energy Center,7999,161002.46,10,46.9688,-123.48,WA,Grays Harbor,America/Los_Angeles,8.0
+1426,Mint Farm Generating Station,55700,1133099.45,10,46.1403,-122.9842,WA,Cowlitz,America/Los_Angeles,8.0
+1427,River Road,7605,864414.59,10,45.65,-122.7231,WA,Clark,America/Los_Angeles,8.0
+1428,Sumas Generating Station,54476,159345.78,10,48.9905,-122.2733,WA,Whatcom,America/Los_Angeles,8.0
+1429,Alma,4140,85248.23,5,44.3085,-91.9106,WI,Buffalo,America/Chicago,6.0
+1430,"Appleton Coated, LLC",55558,10971.83,5,44.2717,-88.3011,WI,Outagamie,America/Chicago,6.0
+1431,Bay Front,3982,202765.91,5,46.5869,-90.9017,WI,Ashland,America/Chicago,6.0
+1432,Blount Street,3992,57399.69,5,43.0792,-89.3739,WI,Dane,America/Chicago,6.0
+1433,Columbia,8023,7756308.88,5,43.4864,-89.4203,WI,Columbia,America/Chicago,6.0
+1434,Concord,7159,83488.96,5,43.1669,-88.69,WI,Jefferson,America/Chicago,6.0
+1435,"DTE Stoneman, LLC",4146,301410.99,5,42.7083,-90.9853,WI,Grant,America/Chicago,6.0
+1436,Depere Energy Center,55029,41444.27,5,44.4489,-88.0731,WI,Brown,America/Chicago,6.0
+1437,Edgewater (4050),4050,3833509.1,5,43.715,-87.7094,WI,Sheboygan,America/Chicago,6.0
+1438,Elk Mound Generating Station,7863,26365.21,5,44.9019,-91.5678,WI,Chippewa,America/Chicago,6.0
+1439,Elm Road Generating Station,56068,2241865.26,5,42.8445,-87.829,WI,Milwaukee,America/Chicago,6.0
+1440,Fitchburg Generating Station,3991,4123.48,5,43.0149,-89.4603,WI,Dane,America/Chicago,6.0
+1441,Fox Energy Center,56031,2772263.94,5,44.3204,-88.2089,WI,Outagamie,America/Chicago,6.0
+1442,French Island,4005,3195.68,5,43.8298,-91.26,WI,La Crosse,America/Chicago,6.0
+1443,Genoa,4143,982143.66,5,43.5592,-91.2333,WI,Vernon,America/Chicago,6.0
+1444,Germantown Power Plant,6253,22437.18,5,43.1952,-88.1496,WI,Washington,America/Chicago,6.0
+1445,Island Street Peaking Plant,55836,1890.99,5,44.2761,-88.2656,WI,Outagamie,America/Chicago,6.0
+1446,J P Madgett,4271,2103104.21,5,44.3026,-91.9126,WI,Buffalo,America/Chicago,6.0
+1447,Manitowoc,4125,,5,44.082,-87.6558,WI,Manitowoc,America/Chicago,6.0
+1448,Marshfield Utilities Combustion Turbine,56480,5831.84,5,44.635,-90.135,WI,Wood,America/Chicago,6.0
+1449,Neenah Energy Facility,55135,108438.5,5,44.1934,-88.5055,WI,Winnebago,America/Chicago,6.0
+1450,Nelson Dewey,4054,940019.08,5,42.7225,-91.0085,WI,Grant,America/Chicago,6.0
+1451,Paris,7270,127637.65,5,42.6658,-88.0131,WI,Kenosha,America/Chicago,6.0
+1452,Pleasant Prairie,6170,5940604.01,5,42.5381,-87.9033,WI,Kenosha,America/Chicago,6.0
+1453,Port Washington Generating Station,4040,5073544.48,5,43.3842,-87.8689,WI,Ozaukee,America/Chicago,6.0
+1454,Pulliam,4072,664625.88,5,44.5397,-88.0083,WI,Brown,America/Chicago,6.0
+1455,Riverside Energy Center,55641,1228083.26,5,42.5835,-89.0351,WI,Rock,America/Chicago,6.0
+1456,Rock River,4057,4857.43,5,42.5831,-89.0292,WI,Rock,America/Chicago,6.0
+1457,Rockgen Energy Center,55391,268498.81,5,42.9767,-89.0492,WI,Dane,America/Chicago,6.0
+1458,Sheboygan Falls Energy Facility,56166,91566.3,5,43.7519,-87.8783,WI,Sheboygan,America/Chicago,6.0
+1459,Sheepskin,4059,2015.54,5,42.8347,-89.1108,WI,Rock,America/Chicago,6.0
+1460,South Fond Du Lac,7203,19132.26,5,43.7353,-88.4968,WI,Fond du Lac,America/Chicago,6.0
+1461,South Oak Creek,4041,4371893.22,5,42.8457,-87.8294,WI,Milwaukee,America/Chicago,6.0
+1462,Valley (WEPCO),4042,,5,43.0303,-87.9233,WI,Milwaukee,America/Chicago,6.0
+1463,West Marinette,4076,59968.4,5,45.0869,-87.6881,WI,Marinette,America/Chicago,6.0
+1464,Weston,4078,5377426.24,5,44.8606,-89.6553,WI,Marathon,America/Chicago,6.0
+1465,Wheaton Generating Plant,4014,77001.29,5,44.8864,-91.5158,WI,Chippewa,America/Chicago,6.0
+1466,Whitewater Cogeneration Facility,55011,1145104.25,5,42.8543,-88.7297,WI,Jefferson,America/Chicago,6.0
+1467,Albright Power Station,3942,194882.54,3,39.4883,-79.6367,WV,Preston,America/New_York,5.0
+1468,"ArcelorMittal Weirton,Inc.",54344,,3,40.422,-80.5955,WV,Hancock,America/New_York,5.0
+1469,Axiall Corporation Natrium Plant,50491,,3,39.7475,-80.8547,WV,Marshall,America/New_York,5.0
+1470,Big Sandy Peaker Plant,55284,45231.0,3,38.3441,-82.5938,WV,Wayne,America/New_York,5.0
+1471,Ceredo Generating Station,55276,31731.23,3,38.3681,-82.5339,WV,Wayne,America/New_York,5.0
+1472,Chemours Belle Plant,10788,,3,38.2431,-81.556,WV,Kanawha,America/New_York,5.0
+1473,Fort Martin Power Station,3943,5993892.29,3,39.7107,-79.9275,WV,Monongalia,America/New_York,5.0
+1474,Grant Town Power Plant,10151,,3,39.5611,-80.1642,WV,Marion,America/New_York,5.0
+1475,Harrison Power Station,3944,10889216.49,3,39.3844,-80.3325,WV,Harrison,America/New_York,5.0
+1476,John E Amos,3935,14119179.67,3,38.4731,-81.8233,WV,Putnam,America/New_York,5.0
+1477,Kammer,3947,1900408.36,3,39.8464,-80.8189,WV,Marshall,America/New_York,5.0
+1478,Kanawha River,3936,1103762.36,3,38.2056,-81.4211,WV,Kanawha,America/New_York,5.0
+1479,Longview Power,56671,4617513.37,3,39.7078,-79.9588,WV,Monongalia,America/New_York,5.0
+1480,Mitchell (WV),3948,8190711.47,3,39.8297,-80.8153,WV,Marshall,America/New_York,5.0
+1481,Morgantown Energy Facility,10743,,3,39.6397,-79.9606,WV,Monongalia,America/New_York,5.0
+1482,Mount Storm Power Station,3954,9031681.54,3,39.2014,-79.2667,WV,Grant,America/New_York,5.0
+1483,Mountaineer (1301),6264,9023750.56,3,38.9794,-81.9344,WV,Mason,America/New_York,5.0
+1484,North Branch Power Station,7537,,3,39.2623,-79.3306,WV,Grant,America/New_York,5.0
+1485,Phil Sporn,3938,1066434.12,3,38.9669,-81.9231,WV,Mason,America/New_York,5.0
+1486,"Pleasants Energy, LLC",55349,78089.12,3,39.3328,-81.3639,WV,Pleasants,America/New_York,5.0
+1487,Pleasants Power Station,6004,8770165.05,3,39.3668,-81.2944,WV,Pleasants,America/New_York,5.0
+1488,Rivesville Power Station,3945,1804.63,3,39.5314,-80.113,WV,Marion,America/New_York,5.0
+1489,UCC South Charleston Plant,50151,,3,38.3688,-81.6786,WV,Kanawha,America/New_York,5.0
+1490,Union Carbide Corp. Institute Facility,880053,,3,38.3844,-81.7764,WV,Kanawha,America/New_York,5.0
+1491,Willow Island Power Station,3946,19378.52,3,39.3672,-81.3006,WV,Pleasants,America/New_York,5.0
+1492,Dave Johnston,4158,5360810.93,8,42.8378,-105.7769,WY,Converse,America/Denver,7.0
+1493,Dry Fork Station,56609,3408938.65,8,44.3901,-105.4591,WY,Campbell,America/Denver,7.0
+1494,Jim Bridger,8066,14541728.14,8,41.7378,-108.7875,WY,Sweetwater,America/Denver,7.0
+1495,Laramie River,6204,11804593.63,8,42.1103,-104.8828,WY,Platte,America/Denver,7.0
+1496,Naughton,4162,5444941.23,8,41.7572,-110.5986,WY,Lincoln,America/Denver,7.0
+1497,Neil Simpson II,7504,656244.5,8,44.2853,-105.3841,WY,Campbell,America/Denver,7.0
+1498,Neil Simpson II (CT2),55477,15556.6,8,44.2853,-105.3841,WY,Campbell,America/Denver,7.0
+1499,Wygen I,55479,762024.9,8,44.2862,-105.3843,WY,Campbell,America/Denver,7.0
+1500,Wygen II,56319,647517.27,8,44.2911,-105.3815,WY,Campbell,America/Denver,7.0
+1501,Wygen III,56596,947192.99,8,44.2892,-105.3795,WY,Campbell,America/Denver,7.0
+1502,Wyodak,6101,2845398.02,8,44.2886,-105.3847,WY,Campbell,America/Denver,7.0

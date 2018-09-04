@@ -1,0 +1,541 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>monet.plots package &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="monet.util package" href="monet.util.html" />
+    <link rel="prev" title="monet.obs package" href="monet.obs.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet-accessor.html">MONET XArray Accessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html#api">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="monet.models.html">monet.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.obs.html">monet.obs package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">monet.plots package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.util.html">monet.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.verification.html">monet.verification package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">Get in touch</a> &raquo;</li>
+        
+          <li><a href="monet.html">monet package</a> &raquo;</li>
+        
+      <li>monet.plots package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/monet.plots.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="monet-plots-package">
+<h1>monet.plots package<a class="headerlink" href="#monet-plots-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-monet.plots.colorbars">
+<span id="monet-plots-colorbars-module"></span><h2>monet.plots.colorbars module<a class="headerlink" href="#module-monet.plots.colorbars" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.plots.colorbars.cmap_discretize">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">cmap_discretize</code><span class="sig-paren">(</span><em>cmap</em>, <em>N</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.cmap_discretize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a discrete colormap from the continuous colormap cmap.</p>
+<p>cmap: colormap instance, eg. cm.jet.
+N: number of colors.</p>
+<dl class="docutils">
+<dt>Example</dt>
+<dd>x = resize(arange(100), (5,100))
+djet = cmap_discretize(cm.jet, 5)
+imshow(x, cmap=djet)</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.colorbar_index">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">colorbar_index</code><span class="sig-paren">(</span><em>ncolors</em>, <em>cmap</em>, <em>minval=None</em>, <em>maxval=None</em>, <em>dtype='int'</em>, <em>basemap=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.colorbar_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.noxcmap">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">noxcmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.noxcmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.o3cmap">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">o3cmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.o3cmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.pm10cmap">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">pm10cmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.pm10cmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.pm25cmap">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">pm25cmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.pm25cmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.rhcmap">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">rhcmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.rhcmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.so2cmap">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">so2cmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.so2cmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.sradcmap">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">sradcmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.sradcmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.tempcmap">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">tempcmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.tempcmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.colorbars.wscmap">
+<code class="descclassname">monet.plots.colorbars.</code><code class="descname">wscmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.wscmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-monet.plots.mapgen">
+<span id="monet-plots-mapgen-module"></span><h2>monet.plots.mapgen module<a class="headerlink" href="#module-monet.plots.mapgen" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.plots.mapgen.draw_map">
+<code class="descclassname">monet.plots.mapgen.</code><code class="descname">draw_map</code><span class="sig-paren">(</span><em>ax=None</em>, <em>crs=None</em>, <em>natural_earth=False</em>, <em>coastlines=True</em>, <em>states=False</em>, <em>countries=True</em>, <em>resolution='10m'</em>, <em>extent=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.mapgen.draw_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ax</strong> (<em>type</em>) – Description of parameter <cite>ax</cite> (the default is None).</li>
+<li><strong>natural_earth</strong> (<em>bool</em>) – Description of parameter <cite>natural_earth</cite> (the default is True).</li>
+<li><strong>coastlines</strong> (<em>bool</em>) – Description of parameter <cite>coastlines</cite> (the default is True).</li>
+<li><strong>states</strong> (<em>bool</em>) – Description of parameter <cite>states</cite> (the default is True).</li>
+<li><strong>countries</strong> (<em>bool</em>) – Description of parameter <cite>countries</cite> (the default is True).</li>
+<li><strong>state_resolutions</strong> (<em>bool</em>) – Description of parameter <cite>state_resolutions</cite> (the default is ‘10m’).</li>
+<li><strong>extent</strong> (<em>[lon_min,lon_max,lat_min,lat_max]</em>) – Description of parameter <cite>extent</cite> (the default is None).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-monet.plots.plots">
+<span id="monet-plots-plots-module"></span><h2>monet.plots.plots module<a class="headerlink" href="#module-monet.plots.plots" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.plots.plots.eight_hr_spatial_scatter">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">eight_hr_spatial_scatter</code><span class="sig-paren">(</span><em>df</em>, <em>m</em>, <em>date</em>, <em>savename=''</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.eight_hr_spatial_scatter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.kdeplot">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">kdeplot</code><span class="sig-paren">(</span><em>df</em>, <em>title=None</em>, <em>label=None</em>, <em>ax=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.kdeplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>col</strong> (<em>type</em>) – Description of parameter <cite>col</cite> (the default is ‘obs’).</li>
+<li><strong>title</strong> (<em>type</em>) – Description of parameter <cite>title</cite> (the default is None).</li>
+<li><strong>label</strong> (<em>type</em>) – Description of parameter <cite>label</cite> (the default is None).</li>
+<li><strong>ax</strong> (<em>type</em>) – Description of parameter <cite>ax</cite> (the default is ax).</li>
+<li><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.make_spatial_contours">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">make_spatial_contours</code><span class="sig-paren">(</span><em>modelvar</em>, <em>gridobj</em>, <em>date</em>, <em>m</em>, <em>dpi=None</em>, <em>savename=''</em>, <em>discrete=True</em>, <em>ncolors=None</em>, <em>dtype='int'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.make_spatial_contours" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.make_spatial_plot">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">make_spatial_plot</code><span class="sig-paren">(</span><em>modelvar</em>, <em>m</em>, <em>dpi=None</em>, <em>plotargs={}</em>, <em>ncolors=15</em>, <em>discrete=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.make_spatial_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.normval">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">normval</code><span class="sig-paren">(</span><em>vmin</em>, <em>vmax</em>, <em>cmap</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.normval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.scatter">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">scatter</code><span class="sig-paren">(</span><em>df</em>, <em>x=None</em>, <em>y=None</em>, <em>title=None</em>, <em>label=None</em>, <em>ax=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.scatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>x</strong> (<em>type</em>) – Description of parameter <cite>x</cite> (the default is ‘obs’).</li>
+<li><strong>y</strong> (<em>type</em>) – Description of parameter <cite>y</cite> (the default is ‘model’).</li>
+<li><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.spatial">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">spatial</code><span class="sig-paren">(</span><em>modelvar</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.spatial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.spatial_bias_scatter">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">spatial_bias_scatter</code><span class="sig-paren">(</span><em>df</em>, <em>m</em>, <em>date</em>, <em>vmin=None</em>, <em>vmax=None</em>, <em>savename=''</em>, <em>ncolors=15</em>, <em>fact=1.5</em>, <em>cmap='RdBu_r'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.spatial_bias_scatter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.spatial_scatter">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">spatial_scatter</code><span class="sig-paren">(</span><em>df</em>, <em>m</em>, <em>discrete=False</em>, <em>plotargs={}</em>, <em>create_cbar=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.spatial_scatter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.spatial_stat_scatter">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">spatial_stat_scatter</code><span class="sig-paren">(</span><em>df</em>, <em>m</em>, <em>date</em>, <em>stat=&lt;function MB&gt;</em>, <em>ncolors=15</em>, <em>fact=1.5</em>, <em>cmap='RdYlBu_r'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.spatial_stat_scatter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.taylordiagram">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">taylordiagram</code><span class="sig-paren">(</span><em>df</em>, <em>marker='o'</em>, <em>col1='obs'</em>, <em>col2='model'</em>, <em>label='CMAQ'</em>, <em>addon=False</em>, <em>dia=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.taylordiagram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.timeseries">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">timeseries</code><span class="sig-paren">(</span><em>df</em>, <em>x='time'</em>, <em>y='obs'</em>, <em>ax=None</em>, <em>plotargs={}</em>, <em>fillargs={'alpha': 0.2}</em>, <em>title=''</em>, <em>ylabel=None</em>, <em>label=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.timeseries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>col</strong> (<em>type</em>) – Description of parameter <cite>col</cite> (the default is ‘Obs’).</li>
+<li><strong>ax</strong> (<em>type</em>) – Description of parameter <cite>ax</cite> (the default is None).</li>
+<li><strong>sample</strong> (<em>type</em>) – Description of parameter <cite>sample</cite> (the default is ‘H’).</li>
+<li><strong>plotargs</strong> (<em>type</em>) – Description of parameter <cite>plotargs</cite> (the default is {}).</li>
+<li><strong>fillargs</strong> (<em>type</em>) – Description of parameter <cite>fillargs</cite> (the default is {}).</li>
+<li><strong>title</strong> (<em>type</em>) – Description of parameter <cite>title</cite> (the default is ‘’).</li>
+<li><strong>label</strong> (<em>type</em>) – Description of parameter <cite>label</cite> (the default is None).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.wind_barbs">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">wind_barbs</code><span class="sig-paren">(</span><em>ws</em>, <em>wdir</em>, <em>gridobj</em>, <em>m</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.wind_barbs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.plots.plots.wind_quiver">
+<code class="descclassname">monet.plots.plots.</code><code class="descname">wind_quiver</code><span class="sig-paren">(</span><em>ws</em>, <em>wdir</em>, <em>gridobj</em>, <em>m</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.wind_quiver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-monet.plots.taylordiagram">
+<span id="monet-plots-taylordiagram-module"></span><h2>monet.plots.taylordiagram module<a class="headerlink" href="#module-monet.plots.taylordiagram" title="Permalink to this headline">¶</a></h2>
+<p>Taylor diagram (Taylor, 2001) test implementation.
+<a class="reference external" href="http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm">http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm</a></p>
+<dl class="class">
+<dt id="monet.plots.taylordiagram.TaylorDiagram">
+<em class="property">class </em><code class="descclassname">monet.plots.taylordiagram.</code><code class="descname">TaylorDiagram</code><span class="sig-paren">(</span><em>refstd</em>, <em>fig=None</em>, <em>rect=111</em>, <em>label='_'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.taylordiagram.TaylorDiagram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Taylor diagram: plot model standard deviation and correlation
+to reference (data) sample in a single-quadrant polar plot, with
+r=stddev and theta=arccos(correlation).</p>
+<dl class="method">
+<dt id="monet.plots.taylordiagram.TaylorDiagram.add_contours">
+<code class="descname">add_contours</code><span class="sig-paren">(</span><em>levels=5</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.taylordiagram.TaylorDiagram.add_contours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add constant centered RMS difference contours.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.plots.taylordiagram.TaylorDiagram.add_sample">
+<code class="descname">add_sample</code><span class="sig-paren">(</span><em>stddev</em>, <em>corrcoef</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.taylordiagram.TaylorDiagram.add_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add sample (stddev,corrcoeff) to the Taylor diagram. args
+and kwargs are directly propagated to the Figure.plot
+command.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-monet.plots">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-monet.plots" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.plots.taylordiagram">
+<code class="descclassname">monet.plots.</code><code class="descname">taylordiagram</code><span class="sig-paren">(</span><em>df</em>, <em>marker='o'</em>, <em>col1='obs'</em>, <em>col2='model'</em>, <em>label='CMAQ'</em>, <em>addon=False</em>, <em>dia=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.taylordiagram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="monet.util.html" class="btn btn-neutral float-right" title="monet.util package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="monet.obs.html" class="btn btn-neutral" title="monet.obs package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

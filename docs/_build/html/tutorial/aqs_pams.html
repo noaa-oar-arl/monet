@@ -1,0 +1,1224 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to read AQS data from PAMS and do a quick analysis &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Loading IMPROVE Data" href="improve_trends_kmeans.html" />
+    <link rel="prev" title="Tutorial" href="../tutorial.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet-accessor.html">MONET XArray Accessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">How to read AQS data from PAMS and do a quick analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plotting">Plotting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="improve_trends_kmeans.html">Loading IMPROVE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CMAQ_hi_volcano.html">How to Open and View CMAQ simulations - HI Volcano Example</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../tutorial.html">Tutorial</a> &raquo;</li>
+        
+      <li>How to read AQS data from PAMS and do a quick analysis</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorial/aqs_pams.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="how-to-read-aqs-data-from-pams-and-do-a-quick-analysis">
+<h1>How to read AQS data from PAMS and do a quick analysis<a class="headerlink" href="#how-to-read-aqs-data-from-pams-and-do-a-quick-analysis" title="Permalink to this headline">¶</a></h1>
+<p>The first tutorial for MONET will load data from the AQS data,
+specifically the PAMS dataset, and show to reshape the dataframe and do
+a statistical analysis with different meteorological and composition
+data. For more examples, please see
+<a class="reference external" href="http://monet-arl.readthedocs.io/en/develop/">http://monet-arl.readthedocs.io/en/develop/</a>. This will later be able to
+be found on the github page and readthedocs.</p>
+<p>We will first begin by importing monet and a few helper classes for
+later</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>          <span class="c1"># numpy</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>         <span class="c1"># pandas</span>
+<span class="kn">from</span> <span class="nn">monet.obs</span> <span class="kn">import</span> <span class="o">*</span>     <span class="c1"># observations from MONET</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span> <span class="c1"># plotting</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>       <span class="c1"># better color palettes</span>
+<span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="kn">as</span> <span class="nn">ccrs</span>  <span class="c1"># map projections</span>
+<span class="kn">import</span> <span class="nn">cartopy.feature</span> <span class="kn">as</span> <span class="nn">cfeature</span> <span class="c1"># politcal and geographic features</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s1">&#39;ticks&#39;</span><span class="p">)</span>   <span class="c1"># plot configuration</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s2">&quot;talk&quot;</span><span class="p">)</span>  <span class="c1"># plot configure for size of text</span>
+</pre></div>
+</div>
+<p>Now we have all the imports we could need lets load some data. Most of
+the PAMS data is on daily data so lets add the kwarg daily=True to the
+call. We will also create this for the year 2015 and 2016. Some
+variables that may be valuable are the VOCS, ozone, NO2, NOX,
+temperature. For all of the measurments available please see
+<a class="reference external" href="https://aqs.epa.gov/aqsweb/airdata/download_files.html">https://aqs.epa.gov/aqsweb/airdata/download_files.html</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2004-01-01&#39;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;2004-12-31&#39;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">aqs</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span><span class="n">daily</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;VOC&#39;</span><span class="p">,</span><span class="s1">&#39;OZONE&#39;</span><span class="p">],</span> <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">Retrieving</span><span class="p">:</span> <span class="n">daily_VOCS_2004</span><span class="o">.</span><span class="n">zip</span>
+<span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">aqs</span><span class="o">.</span><span class="n">epa</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">aqsweb</span><span class="o">/</span><span class="n">airdata</span><span class="o">/</span><span class="n">daily_VOCS_2004</span><span class="o">.</span><span class="n">zip</span>
+
+
+
+ <span class="n">Retrieving</span><span class="p">:</span> <span class="n">daily_44201_2004</span><span class="o">.</span><span class="n">zip</span>
+<span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">aqs</span><span class="o">.</span><span class="n">epa</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">aqsweb</span><span class="o">/</span><span class="n">airdata</span><span class="o">/</span><span class="n">daily_44201_2004</span><span class="o">.</span><span class="n">zip</span>
+
+
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 26.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 26.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 26.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 26.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 26.5s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 34.8s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 34.9s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 34.9s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 35.0s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed | 35.1s</span>
+<span class="n">Monitor</span> <span class="n">File</span> <span class="n">Path</span><span class="p">:</span> <span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">monitoring_site_locations</span><span class="o">.</span><span class="n">hdf</span>
+<span class="n">Monitor</span> <span class="n">File</span> <span class="n">Not</span> <span class="n">Found</span><span class="o">...</span> <span class="n">Reprocessing</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">interactiveshell</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">2963</span><span class="p">:</span> <span class="n">DtypeWarning</span><span class="p">:</span> <span class="n">Columns</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="n">have</span> <span class="n">mixed</span> <span class="n">types</span><span class="o">.</span> <span class="n">Specify</span> <span class="n">dtype</span> <span class="n">option</span> <span class="n">on</span> <span class="kn">import</span> <span class="nn">or</span> <span class="nb">set</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="o">.</span>
+  <span class="n">exec</span><span class="p">(</span><span class="n">code_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_global_ns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
+<span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pandas</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">indexing</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">189</span><span class="p">:</span> <span class="n">SettingWithCopyWarning</span><span class="p">:</span>
+<span class="n">A</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">trying</span> <span class="n">to</span> <span class="n">be</span> <span class="nb">set</span> <span class="n">on</span> <span class="n">a</span> <span class="n">copy</span> <span class="n">of</span> <span class="n">a</span> <span class="nb">slice</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">DataFrame</span>
+
+<span class="n">See</span> <span class="n">the</span> <span class="n">caveats</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">documentation</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">pandas</span><span class="o">.</span><span class="n">pydata</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">pandas</span><span class="o">-</span><span class="n">docs</span><span class="o">/</span><span class="n">stable</span><span class="o">/</span><span class="n">indexing</span><span class="o">.</span><span class="n">html</span><span class="c1">#indexing-view-versus-copy</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">_setitem_with_indexer</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we have the data in aqs.df and a copy of it in df… just in case. So
+lets take a look at it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#df.head()</span>
+<span class="n">aqs</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time_local</th>
+      <th>state_code</th>
+      <th>county_code</th>
+      <th>site_num</th>
+      <th>parameter_code</th>
+      <th>poc</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>datum</th>
+      <th>parameter_name</th>
+      <th>...</th>
+      <th>first_year_of_data</th>
+      <th>gmt_offset</th>
+      <th>land_use</th>
+      <th>location_setting</th>
+      <th>monitor_type</th>
+      <th>msa_code</th>
+      <th>networks</th>
+      <th>state_name</th>
+      <th>tribe_name</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2004-05-15</td>
+      <td>04</td>
+      <td>013</td>
+      <td>4003</td>
+      <td>43000</td>
+      <td>10</td>
+      <td>33.40316</td>
+      <td>-112.07533</td>
+      <td>WGS84</td>
+      <td>Sum of PAMS target compounds</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>-7.0</td>
+      <td>RESIDENTIAL</td>
+      <td>URBAN AND CENTER CITY</td>
+      <td>OTHER</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>AZ</td>
+      <td>NaN</td>
+      <td>2004-05-15 07:00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2004-05-21</td>
+      <td>04</td>
+      <td>013</td>
+      <td>4003</td>
+      <td>43000</td>
+      <td>10</td>
+      <td>33.40316</td>
+      <td>-112.07533</td>
+      <td>WGS84</td>
+      <td>Sum of PAMS target compounds</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>-7.0</td>
+      <td>RESIDENTIAL</td>
+      <td>URBAN AND CENTER CITY</td>
+      <td>OTHER</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>AZ</td>
+      <td>NaN</td>
+      <td>2004-05-21 07:00:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2004-05-27</td>
+      <td>04</td>
+      <td>013</td>
+      <td>4003</td>
+      <td>43000</td>
+      <td>10</td>
+      <td>33.40316</td>
+      <td>-112.07533</td>
+      <td>WGS84</td>
+      <td>Sum of PAMS target compounds</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>-7.0</td>
+      <td>RESIDENTIAL</td>
+      <td>URBAN AND CENTER CITY</td>
+      <td>OTHER</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>AZ</td>
+      <td>NaN</td>
+      <td>2004-05-27 07:00:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2004-06-02</td>
+      <td>04</td>
+      <td>013</td>
+      <td>4003</td>
+      <td>43000</td>
+      <td>10</td>
+      <td>33.40316</td>
+      <td>-112.07533</td>
+      <td>WGS84</td>
+      <td>Sum of PAMS target compounds</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>-7.0</td>
+      <td>RESIDENTIAL</td>
+      <td>URBAN AND CENTER CITY</td>
+      <td>OTHER</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>AZ</td>
+      <td>NaN</td>
+      <td>2004-06-02 07:00:00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2004-06-08</td>
+      <td>04</td>
+      <td>013</td>
+      <td>4003</td>
+      <td>43000</td>
+      <td>10</td>
+      <td>33.40316</td>
+      <td>-112.07533</td>
+      <td>WGS84</td>
+      <td>Sum of PAMS target compounds</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>-7.0</td>
+      <td>RESIDENTIAL</td>
+      <td>URBAN AND CENTER CITY</td>
+      <td>OTHER</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>AZ</td>
+      <td>NaN</td>
+      <td>2004-06-08 07:00:00</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 46 columns</p>
+</div><p>Notice that in this printed format it obscures some of the dataframe
+columns from view. Lets see what they are!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">sort</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sort</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span> <span class="c1"># loop over the sorted columns and print them</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="n">st_max_hour</span>
+<span class="mi">1</span><span class="n">st_max_value</span>
+<span class="n">address</span>
+<span class="n">airnow_flag</span>
+<span class="n">aqi</span>
+<span class="n">cbsa_name</span>
+<span class="n">city_name</span>
+<span class="n">cmsa_name</span>
+<span class="n">collecting_agency</span>
+<span class="n">county_code</span>
+<span class="n">county_name</span>
+<span class="n">date_of_last_change</span>
+<span class="n">datum</span>
+<span class="n">elevation</span>
+<span class="n">epa_region</span>
+<span class="n">event_type</span>
+<span class="n">first_year_of_data</span>
+<span class="n">gmt_offset</span>
+<span class="n">land_use</span>
+<span class="n">latitude</span>
+<span class="n">local_site_name</span>
+<span class="n">location_setting</span>
+<span class="n">longitude</span>
+<span class="n">method_code</span>
+<span class="n">method_name</span>
+<span class="n">monitor_type</span>
+<span class="n">msa_code</span>
+<span class="n">msa_name</span>
+<span class="n">networks</span>
+<span class="n">obs</span>
+<span class="n">observation_count</span>
+<span class="n">observation_percent</span>
+<span class="n">parameter_code</span>
+<span class="n">parameter_name</span>
+<span class="n">poc</span>
+<span class="n">pollutant_standard</span>
+<span class="n">sample_duration</span>
+<span class="n">site_num</span>
+<span class="n">siteid</span>
+<span class="n">state_code</span>
+<span class="n">state_name</span>
+<span class="n">time</span>
+<span class="n">time_local</span>
+<span class="n">tribe_name</span>
+<span class="n">units</span>
+<span class="n">variable</span>
+</pre></div>
+</div>
+<p>We have lots of columns but this is actually the long format (data is
+stacked on variable). Data analysis could be done easier in a wide
+format. So lets use a utility function in MONET to aid with reshaping
+the dataframe.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.util</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="n">new</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">long_to_wide</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">new</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time</th>
+      <th>siteid</th>
+      <th>1,1,2,2-TETRACHLOROETHANE</th>
+      <th>1,1,2-TRICHLORO-1,2,2-TRIFLUOROETHANE</th>
+      <th>1,1,2-TRICHLOROETHANE</th>
+      <th>1,1-DICHLOROETHANE</th>
+      <th>1,1-DICHLOROETHYLENE</th>
+      <th>1,2,3-TRIMETHYLBENZENE</th>
+      <th>1,2,4-TRICHLOROBENZENE</th>
+      <th>1,2,4-TRIMETHYLBENZENE</th>
+      <th>...</th>
+      <th>epa_region</th>
+      <th>first_year_of_data</th>
+      <th>gmt_offset</th>
+      <th>land_use</th>
+      <th>location_setting</th>
+      <th>monitor_type</th>
+      <th>msa_code</th>
+      <th>networks</th>
+      <th>state_name</th>
+      <th>tribe_name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2004-01-01 05:00:00</td>
+      <td>090031003</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>2002.0</td>
+      <td>-5.0</td>
+      <td>RESIDENTIAL</td>
+      <td>SUBURBAN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>CT</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2004-01-01 05:00:00</td>
+      <td>100031007</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>2003.0</td>
+      <td>-5.0</td>
+      <td>AGRICULTURAL</td>
+      <td>RURAL</td>
+      <td>OTHER</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>DE</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2004-01-01 05:00:00</td>
+      <td>100031013</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>2003.0</td>
+      <td>-5.0</td>
+      <td>RESIDENTIAL</td>
+      <td>SUBURBAN</td>
+      <td>SLAMS</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>DE</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2004-01-01 05:00:00</td>
+      <td>110010025</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>1980.0</td>
+      <td>-5.0</td>
+      <td>COMMERCIAL</td>
+      <td>URBAN AND CENTER CITY</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>District Of Columbia</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2004-01-01 05:00:00</td>
+      <td>110010041</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>1993.0</td>
+      <td>-5.0</td>
+      <td>RESIDENTIAL</td>
+      <td>URBAN AND CENTER CITY</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>District Of Columbia</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 157 columns</p>
+</div><p>Lets see how many ISOPRENE sites there are. We will drop the NaN values
+along the ISOPRENE column and then find the unique siteid’s and look at
+the shape of them</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ISOPRENE&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">siteid</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">140</span><span class="p">,)</span>
+</pre></div>
+</div>
+<p>Now as you can see we have lots of columns that is sorted by time and
+siteid. But what measurements are included in the dataframe? Let’s see
+all the new columns generated from pivoting the table.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">sort</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sort</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="o">-</span><span class="n">TETRACHLOROETHANE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">-</span><span class="n">TRICHLORO</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="o">-</span><span class="n">TRIFLUOROETHANE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">-</span><span class="n">TRICHLOROETHANE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="o">-</span><span class="n">DICHLOROETHANE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="o">-</span><span class="n">DICHLOROETHYLENE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">-</span><span class="n">TRIMETHYLBENZENE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="o">-</span><span class="n">TRICHLOROBENZENE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="o">-</span><span class="n">TRIMETHYLBENZENE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">-</span><span class="n">DICHLOROBENZENE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">-</span><span class="n">DICHLOROPROPANE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="o">-</span><span class="n">TRIMETHYLBENZENE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="o">-</span><span class="n">BUTADIENE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="o">-</span><span class="n">DICHLOROBENZENE</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="o">-</span><span class="n">DICHLOROBENZENE</span>
+<span class="mi">1</span><span class="o">-</span><span class="n">BUTENE</span>
+<span class="mi">1</span><span class="o">-</span><span class="n">PENTENE</span>
+<span class="mi">1</span><span class="n">st_max_hour</span>
+<span class="mi">1</span><span class="n">st_max_value</span>
+<span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="o">-</span><span class="n">TRIMETHYLPENTANE</span>
+<span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="o">-</span><span class="n">DIMETHYLBUTANE</span>
+<span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="o">-</span><span class="n">TRIMETHYLPENTANE</span>
+<span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">-</span><span class="n">DIMETHYLBUTANE</span>
+<span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">-</span><span class="n">DIMETHYLPENTANE</span>
+<span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="o">-</span><span class="n">DIMETHYLPENTANE</span>
+<span class="mi">2</span><span class="o">-</span><span class="n">METHYLHEPTANE</span>
+<span class="mi">2</span><span class="o">-</span><span class="n">METHYLHEXANE</span>
+<span class="mi">2</span><span class="o">-</span><span class="n">METHYLPENTANE</span>
+<span class="mi">3</span><span class="o">-</span><span class="n">CHLOROPROPENE</span>
+<span class="mi">3</span><span class="o">-</span><span class="n">METHYLHEPTANE</span>
+<span class="mi">3</span><span class="o">-</span><span class="n">METHYLHEXANE</span>
+<span class="mi">3</span><span class="o">-</span><span class="n">METHYLPENTANE</span>
+<span class="n">ACETALDEHYDE</span>
+<span class="n">ACETONE</span>
+<span class="n">ACETONITRILE</span>
+<span class="n">ACETYLENE</span>
+<span class="n">ACROLEIN</span> <span class="o">-</span> <span class="n">UNVERIFIED</span>
+<span class="n">ACRYLONITRILE</span>
+<span class="n">BENZENE</span>
+<span class="n">BENZYL</span> <span class="n">CHLORIDE</span>
+<span class="n">BROMOCHLOROMETHANE</span>
+<span class="n">BROMODICHLOROMETHANE</span>
+<span class="n">BROMOFORM</span>
+<span class="n">BROMOMETHANE</span>
+<span class="n">CARBON</span> <span class="n">DISULFIDE</span>
+<span class="n">CARBON</span> <span class="n">TETRACHLORIDE</span>
+<span class="n">CHLOROBENZENE</span>
+<span class="n">CHLOROETHANE</span>
+<span class="n">CHLOROFORM</span>
+<span class="n">CHLOROMETHANE</span>
+<span class="n">CHLOROPRENE</span>
+<span class="n">CIS</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">-</span><span class="n">DICHLOROETHENE</span>
+<span class="n">CIS</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="o">-</span><span class="n">DICHLOROPROPENE</span>
+<span class="n">CIS</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">BUTENE</span>
+<span class="n">CIS</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">PENTENE</span>
+<span class="n">CYCLOHEXANE</span>
+<span class="n">CYCLOPENTANE</span>
+<span class="n">DIBROMOCHLOROMETHANE</span>
+<span class="n">DICHLORODIFLUOROMETHANE</span>
+<span class="n">DICHLOROMETHANE</span>
+<span class="n">ETHANE</span>
+<span class="n">ETHYL</span> <span class="n">ACRYLATE</span>
+<span class="n">ETHYLBENZENE</span>
+<span class="n">ETHYLENE</span>
+<span class="n">ETHYLENE</span> <span class="n">DIBROMIDE</span>
+<span class="n">ETHYLENE</span> <span class="n">DICHLORIDE</span>
+<span class="n">FORMALDEHYDE</span>
+<span class="n">FREON</span> <span class="mi">113</span>
+<span class="n">FREON</span> <span class="mi">114</span>
+<span class="n">HEXACHLOROBUTADIENE</span>
+<span class="n">ISOBUTANE</span>
+<span class="n">ISOPENTANE</span>
+<span class="n">ISOPRENE</span>
+<span class="n">ISOPROPYLBENZENE</span>
+<span class="n">M</span><span class="o">-</span><span class="n">DIETHYLBENZENE</span>
+<span class="n">M</span><span class="o">-</span><span class="n">ETHYLTOLUENE</span>
+<span class="n">M</span><span class="o">/</span><span class="n">P</span> <span class="n">XYLENE</span>
+<span class="n">METHYL</span> <span class="n">CHLOROFORM</span>
+<span class="n">METHYL</span> <span class="n">ETHYL</span> <span class="n">KETONE</span>
+<span class="n">METHYL</span> <span class="n">ISOBUTYL</span> <span class="n">KETONE</span>
+<span class="n">METHYL</span> <span class="n">METHACRYLATE</span>
+<span class="n">METHYL</span> <span class="n">TERT</span><span class="o">-</span><span class="n">BUTYL</span> <span class="n">ETHER</span>
+<span class="n">METHYLCYCLOHEXANE</span>
+<span class="n">METHYLCYCLOPENTANE</span>
+<span class="n">N</span><span class="o">-</span><span class="n">BUTANE</span>
+<span class="n">N</span><span class="o">-</span><span class="n">DECANE</span>
+<span class="n">N</span><span class="o">-</span><span class="n">HEPTANE</span>
+<span class="n">N</span><span class="o">-</span><span class="n">HEXANE</span>
+<span class="n">N</span><span class="o">-</span><span class="n">NONANE</span>
+<span class="n">N</span><span class="o">-</span><span class="n">OCTANE</span>
+<span class="n">N</span><span class="o">-</span><span class="n">PENTANE</span>
+<span class="n">N</span><span class="o">-</span><span class="n">PROPYLBENZENE</span>
+<span class="n">N</span><span class="o">-</span><span class="n">UNDECANE</span>
+<span class="n">O</span><span class="o">-</span><span class="n">ETHYLTOLUENE</span>
+<span class="n">O</span><span class="o">-</span><span class="n">XYLENE</span>
+<span class="n">OZONE</span>
+<span class="n">P</span><span class="o">-</span><span class="n">DIETHYLBENZENE</span>
+<span class="n">P</span><span class="o">-</span><span class="n">ETHYLTOLUENE</span>
+<span class="n">PROPANE</span>
+<span class="n">PROPYLENE</span>
+<span class="n">STYRENE</span>
+<span class="n">SUM</span> <span class="n">OF</span> <span class="n">PAMS</span> <span class="n">TARGET</span> <span class="n">COMPOUNDS</span>
+<span class="n">TERT</span><span class="o">-</span><span class="n">AMYL</span> <span class="n">METHYL</span> <span class="n">ETHER</span>
+<span class="n">TERT</span><span class="o">-</span><span class="n">BUTYL</span> <span class="n">ETHYL</span> <span class="n">ETHER</span>
+<span class="n">TETRACHLOROETHYLENE</span>
+<span class="n">TOLUENE</span>
+<span class="n">TOTAL</span> <span class="n">NMOC</span> <span class="p">(</span><span class="n">NON</span><span class="o">-</span><span class="n">METHANE</span> <span class="n">ORGANIC</span> <span class="n">COMPOUND</span><span class="p">)</span>
+<span class="n">TRANS</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">-</span><span class="n">DICHLOROETHYLENE</span>
+<span class="n">TRANS</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="o">-</span><span class="n">DICHLOROPROPENE</span>
+<span class="n">TRANS</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">BUTENE</span>
+<span class="n">TRANS</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">PENTENE</span>
+<span class="n">TRICHLOROETHYLENE</span>
+<span class="n">TRICHLOROFLUOROMETHANE</span>
+<span class="n">VINYL</span> <span class="n">CHLORIDE</span>
+<span class="n">address</span>
+<span class="n">airnow_flag</span>
+<span class="n">aqi</span>
+<span class="n">cbsa_name</span>
+<span class="n">city_name</span>
+<span class="n">cmsa_name</span>
+<span class="n">collecting_agency</span>
+<span class="n">county_code</span>
+<span class="n">county_name</span>
+<span class="n">date_of_last_change</span>
+<span class="n">datum</span>
+<span class="n">elevation</span>
+<span class="n">epa_region</span>
+<span class="n">event_type</span>
+<span class="n">first_year_of_data</span>
+<span class="n">gmt_offset</span>
+<span class="n">land_use</span>
+<span class="n">latitude</span>
+<span class="n">local_site_name</span>
+<span class="n">location_setting</span>
+<span class="n">longitude</span>
+<span class="n">method_code</span>
+<span class="n">method_name</span>
+<span class="n">monitor_type</span>
+<span class="n">msa_code</span>
+<span class="n">msa_name</span>
+<span class="n">networks</span>
+<span class="n">obs</span>
+<span class="n">observation_count</span>
+<span class="n">observation_percent</span>
+<span class="n">parameter_code</span>
+<span class="n">parameter_name</span>
+<span class="n">poc</span>
+<span class="n">pollutant_standard</span>
+<span class="n">sample_duration</span>
+<span class="n">site_num</span>
+<span class="n">siteid</span>
+<span class="n">state_code</span>
+<span class="n">state_name</span>
+<span class="n">time</span>
+<span class="n">time_local</span>
+<span class="n">tribe_name</span>
+<span class="n">units</span>
+<span class="n">variable</span>
+</pre></div>
+</div>
+<p>Now as you can see we have lots of columns that is sorted by time and
+siteid. This can be very useful as we can now do some direct comparisons
+using the dataframe. Lets get a description of the dataset first so we
+can see some averages and ranges of the different chemical species.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>1,1,2,2-TETRACHLOROETHANE</th>
+      <th>1,1,2-TRICHLORO-1,2,2-TRIFLUOROETHANE</th>
+      <th>1,1,2-TRICHLOROETHANE</th>
+      <th>1,1-DICHLOROETHANE</th>
+      <th>1,1-DICHLOROETHYLENE</th>
+      <th>1,2,3-TRIMETHYLBENZENE</th>
+      <th>1,2,4-TRICHLOROBENZENE</th>
+      <th>1,2,4-TRIMETHYLBENZENE</th>
+      <th>1,2-DICHLOROBENZENE</th>
+      <th>1,2-DICHLOROPROPANE</th>
+      <th>...</th>
+      <th>obs</th>
+      <th>1st_max_value</th>
+      <th>1st_max_hour</th>
+      <th>aqi</th>
+      <th>method_code</th>
+      <th>cmsa_name</th>
+      <th>elevation</th>
+      <th>first_year_of_data</th>
+      <th>gmt_offset</th>
+      <th>msa_code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>714352.000000</td>
+      <td>132606.000000</td>
+      <td>665982.000000</td>
+      <td>475211.000000</td>
+      <td>704962.000000</td>
+      <td>766240.000000</td>
+      <td>407466.000000</td>
+      <td>1.105874e+06</td>
+      <td>441391.000000</td>
+      <td>713931.000000</td>
+      <td>...</td>
+      <td>1.501618e+06</td>
+      <td>1.501618e+06</td>
+      <td>1.501618e+06</td>
+      <td>335758.000000</td>
+      <td>1.165860e+06</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.393782e+06</td>
+      <td>1.501618e+06</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>0.020421</td>
+      <td>0.169611</td>
+      <td>0.019323</td>
+      <td>0.012979</td>
+      <td>0.020375</td>
+      <td>0.474538</td>
+      <td>0.111623</td>
+      <td>1.011792e+00</td>
+      <td>0.129964</td>
+      <td>0.030783</td>
+      <td>...</td>
+      <td>3.764996e+00</td>
+      <td>8.070852e+00</td>
+      <td>5.336468e+00</td>
+      <td>37.632730</td>
+      <td>1.404985e+02</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.993263e+03</td>
+      <td>-5.978275e+00</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>0.157866</td>
+      <td>0.215456</td>
+      <td>0.158109</td>
+      <td>0.185480</td>
+      <td>0.178133</td>
+      <td>1.307923</td>
+      <td>1.129665</td>
+      <td>2.255642e+00</td>
+      <td>0.947958</td>
+      <td>0.230669</td>
+      <td>...</td>
+      <td>3.997054e+01</td>
+      <td>1.091979e+02</td>
+      <td>6.966935e+00</td>
+      <td>19.249021</td>
+      <td>2.685583e+01</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.223728e+01</td>
+      <td>1.006215e+00</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>...</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>1.100000e+01</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.959000e+03</td>
+      <td>-1.000000e+01</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>0.000000</td>
+      <td>0.100000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.050000</td>
+      <td>0.000000</td>
+      <td>1.800000e-01</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>...</td>
+      <td>2.000000e-02</td>
+      <td>3.000000e-02</td>
+      <td>0.000000e+00</td>
+      <td>26.000000</td>
+      <td>1.260000e+02</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.982000e+03</td>
+      <td>-6.000000e+00</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>0.000000</td>
+      <td>0.180000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.230000</td>
+      <td>0.000000</td>
+      <td>5.000000e-01</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>...</td>
+      <td>8.000000e-02</td>
+      <td>1.000000e-01</td>
+      <td>0.000000e+00</td>
+      <td>35.000000</td>
+      <td>1.280000e+02</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.997000e+03</td>
+      <td>-6.000000e+00</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>0.010000</td>
+      <td>0.220000</td>
+      <td>0.010000</td>
+      <td>0.000000</td>
+      <td>0.010000</td>
+      <td>0.468182</td>
+      <td>0.000000</td>
+      <td>1.219583e+00</td>
+      <td>0.000000</td>
+      <td>0.020000</td>
+      <td>...</td>
+      <td>6.600000e-01</td>
+      <td>1.000000e+00</td>
+      <td>1.000000e+01</td>
+      <td>43.000000</td>
+      <td>1.740000e+02</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2.003000e+03</td>
+      <td>-5.000000e+00</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>10.000000</td>
+      <td>10.000000</td>
+      <td>10.000000</td>
+      <td>10.000000</td>
+      <td>10.000000</td>
+      <td>39.266667</td>
+      <td>54.700000</td>
+      <td>1.493500e+02</td>
+      <td>59.880000</td>
+      <td>15.000000</td>
+      <td>...</td>
+      <td>9.474708e+03</td>
+      <td>3.854257e+04</td>
+      <td>2.300000e+01</td>
+      <td>212.000000</td>
+      <td>2.110000e+02</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2.018000e+03</td>
+      <td>-4.000000e+00</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>8 rows × 127 columns</p>
+</div><p>This gives us a format that allows simple statistics and plots using
+pandas, matplotlib, and seaborn. For time series it is often useful to
+have the index as the time. Lets do that</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">time</span>
+<span class="n">new</span><span class="p">[</span><span class="s1">&#39;OZONE_ppb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">OZONE</span> <span class="o">*</span> <span class="mf">1000.</span>
+<span class="n">new</span><span class="o">.</span><span class="n">OZONE_ppb</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">27.581303457170307</span>
+</pre></div>
+</div>
+<div class="section" id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
+<p>As you can see the data is now indexed with the UTC time. Lets make a
+time series plot of the average ISOPRENE.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span> <span class="c1"># this is so we can control the figure size.</span>
+<span class="n">new</span><span class="o">.</span><span class="n">ISOPRENE</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c2bb1f860</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/aqs_pams_20_1.png" src="../_images/aqs_pams_20_1.png" />
+<p>This is quite noisy with the daily data. Lets resample in time to every
+month using the average Isoprene concentration to weekly and monthly.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span> <span class="c1"># this is so we can control the figure size.</span>
+<span class="n">new</span><span class="o">.</span><span class="n">ISOPRENE</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span>
+<span class="n">new</span><span class="o">.</span><span class="n">ISOPRENE</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;weekly&#39;</span><span class="p">)</span>
+<span class="n">new</span><span class="o">.</span><span class="n">ISOPRENE</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;ISOP&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/aqs_pams_22_0.png" src="../_images/aqs_pams_22_0.png" />
+<p>Where are these measurements. Lets plot this on a map and see where it
+is. We can use a utility plotting function in monet to generate the plot</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet</span> <span class="kn">import</span> <span class="n">plots</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plots</span><span class="o">.</span><span class="n">draw_map</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">130</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">50</span><span class="p">],</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">)</span>
+<span class="c1"># get only where ISOPRENE is not NAN</span>
+<span class="n">isop</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ISOPRENE&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">isop</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">isop</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">collections</span><span class="o">.</span><span class="n">PathCollection</span> <span class="n">at</span> <span class="mh">0x1c47460f60</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/aqs_pams_24_1.png" src="../_images/aqs_pams_24_1.png" />
+<p>There are monitors all across the US with many in TX, CA, New England
+and the Mid-Atlantic.</p>
+<p>What if we wanted to do a linear regression between two variables. Lets
+say OZONE and temperature. To do this we will use the statsmodels
+package. It is a robust library for curve fitting. For specific
+information for this module look here
+<a class="reference external" href="https://www.statsmodels.org/stable/index.html">https://www.statsmodels.org/stable/index.html</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="kn">as</span> <span class="nn">sm</span> <span class="c1"># load statsmodels api</span>
+<span class="c1">#first clean of nan values</span>
+<span class="n">fit_df</span> <span class="o">=</span> <span class="n">new</span><span class="p">[[</span><span class="s1">&#39;ISOPRENE&#39;</span><span class="p">,</span><span class="s1">&#39;OZONE&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">fit_df</span><span class="o">.</span><span class="n">ISOPRENE</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">fit_df</span><span class="o">.</span><span class="n">OZONE</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+
+<span class="n">fit_df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;ISOPRENE&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;OZONE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">result</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                            <span class="n">OLS</span> <span class="n">Regression</span> <span class="n">Results</span>
+<span class="o">==============================================================================</span>
+<span class="n">Dep</span><span class="o">.</span> <span class="n">Variable</span><span class="p">:</span>                  <span class="n">OZONE</span>   <span class="n">R</span><span class="o">-</span><span class="n">squared</span><span class="p">:</span>                       <span class="mf">0.248</span>
+<span class="n">Model</span><span class="p">:</span>                            <span class="n">OLS</span>   <span class="n">Adj</span><span class="o">.</span> <span class="n">R</span><span class="o">-</span><span class="n">squared</span><span class="p">:</span>                  <span class="mf">0.248</span>
+<span class="n">Method</span><span class="p">:</span>                 <span class="n">Least</span> <span class="n">Squares</span>   <span class="n">F</span><span class="o">-</span><span class="n">statistic</span><span class="p">:</span>                 <span class="mf">1.833e+05</span>
+<span class="n">Date</span><span class="p">:</span>                <span class="n">Tue</span><span class="p">,</span> <span class="mi">19</span> <span class="n">Jun</span> <span class="mi">2018</span>   <span class="n">Prob</span> <span class="p">(</span><span class="n">F</span><span class="o">-</span><span class="n">statistic</span><span class="p">):</span>               <span class="mf">0.00</span>
+<span class="n">Time</span><span class="p">:</span>                        <span class="mi">09</span><span class="p">:</span><span class="mi">31</span><span class="p">:</span><span class="mi">12</span>   <span class="n">Log</span><span class="o">-</span><span class="n">Likelihood</span><span class="p">:</span>             <span class="mf">1.2390e+06</span>
+<span class="n">No</span><span class="o">.</span> <span class="n">Observations</span><span class="p">:</span>              <span class="mi">556733</span>   <span class="n">AIC</span><span class="p">:</span>                        <span class="o">-</span><span class="mf">2.478e+06</span>
+<span class="n">Df</span> <span class="n">Residuals</span><span class="p">:</span>                  <span class="mi">556732</span>   <span class="n">BIC</span><span class="p">:</span>                        <span class="o">-</span><span class="mf">2.478e+06</span>
+<span class="n">Df</span> <span class="n">Model</span><span class="p">:</span>                           <span class="mi">1</span>
+<span class="n">Covariance</span> <span class="n">Type</span><span class="p">:</span>            <span class="n">nonrobust</span>
+<span class="o">==============================================================================</span>
+                 <span class="n">coef</span>    <span class="n">std</span> <span class="n">err</span>          <span class="n">t</span>      <span class="n">P</span><span class="o">&gt;|</span><span class="n">t</span><span class="o">|</span>      <span class="p">[</span><span class="mf">0.025</span>      <span class="mf">0.975</span><span class="p">]</span>
+<span class="o">------------------------------------------------------------------------------</span>
+<span class="n">ISOPRENE</span>       <span class="mf">0.0057</span>   <span class="mf">1.33e-05</span>    <span class="mf">428.134</span>      <span class="mf">0.000</span>       <span class="mf">0.006</span>       <span class="mf">0.006</span>
+<span class="o">==============================================================================</span>
+<span class="n">Omnibus</span><span class="p">:</span>                   <span class="mf">205153.426</span>   <span class="n">Durbin</span><span class="o">-</span><span class="n">Watson</span><span class="p">:</span>                   <span class="mf">0.007</span>
+<span class="n">Prob</span><span class="p">(</span><span class="n">Omnibus</span><span class="p">):</span>                  <span class="mf">0.000</span>   <span class="n">Jarque</span><span class="o">-</span><span class="n">Bera</span> <span class="p">(</span><span class="n">JB</span><span class="p">):</span>          <span class="mf">2465877.353</span>
+<span class="n">Skew</span><span class="p">:</span>                          <span class="o">-</span><span class="mf">1.433</span>   <span class="n">Prob</span><span class="p">(</span><span class="n">JB</span><span class="p">):</span>                         <span class="mf">0.00</span>
+<span class="n">Kurtosis</span><span class="p">:</span>                      <span class="mf">12.904</span>   <span class="n">Cond</span><span class="o">.</span> <span class="n">No</span><span class="o">.</span>                         <span class="mf">1.00</span>
+<span class="o">==============================================================================</span>
+
+<span class="n">Warnings</span><span class="p">:</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">Standard</span> <span class="n">Errors</span> <span class="n">assume</span> <span class="n">that</span> <span class="n">the</span> <span class="n">covariance</span> <span class="n">matrix</span> <span class="n">of</span> <span class="n">the</span> <span class="n">errors</span> <span class="ow">is</span> <span class="n">correctly</span> <span class="n">specified</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x1c1e7f0f28</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../_images/aqs_pams_26_2.png" src="../_images/aqs_pams_26_2.png" />
+<p>Lets save this to a csv file</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;/Users/barry/Desktop/new.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="improve_trends_kmeans.html" class="btn btn-neutral float-right" title="Loading IMPROVE Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../tutorial.html" class="btn btn-neutral" title="Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,704 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>monet.util package &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="monet.verification package" href="monet.verification.html" />
+    <link rel="prev" title="monet.plots package" href="monet.plots.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet-accessor.html">MONET XArray Accessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html#api">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="monet.models.html">monet.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.obs.html">monet.obs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.plots.html">monet.plots package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">monet.util package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.verification.html">monet.verification package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">Get in touch</a> &raquo;</li>
+        
+          <li><a href="monet.html">monet package</a> &raquo;</li>
+        
+      <li>monet.util package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/monet.util.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="monet-util-package">
+<h1>monet.util package<a class="headerlink" href="#monet-util-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-util-combine-module">
+<h2>monet.util.combine module<a class="headerlink" href="#monet-util-combine-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="monet-util-interp-module">
+<h2>monet.util.interp module<a class="headerlink" href="#monet-util-interp-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-monet.util.mystats">
+<span id="monet-util-mystats-module"></span><h2>monet.util.mystats module<a class="headerlink" href="#module-monet.util.mystats" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.util.mystats.AC">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">AC</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.AC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Anomaly Correlation</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.E1">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">E1</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.E1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modified Coefficient of Efficiency, E1</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.ETS">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">ETS</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>minval</em>, <em>maxval</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.ETS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equitable Threat Score (1 is perfect - Range -1/3 -&gt; 1)
+:param obs:
+:param mod:
+:param minval:
+:param maxval:
+:return: HSS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.FB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">FB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.FB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fractional Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.FE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">FE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.FE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fractional Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.HSS">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">HSS</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>minval</em>, <em>maxval</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.HSS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Heidke Skill Score (1 is perfect - below zero means no confidence)
+:param obs:
+:param mod:
+:param minval:
+:param maxval:
+:return: HSS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.IOA">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">IOA</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.IOA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index of Agreement, IOA</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean Bias</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.ME">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">ME</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.ME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean Gross Error (model and obs unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MNB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MNB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MNB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean Normalized Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MNE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MNE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MNE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean Normalized Gross Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MNPB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MNPB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>paxis</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MNPB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean Normalized Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MNPE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MNPE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>paxis</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MNPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean Normalized Peak Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MO">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MO</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean Observations (obs unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MP">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MP</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean Predictions (model unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MdnB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MdnB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MdnB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Median Bias</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MdnE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MdnE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MdnE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Median Gross Error (model and obs unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MdnNB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MdnNB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MdnNB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Median Normalized Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MdnNE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MdnNE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MdnNE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Median Normalized Gross Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MdnNPB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MdnNPB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>paxis</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MdnNPB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Median Normalized Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MdnNPE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MdnNPE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>paxis</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MdnNPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Median Normalized Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MdnO">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MdnO</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MdnO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Median Observations (obs unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.MdnP">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">MdnP</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.MdnP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Median Predictions (model unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NMB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NMB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NMB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized Mean Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NME">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NME</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized Mean Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NMPB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NMPB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>paxis</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NMPB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized Mean Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NMPE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NMPE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>paxis</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NMPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized Mean Peak Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NMdnB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NMdnB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NMdnB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized Median Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NMdnE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NMdnE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NMdnE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized Median Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NMdnPB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NMdnPB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>paxis</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NMdnPB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized Median Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NMdnPE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NMdnPE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>paxis</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NMdnPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized Median Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NO">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NO</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NO" title="Permalink to this definition">¶</a></dt>
+<dd><p>N Observations (#)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NOP">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NOP</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NOP" title="Permalink to this definition">¶</a></dt>
+<dd><p>N Observations/Prediction Pairs (#)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NP">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NP</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NP" title="Permalink to this definition">¶</a></dt>
+<dd><p>N Predictions (#)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.PSUTMNPB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">PSUTMNPB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.PSUTMNPB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paired Space/Unpaired Time Mean Normalized Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.PSUTMNPE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">PSUTMNPE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.PSUTMNPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paired Space/Unpaired Time Mean Normalized Peak Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.PSUTMdnNPB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">PSUTMdnNPB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.PSUTMdnNPB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paired Space/Unpaired Time Median Normalized Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.PSUTMdnNPE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">PSUTMdnNPE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.PSUTMdnNPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paired Space/Unpaired Time Median Normalized Peak Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.PSUTNMPB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">PSUTNMPB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.PSUTNMPB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paired Space/Unpaired Time Normalized Mean Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.PSUTNMPE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">PSUTNMPE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.PSUTNMPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paired Space/Unpaired Time Normalized Mean Peak Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.PSUTNMdnPB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">PSUTNMdnPB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.PSUTNMdnPB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paired Space/Unpaired Time Normalized Median Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.PSUTNMdnPE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">PSUTNMdnPE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.PSUTNMdnPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paired Space/Unpaired Time Normalized Median Peak Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.R2">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">R2</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.R2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficient of Determination (unit squared)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.RM">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">RM</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.RM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean Ratio Observations/Predictions (none)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.RMSE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">RMSE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.RMSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Root Mean Square Error (model unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.RMSEs">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">RMSEs</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.RMSEs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Root Mean Squared Error (obs, mod_hat)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.RMSEu">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">RMSEu</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.RMSEu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Root Mean Squared Error (mod_hat, mod)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.RMdn">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">RMdn</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.RMdn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Median Ratio Observations/Predictions (none)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.STDO">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">STDO</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.STDO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation of Observations</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.STDP">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">STDP</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.STDP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation of Predictions</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.USUTPB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">USUTPB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.USUTPB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unpaired Space/Unpaired Time Peak Bias (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.USUTPE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">USUTPE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.USUTPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unpaired Space/Unpaired Time Peak Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.WDAC">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">WDAC</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.WDAC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wind Direction Anomaly Correlation</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.WDIOA">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">WDIOA</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.WDIOA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wind Direction Index of Agreement, IOA</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.WDMB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">WDMB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.WDMB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wind Direction Mean Bias</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.WDME">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">WDME</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.WDME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wind Direction Mean Gross Error (model and obs unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.WDMdnB">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">WDMdnB</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.WDMdnB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wind Direction Median Bias</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.WDMdnE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">WDMdnE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.WDMdnE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wind Direction Median Gross Error (model and obs unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.WDRMSE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">WDRMSE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.WDRMSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wind Direction Root Mean Square Error (model unit)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.circlebias">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">circlebias</code><span class="sig-paren">(</span><em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.circlebias" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.d1">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">d1</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.d1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modified Index of Agreement, d1</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.matchedcompressed">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">matchedcompressed</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.matchedcompressed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.matchmasks">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">matchmasks</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.matchmasks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.scores">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">scores</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>minval</em>, <em>maxval=100000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.scores" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.stats">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">stats</code><span class="sig-paren">(</span><em>df</em>, <em>minval</em>, <em>maxval</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-monet.util.tools">
+<span id="monet-util-tools-module"></span><h2>monet.util.tools module<a class="headerlink" href="#module-monet.util.tools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.util.tools.findclosest">
+<code class="descclassname">monet.util.tools.</code><code class="descname">findclosest</code><span class="sig-paren">(</span><em>list</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.tools.findclosest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.tools.kolmogorov_zurbenko_filter">
+<code class="descclassname">monet.util.tools.</code><code class="descname">kolmogorov_zurbenko_filter</code><span class="sig-paren">(</span><em>df</em>, <em>window</em>, <em>iterations</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.tools.kolmogorov_zurbenko_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.tools.linregress">
+<code class="descclassname">monet.util.tools.</code><code class="descname">linregress</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.tools.linregress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.tools.long_to_wide">
+<code class="descclassname">monet.util.tools.</code><code class="descname">long_to_wide</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.tools.long_to_wide" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.tools.search_listinlist">
+<code class="descclassname">monet.util.tools.</code><code class="descname">search_listinlist</code><span class="sig-paren">(</span><em>array1</em>, <em>array2</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.tools.search_listinlist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.tools.wsdir2uv">
+<code class="descclassname">monet.util.tools.</code><code class="descname">wsdir2uv</code><span class="sig-paren">(</span><em>ws</em>, <em>wdir</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.tools.wsdir2uv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-monet.util">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-monet.util" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="monet.verification.html" class="btn btn-neutral float-right" title="monet.verification package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="monet.plots.html" class="btn btn-neutral" title="monet.plots package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
