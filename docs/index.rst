@@ -1,4 +1,4 @@
-Model and ObservatioN Evalatution Toolkit (MONET)
+Model and ObservatioN Evaluation Toolkit (MONET)
 =================================================
 
 **MONET** is an open source project and Python package that aims to create a
@@ -23,12 +23,38 @@ several models and observations related to air composition and meteorology.
 
 Please site our work.
 
+What's New
+^^^^^^^^^^
+
+MONET v2.0 has been released.  MONET has re-engineered the way it deals with
+multidimensional observations or model output by using an Xarray Accessor giving
+MONET a flexible and intuitive way of expanding Xarray for multidimensional
+geospatial information commonly used in meteorology, climate and air quality all while
+making it easier on the user to use MONET and add to it.
+
+Features include:
+
+  * Xarray Accessor for both xarray.DataArray and xarray.Dataset using the .monet attribute
+  * vertical interpolation using python-stratify (https://github.com/SciTools-incubator/python-stratify) using the .monet.stratify function
+  * spatial interpolation using .monet.remap including:
+    - Nearest neighbor finder
+    - Constant latitude interpolation
+    - Constant longitude interpolation
+    - remap DataArray to current grid
+    - remap entire dataset to current grid
+  * fixes to observational datasets including Airnow, AQS, Aeronet, and ISH
+  * Added GEOS-R Level NESDIS netCDF data reader
+  * Simplified combine tool to combine point source data with multidimensional xarray objects
+  * icartt reader using Barron Hendersons PseudoNetCDF   
+
 Reference
 ^^^^^^^^^
 
 Baker, Barry; Pan, Li. 2017. “Overview of the Model and Observation
 Evaluation Toolkit (MONET) Version 1.0 for Evaluating Atmospheric
 Transport Models.” Atmosphere 8, no. 11: 210
+
+
 
 
 .. toctree::
