@@ -62,7 +62,6 @@ def cmap_discretize(cmap, N):
     # Return colormap object.
     return mcolors.LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)
 
-
 # def o3cmap():
 #     import matplotlib.cm as cm
 #     # This function returns the colormap and bins for the ozone spatial plots

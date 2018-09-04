@@ -74,7 +74,6 @@ def wsdir2uv(ws, wdir):
     v = -ws * cos(wdir * pi / 180.)
     return u, v
 
-
 def long_to_wide(df):
     from pandas import Series, merge
     w = df.pivot_table(
@@ -86,3 +85,4 @@ def long_to_wide(df):
         w[name + '_unit'] = group.units.unique()[0]
     #mergeon = hstack((index.values, df.variable.unique()))
     return merge(w, df, on=['siteid', 'time'])
+

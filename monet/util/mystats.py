@@ -22,17 +22,16 @@ def MNB(obs, mod, axis=None):
         (mod - obs), obs)).mean(axis=axis) * 100.
 
 
+
 def MNE(obs, mod, axis=None):
     """ Mean Normalized Gross Error (%)"""
     return np.ma.masked_invalid(old_div(np.ma.abs(mod - obs),
                                         obs)).mean(axis=axis) * 100.
 
-
 def MdnNB(obs, mod, axis=None):
     """ Median Normalized Bias (%)"""
     return np.ma.median(
         np.ma.masked_invalid(old_div((mod - obs), obs)), axis=axis) * 100.
-
 
 def MdnNE(obs, mod, axis=None):
     """ Median Normalized Gross Error (%)"""
@@ -207,7 +206,6 @@ def MNPE(obs, mod, paxis, axis=None):
     return (old_div(
         (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))),
         obs.max(axis=paxis))).mean(axis=axis) * 100.
-
 
 def MdnNPE(obs, mod, paxis, axis=None):
     """ Median Normalized Peak Bias (%)"""

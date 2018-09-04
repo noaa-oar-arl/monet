@@ -19,12 +19,14 @@ def make_spatial_plot(modelvar,
                       plotargs={},
                       ncolors=15,
                       discrete=False):
+
     # create figure
     f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
     # determine colorbar
     if 'cmap' not in plotargs:
         plotargs['cmap'] = 'viridis'
     if discrete and 'vmin' in plotargs and 'vmax' in plotargs:
+
         c, cmap = colorbar_index(
             ncolors,
             plotargs['cmap'],
@@ -51,7 +53,6 @@ def make_spatial_plot(modelvar,
     m.drawcoastlines(linewidth=.3)
     m.drawcountries()
     return f, ax, c, cmap, vmin, vmax
-
 
 def spatial(modelvar, **kwargs):
     if kwargs['ax'] is None:
@@ -91,8 +92,6 @@ def make_spatial_contours(modelvar,
             maxval=levels[-1],
             basemap=m,
             dtype=dtype)
-    #        m.contourf(x, y, modelvar, **kwargs,cmap=cmap)
-    # c, cmap = colorbar_index(ncolors, cmap, minval=vmin, maxval=vmax)
     else:
         c = m.colorbar()
     titstring = date.strftime('%B %d %Y %H')
@@ -107,6 +106,7 @@ def make_spatial_contours(modelvar,
 
 def wind_quiver(ws, wdir, gridobj, m, **kwargs):
     from . import tools
+
     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
     # define map and draw boundries
@@ -134,7 +134,6 @@ def normval(vmin, vmax, cmap):
     bounds = arange(vmin, vmax + 5., 5.)
     norm = BoundaryNorm(boundaries=bounds, ncolors=cmap.N)
     return norm
-
 
 # def spatial_scatter(df, m, discrete=False, plotargs={}, create_cbar=True):
 #     from .colorbars import cmap_discretize
@@ -176,6 +175,7 @@ def spatial_bias_scatter(df,
                          ncolors=15,
                          fact=1.5,
                          cmap='RdBu_r'):
+
     from scipy.stats import scoreatpercentile as score
     from numpy import around
     #    plt.figure(figsize=(11, 6), frameon=False)
@@ -187,6 +187,7 @@ def spatial_bias_scatter(df,
     x, y = m(new.longitude.values, new.latitude.values)
     c, cmap = colorbar_index(
         ncolors, cmap, minval=top * -1, maxval=top, basemap=m)
+
     c.ax.tick_params(labelsize=13)
     #    cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
@@ -203,11 +204,11 @@ def spatial_bias_scatter(df,
         edgecolors='k',
         linewidths=.25,
         alpha=.7)
+
     if savename != '':
         plt.savefig(savename + date + '.jpg', dpi=75.)
         plt.close()
     return f, ax, c
-
 
 # def eight_hr_spatial_scatter(df, m, date, savename=''):
 #     fig = plt.figure(figsize=(11, 6), frameon=False)
@@ -264,7 +265,6 @@ def timeseries(df,
         Description of returned object.
 
     """
-
     if ax is None:
         f, ax = plt.subplots(figsize=(11, 6), frameon=False)
 
@@ -299,7 +299,6 @@ def timeseries(df,
     plt.title(title)
     plt.tight_layout()
     return ax
-
 
 def kdeplot(df, title=None, label=None, ax=None, **kwargs):
     """Short summary.
@@ -382,7 +381,6 @@ def taylordiagram(df,
 
         dia = td.TaylorDiagram(obsstd, fig=f, rect=111, label='Obs')
         plt.grid(linewidth=1, alpha=.5)
-
         cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
         dia.add_sample(
             df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label)
