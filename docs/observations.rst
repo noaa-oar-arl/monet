@@ -331,17 +331,19 @@ Data from  Continuous Emissions Monitoring Systems (CEMS)
 determination of a gas or particulate matter concentration or emission rate......CEMS are required
 under some of the EPA regulations..." - https://www.epa.gov/emc/emc-continuous-emission-monitoring-systems
 
-The data is obtained from ftp://newftp/epa/gov/DMDNLoad/emissions/
+The data is obtained from ftp://newftp.epa.gov/DmDnLoad/emissions/
 
 First pick the dates and states you wish to retrieve data for.
 
 .. code::   python
+
     dates = [pd.Timestamp('2012-01-01'), pd.Timestamp('2012-12-31')]
     states = ['md']
 
 To return the pandas :py:class:`~pandas.DataFrame` with the data
 
 .. code::   python
+
     from monet.obs import cems_mod
     cems = cems_mod.CEMS()
     df = cems.add_data(dates, states, download=False, verbose=False)
@@ -351,16 +353,18 @@ It also contains data on emissions of various gasses and particulates.
 To see what data is in the DataFrame simply output the column header values
 
 .. code:: python
+
     print(df.colums.values)
 
 
 The CEMS class also contains the method  cemspivot which will return a pivot table 
 (also :py:class:`~pandas.DataFrame`) in which each column is a time series
 of the specified variable for each orispl code (emission source). The time is given by the
-row index and the column header is the orispl code. The columns may also be broken down by unit id if more
+row index and the column header is the orispl code. The columns may also be broken down by unit id if 
 there is more than one unit and unitid is set to True. 
  
 .. code::   python
+
     pivot_df = cems.cemspivot('so2_lbs', unitid=False, verbose=False)
 
 Climate Reference Network
@@ -379,21 +383,28 @@ Currently, the text files are downloaded into the working directory.
 There is no option not to download the files.
 
 First pick the dates and area you want to retrieve data for.
+
 .. code::   python
 
     dates = [pd.Timestamp('2012-01-01'), pd.Timestamp('2012-12-31')]
+
+.. code::   python
+
     area = [-105.0, -97, 44.5, 49.5]
 
 Now a simple one stop command to return the pandas :py:class:`~pandas.DataFrame`
 of the data on the given dates.  MONET reads the hourly data from the ISD LITE database.
 
 .. code::   python
+
     from monet.obs import ish
     df = ish.add_data(dates, country=None, box=area, resample=False)
    
 
 Or you can create your own instance of the ISH class. 
+
 .. code:: python
+
     from monet.obs import ish_mod
     metdata = ish_mod.ISH()
     df = metdata.add_data(dates, country=None, box=area, resample=False)
@@ -401,6 +412,7 @@ Or you can create your own instance of the ISH class.
 To see what data is in the DataFrame simply output the column header values
 
 .. code:: python
+
     print(df.colums.values)
 
 The ISD (ISH) database contains latitude, longitude, station name, station id, 
