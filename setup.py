@@ -6,7 +6,7 @@ from warnings import warn
 
 try:
     from setuptools import setup, find_packages
-except:
+except ImportError:
     from distutils.core import setup
 
 setup(
@@ -27,7 +27,7 @@ setup(
     install_requires=[
         'numpy', 'pandas', 'pyresample', 'netcdf4', 'xarray', 'dask',
         'matplotlib', 'seaborn', 'pseudonetcdf', 'cartopy', 'future', 'sphinx',
-        'pandoc'
+        'pandoc', 'cython'
     ],
     dependency_links=[
         "git+ssh://git@github.com/barronh/pseudonetcdf.git",
