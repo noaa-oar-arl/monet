@@ -317,10 +317,6 @@ IMPROVE
 
 to do...
 
-OpenAQ
-------
-
-to do.....
 
 CEMS
 ----
@@ -357,12 +353,12 @@ To see what data is in the DataFrame simply output the column header values
     print(df.colums.values)
 
 
-The CEMS class also contains the method  cemspivot which will return a pivot table 
+The CEMS class also contains the method  cemspivot which will return a pivot table
 (also :py:class:`~pandas.DataFrame`) in which each column is a time series
 of the specified variable for each orispl code (emission source). The time is given by the
-row index and the column header is the orispl code. The columns may also be broken down by unit id if 
-there is more than one unit and unitid is set to True. 
- 
+row index and the column header is the orispl code. The columns may also be broken down by unit id if
+there is more than one unit and unitid is set to True.
+
 .. code::   python
 
     pivot_df = cems.cemspivot('so2_lbs', unitid=False, verbose=False)
@@ -379,7 +375,7 @@ from numerous sources into a single common ASCII format and common data model"-
 https://www.ncdc.noaa.gov/isd
 
 Data is retrieved with the ISH class in the ish_mod.py file.
-Currently, the text files are downloaded into the working directory. 
+Currently, the text files are downloaded into the working directory.
 There is no option not to download the files.
 
 First pick the dates and area you want to retrieve data for.
@@ -399,23 +395,31 @@ of the data on the given dates.  MONET reads the hourly data from the ISD LITE d
 
     from monet.obs import ish
     df = ish.add_data(dates, country=None, box=area, resample=False)
-   
 
-Or you can create your own instance of the ISH class. 
+
+Or you can create your own instance of the ISH class.
 
 .. code:: python
 
     from monet.obs import ish_mod
     metdata = ish_mod.ISH()
     df = metdata.add_data(dates, country=None, box=area, resample=False)
-     
+
 To see what data is in the DataFrame simply output the column header values
 
 .. code:: python
 
     print(df.colums.values)
 
-The ISD (ISH) database contains latitude, longitude, station name, station id, 
+Available Measurements
+======================
+
+* dew point (dpt)
+* temperature (t)
+* visibility (vsb)
+* wind speed (ws)
+* wind direction (wdir)
+
+The ISD (ISH) database contains latitude, longitude, station name, station id,
 time, dew point (dpt), temperature (t), visibility (vsb),
 wind speed (ws), wind direction (wdir), as well as various quality flags.
-
