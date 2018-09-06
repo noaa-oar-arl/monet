@@ -36,10 +36,14 @@ intersphinx_mapping = {
 
 autodoc_mock_imports = [
     'numpy', 'iris', 'iris.analysis', 'iris.time', 'iris.experimental',
-    'iris.experimental.equalise_cubes', 'cartopy', 'cartopy.crs'
+    'iris.experimental.equalise_cubes', 'cartopy', 'cartopy.crs',
+    'cartopy.feature'
 ]
-# MOCK_MODULES = ['pygtk', 'gtk', 'gobject', 'argparse', 'numpy', 'pandas']
-# sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+MOCK_MODULES = [
+    'pygtk', 'gtk', 'gobject', 'argparse', 'numpy', 'pandas', 'cartopy',
+    'xarray', 'pseudonetcdf'
+]
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 sys.path.insert(0, os.path.abspath('../'))
 
