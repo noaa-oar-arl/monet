@@ -154,18 +154,17 @@ def add_lazy_pm25(d):
     ])
     if 'PM25_TOT' in keys:
         d['PM25'] = d['PM25_TOT'].chunk()
-
     else:
         index = allvars.isin(keys)
         if can_do(index):
             newkeys = allvars.loc[index]
             newweights = weights.loc[index]
             d['PM25'] = add_multiple_lazy(d, newkeys, weights=newweights)
-    d['PM25'] = d['PM25'].assign_attrs({
-        'units': '$\mu g m^{-3}$',
-        'name': 'PM2.5',
-        'long_name': 'PM2.5'
-    })
+            d['PM25'] = d['PM25'].assign_attrs({
+                'units': '$\mu g m^{-3}$',
+                'name': 'PM2.5',
+                'long_name': 'PM2.5'
+            })
     return d
 
 
@@ -192,14 +191,14 @@ def add_lazy_pm10(d):
         if can_do(index):
             newkeys = allvars.loc[index]
             d['PM10'] = add_multiple_lazy(d, newkeys)
-    d['PM10'] = d['PM10'].assign_attrs({
-        'units':
-        '$\mu g m^{-3}$',
-        'name':
-        'PM10',
-        'long_name':
-        'Particulate Matter < 10 microns'
-    })
+            d['PM10'] = d['PM10'].assign_attrs({
+                'units':
+                '$\mu g m^{-3}$',
+                'name':
+                'PM10',
+                'long_name':
+                'Particulate Matter < 10 microns'
+            })
     return d
 
 
