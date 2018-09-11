@@ -1,5 +1,5 @@
 from pyresample.kd_tree import XArrayResamplerNN
-from pyresample.bilinear.xarr import XArrayResamplerBilinear
+#from pyresample.bilinear.xarr import XArrayResamplerBilinear
 import xarray as xr
 from pyresample.geometry import SwathDefinition, AreaDefinition
 
