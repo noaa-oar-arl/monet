@@ -3,7 +3,7 @@ from ..grids import _hysplit_latlon_grid_from_dataset
 from ..grids import get_hysplit_latlon_pyreample_area_def
 import pandas as pd
 import xarray as xr
-
+import numpy as np
 
 def open_files(fname):
     """Short summary.
@@ -27,17 +27,16 @@ def open_files(fname):
 
 
     """
-
     # open the dataset using xarray
     binfile = ModelBin(fname, verbose=False, readwrite='r')
     dset = binfile.dset
-
     # get the grid information
     p4 = _hysplit_latlon_grid_from_dataset(dset)
-    swath = get_hysplit_latlon_pyreample_area_def(dset, p4)
+    swath = get_hysplit_latlon_pyresample_area_def(dset, p4)
 
     # now assign this to the dataset and each dataarray
     dset = dset.assign_attrs({'proj4_srs': p4})
+
     for i in dset.variables:
         dset[i] = dset[i].assign_attrs({'proj4_srs': p4})
         for j in dset[i].attrs:
@@ -100,7 +99,7 @@ class ModelBin(object):
                  century=None,
                  verbose=False,
                  readwrite='r',
-                 fillra=False):
+                 fillra=True):
         """
           drange should be a list of two datetime objects.
            The read method will store data from the cdump file for which the
@@ -362,6 +361,7 @@ class ModelBin(object):
         iii = 0  # checks to see if some nonzero data was saved in xarray
         # Safety valve - will not allow more than 1000 loops to be executed.
         imax = 1e3
+        imax = 10
         testf = True
         while testf:
             hdata6 = fromfile(fp, dtype=rec6, count=1)
@@ -462,24 +462,22 @@ class ModelBin(object):
                         # This block will fill in zero values in the
                         # concentration grid.
                         if fillra:
-                            n1 = arange(1, self.nlat + 1)
-                            n2 = arange(1, self.nlon + 1)
-                            concframe['ji'] = zip(concframe['jndx'],
-                                                  concframe['indx'])
-                            concframe.set_index(['ji'], inplace=True)
-                            newi = [(x, y) for x in n1 for y in n2]
-                            concframe = concframe.reindex(newi)
-                            concframe.reset_index(inplace=True)
-                            concframe[['jndx',
-                                       'indx']] = concframe['ji'].tolist()
-                            concframe.fillna(0, inplace=True)
-                            concframe.drop('ji', axis=1, inplace=True)
-                            # print(len(lat))
-                            # print(len(lon))
-                            # print(len(n1), len(n2), n1[-1], n2[-1])
-                            # print(self.nlat, self.nlon)
-                            # print(self.llcrnr_lat, self.llcrnr_lon)
-                            # print(concframe[-50:-1])
+                            n1 = lat
+                            n2 = lon 
+                            edata = np.zeros((len(n1),len(n2)))
+                            emptyra = xr.DataArray(edata, coords=[n1,n2], \
+                                      dims=['latitude','longitude'])    
+
+                            #concframe['ji'] = zip(concframe['jndx'],
+                            #                      concframe['indx'])
+                            #concframe.set_index(['ji'], inplace=True)
+                            #newi = [(x, y) for x in n1 for y in n2]
+                            #concframe = concframe.reindex(newi)
+                            #concframe.reset_index(inplace=True)
+                            #concframe[['jndx',
+                            #           'indx']] = concframe['ji'].tolist()
+                            #concframe.fillna(0, inplace=True)
+                            #concframe.drop('ji', axis=1, inplace=True)
 
                         concframe['latitude'] = concframe['jndx'].apply(flat)
                         concframe['longitude'] = concframe['indx'].apply(flon)
@@ -494,6 +492,9 @@ class ModelBin(object):
                         concframe.rename(
                             columns={'conc': col_name}, inplace=True)
                         dset = xr.Dataset.from_dataframe(concframe)
+                        print('Combining datasets', 'Pollutant', pollutant, /
+                               'Level', lev)
+                        if fillra: dset = dset.combine_first(emptyra)
                         # if this is the first time through. create dataframe
                         # for first level and pollutant.
                         if self.dset is None:
