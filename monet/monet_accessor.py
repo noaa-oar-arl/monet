@@ -172,9 +172,9 @@ class MONETAccessor(object):
         """
         from .plots.mapgen import draw_map
         from matplotlib.pyplot import tight_layout
-        # import cartopy.crs as ccrs
-        # crs = self.obj.monet.cartopy()
-        ax = draw_map(**map_kwarg)
+        import cartopy.crs as ccrs
+        crs = self.obj.monet.cartopy()
+        ax = draw_map(crs=crs)
         self.obj.plot(x='longitude', y='latitude', ax=ax, **kwargs)
         ax.outline_patch.set_alpha(0)
         tight_layout()
