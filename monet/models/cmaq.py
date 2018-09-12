@@ -520,6 +520,9 @@ def add_multiple_lazy(dset, variables, weights=None):
     from numpy import ones
     if weights is None:
         weights = ones(len(variables))
+    else:
+        weights = weights.values
+    variables = variables.values
     new = dset[variables[0]].copy() * weights[0]
     for i, j in zip(variables[1:], weights[1:]):
         new = new + dset[i].chunk() * j
