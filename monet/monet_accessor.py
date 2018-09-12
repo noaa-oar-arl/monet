@@ -175,7 +175,12 @@ class MONETAccessor(object):
         import cartopy.crs as ccrs
         crs = self.obj.monet.cartopy()
         ax = draw_map(crs=crs)
-        self.obj.plot(x='longitude', y='latitude', ax=ax, **kwargs)
+        self.obj.plot(
+            x='longitude',
+            y='latitude',
+            ax=ax,
+            transform=ccrs.PlateCarree(),
+            **kwargs)
         ax.outline_patch.set_alpha(0)
         tight_layout()
         return ax
