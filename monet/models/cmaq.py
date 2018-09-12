@@ -12,7 +12,10 @@ def can_do(index):
         return False
 
 
-def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
+def open_files(fname,
+               earth_radius=6370000,
+               convert_to_ppb=True,
+               drop_duplicates=False):
     """Method to open CMAQ IOAPI netcdf files.
 
     Parameters
@@ -33,7 +36,7 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     """
 
     # open the dataset using xarray
-    dset = xr.open_mfdataset(fname)
+    dset = xr.open_mfdataset(fname, concat_dim='TSTEP')
 
     # set log pressure as coordinate
     if 'PRES' in dset.variables:
@@ -65,7 +68,7 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     dset = dset.assign_attrs(area=area_def)
 
     # get the times
-    dset = _get_times(dset)
+    dset = _get_times(dset, drop_duplicates=drop_duplicates)
 
     # get the lat lon
     dset = _get_latlon(dset)
@@ -93,7 +96,7 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     return dset
 
 
-def _get_times(d):
+def _get_times(d, drop_duplicates):
     idims = len(d.TFLAG.dims)
     if idims == 2:
         tflag1 = Series(d['TFLAG'][:, 0]).astype(str).str.zfill(7)
@@ -103,9 +106,12 @@ def _get_times(d):
         tflag2 = Series(d['TFLAG'][:, 0, 1]).astype(str).str.zfill(6)
     date = to_datetime(
         [i + j for i, j in zip(tflag1, tflag2)], format='%Y%j%H%M%S')
-    indexdates = Series(date).drop_duplicates(keep='last').index.values
-    d = d.isel(TSTEP=indexdates)
-    d['TSTEP'] = date[indexdates]
+    if drop_duplicates:
+        indexdates = Series(date).drop_duplicates(keep='last').index.values
+        d = d.isel(TSTEP=indexdates)
+        d['TSTEP'] = date[indexdates]
+    else:
+        d['TSTEP'] = date
     return d.rename({'TSTEP': 'time'})
 
 
@@ -287,7 +293,6 @@ def add_lazy_caf(d):
     index = allvars.isin(keys)
     if can_do(index):
         newkeys = allvars.loc[index]
-        print(newkeys)
         neww = weights.loc[index]
         d['CAf'] = add_multiple_lazy(d, newkeys, weights=neww)
         d['CAf'] = d['CAf'].assign_attrs({
