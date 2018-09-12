@@ -287,6 +287,7 @@ def add_lazy_caf(d):
     index = allvars.isin(keys)
     if can_do(index):
         newkeys = allvars.loc[index]
+        print(newkeys)
         neww = weights.loc[index]
         d['CAf'] = add_multiple_lazy(d, newkeys, weights=neww)
         d['CAf'] = d['CAf'].assign_attrs({
