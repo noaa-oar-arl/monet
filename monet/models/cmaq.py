@@ -38,9 +38,6 @@ def open_files(fname,
     # open the dataset using xarray
     dset = xr.open_mfdataset(fname, concat_dim='TSTEP')
 
-    # set log pressure as coordinate
-    if 'PRES' in dset.variables:
-        dset.coords['logp'] = xr.ufuncs.log(dset.PRES.chunk())
     # add lazy diagnostic variables
     dset = add_lazy_pm25(dset)
     dset = add_lazy_pm10(dset)
@@ -159,7 +156,7 @@ def add_lazy_pm25(d):
         1., 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2
     ])
     if 'PM25_TOT' in keys:
-        d['PM25'] = d['PM25_TOT'].chunk()
+        d['PM25'] = d['PM25_TOT']
     else:
         index = allvars.isin(keys)
         if can_do(index):
@@ -191,7 +188,7 @@ def add_lazy_pm10(d):
     keys = Series([i for i in d.variables])
     allvars = Series(concatenate([aitken, accumulation, coarse]))
     if 'PM_TOT' in keys:
-        d['PM10'] = d['PM_TOT'].chunk()
+        d['PM10'] = d['PM_TOT']
     else:
         index = allvars.isin(keys)
         if can_do(index):
@@ -530,7 +527,7 @@ def add_multiple_lazy(dset, variables, weights=None):
     variables = variables.values
     new = dset[variables[0]].copy() * weights[0]
     for i, j in zip(variables[1:], weights[1:]):
-        new = new + dset[i].chunk() * j
+        new = new + dset[i] * j
     return new
 
 
