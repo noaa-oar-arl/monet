@@ -12,149 +12,11 @@ Python 3
 """
 
 
-def get_stack_dict(df, orispl=None):
-    """
-    Parameters
-    ----------
-    df dataframe created with stack_height() call
-    orispl : list
-           list of orispl codes to consider
-    Returns
-    -------
-    stackhash: dictionary
-    key orispl code and value list of tuples with
-    (stackid, stackht (in feet))
-    """
-    stackhash = {}
-    df = df[df['orispl_code'].isin(orispl)]
-    df = df[['orispl_code', 'stackid', 'stackht']]
-
-    def newc(x):
-        return (x['stackid'], x['stackht'])
-    for oris in df['orispl_code'].unique():
-        dftemp = df[df['orispl_code'] == oris]
-        dftemp['tuple'] = dftemp.apply(newc, axis=1)
-        value = dftemp['tuple'].unique()
-        stackhash[oris] = value
-    return stackhash
-
-
-def max_stackht(df, meters=True, verbose=False):
-    """
-       adds 'max_stackht' column to dataframe returned by stack_height function.
-       this column indicates the largest stack height associated with that
-       orispl code.
-    """
-    df2 = pd.DataFrame()
-    iii = 0
-    mult = 1
-    if meters:
-        mult = 0.3048
-    for orispl in df['orispl_code'].unique():
-        dftemp = df[df['orispl_code'] == orispl]
-        slist = mult * np.array(dftemp['stackht'].unique())
-
-        maxval = np.max(slist)
-        dftemp['max_stackht'] = maxval
-        dftemp.drop(['stackht', 'stackdiam'], inplace=True, axis=1)
-        dftemp.drop_duplicates(inplace=True)
-        #dftemp['list_stackht'] = 0
-        #dftemp.at[orispl, 'list_stackht'] =  list(slist)
-
-        if iii == 0:
-            df2 = dftemp.copy()
-        else:
-            df2 = pd.concat([df2, dftemp], axis=0)
-        iii += 1
-        if verbose:
-            print('ORISPL', orispl, maxval, slist)
-        # print(dftemp['list_stackht'].unique())
-    return df2
-
-
-def read_stack_height(verbose=False, testing=False):
-    """
-    reads file with information on stack heights and diameters and returns a
-    dataframe.
-    Parameters
-    ----------
-    verbose: boolean
-             if true prints out header information in file.
-    testing: boolean
-             if true returns dataframe with more columns
-    Returns
-    -------
-    df2: pandas dataframe
-         dataframe which contains columns which have stack height and diameter
-         for each orispl code and stackid.
-
-    TO DO: CEMS data contains a unit_id but this doesn't seem to correspond to
-    the ids availble in the ptinv file. Not clear how to match individual units
-    with the same orispl code.
-    """
-    pd.options.mode.chained_assignment = None
-    # This file was obtained from Daniel Tong and Youhua Tang 9/13/2018
-    # stack height is in feet in the file.
-    basedir = os.path.abspath(os.path.dirname(__file__))[:-3]
-    fn = 'ptinv_ptipm_cap2005nei_20jun2007_v0_orl.txt'
-    fname = os.path.join(basedir, 'data', fn)
-
-    df = pd.read_csv(fname, comment='#')
-    orispl = 'ORIS_FACILITY_CODE'
-    # drop rows which have nan in the ORISPL code.
-    df.dropna(inplace=True, axis=0, subset=['ORIS_FACILITY_CODE'])
-    #df[orispl].fillna(-999, inplace=True)
-    df[orispl] = df[orispl].astype(int)
-
-    if verbose:
-        print('Data available in ptinv file')
-        print(df.columns.values)
-        print('----------------------------')
-    if testing:  # for testing purposes output all the id codes.
-        df2 = df[['STACKID', 'PLANTID', 'POINTID', 'FIPS', 'ORIS_BOILER_ID',
-                  'STKHGT', 'STKDIAM', orispl, 'PLANT']]
-        df2.columns = ['stackid', 'plantid', 'pointid', 'fips', 'boiler',
-                       'stackht', 'stackdiam', 'orispl_code', 'plant']
-    else:
-        df2 = df[[orispl, 'STKHGT', 'STKDIAM', 'STACKID']]
-        df2.columns = ['orispl_code', 'stackht', 'stackdiam', 'stackid']
-    df2.drop_duplicates(inplace=True)
-    df2 = df2[df2['orispl_code'] != -999]
-    #df2 = max_stackht(df2)
-    #df2.drop(['stackht'], inplace=True)
-    # df2.drop_duplicates(inplace=True)
-    #print('done here')
-    return df2
-
-
 def getdegrees(degrees, minutes, seconds):
-    """
-    Parameters
-    ----------
-    degrees: integer
-    minutes: integer
-    seconds: integer
-
-    Returns
-    ----------
-    decimal degrees.
-    """
     return degrees + minutes / 60.0 + seconds / 3600.00
 
 
 def addmonth(dt):
-    """
-    Parameters
-    ----------
-    dt : datetime object
-
-    Returns: datetime object
-    datetime that is one month from input datetime.
-    handles ambiguities that arise when input date is
-    at the end of a month and next month does not have the
-    same number of days.
-
-    """
     month = dt.month + 1
     year = dt.year
     day = dt.day
@@ -181,7 +43,7 @@ def get_date_fmt(date, verbose=False):
           with format either YYYY-mm-DD or mm-DD-YYYY
     verbose: boolean
           if TRUE print extra information
-    Returns
+    Rerturns
     --------
     fmt: str
         string which can be used with datetime object to give format of date
@@ -295,8 +157,7 @@ class CEMS(object):
             for st in states:
                 url = self.retrieve(rd, st, download=download, verbose=verbose)
                 self.load(url, verbose=verbose)
-        return self.df
-
+        return True
 
     def match_column(self, varname):
         """varname is list of strings.
@@ -315,8 +176,7 @@ class CEMS(object):
                 cmatch = ccc
         return cmatch
 
-    def cemspivot(self, varname, daterange=None, unitid=False, stackht=False,
-                  verbose=True):
+    def cemspivot(self, varname, daterange=None, unitid=False, verbose=True):
         """
         Parameters
         ----------
@@ -329,8 +189,6 @@ class CEMS(object):
                  separate columns in the pivot table.
         verbose: boolean
                  if true print out extra information.
-        stackht: boolean
-                 NOT IMPLEMENTED YET. if true stack height is in header column.
         Returns: pandas DataFrame object
             returns dataframe with rows time. Columns are (orispl_code,
             unit_id).
@@ -339,40 +197,34 @@ class CEMS(object):
              an orispl_code. Values are from the column specified by the
              varname input.
         """
+
         from .obs_util import timefilter
-        stackht = False  # option not tested.
         temp = self.df.copy()
         if daterange:
             temp = timefilter(temp, daterange)
-        if stackht:
-            stack_df = read_stack_height(verbose=verbose)
-            olist = temp['orispl_code'].unique()
-            stack_df = stack_df[stack_df['orispl_code'].isin(olist)]
-            stack_df = max_stackht(stack_df)
-            temp = temp.merge(stack_df, left_on=['orispl_code'],
-                              right_on=['orispl_code'], how='left')
         if 'unit_id' in temp.columns.values and unitid:
             if temp['unit_id'].unique():
                 if verbose:
                     print('UNIT IDs ', temp['unit_id'].unique())
-            cols = ['orispl_code', 'unit_id']
-            if stackht:
-                cols.append('stackht')
+            # create pandas frame with index datetime and columns for value for
+            # each unit_id,orispl
+            pivot = pd.pivot_table(
+                temp,
+                values=varname,
+                index=['time'],
+                columns=['orispl_code', 'unit_id'],
+                aggfunc=np.sum)
         else:
-            cols = ['orispl_code']
-            if stackht:
-                cols.append('max_stackht')
-
-        # create pandas frame with index datetime and columns for value for
-        # each unit_id,orispl
-        pivot = pd.pivot_table(
-            temp,
-            values=varname,
-            index=['time'],
-            columns=cols,
-            aggfunc=np.sum)
-        #print('PIVOT ----------')
-        # print(pivot[0:20])
+            if verbose:
+                print('NO UNIT ID')
+            # returns data frame where rows are date and columns are the values
+            # of cmatch for orispl
+            pivot = pd.pivot_table(
+                temp,
+                values=varname,
+                index=['time'],
+                columns=['orispl_code'],
+                aggfunc=np.sum)
         return pivot
 
     def get_var(self,
@@ -394,6 +246,8 @@ class CEMS(object):
 
            if a particular unitid is specified then will return values for that
             unit.
+
+
         Parameters
         ----------
         varname : string or iteratable of strings
@@ -412,10 +266,9 @@ class CEMS(object):
             ui = False
         temp = self.cemspivot(varname, daterange, unitid=ui)
         if not ui:
-            returnval = temp[orisp]
+            return temp[orisp]
         else:
-            returnval = temp[orisp, unitid]
-        return returnval
+            return temp[orisp, unitid]
 
     def retrieve(self, rdate, state, download=True, verbose=False):
         """Short summary.
@@ -635,7 +488,7 @@ class CEMS(object):
         return dftemp
         # return dfnew
 
-    def load(self, efile, verbose=False):
+    def load(self, efile, verbose=True):
         """
         loads information found in efile into a pandas dataframe.
         Parameters
@@ -652,7 +505,6 @@ class CEMS(object):
         columns = self.columns_rename(columns, verbose)
         dftemp.columns = columns
         if verbose:
-            print('Data available in CEMS file')
             print(columns)
         dfmt = get_date_fmt(dftemp['date'][0], verbose=verbose)
 
