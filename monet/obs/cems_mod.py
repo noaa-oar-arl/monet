@@ -297,7 +297,6 @@ class CEMS(object):
                 self.load(url, verbose=verbose)
         return self.df
 
-
     def match_column(self, varname):
         """varname is list of strings.
            returns column name which contains all the strings.
