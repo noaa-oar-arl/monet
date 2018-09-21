@@ -463,18 +463,18 @@ class ModelBin(object):
                         # concentration grid.
                         if fillra:
                             n1 = lat
-                            n2 = lon 
-                            edata = np.zeros((len(n1),len(n2)))
-                            emptyra = xr.DataArray(edata, coords=[n1,n2], \
-                                      dims=['latitude','longitude'])    
+                            n2 = lon
+                            edata = np.zeros((len(n1), len(n2)))
+                            emptyra = xr.DataArray(edata, coords=[n1, n2],
+                                                   dims=['latitude', 'longitude'])
 
-                            #concframe['ji'] = zip(concframe['jndx'],
+                            # concframe['ji'] = zip(concframe['jndx'],
                             #                      concframe['indx'])
                             #concframe.set_index(['ji'], inplace=True)
                             #newi = [(x, y) for x in n1 for y in n2]
                             #concframe = concframe.reindex(newi)
-                            #concframe.reset_index(inplace=True)
-                            #concframe[['jndx',
+                            # concframe.reset_index(inplace=True)
+                            # concframe[['jndx',
                             #           'indx']] = concframe['ji'].tolist()
                             #concframe.fillna(0, inplace=True)
                             #concframe.drop('ji', axis=1, inplace=True)
@@ -493,8 +493,9 @@ class ModelBin(object):
                             columns={'conc': col_name}, inplace=True)
                         dset = xr.Dataset.from_dataframe(concframe)
                         print('Combining datasets', 'Pollutant', pollutant, /
-                               'Level', lev)
-                        if fillra: dset = dset.combine_first(emptyra)
+                              'Level', lev)
+                        if fillra:
+                            dset = dset.combine_first(emptyra)
                         # if this is the first time through. create dataframe
                         # for first level and pollutant.
                         if self.dset is None:

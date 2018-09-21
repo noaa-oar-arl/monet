@@ -11,6 +11,7 @@ Python 3
 #################################################################
 """
 
+
 def get_stack_dict(df, orispl=None):
     """
     Parameters
@@ -27,6 +28,7 @@ def get_stack_dict(df, orispl=None):
     stackhash = {}
     df = df[df['orispl_code'].isin(orispl)]
     df = df[['orispl_code', 'stackid', 'stackht']]
+
     def newc(x):
         return (x['stackid'], x['stackht'])
     for oris in df['orispl_code'].unique():
@@ -35,6 +37,7 @@ def get_stack_dict(df, orispl=None):
         value = dftemp['tuple'].unique()
         stackhash[oris] = value
     return stackhash
+
 
 def max_stackht(df, meters=True, verbose=False):
     """
@@ -45,11 +48,11 @@ def max_stackht(df, meters=True, verbose=False):
     df2 = pd.DataFrame()
     iii = 0
     mult = 1
-    if meters: mult = 0.3048
+    if meters:
+        mult = 0.3048
     for orispl in df['orispl_code'].unique():
         dftemp = df[df['orispl_code'] == orispl]
         slist = mult * np.array(dftemp['stackht'].unique())
-
 
         maxval = np.max(slist)
         dftemp['max_stackht'] = maxval
@@ -58,13 +61,14 @@ def max_stackht(df, meters=True, verbose=False):
         #dftemp['list_stackht'] = 0
         #dftemp.at[orispl, 'list_stackht'] =  list(slist)
 
-        if iii == 0: df2 = dftemp.copy()
+        if iii == 0:
+            df2 = dftemp.copy()
         else:
             df2 = pd.concat([df2, dftemp], axis=0)
         iii += 1
         if verbose:
             print('ORISPL', orispl, maxval, slist)
-        #print(dftemp['list_stackht'].unique())
+        # print(dftemp['list_stackht'].unique())
     return df2
 
 
@@ -89,15 +93,15 @@ def read_stack_height(verbose=False, testing=False):
     with the same orispl code.
     """
     pd.options.mode.chained_assignment = None
-    ##This file was obtained from Daniel Tong and Youhua Tang 9/13/2018
-    ##stack height is in feet in the file.
+    # This file was obtained from Daniel Tong and Youhua Tang 9/13/2018
+    # stack height is in feet in the file.
     basedir = os.path.abspath(os.path.dirname(__file__))[:-3]
     fn = 'ptinv_ptipm_cap2005nei_20jun2007_v0_orl.txt'
     fname = os.path.join(basedir, 'data', fn)
 
     df = pd.read_csv(fname, comment='#')
     orispl = 'ORIS_FACILITY_CODE'
-    ##drop rows which have nan in the ORISPL code.
+    # drop rows which have nan in the ORISPL code.
     df.dropna(inplace=True, axis=0, subset=['ORIS_FACILITY_CODE'])
     #df[orispl].fillna(-999, inplace=True)
     df[orispl] = df[orispl].astype(int)
@@ -106,10 +110,10 @@ def read_stack_height(verbose=False, testing=False):
         print('Data available in ptinv file')
         print(df.columns.values)
         print('----------------------------')
-    if testing: #for testing purposes output all the id codes.
-        df2 = df[['STACKID', 'PLANTID', 'POINTID', 'FIPS', 'ORIS_BOILER_ID', 
+    if testing:  # for testing purposes output all the id codes.
+        df2 = df[['STACKID', 'PLANTID', 'POINTID', 'FIPS', 'ORIS_BOILER_ID',
                   'STKHGT', 'STKDIAM', orispl, 'PLANT']]
-        df2.columns = ['stackid', 'plantid', 'pointid', 'fips', 'boiler', 
+        df2.columns = ['stackid', 'plantid', 'pointid', 'fips', 'boiler',
                        'stackht', 'stackdiam', 'orispl_code', 'plant']
     else:
         df2 = df[[orispl, 'STKHGT', 'STKDIAM', 'STACKID']]
@@ -118,7 +122,7 @@ def read_stack_height(verbose=False, testing=False):
     df2 = df2[df2['orispl_code'] != -999]
     #df2 = max_stackht(df2)
     #df2.drop(['stackht'], inplace=True)
-    #df2.drop_duplicates(inplace=True)
+    # df2.drop_duplicates(inplace=True)
     #print('done here')
     return df2
 
@@ -336,7 +340,7 @@ class CEMS(object):
              varname input.
         """
         from .obs_util import timefilter
-        stackht = False ####option not tested.
+        stackht = False  # option not tested.
         temp = self.df.copy()
         if daterange:
             temp = timefilter(temp, daterange)
@@ -345,17 +349,19 @@ class CEMS(object):
             olist = temp['orispl_code'].unique()
             stack_df = stack_df[stack_df['orispl_code'].isin(olist)]
             stack_df = max_stackht(stack_df)
-            temp = temp.merge(stack_df, left_on=['orispl_code'], \
-                             right_on=['orispl_code'], how='left')
+            temp = temp.merge(stack_df, left_on=['orispl_code'],
+                              right_on=['orispl_code'], how='left')
         if 'unit_id' in temp.columns.values and unitid:
             if temp['unit_id'].unique():
                 if verbose:
                     print('UNIT IDs ', temp['unit_id'].unique())
             cols = ['orispl_code', 'unit_id']
-            if stackht: cols.append('stackht')
+            if stackht:
+                cols.append('stackht')
         else:
             cols = ['orispl_code']
-            if stackht: cols.append('max_stackht')
+            if stackht:
+                cols.append('max_stackht')
 
         # create pandas frame with index datetime and columns for value for
         # each unit_id,orispl
@@ -366,7 +372,7 @@ class CEMS(object):
             columns=cols,
             aggfunc=np.sum)
         #print('PIVOT ----------')
-        #print(pivot[0:20])
+        # print(pivot[0:20])
         return pivot
 
     def get_var(self,
