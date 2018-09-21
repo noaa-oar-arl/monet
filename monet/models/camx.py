@@ -6,6 +6,19 @@ from ..grids import grid_from_dataset, get_ioapi_pyresample_area_def
 
 
 def can_do(index):
+    """ Utility function to see if something is possible in the Xarray object
+
+    Parameters
+    ----------
+    index : type
+        Description of parameter `index`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     if index.max():
         return True
     else:
@@ -67,6 +80,19 @@ def open_files(fname, earth_radius=6370000):
 
 
 def _get_times(d):
+    """Get the CAMx times
+
+    Parameters
+    ----------
+    d : type
+        Description of parameter `d`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     idims = len(d.TFLAG.dims)
     if idims == 2:
         tflag1 = Series(d['TFLAG'][:, 0]).astype(str).str.zfill(7)
@@ -104,17 +130,16 @@ def _get_latlon(dset):
 
 
 def add_lazy_pm25(d):
-    """Short summary.
+    """Add up PM2.5 for a variable lazily
 
     Parameters
     ----------
-    d : type
+    d : xarray.Dataset
         Description of parameter `d`.
 
     Returns
     -------
-    type
-        Description of returned object.
+    xarray.Dataset
 
     """
     keys = Series([i for i in d.variables])
@@ -130,6 +155,19 @@ def add_lazy_pm25(d):
 
 
 def add_lazy_pm10(d):
+    """Add up PM2.5 for a variable lazily
+
+    Parameters
+    ----------
+    d : type
+        Description of parameter `d`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     keys = Series([i for i in d.variables])
     allvars = Series(concatenate([fine, coarse]))
     if 'PM_TOT' in keys:
@@ -149,6 +187,19 @@ def add_lazy_pm10(d):
 
 
 def add_lazy_pm_course(d):
+    """Add up just the coarse mode PM
+
+    Parameters
+    ----------
+    d : type
+        Description of parameter `d`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     keys = Series([i for i in d.variables])
     allvars = Series(coarse)
     index = allvars.isin(keys)
@@ -165,6 +216,19 @@ def add_lazy_pm_course(d):
 
 
 def add_lazy_clf(d):
+    """Add up Cl particles
+
+    Parameters
+    ----------
+    d : type
+        Description of parameter `d`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     keys = Series([i for i in d.variables])
     allvars = Series(['ACLI', 'ACLJ', 'ACLK'])
     weights = Series([1, 1, .2])
@@ -183,6 +247,19 @@ def add_lazy_clf(d):
 
 
 def add_lazy_noy(d):
+    """Calculate NOy
+
+    Parameters
+    ----------
+    d : type
+        Description of parameter `d`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     keys = Series([i for i in d.variables])
     allvars = Series(noy_gas)
     index = allvars.isin(keys)
@@ -194,6 +271,19 @@ def add_lazy_noy(d):
 
 
 def add_lazy_nox(d):
+    """Calculate NOx
+
+    Parameters
+    ----------
+    d : type
+        Description of parameter `d`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     keys = Series([i for i in d.variables])
     allvars = Series(['NO', 'NOX'])
     index = allvars.isin(keys)
@@ -205,6 +295,23 @@ def add_lazy_nox(d):
 
 
 def add_multiple_lazy(dset, variables, weights=None):
+    """Utility function to add multiple variables with weights if needed
+
+    Parameters
+    ----------
+    dset : type
+        Description of parameter `dset`.
+    variables : type
+        Description of parameter `variables`.
+    weights : type
+        Description of parameter `weights`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     from numpy import ones
     if weights is None:
         weights = ones(len(variables))

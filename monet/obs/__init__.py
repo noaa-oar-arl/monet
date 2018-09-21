@@ -10,6 +10,7 @@ __all__ = [
 
 __name__ = 'obs'
 
+ish = ish_mod.ISH()
 airnow = airnow_mod.AirNow()
 aqs = aqs_mod.AQS()
 aeronet = aeronet_mod.AERONET()

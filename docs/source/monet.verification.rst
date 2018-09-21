@@ -20,14 +20,6 @@ monet.verification.interpolation module
     :undoc-members:
     :show-inheritance:
 
-monet.verification.obsdata module
----------------------------------
-
-.. automodule:: monet.verification.obsdata
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 monet.verification.verify module
 --------------------------------
 
