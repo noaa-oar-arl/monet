@@ -244,7 +244,7 @@ class crn(object):
         cols[2] = 'WBAN'
         self.df.columns = cols
         con = (self.df.datetime >= self.dates[0]) & (
-                self.df.datetime <= self.dates[-1])
+            self.df.datetime <= self.dates[-1])
         self.df = self.df[con]
         self.merge_monitor_meta_data()
         if output == '':

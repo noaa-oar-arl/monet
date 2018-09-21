@@ -18,7 +18,8 @@ class AERONET(object):
         self.df = None
         self.objtype = 'AERONET'
         self.usecols = concatenate((arange(30), arange(65, 83)))
-        self.latlonbox = None  # [21.1,-131.6686,53.04,-58.775] #[latmin,lonmin,latmax,lonmax]
+        # [21.1,-131.6686,53.04,-58.775] #[latmin,lonmin,latmax,lonmax]
+        self.latlonbox = None
         self.station_df = None
         self.colnames = ['Site_Name', 'date', 'time', 'Day_of_Year', 'Day_of_Year(Fraction)', 'AOD_1640nm',
                          'AOD_1020nm', 'AOD_870nm', 'AOD_865nm', 'AOD_779nm', 'AOD_675nm', 'AOD_667nm', 'AOD_620nm',
@@ -43,14 +44,16 @@ class AERONET(object):
         eh = self.dates.max().strftime('%H')
         if self.latlonbox is None:
             self.url = 'https://aeronet.gsfc.nasa.gov/cgi-bin/print_web_data_v3?year=' + sy + '&month=' + sm + '&day=' + sd + \
-                       '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed + '&hour2=' + eh + '&AOD15=1&AVG=10&if_no_html=1'
+                       '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + \
+                ed + '&hour2=' + eh + '&AOD15=1&AVG=10&if_no_html=1'
         else:
             lat1 = str(self.latlonbox[0])
             lon1 = str(self.latlonbox[1])
             lat2 = str(self.latlonbox[2])
             lon2 = str(self.latlonbox[3])
             self.url = 'https://aeronet.gsfc.nasa.gov/cgi-bin/print_web_data_v3?year=' + sy + '&month=' + sm + '&day=' + sd + '&hour=' + sh + '&year2=' + ey + \
-                       '&month2=' + em + '&day2=' + ed + '&hour2=' + eh + '&lat1=' + lat1 + '&lat2=' + lat2 + '&lon1=' + lon1 + '&lon2=' + lon2 + '&AOD15=1&AVG=10&if_no_html=1'
+                       '&month2=' + em + '&day2=' + ed + '&hour2=' + eh + '&lat1=' + lat1 + '&lat2=' + \
+                lat2 + '&lon1=' + lon1 + '&lon2=' + lon2 + '&AOD15=1&AVG=10&if_no_html=1'
 
     def read_aeronet(self):
         import requests
@@ -72,12 +75,15 @@ class AERONET(object):
 
         aod550 = aod500 * (550/500) ^ -alpha
         Following P.B. Russell et al. """
-        self.df['AOD_550'] = self.df.AOD_500nm * (old_div(550., 500.)) ** (-self.df['440-870_Angstrom_Exponent'])
+        self.df['AOD_550'] = self.df.AOD_500nm * \
+            (old_div(550., 500.)) ** (-self.df['440-870_Angstrom_Exponent'])
 
     def dust_detect(self):
         """ [Dubovik et al., 2002]. AOD_1020 > 0.3 and AE(440,870) < 0.6"""
-        self.df['DUST'] = (self.df['AOD_1020nm'] > 0.3) & (self.df['440-870_Angstrom_Exponent'] < 0.6)
+        self.df['DUST'] = (self.df['AOD_1020nm'] > 0.3) & (
+            self.df['440-870_Angstrom_Exponent'] < 0.6)
 
     def set_daterange(self, begin='', end=''):
-        dates = pd.date_range(start=begin, end=end, freq='H').values.astype('M8[s]').astype('O')
+        dates = pd.date_range(start=begin, end=end,
+                              freq='H').values.astype('M8[s]').astype('O')
         self.dates = dates

@@ -22,7 +22,8 @@ ProgressBar().register()
 
 class ish(object):
     def __init__(self):
-        self.WIDTHS = [4, 11, 8, 4, 1, 6, 7, 5, 5, 5, 4, 3, 1, 1, 4, 1, 5, 1, 1, 1, 6, 1, 1, 1, 5, 1, 5, 1, 5, 1]
+        self.WIDTHS = [4, 11, 8, 4, 1, 6, 7, 5, 5, 5, 4, 3, 1,
+                       1, 4, 1, 5, 1, 1, 1, 6, 1, 1, 1, 5, 1, 5, 1, 5, 1]
         self.DTYPES = [('varlength', 'i2'),
                        ('station_id', 'S11'),
                        ('date', 'i4'),
@@ -60,11 +61,11 @@ class ish(object):
 
     def delimit(self, file_object, delimiter=','):
         """Iterate over the lines in a file yielding comma delimited versions.
-        
+
         Arguments
         ---------
         file_object : file or filename
-        
+
         """
 
         try:
@@ -73,7 +74,7 @@ class ish(object):
             pass
 
         for line in file_object:
-            items = [];
+            items = []
             index = 0
             for w in self.WIDTHS:
                 items.append(line[index:index + w])
@@ -103,13 +104,15 @@ class ish(object):
         frame = self._clean_column_by_name(frame, 'vsb', missing=999999)
         frame = self._clean_column_by_name(frame, 't', multiplier=10)
         frame = self._clean_column_by_name(frame, 'dpt', multiplier=10)
-        frame = self._clean_column_by_name(frame, 'p', multiplier=10, missing=99999)
+        frame = self._clean_column_by_name(
+            frame, 'p', multiplier=10, missing=99999)
         return frame
 
     def read_data_frame(self, file_object):
         """Create a data frame from an ISH file."""
 
-        frame_as_array = np.genfromtxt(file_object, delimiter=self.WIDTHS, dtype=self.DTYPES)
+        frame_as_array = np.genfromtxt(
+            file_object, delimiter=self.WIDTHS, dtype=self.DTYPES)
 
         frame = pd.DataFrame.from_records(frame_as_array)
 
@@ -125,13 +128,18 @@ class ish(object):
     def read_ish_history(self):
         """ read ISH history file """
         fname = self.history_file
-        self.history = pd.read_csv(fname, parse_dates=['BEGIN', 'END'], infer_datetime_format=True)
-        index = (self.history.END >= self.dates.min())  # & (self.history.END <= self.dates.max())
+        self.history = pd.read_csv(
+            fname, parse_dates=['BEGIN', 'END'], infer_datetime_format=True)
+        # & (self.history.END <= self.dates.max())
+        index = (self.history.END >= self.dates.min())
         self.history = self.history.loc[index, :].dropna(subset=['LAT', 'LON'])
-        self.history.loc[:, 'USAF'] = self.history.USAF.astype('str').str.zfill(6)
-        self.history.loc[:, 'WBAN'] = self.history.WBAN.astype('str').str.zfill(5)
+        self.history.loc[:, 'USAF'] = self.history.USAF.astype(
+            'str').str.zfill(6)
+        self.history.loc[:, 'WBAN'] = self.history.WBAN.astype(
+            'str').str.zfill(5)
         self.history['station_id'] = self.history.USAF + self.history.WBAN
-        self.history.rename(columns={'LAT': 'latitude', 'LON': 'longitude'}, inplace=True)
+        self.history.rename(
+            columns={'LAT': 'latitude', 'LON': 'longitude'}, inplace=True)
 
     def subset_sites(self, latmin=32.65, lonmin=-113.3, latmax=34.5, lonmax=-110.4):
         """ find sites within designated region"""
@@ -141,18 +149,22 @@ class ish(object):
         return dfloc
 
     def read_sites(self, box=None, country=None, state=None, site=None, resample=True, window='H'):
-        import urllib.request, urllib.error, urllib.parse
+        import urllib.request
+        import urllib.error
+        import urllib.parse
         from numpy import NaN
         i = self.dates[0]
         year = i.strftime('%Y')
         url = 'https://www1.ncdc.noaa.gov/pub/data/noaa/' + year + '/'
         if self.history is None:
             self.read_ish_history()
-        self.history['fname'] = url + self.history.USAF + '-' + self.history.WBAN + '-' + year + '.gz'
+        self.history['fname'] = url + self.history.USAF + \
+            '-' + self.history.WBAN + '-' + year + '.gz'
         dfloc = self.history.copy()
         if type(box) is not type(None):
             print('Retrieving Sites in: ' + box)
-            dfloc = self.subset_sites(latmin=box[0], lonmin=box[1], latmax=box[2], lonmax=box[3])
+            dfloc = self.subset_sites(
+                latmin=box[0], lonmin=box[1], latmax=box[2], lonmax=box[3])
         elif country is not None:
             print('Retrieving Country: ' + country)
             dfloc = self.history.loc[self.history.CTRY == country, :]
@@ -180,13 +192,16 @@ class ish(object):
         if resample:
             print('  Resampling to every ' + window)
             self.df.index = self.df.datetime
-            self.df = self.df.groupby('station_id').resample('H').mean().reset_index()
+            self.df = self.df.groupby('station_id').resample(
+                'H').mean().reset_index()
         self.df = self.df.merge(self.history[['station_id', 'latitude', 'longitude', 'STATION NAME']],
                                 on=['station_id'], how='left')
 
     def get_url_file_objs(self, fname):
         from io import StringIO
-        import urllib.request, urllib.error, urllib.parse
+        import urllib.request
+        import urllib.error
+        import urllib.parse
         import gzip
         objs = []
         size = []

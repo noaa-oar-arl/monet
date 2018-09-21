@@ -13,11 +13,15 @@ class improve(object):
     def __init__(self):
         self.datestr = []
         self.df = None
-        self.se_states = array(['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN', 'VA', 'WV'], dtype='|S2')
-        self.ne_states = array(['CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'], dtype='|S2')
-        self.nc_states = array(['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'], dtype='|S2')
+        self.se_states = array(
+            ['AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN', 'VA', 'WV'], dtype='|S2')
+        self.ne_states = array(
+            ['CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'], dtype='|S2')
+        self.nc_states = array(
+            ['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'], dtype='|S2')
         self.sc_states = array(['AR', 'LA', 'OK', 'TX'], dtype='|S2')
-        self.r_states = array(['AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD', 'UT', 'WY'], dtype='|S2')
+        self.r_states = array(['AZ', 'CO', 'ID', 'KS', 'MT',
+                               'NE', 'NV', 'NM', 'ND', 'SD', 'UT', 'WY'], dtype='|S2')
         self.p_states = array(['CA', 'OR', 'WA'], dtype='|S2')
 
     def open_file(self, fname, output=''):
@@ -42,7 +46,8 @@ class improve(object):
             Description of returned object.
 
         """
-        self.df = pd.read_csv(fname, delimiter=',', parse_dates=[2], infer_datetime_format=True)
+        self.df = pd.read_csv(fname, delimiter=',', parse_dates=[
+                              2], infer_datetime_format=True)
         self.df.rename(columns={'EPACode': 'SCS'}, inplace=True)
         self.df.rename(columns={'Value2': 'Obs'}, inplace=True)
         self.df.rename(columns={'State': 'State_Name'}, inplace=True)
@@ -58,13 +63,15 @@ class improve(object):
         self.df.dropna(subset=['Species'], inplace=True)
         self.df.Species.loc[self.df.Species == 'MT'] = 'PM10'
         self.df.Species.loc[self.df.Species == 'MF'] = 'PM2.5'
-        self.df.datetime = [datetime.strptime(i, '%Y%m%d') for i in self.df.datetime]
+        self.df.datetime = [datetime.strptime(
+            i, '%Y%m%d') for i in self.df.datetime]
         if output == '':
             output = 'IMPROVE.hdf'
         print('Outputing data to: ' + output)
         self.df.Obs.loc[self.df.Obs < 0] = NaN
         self.df.dropna(subset=['Obs'], inplace=True)
-        self.df.to_hdf(output, 'df', format='fixed', complevel=9, complib='zlib')
+        self.df.to_hdf(output, 'df', format='fixed',
+                       complevel=9, complib='zlib')
 
     def load_hdf(self, fname, dates):
         """Short summary.
@@ -119,7 +126,8 @@ class improve(object):
             Description of returned object.
 
         """
-        dates = pd.date_range(start=begin, end=end, freq='H').values.astype('M8[s]').astype('O')
+        dates = pd.date_range(start=begin, end=end,
+                              freq='H').values.astype('M8[s]').astype('O')
         self.dates = dates
 
     def get_local_datetime(self, df):
