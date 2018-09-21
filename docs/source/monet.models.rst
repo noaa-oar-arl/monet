@@ -4,6 +4,14 @@ monet.models package
 Submodules
 ----------
 
+monet.models.basemodel module
+-----------------------------
+
+.. automodule:: monet.models.basemodel
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 monet.models.camx module
 ------------------------
 
@@ -16,14 +24,6 @@ monet.models.cmaq module
 ------------------------
 
 .. automodule:: monet.models.cmaq
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-monet.models.combinetool module
--------------------------------
-
-.. automodule:: monet.models.combinetool
     :members:
     :undoc-members:
     :show-inheritance:

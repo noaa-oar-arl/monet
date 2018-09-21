@@ -14,37 +14,6 @@
 #
 import os
 import sys
-from unittest.mock import MagicMock
-
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return MagicMock()
-
-
-intersphinx_mapping = {
-    'python': ('http://docs.python.org/2.7', None),
-    'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-    'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
-    'matplotlib': ('http://matplotlib.org/', None),
-    'iris': ('http://scitools.org.uk/iris/docs/latest/', None),
-    'cartopy': ('http://scitools.org.uk/cartopy/docs/latest/', None),
-    'biggus': ('https://biggus.readthedocs.io/en/latest/', None),
-    'iris-grib': ('http://iris-grib.readthedocs.io/en/latest/', None),
-}
-
-autodoc_mock_imports = [
-    'numpy', 'iris', 'iris.analysis', 'iris.time', 'iris.experimental',
-    'iris.experimental.equalise_cubes', 'cartopy', 'cartopy.crs',
-    'cartopy.feature'
-]
-MOCK_MODULES = [
-    'pygtk', 'gtk', 'gobject', 'argparse', 'numpy', 'pandas', 'cartopy',
-    'xarray', 'pseudonetcdf'
-]
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
 sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
@@ -69,10 +38,9 @@ release = u''
 # ones.
 extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.napoleon',
-    'sphinx.ext.extlinks', 'sphinx.ext.ifconfig', 'sphinx.ext.intersphinx',
-    'sphinx.ext.todo', 'sphinx.ext.doctest'
+    'sphinx.ext.extlinks'
 ]
-# exclude_patterns = ['_build', '**.ipynb_checkpoints']
+#exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 extlinks = {
     'issue': ('https://github.com/noaa-oar-arl/MONET/issues/%s', 'GH'),

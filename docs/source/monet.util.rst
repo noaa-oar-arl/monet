@@ -4,10 +4,18 @@ monet.util package
 Submodules
 ----------
 
-monet.util.interp\_util module
-------------------------------
+monet.util.combine module
+-------------------------
 
-.. automodule:: monet.util.interp_util
+.. automodule:: monet.util.combine
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+monet.util.interp module
+------------------------
+
+.. automodule:: monet.util.interp
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,14 +24,6 @@ monet.util.mystats module
 -------------------------
 
 .. automodule:: monet.util.mystats
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-monet.util.resample module
---------------------------
-
-.. automodule:: monet.util.resample
     :members:
     :undoc-members:
     :show-inheritance:
