@@ -172,7 +172,6 @@ class MONETAccessor(object):
         """
         from .plots.mapgen import draw_map
         from matplotlib.pyplot import tight_layout
-        from .util.resample import _check_swath_or_area
         import cartopy.crs as ccrs
 
         if self._check_swath_def(self.obj.area):
