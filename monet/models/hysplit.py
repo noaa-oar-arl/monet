@@ -492,7 +492,7 @@ class ModelBin(object):
                         concframe.rename(
                             columns={'conc': col_name}, inplace=True)
                         dset = xr.Dataset.from_dataframe(concframe)
-                        print('Combining datasets', 'Pollutant', pollutant, /
+                        print('Combining datasets', 'Pollutant', pollutant,
                               'Level', lev)
                         if fillra:
                             dset = dset.combine_first(emptyra)
