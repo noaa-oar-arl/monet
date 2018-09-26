@@ -173,7 +173,11 @@ class MONETAccessor(object):
         from .plots.mapgen import draw_map
         from matplotlib.pyplot import tight_layout
         import cartopy.crs as ccrs
-        crs = self.obj.monet.cartopy()
+
+        if self._check_swath_def(self.obj.area):
+            crs = ccrs.PlateCarree()
+        else:
+            crs = self.obj.monet.cartopy()
         ax = draw_map(crs=crs)
         self.obj.plot(
             x='longitude',
@@ -184,6 +188,26 @@ class MONETAccessor(object):
         ax.outline_patch.set_alpha(0)
         tight_layout()
         return ax
+
+    def _check_swath_def(defin):
+        """checks if it is a pyresample SwathDefinition or AreaDefinition.
+
+        Parameters
+        ----------
+        defin : type
+            Description of parameter `defin`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        from pyresample.geometry import SwathDefinition
+        if isinstance(defin, SwathDefinition):
+            return True
+        else:
+            return False
 
     def remap_data(self, dataarray, grid=None, **kwargs):
         """remaps from another grid to the current grid of self using pyresample.

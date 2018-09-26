@@ -25,6 +25,128 @@ def can_do(index):
         return False
 
 
+def open_dataset(fname,
+                 earth_radius=6370000,
+                 convert_to_ppb=True,
+                 drop_duplicates=False):
+    """Method to open CMAQ IOAPI netcdf files.
+
+    Parameters
+    ----------
+    fname : string or list
+        fname is the path to the file or files.  It will accept hot keys in
+        strings as well.
+    earth_radius : float
+        The earth radius used for the map projection
+    convert_to_ppb : boolean
+        If true the units of the gas species will be converted to ppbV
+
+    Returns
+    -------
+    xarray.DataSet
+
+
+    """
+
+    # open the dataset using xarray
+    dset = xr.open_dataset(
+        fname, engine='pseudonetcdf', backend_kwargs={'format': 'uamiv'})
+
+    # get the grid information
+    grid = grid_from_dataset(dset, earth_radius=earth_radius)
+    area_def = get_ioapi_pyresample_area_def(dset, grid)
+    # assign attributes for dataset and all DataArrays
+    dset = dset.assign_attrs({'proj4_srs': grid})
+    for i in dset.variables:
+        dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
+        for j in dset[i].attrs:
+            dset[i].attrs[j] = dset[i].attrs[j].strip()
+        dset[i] = dset[i].assign_attrs({'area': area_def})
+    dset = dset.assign_attrs(area=area_def)
+
+    # add lazy diagnostic variables
+    dset = add_lazy_pm25(dset)
+    dset = add_lazy_pm10(dset)
+    dset = add_lazy_pm_course(dset)
+    dset = add_lazy_noy(dset)
+    dset = add_lazy_nox(dset)
+
+    # get the times
+    dset = _get_times(dset)
+
+    # get the lat lon
+    dset = _get_latlon(dset)
+
+    # get Predefined mapping tables for observations
+    dset = _predefined_mapping_tables(dset)
+
+    # rename dimensions
+    dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
+
+    return dset
+
+
+def open_mfdataset(fname,
+                   earth_radius=6370000,
+                   convert_to_ppb=True,
+                   drop_duplicates=False):
+    """Method to open CMAQ IOAPI netcdf files.
+
+    Parameters
+    ----------
+    fname : string or list
+        fname is the path to the file or files.  It will accept hot keys in
+        strings as well.
+    earth_radius : float
+        The earth radius used for the map projection
+    convert_to_ppb : boolean
+        If true the units of the gas species will be converted to ppbV
+
+    Returns
+    -------
+    xarray.DataSet
+
+
+    """
+
+    # open the dataset using xarray
+    dset = xr.open_mfdataset(
+        fname, engine='pseudonetcdf', backend_kwargs={'format': 'uamiv'})
+
+    # get the grid information
+    grid = grid_from_dataset(dset, earth_radius=earth_radius)
+    area_def = get_ioapi_pyresample_area_def(dset, grid)
+    # assign attributes for dataset and all DataArrays
+    dset = dset.assign_attrs({'proj4_srs': grid})
+    for i in dset.variables:
+        dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
+        for j in dset[i].attrs:
+            dset[i].attrs[j] = dset[i].attrs[j].strip()
+        dset[i] = dset[i].assign_attrs({'area': area_def})
+    dset = dset.assign_attrs(area=area_def)
+
+    # add lazy diagnostic variables
+    dset = add_lazy_pm25(dset)
+    dset = add_lazy_pm10(dset)
+    dset = add_lazy_pm_course(dset)
+    dset = add_lazy_noy(dset)
+    dset = add_lazy_nox(dset)
+
+    # get the times
+    dset = _get_times(dset)
+
+    # get the lat lon
+    dset = _get_latlon(dset)
+
+    # get Predefined mapping tables for observations
+    dset = _predefined_mapping_tables(dset)
+
+    # rename dimensions
+    dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
+
+    return dset
+
+
 def open_files(fname, earth_radius=6370000):
     """Short summary.
 
