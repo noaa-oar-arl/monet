@@ -189,7 +189,7 @@ class MONETAccessor(object):
         tight_layout()
         return ax
 
-    def _check_swath_def(defin):
+    def _check_swath_def(self, defin):
         """checks if it is a pyresample SwathDefinition or AreaDefinition.
 
         Parameters
