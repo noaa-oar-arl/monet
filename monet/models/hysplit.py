@@ -5,7 +5,7 @@ import pandas as pd
 import xarray as xr
 
 
-def open_files(fname):
+def open_dataset(fname):
     """Short summary.
 
     Parameters
