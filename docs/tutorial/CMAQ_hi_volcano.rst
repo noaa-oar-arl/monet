@@ -208,47 +208,6 @@ rather than a linear scale.
 .. image:: CMAQ_hi_volcano_files/CMAQ_hi_volcano_11_3.png
 
 
-What if we want a horizontal colorbar? add the
-``'orientation':'horizontal'`` flag to ``cbar_kwargs``.
-
-.. code:: python
-
-    so2.where(so2 > .1).monet.quick_map(robust=True,norm=LogNorm(), 'orientation':'horizontal'})
-
-
-.. parsed-literal::
-
-    {'figsize': (12, 10.5), 'subplot_kw': {'projection': <cartopy.crs.PlateCarree object at 0x1c29e9afc0>}}
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-
-
-
-
-.. parsed-literal::
-
-    <matplotlib.collections.QuadMesh at 0x1c2a71f198>
-
-
-
-.. parsed-literal::
-
-    /anaconda3/lib/python3.6/site-packages/matplotlib/colors.py:1031: RuntimeWarning: invalid value encountered in less_equal
-      mask |= resdat <= 0
-
-
-
-.. image:: CMAQ_hi_volcano_files/CMAQ_hi_volcano_13_3.png
-
-
 Now let’s us view serveral time slices at once. We will average in time
 (every 8 hours) to give us 6 total subplots.
 
@@ -262,86 +221,6 @@ Now let’s us view serveral time slices at once. We will average in time
         draw_map(ax=ax,resolution='10m',extent=extent)
 
 
-.. parsed-literal::
-
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-
-
-
 .. image:: CMAQ_hi_volcano_files/CMAQ_hi_volcano_15_1.png
 
 
@@ -349,40 +228,13 @@ Finding nearest lat lon point
 -----------------------------
 
 Suppose that we want to find the model data found at a point
-(latitude,longitude). Use the
-``monet.verification.interpolation.find_nearest_latlon_xarray``
+(latitude,longitude). Use the MONETAccessor again
 
 .. code:: python
 
-    from monet.verification.interpolation import find_nearest_latlon_xarray as fnll
-    da = fnll(so2,lat=20.5,lon=-157.5)
-    f,ax = plt.subplots(figsize=(12,6))
-    da.to_pandas().to_csv('/Users/barry/Desktop/test.csv')
-    da.plot(ax=ax)
-
-
-.. parsed-literal::
-
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-
-
-
-
-.. parsed-literal::
-
-    [<matplotlib.lines.Line2D at 0x1c2b1d1320>]
-
-
-
+    so2.monet.nearest_latlon(lat=20.5,lon=157.5).plot(figsize=(12,6))
+    plt.xlabel('')
+    plt.tight_layout()
 
 .. image:: CMAQ_hi_volcano_files/CMAQ_hi_volcano_17_2.png
 
@@ -394,12 +246,13 @@ It is often useful to be able to pair model data with observational
 data. MONET uses the pyresample library
 (http://pyresample.readthedocs.io/en/latest/) to do a nearest neighbor
 interpolation. First let us get the airnow data for the dates of the
-simulation.
+simulation. We will also rotate it from the raw AirNow long format (stacked variables) to a wide format (each variable is a seperate column)
+
 
 .. code:: python
-
+    from monet.util import tools
     df = airnow.add_data(so2.time.to_index())
-
+    df = tools.long_to_wide(df)
 
 .. parsed-literal::
 
@@ -423,292 +276,16 @@ new column (model).
 
 .. code:: python
 
-    from monet.verification import combine
-    df = combine.combine(cmaq,airnow,mapping_table={'NOX': ['NO','NO2']})
-
+    df_combined = so2.monet.combine(df,col='SO2')
 
 .. parsed-literal::
 
-    Pairing: OZONE
-    ['O3']
-    O3
-    [########################################] | 100% Completed |  0.1s
-
-.. parsed-literal::
-
-    /anaconda3/lib/python3.6/_collections_abc.py:702: FutureWarning: calling len() on an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Call len() on the Dataset.variables property instead, like ``len(ds.variables)``, to preserve existing behavior in a forwards compatible manner.
-      return len(self._mapping)
-    /anaconda3/lib/python3.6/_collections_abc.py:720: FutureWarning: iteration over an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Iterate over the Dataset.variables property instead to preserve existing behavior in a forwards compatible manner.
-      yield from self._mapping
-
-
-.. parsed-literal::
-
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    [########################################] | 100% Completed |  0.5s
-    Pairing: PM2.5
-    ['PM25']
-    PM25
-    [########################################] | 100% Completed |  0.7s
-    [########################################] | 100% Completed |  0.7s
-    [########################################] | 100% Completed |  0.8s
-    [########################################] | 100% Completed |  0.9s
-    [########################################] | 100% Completed |  1.0s
-    Pairing: NO
-    ['NO']
-    NO
-    [########################################] | 100% Completed |  0.1s
-
-
-.. parsed-literal::
-
-    /anaconda3/lib/python3.6/_collections_abc.py:702: FutureWarning: calling len() on an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Call len() on the Dataset.variables property instead, like ``len(ds.variables)``, to preserve existing behavior in a forwards compatible manner.
-      return len(self._mapping)
-    /anaconda3/lib/python3.6/_collections_abc.py:720: FutureWarning: iteration over an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Iterate over the Dataset.variables property instead to preserve existing behavior in a forwards compatible manner.
-      yield from self._mapping
-
-
-.. parsed-literal::
-
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.4s
-    Pairing: NO2
-    ['NO2']
-    NO2
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    Pairing: SO2
-    ['SO2']
-    SO2
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    Pairing: PM10
-    ['PM10']
-    PM10
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    [########################################] | 100% Completed |  0.6s
-    [########################################] | 100% Completed |  0.7s
-    Pairing: CO
-    ['CO']
-    CO
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.1s
-
-.. parsed-literal::
-
-    /anaconda3/lib/python3.6/_collections_abc.py:702: FutureWarning: calling len() on an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Call len() on the Dataset.variables property instead, like ``len(ds.variables)``, to preserve existing behavior in a forwards compatible manner.
-      return len(self._mapping)
-    /anaconda3/lib/python3.6/_collections_abc.py:720: FutureWarning: iteration over an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Iterate over the Dataset.variables property instead to preserve existing behavior in a forwards compatible manner.
-      yield from self._mapping
-
-
-.. parsed-literal::
-
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.5s
-    Pairing: TEMP
-    ['TEMP2']
-    TEMP2
-    TEMP not in dataset and will not be paired
-    Pairing: WS
-    ['WSPD10']
-    WSPD10
-    WS not in dataset and will not be paired
-    Pairing: WD
-    ['WDIR10']
-    WDIR10
-    WD not in dataset and will not be paired
-    Pairing: NOY
-    ['NO', 'NO2', 'NO3', 'N2O5', 'HONO', 'HNO3', 'PAN', 'PANX', 'PNA', 'NTR', 'CRON', 'CRN2', 'CRNO', 'CRPX', 'OPAN']
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-    [########################################] | 100% Completed |  0.4s
-    Pairing: NOX
-    ['NO', 'NO2']
-    [########################################] | 100% Completed |  0.1s
-    [########################################] | 100% Completed |  0.1s
-
-.. parsed-literal::
-
-    /anaconda3/lib/python3.6/_collections_abc.py:702: FutureWarning: calling len() on an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Call len() on the Dataset.variables property instead, like ``len(ds.variables)``, to preserve existing behavior in a forwards compatible manner.
-      return len(self._mapping)
-    /anaconda3/lib/python3.6/_collections_abc.py:720: FutureWarning: iteration over an xarray.Dataset will change in xarray v0.11 to only include data variables, not coordinates. Iterate over the Dataset.variables property instead to preserve existing behavior in a forwards compatible manner.
-      yield from self._mapping
-
-
-.. parsed-literal::
-
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.2s
-    [########################################] | 100% Completed |  0.3s
-    [########################################] | 100% Completed |  0.4s
-
-
-Notice the new column name model here
-
-.. code:: python
-
-    df.columns
-    df.head()
-
-
-
-
-.. raw:: html
-
-    <div>
-    <style scoped>
-        .dataframe tbody tr th:only-of-type {
-            vertical-align: middle;
-        }
-
-        .dataframe tbody tr th {
-            vertical-align: top;
-        }
-
-        .dataframe thead th {
-            text-align: right;
-        }
-    </style>
-    <table border="1" class="dataframe">
-      <thead>
-        <tr style="text-align: right;">
-          <th></th>
-          <th>siteid</th>
-          <th>time</th>
-          <th>model</th>
-          <th>site</th>
-          <th>utcoffset</th>
-          <th>variable</th>
-          <th>units</th>
-          <th>obs</th>
-          <th>time_local</th>
-          <th>latitude</th>
-          <th>longitude</th>
-          <th>cmsa_name</th>
-          <th>msa_code</th>
-          <th>msa_name</th>
-          <th>state_name</th>
-          <th>epa_region</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th>0</th>
-          <td>000010102</td>
-          <td>2018-05-17 12:00:00</td>
-          <td>NaN</td>
-          <td>St. John's</td>
-          <td>-4.0</td>
-          <td>OZONE</td>
-          <td>PPB</td>
-          <td>29.0</td>
-          <td>2018-05-17 08:00:00</td>
-          <td>47.6528</td>
-          <td>-52.8167</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>CC</td>
-          <td>CA</td>
-        </tr>
-        <tr>
-          <th>1</th>
-          <td>000010102</td>
-          <td>2018-05-17 13:00:00</td>
-          <td>NaN</td>
-          <td>St. John's</td>
-          <td>-4.0</td>
-          <td>OZONE</td>
-          <td>PPB</td>
-          <td>35.0</td>
-          <td>2018-05-17 09:00:00</td>
-          <td>47.6528</td>
-          <td>-52.8167</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>CC</td>
-          <td>CA</td>
-        </tr>
-        <tr>
-          <th>2</th>
-          <td>000010102</td>
-          <td>2018-05-17 14:00:00</td>
-          <td>NaN</td>
-          <td>St. John's</td>
-          <td>-4.0</td>
-          <td>OZONE</td>
-          <td>PPB</td>
-          <td>30.0</td>
-          <td>2018-05-17 10:00:00</td>
-          <td>47.6528</td>
-          <td>-52.8167</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>CC</td>
-          <td>CA</td>
-        </tr>
-        <tr>
-          <th>3</th>
-          <td>000010102</td>
-          <td>2018-05-17 15:00:00</td>
-          <td>NaN</td>
-          <td>St. John's</td>
-          <td>-4.0</td>
-          <td>OZONE</td>
-          <td>PPB</td>
-          <td>42.0</td>
-          <td>2018-05-17 11:00:00</td>
-          <td>47.6528</td>
-          <td>-52.8167</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>CC</td>
-          <td>CA</td>
-        </tr>
-        <tr>
-          <th>4</th>
-          <td>000010102</td>
-          <td>2018-05-17 16:00:00</td>
-          <td>NaN</td>
-          <td>St. John's</td>
-          <td>-4.0</td>
-          <td>OZONE</td>
-          <td>PPB</td>
-          <td>43.0</td>
-          <td>2018-05-17 12:00:00</td>
-          <td>47.6528</td>
-          <td>-52.8167</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>NaN</td>
-          <td>CC</td>
-          <td>CA</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-
+  [########################################] | 100% Completed |  0.1s
+  [########################################] | 100% Completed |  0.2s
+  [########################################] | 100% Completed |  0.1s
+  [########################################] | 100% Completed |  0.2s
+  [########################################] | 100% Completed |  0.1s
+  [########################################] | 100% Completed |  0.2s
 
 
 Let’s look at the distributions to see if the two overlap to get a
