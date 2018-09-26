@@ -1,6 +1,6 @@
 """ HYPSLIT MODEL READER """
 from ..grids import _hysplit_latlon_grid_from_dataset
-from ..grids import get_hysplit_latlon_pyreample_area_def
+from ..grids import get_hysplit_latlon_pyresample_area_def
 import pandas as pd
 import xarray as xr
 import numpy as np
