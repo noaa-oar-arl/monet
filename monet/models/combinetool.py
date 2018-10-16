@@ -25,8 +25,8 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     -------
     pandas.DataFrame
     """
-    from ..util.interp_util import lonlat_to_swathdefinition
-    from ..util.resample import resample_dataset
+    from util.interp_util import lonlat_to_swathdefinition
+    from util.resample import resample_dataset
     try:
         if col is None:
             raise RuntimeError
@@ -51,6 +51,110 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
         df_interped, on=['latitude', 'longitude', 'time'], how='left')
     return final_df
 
+def combine_da_to_df_strat(df,
+                           dobs,
+                           daz, 
+                           da, 
+                           col_obs=None, 
+                           col_mod=None, 
+                           radius_of_influence=12e3, 
+                           merge=True):
+    """This function will combine an xarray data array with spatial information
+    point observations in `df`.
+
+    Parameters
+    ----------
+    daz:  xr.DataArray (Model Altitude)
+           Description of parameter `damodp`
+    da : xr.DataArray  (Model Variable)
+        Description of parameter `da`.
+    df : pd.DataFrame
+        Description of parameter `df`.
+    lay : iterable, default = [0]
+        Description of parameter `lay`.
+    radius : integer or float, default = 12e3
+        Description of parameter `radius`.
+
+    Returns
+    -------
+    pandas.DataFrame
+    """
+    from util.interp_util import lonlat_to_swathdefinition
+    from util.resample import resample_dataset_stratify
+    from util.tools import findclosest_modtimes_to_dfindex
+    import pandas as pd
+    
+    try:
+        if col_obs is None:
+            raise RuntimeError
+    except RuntimeError:
+        print('Must enter column name')
+    dfn = df.dropna(subset=[col_obs])
+    
+    # unit = dfnn[col + '_unit'].unique()[0]
+    #Set target grid lat/lon and altitudes
+    target_grid = lonlat_to_swathdefinition(
+        longitude=dfn.longitude.values, latitude=dfn.latitude.values)
+    target_altitudes = dfn.altitude.values
+    
+     #Perform horizontal & Vertical interpolation:  
+     #default to nearest neighbor and linear interpolation, respectively 
+     #but independent of model time at this point as sorted by altitudes
+    df_interped_vert = resample_dataset_stratify(da.compute(), 
+                                            daz.compute(), 
+                                            target_grid, 
+                                            target_altitudes, 
+                                            radius_of_influence=radius_of_influence)
+    
+    
+    #Scan closest model times and set their indices to true for all obs times
+    #df_timeindex = findclosest_modtimes_to_dfindex(da, dobs.time)
+    
+    #reindex 2d dataframe with obs sorted altitudes vs. model times
+    #df_interped_vert.index = dobs.time
+    df_interped_vert.index = sorted(target_altitudes)
+    df_interped_vert.index.rename('altitude', inplace=True)
+    df_interped_vert.columns = da.time
+    
+    #Make new dataframe with obs altitude and time
+    dfsort = {'altitude': target_altitudes, 'time': dobs.time}
+    dfsort = pd.DataFrame(data=dfsort)
+    
+    #Sort dataframe with ascending altitudes, expand to times to match, reset index
+    dfsorted = dfsort.sort_values('altitude')
+    dfsorted_index = dfsorted.reset_index(drop=True)
+    
+    
+    #Place obs times into dataframe that are associated with sorted altitudes
+    df_interped_vert.insert(0, 'obs_time', dfsorted_index['time'], allow_duplicates=True)
+    
+    #Re-sort whole dataframe as ascending times, and expand to whole dataframe
+    df_interped_vert_sorted = df_interped_vert.sort_values('obs_time')
+    df_interped_vert_sorted_i = df_interped_vert_sorted.reset_index(drop=True)
+    
+    #Scan closest model times and set their indices to true for all obs times
+    df_times = findclosest_modtimes_to_dfindex(da, dobs.time)
+    
+    #Selecting subset of rows and columns in the datframe based on closest matching obs/model times
+    df_interped_vert_sorted_isub = df_interped_vert_sorted_i[df_times]
+    
+    #May eventually want to mask if there are multiple model column hours for flights
+    #Based on closest or resampled linear interpolated
+    # i.e., if multiple columns...then mask...create one column
+        
+    #Add suffix to column headers with model variable name     
+    df_interped_vert_sorted_isub.columns =[str(df_times) + '_' + col_mod]
+
+
+    #Reindex interpolated datframe by observed times for merge
+    df_interped_vert_sorted_isub.index = dobs.time
+    df_interped_vert_sorted_isub.index.names = ['time']
+      
+    #Merge the interpolated model with original observation dataframe
+    final_df = df.merge(
+        df_interped_vert_sorted_isub,on=['time'], how='left')
+    
+    return final_df
 
 def combine_da_to_height_profile(da, dset, radius_of_influence=12e3):
     """This function will combine an xarray.DataArray to a 2d dataset with
@@ -82,8 +186,66 @@ def combine_da_to_height_profile(da, dset, radius_of_influence=12e3):
 
     return dset
 
+def combine_mod_to_flight_data(daobs, 
+                               damod,
+                               modzvar, 
+                               obsvar=None, 
+                               modvar=None, 
+                               resample = False, 
+                               freq = '3600S'):
+    """This function will combine an model xarray.DataArray with an xarray of
+    flight path data (typically ICARTT, use icartt_mod reader), and deliver
+    a combined dataframe/file for analysis
+    
+    It does pair up final obs and model data for analysis in dataframe
+    Does NOT convert units to match
 
-#
+    Parameters
+    ----------
+    daobs : xarray.DataSet of Flight/ICARTT data
+        Description of parameter `daobs`.
+    dmod : xarray.DataSet of Model/CMAQ data
+        Description of parameter `damod`.
+    modzvar:  xrray.DataArray of Model/CMAQ heights/altitudes
+
+    Returns
+    -------
+    xarray.Dataset
+        returns the xarray.Dataset with the `da` added as an additional
+        variable.
+
+    """
+    try:
+        if obsvar is None or modvar is None:
+            raise RuntimeError
+    except RuntimeError:
+        print('Error: Must enter both a obs and model variable name')
+    
+        
+    #converts icartt flight obs to dataframe for combination/resampling
+    dobsdf = daobs.to_dataframe()
+        
+    #performs horizontal and vertical interpolation and combines with obs
+    dfinterp = combine_da_to_df_strat(dobsdf,
+                                      daobs,
+                                      modzvar,
+                                      damod[modvar], 
+                                      col_obs=obsvar, 
+                                      col_mod=modvar, 
+                                      radius_of_influence=12e3,
+                                      merge=True)
+    
+     #final resample to the data to desired frequency (default = False)
+    if resample:       
+        dfinterpset = dfinterp.resample(freq).mean()  
+    else:
+        dfinterpset = dfinterp
+   
+    return dfinterpset
+    
+    
+    
+    
 # def combine_to_df(model=None,
 #                   obs=None,
 #                   mapping_table=None,
