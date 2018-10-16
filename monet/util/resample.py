@@ -127,7 +127,7 @@ def resample_dataset(data,
         resampler.valid_output_index = resample_cache['valid_output_index']
         resampler.index_array = resample_cache['index_array']
         resampler.distance_array = resample_cache['distance_array']
-    
+
     # now store the resampled data temporarily in temp
     temp = resampler.get_sample_from_neighbour_info(data)
 
@@ -143,18 +143,19 @@ def resample_dataset(data,
     else:
         return out
 
+
 def resample_dataset_stratify(data,
-                     dataz,
-                     target_grid,
-                     target_altitudes,
-                     radius_of_influence=100e3,
-                     resample_cache=None,
-                     return_neighbor_info=False,
-                     neighbours=1,
-                     epsilon=0,
-                     hinterp='nearest',
-                     vinterp='linear'):
-   
+                              dataz,
+                              target_grid,
+                              target_altitudes,
+                              radius_of_influence=100e3,
+                              resample_cache=None,
+                              return_neighbor_info=False,
+                              neighbours=1,
+                              epsilon=0,
+                              hinterp='nearest',
+                              vinterp='linear'):
+
     # first get the source grid definition
     try:
         if 'area' in data.attrs:
@@ -192,28 +193,28 @@ def resample_dataset_stratify(data,
         resampler.valid_output_index = resample_cache['valid_output_index']
         resampler.index_array = resample_cache['index_array']
         resampler.distance_array = resample_cache['distance_array']
-    
+
     # now store the horizontal resampled data temporarily in temp
     temp = resampler.get_sample_from_neighbour_info(data)
     tempz = resampler.get_sample_from_neighbour_info(dataz)
-    
+
     import stratify as strat
    # print(sorted(target_altitudes))
-    #now store the vertical resampled data temporarily in temp
-    #Note:  Need target altitudes ascending for stratify
-    tempnew = strat.interpolate(sorted(target_altitudes), 
-                                    tempz[0,:,:,:], 
-                                    temp, 
-                                    axis=1,
-                                    interpolation = vinterp
-                                    )
-    
-    #return 2D array (t,x)
-    out = tempnew[:,:,0,0]
-    #transposes as a dataframe (rows =flight points, cols = model times)
+    # now store the vertical resampled data temporarily in temp
+    # Note:  Need target altitudes ascending for stratify
+    tempnew = strat.interpolate(sorted(target_altitudes),
+                                tempz[0, :, :, :],
+                                temp,
+                                axis=1,
+                                interpolation=vinterp
+                                )
+
+    # return 2D array (t,x)
+    out = tempnew[:, :, 0, 0]
+    # transposes as a dataframe (rows =flight points, cols = model times)
     import pandas as pd
     outdf = pd.DataFrame(out).transpose()
-    
+
     if return_neighbor_info:
         resample_cache = dict(
             valid_input_index=valid_input_index,
@@ -223,8 +224,8 @@ def resample_dataset_stratify(data,
         return outdf, resample_cache
     else:
         return outdf
-    
-    #def resample_time(df):
+
+    # def resample_time(df):
     #df = df.resample(time='1H').interpolate('linear')
  #   df = df.resample.asfreq(time='1H')
  #   return df

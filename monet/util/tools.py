@@ -43,29 +43,31 @@ def findclosest(list, value):
     a = min((abs(x - value), x, i) for i, x in enumerate(list))
     return a[2], a[1]
 
+
 def findclosest_modtimes_to_dfindex(da, times):
-    #Find nearest model times from xarray dataset to xarray obs times
-    #then passing out as timestamps for subsetting dataframes
-    data  = da.sel_points(time=times, method='nearest')
-    
+    # Find nearest model times from xarray dataset to xarray obs times
+    # then passing out as timestamps for subsetting dataframes
+    data = da.sel_points(time=times, method='nearest')
+
     data = data.rename({'points': 'time'})
-    
+
     index = da.time.isin(data.time)
-    
+
     dfindex = index.to_dataframe()
-    
+
     dflist = dfindex.index[dfindex['time'] == True].tolist()
-    
+
     #data.coords['time'] = times
     return dflist
 
-#FIXME:  2-d model lat/lon
-#def findclosest_modtimes_latslons(da, times, latitudes, longitudes):
-    #Extracting nearest model times from netcdf file to obs times using xarray
+# FIXME:  2-d model lat/lon
+# def findclosest_modtimes_latslons(da, times, latitudes, longitudes):
+    # Extracting nearest model times from netcdf file to obs times using xarray
 #    data  = da.sel_points(time=times,latitude=latitudes, longitude=longitudes, method='nearest')
 #    print(data)
     #_hndl_nc.sel(time='2016-01-10', longitude=-170.0, latitude=-20.0, method='nearest')
 #    return data
+
 
 def _force_forder(x):
     """

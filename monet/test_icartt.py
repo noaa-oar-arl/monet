@@ -19,33 +19,31 @@ modname = 'C:/Users/drnim/OneDrive/Documents/UMD_NOAA_ARL/Mod/aqm.20180617.t12z.
 modnamez = 'C:/Users/drnim/OneDrive/Documents/UMD_NOAA_ARL/Mod/aqm.t12z.metcro3d.ncf'
 
 
-#Read ICARTT data file and add data as xarray
+# Read ICARTT data file and add data as xarray
 dataread = icartt.add_data(obsname)
 
-#Get flight 'time', 'latitude', and 'longitude', and specified 'altitude' (if specified)
-obs = icartt.get_data(dataread,lat_label=None, lon_label=None, 
+# Get flight 'time', 'latitude', and 'longitude', and specified 'altitude' (if specified)
+obs = icartt.get_data(dataread, lat_label=None, lon_label=None,
                       alt_label='ALTGPS_m')
 
-#get 3D CTM model data to analyze
+# get 3D CTM model data to analyze
 mod = cmaq.open_files(modname)
-#get 3D CTM model data that includes model layer heights (AGL) to interpolate
-#The example below shows for CMAQ using mid-layer height above ground
-#Note: If not available, calculate and provide associated xarray height (t,z,x,y) as modzvar
+# get 3D CTM model data that includes model layer heights (AGL) to interpolate
+# The example below shows for CMAQ using mid-layer height above ground
+# Note: If not available, calculate and provide associated xarray height (t,z,x,y) as modzvar
 modz = cmaq.open_files(modnamez)
 modzvar = modz['ZH']
 
-#Combines model and interpolated flight data both horizontally and vertically
-df_test = combinetool.combine_mod_to_flight_data(obs, 
+# Combines model and interpolated flight data both horizontally and vertically
+df_test = combinetool.combine_mod_to_flight_data(obs,
                                                  mod,
                                                  modzvar,
-                                                 obsvar='O3_ppbv', 
-                                                 modvar='O3', 
-                                                 resample = False, 
-                                                 freq = '60S', 
+                                                 obsvar='O3_ppbv',
+                                                 modvar='O3',
+                                                 resample=False,
+                                                 freq='60S',
                                                  )
 
 
 df_test.to_csv('final_merge_test.csv')
 print('done!')
-
-
