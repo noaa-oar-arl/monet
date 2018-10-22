@@ -189,12 +189,12 @@ class MONETAccessor(object):
         tight_layout()
         return ax
 
-    def _check_and_fix_coords(self):
-        if not self.obj.coords:
-            # get the lat lons from the swath or area def
-            lon, lat = self.obj.area.get_lonlats()
-            self.obj.coords['longitude'] = lon
-            self.obj.coords['latitude'] = lat
+    # def _check_and_fix_coords(self):
+    #     if not self.obj.coords:
+    #         # get the lat lons from the swath or area def
+    #         lon, lat = self.obj.area.get_lonlats()
+    #         self.obj.coords['longitude'] = lon
+    #         self.obj.coords['latitude'] = lat
 
     def _check_swath_def(self, defin):
         """checks if it is a pyresample SwathDefinition or AreaDefinition.
