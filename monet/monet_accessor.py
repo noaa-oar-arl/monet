@@ -178,7 +178,7 @@ class MONETAccessor(object):
             crs = ccrs.PlateCarree()
         else:
             crs = self.obj.monet.cartopy()
-        ax = draw_map(crs=crs)
+        ax = draw_map(crs=crs, **map_kwarg)
         self.obj.plot(
             x='longitude',
             y='latitude',
@@ -189,7 +189,14 @@ class MONETAccessor(object):
         tight_layout()
         return ax
 
-    def _check_swath_def(defin):
+    def _check_and_fix_coords(self):
+        if not self.obj.coords:
+            # get the lat lons from the swath or area def
+            lon, lat = self.obj.area.get_lonlats()
+            self.obj.coords['longitude'] = lon
+            self.obj.coords['latitude'] = lat
+
+    def _check_swath_def(self, defin):
         """checks if it is a pyresample SwathDefinition or AreaDefinition.
 
         Parameters
@@ -233,12 +240,33 @@ class MONETAccessor(object):
         # check to see if grid is supplied
         target = self.obj.area
         if grid is None:  # grid is assumed to be in da.area
-            out = resample.resample_dataset(dataarray.chunk(), target,
-                                            **kwargs)
+            out = resample.resample_dataset(dataarray, target, **kwargs)
         else:
             dataarray.attrs['area'] = grid
-            out = resample.resample_dataset(dataarray.chunk(), target,
-                                            **kwargs)
+            out = resample.resample_dataset(dataarray, target, **kwargs)
+        return out
+
+    def remap_xesmf(self, dataarray, method='bilinear', **kwargs):
+        """remaps from another grid to the current grid of self using xesmf
+
+        Parameters
+        ----------
+        daaarray : ndarray or xarray DataArray
+            Description of parameter `dset`.
+        radius_of_influence : float or integer
+            radius of influcence for pyresample in meters.
+
+        Returns
+        -------
+        xarray.DataArray
+            resampled object on current grid.
+
+        """
+        from .util import resample
+        # check to see if grid is supplied
+        target = self.obj
+        out = resample.resample_xesmf(
+            dataarray, target, method=method, **kwargs)
         return out
 
     def combine(self, data, col=None, radius_of_influence=None):
@@ -325,6 +353,80 @@ class MONETAccessorDataset(object):
         except TypeError:
             print('data must be an xarray.DataArray or xarray.Dataset')
 
+    def remap_xesmf(self, data, **kwargs):
+        """Short summary.
+
+        Parameters
+        ----------
+        data : type
+            Description of parameter `data`.
+        **kwargs : type
+            Description of parameter `**kwargs`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        print(data)
+        # try:
+        if isinstance(data, xr.DataArray):
+            self._remap_xesmf_dataarray(data, **kwargs)
+        elif isinstance(data, xr.Dataset):
+            self._remap_xesmf_dataset(data, **kwargs)
+        else:
+            raise TypeError
+        # except TypeError:
+        #     print('data must be an xarray.DataArray or xarray.Dataset')
+
+    def _remap_xesmf_dataset(self,
+                             dset,
+                             filename='monet_xesmf_regrid_file.nc',
+                             **kwargs):
+
+        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
+        vars = pd.Series(dset.variables)
+        loop_vars = vars.loc[~vars.isin(skip_keys)]
+        dataarray = dset[loop_vars[0]]
+        da = self._remap_xesmf_dataarray(
+            dataarray, self.obj, filename=filename, **kwargs)
+        if da.name in self.obj.variables:
+            da.name = da.name + '_y'
+        self.obj[da.name] = da
+        for i in loop_vars[1:]:
+            dataarray = dset[i]
+            self._remap_xesmf_dataarray(
+                dataarray, filename=filename, reuse_weights=True, **kwargs)
+
+    def _remap_xesmf_dataarray(self,
+                               dataarray,
+                               method='bilinear',
+                               filename='monet_xesmf_regrid_file.nc',
+                               **kwargs):
+        """Resample the DataArray to the dataset object.
+
+        Parameters
+        ----------
+        dataarray : type
+            Description of parameter `dataarray`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        from .util import resample
+        target = self.obj
+        out = resample.resample_xesmf(
+            dataarray, target, method=method, filename=filename, **kwargs)
+        print(out)
+        if out.name in self.obj.variables:
+            out.name = out.name + '_y'
+        self.obj[out.name] = out
+        return out
+
     def _remap_dataset(self, dset, grid=None, **kwargs):
         """Resample the entire dset (xarray.Dataset) to the current dataset object.
 
@@ -375,18 +477,15 @@ class MONETAccessorDataset(object):
 
         """
         from .util import resample
-        target = self.obj.area
         if grid is None:  # grid is assumed to be in da.area
-            out = resample.resample_dataset(dataarray.chunk(), target,
+            out = resample.resample_dataset(dataarray.chunk(), self.obj,
                                             **kwargs)
 
         else:
             dataarray.attrs['area'] = grid
-            out = resample.resample_dataset(dataarray.chunk(), target,
+            out = resample.resample_dataset(dataarray.chunk(), self.obj,
                                             **kwargs)
-        if out.name in self.obj.variables:
-            out.name = out.name + '_y'
-        self.obj[out.name] = out
+        return out
 
     def nearest_latlon(self, lat=None, lon=None, **kwargs):
         vars = pd.Series(self.obj.variables)

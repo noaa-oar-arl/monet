@@ -1,5 +1,5 @@
 from pyresample.kd_tree import XArrayResamplerNN
-#from pyresample.bilinear.xarr import XArrayResamplerBilinear
+# from pyresample.bilinear.xarr import XArrayResamplerBilinear
 import xarray as xr
 from pyresample.geometry import SwathDefinition, AreaDefinition
 
@@ -81,6 +81,24 @@ def _reformat_resampled_data(orig, new, target_grid):
     return new
 
 
+def resample_xesmf(source_da,
+                   target_da,
+                   method='bilinear',
+                   periodic=False,
+                   filename='monet_xesmf_regrid_file.nc',
+                   reuse_weights=False):
+    import xesmf as xe
+    regridder = xe.Regridder(
+        source_da,
+        target_da,
+        method,
+        periodic=periodic,
+        filename=filename,
+        reuse_weights=reuse_weights)
+
+    return regridder(source_da)
+
+
 def resample_dataset(data,
                      target_grid,
                      radius_of_influence=100e3,
@@ -113,11 +131,11 @@ def resample_dataset(data,
         epsilon=epsilon)
     if interp is 'nearest':
         resampler = XArrayResamplerNN(**kwargs)
-    else:
-        resampler = XArrayResamplerBilinear(**kwargs)
+    # else:
+    # resampler = XArrayResamplerBilinear(**kwargs)
 
     # check if resample cash is none else assume it is a dict with keys
-    #[valid_input_index, valid_output_index, index_array, distance_array]
+    # [valid_input_index, valid_output_index, index_array, distance_array]
     # else generate the data
     if resample_cache is None:
         valid_input_index, valid_output_index, index_array, distance_array = resampler.get_neighbour_info(
