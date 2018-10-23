@@ -151,8 +151,8 @@ class MONETAccessor(object):
                 Returns a cartopy.crs.Projection for this dataset
 
         """
-
-        return self.obj.area.to_cartopy_crs()
+        from .grids import get_optimal_cartopy_proj
+        return get_optimal_cartopy_proj(self.lat, self.lon, self.proj4_srs)
 
     def quick_map(self, map_kwarg={}, **kwargs):
         """Short summary.
@@ -174,10 +174,7 @@ class MONETAccessor(object):
         from matplotlib.pyplot import tight_layout
         import cartopy.crs as ccrs
 
-        if self._check_swath_def(self.obj.area):
-            crs = ccrs.PlateCarree()
-        else:
-            crs = self.obj.monet.cartopy()
+        crs = self.obj.monet.cartopy()
         ax = draw_map(crs=crs, **map_kwarg)
         self.obj.plot(
             x='longitude',
@@ -237,13 +234,17 @@ class MONETAccessor(object):
 
         """
         from .util import resample
+        from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
-        target = self.obj.area
+        target = get_generic_projection_from_proj4(
+            self.obj.latitude, self.object.longitude, self.obj.proj4_srs)
+        source_grid = get_generic_projection_from_proj4(
+            dataarray.latitude, dataarray.longitude, dataarray.proj4_srs)
         if grid is None:  # grid is assumed to be in da.area
-            out = resample.resample_dataset(dataarray, target, **kwargs)
+            out = resample.resample_dataset(dataarray, source_grid, target,
+                                            **kwargs)
         else:
-            dataarray.attrs['area'] = grid
-            out = resample.resample_dataset(dataarray, target, **kwargs)
+            out = resample.resample_dataset(dataarray, grid, target, **kwargs)
         return out
 
     def remap_xesmf(self, dataarray, method='bilinear', **kwargs):

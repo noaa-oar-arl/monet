@@ -100,6 +100,7 @@ def resample_xesmf(source_da,
 
 
 def resample_dataset(data,
+                     source_grid,
                      target_grid,
                      radius_of_influence=100e3,
                      resample_cache=None,
@@ -109,9 +110,7 @@ def resample_dataset(data,
                      interp='nearest'):
     # first get the source grid definition
     try:
-        if 'area' in data.attrs:
-            source_grid = data.attrs['area']
-        else:
+        if source_grid is None:
             raise RuntimeError
     except RuntimeError:
         print('Must include pyresample.gemoetry in the data.attrs area_def or '
