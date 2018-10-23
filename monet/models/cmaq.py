@@ -61,8 +61,8 @@ def open_dataset(fname,
         dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
         for j in dset[i].attrs:
             dset[i].attrs[j] = dset[i].attrs[j].strip()
-        #dset[i] = dset[i].assign_attrs({'area': area_def})
-    #dset = dset.assign_attrs(area=area_def)
+        # dset[i] = dset[i].assign_attrs({'area': area_def})
+    # dset = dset.assign_attrs(area=area_def)
 
     # get the times
     dset = _get_times(dset, drop_duplicates=drop_duplicates)
@@ -71,7 +71,7 @@ def open_dataset(fname,
     dset = _get_latlon(dset, area_def)
 
     # get Predefined mapping tables for observations
-    #dset = _predefined_mapping_tables(dset)
+    # dset = _predefined_mapping_tables(dset)
 
     # rename dimensions
     dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
@@ -142,8 +142,8 @@ def open_mfdataset(fname,
         dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
         for j in dset[i].attrs:
             dset[i].attrs[j] = dset[i].attrs[j].strip()
-        #dset[i] = dset[i].assign_attrs({'area': area_def})
-    #dset = dset.assign_attrs(area=area_def)
+        # dset[i] = dset[i].assign_attrs({'area': area_def})
+    # dset = dset.assign_attrs(area=area_def)
 
     # get the times
     dset = _get_times(dset, drop_duplicates=drop_duplicates)
@@ -152,8 +152,7 @@ def open_mfdataset(fname,
     dset = _get_latlon(dset, area_def)
 
     # get Predefined mapping tables for observations
-    dset = _predefined_mapping_tables(dset)
-
+    # d set = _predefined_mapping_tables(dset)
     # rename dimensions
     dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
 
