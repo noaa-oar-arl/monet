@@ -73,6 +73,7 @@ class MONETAccessor(object):
             """
         from .util.interp_util import constant_lat_swathdefition
         from .util.resample import resample_dataset
+        from .grids import get_generic_projection_from_proj4
         from numpy import linspace
         try:
             if lat is None:
@@ -82,7 +83,9 @@ class MONETAccessor(object):
         longitude = linspace(self.obj.longitude.min(),
                              self.obj.longitude.max(), len(self.obj.x))
         target = constant_lat_swathdefition(longitude=longitude, latitude=lat)
-        output = resample_dataset(self.obj, target, **kwargs).squeeze()
+        source = get_generic_projection_from_proj4(
+            self.obj.latitude, self.obj.longitude, self.obj.proj4_srs)
+        output = resample_dataset(self.obj, source, target, **kwargs).squeeze()
         return output
 
     def interp_constant_lon(self, lon=None, **kwargs):
@@ -101,6 +104,7 @@ class MONETAccessor(object):
             """
         from .util.interp_util import constant_lon_swathdefition
         from .util.resample import resample_dataset
+        from .grids import get_generic_projection_from_proj4
         from numpy import linspace
         try:
             if lon is None:
@@ -110,7 +114,9 @@ class MONETAccessor(object):
         latitude = linspace(self.obj.latitude.min(), self.obj.latitude.max(),
                             len(self.obj.y))
         target = constant_lon_swathdefition(longitude=lon, latitude=latitude)
-        output = resample_dataset(self.obj, target, **kwargs).squeeze()
+        source = get_generic_projection_from_proj4(
+            self.obj.latitude, self.obj.longitude, self.obj.proj4_srs)
+        output = resample_dataset(self.obj, source, target, **kwargs).squeeze()
         return output
 
     def nearest_latlon(self, lat=None, lon=None, **kwargs):
@@ -133,13 +139,16 @@ class MONETAccessor(object):
         """
         from .util.interp_util import nearest_point_swathdefinition
         from .util.resample import resample_dataset
+        from .grids import get_generic_projection_from_proj4
         try:
             if lat is None or lon is None:
                 raise RuntimeError
         except RuntimeError:
             print('Must provide latitude and longitude')
         target = nearest_point_swathdefinition(longitude=lon, latitude=lat)
-        output = resample_dataset(self.obj, target, **kwargs)
+        source = get_generic_projection_from_proj4(
+            self.obj.latitude, self.obj.longitude, self.obj.proj4_srs)
+        output = resample_dataset(self.obj, source, target, **kwargs)
         return output
 
     def cartopy(self):
