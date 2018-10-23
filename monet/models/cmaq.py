@@ -61,17 +61,17 @@ def open_dataset(fname,
         dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
         for j in dset[i].attrs:
             dset[i].attrs[j] = dset[i].attrs[j].strip()
-        dset[i] = dset[i].assign_attrs({'area': area_def})
-    dset = dset.assign_attrs(area=area_def)
+        #dset[i] = dset[i].assign_attrs({'area': area_def})
+    #dset = dset.assign_attrs(area=area_def)
 
     # get the times
     dset = _get_times(dset, drop_duplicates=drop_duplicates)
 
     # get the lat lon
-    dset = _get_latlon(dset)
+    dset = _get_latlon(dset, area_def)
 
     # get Predefined mapping tables for observations
-    dset = _predefined_mapping_tables(dset)
+    #dset = _predefined_mapping_tables(dset)
 
     # rename dimensions
     dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
@@ -142,14 +142,14 @@ def open_mfdataset(fname,
         dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
         for j in dset[i].attrs:
             dset[i].attrs[j] = dset[i].attrs[j].strip()
-        dset[i] = dset[i].assign_attrs({'area': area_def})
-    dset = dset.assign_attrs(area=area_def)
+        #dset[i] = dset[i].assign_attrs({'area': area_def})
+    #dset = dset.assign_attrs(area=area_def)
 
     # get the times
     dset = _get_times(dset, drop_duplicates=drop_duplicates)
 
     # get the lat lon
-    dset = _get_latlon(dset)
+    dset = _get_latlon(dset, area_def)
 
     # get Predefined mapping tables for observations
     dset = _predefined_mapping_tables(dset)
@@ -193,7 +193,7 @@ def _get_times(d, drop_duplicates):
     return d.rename({'TSTEP': 'time'})
 
 
-def _get_latlon(dset):
+def _get_latlon(dset, area):
     """gets the lat and lons from the pyreample.geometry.AreaDefinition
 
     Parameters
@@ -207,7 +207,7 @@ def _get_latlon(dset):
         Description of returned object.
 
     """
-    lon, lat = dset.area.get_lonlats()
+    lon, lat = area.get_lonlats()
     dset['longitude'] = xr.DataArray(lon[::-1, :], dims=['ROW', 'COL'])
     dset['latitude'] = xr.DataArray(lat[::-1, :], dims=['ROW', 'COL'])
     dset = dset.assign_coords(longitude=dset.longitude, latitude=dset.latitude)
