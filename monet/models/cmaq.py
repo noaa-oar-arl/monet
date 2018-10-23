@@ -15,7 +15,8 @@ def can_do(index):
 def open_dataset(fname,
                  earth_radius=6370000,
                  convert_to_ppb=True,
-                 drop_duplicates=False):
+                 drop_duplicates=False,
+                 **kwargs):
     """Method to open CMAQ IOAPI netcdf files.
 
     Parameters
@@ -36,7 +37,7 @@ def open_dataset(fname,
     """
 
     # open the dataset using xarray
-    dset = xr.open_dataset(fname)
+    dset = xr.open_dataset(fname, **kwargs)
 
     # add lazy diagnostic variables
     dset = add_lazy_pm25(dset)
@@ -96,7 +97,8 @@ def open_dataset(fname,
 def open_mfdataset(fname,
                    earth_radius=6370000,
                    convert_to_ppb=True,
-                   drop_duplicates=False):
+                   drop_duplicates=False,
+                   **kwargs):
     """Method to open CMAQ IOAPI netcdf files.
 
     Parameters
@@ -117,7 +119,7 @@ def open_mfdataset(fname,
     """
 
     # open the dataset using xarray
-    dset = xr.open_mfdataset(fname, concat_dim='TSTEP')
+    dset = xr.open_mfdataset(fname, concat_dim='TSTEP', **kwargs)
 
     # add lazy diagnostic variables
     dset = add_lazy_pm25(dset)
