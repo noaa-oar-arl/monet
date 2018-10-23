@@ -140,6 +140,53 @@ def get_ioapi_pyresample_area_def(ds, proj4_srs):
     return area_def
 
 
+def get_generic_projection_from_proj4(lat, lon, proj4_srs):
+    """Short summary.
+
+    Parameters
+    ----------
+    lat : type
+        Description of parameter `lat`.
+    lon : type
+        Description of parameter `lon`.
+    proj4_srs : type
+        Description of parameter `proj4_srs`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    from pyresample.utils import proj4_str_to_dict
+    from pyresample.geometry import SwathDefinition
+    swath = SwathDefinition(lats=lat, lons=lon)
+    area = swath.compute_optimal_bb_area(proj4_str_to_dict(proj4_srs))
+    return area
+
+
+def get_optimal_cartopy_proj(lat, lon, proj4_srs):
+    """Short summary.
+
+    Parameters
+    ----------
+    lat : type
+        Description of parameter `lat`.
+    lon : type
+        Description of parameter `lon`.
+    proj4_srs : type
+        Description of parameter `proj4_srs`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    area = get_generic_projection_from_proj4(lat, lon, proj4_srs)
+    return area.to_cartopy_crs()
+
+
 def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
     """Get the IOAPI projection out of the file into proj4."""
 
