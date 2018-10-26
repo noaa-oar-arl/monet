@@ -331,13 +331,14 @@ class MONETAccessor(object):
             Description of returned object.
 
         """
-        from .models.combinetool import combine_da_to_df
+        from .models.combinetool import combine_da_to_df_xesmf
         # point source data
         if isinstance(data, pd.DataFrame):
             try:
                 if col is None:
                     raise RuntimeError
-                return combine_da_to_df(self.obj, data, col=col, **kwargs)
+                return combine_da_to_df_xesmf(
+                    self.obj, data, col=col, **kwargs)
             except RuntimeError:
                 print('Must enter col ')
         elif isinstance(data, xr.Dataset) or isinstance(data, xr.DataArray):
