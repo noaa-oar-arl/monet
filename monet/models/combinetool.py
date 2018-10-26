@@ -87,19 +87,17 @@ def combine_da_to_df_xesmf(da, df, col=None, **kwargs):
             raise RuntimeError
     except RuntimeError:
         print('Must enter column name')
-    #dfn = df.dropna(subset=[col])
+    # dfn = df.dropna(subset=[col])
     dfnn = df.drop_duplicates(subset=['latitude', 'longitude'])
     # unit = dfnn[col + '_unit'].unique()[0]
     # target_grid = lonlat_to_swathdefinition(
     #     longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
     target = constant_1d_xesmf(
         longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
-    print(da.coords)
+
     da = _rename_latlon(da)  # check to rename latitude and longitude
-    print(da.coords)
     da_interped = resample_xesmf(da, target, **kwargs)
     da_interped = _rename_latlon(da_interped)  # check to change back
-    print(da_interped.coords)
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]

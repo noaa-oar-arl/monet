@@ -223,7 +223,7 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
     else:
         raise NotImplementedError('IOAPI proj not implemented yet: '
                                   '{}'.format(proj_id))
-    #area_def = _get_ioapi_pyresample_area_def(ds)
+    # area_def = _get_ioapi_pyresample_area_def(ds)
     return p4  # , area_def
 
 

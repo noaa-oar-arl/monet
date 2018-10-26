@@ -4,7 +4,6 @@ from __future__ import absolute_import, division, print_function
 from builtins import object
 import pandas as pd
 import xarray as xr
-import stratify
 
 
 def rename_latlon(ds):
@@ -51,17 +50,8 @@ class MONETAccessor(object):
             Description of returned object.
 
         """
-        result = stratify.interpolate(
-            levels, vertical.chunk(), self.obj.chunk(), axis=axis)
-        dims = self.obj.dims
-        out = xr.DataArray(result, dims=dims)
-        for i in dims:
-            if i != 'z':
-                out[i] = self.obj[i]
-        out.attrs = self.obj.attrs.copy()
-        if len(self.obj.coords) > 0:
-            for i in self.obj.coords:
-                out.coords[i] = self.obj.coords[i]
+        from .util.resample import resample_stratify
+        out = resample_stratify(self.obj, levels, vertical, axis=1)
         return out
 
     def window(self, lat_min, lon_min, lat_max, lon_max):
@@ -313,7 +303,7 @@ class MONETAccessor(object):
             dataarray, target, method=method, **kwargs)
         return out
 
-    def combine(self, data, col=None, **kwargs):
+    def combine_point(self, data, col=None, **kwargs):
         """Short summary.
 
         Parameters
@@ -676,11 +666,7 @@ class MONETAccessorDataset(object):
         x, y = index.coords['x'], index.coords['y']
         return self.obj.sel(x=x, y=y)
 
-    def cartopy(self):
-        """Returns a cartopy.crs.Projection for this dataset."""
-        return self.obj.area.to_cartopy_crs()
-
-    def combine_to_df(self, df, mapping_table=None, **kwargs):
+    def combine_point(self, df, mapping_table=None, **kwargs):
         """Short summary.
 
         Parameters
