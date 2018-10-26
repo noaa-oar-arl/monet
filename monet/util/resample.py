@@ -81,21 +81,11 @@ def _reformat_resampled_data(orig, new, target_grid):
     return new
 
 
-def resample_xesmf(source_da,
-                   target_da,
-                   method='bilinear',
-                   periodic=False,
-                   filename='monet_xesmf_regrid_file.nc',
-                   reuse_weights=False):
+def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
     import xesmf as xe
-    regridder = xe.Regridder(
-        source_da,
-        target_da,
-        method,
-        periodic=periodic,
-        filename=filename,
-        reuse_weights=reuse_weights)
-
+    regridder = xe.Regridder(source_da, target_da, **kwargs)
+    if cleanup:
+        regridder.clean_weight_file()
     return regridder(source_da)
 
 

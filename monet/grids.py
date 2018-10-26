@@ -158,8 +158,11 @@ def get_generic_projection_from_proj4(lat, lon, proj4_srs):
         Description of returned object.
 
     """
-    from pyresample.utils import proj4_str_to_dict
-    from pyresample.geometry import SwathDefinition
+    try:
+        from pyresample.utils import proj4_str_to_dict
+        from pyresample.geometry import SwathDefinition
+    except ImportError:
+        print('please install pyresample to use this functionality')
     swath = SwathDefinition(lats=lat, lons=lon)
     area = swath.compute_optimal_bb_area(proj4_str_to_dict(proj4_srs))
     return area

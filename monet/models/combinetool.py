@@ -52,6 +52,63 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     return final_df
 
 
+def _rename_latlon(ds):
+    if 'latitude' in ds.coords:
+        return ds.rename({'latitude': 'lat', 'longitude': 'lon'})
+    elif 'lat' in ds.coords:
+        return ds.rename({'lat': 'latitude', 'lon': 'longitude'})
+    else:
+        return ds
+
+
+def combine_da_to_df_xesmf(da, df, col=None, **kwargs):
+    """This function will combine an xarray data array with spatial information
+    point observations in `df`.
+
+    Parameters
+    ----------
+    da : xr.DataArray
+        Description of parameter `da`.
+    df : pd.DataFrame
+        Description of parameter `df`.
+    lay : iterable, default = [0]
+        Description of parameter `lay`.
+    radius : integer or float, default = 12e3
+        Description of parameter `radius`.
+
+    Returns
+    -------
+    pandas.DataFrame
+    """
+    from ..util.interp_util import constant_1d_xesmf
+    from ..util.resample import resample_xesmf
+    try:
+        if col is None:
+            raise RuntimeError
+    except RuntimeError:
+        print('Must enter column name')
+    dfn = df.dropna(subset=[col])
+    dfnn = dfn.drop_duplicates(subset=['latitude', 'longitude'])
+    # unit = dfnn[col + '_unit'].unique()[0]
+    # target_grid = lonlat_to_swathdefinition(
+    #     longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
+    target = constant_1d_xesmf(
+        longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
+    da = _rename_latlon(da)  # check to rename latitude and longitude
+    da_interped = resample_xesmf(da, target, **kwargs)
+    da = _rename_latlon(da)  # check to change back
+    df_interped = da_interped.to_dataframe().reset_index()
+    cols = Series(df_interped.columns)
+    drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
+    df_interped.drop(drop_cols, axis=1, inplace=True)
+    if da.name in df.columns:
+        df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
+        print(df_interped.keys())
+    final_df = df.merge(
+        df_interped, on=['latitude', 'longitude', 'time'], how='left')
+    return final_df
+
+
 def combine_da_to_height_profile(da, dset, radius_of_influence=12e3):
     """This function will combine an xarray.DataArray to a 2d dataset with
     dimensions (time,z)

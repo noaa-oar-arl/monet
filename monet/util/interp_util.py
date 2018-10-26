@@ -4,6 +4,34 @@ from __future__ import print_function
 from builtins import str, zip
 
 
+def lonlat_to_xesmf(longitude=None, latitude=None):
+    """Creates an empty xarray.Dataset with the coordinate (longitude, latitude).
+
+    Parameters
+    ----------
+    longitude : type
+        Description of parameter `longitude`.
+    latitude : type
+        Description of parameter `latitude`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    import xarray as xr
+    from numpy import asarray
+    lat = asarray(latitude)
+    lon = asarray(longitude)
+    dset = xr.Dataset(
+        coords={
+            'lon': (['x', 'y'], lon.reshape(1, 1)),
+            'lat': (['x', 'y'], lat.reshape(1, 1))
+        })
+    return dset
+
+
 def lonlat_to_swathdefinition(longitude=None, latitude=None):
     """Short summary.
 
@@ -52,6 +80,35 @@ def nearest_point_swathdefinition(longitude=None, latitude=None):
     lons = vstack([longitude])
     lats = vstack([latitude])
     return SwathDefinition(lons=lons, lats=lats)
+
+
+def constant_1d_xesmf(longitude=None, latitude=None):
+    """Creates a pyreample.geometry.SwathDefinition with a constant latitude along
+    the longitude array.  Longitude can be a 1d or 2d np.array or xr.DataArray
+
+    Parameters
+    ----------
+    longitude : numpy.array or xarray.DataArray
+        Array of longitude values
+    latitude : float
+        latitude for constant
+
+    Returns
+    -------
+    pyreample.geometry.SwathDefinition
+
+    """
+    import xarray as xr
+    from numpy import asarray
+    lat = asarray(latitude)
+    lon = asarray(longitude)
+    s = lat.shape[0]
+    dset = xr.Dataset(
+        coords={
+            'lon': (['x', 'y'], lon.reshape(s, 1)),
+            'lat': (['x', 'y'], lat.reshape(s, 1))
+        })
+    return dset
 
 
 def constant_lat_swathdefition(longitude=None, latitude=None):
