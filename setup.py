@@ -11,7 +11,7 @@ except ImportError:
 
 setup(
     name='monet',
-    version='2.0',
+    version='2.1',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
     author='Barry D. Baker',
@@ -19,6 +19,7 @@ setup(
     maintainer='Barry Baker',
     maintainer_email='barry.baker@noaa.gov',
     packages=find_packages(),
+    packaged_data={'monet':['data/*.txt','data/*.dat','data/*.hdf','data/*.ncf']}
     keywords=[
         'model', 'verification', 'hysplit', 'cmaq', 'atmosphere', 'camx',
         'evaluation'
