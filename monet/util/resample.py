@@ -92,7 +92,8 @@ def resample_stratify(da, levels, vertical, axis=1):
     out.attrs = da.attrs.copy()
     if len(da.coords) > 0:
         for i in da.coords:
-            out.coords[i] = da.coords[i]
+            if i != 'z':
+                out.coords[i] = da.coords[i]
     return out
 
 
