@@ -109,6 +109,7 @@ def combine_da_to_df_xesmf(da, df, col=None, **kwargs):
         df_interped, on=['latitude', 'longitude', 'time'], how='left')
     return final_df
 
+
 def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
     """This function will combine an xarray data array with spatial information
     point observations in `df`.
@@ -132,51 +133,54 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
     """
     from ..util.interp_util import constant_1d_xesmf
     from ..util.resample import resample_xesmf
-   
+
     try:
         if da.shape != daz.shape:
             raise RuntimeError
     except RuntimeError:
         print('da and daz must be of the same shape')
-        print('da shape= ',da.shape, 'daz shape= ',daz.shape)
+        print('da shape= ', da.shape, 'daz shape= ', daz.shape)
         return -1
-    
+
     target = constant_1d_xesmf(
         longitude=df.longitude.values, latitude=df.latitude.values)
 
-    da = _rename_latlon(da)  # check to rename 'latitude' and 'longitude' for xe.Regridder
-    daz= _rename_latlon(daz)
-    da_interped = resample_xesmf(da, target, **kwargs) #interpolate fields
+    # check to rename 'latitude' and 'longitude' for xe.Regridder
+    da = _rename_latlon(da)
+    daz = _rename_latlon(daz)
+    da_interped = resample_xesmf(da, target, **kwargs)  # interpolate fields
     daz_interped = resample_xesmf(daz, target, **kwargs)
-    da_interped = _rename_latlon(da_interped)  # check to change 'lat' 'lon' back 
-    daz_interped = _rename_latlon(daz_interped)  
-    
+    # check to change 'lat' 'lon' back
+    da_interped = _rename_latlon(da_interped)
+    daz_interped = _rename_latlon(daz_interped)
 
-    #sort aircraft target altitudes and call stratfiy from resample to do vertical interpolation
-    #resample_stratify from monet accessor
-    daz_interped_xyz = daz_interped.monet.stratify(sorted(df['altitude']), daz_interped, axis=1)
-    da_interped_xyz = da_interped.monet.stratify(sorted(df['altitude']), daz_interped, axis=1)
+    # sort aircraft target altitudes and call stratfiy from resample to do vertical interpolation
+    # resample_stratify from monet accessor
+    daz_interped_xyz = daz_interped.monet.stratify(
+        sorted(df['altitude']), daz_interped, axis=1)
+    da_interped_xyz = da_interped.monet.stratify(
+        sorted(df['altitude']), daz_interped, axis=1)
     da_interped_xyz.name = da.name
     daz_interped_xyz.name = 'altitude'
     df_interped_xyz = da_interped_xyz.to_dataframe().reset_index()
-    dfz_interped_xyz =daz_interped_xyz.to_dataframe().reset_index()
-    
-    df_interped_xyz.insert(0,'altitude',dfz_interped_xyz['altitude'], allow_duplicates=True)
-    
- 
+    dfz_interped_xyz = daz_interped_xyz.to_dataframe().reset_index()
+
+    df_interped_xyz.insert(
+        0, 'altitude', dfz_interped_xyz['altitude'], allow_duplicates=True)
+
     cols = Series(df_interped_xyz.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
     df_interped_xyz.drop(drop_cols, axis=1, inplace=True)
     if da.name in df.columns:
-        df_interped_xyz.rename(columns={da.name: da.name + '_new'}, inplace=True)
+        df_interped_xyz.rename(
+            columns={da.name: da.name + '_new'}, inplace=True)
         print(df_interped_xyz.keys())
-   
-    final_df = merge_asof(df,df_interped_xyz,
-                             by=['latitude','longitude','altitude'],
-                             on = 'time',
-                             direction='nearest') 
-    return final_df
 
+    final_df = merge_asof(df, df_interped_xyz,
+                          by=['latitude', 'longitude', 'altitude'],
+                          on='time',
+                          direction='nearest')
+    return final_df
 
 
 def combine_da_to_height_profile(da, dset, radius_of_influence=12e3):
