@@ -1,4 +1,4 @@
-geos>=3.3.3
+shapely
 pyproj
 cython
 numpy>=1.6
