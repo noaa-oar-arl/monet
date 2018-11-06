@@ -51,13 +51,13 @@ class AQS(object):
         #        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
         self.objtype = 'AQS'
         self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
-        #self.renamedhcols = [
+        # self.renamedhcols = [
         #    'time', 'time_local', 'state_code', 'county_code', 'site_num',
         #    'parameter_code', 'poc', 'latitude', 'longitude', 'datum',
         #    'parameter_name', 'obs', 'units', 'mdl', 'uncertainty',
         #    'qualifier', 'method_type', 'method_code', 'method_name',
         #    'state_name', 'county_name', 'date_of_last_change'
-        #]
+        # ]
         self.renameddcols = [
             'time_local', 'state_code', 'county_code', 'site_num',
             'parameter_code', 'poc', 'latitude', 'longitude', 'datum',
@@ -86,7 +86,7 @@ class AQS(object):
         columns : list of strings
                   list of current columns
         verbose : boolean
-       
+
         Returns
         --------
         rcolumn: list of strings
@@ -95,15 +95,16 @@ class AQS(object):
         rcolumn = []
         for ccc in columns:
             if ccc.strip() == 'Sample Measurement':
-               newc = 'obs'
+                newc = 'obs'
             elif ccc.strip() == 'Units of Measure':
-               newc='units'
-            else: 
-               newc = ccc.strip().lower()
-               newc = newc.replace(' ','_')
-            if verbose: print(ccc + ' renamed ' + newc)
+                newc = 'units'
+            else:
+                newc = ccc.strip().lower()
+                newc = newc.replace(' ', '_')
+            if verbose:
+                print(ccc + ' renamed ' + newc)
             rcolumn.append(newc)
-        return rcolumn     
+        return rcolumn
 
     def load_aqs_file(self, url, network):
         """Short summary.
@@ -148,7 +149,7 @@ class AQS(object):
                     'time_local': ["Date Local", "Time Local"]
                 },
                 infer_datetime_format=True)
-            #print(df.columns.values)
+            # print(df.columns.values)
             df.columns = self.columns_rename(df.columns.values)
 
         df['siteid'] = df.state_code.astype(str).str.zfill(
@@ -335,7 +336,6 @@ class AQS(object):
         dff = dd.from_delayed(dfs)
         dfff = dff.compute()
         return(self.add_data2(dfff, daily, network))
-        
 
     def add_data2(self, df, daily=False, network=None):
         """
@@ -344,7 +344,7 @@ class AQS(object):
         df : dataframe
         daily : boolean
         network : 
-       
+
         Returns:
         self.df.copy() : dataframe 
         """
