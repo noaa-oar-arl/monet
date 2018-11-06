@@ -31,3 +31,4 @@ setup(
         'pandas', 'xesmf', 'netcdf4', 'xarray', 'dask',
         'matplotlib', 'seaborn', 'pseudonetcdf', 'future', 'sphinx',
         'pandoc']
+)
