@@ -1,5 +1,5 @@
 numpy>=1.6
-proj4
+pyproj
 cython
 pandas
 xarray
