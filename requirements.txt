@@ -1,9 +1,7 @@
-numpy>=1.6
-pyproj
-cython
+cartopy
 pandas
 xarray
 dask
 matplotlib
 seaborn
-cartopy
+
