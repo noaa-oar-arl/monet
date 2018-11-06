@@ -14,12 +14,13 @@ setup(
     version='2.1',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
+    include_package_data=True
     author='Barry D. Baker',
     author_email='barry.baker@noaa.gov',
     maintainer='Barry Baker',
     maintainer_email='barry.baker@noaa.gov',
     packages=find_packages(),
-    packaged_data={'monet': ['data/*.txt',
+    package_data={'': ['data/*.txt',
                              'data/*.dat', 'data/*.hdf', 'data/*.ncf']},
     keywords=[
         'model', 'verification', 'hysplit', 'cmaq', 'atmosphere', 'camx',
@@ -29,7 +30,4 @@ setup(
     install_requires=[
         'pandas', 'xesmf', 'netcdf4', 'xarray', 'dask',
         'matplotlib', 'seaborn', 'pseudonetcdf', 'future', 'sphinx',
-        'pandoc'],
-    dependency_links=[
-        "git+ssh://git@github.com/barronh/pseudonetcdf.git","git+ssh://github.com/QuLogic/cartopy.git@requirements"
-    ])
+        'pandoc']
