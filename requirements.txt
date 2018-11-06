@@ -1,3 +1,7 @@
+geos
+pyproj
+cython
+numpy
 cartopy
 pandas
 xarray
