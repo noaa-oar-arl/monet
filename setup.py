@@ -14,7 +14,7 @@ setup(
     version='2.1',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
-    include_package_data=True
+    include_package_data=True,
     author='Barry D. Baker',
     author_email='barry.baker@noaa.gov',
     maintainer='Barry Baker',
