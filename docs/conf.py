@@ -161,7 +161,7 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "_static/noaa.png"
+html_logo = "_static/Monet-transparent.png"
 
 # -- Options for LaTeX output ------------------------------------------------
 

@@ -21,7 +21,7 @@ All you have to do is import monet after you import xarray.
 
     from monet.models import cmaq
 
-    c = cmaq.open_files(cmaqfile)
+    c = cmaq.open_dataset(cmaqfile)
 
     c.O3[0,0,:,:].monet.quick_map()
 
