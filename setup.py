@@ -28,7 +28,7 @@ setup(
     ],
     description='The Model and Observation Evaluation Toolkit (MONET)',
     install_requires=[
-        'pandas', 'xesmf', 'netcdf4', 'xarray', 'dask',
+        'pandas', 'netcdf4', 'xarray', 'dask',
         'matplotlib', 'seaborn', 'pseudonetcdf', 'future', 'sphinx',
         'pandoc']
 )
