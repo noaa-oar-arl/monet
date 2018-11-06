@@ -31,5 +31,5 @@ setup(
         'matplotlib', 'seaborn', 'pseudonetcdf', 'future', 'sphinx',
         'pandoc','proj4','cartopy'],
     dependency_links=[
-        "git+ssh://git@github.com/barronh/pseudonetcdf.git",
+        "git+ssh://git@github.com/barronh/pseudonetcdf.git","git+https://github.com/QuLogic/cartopy.git@requirements"
     ])
