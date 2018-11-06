@@ -29,7 +29,7 @@ setup(
     install_requires=[
         'numpy>=1.6','cython', 'pandas', 'pyresample', 'netcdf4', 'xarray', 'dask',
         'matplotlib', 'seaborn', 'pseudonetcdf', 'future', 'sphinx',
-        'pandoc'],
+        'pandoc','cartopy'],
     dependency_links=[
         "git+ssh://git@github.com/barronh/pseudonetcdf.git",
     ])
