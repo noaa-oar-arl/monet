@@ -1,7 +1,7 @@
 geos
 pyproj
 cython
-numpy
+numpy>=1.6
 cartopy
 pandas
 xarray
