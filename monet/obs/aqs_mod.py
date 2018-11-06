@@ -51,13 +51,13 @@ class AQS(object):
         #        self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
         self.objtype = 'AQS'
         self.baseurl = 'https://aqs.epa.gov/aqsweb/airdata/'
-        self.renamedhcols = [
-            'time_local', 'time', 'state_code', 'county_code', 'site_num',
-            'parameter_code', 'poc', 'latitude', 'longitude', 'datum',
-            'parameter_name', 'obs', 'units', 'mdl', 'uncertainty',
-            'qualifier', 'method_type', 'method_code', 'method_name',
-            'state_name', 'county_name', 'date_of_last_change'
-        ]
+        # self.renamedhcols = [
+        #    'time', 'time_local', 'state_code', 'county_code', 'site_num',
+        #    'parameter_code', 'poc', 'latitude', 'longitude', 'datum',
+        #    'parameter_name', 'obs', 'units', 'mdl', 'uncertainty',
+        #    'qualifier', 'method_type', 'method_code', 'method_name',
+        #    'state_name', 'county_name', 'date_of_last_change'
+        # ]
         self.renameddcols = [
             'time_local', 'state_code', 'county_code', 'site_num',
             'parameter_code', 'poc', 'latitude', 'longitude', 'datum',
@@ -77,6 +77,34 @@ class AQS(object):
         self.monitor_df = None
         self.daily = False
         self.d_df = None  # daily dataframe
+
+    def columns_rename(self, columns, verbose=False):
+        """
+        rename columns for hourly data. 
+        Parameters
+        ----------
+        columns : list of strings
+                  list of current columns
+        verbose : boolean
+
+        Returns
+        --------
+        rcolumn: list of strings
+                 list of new column names to use.
+        """
+        rcolumn = []
+        for ccc in columns:
+            if ccc.strip() == 'Sample Measurement':
+                newc = 'obs'
+            elif ccc.strip() == 'Units of Measure':
+                newc = 'units'
+            else:
+                newc = ccc.strip().lower()
+                newc = newc.replace(' ', '_')
+            if verbose:
+                print(ccc + ' renamed ' + newc)
+            rcolumn.append(newc)
+        return rcolumn
 
     def load_aqs_file(self, url, network):
         """Short summary.
@@ -121,7 +149,8 @@ class AQS(object):
                     'time_local': ["Date Local", "Time Local"]
                 },
                 infer_datetime_format=True)
-            df.columns = self.renamedhcols
+            # print(df.columns.values)
+            df.columns = self.columns_rename(df.columns.values)
 
         df['siteid'] = df.state_code.astype(str).str.zfill(
             2) + df.county_code.astype(str).str.zfill(3) + df.site_num.astype(
@@ -245,7 +274,6 @@ class AQS(object):
 
         """
         import requests
-
         if not os.path.isfile(fname):
             print('\n Retrieving: ' + fname)
             print(url)
@@ -279,7 +307,7 @@ class AQS(object):
 
         Returns
         -------
-        type
+        pandas DataFrame
             Description of returned object.
 
         """
@@ -306,7 +334,21 @@ class AQS(object):
         else:
             dfs = [dask.delayed(self.load_aqs_file)(i, network) for i in urls]
         dff = dd.from_delayed(dfs)
-        self.df = dff.compute()
+        dfff = dff.compute()
+        return(self.add_data2(dfff, daily, network))
+
+    def add_data2(self, df, daily=False, network=None):
+        """
+        Parameters
+        ------------
+        df : dataframe
+        daily : boolean
+        network : 
+
+        Returns:
+        self.df.copy() : dataframe 
+        """
+        self.df = df
         self.df = self.change_units(self.df)
         if self.monitor_df is None:
             self.monitor_df = read_monitor_file()
