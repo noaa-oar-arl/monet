@@ -1,0 +1,9 @@
+numpy>=1.6
+proj4
+cython
+pandas
+xarray
+dask
+matplotlib
+seaborn
+cartopy
