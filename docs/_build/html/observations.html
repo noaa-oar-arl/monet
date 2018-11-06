@@ -54,7 +54,7 @@
 
           
             
-            <img src="_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="_static/Monet-transparent.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -116,10 +116,10 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#improve">IMPROVE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#openaq">OpenAQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cems">CEMS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#climate-reference-network">Climate Reference Network</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#integrated-surface-database">Integrated Surface Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#icartt">ICARTT</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
@@ -537,13 +537,38 @@ chemistry collector and gage. The automated collector ensures that the sample is
 <h2>IMPROVE<a class="headerlink" href="#improve" title="Permalink to this headline">¶</a></h2>
 <p>to do…</p>
 </div>
-<div class="section" id="openaq">
-<h2>OpenAQ<a class="headerlink" href="#openaq" title="Permalink to this headline">¶</a></h2>
-<p>to do…..</p>
-</div>
 <div class="section" id="cems">
 <h2>CEMS<a class="headerlink" href="#cems" title="Permalink to this headline">¶</a></h2>
-<p>to do…..</p>
+<p>Data from  Continuous Emissions Monitoring Systems (CEMS)</p>
+<p>“A continuous emission monitoring system (CEMS) is the total equipment necessary for the
+determination of a gas or particulate matter concentration or emission rate……CEMS are required
+under some of the EPA regulations…” - <a class="reference external" href="https://www.epa.gov/emc/emc-continuous-emission-monitoring-systems">https://www.epa.gov/emc/emc-continuous-emission-monitoring-systems</a></p>
+<p>The data is obtained from <a class="reference external" href="ftp://newftp.epa.gov/DmDnLoad/emissions/">ftp://newftp.epa.gov/DmDnLoad/emissions/</a></p>
+<p>First pick the dates and states you wish to retrieve data for.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2012-12-31&#39;</span><span class="p">)]</span>
+<span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;md&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To return the pandas <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> with the data</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.obs</span> <span class="k">import</span> <span class="n">cems_mod</span>
+<span class="n">cems</span> <span class="o">=</span> <span class="n">cems_mod</span><span class="o">.</span><span class="n">CEMS</span><span class="p">()</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">cems</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Each row in the dataframe contains the orispl code, latitude, longitude and station name of the emissions source.
+It also contains data on emissions of various gasses and particulates.
+To see what data is in the DataFrame simply output the column header values</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">colums</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The CEMS class also contains the method  cemspivot which will return a pivot table
+(also <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) in which each column is a time series
+of the specified variable for each orispl code (emission source). The time is given by the
+row index and the column header is the orispl code. The columns may also be broken down by unit id if
+there is more than one unit and unitid is set to True.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pivot_df</span> <span class="o">=</span> <span class="n">cems</span><span class="o">.</span><span class="n">cemspivot</span><span class="p">(</span><span class="s1">&#39;so2_lbs&#39;</span><span class="p">,</span> <span class="n">unitid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="climate-reference-network">
 <h2>Climate Reference Network<a class="headerlink" href="#climate-reference-network" title="Permalink to this headline">¶</a></h2>
@@ -551,7 +576,62 @@ chemistry collector and gage. The automated collector ensures that the sample is
 </div>
 <div class="section" id="integrated-surface-database">
 <h2>Integrated Surface Database<a class="headerlink" href="#integrated-surface-database" title="Permalink to this headline">¶</a></h2>
-<p>to do…..</p>
+<p>“The Integrated Surface Database consists of global hourly and synoptic observations compiled
+from numerous sources into a single common ASCII format and common data model”-
+<a class="reference external" href="https://www.ncdc.noaa.gov/isd">https://www.ncdc.noaa.gov/isd</a></p>
+<p>Data is retrieved with the ISH class in the ish_mod.py file.
+Currently, the text files are downloaded into the working directory.
+There is no option not to download the files.</p>
+<p>First pick the dates and area you want to retrieve data for.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2012-12-31&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">area</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">105.0</span><span class="p">,</span> <span class="o">-</span><span class="mi">97</span><span class="p">,</span> <span class="mf">44.5</span><span class="p">,</span> <span class="mf">49.5</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Now a simple one stop command to return the pandas <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>
+of the data on the given dates.  MONET reads the hourly data from the ISD LITE database.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.obs</span> <span class="k">import</span> <span class="n">ish</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">ish</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">country</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="n">area</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or you can create your own instance of the ISH class.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.obs</span> <span class="k">import</span> <span class="n">ish_mod</span>
+<span class="n">metdata</span> <span class="o">=</span> <span class="n">ish_mod</span><span class="o">.</span><span class="n">ISH</span><span class="p">()</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">metdata</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">country</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="n">area</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To see what data is in the DataFrame simply output the column header values</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">colums</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>dew point (dpt)</li>
+<li>temperature (t)</li>
+<li>visibility (vsb)</li>
+<li>wind speed (ws)</li>
+<li>wind direction (wdir)</li>
+</ul>
+<p>The ISD (ISH) database contains latitude, longitude, station name, station id,
+time, dew point (dpt), temperature (t), visibility (vsb),
+wind speed (ws), wind direction (wdir), as well as various quality flags.</p>
+</div>
+<div class="section" id="icartt">
+<h2>ICARTT<a class="headerlink" href="#icartt" title="Permalink to this headline">¶</a></h2>
+<p>MONET is capable of reading the NASA ICARTT data format (<a class="reference external" href="https://go.nasa.gov/2F4yQWI">https://go.nasa.gov/2F4yQWI</a>).  Many field
+campaigns save data in ICARTT format.  Methods are available to combine flight data.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.obs</span> <span class="k">import</span> <span class="n">icartt</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="n">icartt</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will return a xarray.Dataset.  If you would prefer a pandas.DataFrame you
+can use the icartt.get_data function.  This will try to automatically rename a
+few columns like latitude and longitude and time from the data array and return
+a monet compatible pandas.DataFrame.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">icartt</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -608,6 +688,7 @@ chemistry collector and gage. The automated collector ensures that the sample is
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

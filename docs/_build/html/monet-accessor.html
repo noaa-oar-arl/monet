@@ -54,7 +54,7 @@
 
           
             
-            <img src="_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="_static/Monet-transparent.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -181,7 +181,7 @@ xarray.Dataset objects after a simple import monet in your code.</p>
 
 <span class="kn">from</span> <span class="nn">monet.models</span> <span class="kn">import</span> <span class="n">cmaq</span>
 
-<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_files</span><span class="p">(</span><span class="n">cmaqfile</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">cmaqfile</span><span class="p">)</span>
 
 <span class="n">c</span><span class="o">.</span><span class="n">O3</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">()</span>
 </pre></div>
@@ -375,6 +375,7 @@ Attributes:
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

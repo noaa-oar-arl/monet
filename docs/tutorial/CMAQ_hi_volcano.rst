@@ -24,7 +24,7 @@ that a seperate grdcro2d (grddot2d) file be loaded for the mass points
 .. code:: python
 
     conc = '/Users/barry/Desktop/MONET/data/aqm.t12z.aconc.ncf'
-    c = cmaq.open_files(flist=conc)
+    c = cmaq.open_dtaset(flist=conc)
 
 
 The cmaq object will return a ``xarray.Dataset`` but it also still lives
@@ -276,7 +276,7 @@ new column (model).
 
 .. code:: python
 
-    df_combined = so2.monet.combine(df,col='SO2')
+    df_combined = so2.monet.combine_point(df,col='SO2')
 
 .. parsed-literal::
 

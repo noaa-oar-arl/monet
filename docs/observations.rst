@@ -423,3 +423,24 @@ Available Measurements
 The ISD (ISH) database contains latitude, longitude, station name, station id,
 time, dew point (dpt), temperature (t), visibility (vsb),
 wind speed (ws), wind direction (wdir), as well as various quality flags.
+
+ICARTT
+------
+
+MONET is capable of reading the NASA ICARTT data format (https://go.nasa.gov/2F4yQWI).  Many field
+campaigns save data in ICARTT format.  Methods are available to combine flight data.
+
+.. code:: python
+
+  from monet.obs import icartt
+
+  f = icartt.add_data('filename')
+
+This will return a xarray.Dataset.  If you would prefer a pandas.DataFrame you
+can use the icartt.get_data function.  This will try to automatically rename a
+few columns like latitude and longitude and time from the data array and return
+a monet compatible pandas.DataFrame.
+
+.. code:: python
+
+  df = icartt.get_data(f)

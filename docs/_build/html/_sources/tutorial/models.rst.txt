@@ -25,7 +25,7 @@ First we will set the path to the data files
 
     from monet.models import *
 
-    c = cmaq.open_files(flist=cmaqfile, grid=gridcro2d)
+    c = cmaq.open_dataset(flist=cmaqfile, grid=gridcro2d)
 
 This will return an :py:class:`~xarray.Dataset`.  The dataset is also still stored
 in the :py:class:`~cmaq` object as :py:class:`~cmaq.dset`.
