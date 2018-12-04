@@ -146,6 +146,15 @@ class MONETAccessor(object):
             Description of returned object.
 
         """
+        try:
+            from pyresample import geometry
+            from .util.resample import resample_dataset
+            from .util.interp_util import nearest_point_swathdefinition as npsd
+            from .util.interp_util import latlon_to_swathdefinition as llsd
+            has_pyresample = True
+        except ImportError:
+            has_pyresample = False
+
         from .util.interp_util import lonlat_to_xesmf
         from .util.resample import resample_xesmf
         try:
@@ -153,12 +162,22 @@ class MONETAccessor(object):
                 raise RuntimeError
         except RuntimeError:
             print('Must provide latitude and longitude')
-        kwargs = self._check_kwargs_and_set_defaults(**kwargs)
-        self.obj = rename_latlon(self.obj)
-        target = lonlat_to_xesmf(longitude=lon, latitude=lat)
-        output = resample_xesmf(self.obj, target, **kwargs)
-        if cleanup:
-            output = resample_xesmf(self.obj, target, cleanup=True, **kwargs)
+
+        if has_pyresample:
+            source = llsd(
+                longitude=self.obj.longitude.values,
+                latitude=self.obj.latitude.values)
+            target = npsd(latitude=lat, longitude=lon)
+            output = resample_dataset(self.obj, source, target, **kwargs)
+            print('here')
+        else:
+            kwargs = self._check_kwargs_and_set_defaults(**kwargs)
+            self.obj = rename_latlon(self.obj)
+            target = lonlat_to_xesmf(longitude=lon, latitude=lat)
+            output = resample_xesmf(self.obj, target, **kwargs)
+            if cleanup:
+                output = resample_xesmf(
+                    self.obj, target, cleanup=True, **kwargs)
         return rename_latlon(output.squeeze())
 
     @staticmethod
