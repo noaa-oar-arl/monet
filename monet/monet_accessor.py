@@ -310,10 +310,10 @@ class MONETAccessor(object):
         """
         from .util import resample
         # check to see if grid is supplied
-        target = self.obj
+        target = rename_latlon(self.obj)
         out = resample.resample_xesmf(
             dataarray, target, method=method, **kwargs)
-        return out
+        return rename_latlon(out)
 
     def combine_point(self, data, col=None, **kwargs):
         """Short summary.

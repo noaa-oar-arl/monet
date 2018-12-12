@@ -54,7 +54,7 @@ class AERONET(object):
                 'TOT15', 'TOT20'
         ]:
             base_url = 'https://aeronet.gsfc.nasa.gov/cgi-bin/print_web_data_v3?'
-            inv_type = ''
+            inv_type = None
         else:
             base_url = 'https://aeronet.gsfc.nasa.gov/cgi-bin/print_web_data_inv_v3?'
             if self.inv_type == 'ALM15':
@@ -64,10 +64,12 @@ class AERONET(object):
         date_portion = 'year=' + sy + '&month=' + sm + '&day=' + sd + \
             '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed +\
             '&hour2=' + eh
-        if self.inv_type is not '':
+        print(self.prod, inv_type)
+        if self.inv_type is not None:
             product = '&product=' + self.prod
         else:
             product = '&' + self.prod + '=1'
+            self.inv_type = ''
         time = '&AVG=' + str(self.daily)
         if self.latlonbox is None:
             latlonbox = ''
@@ -78,15 +80,15 @@ class AERONET(object):
             lon2 = str(self.latlonbox[3])
             latlonbox = '&lat1=' + lat1 + '&lat2=' + \
                 lat2 + '&lon1=' + lon1 + '&lon2=' + lon2
-        self.url = base_url + date_portion + product + inv_type + time +\
-            '&if_no_html=1'
-        #
-        # self.url = 'https://aeronet.gsfc.nasa.gov/cgi-bin/print_web_data_v3?year=' + sy + '&month=' + sm + '&day=' + sd + \
-        #            '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed + '&hour2=' + eh + '&AOD15=1&AVG=10&if_no_html=1'
-        #
-        #
-        # self.url = 'https://aeronet.gsfc.nasa.gov/cgi-bin/print_web_data_v3?year=' + sy + '&month=' + sm + '&day=' + sd + '&hour=' + sh + '&year2=' + ey + \
-        #            '&month2=' + em + '&day2=' + ed + '&hour2=' + eh + '&lat1=' + lat1 + '&lat2=' + lat2 + '&lon1=' + lon1 + '&lon2=' + lon2 + '&AOD15=1&AVG=10&if_no_html=1'
+        print(base_url)
+        print(date_portion)
+        print(product)
+        print(inv_type)
+        print(time)
+        print(latlonbox)
+        if inv_type is None:
+            inv_type = ''
+        self.url = base_url + date_portion + product + inv_type + time + latlonbox + '&if_no_html=1'
 
     def read_aeronet(self):
         """Short summary.
@@ -191,11 +193,12 @@ class AERONET(object):
             self.daily = 20  # daily data
         else:
             self.daily = 10  # all points
-        if inv_type is None:
+        if inv_type is not None:
             self.inv_type = 'ALM15'
         else:
             self.inv_type = inv_type
         self.build_url()
+        print(self.url)
         self.read_aeronet()
         if freq is not None:
             self.df = self.df.groupby('siteid').resample(
