@@ -233,6 +233,7 @@ class MONETAccessor(object):
             y='latitude',
             ax=ax,
             transform=ccrs.PlateCarree(),
+            infer_intervals=True,
             **kwargs)
         ax.outline_patch.set_alpha(0)
         tight_layout()
@@ -315,7 +316,7 @@ class MONETAccessor(object):
             dataarray, target, method=method, **kwargs)
         return rename_latlon(out)
 
-    def combine_point(self, data, col=None, **kwargs):
+    def combine_point(self, data, col=None, pyresample=False, **kwargs):
         """Short summary.
 
         Parameters
@@ -339,14 +340,14 @@ class MONETAccessor(object):
             try:
                 if col is None:
                     raise RuntimeError
+                if pyresample:
+                    return combine_da_to_df()
                 return combine_da_to_df_xesmf(
                     self.obj, data, col=col, **kwargs)
             except RuntimeError:
-                print('Must enter col ')
-        elif isinstance(data, xr.Dataset) or isinstance(data, xr.DataArray):
-            print('do spatial transform')
+                print('Must enter col...')
         else:
-            print('d must be either a pd.DataFrame or xr.DataArray')
+            print('d must be either a pd.DataFrame')
 
 
 @xr.register_dataset_accessor('monet')
