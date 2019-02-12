@@ -79,14 +79,15 @@ def _fix_nemsio(f):
 
     """
     from numpy import meshgrid
-    rename_dict = {'lat': 'y', 'lon': 'x', 'lev': 'z'}
-    f = _rename_func(f, rename_dict)
-    lat = f.y.values
-    lon = f.x.values
+    # f = _rename_func(f, rename_dict)
+    lat = f.lat.values
+    lon = f.lon.values
     lon, lat = meshgrid(lon, lat)
+    f = f.rename({'lat': 'y', 'lon': 'x', 'lev': 'z'})
     f['longitude'] = (('y', 'x'), lon)
     f['latitude'] = (('y', 'x'), lat)
     f = f.set_coords(['latitude', 'longitude'])
+    f = _rename_func(f, {})
     try:
         f['geohgt'] = _calc_nemsio_hgt(f)
     except:
