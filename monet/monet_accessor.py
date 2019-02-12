@@ -1,7 +1,6 @@
 "MONET Accessor"
 
-from __future__ import absolute_import, division, print_function
-from builtins import object
+from __future__ import print_function
 import pandas as pd
 import xarray as xr
 
@@ -54,15 +53,51 @@ class MONETAccessor(object):
         out = resample_stratify(self.obj, levels, vertical, axis=1)
         return out
 
-    def window(self, lat_min, lon_min, lat_max, lon_max):
-        obj2 = self.obj.copy()
-        obj2.coords['x'] = obj2.x.to_index()
-        obj2.coords['y'] = obj2.y.to_index()
-        con = (obj2.longitude >= lon_min) & (obj2.longitude <= lon_max) & (
-            obj2.latitude <= lat_max) & (obj2.latitude >= lat_min)
-        index = obj2.where(con, drop=True)
-        x, y = index.coords['x'], index.coords['y']
-        return self.obj.sel(x=x, y=y)
+    def window(self, lat_min=None, lon_min=None, lat_max=None, lon_max=None):
+        """Function to window, ie select a specific region, given the lower left
+        latitude and longitude and the upper right latitude and longitude
+
+        Parameters
+        ----------
+        lat_min : float
+            lower left latitude .
+        lon_min : float
+            lower left longitude.
+        lat_max : float
+            upper right latitude.
+        lon_max : float
+            upper right longitude.
+
+        Returns
+        -------
+        xr.DataArray
+            returns the windowed object.
+
+        """
+        try:
+            from pyresample import utils
+            from .util.interp_util import nearest_point_swathdefinition as npsd
+            from .util.interp_util import lonlat_to_swathdefinition as llsd
+            has_pyresample = True
+        except ImportError:
+            has_pyresample = False
+        try:
+            if has_pyreample:
+                swath = llsd(longitude=self.longitude.values,
+                             latitude=self.latitude.values)
+                pswath_ll = npsd(longitude=lon_min, latitude=lat_min)
+                pswath_ur = npsd(longitude=lon_max, latitude=lat_max)
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ll, 100000)
+                y_ll, x_ll = row[0][0], col[0][0]
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ur, 100000)
+                y_ur, x_ur = row[0][0], col[0][0]
+                return self.obj.isel(x=slice(x_ll, x_ur), y=slice(y_ll, y_ur))
+            else:
+                raise ImportError
+        except ImportError:
+            print('Window functionality is unavailable without pyresample')
 
     def interp_constant_lat(self, lat=None, **kwargs):
         """Interpolates the data array to constant longitude.
@@ -150,7 +185,7 @@ class MONETAccessor(object):
             from pyresample import geometry
             from .util.resample import resample_dataset
             from .util.interp_util import nearest_point_swathdefinition as npsd
-            from .util.interp_util import latlon_to_swathdefinition as llsd
+            from .util.interp_util import lonlat_to_swathdefinition as llsd
             has_pyresample = True
         except ImportError:
             has_pyresample = False
@@ -164,12 +199,14 @@ class MONETAccessor(object):
             print('Must provide latitude and longitude')
 
         if has_pyresample:
-            source = llsd(
-                longitude=self.obj.longitude.values,
-                latitude=self.obj.latitude.values)
-            target = npsd(latitude=lat, longitude=lon)
-            output = resample_dataset(self.obj, source, target, **kwargs)
-            print('here')
+            swath = llsd(longitude=self.longitude.values,
+                         latitude=self.latitude.values)
+            pswath = npsd(longitude=lon, latitude=lat)
+            row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                swath, pswath, 100000)
+            y, x = row[0][0], col[0][0]
+            return dset.sel(x=x, y=y)
+
         else:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
             self.obj = rename_latlon(self.obj)
@@ -178,7 +215,7 @@ class MONETAccessor(object):
             if cleanup:
                 output = resample_xesmf(
                     self.obj, target, cleanup=True, **kwargs)
-        return rename_latlon(output.squeeze())
+            return rename_latlon(output.squeeze())
 
     @staticmethod
     def _check_kwargs_and_set_defaults(**kwargs):
@@ -191,18 +228,6 @@ class MONETAccessor(object):
         if 'filename' not in kwargs:
             kwargs['filename'] = 'monet_xesmf_regrid_file.nc'
         return kwargs
-
-    def cartopy(self):
-        """Short summary.
-
-        Returns
-        -------
-        type
-                Returns a cartopy.crs.Projection for this dataset
-
-        """
-        from .grids import get_optimal_cartopy_proj
-        return get_optimal_cartopy_proj(self.lat, self.lon, self.proj4_srs)
 
     def quick_map(self, map_kwarg={}, **kwargs):
         """Short summary.
@@ -413,22 +438,20 @@ class MONETAccessorDataset(object):
             Description of returned object.
 
         """
-        print(data)
-        # try:
-        if isinstance(data, xr.DataArray):
-            self._remap_xesmf_dataarray(data, **kwargs)
-        elif isinstance(data, xr.Dataset):
-            self._remap_xesmf_dataset(data, **kwargs)
-        else:
-            raise TypeError
-        # except TypeError:
-        #     print('data must be an xarray.DataArray or xarray.Dataset')
+        try:
+            if isinstance(data, xr.DataArray):
+                self._remap_xesmf_dataarray(data, **kwargs)
+            elif isinstance(data, xr.Dataset):
+                self._remap_xesmf_dataset(data, **kwargs)
+            else:
+                raise TypeError
+        except TypeError:
+            print('data must be an xarray.DataArray or xarray.Dataset')
 
     def _remap_xesmf_dataset(self,
                              dset,
                              filename='monet_xesmf_regrid_file.nc',
                              **kwargs):
-
         skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
         vars = pd.Series(dset.variables)
         loop_vars = vars.loc[~vars.isin(skip_keys)]
@@ -549,22 +572,38 @@ class MONETAccessorDataset(object):
             Description of returned object.
 
         """
-        vars = pd.Series(self.obj.variables)
-        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
-        loop_vars = vars.loc[~vars.isin(skip_keys)]
-        kwargs = self._check_kwargs_and_set_defaults(**kwargs)
-        kwargs['reuse_weights'] = True
-        orig = self.obj[loop_vars.iloc[0]].monet.nearest_latlon(
-            lat=lat, lon=lon, cleanup=False, **kwargs)
-        dset = orig.to_dataset()
-        dset.attrs = self.obj.attrs.copy()
-        for i in loop_vars[1:-1].values:
-            dset[i] = self.obj[i].monet.nearest_latlon(
+        try:
+            from pyresample import utils
+            from .util.interp_util import nearest_point_swathdefinition as npsd
+            from .util.interp_util import lonlat_to_swathdefinition as llsd
+            has_pyresample = True
+        except ImportError:
+            has_pyresample = False
+        if has_pyresample:
+            swath = llsd(longitude=self.longitude.values,
+                         latitude=self.latitude.values)
+            pswath = npsd(longitude=lon, latitude=lat)
+            row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                swath, pswath, 100000)
+            y, x = row[0][0], col[0][0]
+            return dset.sel(x=x, y=y)
+        else:
+            vars = pd.Series(self.obj.variables)
+            skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
+            loop_vars = vars.loc[~vars.isin(skip_keys)]
+            kwargs = self._check_kwargs_and_set_defaults(**kwargs)
+            kwargs['reuse_weights'] = True
+            orig = self.obj[loop_vars.iloc[0]].monet.nearest_latlon(
                 lat=lat, lon=lon, cleanup=False, **kwargs)
-        i = loop_vars.values[-1]
-        dset[i] = self.obj[i].monet.nearest_latlon(
-            lat=lat, lon=lon, cleanup=True, **kwargs)
-        return dset
+            dset = orig.to_dataset()
+            dset.attrs = self.obj.attrs.copy()
+            for i in loop_vars[1:-1].values:
+                dset[i] = self.obj[i].monet.nearest_latlon(
+                    lat=lat, lon=lon, cleanup=False, **kwargs)
+            i = loop_vars.values[-1]
+            dset[i] = self.obj[i].monet.nearest_latlon(
+                lat=lat, lon=lon, cleanup=True, **kwargs)
+            return dset
 
     @staticmethod
     def _check_kwargs_and_set_defaults(**kwargs):
@@ -670,14 +709,50 @@ class MONETAccessorDataset(object):
         return dset
 
     def window(self, lat_min, lon_min, lat_max, lon_max):
-        obj2 = self.obj.longitude.copy()
-        obj2.coords['x'] = obj2.x.to_index()
-        obj2.coords['y'] = obj2.y.to_index()
-        con = (obj2.longitude >= lon_min) & (obj2.longitude <= lon_max) & (
-            obj2.latitude <= lat_max) & (obj2.latitude >= lat_min)
-        index = obj2.where(con, drop=True)
-        x, y = index.coords['x'], index.coords['y']
-        return self.obj.sel(x=x, y=y)
+        """Function to window, ie select a specific region, given the lower left
+        latitude and longitude and the upper right latitude and longitude
+
+        Parameters
+        ----------
+        lat_min : float
+            lower left latitude .
+        lon_min : float
+            lower left longitude.
+        lat_max : float
+            upper right latitude.
+        lon_max : float
+            upper right longitude.
+
+        Returns
+        -------
+        xr.DataSet
+            returns the windowed object.
+
+        """
+        try:
+            from pyresample import utils
+            from .util.interp_util import nearest_point_swathdefinition as npsd
+            from .util.interp_util import lonlat_to_swathdefinition as llsd
+            has_pyresample = True
+        except ImportError:
+            has_pyresample = False
+        try:
+            if has_pyreample:
+                swath = llsd(longitude=self.longitude.values,
+                             latitude=self.latitude.values)
+                pswath_ll = npsd(longitude=lon_min, latitude=lat_min)
+                pswath_ur = npsd(longitude=lon_max, latitude=lat_max)
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ll, 100000)
+                y_ll, x_ll = row[0][0], col[0][0]
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ur, 100000)
+                y_ur, x_ur = row[0][0], col[0][0]
+                return self.obj.isel(x=slice(x_ll, x_ur), y=slice(y_ll, y_ur))
+            else:
+                raise ImportError
+        except ImportError:
+            print('Window functionality is unavailable without pyresample')
 
     def combine_point(self, df, mapping_table=None, **kwargs):
         """Short summary.
