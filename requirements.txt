@@ -1,9 +1,0 @@
-pyproj
-cython
-numpy>=1.6
-pandas
-xarray
-dask
-matplotlib
-seaborn
-
