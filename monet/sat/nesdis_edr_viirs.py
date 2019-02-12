@@ -27,12 +27,13 @@ def open_dataset(date, resolution='high', datapath='.'):
     data = read_data(fname, lat, lon, date)
     return data
 
-def open_mfdataset(dates, resolution='high',datapath='.'):
+
+def open_mfdataset(dates, resolution='high', datapath='.'):
     from xarray import concat
     das = []
     for i in dates:
-        das.append(open_dataset(i,resolution=resolution,datapath=datapath))
-    ds = concat(das,dim='time')
+        das.append(open_dataset(i, resolution=resolution, datapath=datapath))
+    ds = concat(das, dim='time')
     return ds
 
 
