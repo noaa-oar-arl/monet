@@ -186,14 +186,14 @@ latitude and longitude) and processing varaibles like geopotential
 height and pressure if available. First lets import ``monet`` and
 ``fv3chem`` from MONET
 
-.. code:: ipython3
+.. code-block:: python
 
     import matplotlib.pyplot as plt
     from monet.models import fv3chem
 
 To open a single file
 
-.. code:: ipython3
+.. code-block:: python
 
     f = fv3chem.open_dataset('/Users/barry/Desktop/temp/gfs.t00z.atmf006.nemsio.nc4')
     print(f)
@@ -260,7 +260,7 @@ Notice this object f has dimensions of (time,z,y,x) with 2d coordinates
 of latitude and longitude. You can get more infomation on single
 varaibles such as pm25 simply by printing the varaible.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(f.pm25)
 
@@ -290,7 +290,7 @@ Now one of the main things that will need to be done is plotting on a
 map. This can be done quickly using the functionallity in MONET. In this
 example we will plot the first layer PM2.5 at time 2018-07-01.
 
-.. code:: ipython3
+.. code-block:: python
 
     f.pm25[0,0,:,:].monet.quick_map()
 
@@ -310,7 +310,7 @@ example we will plot the first layer PM2.5 at time 2018-07-01.
 Adjusting the scale is simple by suppling ``vmin`` and ``vmax``. Lets
 set a minimum of 0 AOD and maximum of 0.5.
 
-.. code:: ipython3
+.. code-block:: python
 
     f.pm25[0,0,:,:].monet.quick_map(vmin=0,vmax=.5)
 
@@ -332,7 +332,7 @@ routines. For example, lets have a descrete colorbar with 10 levels,
 ``levels=10``, and let it determine the levels by throwing out the top
 and bottom 2% of values using the ``robust=True``
 
-.. code:: ipython3
+.. code-block:: python
 
     f.pm25[0,0,:,:].monet.quick_map(levels=10,robust=True)
 
@@ -352,7 +352,7 @@ and bottom 2% of values using the ``robust=True``
 Now there are a lot of very low values, since this is at the beginning
 of the simulation so lets mask out values less than 0.015 AOD.
 
-.. code:: ipython3
+.. code-block:: python
 
     f.pm25.where(f.pm25 > 0.015)[0,0,:,:].monet.quick_map(levels=10,robust=True)
 
@@ -384,7 +384,7 @@ Monet has some extra functionality that may be useful for exploritory
 studies such as nearest neighbor finder. Lets find the nearest neighbor
 to NCWCP (38.972 N, 76.9245 W).
 
-.. code:: ipython3
+.. code-block:: python
 
     nn = f.pm25.monet.nearest_latlon(lat=38.972,lon=-76.9245)
     print(nn)
@@ -422,7 +422,7 @@ to NCWCP (38.972 N, 76.9245 W).
 Now we can do a quick plot of this vertically, since it was a single
 time step.
 
-.. code:: ipython3
+.. code-block:: python
 
     nn.plot(aspect=2,size=5)
 
@@ -442,7 +442,7 @@ time step.
 Now this is a simple plot but it is usually valuable to view the
 vertical coordinate on the y-axis.
 
-.. code:: ipython3
+.. code-block:: python
 
     nn.plot(y='z',aspect=2,size=5)
 
@@ -463,7 +463,7 @@ Now this is not very useful because the vertical coordinate right now is
 just the layer number. Lets get the geopoential height at this location
 and add it as a coordinate to plot.
 
-.. code:: ipython3
+.. code-block:: python
 
     # nn['geohgt']= f.geohgt.monet.nearest_latlon(lat=38.972,lon=-76.9245)
     # nn.plot(y='z',aspect=2,size=5)
@@ -509,7 +509,7 @@ and add it as a coordinate to plot.
 
 
 
-.. code:: ipython3
+.. code-block:: python
 
     nn['z'] = geohgt.values
     nn.plot(y='z')
@@ -540,7 +540,7 @@ section. This feature is included in monet through the
 ``xr.DataArray.monet`` accessor. Lets take a constant latitude at 10
 degrees N.
 
-.. code:: ipython3
+.. code-block:: python
 
     pm25_constant_lat = f.pm25.monet.interp_constant_lat(lat=10., method='bilinear')
     pm25_constant_lat
@@ -580,7 +580,7 @@ degrees N.
 Like before lets go ahead and get the geopotential height along this
 latitude.
 
-.. code:: ipython3
+.. code-block:: python
 
     geoght_constant_lat = f.geohgt.monet.interp_constant_lat(lat=10., method='bilinear')
     pm25_constant_lat['geohgt'] = geoght_constant_lat
@@ -594,7 +594,7 @@ latitude.
 
 Let us plot the 2D cross track (height vs longitude).
 
-.. code:: ipython3
+.. code-block:: python
 
     pm25_constant_lat.plot(x='longitude',y='geohgt',robust=True,ylim=1000,aspect=2,size=5)
     plt.ylim([0,50000])
