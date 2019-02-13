@@ -248,86 +248,86 @@ def get_gfs_area_def(nx=1440, ny=721):
                                   ny, area_extent)
     return area_def
 
-
-def geotiff_meta_to_areadef(meta):
-    """
-    Transform (Rasterio) geotiff meta dictionary to pyresample area definition
-    Arguments:
-     meta (dictionary) : dictionary containing projection and image geometry
-                         information (formed by Rasterio)
-    Returns:
-         area_def (pyresample.geometry.AreaDefinition) : Area definition object
-    """
-    import pyresample
-    area_id = ""
-    name = ""
-    proj_id = "Generated from GeoTIFF"
-    proj_dict = meta['crs']
-    proj_dict_with_string_values = dict(
-        list(
-            zip([str(key) for key in list(proj_dict.keys())],
-                [str(value) for value in list(proj_dict.values())])))
-    x_size = meta['width']
-    x_res = meta['transform'][0]
-    y_res = meta['transform'][4] * -1
-    y_size = meta['height']
-    x_ll = meta['transform'][2]
-    y_ur = meta['transform'][5]
-    y_ll = y_ur - y_size * y_res
-    x_ur = x_ll + x_size * x_res
-    area_extent = [x_ll, y_ll, x_ur, y_ur]
-    print(area_extent, x_size, y_size, x_res, y_res)
-
-    area_def = pyresample.geometry.AreaDefinition(
-        area_id, name, proj_id, proj_dict_with_string_values, x_size, y_size,
-        area_extent)
-    # print(area_extent, x_size, y_size)
-    return area_def
-
-
-def geotiff_meta_to_areadef2(meta):
-    """
-    Transform (Rasterio) geotiff meta dictionary to pyresample area definition
-    Arguments:
-     meta (dictionary) : dictionary containing projection and image geometry
-                         information (formed by Rasterio)
-    Returns:
-         area_def (pyresample.geometry.AreaDefinition) : Area definition object
-    """
-    import pyresample
-    area_id = ""
-    name = ""
-    proj_id = "Generated from GeoTIFF"
-    proj_dict = meta['crs']
-    proj_dict_with_string_values = dict(
-        list(
-            zip([str(key) for key in list(proj_dict.keys())],
-                [str(value) for value in list(proj_dict.values())])))
-    x_size = meta['width']
-    x_res = 50000.
-    y_res = 50000.
-    y_size = meta['height']
-    x_ll = meta['transform'][2]
-    y_ur = meta['transform'][5]
-    y_ll = y_ur - y_size * y_res
-    x_ur = x_ll + x_size * x_res
-    area_extent = [x_ll, y_ll, x_ur, y_ur]
-    print(area_extent, x_size, y_size, x_res, y_res)
-
-    area_def = pyresample.geometry.AreaDefinition(
-        area_id, name, proj_id, proj_dict_with_string_values, x_size, y_size,
-        area_extent)
-    return area_def
-    """Short summary.
-
-    Parameters
-    ----------
-    meta : type
-        Description of parameter `meta`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
+#
+# def geotiff_meta_to_areadef(meta):
+#     """
+#     Transform (Rasterio) geotiff meta dictionary to pyresample area definition
+#     Arguments:
+#      meta (dictionary) : dictionary containing projection and image geometry
+#                          information (formed by Rasterio)
+#     Returns:
+#          area_def (pyresample.geometry.AreaDefinition) : Area definition object
+#     """
+#     import pyresample
+#     area_id = ""
+#     name = ""
+#     proj_id = "Generated from GeoTIFF"
+#     proj_dict = meta['crs']
+#     proj_dict_with_string_values = dict(
+#         list(
+#             zip([str(key) for key in list(proj_dict.keys())],
+#                 [str(value) for value in list(proj_dict.values())])))
+#     x_size = meta['width']
+#     x_res = meta['transform'][0]
+#     y_res = meta['transform'][4] * -1
+#     y_size = meta['height']
+#     x_ll = meta['transform'][2]
+#     y_ur = meta['transform'][5]
+#     y_ll = y_ur - y_size * y_res
+#     x_ur = x_ll + x_size * x_res
+#     area_extent = [x_ll, y_ll, x_ur, y_ur]
+#     print(area_extent, x_size, y_size, x_res, y_res)
+#
+#     area_def = pyresample.geometry.AreaDefinition(
+#         area_id, name, proj_id, proj_dict_with_string_values, x_size, y_size,
+#         area_extent)
+#     # print(area_extent, x_size, y_size)
+#     return area_def
+#
+#
+# def geotiff_meta_to_areadef2(meta):
+#     """
+#     Transform (Rasterio) geotiff meta dictionary to pyresample area definition
+#     Arguments:
+#      meta (dictionary) : dictionary containing projection and image geometry
+#                          information (formed by Rasterio)
+#     Returns:
+#          area_def (pyresample.geometry.AreaDefinition) : Area definition object
+#     """
+#     import pyresample
+#     area_id = ""
+#     name = ""
+#     proj_id = "Generated from GeoTIFF"
+#     proj_dict = meta['crs']
+#     proj_dict_with_string_values = dict(
+#         list(
+#             zip([str(key) for key in list(proj_dict.keys())],
+#                 [str(value) for value in list(proj_dict.values())])))
+#     x_size = meta['width']
+#     x_res = 50000.
+#     y_res = 50000.
+#     y_size = meta['height']
+#     x_ll = meta['transform'][2]
+#     y_ur = meta['transform'][5]
+#     y_ll = y_ur - y_size * y_res
+#     x_ur = x_ll + x_size * x_res
+#     area_extent = [x_ll, y_ll, x_ur, y_ur]
+#     print(area_extent, x_size, y_size, x_res, y_res)
+#
+#     area_def = pyresample.geometry.AreaDefinition(
+#         area_id, name, proj_id, proj_dict_with_string_values, x_size, y_size,
+#         area_extent)
+#     return area_def
+#     """Short summary.
+#
+#     Parameters
+#     ----------
+#     meta : type
+#         Description of parameter `meta`.
+#
+#     Returns
+#     -------
+#     type
+#         Description of returned object.
+#
+#     """
