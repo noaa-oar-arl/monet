@@ -252,6 +252,9 @@ class MONETAccessor(object):
         sns.set_context('talk', font_scale=.9)
         if 'crs' not in map_kwarg:
             map_kwarg['crs'] = ccrs.PlateCarree()
+        if 'ax' in kwargs:
+            map_kwarg['ax'] = kwargs['ax']
+            del kwargs['ax']
         ax = draw_map(**map_kwarg)
         self.obj.plot(
             x='longitude',
@@ -359,7 +362,7 @@ class MONETAccessor(object):
             Description of returned object.
 
         """
-        from .models.combinetool import combine_da_to_df_xesmf
+        from .util.combinetool import combine_da_to_df_xesmf
         # point source data
         if isinstance(data, pd.DataFrame):
             try:
@@ -772,7 +775,7 @@ class MONETAccessorDataset(object):
             Description of returned object.
 
         """
-        from .models.combinetool import combine_da_to_df_xesmf
+        from .util.combinetool import combine_da_to_df_xesmf
         try:
             if ~isinstance(df, pd.DataFrame):
                 raise TypeError
