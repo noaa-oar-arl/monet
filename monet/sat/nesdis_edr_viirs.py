@@ -85,7 +85,11 @@ def download_data(date, resolution='high'):
         file = 'npp_aot550_edr_gridded_0.25_{}.high.bin.gz'.format(yyyymmdd)
     ftp = ftplib.FTP(server)
     ftp.login()
+    # print(base_dir)
+    # print(year)
+    # print(base_dir + year)
     ftp.cwd(base_dir + year)
+    # print(file)
     ftp.retrbinary("RETR " + file, open(file, 'wb').write)
     return file, date
 

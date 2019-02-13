@@ -27,10 +27,10 @@ def open_dataset(date, datapath='.'):
     nlat = 720
     nlon = 1440
     lon, lat = _get_latlons(nlat, nlon)
-    fname = download_data(date)
+    fname, date = download_data(date)
     data = read_data(fname, lat, lon, date)
     change_dir(current)
-    return data
+    return data.where(data > 0)
 
 
 def open_mfdataset(dates, datapath='.'):
@@ -79,12 +79,13 @@ def read_data(fname, lat, lon, date):
     """
     from numpy import nan
     from pandas import to_datetime
-    da = xr.open_dataset(fname)
+    f = xr.open_dataset(fname)
     datearr = to_datetime([date])
     da = f['aot_ip_out']
     da = da.rename({'nlat': 'y', 'nlon': 'x'})
     da['latitude'] = (('y', 'x'), lat)
     da['longitude'] = (('y', 'x'), lon)
+    da = da.expand_dims('time')
     da['time'] = datearr
     da.attrs['units'] = ''
     da.name = 'VIIRS EPS AOT'
@@ -138,6 +139,7 @@ def download_data(date, resolution='high'):
         date = Timestamp(date)
         year = date.strftime('%Y')
         yyyymmdd = date.strftime('%Y%m%d')
+        # npp_eaot_ip_gridded_0.25_20181222.high.nc
     file = 'npp_eaot_ip_gridded_0.25_{}.high.nc'.format(yyyymmdd)
     ftp = ftplib.FTP(server)
     ftp.login()
