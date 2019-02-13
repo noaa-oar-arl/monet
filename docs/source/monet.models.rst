@@ -28,6 +28,14 @@ monet.models.combinetool module
     :undoc-members:
     :show-inheritance:
 
+monet.models.fv3chem module
+---------------------------
+
+.. automodule:: monet.models.fv3chem
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 monet.models.hysplit module
 ---------------------------
 

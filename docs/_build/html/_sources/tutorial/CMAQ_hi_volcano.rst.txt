@@ -250,6 +250,7 @@ simulation. We will also rotate it from the raw AirNow long format (stacked vari
 
 
 .. code:: python
+
     from monet.util import tools
     df = airnow.add_data(so2.time.to_index())
     df = tools.long_to_wide(df)

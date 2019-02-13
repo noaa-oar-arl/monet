@@ -23,30 +23,9 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-intersphinx_mapping = {
-    'python': ('http://docs.python.org/2.7', None),
-    'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-    'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
-    'matplotlib': ('http://matplotlib.org/', None),
-    'iris': ('http://scitools.org.uk/iris/docs/latest/', None),
-    'cartopy': ('http://scitools.org.uk/cartopy/docs/latest/', None),
-    'biggus': ('https://biggus.readthedocs.io/en/latest/', None),
-    'iris-grib': ('http://iris-grib.readthedocs.io/en/latest/', None),
-}
 
-autodoc_mock_imports = [
-    'numpy', 'iris', 'iris.analysis', 'iris.time', 'iris.experimental',
-    'iris.experimental.equalise_cubes', 'cartopy', 'cartopy.crs',
-    'cartopy.feature'
-]
-MOCK_MODULES = [
-    'pygtk', 'gtk', 'gobject', 'argparse', 'numpy', 'pandas', 'cartopy',
-    'xarray', 'pseudonetcdf'
-]
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
+#sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 sys.path.insert(0, os.path.abspath('../'))
-
 # -- Project information -----------------------------------------------------
 
 project = u'MONET'
@@ -79,11 +58,11 @@ extlinks = {
     'pull': ('https://github.com/noaa-oar-arl/MONET/pull/%s', 'PR'),
 }
 
-autosummary_generate = True
+autosummary_generate = False #True
 numpydoc_class_members_toctree = True
 napoleon_google_docstring = False
 napoleon_use_param = False
-napoleon_use_ivar = True
+napoleon_use_ivar = False #True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

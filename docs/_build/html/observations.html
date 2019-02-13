@@ -17,13 +17,19 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/style.css" type="text/css" />
@@ -31,21 +37,16 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Models" href="models.html" />
     <link rel="prev" title="MONET XArray Accessor" href="monet-accessor.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -118,7 +119,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#improve">IMPROVE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cems">CEMS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#climate-reference-network">Climate Reference Network</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#integrated-surface-database">Integrated Surface Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integrated-surface-database">Integrated Surface Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Available Measurements</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#icartt">ICARTT</a></li>
 </ul>
 </li>
@@ -352,8 +356,8 @@ their web service portal is available in MONET except for the raw sky scans.  Th
 as the inversion products.</p>
 <div class="section" id="id2">
 <h3>Available Measurements<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<table border="1" class="colwidths-given docutils" id="id5">
-<caption><span class="caption-text">AOD and SDA Measurements</span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
+<table border="1" class="colwidths-given docutils" id="id6">
+<caption><span class="caption-text">AOD and SDA Measurements</span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col width="50%" />
 <col width="50%" />
@@ -396,8 +400,8 @@ as the inversion products.</p>
 </tr>
 </tbody>
 </table>
-<table border="1" class="colwidths-given docutils" id="id6">
-<caption><span class="caption-text">Inversion Products</span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
+<table border="1" class="colwidths-given docutils" id="id7">
+<caption><span class="caption-text">Inversion Products</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col width="50%" />
 <col width="50%" />
@@ -605,6 +609,8 @@ of the data on the given dates.  MONET reads the hourly data from the ISD LITE d
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">colums</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="section" id="id5">
+<h3>Available Measurements<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>dew point (dpt)</li>
 <li>temperature (t)</li>
@@ -615,6 +621,7 @@ of the data on the given dates.  MONET reads the hourly data from the ISD LITE d
 <p>The ISD (ISH) database contains latitude, longitude, station name, station id,
 time, dew point (dpt), temperature (t), visibility (vsb),
 wind speed (ws), wind direction (wdir), as well as various quality flags.</p>
+</div>
 </div>
 <div class="section" id="icartt">
 <h2>ICARTT<a class="headerlink" href="#icartt" title="Permalink to this headline">¶</a></h2>
@@ -646,7 +653,7 @@ a monet compatible pandas.DataFrame.</p>
         <a href="models.html" class="btn btn-neutral float-right" title="Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="monet-accessor.html" class="btn btn-neutral" title="MONET XArray Accessor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="monet-accessor.html" class="btn btn-neutral float-left" title="MONET XArray Accessor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -655,7 +662,7 @@ a monet compatible pandas.DataFrame.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -672,33 +679,16 @@ a monet compatible pandas.DataFrame.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

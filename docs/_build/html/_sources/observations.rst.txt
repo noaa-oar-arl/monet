@@ -412,7 +412,7 @@ To see what data is in the DataFrame simply output the column header values
     print(df.colums.values)
 
 Available Measurements
-======================
+^^^^^^^^^^^^^^^^^^^^^^
 
 * dew point (dpt)
 * temperature (t)

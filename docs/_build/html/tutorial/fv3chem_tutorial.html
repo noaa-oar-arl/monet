@@ -1,0 +1,699 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>FV3-CHEM in MONET &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Get in touch" href="../api.html" />
+    <link rel="prev" title="NOAA NESDIS AOD" href="NESDIS_VIIRS_AOD.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/Monet-transparent.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet-accessor.html">MONET XArray Accessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="aqs_pams.html">How to read AQS data from PAMS and do a quick analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="improve_trends_kmeans.html">Loading IMPROVE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CMAQ_hi_volcano.html">How to Open and View CMAQ simulations - HI Volcano Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="NESDIS_VIIRS_AOD.html">NOAA NESDIS AOD</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">FV3-CHEM in MONET</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#monet-on-wcoss">MONET on WCOSS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-condarc">Create .condarc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#activate-monet-environment">Activate MONET Environment</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-nemsio2nc4">Convert nemsio2nc4</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-usage">Example Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-fv3grib2nc4">Convert fv3grib2nc4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-monet">Using MONET</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#quick-map-plotting">Quick Map Plotting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nearest-neighbor">Nearest neighbor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#constant-latitude-and-longitude">Constant Latitude and Longitude</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../tutorial.html">Tutorial</a> &raquo;</li>
+        
+      <li>FV3-CHEM in MONET</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorial/fv3chem_tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="fv3-chem-in-monet">
+<h1>FV3-CHEM in MONET<a class="headerlink" href="#fv3-chem-in-monet" title="Permalink to this headline">¶</a></h1>
+<p>FV3-CHEM is the experimental implementation of the NASA Gocart model
+into NOAA’s Next Generation Global Prediction System. This tutorial will
+explain how to open read and use MONET to explore output from the
+FV3-CHEM system.</p>
+<p>Currently, FV3 outputs data in three formats, i.e., nemsio, grib2, and
+netcdf. There are slight issues with both the nemsio and grib2 data that
+will be explained below but needless to say they need to be converted
+with precossors.</p>
+<div class="section" id="monet-on-wcoss">
+<h2>MONET on WCOSS<a class="headerlink" href="#monet-on-wcoss" title="Permalink to this headline">¶</a></h2>
+<p>MONET can be used currently on WCOSS Phase 1, and WCOSS Phase 2. MONET
+will not be installed on WCOSS Cray but there are plans to move to WCOSS
+Phase 3 in the near future. To use the python environment that MONET is
+installed on users much do a few things.</p>
+<div class="section" id="create-condarc">
+<h3>Create .condarc<a class="headerlink" href="#create-condarc" title="Permalink to this headline">¶</a></h3>
+<p>First, a <code class="docutils literal notranslate"><span class="pre">.condarc</span></code> file needs to be created and placed in the
+<code class="docutils literal notranslate"><span class="pre">HOME</span></code> directory. To create this please copy the following and place
+in the file named <code class="docutils literal notranslate"><span class="pre">.condarc</span></code> :</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">channels</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+  <span class="o">-</span> <span class="n">defaults</span>
+<span class="n">envs_dirs</span><span class="p">:</span>
+  <span class="o">-</span> <span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">envs</span>
+<span class="n">pkgs_dirs</span><span class="p">:</span>
+  <span class="o">-</span> <span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">//</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">pkgs</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="activate-monet-environment">
+<h3>Activate MONET Environment<a class="headerlink" href="#activate-monet-environment" title="Permalink to this headline">¶</a></h3>
+<p>The MONET python environment can then be loaded and sourced. It is
+recommended that in the current shell that other modules be purged so
+that conflicts between packages do not raise.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="n">purge</span>
+</pre></div>
+</div>
+<p>Next, use and load the modules:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="n">use</span> <span class="o">-</span><span class="n">a</span> <span class="o">/</span><span class="n">gpfs</span><span class="o">/</span><span class="n">hps3</span><span class="o">/</span><span class="n">emc</span><span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">save</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">modulefiles</span>
+<span class="n">module</span> <span class="n">load</span> <span class="n">anaconda</span><span class="o">/</span><span class="n">latest</span>
+</pre></div>
+</div>
+<p>and then activate the MONET environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="n">activate</span> <span class="n">monet</span>
+</pre></div>
+</div>
+<p>You can put this all in a bash script that you can source when wanting
+to use MONET:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="n">module</span> <span class="n">purge</span>
+
+<span class="n">module</span> <span class="n">use</span> <span class="o">-</span><span class="n">a</span> <span class="o">/</span><span class="n">gpfs</span><span class="o">/</span><span class="n">hps3</span><span class="o">/</span><span class="n">emc</span><span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">save</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">modulefiles</span>
+<span class="n">module</span> <span class="n">load</span> <span class="n">anaconda</span><span class="o">/</span><span class="n">latest</span>
+
+<span class="n">source</span> <span class="n">activate</span> <span class="n">monet</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="convert-nemsio2nc4">
+<h2>Convert nemsio2nc4<a class="headerlink" href="#convert-nemsio2nc4" title="Permalink to this headline">¶</a></h2>
+<p>The first format that needs to be converted is the nemsio data. This is
+a binary format used within EMC that is planned to be phased out in
+favor for netCDF. As a work around a converter was created to convert
+the binary nemsio data into netCDF, nemsio2nc4.py.</p>
+<p>This is a command-line script that converts the nemsio data output by
+the FV3 system to netcdf4 files using a combination of mkgfsnemsioctl
+found within the fv3 workflow and the climate data operators (cdo). This
+tool is available on github at <a class="reference external" href="https://github.com/bbakernoaa/nemsio2nc4">https://github.com/bbakernoaa/nemsio2nc4</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nemsio2nc4</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">help</span>
+<span class="n">usage</span><span class="p">:</span> <span class="n">nemsio2nc4</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">-</span><span class="n">f</span> <span class="n">FILES</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NPROCS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span>
+
+<span class="n">convert</span> <span class="n">nemsio</span> <span class="n">file</span> <span class="n">to</span> <span class="n">netCDF4</span> <span class="n">file</span>
+
+<span class="n">optional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">-</span><span class="n">f</span> <span class="n">FILES</span><span class="p">,</span> <span class="o">--</span><span class="n">files</span> <span class="n">FILES</span>
+                        <span class="nb">input</span> <span class="n">nemsio</span> <span class="n">file</span> <span class="n">name</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">v</span><span class="p">,</span> <span class="o">--</span><span class="n">verbose</span>         <span class="nb">print</span> <span class="n">debugging</span> <span class="n">information</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="example-usage">
+<h3>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h3>
+<p>If you want to convert a single nemsio data file to netcdf4, it can be
+done like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nemsio2nc4</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;gfs.t00z.atmf000.nemsio&#39;</span>
+<span class="n">mkgfsnemsioctl</span><span class="p">:</span> <span class="o">/</span><span class="n">gpfs</span><span class="o">/</span><span class="n">hps3</span><span class="o">/</span><span class="n">emc</span><span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">FV3CHEM</span><span class="o">/</span><span class="n">exec</span><span class="o">/</span><span class="n">mkgfsnemsioctl</span>
+<span class="n">cdo</span><span class="p">:</span> <span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">envs</span><span class="o">/</span><span class="n">monet</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">cdo</span>
+<span class="n">Executing</span><span class="p">:</span> <span class="o">/</span><span class="n">gpfs</span><span class="o">/</span><span class="n">hps3</span><span class="o">/</span><span class="n">emc</span><span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">FV3CHEM</span><span class="o">/</span><span class="n">exec</span><span class="o">/</span><span class="n">mkgfsnemsioctl</span> <span class="n">gfs</span><span class="o">.</span><span class="n">t00z</span><span class="o">.</span><span class="n">atmf000</span><span class="o">.</span><span class="n">nemsio</span>
+<span class="n">Executing</span><span class="p">:</span> <span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">envs</span><span class="o">/</span><span class="n">monet</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">cdo</span> <span class="o">-</span><span class="n">f</span> <span class="n">nc4</span> <span class="n">import_binary</span> <span class="n">gfs</span><span class="o">.</span><span class="n">t00z</span><span class="o">.</span><span class="n">atmf000</span><span class="o">.</span><span class="n">nemsio</span><span class="o">.</span><span class="n">ctl</span> <span class="n">gfs</span><span class="o">.</span><span class="n">t00z</span><span class="o">.</span><span class="n">atmf000</span><span class="o">.</span><span class="n">nemsio</span><span class="o">.</span><span class="n">nc4</span>
+<span class="n">cdo</span> <span class="n">import_binary</span><span class="p">:</span> <span class="n">Processed</span> <span class="mi">35</span> <span class="n">variables</span> <span class="p">[</span><span class="mf">1.56</span><span class="n">s</span> <span class="mi">152</span><span class="n">MB</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To convert multiple files you can simple use the hot keys available in
+linux terminals.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nemsio2nc4</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;gfs.t00z.atmf0*.nemsio&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="convert-fv3grib2nc4">
+<h2>Convert fv3grib2nc4<a class="headerlink" href="#convert-fv3grib2nc4" title="Permalink to this headline">¶</a></h2>
+<p>Although there are several ways in which to read grib data from python
+such as pynio, a converter was created due to the specific need to
+distinguish aerosols which these readers do not process well.</p>
+<p>fv3grib2nc4.py like nemsio2nc4.py tool is a command line tool created to
+convert the grib2 aerosol data to netcdf files. fv3grib2nc4.py will
+create seperate files for each of the three layer types; ‘1 hybrid
+layer’, ‘entire atmosphere’, and ‘surface’. These are the three layers
+that currently hold aerosol data. The tool is available at
+<a class="reference external" href="https://github.com/bbakernoaa/fv3grib2nc4">https://github.com/bbakernoaa/fv3grib2nc4</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>fv3grib2nc4.py --help
+usage: fv3grib2nc4.py [-h] -f FILES [-v]
+
+convert nemsio file to netCDF4 file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FILES, --files FILES
+                        input nemsio file name (default: None)
+  -v, --verbose         print debugging information (default: False) ```
+
+### Example Usage
+
+If you want to convert a single grib2 data file to netcdf4, it can be done like this:
+</pre></div>
+</div>
+<p>fv3grib2nc4.py -v -f ‘gfs.t00z.master.grb2f000’ wgrib2:
+/nwprod2/grib_util.v1.0.0/exec/wgrib2 Executing:
+/nwprod2/grib_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+“entire atmosphere:” -nc_nlev 1 -append -set_ext_name 1 -netcdf
+gfs.t00z.master.grb2f000.entire_atm.nc Executing:
+/nwprod2/grib_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+“1 hybrid level:” -append -set_ext_name 1 -netcdf
+gfs.t00z.master.grb2f000.hybrid.nc Executing:
+/nwprod2/grib_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+“surface:” -nc_nlev 1 -append -set_ext_name 1 -netcdf
+gfs.t00z.master.grb2f000.surface.nc```</p>
+<p>To convert multiple files you can simple use the hot keys available in
+linux terminals.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fv3grib2nc4</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;gfs.t00z.master.grb2f0*&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-monet">
+<h2>Using MONET<a class="headerlink" href="#using-monet" title="Permalink to this headline">¶</a></h2>
+<p>Using MONET with FV3-Chem is much like using MONET with other model
+outputs. It tries to recognize where the files came from (nemsio, grib2,
+etc….) and then processes the data, renaming coordinates (lat lon to
+latitude and longitude) and processing varaibles like geopotential
+height and pressure if available. First lets import <code class="docutils literal notranslate"><span class="pre">monet</span></code> and
+<code class="docutils literal notranslate"><span class="pre">fv3chem</span></code> from MONET</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">monet.models</span> <span class="k">import</span> <span class="n">fv3chem</span>
+</pre></div>
+</div>
+<p>To open a single file</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">fv3chem</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;/Users/barry/Desktop/temp/gfs.t00z.atmf006.nemsio.nc4&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="o">&gt;</span>
+<span class="n">Dimensions</span><span class="p">:</span>    <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">384</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+  <span class="o">*</span> <span class="n">time</span>       <span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span>
+  <span class="o">*</span> <span class="n">x</span>          <span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+  <span class="o">*</span> <span class="n">y</span>          <span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">88.36</span> <span class="mf">87.42</span> <span class="mf">86.49</span> <span class="o">...</span> <span class="o">-</span><span class="mf">87.42</span> <span class="o">-</span><span class="mf">88.36</span> <span class="o">-</span><span class="mf">89.28</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+    <span class="n">longitude</span>  <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+    <span class="n">latitude</span>   <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="o">...</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span>
+<span class="n">Data</span> <span class="n">variables</span><span class="p">:</span>
+    <span class="n">ugrd</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">vgrd</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">dzdt</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">delz</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">tmp</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">dpres</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="mf">536.92773</span> <span class="mf">536.92255</span> <span class="o">...</span> <span class="mf">44.247</span> <span class="mf">44.246998</span>
+    <span class="n">spfh</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">clwmr</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">rwmr</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">icmr</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">snmr</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">grle</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">cld_amt</span>    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">o3mr</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">so2</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">sulf</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">dms</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">msa</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">pm25</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">bc1</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">bc2</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">oc1</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">oc2</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">dust1</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">dust2</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">dust3</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">dust4</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">dust5</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">seas1</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">seas2</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">seas3</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">seas4</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">pm10</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">pressfc</span>    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="mf">100758.96</span> <span class="mf">100757.984</span> <span class="o">...</span> <span class="mf">68074.79</span> <span class="mf">68062.836</span>
+    <span class="n">hgtsfc</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="o">...</span>
+    <span class="n">geohgt</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="mf">42.8954</span> <span class="mf">42.895294</span> <span class="o">...</span> <span class="mf">226585.3</span> <span class="mf">226675.9</span>
+    <span class="n">pres</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="mf">1002.22034</span> <span class="mf">1002.21063</span> <span class="o">...</span> <span class="mf">0.35121927</span>
+    <span class="n">geoht</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="mf">42.8954</span> <span class="mf">42.895294</span> <span class="o">...</span> <span class="mf">226585.3</span> <span class="mf">226675.9</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">CDI</span><span class="p">:</span>          <span class="n">Climate</span> <span class="n">Data</span> <span class="n">Interface</span> <span class="n">version</span> <span class="mf">1.9</span><span class="o">.</span><span class="mi">5</span> <span class="p">(</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mpimet</span><span class="o">.</span><span class="n">mpg</span><span class="o">.</span><span class="n">de</span><span class="o">/...</span>
+    <span class="n">Conventions</span><span class="p">:</span>  <span class="n">CF</span><span class="o">-</span><span class="mf">1.6</span>
+    <span class="n">history</span><span class="p">:</span>      <span class="n">Thu</span> <span class="n">Dec</span> <span class="mi">20</span> <span class="mi">17</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">09</span> <span class="mi">2018</span><span class="p">:</span> <span class="n">cdo</span> <span class="o">-</span><span class="n">f</span> <span class="n">nc4</span> <span class="n">import_binary</span> <span class="n">gfs</span><span class="o">.</span><span class="n">t00z</span><span class="o">...</span>
+    <span class="n">CDO</span><span class="p">:</span>          <span class="n">Climate</span> <span class="n">Data</span> <span class="n">Operators</span> <span class="n">version</span> <span class="mf">1.9</span><span class="o">.</span><span class="mi">5</span> <span class="p">(</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mpimet</span><span class="o">.</span><span class="n">mpg</span><span class="o">.</span><span class="n">de</span><span class="o">/...</span>
+</pre></div>
+</div>
+<p>Notice this object f has dimensions of (time,z,y,x) with 2d coordinates
+of latitude and longitude. You can get more infomation on single
+varaibles such as pm25 simply by printing the varaible.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;pm25&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="p">[</span><span class="mi">4718592</span> <span class="n">values</span> <span class="k">with</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">]</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+  <span class="o">*</span> <span class="n">time</span>       <span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span>
+  <span class="o">*</span> <span class="n">x</span>          <span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+  <span class="o">*</span> <span class="n">y</span>          <span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">88.36</span> <span class="mf">87.42</span> <span class="mf">86.49</span> <span class="o">...</span> <span class="o">-</span><span class="mf">87.42</span> <span class="o">-</span><span class="mf">88.36</span> <span class="o">-</span><span class="mf">89.28</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+    <span class="n">longitude</span>  <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+    <span class="n">latitude</span>   <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="o">...</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">long_name</span><span class="p">:</span>  <span class="n">model</span> <span class="n">layer</span>
+</pre></div>
+</div>
+<p>Here units are not included because it is not stored in the nemsio
+format.</p>
+<div class="section" id="quick-map-plotting">
+<h3>Quick Map Plotting<a class="headerlink" href="#quick-map-plotting" title="Permalink to this headline">¶</a></h3>
+<p>Now one of the main things that will need to be done is plotting on a
+map. This can be done quickly using the functionallity in MONET. In this
+example we will plot the first layer PM2.5 at time 2018-07-01.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c25af8668</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/fv3tutorial_8_1.png" src="../_images/fv3tutorial_8_1.png" />
+<p>Adjusting the scale is simple by suppling <code class="docutils literal notranslate"><span class="pre">vmin</span></code> and <code class="docutils literal notranslate"><span class="pre">vmax</span></code>. Lets
+set a minimum of 0 AOD and maximum of 0.5.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">vmax</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c2b9d2e10</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/fv3tutorial_10_1.png" src="../_images/fv3tutorial_10_1.png" />
+<p>Now we have all the control that xarray has built into their plotting
+routines. For example, lets have a descrete colorbar with 10 levels,
+<code class="docutils literal notranslate"><span class="pre">levels=10</span></code>, and let it determine the levels by throwing out the top
+and bottom 2% of values using the <code class="docutils literal notranslate"><span class="pre">robust=True</span></code></p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c2b9d2dd8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/fv3tutorial_12_1.png" src="../_images/fv3tutorial_12_1.png" />
+<p>Now there are a lot of very low values, since this is at the beginning
+of the simulation so lets mask out values less than 0.015 AOD.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span> <span class="o">&gt;</span> <span class="mf">0.015</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c2c323c88</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/fv3tutorial_14_1.png" src="../_images/fv3tutorial_14_1.png" />
+<p>For more information on plotting with xarray and matplotlib some useful
+links are shown below</p>
+<ul class="simple">
+<li><a class="reference external" href="http://xarray.pydata.org/en/stable/plotting.html#two-dimensions">Xarray
+Plotting</a></li>
+<li><a class="reference external" href="https://matplotlib.org/tutorials/colors/colormaps.html">Matplotlib
+Colorbars</a></li>
+</ul>
+</div>
+<div class="section" id="nearest-neighbor">
+<h3>Nearest neighbor<a class="headerlink" href="#nearest-neighbor" title="Permalink to this headline">¶</a></h3>
+<p>Monet has some extra functionality that may be useful for exploritory
+studies such as nearest neighbor finder. Lets find the nearest neighbor
+to NCWCP (38.972 N, 76.9245 W).</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">nearest_latlon</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">38.972</span><span class="p">,</span><span class="n">lon</span><span class="o">=-</span><span class="mf">76.9245</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Create</span> <span class="n">weight</span> <span class="n">file</span><span class="p">:</span> <span class="n">monet_xesmf_regrid_file</span><span class="o">.</span><span class="n">nc</span>
+<span class="n">Overwrite</span> <span class="n">existing</span> <span class="n">file</span><span class="p">:</span> <span class="n">monet_xesmf_regrid_file</span><span class="o">.</span><span class="n">nc</span>
+ <span class="n">You</span> <span class="n">can</span> <span class="nb">set</span> <span class="n">reuse_weights</span><span class="o">=</span><span class="kc">True</span> <span class="n">to</span> <span class="n">save</span> <span class="n">computing</span> <span class="n">time</span><span class="o">.</span>
+<span class="n">Remove</span> <span class="n">file</span> <span class="n">monet_xesmf_regrid_file</span><span class="o">.</span><span class="n">nc</span>
+<span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;pm25&#39;</span> <span class="p">(</span><span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">array</span><span class="p">([</span><span class="mf">5.360318e-01</span><span class="p">,</span> <span class="mf">3.792825e-01</span><span class="p">,</span> <span class="mf">2.377463e-01</span><span class="p">,</span> <span class="mf">1.332659e-01</span><span class="p">,</span> <span class="mf">5.727730e-02</span><span class="p">,</span>
+       <span class="mf">2.083287e-02</span><span class="p">,</span> <span class="mf">6.091245e-03</span><span class="p">,</span> <span class="mf">1.443858e-03</span><span class="p">,</span> <span class="mf">3.188324e-04</span><span class="p">,</span> <span class="mf">1.198079e-04</span><span class="p">,</span>
+       <span class="mf">9.345255e-05</span><span class="p">,</span> <span class="mf">9.057471e-05</span><span class="p">,</span> <span class="mf">9.048021e-05</span><span class="p">,</span> <span class="mf">9.048422e-05</span><span class="p">,</span> <span class="mf">9.048710e-05</span><span class="p">,</span>
+       <span class="mf">9.047858e-05</span><span class="p">,</span> <span class="mf">9.047571e-05</span><span class="p">,</span> <span class="mf">9.047643e-05</span><span class="p">,</span> <span class="mf">9.048853e-05</span><span class="p">,</span> <span class="mf">9.048565e-05</span><span class="p">,</span>
+       <span class="mf">9.048233e-05</span><span class="p">,</span> <span class="mf">9.048278e-05</span><span class="p">,</span> <span class="mf">9.048375e-05</span><span class="p">,</span> <span class="mf">9.048294e-05</span><span class="p">,</span> <span class="mf">9.048243e-05</span><span class="p">,</span>
+       <span class="mf">9.048294e-05</span><span class="p">,</span> <span class="mf">9.048338e-05</span><span class="p">,</span> <span class="mf">9.048596e-05</span><span class="p">,</span> <span class="mf">9.048430e-05</span><span class="p">,</span> <span class="mf">9.048299e-05</span><span class="p">,</span>
+       <span class="mf">9.048199e-05</span><span class="p">,</span> <span class="mf">9.048250e-05</span><span class="p">,</span> <span class="mf">9.048302e-05</span><span class="p">,</span> <span class="mf">9.048319e-05</span><span class="p">,</span> <span class="mf">9.048475e-05</span><span class="p">,</span>
+       <span class="mf">9.048442e-05</span><span class="p">,</span> <span class="mf">9.048307e-05</span><span class="p">,</span> <span class="mf">9.048300e-05</span><span class="p">,</span> <span class="mf">9.048275e-05</span><span class="p">,</span> <span class="mf">9.048315e-05</span><span class="p">,</span>
+       <span class="mf">9.048282e-05</span><span class="p">,</span> <span class="mf">9.048314e-05</span><span class="p">,</span> <span class="mf">9.048325e-05</span><span class="p">,</span> <span class="mf">9.048280e-05</span><span class="p">,</span> <span class="mf">9.048348e-05</span><span class="p">,</span>
+       <span class="mf">9.048296e-05</span><span class="p">,</span> <span class="mf">9.048288e-05</span><span class="p">,</span> <span class="mf">9.048266e-05</span><span class="p">,</span> <span class="mf">9.048266e-05</span><span class="p">,</span> <span class="mf">9.048268e-05</span><span class="p">,</span>
+       <span class="mf">9.048302e-05</span><span class="p">,</span> <span class="mf">9.048297e-05</span><span class="p">,</span> <span class="mf">9.048301e-05</span><span class="p">,</span> <span class="mf">9.048301e-05</span><span class="p">,</span> <span class="mf">9.048298e-05</span><span class="p">,</span>
+       <span class="mf">9.048302e-05</span><span class="p">,</span> <span class="mf">9.048302e-05</span><span class="p">,</span> <span class="mf">9.048306e-05</span><span class="p">,</span> <span class="mf">9.048300e-05</span><span class="p">,</span> <span class="mf">9.048304e-05</span><span class="p">,</span>
+       <span class="mf">9.048361e-05</span><span class="p">,</span> <span class="mf">9.047704e-05</span><span class="p">,</span> <span class="mf">9.048659e-05</span><span class="p">,</span> <span class="mf">9.983109e-05</span><span class="p">])</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+    <span class="n">longitude</span>  <span class="n">float64</span> <span class="o">-</span><span class="mf">76.92</span>
+    <span class="n">latitude</span>   <span class="n">float64</span> <span class="mf">38.97</span>
+    <span class="n">time</span>       <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">regrid_method</span><span class="p">:</span>  <span class="n">bilinear</span>
+</pre></div>
+</div>
+<p>Now we can do a quick plot of this vertically, since it was a single
+time step.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x1c32bae940</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../_images/fv3tutorial_19_1.png" src="../_images/fv3tutorial_19_1.png" />
+<p>Now this is a simple plot but it is usually valuable to view the
+vertical coordinate on the y-axis.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x1c32af5908</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../_images/fv3tutorial_21_1.png" src="../_images/fv3tutorial_21_1.png" />
+<p>Now this is not very useful because the vertical coordinate right now is
+just the layer number. Lets get the geopoential height at this location
+and add it as a coordinate to plot.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nn[&#39;geohgt&#39;]= f.geohgt.monet.nearest_latlon(lat=38.972,lon=-76.9245)</span>
+<span class="c1"># nn.plot(y=&#39;z&#39;,aspect=2,size=5)</span>
+<span class="c1"># from matplotlib.pyplot import *</span>
+<span class="c1"># ylim([0,2000])</span>
+<span class="n">geohgt</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">geohgt</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">nearest_latlon</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">38.972</span><span class="p">,</span><span class="n">lon</span><span class="o">=-</span><span class="mf">76.9245</span><span class="p">)</span>
+<span class="n">geohgt</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Create</span> <span class="n">weight</span> <span class="n">file</span><span class="p">:</span> <span class="n">monet_xesmf_regrid_file</span><span class="o">.</span><span class="n">nc</span>
+<span class="n">Overwrite</span> <span class="n">existing</span> <span class="n">file</span><span class="p">:</span> <span class="n">monet_xesmf_regrid_file</span><span class="o">.</span><span class="n">nc</span>
+ <span class="n">You</span> <span class="n">can</span> <span class="nb">set</span> <span class="n">reuse_weights</span><span class="o">=</span><span class="kc">True</span> <span class="n">to</span> <span class="n">save</span> <span class="n">computing</span> <span class="n">time</span><span class="o">.</span>
+<span class="n">Remove</span> <span class="n">file</span> <span class="n">monet_xesmf_regrid_file</span><span class="o">.</span><span class="n">nc</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;geohgt&#39;</span> <span class="p">(</span><span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">array</span><span class="p">([</span>  <span class="mf">142.29006</span> <span class="p">,</span>   <span class="mf">291.280994</span><span class="p">,</span>   <span class="mf">447.847933</span><span class="p">,</span>   <span class="mf">612.93705</span> <span class="p">,</span>   <span class="mf">787.572251</span><span class="p">,</span>
+         <span class="mf">972.901864</span><span class="p">,</span>  <span class="mf">1170.125815</span><span class="p">,</span>  <span class="mf">1380.589313</span><span class="p">,</span>  <span class="mf">1605.757127</span><span class="p">,</span>  <span class="mf">1847.213012</span><span class="p">,</span>
+        <span class="mf">2106.643259</span><span class="p">,</span>  <span class="mf">2385.86942</span> <span class="p">,</span>  <span class="mf">2686.82763</span> <span class="p">,</span>  <span class="mf">3011.117315</span><span class="p">,</span>  <span class="mf">3360.498532</span><span class="p">,</span>
+        <span class="mf">3736.934345</span><span class="p">,</span>  <span class="mf">4142.499136</span><span class="p">,</span>  <span class="mf">4578.190698</span><span class="p">,</span>  <span class="mf">5043.976683</span><span class="p">,</span>  <span class="mf">5540.515765</span><span class="p">,</span>
+        <span class="mf">6069.323374</span><span class="p">,</span>  <span class="mf">6629.896353</span><span class="p">,</span>  <span class="mf">7220.182094</span><span class="p">,</span>  <span class="mf">7840.337875</span><span class="p">,</span>  <span class="mf">8492.631454</span><span class="p">,</span>
+        <span class="mf">9173.72607</span> <span class="p">,</span>  <span class="mf">9882.930796</span><span class="p">,</span> <span class="mf">10617.262252</span><span class="p">,</span> <span class="mf">11371.849584</span><span class="p">,</span> <span class="mf">12143.780825</span><span class="p">,</span>
+       <span class="mf">12929.977534</span><span class="p">,</span> <span class="mf">13727.087343</span><span class="p">,</span> <span class="mf">14533.051271</span><span class="p">,</span> <span class="mf">15345.267905</span><span class="p">,</span> <span class="mf">16163.117259</span><span class="p">,</span>
+       <span class="mf">16985.63724</span> <span class="p">,</span> <span class="mf">17810.482429</span><span class="p">,</span> <span class="mf">18638.26789</span> <span class="p">,</span> <span class="mf">19471.321652</span><span class="p">,</span> <span class="mf">20319.38806</span> <span class="p">,</span>
+       <span class="mf">21188.872107</span><span class="p">,</span> <span class="mf">22080.233274</span><span class="p">,</span> <span class="mf">22995.270321</span><span class="p">,</span> <span class="mf">23936.541907</span><span class="p">,</span> <span class="mf">24899.187727</span><span class="p">,</span>
+       <span class="mf">25882.293229</span><span class="p">,</span> <span class="mf">26889.376598</span><span class="p">,</span> <span class="mf">27922.722714</span><span class="p">,</span> <span class="mf">28985.4569</span>  <span class="p">,</span> <span class="mf">30080.057902</span><span class="p">,</span>
+       <span class="mf">31209.971081</span><span class="p">,</span> <span class="mf">32381.47682</span> <span class="p">,</span> <span class="mf">33603.069826</span><span class="p">,</span> <span class="mf">34883.983199</span><span class="p">,</span> <span class="mf">36237.265007</span><span class="p">,</span>
+       <span class="mf">37683.244583</span><span class="p">,</span> <span class="mf">39247.735096</span><span class="p">,</span> <span class="mf">40970.280218</span><span class="p">,</span> <span class="mf">42919.334275</span><span class="p">,</span> <span class="mf">45195.309154</span><span class="p">,</span>
+       <span class="mf">47994.95128</span> <span class="p">,</span> <span class="mf">51753.502712</span><span class="p">,</span> <span class="mf">57685.145016</span><span class="p">,</span> <span class="mf">66370.491103</span><span class="p">])</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+    <span class="n">longitude</span>  <span class="n">float64</span> <span class="o">-</span><span class="mf">76.92</span>
+    <span class="n">latitude</span>   <span class="n">float64</span> <span class="mf">38.97</span>
+    <span class="n">time</span>       <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">regrid_method</span><span class="p">:</span>  <span class="n">bilinear</span>
+</pre></div>
+</div>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geohgt</span><span class="o">.</span><span class="n">values</span>
+<span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">3000</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---------------------------------------------------------------------------</span>
+
+<span class="ne">NameError</span>                                 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">bf5af89b4f77</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="o">----&gt;</span> <span class="mi">1</span> <span class="n">nn</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geohgt</span><span class="o">.</span><span class="n">values</span>
+      <span class="mi">2</span> <span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>
+      <span class="mi">3</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">3000</span><span class="p">])</span>
+
+
+<span class="ne">NameError</span><span class="p">:</span> <span class="n">name</span> <span class="s1">&#39;geohgt&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">defined</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="constant-latitude-and-longitude">
+<h3>Constant Latitude and Longitude<a class="headerlink" href="#constant-latitude-and-longitude" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes it may be useful to see a latitudinal or longitudinal cross
+section. This feature is included in monet through the
+<code class="docutils literal notranslate"><span class="pre">xr.DataArray.monet</span></code> accessor. Lets take a constant latitude at 10
+degrees N.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pm25_constant_lat</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">interp_constant_lat</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">pm25_constant_lat</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Overwrite</span> <span class="n">existing</span> <span class="n">file</span><span class="p">:</span> <span class="n">bilinear_192x384_192x1</span><span class="o">.</span><span class="n">nc</span>
+ <span class="n">You</span> <span class="n">can</span> <span class="nb">set</span> <span class="n">reuse_weights</span><span class="o">=</span><span class="kc">True</span> <span class="n">to</span> <span class="n">save</span> <span class="n">computing</span> <span class="n">time</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;pm25&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">1</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">array</span><span class="p">([[[[</span><span class="mf">8.107865e-02</span><span class="p">],</span>
+         <span class="o">...</span><span class="p">,</span>
+         <span class="p">[</span><span class="mf">4.765707e-02</span><span class="p">]],</span>
+
+        <span class="o">...</span><span class="p">,</span>
+
+        <span class="p">[[</span><span class="mf">9.984020e-05</span><span class="p">],</span>
+         <span class="o">...</span><span class="p">,</span>
+         <span class="p">[</span><span class="mf">9.982444e-05</span><span class="p">]]]])</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+    <span class="n">longitude</span>  <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">1.88</span> <span class="mf">3.76</span> <span class="mf">5.64</span> <span class="o">...</span> <span class="mf">353.4</span> <span class="mf">355.3</span> <span class="mf">357.2</span> <span class="mf">359.1</span>
+    <span class="n">latitude</span>   <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="o">...</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span>
+  <span class="o">*</span> <span class="n">time</span>       <span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+<span class="n">Dimensions</span> <span class="n">without</span> <span class="n">coordinates</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">regrid_method</span><span class="p">:</span>  <span class="n">bilinear</span>
+</pre></div>
+</div>
+<p>Like before lets go ahead and get the geopotential height along this
+latitude.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">geoght_constant_lat</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">geohgt</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">interp_constant_lat</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">pm25_constant_lat</span><span class="p">[</span><span class="s1">&#39;geohgt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geoght_constant_lat</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Overwrite</span> <span class="n">existing</span> <span class="n">file</span><span class="p">:</span> <span class="n">bilinear_192x384_192x1</span><span class="o">.</span><span class="n">nc</span>
+ <span class="n">You</span> <span class="n">can</span> <span class="nb">set</span> <span class="n">reuse_weights</span><span class="o">=</span><span class="kc">True</span> <span class="n">to</span> <span class="n">save</span> <span class="n">computing</span> <span class="n">time</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Let us plot the 2D cross track (height vs longitude).</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pm25_constant_lat</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;geohgt&#39;</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">ylim</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">50000</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50000</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/fv3tutorial_30_1.png" src="../_images/fv3tutorial_30_1.png" />
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../api.html" class="btn btn-neutral float-right" title="Get in touch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="NESDIS_VIIRS_AOD.html" class="btn btn-neutral float-left" title="NOAA NESDIS AOD" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
