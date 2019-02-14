@@ -18,13 +18,15 @@ def open_dataset(fname):
         Description of returned object.
 
     """
+    names, nemsio, grib = _ensure_mfdataset_filenames(fname)
     try:
-        if 'nemsio' in fname:
-            f = xr.open_dataset(fname)
+        if nemsio:
+            f = xr.open_mfdataset(names)
             f = _fix_nemsio(f)
-            f['geoht'] = _calc_nemsio_hgt(f)
-        elif 'grib2' in fname or 'grb2' in fname:
-            f = xr.open_dataset(fname)
+            f = _fix_time_nemsio(f, names[0])
+            # f['geoht'] = _calc_nemsio_hgt(f)
+        elif grib:
+            f = xr.open_dataset(names)
             f = _fix_grib2(f)
         else:
             raise ValueError
@@ -48,19 +50,88 @@ def open_mfdataset(fname):
         Description of returned object.
 
     """
+    names, nemsio, grib = _ensure_mfdataset_filenames(fname)
     try:
-        if 'nemsio' in fname:
-            f = xr.open_mfdataset(fname, concat_dim='time')
+        if nemsio:
+            f = xr.open_mfdataset(names, concat_dim='time')
             f = _fix_nemsio(f)
-            f['geoht'] = _calc_nemsio_hgt(f)
-        elif 'grib2' in fname or 'grb2' in fname:
-            f = xr.open_mfdataset(fname, concat_dim='time')
+            f = _fix_time_nemsio(f, names)
+            # f['geoht'] = _calc_nemsio_hgt(f)
+        elif grib:
+            f = xr.open_mfdataset(names, concat_dim='time')
             f = _fix_grib2(f)
         else:
             raise ValueError
     except ValueError:
         print('''File format not recognized. Note that you must preprocess the
-             files with nemsio2nc4 or fv3grib2nc4 available on github.''')
+             files with nemsio2nc4 or fv3grib2nc4 available on github. Do not
+             mix and match file types.  Ensure all are the same file format.''')
+    return f
+
+
+def _ensure_mfdataset_filenames(fname):
+    """Checks if grib or nemsio data
+
+    Parameters
+    ----------
+    fname : string or list of strings
+        Description of parameter `fname`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    from glob import glob
+    from numpy import sort
+    import six
+    if isinstance(fname, six.string_types):
+        names = sort(glob(fname))
+    else:
+        names = sort(fname)
+    nemsios = [True for i in names if 'nemsio' in i]
+    gribs = [True for i in names if 'grb2' in i or 'grib2' in i]
+    grib = False
+    nemsio = False
+    if len(nemsios) >= 1:
+        nemsio = True
+    elif len(gribs) >= 1:
+        grib = True
+    return names, nemsio, grib
+
+
+def _fix_time_nemsio(f, fname):
+    """Short summary.
+
+    Parameters
+    ----------
+    f : type
+        Description of parameter `f`.
+    fname : type
+        Description of parameter `fname`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    from pandas import Timedelta, to_datetime
+    time = None
+    print(fname)
+    if len(f.time) > 1:
+        tarray = []
+        for t, fn in zip(f.time.to_index(), fname):
+            hour = int([i for i in fn.split('.') if 'atmf' in i][0][-3:])
+            tdelta = Timedelta(hour, unit='h')
+            tarray.append(t + tdelta)
+        time = to_datetime(tarray)
+    else:
+        hour = int([i for i in fname.split('.') if 'atmf' in i][0][-3:])
+        tdelta = Timedelta(hour, unit='h')
+        time = f.time.to_index() + tdelta
+    f['time'] = time
     return f
 
 
@@ -92,10 +163,10 @@ def _fix_nemsio(f):
         f['geohgt'] = _calc_nemsio_hgt(f)
     except:
         print('geoht calculation not completed')
-    try:
-        f['pres'] = _calc_nemsio_pressure(f)
-    except:
-        print('pres calculation not completed...')
+    # try:
+    #     f['pres'] = _calc_nemsio_pressure(f)
+    # except:
+    #     print('pres calculation not completed...')
     return f
 
 
@@ -272,7 +343,7 @@ def _calc_nemsio_hgt(f):
     return z
 
 
-def _calc_nemsio_pressure(dset):
+def calc_nemsio_pressure(dset):
     """Calculate the pressure in mb form a nemsio file xarray.Dataset.
     Currently a slow loop.  Looking for a way to speed this up.  Recommend not
     using this for large datasets.  First subset your data and then use to not
@@ -289,8 +360,10 @@ def _calc_nemsio_pressure(dset):
         Description of returned object.
 
     """
-    sfc = dset.pressfc.load() / 100.
-    dpres = dset.dpres.load() / 100. * -1.
+    # sfc = dset.pressfc.load() / 100.
+    # dpres = dset.dpres.load() / 100. * -1.
+    sfc = dset.pressfc / 100.
+    dpres = dset.dpres / 100. * -1.
     dpres[:, 0, :, :] = sfc + dpres[:, 0, :, :]
     pres = dpres.rolling(z=len(dset.z), min_periods=1).sum()
     pres.name = 'press'
