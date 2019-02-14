@@ -83,8 +83,9 @@ class MONETAccessor(object):
             has_pyresample = False
         try:
             if has_pyreample:
-                swath = llsd(longitude=self.longitude.values,
-                             latitude=self.latitude.values)
+                lons, lats = utils.check_and_wrap(
+                    self.obj.longitude.values, self.obj.latitude.values)
+                swath = llsd(longitude=lons, latitude=lats)
                 pswath_ll = npsd(longitude=lon_min, latitude=lat_min)
                 pswath_ur = npsd(longitude=lon_max, latitude=lat_max)
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
@@ -182,7 +183,7 @@ class MONETAccessor(object):
 
         """
         try:
-            from pyresample import geometry
+            from pyresample import geometry, utils
             from .util.resample import resample_dataset
             from .util.interp_util import nearest_point_swathdefinition as npsd
             from .util.interp_util import lonlat_to_swathdefinition as llsd
@@ -199,14 +200,14 @@ class MONETAccessor(object):
             print('Must provide latitude and longitude')
 
         if has_pyresample:
-            swath = llsd(longitude=self.longitude.values,
-                         latitude=self.latitude.values)
+            lons, lats = utils.check_and_wrap(
+                self.obj.longitude.values, self.obj.latitude.values)
+            swath = llsd(longitude=lons, latitude=lats)
             pswath = npsd(longitude=lon, latitude=lat)
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, 100000)
             y, x = row[0][0], col[0][0]
-            return dset.sel(x=x, y=y)
-
+            return self.obj.isel(x=x, y=y)
         else:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
             self.obj = rename_latlon(self.obj)
@@ -583,13 +584,14 @@ class MONETAccessorDataset(object):
         except ImportError:
             has_pyresample = False
         if has_pyresample:
-            swath = llsd(longitude=self.longitude.values,
-                         latitude=self.latitude.values)
+            lons, lats = utils.check_and_wrap(
+                self.obj.longitude.values, self.obj.latitude.values)
+            swath = llsd(longitude=lons, latitude=lats)
             pswath = npsd(longitude=lon, latitude=lat)
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, 100000)
             y, x = row[0][0], col[0][0]
-            return dset.sel(x=x, y=y)
+            return self.obj.isel(x=x, y=y)
         else:
             vars = pd.Series(self.obj.variables)
             skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
@@ -741,8 +743,9 @@ class MONETAccessorDataset(object):
             has_pyresample = False
         try:
             if has_pyreample:
-                swath = llsd(longitude=self.longitude.values,
-                             latitude=self.latitude.values)
+                lons, lats = utils.check_and_wrap(
+                    self.obj.longitude.values, self.obj.latitude.values)
+                swath = llsd(longitude=lons, latitude=lats)
                 pswath_ll = npsd(longitude=lon_min, latitude=lat_min)
                 pswath_ur = npsd(longitude=lon_max, latitude=lat_max)
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
