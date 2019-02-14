@@ -15,7 +15,7 @@ the Blue Sky algorithm to retrieve over bright surfaces such as the
 Sahara. Lets open the data on a single day at first, in this case
 '2018-07-05'.
 
-.. code:: ipython3
+.. code-block:: python
 
     from monet.sat import nesdis_edr_viirs
     edr = nesdis_edr_viirs.open_dataset('2018-07-05')
@@ -48,7 +48,7 @@ download this into a different directory you can supply the
 ``datapath=`` keyword if needed. To quickly view this you can use the
 ``monet`` accessor.
 
-.. code:: ipython3
+.. code-block:: python
 
     edr.monet.quick_map(robust=True)
 
@@ -69,7 +69,7 @@ The EDR data is available in two resolutions. By default ``monet`` will
 download the 0.1 degree dataset. If you would like the 0.25 degree
 dataset you can pass the kwarg ``resolution='low'``.
 
-.. code:: ipython3
+.. code-block:: python
 
     edr = nesdis_edr_viirs.open_dataset('2018-07-05', resolution='low')
     print(edr)
@@ -103,13 +103,13 @@ Open Multiple Days
 If you want to open multiple days in a sinlge call you could use the
 open\_mfdataset. Lets grab the first nine days of July 2018.
 
-.. code:: ipython3
+.. code-block:: python
 
     import pandas as pd
     dates = pd.date_range(start='2018-07-01',end='2018-07-09')
     edr = nesdis_edr_viirs.open_mfdataset(dates)
 
-.. code:: ipython3
+.. code-block:: python
 
     print(edr)
 
@@ -158,7 +158,7 @@ We can visualize these in a seaborn FacetGrid through xarray. For more
 information on FacetGrid in ``xarray`` plotting please look here:
 http://xarray.pydata.org/en/stable/plotting.html#faceting
 
-.. code:: ipython3
+.. code-block:: python
 
     import cartopy.crs as ccrs # map projections and coastlines
     cbar_kwargs=dict(orientation='horizontal',pad=0.1, aspect=30)
@@ -180,7 +180,7 @@ The VIIRS EPS data includes the Blue Sky algorithm in the AOD
 calculation. The same methods are available as with the
 ``nesdis_edr_viirs`` methods.
 
-.. code:: ipython3
+.. code-block:: python
 
     from monet.sat import nesdis_eps_viirs
     eps = nesdis_eps_viirs.open_dataset('2018-07-05')
@@ -206,7 +206,7 @@ calculation. The same methods are available as with the
         source:     ftp://ftp.star.nesdis.noaa.gov/pub/smcd/VIIRS_Aerosol/npp.vii...
 
 
-.. code:: ipython3
+.. code-block:: python
 
     eps.monet.quick_map(robust=True)
 

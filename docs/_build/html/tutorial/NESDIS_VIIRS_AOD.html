@@ -105,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="fv3chem_tutorial.html">FV3-CHEM in MONET</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
 <ul>
@@ -188,9 +189,9 @@ and 0.25 degree resolution. This VIIRS EDR product also does not include
 the Blue Sky algorithm to retrieve over bright surfaces such as the
 Sahara. Lets open the data on a single day at first, in this case
 ‘2018-07-05’.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.sat</span> <span class="k">import</span> <span class="n">nesdis_edr_viirs</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.sat</span> <span class="kn">import</span> <span class="n">nesdis_edr_viirs</span>
 <span class="n">edr</span> <span class="o">=</span> <span class="n">nesdis_edr_viirs</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;2018-07-05&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">edr</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">edr</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;VIIRS EDR AOD&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">1800</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">3600</span><span class="p">)</span><span class="o">&gt;</span>
@@ -216,7 +217,7 @@ Sahara. Lets open the data on a single day at first, in this case
 download this into a different directory you can supply the
 <code class="docutils literal notranslate"><span class="pre">datapath=</span></code> keyword if needed. To quickly view this you can use the
 <code class="docutils literal notranslate"><span class="pre">monet</span></code> accessor.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">edr</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">edr</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">robust</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1022a77470</span><span class="o">&gt;</span>
@@ -226,8 +227,8 @@ download this into a different directory you can supply the
 <p>The EDR data is available in two resolutions. By default <code class="docutils literal notranslate"><span class="pre">monet</span></code> will
 download the 0.1 degree dataset. If you would like the 0.25 degree
 dataset you can pass the kwarg <code class="docutils literal notranslate"><span class="pre">resolution='low'</span></code>.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">edr</span> <span class="o">=</span> <span class="n">nesdis_edr_viirs</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;2018-07-05&#39;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;low&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">edr</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">edr</span> <span class="o">=</span> <span class="n">nesdis_edr_viirs</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;2018-07-05&#39;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;low&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">edr</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;VIIRS EDR AOD&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">720</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1440</span><span class="p">)</span><span class="o">&gt;</span>
@@ -253,12 +254,12 @@ dataset you can pass the kwarg <code class="docutils literal notranslate"><span 
 <h3>Open Multiple Days<a class="headerlink" href="#open-multiple-days" title="Permalink to this headline">¶</a></h3>
 <p>If you want to open multiple days in a sinlge call you could use the
 open_mfdataset. Lets grab the first nine days of July 2018.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2018-07-01&#39;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;2018-07-09&#39;</span><span class="p">)</span>
 <span class="n">edr</span> <span class="o">=</span> <span class="n">nesdis_edr_viirs</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">edr</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">edr</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;VIIRS EDR AOD&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">1800</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">3600</span><span class="p">)</span><span class="o">&gt;</span>
@@ -302,10 +303,10 @@ open_mfdataset. Lets grab the first nine days of July 2018.</p>
 <p>We can visualize these in a seaborn FacetGrid through xarray. For more
 information on FacetGrid in <code class="docutils literal notranslate"><span class="pre">xarray</span></code> plotting please look here:
 <a class="reference external" href="http://xarray.pydata.org/en/stable/plotting.html#faceting">http://xarray.pydata.org/en/stable/plotting.html#faceting</a></p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="k">as</span> <span class="nn">ccrs</span> <span class="c1"># map projections and coastlines</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="kn">as</span> <span class="nn">ccrs</span> <span class="c1"># map projections and coastlines</span>
 <span class="n">cbar_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 <span class="n">d</span> <span class="o">=</span> <span class="n">edr</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">cbar_kwargs</span><span class="o">=</span><span class="n">cbar_kwargs</span><span class="p">,</span>
+                        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span><span class="n">robust</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">cbar_kwargs</span><span class="o">=</span><span class="n">cbar_kwargs</span><span class="p">,</span>
                        <span class="n">subplot_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;projection&#39;</span><span class="p">:</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">()})</span>
 <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">flat</span><span class="p">:</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">coastlines</span><span class="p">()</span>
@@ -319,9 +320,9 @@ information on FacetGrid in <code class="docutils literal notranslate"><span cla
 <p>The VIIRS EPS data includes the Blue Sky algorithm in the AOD
 calculation. The same methods are available as with the
 <code class="docutils literal notranslate"><span class="pre">nesdis_edr_viirs</span></code> methods.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.sat</span> <span class="k">import</span> <span class="n">nesdis_eps_viirs</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monet.sat</span> <span class="kn">import</span> <span class="n">nesdis_eps_viirs</span>
 <span class="n">eps</span> <span class="o">=</span> <span class="n">nesdis_eps_viirs</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;2018-07-05&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;VIIRS EPS AOT&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">720</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1440</span><span class="p">)</span><span class="o">&gt;</span>
@@ -341,7 +342,7 @@ calculation. The same methods are available as with the
     <span class="n">source</span><span class="p">:</span>     <span class="n">ftp</span><span class="p">:</span><span class="o">//</span><span class="n">ftp</span><span class="o">.</span><span class="n">star</span><span class="o">.</span><span class="n">nesdis</span><span class="o">.</span><span class="n">noaa</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">pub</span><span class="o">/</span><span class="n">smcd</span><span class="o">/</span><span class="n">VIIRS_Aerosol</span><span class="o">/</span><span class="n">npp</span><span class="o">.</span><span class="n">vii</span><span class="o">...</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eps</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">eps</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">robust</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c3406d080</span><span class="o">&gt;</span>

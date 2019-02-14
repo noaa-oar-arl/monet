@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Get in touch" href="../api.html" />
+    <link rel="next" title="MONET on WCOSS" href="../monet_wcoss.html" />
     <link rel="prev" title="NOAA NESDIS AOD" href="NESDIS_VIIRS_AOD.html" /> 
 </head>
 
@@ -96,11 +96,6 @@
 <li class="toctree-l2"><a class="reference internal" href="CMAQ_hi_volcano.html">How to Open and View CMAQ simulations - HI Volcano Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="NESDIS_VIIRS_AOD.html">NOAA NESDIS AOD</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">FV3-CHEM in MONET</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#monet-on-wcoss">MONET on WCOSS</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#create-condarc">Create .condarc</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#activate-monet-environment">Activate MONET Environment</a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="#convert-nemsio2nc4">Convert nemsio2nc4</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example-usage">Example Usage</a></li>
 </ul>
@@ -116,6 +111,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
 <ul>
@@ -197,58 +193,6 @@ FV3-CHEM system.</p>
 netcdf. There are slight issues with both the nemsio and grib2 data that
 will be explained below but needless to say they need to be converted
 with precossors.</p>
-<div class="section" id="monet-on-wcoss">
-<h2>MONET on WCOSS<a class="headerlink" href="#monet-on-wcoss" title="Permalink to this headline">¶</a></h2>
-<p>MONET can be used currently on WCOSS Phase 1, and WCOSS Phase 2. MONET
-will not be installed on WCOSS Cray but there are plans to move to WCOSS
-Phase 3 in the near future. To use the python environment that MONET is
-installed on users much do a few things.</p>
-<div class="section" id="create-condarc">
-<h3>Create .condarc<a class="headerlink" href="#create-condarc" title="Permalink to this headline">¶</a></h3>
-<p>First, a <code class="docutils literal notranslate"><span class="pre">.condarc</span></code> file needs to be created and placed in the
-<code class="docutils literal notranslate"><span class="pre">HOME</span></code> directory. To create this please copy the following and place
-in the file named <code class="docutils literal notranslate"><span class="pre">.condarc</span></code> :</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">channels</span><span class="p">:</span>
-  <span class="o">-</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
-  <span class="o">-</span> <span class="n">defaults</span>
-<span class="n">envs_dirs</span><span class="p">:</span>
-  <span class="o">-</span> <span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">envs</span>
-<span class="n">pkgs_dirs</span><span class="p">:</span>
-  <span class="o">-</span> <span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">//</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">pkgs</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="activate-monet-environment">
-<h3>Activate MONET Environment<a class="headerlink" href="#activate-monet-environment" title="Permalink to this headline">¶</a></h3>
-<p>The MONET python environment can then be loaded and sourced. It is
-recommended that in the current shell that other modules be purged so
-that conflicts between packages do not raise.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="n">purge</span>
-</pre></div>
-</div>
-<p>Next, use and load the modules:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="n">use</span> <span class="o">-</span><span class="n">a</span> <span class="o">/</span><span class="n">gpfs</span><span class="o">/</span><span class="n">hps3</span><span class="o">/</span><span class="n">emc</span><span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">save</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">modulefiles</span>
-<span class="n">module</span> <span class="n">load</span> <span class="n">anaconda</span><span class="o">/</span><span class="n">latest</span>
-</pre></div>
-</div>
-<p>and then activate the MONET environment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="n">activate</span> <span class="n">monet</span>
-</pre></div>
-</div>
-<p>You can put this all in a bash script that you can source when wanting
-to use MONET:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-<span class="n">module</span> <span class="n">purge</span>
-
-<span class="n">module</span> <span class="n">use</span> <span class="o">-</span><span class="n">a</span> <span class="o">/</span><span class="n">gpfs</span><span class="o">/</span><span class="n">hps3</span><span class="o">/</span><span class="n">emc</span><span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">save</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">modulefiles</span>
-<span class="n">module</span> <span class="n">load</span> <span class="n">anaconda</span><span class="o">/</span><span class="n">latest</span>
-
-<span class="n">source</span> <span class="n">activate</span> <span class="n">monet</span>
-</pre></div>
-</div>
-</div>
-</div>
 <div class="section" id="convert-nemsio2nc4">
 <h2>Convert nemsio2nc4<a class="headerlink" href="#convert-nemsio2nc4" title="Permalink to this headline">¶</a></h2>
 <p>The first format that needs to be converted is the nemsio data. This is
@@ -342,13 +286,13 @@ etc….) and then processes the data, renaming coordinates (lat lon to
 latitude and longitude) and processing varaibles like geopotential
 height and pressure if available. First lets import <code class="docutils literal notranslate"><span class="pre">monet</span></code> and
 <code class="docutils literal notranslate"><span class="pre">fv3chem</span></code> from MONET</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">monet.models</span> <span class="k">import</span> <span class="n">fv3chem</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">monet.models</span> <span class="kn">import</span> <span class="n">fv3chem</span>
 </pre></div>
 </div>
 <p>To open a single file</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">fv3chem</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;/Users/barry/Desktop/temp/gfs.t00z.atmf006.nemsio.nc4&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">fv3chem</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;/Users/barry/Desktop/temp/gfs.t00z.atmf006.nemsio.nc4&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="o">&gt;</span>
@@ -409,7 +353,7 @@ height and pressure if available. First lets import <code class="docutils litera
 <p>Notice this object f has dimensions of (time,z,y,x) with 2d coordinates
 of latitude and longitude. You can get more infomation on single
 varaibles such as pm25 simply by printing the varaible.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;pm25&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
@@ -432,7 +376,7 @@ format.</p>
 <p>Now one of the main things that will need to be done is plotting on a
 map. This can be done quickly using the functionallity in MONET. In this
 example we will plot the first layer PM2.5 at time 2018-07-01.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c25af8668</span><span class="o">&gt;</span>
@@ -441,7 +385,7 @@ example we will plot the first layer PM2.5 at time 2018-07-01.</p>
 <img alt="../_images/fv3tutorial_8_1.png" src="../_images/fv3tutorial_8_1.png" />
 <p>Adjusting the scale is simple by suppling <code class="docutils literal notranslate"><span class="pre">vmin</span></code> and <code class="docutils literal notranslate"><span class="pre">vmax</span></code>. Lets
 set a minimum of 0 AOD and maximum of 0.5.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">vmax</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">vmax</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c2b9d2e10</span><span class="o">&gt;</span>
@@ -452,7 +396,7 @@ set a minimum of 0 AOD and maximum of 0.5.</p>
 routines. For example, lets have a descrete colorbar with 10 levels,
 <code class="docutils literal notranslate"><span class="pre">levels=10</span></code>, and let it determine the levels by throwing out the top
 and bottom 2% of values using the <code class="docutils literal notranslate"><span class="pre">robust=True</span></code></p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c2b9d2dd8</span><span class="o">&gt;</span>
@@ -461,7 +405,7 @@ and bottom 2% of values using the <code class="docutils literal notranslate"><sp
 <img alt="../_images/fv3tutorial_12_1.png" src="../_images/fv3tutorial_12_1.png" />
 <p>Now there are a lot of very low values, since this is at the beginning
 of the simulation so lets mask out values less than 0.015 AOD.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span> <span class="o">&gt;</span> <span class="mf">0.015</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span> <span class="o">&gt;</span> <span class="mf">0.015</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c2c323c88</span><span class="o">&gt;</span>
@@ -482,8 +426,8 @@ Colorbars</a></li>
 <p>Monet has some extra functionality that may be useful for exploritory
 studies such as nearest neighbor finder. Lets find the nearest neighbor
 to NCWCP (38.972 N, 76.9245 W).</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">nearest_latlon</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">38.972</span><span class="p">,</span><span class="n">lon</span><span class="o">=-</span><span class="mf">76.9245</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">nearest_latlon</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">38.972</span><span class="p">,</span><span class="n">lon</span><span class="o">=-</span><span class="mf">76.9245</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Create</span> <span class="n">weight</span> <span class="n">file</span><span class="p">:</span> <span class="n">monet_xesmf_regrid_file</span><span class="o">.</span><span class="n">nc</span>
@@ -515,7 +459,7 @@ to NCWCP (38.972 N, 76.9245 W).</p>
 </div>
 <p>Now we can do a quick plot of this vertically, since it was a single
 time step.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x1c32bae940</span><span class="o">&gt;</span><span class="p">]</span>
@@ -524,7 +468,7 @@ time step.</p>
 <img alt="../_images/fv3tutorial_19_1.png" src="../_images/fv3tutorial_19_1.png" />
 <p>Now this is a simple plot but it is usually valuable to view the
 vertical coordinate on the y-axis.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x1c32af5908</span><span class="o">&gt;</span><span class="p">]</span>
@@ -534,7 +478,7 @@ vertical coordinate on the y-axis.</p>
 <p>Now this is not very useful because the vertical coordinate right now is
 just the layer number. Lets get the geopoential height at this location
 and add it as a coordinate to plot.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nn[&#39;geohgt&#39;]= f.geohgt.monet.nearest_latlon(lat=38.972,lon=-76.9245)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># nn[&#39;geohgt&#39;]= f.geohgt.monet.nearest_latlon(lat=38.972,lon=-76.9245)</span>
 <span class="c1"># nn.plot(y=&#39;z&#39;,aspect=2,size=5)</span>
 <span class="c1"># from matplotlib.pyplot import *</span>
 <span class="c1"># ylim([0,2000])</span>
@@ -571,7 +515,7 @@ and add it as a coordinate to plot.</p>
     <span class="n">regrid_method</span><span class="p">:</span>  <span class="n">bilinear</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geohgt</span><span class="o">.</span><span class="n">values</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geohgt</span><span class="o">.</span><span class="n">values</span>
 <span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">3000</span><span class="p">])</span>
 </pre></div>
@@ -596,7 +540,7 @@ and add it as a coordinate to plot.</p>
 section. This feature is included in monet through the
 <code class="docutils literal notranslate"><span class="pre">xr.DataArray.monet</span></code> accessor. Lets take a constant latitude at 10
 degrees N.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pm25_constant_lat</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">interp_constant_lat</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pm25_constant_lat</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">interp_constant_lat</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
 <span class="n">pm25_constant_lat</span>
 </pre></div>
 </div>
@@ -626,7 +570,7 @@ degrees N.</p>
 </div>
 <p>Like before lets go ahead and get the geopotential height along this
 latitude.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">geoght_constant_lat</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">geohgt</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">interp_constant_lat</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">geoght_constant_lat</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">geohgt</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">interp_constant_lat</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
 <span class="n">pm25_constant_lat</span><span class="p">[</span><span class="s1">&#39;geohgt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geoght_constant_lat</span>
 </pre></div>
 </div>
@@ -635,7 +579,7 @@ latitude.</p>
 </pre></div>
 </div>
 <p>Let us plot the 2D cross track (height vs longitude).</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pm25_constant_lat</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;geohgt&#39;</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">ylim</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pm25_constant_lat</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;geohgt&#39;</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">ylim</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">50000</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -655,7 +599,7 @@ latitude.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../api.html" class="btn btn-neutral float-right" title="Get in touch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../monet_wcoss.html" class="btn btn-neutral float-right" title="MONET on WCOSS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="NESDIS_VIIRS_AOD.html" class="btn btn-neutral float-left" title="NOAA NESDIS AOD" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
