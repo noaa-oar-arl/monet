@@ -135,54 +135,53 @@ To open a single file
 
 .. parsed-literal::
 
+    /Users/barry/Desktop/temp/gfs.t00z.atmf006.nemsio.nc4
     <xarray.Dataset>
     Dimensions:    (time: 1, x: 384, y: 192, z: 64)
     Coordinates:
-      * time       (time) datetime64[ns] 2018-07-01
+      * time       (time) datetime64[ns] 2018-07-01T06:00:00
       * x          (x) float64 0.0 0.9375 1.875 2.812 ... 356.2 357.2 358.1 359.1
       * y          (y) float64 89.28 88.36 87.42 86.49 ... -87.42 -88.36 -89.28
       * z          (z) float64 1.0 2.0 3.0 4.0 5.0 6.0 ... 60.0 61.0 62.0 63.0 64.0
         longitude  (y, x) float64 0.0 0.9375 1.875 2.812 ... 356.2 357.2 358.1 359.1
         latitude   (y, x) float64 89.28 89.28 89.28 89.28 ... -89.28 -89.28 -89.28
     Data variables:
-        ugrd       (time, z, y, x) float32 ...
-        vgrd       (time, z, y, x) float32 ...
-        dzdt       (time, z, y, x) float32 ...
-        delz       (time, z, y, x) float32 ...
-        tmp        (time, z, y, x) float32 ...
-        dpres      (time, z, y, x) float32 536.92773 536.92255 ... 44.247 44.246998
-        spfh       (time, z, y, x) float32 ...
-        clwmr      (time, z, y, x) float32 ...
-        rwmr       (time, z, y, x) float32 ...
-        icmr       (time, z, y, x) float32 ...
-        snmr       (time, z, y, x) float32 ...
-        grle       (time, z, y, x) float32 ...
-        cld_amt    (time, z, y, x) float32 ...
-        o3mr       (time, z, y, x) float32 ...
-        so2        (time, z, y, x) float32 ...
-        sulf       (time, z, y, x) float32 ...
-        dms        (time, z, y, x) float32 ...
-        msa        (time, z, y, x) float32 ...
-        pm25       (time, z, y, x) float32 ...
-        bc1        (time, z, y, x) float32 ...
-        bc2        (time, z, y, x) float32 ...
-        oc1        (time, z, y, x) float32 ...
-        oc2        (time, z, y, x) float32 ...
-        dust1      (time, z, y, x) float32 ...
-        dust2      (time, z, y, x) float32 ...
-        dust3      (time, z, y, x) float32 ...
-        dust4      (time, z, y, x) float32 ...
-        dust5      (time, z, y, x) float32 ...
-        seas1      (time, z, y, x) float32 ...
-        seas2      (time, z, y, x) float32 ...
-        seas3      (time, z, y, x) float32 ...
-        seas4      (time, z, y, x) float32 ...
-        pm10       (time, z, y, x) float32 ...
-        pressfc    (time, y, x) float32 100758.96 100757.984 ... 68074.79 68062.836
-        hgtsfc     (time, y, x) float32 ...
-        geohgt     (time, z, y, x) float32 42.8954 42.895294 ... 226585.3 226675.9
-        pres       (time, z, y, x) float32 1002.22034 1002.21063 ... 0.35121927
-        geoht      (time, z, y, x) float32 42.8954 42.895294 ... 226585.3 226675.9
+        ugrd       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        vgrd       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        dzdt       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        delz       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        tmp        (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        dpres      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        spfh       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        clwmr      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        rwmr       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        icmr       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        snmr       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        grle       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        cld_amt    (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        o3mr       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        so2        (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        sulf       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        dms        (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        msa        (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        pm25       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        bc1        (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        bc2        (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        oc1        (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        oc2        (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        dust1      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        dust2      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        dust3      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        dust4      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        dust5      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        seas1      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        seas2      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        seas3      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        seas4      (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        pm10       (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
+        pressfc    (time, y, x) float32 dask.array<shape=(1, 192, 384), chunksize=(1, 192, 384)>
+        hgtsfc     (time, y, x) float32 dask.array<shape=(1, 192, 384), chunksize=(1, 192, 384)>
+        geohgt     (time, z, y, x) float32 dask.array<shape=(1, 64, 192, 384), chunksize=(1, 64, 192, 384)>
     Attributes:
         CDI:          Climate Data Interface version 1.9.5 (http://mpimet.mpg.de/...
         Conventions:  CF-1.6
@@ -202,9 +201,9 @@ varaibles such as pm25 simply by printing the varaible.
 .. parsed-literal::
 
     <xarray.DataArray 'pm25' (time: 1, z: 64, y: 192, x: 384)>
-    [4718592 values with dtype=float32]
+    dask.array<shape=(1, 64, 192, 384), dtype=float32, chunksize=(1, 64, 192, 384)>
     Coordinates:
-      * time       (time) datetime64[ns] 2018-07-01
+      * time       (time) datetime64[ns] 2018-07-01T06:00:00
       * x          (x) float64 0.0 0.9375 1.875 2.812 ... 356.2 357.2 358.1 359.1
       * y          (y) float64 89.28 88.36 87.42 86.49 ... -87.42 -88.36 -89.28
       * z          (z) float64 1.0 2.0 3.0 4.0 5.0 6.0 ... 60.0 61.0 62.0 63.0 64.0
@@ -229,16 +228,24 @@ example we will plot the first layer PM2.5 at time 2018-07-01.
     f.pm25[0,0,:,:].monet.quick_map()
 
 
+.. parsed-literal::
+
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+
+
 
 
 .. parsed-literal::
 
-    <cartopy.mpl.geoaxes.GeoAxesSubplot at 0x1c25af8668>
+    <cartopy.mpl.geoaxes.GeoAxesSubplot at 0x1c164f2dd8>
 
 
 
 
-.. image:: fv3tutorial_8_1.png
+.. image:: output_8_2.png
 
 
 Adjusting the scale is simple by suppling ``vmin`` and ``vmax``. Lets
@@ -249,16 +256,24 @@ set a minimum of 0 AOD and maximum of 0.5.
     f.pm25[0,0,:,:].monet.quick_map(vmin=0,vmax=.5)
 
 
+.. parsed-literal::
+
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+
+
 
 
 .. parsed-literal::
 
-    <cartopy.mpl.geoaxes.GeoAxesSubplot at 0x1c2b9d2e10>
+    <cartopy.mpl.geoaxes.GeoAxesSubplot at 0x1c18cbf6d8>
 
 
 
 
-.. image:: fv3tutorial_10_1.png
+.. image:: output_10_2.png
 
 
 Now we have all the control that xarray has built into their plotting
@@ -271,16 +286,24 @@ and bottom 2% of values using the ``robust=True``
     f.pm25[0,0,:,:].monet.quick_map(levels=10,robust=True)
 
 
+.. parsed-literal::
+
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+
+
 
 
 .. parsed-literal::
 
-    <cartopy.mpl.geoaxes.GeoAxesSubplot at 0x1c2b9d2dd8>
+    <cartopy.mpl.geoaxes.GeoAxesSubplot at 0x1c1905ce48>
 
 
 
 
-.. image:: fv3tutorial_12_1.png
+.. image:: output_12_2.png
 
 
 Now there are a lot of very low values, since this is at the beginning
@@ -291,16 +314,24 @@ of the simulation so lets mask out values less than 0.015 AOD.
     f.pm25.where(f.pm25 > 0.015)[0,0,:,:].monet.quick_map(levels=10,robust=True)
 
 
+.. parsed-literal::
+
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+
+
 
 
 .. parsed-literal::
 
-    <cartopy.mpl.geoaxes.GeoAxesSubplot at 0x1c2c323c88>
+    <cartopy.mpl.geoaxes.GeoAxesSubplot at 0x1c19635240>
 
 
 
 
-.. image:: fv3tutorial_14_1.png
+.. image:: output_14_2.png
 
 
 For more information on plotting with xarray and matplotlib some useful
@@ -324,33 +355,21 @@ to NCWCP (38.972 N, 76.9245 W).
     print(nn)
 
 
+
+
 .. parsed-literal::
 
-    Create weight file: monet_xesmf_regrid_file.nc
-    Overwrite existing file: monet_xesmf_regrid_file.nc
-     You can set reuse_weights=True to save computing time.
-    Remove file monet_xesmf_regrid_file.nc
-    <xarray.DataArray 'pm25' (z: 64)>
-    array([5.360318e-01, 3.792825e-01, 2.377463e-01, 1.332659e-01, 5.727730e-02,
-           2.083287e-02, 6.091245e-03, 1.443858e-03, 3.188324e-04, 1.198079e-04,
-           9.345255e-05, 9.057471e-05, 9.048021e-05, 9.048422e-05, 9.048710e-05,
-           9.047858e-05, 9.047571e-05, 9.047643e-05, 9.048853e-05, 9.048565e-05,
-           9.048233e-05, 9.048278e-05, 9.048375e-05, 9.048294e-05, 9.048243e-05,
-           9.048294e-05, 9.048338e-05, 9.048596e-05, 9.048430e-05, 9.048299e-05,
-           9.048199e-05, 9.048250e-05, 9.048302e-05, 9.048319e-05, 9.048475e-05,
-           9.048442e-05, 9.048307e-05, 9.048300e-05, 9.048275e-05, 9.048315e-05,
-           9.048282e-05, 9.048314e-05, 9.048325e-05, 9.048280e-05, 9.048348e-05,
-           9.048296e-05, 9.048288e-05, 9.048266e-05, 9.048266e-05, 9.048268e-05,
-           9.048302e-05, 9.048297e-05, 9.048301e-05, 9.048301e-05, 9.048298e-05,
-           9.048302e-05, 9.048302e-05, 9.048306e-05, 9.048300e-05, 9.048304e-05,
-           9.048361e-05, 9.047704e-05, 9.048659e-05, 9.983109e-05])
+    <xarray.DataArray 'pm25' (time: 1, z: 64)>
+    dask.array<shape=(1, 64), dtype=float32, chunksize=(1, 64)>
     Coordinates:
-        longitude  float64 -76.92
-        latitude   float64 38.97
-        time       datetime64[ns] 2018-07-01
+      * time       (time) datetime64[ns] 2018-07-01T06:00:00
+        x          float64 283.1
+        y          float64 38.81
       * z          (z) float64 1.0 2.0 3.0 4.0 5.0 6.0 ... 60.0 61.0 62.0 63.0 64.0
+        longitude  float64 283.1
+        latitude   float64 38.81
     Attributes:
-        regrid_method:  bilinear
+        long_name:  model layer
 
 
 Now we can do a quick plot of this vertically, since it was a single
@@ -361,16 +380,22 @@ time step.
     nn.plot(aspect=2,size=5)
 
 
+.. parsed-literal::
+
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.1s
+
+
 
 
 .. parsed-literal::
 
-    [<matplotlib.lines.Line2D at 0x1c32bae940>]
+    [<matplotlib.lines.Line2D at 0x1c194702e8>]
 
 
 
 
-.. image:: fv3tutorial_19_1.png
+.. image:: output_19_2.png
 
 
 Now this is a simple plot but it is usually valuable to view the
@@ -381,16 +406,24 @@ vertical coordinate on the y-axis.
     nn.plot(y='z',aspect=2,size=5)
 
 
+.. parsed-literal::
+
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+
+
 
 
 .. parsed-literal::
 
-    [<matplotlib.lines.Line2D at 0x1c32af5908>]
+    [<matplotlib.lines.Line2D at 0x1c1c0bbac8>]
 
 
 
 
-.. image:: fv3tutorial_21_1.png
+.. image:: output_21_2.png
 
 
 Now this is not very useful because the vertical coordinate right now is
@@ -399,20 +432,8 @@ and add it as a coordinate to plot.
 
 .. code-block:: python
 
-    # nn['geohgt']= f.geohgt.monet.nearest_latlon(lat=38.972,lon=-76.9245)
-    # nn.plot(y='z',aspect=2,size=5)
-    # from matplotlib.pyplot import *
-    # ylim([0,2000])
-    geohgt = f.geohgt.monet.nearest_latlon(lat=38.972,lon=-76.9245)
+    geohgt = f.geohgt.monet.nearest_latlon(lat=38.972,lon=-76.9245).squeeze()
     geohgt
-
-
-.. parsed-literal::
-
-    Create weight file: monet_xesmf_regrid_file.nc
-    Overwrite existing file: monet_xesmf_regrid_file.nc
-     You can set reuse_weights=True to save computing time.
-    Remove file monet_xesmf_regrid_file.nc
 
 
 
@@ -420,26 +441,17 @@ and add it as a coordinate to plot.
 .. parsed-literal::
 
     <xarray.DataArray 'geohgt' (z: 64)>
-    array([  142.29006 ,   291.280994,   447.847933,   612.93705 ,   787.572251,
-             972.901864,  1170.125815,  1380.589313,  1605.757127,  1847.213012,
-            2106.643259,  2385.86942 ,  2686.82763 ,  3011.117315,  3360.498532,
-            3736.934345,  4142.499136,  4578.190698,  5043.976683,  5540.515765,
-            6069.323374,  6629.896353,  7220.182094,  7840.337875,  8492.631454,
-            9173.72607 ,  9882.930796, 10617.262252, 11371.849584, 12143.780825,
-           12929.977534, 13727.087343, 14533.051271, 15345.267905, 16163.117259,
-           16985.63724 , 17810.482429, 18638.26789 , 19471.321652, 20319.38806 ,
-           21188.872107, 22080.233274, 22995.270321, 23936.541907, 24899.187727,
-           25882.293229, 26889.376598, 27922.722714, 28985.4569  , 30080.057902,
-           31209.971081, 32381.47682 , 33603.069826, 34883.983199, 36237.265007,
-           37683.244583, 39247.735096, 40970.280218, 42919.334275, 45195.309154,
-           47994.95128 , 51753.502712, 57685.145016, 66370.491103])
+    dask.array<shape=(64,), dtype=float32, chunksize=(64,)>
     Coordinates:
-        longitude  float64 -76.92
-        latitude   float64 38.97
-        time       datetime64[ns] 2018-07-01
+        time       datetime64[ns] 2018-07-01T06:00:00
+        x          float64 283.1
+        y          float64 38.81
       * z          (z) float64 1.0 2.0 3.0 4.0 5.0 6.0 ... 60.0 61.0 62.0 63.0 64.0
+        longitude  float64 283.1
+        latitude   float64 38.81
     Attributes:
-        regrid_method:  bilinear
+        long_name:  Geopotential Height
+        units:      m
 
 
 
@@ -450,20 +462,26 @@ and add it as a coordinate to plot.
     plt.ylim([0,3000])
 
 
-::
+.. parsed-literal::
+
+    [########################################] | 100% Completed |  0.3s
+    [########################################] | 100% Completed |  0.4s
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
 
 
-    ---------------------------------------------------------------------------
-
-    NameError                                 Traceback (most recent call last)
-
-    <ipython-input-2-bf5af89b4f77> in <module>
-    ----> 1 nn['z'] = geohgt.values
-          2 nn.plot(y='z')
-          3 plt.ylim([0,3000])
 
 
-    NameError: name 'geohgt' is not defined
+.. parsed-literal::
+
+    (0, 3000)
+
+
+
+
+.. image:: output_24_2.png
 
 
 Constant Latitude and Longitude
@@ -482,8 +500,9 @@ degrees N.
 
 .. parsed-literal::
 
-    Overwrite existing file: bilinear_192x384_192x1.nc
-     You can set reuse_weights=True to save computing time.
+    Create weight file: bilinear_192x384_192x1.nc
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
 
 
 
@@ -503,7 +522,7 @@ degrees N.
     Coordinates:
         longitude  (x, y) float64 0.0 1.88 3.76 5.64 ... 353.4 355.3 357.2 359.1
         latitude   (x, y) float64 10.0 10.0 10.0 10.0 10.0 ... 10.0 10.0 10.0 10.0
-      * time       (time) datetime64[ns] 2018-07-01
+      * time       (time) datetime64[ns] 2018-07-01T06:00:00
       * z          (z) float64 1.0 2.0 3.0 4.0 5.0 6.0 ... 60.0 61.0 62.0 63.0 64.0
     Dimensions without coordinates: x, y
     Attributes:
@@ -524,6 +543,8 @@ latitude.
 
     Overwrite existing file: bilinear_192x384_192x1.nc
      You can set reuse_weights=True to save computing time.
+    [########################################] | 100% Completed |  0.7s
+    [########################################] | 100% Completed |  0.8s
 
 
 Let us plot the 2D cross track (height vs longitude).
@@ -543,4 +564,50 @@ Let us plot the 2D cross track (height vs longitude).
 
 
 
-.. image:: fv3tutorial_30_1.png
+.. image:: output_30_1.png
+
+Calculate Pressure Levels
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default pressure levels are not calculated due to processing time,
+however, MONET does include a helper function in the fv3chem module,
+``fv3chem.calc_nemsio_pressure``.
+
+.. code-block:: python
+
+    f = fv3chem.calc_nemsio_pressure(f)
+    f
+
+
+.. parsed-literal::
+
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+    [########################################] | 100% Completed |  0.1s
+    [########################################] | 100% Completed |  0.2s
+
+
+
+
+.. parsed-literal::
+
+    <xarray.DataArray 'press' (time: 1, z: 64, y: 192, x: 384)>
+    array([[[[1.002220e+03, ..., 1.002230e+03],
+             ...,
+             [6.768812e+02, ..., 6.770022e+02]],
+
+            ...,
+
+            [[2.037354e-01, ..., 2.038117e-01],
+             ...,
+             [3.515549e-01, ..., 3.512193e-01]]]], dtype=float32)
+    Coordinates:
+      * time       (time) datetime64[ns] 2018-07-01T06:00:00
+      * x          (x) float64 0.0 0.9375 1.875 2.812 ... 356.2 357.2 358.1 359.1
+      * y          (y) float64 89.28 88.36 87.42 86.49 ... -87.42 -88.36 -89.28
+      * z          (z) float64 1.0 2.0 3.0 4.0 5.0 6.0 ... 60.0 61.0 62.0 63.0 64.0
+        longitude  (y, x) float64 0.0 0.9375 1.875 2.812 ... 356.2 357.2 358.1 359.1
+        latitude   (y, x) float64 89.28 89.28 89.28 89.28 ... -89.28 -89.28 -89.28
+    Attributes:
+        units:      mb
+        long_name:  Mid Layer Pressure

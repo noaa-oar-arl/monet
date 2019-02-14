@@ -709,6 +709,27 @@ strings as well.</li>
 <div class="section" id="module-monet.models.fv3chem">
 <span id="monet-models-fv3chem-module"></span><h2>monet.models.fv3chem module<a class="headerlink" href="#module-monet.models.fv3chem" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="monet.models.fv3chem.calc_nemsio_pressure">
+<code class="descclassname">monet.models.fv3chem.</code><code class="descname">calc_nemsio_pressure</code><span class="sig-paren">(</span><em>dset</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.fv3chem.calc_nemsio_pressure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the pressure in mb form a nemsio file xarray.Dataset.
+Currently a slow loop.  Looking for a way to speed this up.  Recommend not
+using this for large datasets.  First subset your data and then use to not
+run out of memory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dset</strong> (<em>xarray.Dataset</em>) – nemsio dataset opened</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">xarray.DataArray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="monet.models.fv3chem.open_dataset">
 <code class="descclassname">monet.models.fv3chem.</code><code class="descname">open_dataset</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.fv3chem.open_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open a single dataset from fv3chem outputs (nemsio or grib2 currently)</p>
