@@ -1,6 +1,7 @@
 "MONET Accessor"
 
 from __future__ import print_function
+
 import pandas as pd
 import xarray as xr
 
@@ -8,8 +9,23 @@ import xarray as xr
 def rename_latlon(ds):
     if 'latitude' in ds.coords:
         return ds.rename({'latitude': 'lat', 'longitude': 'lon'})
-    elif 'lat' in ds.coords:
+    elif 'Latitude' in ds.coords:
+        return ds.rename({'Latitude': 'lat', 'Longitude': 'lon'})
+    elif 'Lat' in ds.coords:
+        return ds.rename({'Lat': 'lat', 'Lon': 'lon'})
+    else:
+        return ds
+
+
+def _rename_to_monet_latlon(ds):
+    if 'lat' in ds.coords:
         return ds.rename({'lat': 'latitude', 'lon': 'longitude'})
+    elif 'Latitude' in ds.coords:
+        return ds.rename({'Latitude': 'latitude', 'Longitude': 'longitude'})
+    elif 'Lat' in ds.coords:
+        return ds.rename({'Lat': 'latitude', 'Lon': 'longitude'})
+    else:
+        return ds
 
 
 @xr.register_dataarray_accessor('monet')
@@ -253,9 +269,13 @@ class MONETAccessor(object):
         sns.set_context('talk', font_scale=.9)
         if 'crs' not in map_kwarg:
             map_kwarg['crs'] = ccrs.PlateCarree()
-        if 'ax' in kwargs:
-            map_kwarg['ax'] = kwargs['ax']
-            del kwargs['ax']
+        # if 'ax' in kwargs:
+        #     map_kwarg['ax'] = kwargs['ax']
+        #     del kwargs['ax']
+        print(kwargs)
+        if 'figsize' in kwargs:
+            map_kwarg['figsize'] = kwargs['figsize']
+            del kwargs['figsize']
         ax = draw_map(**map_kwarg)
         self.obj.plot(
             x='longitude',
@@ -308,15 +328,25 @@ class MONETAccessor(object):
             resampled object on current grid.
 
         """
+        from pyresample import utils
         from .util import resample
-        from .grids import get_generic_projection_from_proj4
+        from .util.interp_util import lonlat_to_swathdefinition as llsd
+        # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
-        target = get_generic_projection_from_proj4(
-            self.obj.latitude, self.object.longitude, self.obj.proj4_srs)
-        source_grid = get_generic_projection_from_proj4(
-            dataarray.latitude, dataarray.longitude, dataarray.proj4_srs)
+        dataarray = _rename_to_monet_latlon(dataarray)
+        lons_t, lats_t = utils.check_and_wrap(
+            self.obj.longitude.values, self.obj.latitude.values)
+        self.obj = _rename_to_monet_latlon(self.obj)
+        lons_s, lats_s = utils.check_and_wrap(
+            dataarray.longitude.values, dataarray.latitude.values)
+        target = llsd(longitude=lons_t, latitude=lats_t)
+        source = llsd(latitude=lats_s, longitude=lons_s)
+        # target = get_generic_projection_from_proj4(
+        #     self.obj.latitude, self.object.longitude, self.obj.proj4_srs)
+        # source_grid = get_generic_projection_from_proj4(
+        #     dataarray.latitude, dataarray.longitude, dataarray.proj4_srs)
         if grid is None:  # grid is assumed to be in da.area
-            out = resample.resample_dataset(dataarray, source_grid, target,
+            out = resample.resample_dataset(dataarray, source, target,
                                             **kwargs)
         else:
             out = resample.resample_dataset(dataarray, grid, target, **kwargs)
@@ -341,9 +371,10 @@ class MONETAccessor(object):
         from .util import resample
         # check to see if grid is supplied
         target = rename_latlon(self.obj)
+        source = rename_latlon(dataarray)
         out = resample.resample_xesmf(
-            dataarray, target, method=method, **kwargs)
-        return rename_latlon(out)
+            source, target, method=method, **kwargs)
+        return _rename_to_monet_latlon(out)
 
     def combine_point(self, data, col=None, pyresample=False, **kwargs):
         """Short summary.
@@ -444,8 +475,10 @@ class MONETAccessorDataset(object):
         """
         try:
             if isinstance(data, xr.DataArray):
+                data = rename_latlon(data)
                 self._remap_xesmf_dataarray(data, **kwargs)
             elif isinstance(data, xr.Dataset):
+                data = rename_latlon(data)
                 self._remap_xesmf_dataset(data, **kwargs)
             else:
                 raise TypeError
