@@ -275,7 +275,6 @@ class MONETAccessor(object):
         print(kwargs)
         if 'figsize' in kwargs:
             map_kwarg['figsize'] = kwargs['figsize']
-            del kwargs['figsize']
         ax = draw_map(**map_kwarg)
         self.obj.plot(
             x='longitude',
