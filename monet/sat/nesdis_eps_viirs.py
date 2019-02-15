@@ -23,11 +23,15 @@ def open_dataset(date, datapath='.'):
         Description of returned object.
 
     """
+    import six
     current = change_dir(datapath)
     nlat = 720
     nlon = 1440
     lon, lat = _get_latlons(nlat, nlon)
-    fname, date = download_data(date)
+    if isinstance(date, six.string_types):
+        fname, date = download_data(date)
+    else:
+        fname, date = download_data(date[0])
     data = read_data(fname, lat, lon, date)
     change_dir(current)
     return data.where(data > 0)
@@ -52,7 +56,7 @@ def open_mfdataset(dates, datapath='.'):
     from xarray import concat
     das = []
     for i in dates:
-        das.append(open_dataset(i, resolution=resolution, datapath=datapath))
+        das.append(open_dataset(i, datapath=datapath))
     ds = concat(das, dim='time')
     return ds
 
@@ -131,7 +135,8 @@ def download_data(date, resolution='high'):
     """
     import ftplib
     from datetime import datetime
-    if isinstance(date, datetime):
+    from pandas import DatetimeIndex
+    if isinstance(date, datetime) or isinstance(date, DatetimeIndex):
         year = date.strftime('%Y')
         yyyymmdd = date.strftime('%Y%m%d')
     else:
@@ -140,6 +145,7 @@ def download_data(date, resolution='high'):
         year = date.strftime('%Y')
         yyyymmdd = date.strftime('%Y%m%d')
         # npp_eaot_ip_gridded_0.25_20181222.high.nc
+    # print(year, yyyymmdd)
     file = 'npp_eaot_ip_gridded_0.25_{}.high.nc'.format(yyyymmdd)
     ftp = ftplib.FTP(server)
     ftp.login()
