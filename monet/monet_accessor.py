@@ -811,6 +811,8 @@ class MONETAccessorDataset(object):
             Description of returned object.
 
         """
+        print('dataframe')
+        print(df)
         from .util.combinetool import combine_da_to_df_xesmf
         try:
             if ~isinstance(df, pd.DataFrame):
