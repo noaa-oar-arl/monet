@@ -64,7 +64,7 @@ class AERONET(object):
         date_portion = 'year=' + sy + '&month=' + sm + '&day=' + sd + \
             '&hour=' + sh + '&year2=' + ey + '&month2=' + em + '&day2=' + ed +\
             '&hour2=' + eh
-        print(self.prod, inv_type)
+        # print(self.prod, inv_type)
         if self.inv_type is not None:
             product = '&product=' + self.prod
         else:
@@ -80,15 +80,16 @@ class AERONET(object):
             lon2 = str(self.latlonbox[3])
             latlonbox = '&lat1=' + lat1 + '&lat2=' + \
                 lat2 + '&lon1=' + lon1 + '&lon2=' + lon2
-        print(base_url)
-        print(date_portion)
-        print(product)
-        print(inv_type)
-        print(time)
-        print(latlonbox)
+        # print(base_url)
+        # print(date_portion)
+        # print(product)
+        # print(inv_type)
+        # print(time)
+        # print(latlonbox)
         if inv_type is None:
             inv_type = ''
-        self.url = base_url + date_portion + product + inv_type + time + latlonbox + '&if_no_html=1'
+        self.url = base_url + date_portion + product + \
+            inv_type + time + latlonbox + '&if_no_html=1'
 
     def read_aeronet(self):
         """Short summary.
@@ -198,7 +199,7 @@ class AERONET(object):
         else:
             self.inv_type = inv_type
         self.build_url()
-        print(self.url)
+        # print(self.url)
         self.read_aeronet()
         if freq is not None:
             self.df = self.df.groupby('siteid').resample(
@@ -235,8 +236,8 @@ class AERONET(object):
             Description of returned object.
 
         """
-        self.df['dust'] = (self.df['aod_1020nm'] >
-                           0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
+        self.df['dust'] = (self.df['aod_1020nm']
+                           > 0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
 
     def set_daterange(self, begin='', end=''):
         """Short summary.
