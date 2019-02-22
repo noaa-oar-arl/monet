@@ -811,7 +811,7 @@ class MONETAccessorDataset(object):
         print(df)
         from .util.combinetool import combine_da_to_df_xesmf
         try:
-            if ~isinstance(df, pd.DataFrame):
+            if ~isinstance(df, pd.core.frame.DataFrame):
                 raise TypeError
         except TypeError:
             print('df must be of type pd.DataFrame')
