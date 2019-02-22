@@ -266,13 +266,9 @@ class MONETAccessor(object):
         from matplotlib.pyplot import tight_layout
         import cartopy.crs as ccrs
         import seaborn as sns
-        sns.set_context('talk', font_scale=.9)
+        # sns.set_context('talk', font_scale=.9)
         if 'crs' not in map_kwarg:
             map_kwarg['crs'] = ccrs.PlateCarree()
-        # if 'ax' in kwargs:
-        #     map_kwarg['ax'] = kwargs['ax']
-        #     del kwargs['ax']
-        print(kwargs)
         if 'figsize' in kwargs:
             map_kwarg['figsize'] = kwargs['figsize']
             kwargs.pop('figsize', None)
