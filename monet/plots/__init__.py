@@ -43,7 +43,7 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
             img.save(fname, "JPEG")
 
 
-def sp_scatter_bias(df, col1=None, col2=None, ax=None, map_kwargs={}):
+def sp_scatter_bias(df, col1=None, col2=None, ax=None, map_kwargs={}, **kwargs):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
     if ax is None:
