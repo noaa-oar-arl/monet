@@ -380,7 +380,7 @@ def taylordiagram(df,
                   marker='o',
                   col1='obs',
                   col2='model',
-                  label1='OBS'
+                  label1='OBS',
                   label2='MODEL',
                   addon=False,
                   dia=None):
