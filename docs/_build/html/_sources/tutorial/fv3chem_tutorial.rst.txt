@@ -91,17 +91,17 @@ https://github.com/bbakernoaa/fv3grib2nc4
 
     If you want to convert a single grib2 data file to netcdf4, it can be done like this:
 
-fv3grib2nc4.py -v -f 'gfs.t00z.master.grb2f000' wgrib2:
-/nwprod2/grib\_util.v1.0.0/exec/wgrib2 Executing:
-/nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
-"entire atmosphere:" -nc\_nlev 1 -append -set\_ext\_name 1 -netcdf
-gfs.t00z.master.grb2f000.entire\_atm.nc Executing:
-/nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
-"1 hybrid level:" -append -set\_ext\_name 1 -netcdf
-gfs.t00z.master.grb2f000.hybrid.nc Executing:
-/nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
-"surface:" -nc\_nlev 1 -append -set\_ext\_name 1 -netcdf
-gfs.t00z.master.grb2f000.surface.nc\`\`\`
+    fv3grib2nc4.py -v -f 'gfs.t00z.master.grb2f000' wgrib2:
+    /nwprod2/grib\_util.v1.0.0/exec/wgrib2 Executing:
+    /nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+    "entire atmosphere:" -nc\_nlev 1 -append -set\_ext\_name 1 -netcdf
+    gfs.t00z.master.grb2f000.entire\_atm.nc Executing:
+    /nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+    "1 hybrid level:" -append -set\_ext\_name 1 -netcdf
+    gfs.t00z.master.grb2f000.hybrid.nc Executing:
+    /nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+    "surface:" -nc\_nlev 1 -append -set\_ext\_name 1 -netcdf
+    gfs.t00z.master.grb2f000.surface.nc\`\`\`
 
 To convert multiple files you can simple use the hot keys available in
 linux terminals.
