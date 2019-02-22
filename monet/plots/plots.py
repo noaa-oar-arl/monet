@@ -19,8 +19,6 @@ def make_spatial_plot(modelvar,
                       plotargs={},
                       ncolors=15,
                       discrete=False):
-
-    # create figure
     f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
     # determine colorbar
     if 'cmap' not in plotargs:
@@ -382,7 +380,8 @@ def taylordiagram(df,
                   marker='o',
                   col1='obs',
                   col2='model',
-                  label='CMAQ',
+                  label1='OBS'
+                  label2='MODEL',
                   addon=False,
                   dia=None):
     from numpy import corrcoef
@@ -394,11 +393,11 @@ def taylordiagram(df,
         sns.set_style('ticks')
         obsstd = df[col1].std()
 
-        dia = td.TaylorDiagram(obsstd, fig=f, rect=111, label='Obs')
+        dia = td.TaylorDiagram(obsstd, fig=f, rect=111, label=label1)
         plt.grid(linewidth=1, alpha=.5)
         cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
         dia.add_sample(
-            df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label)
+            df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label2)
         contours = dia.add_contours(colors='0.5')
         plt.clabel(contours, inline=1, fontsize=10)
         plt.grid(alpha=.5)
