@@ -41,3 +41,25 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
             img.save(fname, "PNG")
         elif fname.split('.')[-1] == 'jpg':
             img.save(fname, "JPEG")
+
+
+def sp_scatter_bias(df, col1=None, col2=None, ax=None, map_kwargs={}):
+    from scipy.stats import scoreatpercentile as score
+    from numpy import around
+    if ax is None:
+        ax = draw_map(**map_kwargs)
+    try:
+        if col1 is None or col2 is None:
+            print('User must specify col1 and col2 in the dataframe')
+            raise ValueError
+        else:
+            diff = (df[col2] - df[col1])
+            top = around(score(diff.abs(), per=95))
+            x, y = df.longitude.values, df.latitude.values
+            ss = diff.abs() / top * 100.
+            ss[ss > 300] = 300.
+
+            ax.scatter(x, y, c=diff, s=ss, vmin=-1 * top, vmax=top, **kwargs)
+            return ax
+    except ValueError:
+        exit
