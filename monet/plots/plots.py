@@ -402,7 +402,7 @@ def taylordiagram(df,
         plt.clabel(contours, inline=1, fontsize=10)
         plt.grid(alpha=.5)
         plt.legend(fontsize='small', loc='best')
-        plt.tight_layout()
+#        plt.tight_layout()
 
     elif not addon and dia is not None:
         print('Do you want to add this on? if so please turn '
