@@ -43,7 +43,7 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
             img.save(fname, "JPEG")
 
 
-def sp_scatter_bias(df, col1=None, col2=None, ax=None, map_kwargs={}, **kwargs):
+def sp_scatter_bias(df, col1=None, col2=None, ax=None, outline=False, tight=True, global_map=True, map_kwargs={}, **kwargs):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
     if ax is None:
@@ -53,13 +53,23 @@ def sp_scatter_bias(df, col1=None, col2=None, ax=None, map_kwargs={}, **kwargs):
             print('User must specify col1 and col2 in the dataframe')
             raise ValueError
         else:
-            diff = (df[col2] - df[col1])
-            top = around(score(diff.abs(), per=95))
+            dfnew = df[['latitude', 'longitude', col1, col2]
+                       ].dropna().copy(deep=True)
+            dfnew['sp_diff'] = (dfnew[col2] - dfnew[col1])
+            top = around(score(dfnew['sp_diff'].abs(), per=95))
             x, y = df.longitude.values, df.latitude.values
-            ss = diff.abs() / top * 100.
+            dfnew['sp_diff_size'] = dfnew['sp_diff'].abs() / top * 100.
             ss[ss > 300] = 300.
 
-            ax.scatter(x, y, c=diff, s=ss, vmin=-1 * top, vmax=top, **kwargs)
+            dfnew.plot.scatter(x='longitude', y='latitude',
+                               c=dfnew['sp_diff'], s=dfnew['sp_diff_size'], vmin=-1 * top, vmax=top, **kwargs)
+            if ~outline:
+                ax.outline_patch.set_alpha(0)
+            if global_map:
+                plt.xlim([-180, 180])
+                plt.ylim([-90, 90])
+            if tight:
+                plt.tight_layout(pad=0)
             return ax
     except ValueError:
         exit
