@@ -4,6 +4,14 @@ monet.util package
 Submodules
 ----------
 
+monet.util.combinetool module
+-----------------------------
+
+.. automodule:: monet.util.combinetool
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 monet.util.interp\_util module
 ------------------------------
 
