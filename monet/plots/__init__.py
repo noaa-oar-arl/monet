@@ -56,13 +56,13 @@ def sp_scatter_bias(df, col1=None, col2=None, ax=None, outline=False, tight=True
             dfnew = df[['latitude', 'longitude', col1, col2]
                        ].dropna().copy(deep=True)
             dfnew['sp_diff'] = (dfnew[col2] - dfnew[col1])
-            top = around(score(dfnew['sp_diff'].abs(), per=95))
+            top = score(dfnew['sp_diff'].abs(), per=95)
             x, y = df.longitude.values, df.latitude.values
             dfnew['sp_diff_size'] = dfnew['sp_diff'].abs() / top * 100.
-            dfnew.loc[dfnew['sp_diff_size']
-                      > 300, 'sp_diff_size'] = 300.
+            dfnew.loc[dfnew['sp_diff_size'] >
+                      300, 'sp_diff_size'] = 300.
             dfnew.plot.scatter(x='longitude', y='latitude',
-                               c=dfnew['sp_diff'], s=dfnew['sp_diff_size'], vmin=-1 * top, vmax=top, **kwargs)
+                               c=dfnew['sp_diff'], s=dfnew['sp_diff_size'], vmin=-1 * top, vmax=top, ax=ax, **kwargs)
             if ~outline:
                 ax.outline_patch.set_alpha(0)
             if global_map:
