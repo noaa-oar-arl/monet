@@ -7,36 +7,6 @@ import numpy as np
 __author__ = 'barry'
 
 
-def get_giorgi_region_bounds(index=None, acronym=None):
-    import pandas as pd
-    i = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-         13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
-    acro = ['NAU', 'SAU', 'AMZ', 'SSA', 'CAM', 'WNA', 'CNA', 'ENA', 'ALA', 'GRL', 'MED',
-            'NEU', 'WAF', 'EAF', 'SAF', 'SAH', 'SEA', 'EAS', 'SAS', 'CAS', 'TIB', 'NAS']
-    lonmax = [155, 155, -34, -40, -83, -103, -85, -60, -103,
-              - 10, 40, 40, 22, 52, 52, 65, 155, 145, 100, 75, 100, 180]
-    lonmin = [110, 110, -82, -76, -116, -130, -103, -85, -170,
-              - 103, -10, -10, -20, 22, -10, -20, 95, 100, 65, 40, 75, 40]
-    latmax = [-11, -28, 12, -20, 30, 60, 50, 50, 72, 85,
-              48, 75, 18, 18, -12, 30, 20, 50, 30, 50, 50, 70]
-    latmin = [-28, -45, -20, -56, 10, 30, 30, 25, 60, 50,
-              30, 48, -12, -12, -35, 18, -11, 20, 5, 30, 30, 50]
-    df = pd.DataFrame({'latmin': latmin, 'lonmin': lonmin,
-                       'latmax': latmax, 'lonmax': lonmax, 'acronym': acro}, index=i)
-    try:
-        if index is None and acronym is None:
-            print('either index or acronym needs to be supplied')
-            print(
-                'look here https://web.northeastern.edu/sds/web/demsos/images_002/subregions.jpg')
-            raise ValueError
-        elif index is not None:
-            return df.loc[df.index == index].values.flatten()
-        else:
-            return df.loc[df.acronym == acronym.upper()].values.flatten()
-    except ValueError:
-        exit
-
-
 def search_listinlist(array1, array2):
     # find intersections
 
@@ -116,3 +86,65 @@ def long_to_wide(df):
         w[name + '_unit'] = group.units.unique()[0]
     #mergeon = hstack((index.values, df.variable.unique()))
     return merge(w, df, on=['siteid', 'time'])
+
+
+def calc_8hr_rolling_max(df, col=None, window=None):
+    df.index = df.time_local
+    df_rolling = df.groupby('siteid')[col].rolling(
+        window, center=True, win_type='boxcar').mean().reset_index().dropna()
+    df_rolling_max = df_rolling.groupby('siteid').resample(
+        'D', on='time_local').max().reset_index(drop=True)
+    df = df.reset_index(drop=True)
+    return df.merge(df_rolling_max, on=['siteid', 'time_local'])
+
+
+def calc_24hr_ave(df, col=None):
+    df.index = df.time_local
+    df_24hr_ave = df.groupby('siteid')[col].resample('D').mean().reset_index()
+    df = df.reset_index(drop=True)
+    return df.merge(df_24hr_ave, on=['siteid', 'time_local'])
+
+
+def calc_3hr_ave(df, col=None):
+    df.index = df.time_local
+    df_3hr_ave = df.groupby('siteid')[col].resample('3H').mean().reset_index()
+    df = df.reset_index(drop=True)
+    return df.merge(df_3hr_ave, on=['siteid', 'time_local'])
+
+
+def calc_annual_ave(df, col=None):
+    df.index = df.time_local
+    df_annual_ave = df.groupby('siteid')[col].resample(
+        'A').mean().reset_index()
+    df = df.reset_index(drop=True)
+    return df.merge(df_annual_ave, on=['siteid', 'time_local'])
+
+
+def get_giorgi_region_bounds(index=None, acronym=None):
+    import pandas as pd
+    i = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+         13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+    acro = ['NAU', 'SAU', 'AMZ', 'SSA', 'CAM', 'WNA', 'CNA', 'ENA', 'ALA', 'GRL', 'MED',
+            'NEU', 'WAF', 'EAF', 'SAF', 'SAH', 'SEA', 'EAS', 'SAS', 'CAS', 'TIB', 'NAS']
+    lonmax = [155, 155, -34, -40, -83, -103, -85, -60, -103,
+              - 10, 40, 40, 22, 52, 52, 65, 155, 145, 100, 75, 100, 180]
+    lonmin = [110, 110, -82, -76, -116, -130, -103, -85, -170,
+              - 103, -10, -10, -20, 22, -10, -20, 95, 100, 65, 40, 75, 40]
+    latmax = [-11, -28, 12, -20, 30, 60, 50, 50, 72, 85,
+              48, 75, 18, 18, -12, 30, 20, 50, 30, 50, 50, 70]
+    latmin = [-28, -45, -20, -56, 10, 30, 30, 25, 60, 50,
+              30, 48, -12, -12, -35, 18, -11, 20, 5, 30, 30, 50]
+    df = pd.DataFrame({'latmin': latmin, 'lonmin': lonmin,
+                       'latmax': latmax, 'lonmax': lonmax, 'acronym': acro}, index=i)
+    try:
+        if index is None and acronym is None:
+            print('either index or acronym needs to be supplied')
+            print(
+                'look here https://web.northeastern.edu/sds/web/demsos/images_002/subregions.jpg')
+            raise ValueError
+        elif index is not None:
+            return df.loc[df.index == index].values.flatten()
+        else:
+            return df.loc[df.acronym == acronym.upper()].values.flatten()
+    except ValueError:
+        exit
