@@ -107,7 +107,7 @@ def calc_3hr_ave(df,col=None):
 
 def calc_annual_ave(df,col=None):
     df.index = df.time_local
-    df_24hr_ave = df.groupby('siteid')[col].resample('A').mean().reset_index()
+    df_annual_ave = df.groupby('siteid')[col].resample('A').mean().reset_index()
     df = df.reset_index(drop=True)
-    return df.merge(df_24hr_ave,on=['siteid','time_local'])
+    return df.merge(df_annual_ave,on=['siteid','time_local'])
 
