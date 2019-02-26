@@ -7,6 +7,36 @@ import numpy as np
 __author__ = 'barry'
 
 
+def get_giorgi_region_bounds(index=None, acronym=None):
+    import pandas as pd
+    i = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+         13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+    acro = ['NAU', 'SAU', 'AMZ', 'SSA', 'CAM', 'WNA', 'CNA', 'ENA', 'ALA', 'GRL', 'MED',
+            'NEU', 'WAF', 'EAF', 'SAF', 'SAH', 'SEA', 'EAS', 'SAS', 'CAS', 'TIB', 'NAS']
+    lonmax = [155, 155, -34, -40, -83, -103, -85, -60, -103,
+              - 10, 40, 40, 22, 52, 52, 65, 155, 145, 100, 75, 100, 180]
+    lonmin = [110, 110, -82, -76, -116, -130, -103, -85, -170,
+              - 103, -10, -10, -20, 22, -10, -20, 95, 100, 65, 40, 75, 40]
+    latmax = [-11, -28, 12, -20, 30, 60, 50, 50, 72, 85,
+              48, 75, 18, 18, -12, 30, 20, 50, 30, 50, 50, 70]
+    latmin = [-28, -45, -20, -56, 10, 30, 30, 25, 60, 50,
+              30, 48, -12, -12, -35, 18, -11, 20, 5, 30, 30, 50]
+    df = pd.DataFrame({'latmin': latmin, 'lonmin': lonmin,
+                       'latmax': latmax, 'lonmax': lonmax, 'acronym': acro}, index=i)
+    try:
+        if index is None and acronym is None:
+            print('either index or acronym needs to be supplied')
+            print(
+                'look here https://web.northeastern.edu/sds/web/demsos/images_002/subregions.jpg')
+            raise ValueError
+        elif index is not None:
+            return df.loc[df.index == index].values.flatten()
+        else:
+            return df.loc[df.acronym == acronym.upper()].values.flatten()
+    except ValueError:
+        exit
+
+
 def search_listinlist(array1, array2):
     # find intersections
 
@@ -74,6 +104,7 @@ def wsdir2uv(ws, wdir):
     v = -ws * cos(wdir * pi / 180.)
     return u, v
 
+
 def long_to_wide(df):
     from pandas import Series, merge
     w = df.pivot_table(
@@ -85,4 +116,3 @@ def long_to_wide(df):
         w[name + '_unit'] = group.units.unique()[0]
     #mergeon = hstack((index.values, df.variable.unique()))
     return merge(w, df, on=['siteid', 'time'])
-
