@@ -152,12 +152,17 @@ def WDMdnE(obs, mod, axis=None):
     return np.ma.median(np.ma.abs(cb), axis=axis)
 
 
-def NME(obs, mod, axis=None):
-    """ Normalized Mean Error (%)"""
-    out = (old_div(np.ma.abs(mod - obs).sum(axis=axis),
+def NME_m(obs, mod, axis=None):
+    """ Normalized Mean Error (%) (avoid single block error in np.abs)"""
+    out = (old_div(np.abs(mod - obs).sum(axis=axis),
                    obs.sum(axis=axis))) * 100
     return out
 
+def NME(obs, mod, axis=None):
+    """ Normalized Mean Error (%) """
+    out = (old_div(np.ma.abs(mod - obs).sum(axis=axis),
+                   obs.sum(axis=axis))) * 100
+    return out
 
 def NMdnE(obs, mod, axis=None):
     """ Normalized Median Error (%)"""
@@ -358,8 +363,18 @@ def E1(obs, mod, axis=None):
         (np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
 
 
+def IOA_m(obs, mod, axis=None):
+    """ Index of Agreement, IOA (avoid single block error in np.abs) """
+    obsmean = obs.mean(axis=axis)
+    if not axis is None:
+        obsmean = np.expand_dims(obsmean, axis=axis)
+    return 1.0 - old_div(
+        (np.abs(obs - mod)**2).sum(axis=axis),
+        ((np.abs(mod - obsmean) + np.abs(obs - obsmean)) **
+         2).sum(axis=axis))
+
 def IOA(obs, mod, axis=None):
-    """ Index of Agreement, IOA"""
+    """ Index of Agreement, IOA """
     obsmean = obs.mean(axis=axis)
     if not axis is None:
         obsmean = np.expand_dims(obsmean, axis=axis)
@@ -367,7 +382,6 @@ def IOA(obs, mod, axis=None):
         (np.ma.abs(obs - mod)**2).sum(axis=axis),
         ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) **
          2).sum(axis=axis))
-
 
 def circlebias(b):
     b = np.ma.where(b > 180, b - 360, b)

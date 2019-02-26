@@ -86,3 +86,28 @@ def long_to_wide(df):
     #mergeon = hstack((index.values, df.variable.unique()))
     return merge(w, df, on=['siteid', 'time'])
 
+def calc_8hr_rolling_max(df,col=None,window=None):
+    df.index = df.time_local
+    df_rolling = df.groupby('siteid')[col].rolling(window,center=True,win_type='boxcar').mean().reset_index().dropna()
+    df_rolling_max = df_rolling.groupby('siteid').resample('D',on='time_local').max().reset_index(drop=True)
+    df = df.reset_index(drop=True)
+    return df.merge(df_rolling_max,on=['siteid','time_local'])
+
+def calc_24hr_ave(df,col=None):
+    df.index = df.time_local
+    df_24hr_ave = df.groupby('siteid')[col].resample('D').mean().reset_index()
+    df = df.reset_index(drop=True)
+    return df.merge(df_24hr_ave,on=['siteid','time_local'])
+
+def calc_3hr_ave(df,col=None):
+    df.index = df.time_local
+    df_24hr_ave = df.groupby('siteid')[col].resample('3H').mean().reset_index()
+    df = df.reset_index(drop=True)
+    return df.merge(df_24hr_ave,on=['siteid','time_local'])
+
+def calc_annual_ave(df,col=None):
+    df.index = df.time_local
+    df_24hr_ave = df.groupby('siteid')[col].resample('A').mean().reset_index()
+    df = df.reset_index(drop=True)
+    return df.merge(df_24hr_ave,on=['siteid','time_local'])
+
