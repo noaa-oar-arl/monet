@@ -109,16 +109,26 @@ def calc_3hr_ave(df, col=None):
     df.index = df.time_local
     df_3hr_ave = df.groupby('siteid')[col].resample('3H').mean().reset_index()
     df = df.reset_index(drop=True)
+<<<<<<< HEAD
     return df.merge(df_3hr_ave, on=['siteid', 'time_local'])
+=======
+    return df.merge(df_3hr_ave,on=['siteid','time_local'])
+>>>>>>> 3e14a39254f4b77c9e2de18183834f6a2ab714c7
 
 
 def calc_annual_ave(df, col=None):
     df.index = df.time_local
+<<<<<<< HEAD
     df_annual_ave = df.groupby('siteid')[col].resample(
         'A').mean().reset_index()
     df = df.reset_index(drop=True)
     return df.merge(df_annual_ave, on=['siteid', 'time_local'])
 
+=======
+    df_annual_ave = df.groupby('siteid')[col].resample('A').mean().reset_index()
+    df = df.reset_index(drop=True)
+    return df.merge(df_annual_ave,on=['siteid','time_local'])
+>>>>>>> 3e14a39254f4b77c9e2de18183834f6a2ab714c7
 
 def get_giorgi_region_bounds(index=None, acronym=None):
     import pandas as pd
