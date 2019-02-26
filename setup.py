@@ -21,7 +21,7 @@ setup(
     maintainer_email='barry.baker@noaa.gov',
     packages=find_packages(),
     package_data={'': ['data/*.txt',
-                       'data/*.dat', 'data/*.hdf', 'data/*.ncf']},
+                       'data/*.dat', 'data/*.hdf', 'data/*.ncf', 'data/*.jpg']},
     keywords=[
         'model', 'verification', 'hysplit', 'cmaq', 'atmosphere', 'camx',
         'evaluation'

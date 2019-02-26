@@ -55,7 +55,7 @@
 
           
             
-            <img src="../_static/transparent.png" class="logo" alt="Logo"/>
+            <img src="../_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -260,19 +260,20 @@ optional arguments:
 ### Example Usage
 
 If you want to convert a single grib2 data file to netcdf4, it can be done like this:
+
+fv3grib2nc4.py -v -f &#39;gfs.t00z.master.grb2f000&#39; wgrib2:
+/nwprod2/grib\_util.v1.0.0/exec/wgrib2 Executing:
+/nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+&quot;entire atmosphere:&quot; -nc\_nlev 1 -append -set\_ext\_name 1 -netcdf
+gfs.t00z.master.grb2f000.entire\_atm.nc Executing:
+/nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+&quot;1 hybrid level:&quot; -append -set\_ext\_name 1 -netcdf
+gfs.t00z.master.grb2f000.hybrid.nc Executing:
+/nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+&quot;surface:&quot; -nc\_nlev 1 -append -set\_ext\_name 1 -netcdf
+gfs.t00z.master.grb2f000.surface.nc\`\`\`
 </pre></div>
 </div>
-<p>fv3grib2nc4.py -v -f ‘gfs.t00z.master.grb2f000’ wgrib2:
-/nwprod2/grib_util.v1.0.0/exec/wgrib2 Executing:
-/nwprod2/grib_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
-“entire atmosphere:” -nc_nlev 1 -append -set_ext_name 1 -netcdf
-gfs.t00z.master.grb2f000.entire_atm.nc Executing:
-/nwprod2/grib_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
-“1 hybrid level:” -append -set_ext_name 1 -netcdf
-gfs.t00z.master.grb2f000.hybrid.nc Executing:
-/nwprod2/grib_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
-“surface:” -nc_nlev 1 -append -set_ext_name 1 -netcdf
-gfs.t00z.master.grb2f000.surface.nc```</p>
 <p>To convert multiple files you can simple use the hot keys available in
 linux terminals.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fv3grib2nc4</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;gfs.t00z.master.grb2f0*&#39;</span>

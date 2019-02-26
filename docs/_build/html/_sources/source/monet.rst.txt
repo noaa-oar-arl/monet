@@ -11,7 +11,6 @@ Subpackages
     monet.plots
     monet.sat
     monet.util
-    monet.verification
 
 Submodules
 ----------

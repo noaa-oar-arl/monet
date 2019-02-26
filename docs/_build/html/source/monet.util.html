@@ -54,7 +54,7 @@
 
           
             
-            <img src="../_static/transparent.png" class="logo" alt="Logo"/>
+            <img src="../_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -168,6 +168,117 @@
 <h1>monet.util package<a class="headerlink" href="#monet-util-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-monet.util.combinetool">
+<span id="monet-util-combinetool-module"></span><h2>monet.util.combinetool module<a class="headerlink" href="#module-monet.util.combinetool" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.util.combinetool.combine_da_to_df">
+<code class="descclassname">monet.util.combinetool.</code><code class="descname">combine_da_to_df</code><span class="sig-paren">(</span><em>da</em>, <em>df</em>, <em>col=None</em>, <em>radius_of_influence=12000.0</em>, <em>merge=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.combinetool.combine_da_to_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will combine an xarray data array with spatial information
+point observations in <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>da</strong> (<em>xr.DataArray</em>) – Description of parameter <cite>da</cite>.</li>
+<li><strong>df</strong> (<em>pd.DataFrame</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>lay</strong> (<em>iterable, default = [0]</em>) – Description of parameter <cite>lay</cite>.</li>
+<li><strong>radius</strong> (<em>integer or float, default = 12e3</em>) – Description of parameter <cite>radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.combinetool.combine_da_to_df_xesmf">
+<code class="descclassname">monet.util.combinetool.</code><code class="descname">combine_da_to_df_xesmf</code><span class="sig-paren">(</span><em>da</em>, <em>df</em>, <em>col=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.combinetool.combine_da_to_df_xesmf" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will combine an xarray data array with spatial information
+point observations in <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>da</strong> (<em>xr.DataArray</em>) – Description of parameter <cite>da</cite>.</li>
+<li><strong>df</strong> (<em>pd.DataFrame</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>lay</strong> (<em>iterable, default = [0]</em>) – Description of parameter <cite>lay</cite>.</li>
+<li><strong>radius</strong> (<em>integer or float, default = 12e3</em>) – Description of parameter <cite>radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.combinetool.combine_da_to_df_xesmf_strat">
+<code class="descclassname">monet.util.combinetool.</code><code class="descname">combine_da_to_df_xesmf_strat</code><span class="sig-paren">(</span><em>da</em>, <em>daz</em>, <em>df</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.combinetool.combine_da_to_df_xesmf_strat" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will combine an xarray data array with spatial information
+point observations in <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>da</strong> (<em>xr.DataArray</em>) – Description of parameter <cite>da</cite>.</li>
+<li><strong>daz</strong> (<em>xr.DataArray</em>) – Description of parameter <cite>daz</cite>.</li>
+<li><strong>df</strong> (<em>pd.DataFrame</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>lay</strong> (<em>iterable, default = [0]</em>) – Description of parameter <cite>lay</cite>.</li>
+<li><strong>radius</strong> (<em>integer or float, default = 12e3</em>) – Description of parameter <cite>radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.combinetool.combine_da_to_height_profile">
+<code class="descclassname">monet.util.combinetool.</code><code class="descname">combine_da_to_height_profile</code><span class="sig-paren">(</span><em>da</em>, <em>dset</em>, <em>radius_of_influence=12000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.combinetool.combine_da_to_height_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will combine an xarray.DataArray to a 2d dataset with
+dimensions (time,z)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>da</strong> (<em>xarray.DataArray</em>) – Description of parameter <cite>da</cite>.</li>
+<li><strong>dset</strong> (<em>xarray.Dataset</em>) – Description of parameter <cite>dset</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">returns the xarray.Dataset with the <cite>da</cite> added as an additional
+variable.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xarray.Dataset</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-monet.util.interp_util">
 <span id="monet-util-interp-util-module"></span><h2>monet.util.interp_util module<a class="headerlink" href="#module-monet.util.interp_util" title="Permalink to this headline">¶</a></h2>
