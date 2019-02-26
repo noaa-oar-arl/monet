@@ -208,7 +208,7 @@ class AERONET(object):
             self.dust_detect()
         if calc_550:
             self.calc_550nm()
-        return self.df.copy()
+        return self.df
 
     def calc_550nm(self):
         """Since AOD at 500nm is not calculated we use the extrapolation of
