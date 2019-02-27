@@ -98,7 +98,7 @@ class MONETAccessor(object):
         except ImportError:
             has_pyresample = False
         try:
-            if has_pyreample:
+            if has_pyresample:
                 lons, lats = utils.check_and_wrap(
                     self.obj.longitude.values, self.obj.latitude.values)
                 swath = llsd(longitude=lons, latitude=lats)
