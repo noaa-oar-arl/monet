@@ -1,7 +1,7 @@
 # FV3-CHEM READER
 
-import xarray as xr
 import dask
+import xarray as xr
 
 
 def open_dataset(fname):
@@ -65,7 +65,8 @@ def open_mfdataset(fname):
     except ValueError:
         print('''File format not recognized. Note that you must preprocess the
              files with nemsio2nc4 or fv3grib2nc4 available on github. Do not
-             mix and match file types.  Ensure all are the same file format.''')
+             mix and match file types.  Ensure all are the same file format.'''
+              )
     return f
 
 
