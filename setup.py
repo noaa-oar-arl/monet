@@ -20,8 +20,10 @@ setup(
     maintainer='Barry Baker',
     maintainer_email='barry.baker@noaa.gov',
     packages=find_packages(),
-    package_data={'': ['data/*.txt',
-                       'data/*.dat', 'data/*.hdf', 'data/*.ncf', 'data/*.jpg']},
+    package_data={
+        '':
+        ['data/*.txt', 'data/*.dat', 'data/*.hdf', 'data/*.ncf', 'data/*.jpg']
+    },
     keywords=[
         'model', 'verification', 'hysplit', 'cmaq', 'atmosphere', 'camx',
         'evaluation'
@@ -29,5 +31,5 @@ setup(
     description='The Model and Observation Evaluation Toolkit (MONET)',
     install_requires=[
         'pandas', 'netcdf4', 'xarray', 'dask', 'xesmf', 'pyresample',
-        'matplotlib', 'seaborn', 'pseudonetcdf', 'future']
-)
+        'matplotlib', 'seaborn', 'pseudonetcdf', 'future', 'cartopy'
+    ])
