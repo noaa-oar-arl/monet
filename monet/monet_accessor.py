@@ -94,6 +94,7 @@ class MONETAccessor(object):
             from pyresample import utils
             from .util.interp_util import nearest_point_swathdefinition as npsd
             from .util.interp_util import lonlat_to_swathdefinition as llsd
+            from numpy import concatenate
             has_pyresample = True
         except ImportError:
             has_pyresample = False
