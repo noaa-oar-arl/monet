@@ -102,15 +102,30 @@ class MONETAccessor(object):
                 lons, lats = utils.check_and_wrap(self.obj.longitude.values,
                                                   self.obj.latitude.values)
                 swath = llsd(longitude=lons, latitude=lats)
-                pswath_ll = npsd(longitude=lon_min, latitude=lat_min)
-                pswath_ur = npsd(longitude=lon_max, latitude=lat_max)
+                pswath_ll = npsd(
+                    longitude=float(lon_min), latitude=float(lat_min))
+                pswath_ur = npsd(
+                    longitude=float(lon_max), latitude=float(lat_max))
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                    swath, pswath_ll, 100000)
+                    swath, pswath_ll, 1e6)
                 y_ll, x_ll = row[0][0], col[0][0]
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                    swath, pswath_ur, 100000)
+                    swath, pswath_ur, 1e6)
                 y_ur, x_ur = row[0][0], col[0][0]
-                return self.obj.isel(x=slice(x_ll, x_ur), y=slice(y_ll, y_ur))
+                if x_ur < x_ll:
+                    x1 = self.obj.x.where(self.obj.x >= x_ll, drop=True).values
+                    x2 = self.obj.x.where(self.obj.x <= x_ur, drop=True).values
+                    xrange = concatenate([x1, x2]).astype(int)
+                    # xrange = arange(float(x_ur), float(x_ll), dtype=int)
+                else:
+                    xrange = slice(x_ll, x_ur)
+                if y_ur < y_ll:
+                    y1 = self.obj.y.where(self.obj.y >= y_ll, drop=True).values
+                    y2 = self.obj.y.where(self.obj.y <= y_ur, drop=True).values
+                    yrange = concatenate([y1, y2]).astype(int)
+                else:
+                    yrange = slice(y_ll, y_ur)
+                return self.obj.sel(x=xrange, y=yrange)
             else:
                 raise ImportError
         except ImportError:
@@ -773,6 +788,7 @@ class MONETAccessorDataset(object):
             from pyresample import utils
             from .util.interp_util import nearest_point_swathdefinition as npsd
             from .util.interp_util import lonlat_to_swathdefinition as llsd
+            from numpy import concatenate
             has_pyresample = True
         except ImportError:
             has_pyresample = False
@@ -791,7 +807,20 @@ class MONETAccessorDataset(object):
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
                     swath, pswath_ur, float(1e6))
                 y_ur, x_ur = row[0][0], col[0][0]
-                return self.obj.isel(x=slice(x_ll, x_ur), y=slice(y_ll, y_ur))
+                if x_ur < x_ll:
+                    x1 = self.obj.x.where(self.obj.x >= x_ll, drop=True).values
+                    x2 = self.obj.x.where(self.obj.x <= x_ur, drop=True).values
+                    xrange = concatenate([x1, x2]).astype(int)
+                    # xrange = arange(float(x_ur), float(x_ll), dtype=int)
+                else:
+                    xrange = slice(x_ll, x_ur)
+                if y_ur < y_ll:
+                    y1 = self.obj.y.where(self.obj.y >= y_ll, drop=True).values
+                    y2 = self.obj.y.where(self.obj.y <= y_ur, drop=True).values
+                    yrange = concatenate([y1, y2]).astype(int)
+                else:
+                    yrange = slice(y_ll, y_ur)
+                return self.obj.sel(x=xrange, y=yrange)
             else:
                 raise ImportError
         except ImportError:
