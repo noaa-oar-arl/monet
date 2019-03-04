@@ -1,7 +1,7 @@
 # FV3-CHEM READER
 
-import xarray as xr
 import dask
+import xarray as xr
 
 
 def open_dataset(fname):
@@ -65,7 +65,8 @@ def open_mfdataset(fname):
     except ValueError:
         print('''File format not recognized. Note that you must preprocess the
              files with nemsio2nc4 or fv3grib2nc4 available on github. Do not
-             mix and match file types.  Ensure all are the same file format.''')
+             mix and match file types.  Ensure all are the same file format.'''
+              )
     return f
 
 
@@ -163,10 +164,13 @@ def _fix_nemsio(f):
         f['geohgt'] = _calc_nemsio_hgt(f)
     except:
         print('geoht calculation not completed')
-    # try:
-    #     f['pres'] = _calc_nemsio_pressure(f)
-    # except:
-    #     print('pres calculation not completed...')
+    try:
+        from pyresample import utils
+        f['longitude'] = utils.wrap_longitudes(f.longitude)
+    except ImportError:
+        print(
+            'Users may need to wrap longitude values for plotting over 0 degrees'
+        )
     return f
 
 
@@ -316,6 +320,13 @@ def _fix_grib2(f):
     f['longitude'] = (('y', 'x'), lon)
     f['latitude'] = (('y', 'x'), lat)
     f = f.set_coords(['latitude', 'longitude'])
+    try:
+        from pyresample import utils
+        f['longitude'] = utils.wrap_longitudes(f.longitude)
+    except ImportError:
+        print(
+            'Users may need to wrap longitude values for plotting over 0 degrees'
+        )
     return f
 
 

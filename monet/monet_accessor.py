@@ -94,23 +94,39 @@ class MONETAccessor(object):
             from pyresample import utils
             from .util.interp_util import nearest_point_swathdefinition as npsd
             from .util.interp_util import lonlat_to_swathdefinition as llsd
+            from numpy import concatenate
             has_pyresample = True
         except ImportError:
             has_pyresample = False
         try:
-            if has_pyreample:
-                lons, lats = utils.check_and_wrap(
-                    self.obj.longitude.values, self.obj.latitude.values)
+            if has_pyresample:
+                lons, lats = utils.check_and_wrap(self.obj.longitude.values,
+                                                  self.obj.latitude.values)
                 swath = llsd(longitude=lons, latitude=lats)
-                pswath_ll = npsd(longitude=lon_min, latitude=lat_min)
-                pswath_ur = npsd(longitude=lon_max, latitude=lat_max)
+                pswath_ll = npsd(
+                    longitude=float(lon_min), latitude=float(lat_min))
+                pswath_ur = npsd(
+                    longitude=float(lon_max), latitude=float(lat_max))
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                    swath, pswath_ll, 100000)
+                    swath, pswath_ll, 1e6)
                 y_ll, x_ll = row[0][0], col[0][0]
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                    swath, pswath_ur, 100000)
+                    swath, pswath_ur, 1e6)
                 y_ur, x_ur = row[0][0], col[0][0]
-                return self.obj.isel(x=slice(x_ll, x_ur), y=slice(y_ll, y_ur))
+                if x_ur < x_ll:
+                    x1 = self.obj.x.where(self.obj.x >= x_ll, drop=True).values
+                    x2 = self.obj.x.where(self.obj.x <= x_ur, drop=True).values
+                    xrange = concatenate([x1, x2]).astype(int)
+                    # xrange = arange(float(x_ur), float(x_ll), dtype=int)
+                else:
+                    xrange = slice(x_ll, x_ur)
+                if y_ur < y_ll:
+                    y1 = self.obj.y.where(self.obj.y >= y_ll, drop=True).values
+                    y2 = self.obj.y.where(self.obj.y <= y_ur, drop=True).values
+                    yrange = concatenate([y1, y2]).astype(int)
+                else:
+                    yrange = slice(y_ll, y_ur)
+                return self.obj.sel(x=xrange, y=yrange)
             else:
                 raise ImportError
         except ImportError:
@@ -179,7 +195,12 @@ class MONETAccessor(object):
         out = resample_xesmf(self.obj, output, **kwargs)
         return rename_latlon(out)
 
-    def nearest_latlon(self, lat=None, lon=None, cleanup=True, **kwargs):
+    def nearest_latlon(self,
+                       lat=None,
+                       lon=None,
+                       cleanup=True,
+                       esmf=False,
+                       **kwargs):
         """Uses xesmf to intepolate to a given latitude and longitude.  Note
         that the conservative method is not available.
 
@@ -206,6 +227,8 @@ class MONETAccessor(object):
             has_pyresample = True
         except ImportError:
             has_pyresample = False
+        if esmf:
+            has_pyresample = False
 
         from .util.interp_util import lonlat_to_xesmf
         from .util.resample import resample_xesmf
@@ -216,14 +239,14 @@ class MONETAccessor(object):
             print('Must provide latitude and longitude')
 
         if has_pyresample:
-            lons, lats = utils.check_and_wrap(
-                self.obj.longitude.values, self.obj.latitude.values)
+            lons, lats = utils.check_and_wrap(self.obj.longitude.values,
+                                              self.obj.latitude.values)
             swath = llsd(longitude=lons, latitude=lats)
-            pswath = npsd(longitude=lon, latitude=lat)
+            pswath = npsd(longitude=float(lon), latitude=float(lat))
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                swath, pswath, 100000)
+                swath, pswath, float(1e6))
             y, x = row[0][0], col[0][0]
-            return self.obj.isel(x=x, y=y)
+            return self.obj.sel(x=x, y=y)
         else:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
             self.obj = rename_latlon(self.obj)
@@ -330,11 +353,11 @@ class MONETAccessor(object):
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
         dataarray = _rename_to_monet_latlon(dataarray)
-        lons_t, lats_t = utils.check_and_wrap(
-            self.obj.longitude.values, self.obj.latitude.values)
+        lons_t, lats_t = utils.check_and_wrap(self.obj.longitude.values,
+                                              self.obj.latitude.values)
         self.obj = _rename_to_monet_latlon(self.obj)
-        lons_s, lats_s = utils.check_and_wrap(
-            dataarray.longitude.values, dataarray.latitude.values)
+        lons_s, lats_s = utils.check_and_wrap(dataarray.longitude.values,
+                                              dataarray.latitude.values)
         target = llsd(longitude=lons_t, latitude=lats_t)
         source = llsd(latitude=lats_s, longitude=lons_s)
         # target = get_generic_projection_from_proj4(
@@ -368,8 +391,7 @@ class MONETAccessor(object):
         # check to see if grid is supplied
         target = rename_latlon(self.obj)
         source = rename_latlon(dataarray)
-        out = resample.resample_xesmf(
-            source, target, method=method, **kwargs)
+        out = resample.resample_xesmf(source, target, method=method, **kwargs)
         return _rename_to_monet_latlon(out)
 
     def combine_point(self, data, col=None, pyresample=False, **kwargs):
@@ -613,12 +635,12 @@ class MONETAccessorDataset(object):
         except ImportError:
             has_pyresample = False
         if has_pyresample:
-            lons, lats = utils.check_and_wrap(
-                self.obj.longitude.values, self.obj.latitude.values)
+            lons, lats = utils.check_and_wrap(self.obj.longitude.values,
+                                              self.obj.latitude.values)
             swath = llsd(longitude=lons, latitude=lats)
-            pswath = npsd(longitude=lon, latitude=lat)
+            pswath = npsd(longitude=float(lon), latitude=float(lat))
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                swath, pswath, 100000)
+                swath, pswath, float(1e6))
             y, x = row[0][0], col[0][0]
             return self.obj.isel(x=x, y=y)
         else:
@@ -767,23 +789,39 @@ class MONETAccessorDataset(object):
             from pyresample import utils
             from .util.interp_util import nearest_point_swathdefinition as npsd
             from .util.interp_util import lonlat_to_swathdefinition as llsd
+            from numpy import concatenate
             has_pyresample = True
         except ImportError:
             has_pyresample = False
         try:
             if has_pyresample:
-                lons, lats = utils.check_and_wrap(
-                    self.obj.longitude.values, self.obj.latitude.values)
+                lons, lats = utils.check_and_wrap(self.obj.longitude.values,
+                                                  self.obj.latitude.values)
                 swath = llsd(longitude=lons, latitude=lats)
-                pswath_ll = npsd(longitude=lon_min, latitude=lat_min)
-                pswath_ur = npsd(longitude=lon_max, latitude=lat_max)
+                pswath_ll = npsd(
+                    longitude=float(lon_min), latitude=float(lat_min))
+                pswath_ur = npsd(
+                    longitude=float(lon_max), latitude=float(lat_max))
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                    swath, pswath_ll, 100000)
+                    swath, pswath_ll, float(1e6))
                 y_ll, x_ll = row[0][0], col[0][0]
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                    swath, pswath_ur, 100000)
+                    swath, pswath_ur, float(1e6))
                 y_ur, x_ur = row[0][0], col[0][0]
-                return self.obj.isel(x=slice(x_ll, x_ur), y=slice(y_ll, y_ur))
+                if x_ur < x_ll:
+                    x1 = self.obj.x.where(self.obj.x >= x_ll, drop=True).values
+                    x2 = self.obj.x.where(self.obj.x <= x_ur, drop=True).values
+                    xrange = concatenate([x1, x2]).astype(int)
+                    # xrange = arange(float(x_ur), float(x_ll), dtype=int)
+                else:
+                    xrange = slice(x_ll, x_ur)
+                if y_ur < y_ll:
+                    y1 = self.obj.y.where(self.obj.y >= y_ll, drop=True).values
+                    y2 = self.obj.y.where(self.obj.y <= y_ur, drop=True).values
+                    yrange = concatenate([y1, y2]).astype(int)
+                else:
+                    yrange = slice(y_ll, y_ur)
+                return self.obj.sel(x=xrange, y=yrange)
             else:
                 raise ImportError
         except ImportError:
