@@ -33,9 +33,9 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
         elif loc == 3:
             dc.align_right()
         # sys.argv[0])[-5] + 'data/MONET_logo.png'
-        print(os.path.basename(__file__))
+        # print(os.path.basename(__file__))
         logo = os.path.abspath(__file__)[:-17] + 'data/MONET-logo.png'
-        print(logo)
+        # print(logo)
         dc.add_logo(logo)
         if fname.split('.')[-1] == 'png':
             img.save(fname, "PNG")
