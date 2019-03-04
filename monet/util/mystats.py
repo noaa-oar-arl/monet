@@ -151,11 +151,13 @@ def WDMdnE(obs, mod, axis=None):
     cb = circlebias(mod - obs)
     return np.ma.median(np.ma.abs(cb), axis=axis)
 
+
 def NME_m(obs, mod, axis=None):
     """ Normalized Mean Error (%) (avoid single block error in np.abs)"""
     out = (old_div(np.abs(mod - obs).sum(axis=axis),
                    obs.sum(axis=axis))) * 100
     return out
+
 
 def NME(obs, mod, axis=None):
     """ Normalized Mean Error (%)"""
@@ -361,6 +363,7 @@ def E1(obs, mod, axis=None):
     return 1.0 - old_div(
         (np.ma.abs(obs - mod)).sum(axis=axis),
         (np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
+
 
 def IOA_m(obs, mod, axis=None):
     """ Index of Agreement, IOA (avoid single block error in np.abs) """
