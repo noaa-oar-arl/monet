@@ -164,13 +164,13 @@ def _fix_nemsio(f):
         f['geohgt'] = _calc_nemsio_hgt(f)
     except:
         print('geoht calculation not completed')
-    try:
-        from pyresample import utils
-        f['longitude'] = utils.wrap_longitudes(f.longitude)
-    except ImportError:
-        print(
-            'Users may need to wrap longitude values for plotting over 0 degrees'
-        )
+    # try:
+    #     from pyresample import utils
+    #     f['longitude'] = utils.wrap_longitudes(f.longitude)
+    # except ImportError:
+    #     print(
+    #         'Users may need to wrap longitude values for plotting over 0 degrees'
+    #     )
     return f
 
 
@@ -320,13 +320,13 @@ def _fix_grib2(f):
     f['longitude'] = (('y', 'x'), lon)
     f['latitude'] = (('y', 'x'), lat)
     f = f.set_coords(['latitude', 'longitude'])
-    try:
-        from pyresample import utils
-        f['longitude'] = utils.wrap_longitudes(f.longitude)
-    except ImportError:
-        print(
-            'Users may need to wrap longitude values for plotting over 0 degrees'
-        )
+    # try:
+    #     from pyresample import utils
+    #     f['longitude'] = utils.wrap_longitudes(f.longitude)
+    # except ImportError:
+    #     print(
+    #         'Users may need to wrap longitude values for plotting over 0 degrees'
+    #     )
     return f
 
 
