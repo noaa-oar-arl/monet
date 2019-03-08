@@ -848,12 +848,6 @@ class MONETAccessorDataset(object):
         print('dataframe')
         print(df)
         from .util.combinetool import combine_da_to_df_xesmf
-        try:
-            if ~isinstance(df, pd.core.frame.DataFrame):
-                raise TypeError
-        except TypeError:
-            print('df must be of type pd.DataFrame')
-        for i in mapping_table:
-            df = combine_da_to_df_xesmf(
-                self.obj[mapping_table[i]], df, col=i, **kwargs)
+        for key, val in mapping_table.items():
+            df = combine_da_to_df_xesmf(self.obj[val], df, col=key, **kwargs)
         return df
