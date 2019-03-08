@@ -193,7 +193,7 @@ class Pardump():
                         # returns only particles with
                         par_frame = par_frame.loc[par_frame['sorti'].isin(
                             sorti)]
-                          # sort index in list sorti
+                        # sort index in list sorti
                     par_frame['date'] = pdate
                     par_frame.sort('ht', inplace=True)  # sort by height
                     # add a filename key
