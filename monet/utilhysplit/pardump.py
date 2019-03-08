@@ -47,9 +47,9 @@ class Pardump():
                                 ('year', tp2),
                                 ('month', tp2),
                                 ('day', tp2),
-            ('hour', tp2),
-            ('minute', tp2)
-        ])
+                                ('hour', tp2),
+                                ('minute', tp2)
+                                ])
 
         # data record in fortran file.
         self.pardt = np.dtype([('p1', tp2),
@@ -59,12 +59,12 @@ class Pardump():
                                ('lat', tp1),
                                ('lon', tp1),
                                ('ht', tp1),
-            ('su', tp1),
-            ('sv', tp1),
-            ('sx', tp1),
-            ('p4', '>l'),
-            ('age', tp2),
-            ('dist', tp2),
+                               ('su', tp1),
+                               ('sv', tp1),
+                               ('sx', tp1),
+                               ('p4', '>l'),
+                               ('age', tp2),
+                               ('dist', tp2),
             ('poll', tp2),
             ('mgrid', tp2),
             ('sorti', tp2)])
@@ -186,14 +186,14 @@ class Pardump():
                                    inplace=True, axis=1)  # drop other fields
                     # drop where the lat field is 0. because
                     par_frame = par_frame.loc[par_frame['lat'] != 0]
-                                                                            # in pardump file particles which have not been
-                                                                             # released yet
+                                                                      # in pardump file particles which have not been
+                                                                       # released yet
 
                     if sorti != []:
                         # returns only particles with
                         par_frame = par_frame.loc[par_frame['sorti'].isin(
                             sorti)]
-                                                                                      # sort index in list sorti
+                                                                                # sort index in list sorti
                     par_frame['date'] = pdate
                     par_frame.sort('ht', inplace=True)  # sort by height
                     # add a filename key

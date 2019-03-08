@@ -55,7 +55,7 @@ class EmiTimes(object):
         self.chash = {}
         self.sdatelist = []
         self.nanvalue = nanvalue  # if NaN shows up, what value to use.
-                            # if None, will throw and error if there a Nan
+                      # if None, will throw and error if there a Nan
         self.header = self.header_str()
 
     def header_str(self):
