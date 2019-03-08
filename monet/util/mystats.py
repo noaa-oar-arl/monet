@@ -368,7 +368,7 @@ def E1(obs, mod, axis=None):
 def IOA_m(obs, mod, axis=None):
     """ Index of Agreement, IOA (avoid single block error in np.abs) """
     obsmean = obs.mean(axis=axis)
-    if not axis is None:
+    if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
     return 1.0 - old_div(
         (np.abs(obs - mod)**2).sum(axis=axis),
@@ -378,7 +378,7 @@ def IOA_m(obs, mod, axis=None):
 def IOA(obs, mod, axis=None):
     """ Index of Agreement, IOA"""
     obsmean = obs.mean(axis=axis)
-    if not axis is None:
+    if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
     return 1.0 - old_div(
         (np.ma.abs(obs - mod)**2).sum(axis=axis),
