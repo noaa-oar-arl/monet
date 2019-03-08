@@ -1,10 +1,11 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-import numpy as np
 import datetime
+
+import numpy as np
 import pandas as pd
+
+
 #from pylab import matrix
-
-
 """
 PGRMMR: Alice Crawford ORG: ARL/CICS
 PYTHON 3
@@ -49,7 +50,7 @@ class ConcGrid():
     Methods
     -------
     __init__
-    get_nlev 
+    get_nlev
     set_annotate
     describe
     __str__
@@ -71,17 +72,25 @@ class ConcGrid():
     sample_stop
     sampletype
     interval
-    annotate : boolean 
+    annotate : boolean
     """
 
-    def __init__(self, name, levels=None,
-                 centerlat=0.0, centerlon=0.0,
-                 latdiff=-1.0, londiff=-1.0,
-                 latspan=90.0, lonspan=360.0,
-                 outdir='./', outfile='cdump', nlev=-1,
+    def __init__(self,
+                 name,
+                 levels=None,
+                 centerlat=0.0,
+                 centerlon=0.0,
+                 latdiff=-1.0,
+                 londiff=-1.0,
+                 latspan=90.0,
+                 lonspan=360.0,
+                 outdir='./',
+                 outfile='cdump',
+                 nlev=-1,
                  sample_start='00 00 00 00 00',
                  sample_stop='00 00 00 00 00',
-                 sampletype=0, interval=(-1, -1)):
+                 sampletype=0,
+                 interval=(-1, -1)):
         """
         Parameters
         ----------
@@ -90,7 +99,7 @@ class ConcGrid():
         center_lat : float
         center_lon : float
         interval is
-        sample type : integer (0 is average) 
+        sample type : integer (0 is average)
 
         Return
         -------
@@ -120,7 +129,7 @@ class ConcGrid():
 
     def set_annotate(self, on=True):
         """
-        write 
+        write
         """
         if on:
             self.annotate = True
@@ -316,8 +325,18 @@ class Species():
     def status():
         return Species.total
 
-    def __init__(self, name, psize=0, rate='1', duration=-1, density=2.5, shape=1, date="00 00 00 00 00", wetdep=1,
-                 vel='0.0 0.0 0.0 0.0 0.0', decay='0.0', resuspension='0.0'):
+    def __init__(self,
+                 name,
+                 psize=0,
+                 rate='1',
+                 duration=-1,
+                 density=2.5,
+                 shape=1,
+                 date="00 00 00 00 00",
+                 wetdep=1,
+                 vel='0.0 0.0 0.0 0.0 0.0',
+                 decay='0.0',
+                 resuspension='0.0'):
         self.name = name
         self.rate = rate
         self.duration = duration
@@ -350,8 +369,8 @@ class Species():
             self.datestr = self.date
         else:
             try:
-                self.date = datetime.datetime.strptime(
-                    lines[2].strip(), "%y %m %d %H %M")
+                self.date = datetime.datetime.strptime(lines[2].strip(),
+                                                       "%y %m %d %H %M")
                 self.datestr = self.date.strptime("%y %M %D %H")
             except:
                 print("warning: date not valid", lines[2])
@@ -467,13 +486,18 @@ class NameList():
             self.wdir = working_directory
 
     def _load_descrip(self):
-        self.descrip['ichem'] = 'Chemistry conversion modules. 0:none, 1:matrix , 2:convert, 3:dust'
+        self.descrip[
+            'ichem'] = 'Chemistry conversion modules. 0:none, 1:matrix , 2:convert, 3:dust'
         self.descrip['qcycle'] = 'Cycling of emission hours'
-        self.descrip['delt'] = 'integration time step (0=autoset, >0= constant ,<0=minimum)'
-        self.descrip['kmixd'] = 'mixed layer obtained from 0:input, 1:temperature, 2: TKE'
+        self.descrip[
+            'delt'] = 'integration time step (0=autoset, >0= constant ,<0=minimum)'
+        self.descrip[
+            'kmixd'] = 'mixed layer obtained from 0:input, 1:temperature, 2: TKE'
         self.descrip['kmix0'] = 'mixing depth. 250 minimum'
-        self.descrip['kzmis'] = 'Vertical mixing profile. 0:No adjustments. 1: vertical diffusivity in PBL single average value'
-        self.descrip['kbls'] = 'Stability computed by (1) Heat and momentum fluxes, 2: Wind and temperature profiles'
+        self.descrip[
+            'kzmis'] = 'Vertical mixing profile. 0:No adjustments. 1: vertical diffusivity in PBL single average value'
+        self.descrip[
+            'kbls'] = 'Stability computed by (1) Heat and momentum fluxes, 2: Wind and temperature profiles'
         self.descrip[
             'kblt'] = 'Flag to set vertical turbulence computational method. 1:Beljaars/Holtslag (2):Kanthar/Clayson 3:TKE field 4:Velocity Variances'
         self.descrip['initd'] = 'defines particle or puff mode'
@@ -488,9 +512,13 @@ class NameList():
             elif test == 2:
                 print('Top-Hat horizontal and vertical puff')
             elif test == 3:
-                print('Gaussian horizontal puff and vertical particle distribution')
+                print(
+                    'Gaussian horizontal puff and vertical particle distribution'
+                )
             elif test == 4:
-                print('Top-Hat horizontal puff and vertical particle distribution')
+                print(
+                    'Top-Hat horizontal puff and vertical particle distribution'
+                )
             else:
                 print('3D particle horizontal and vertical')
 
@@ -524,8 +552,8 @@ class NameList():
                 try:
                     fid.write(key.lower() + '=' + self.nlist[key] + ',\n')
                 except:
-                    print('WARNING: ' + str(key) + ' ' +
-                          str(self.nlist[key]) + ' not str')
+                    print('WARNING: ' + str(key) + ' ' + str(self.nlist[key]) +
+                          ' not str')
                     kstr = False
                 if not kstr:
                     fid.write(str(key) + '=' + str(self.nlist[key]) + ',\n')
@@ -540,11 +568,16 @@ class ControlLoc():
     def status():
         return ControlLoc.total
 
-    def __init__(self, line=False, latlon=(-1, -1), alt=10.0, rate=False, area=False):
+    def __init__(self,
+                 line=False,
+                 latlon=(-1, -1),
+                 alt=10.0,
+                 rate=False,
+                 area=False):
         """ Can either input a string (line from HYSPLIT CONTROL file) or can enter
             latlon = tuple (default(-1,-1))
             altitude= real (default (10.0))
-            rate 
+            rate
             area """
 
         if line:
@@ -599,7 +632,9 @@ class ControlLoc():
 class HycsControl():
     """class which represents the HYSPLIT control file and all the information in it"""
 
-    def __init__(self, fname='CONTROL', working_directory='./',
+    def __init__(self,
+                 fname='CONTROL',
+                 working_directory='./',
                  rtype='dispersion'):
         self.fname = fname
         if working_directory[-1] != '/':
@@ -636,10 +671,16 @@ class HycsControl():
         self.num_grids += 1
         self.concgrids.append(cgrid)
 
-    def add_location(self, line=False, latlon=(0, 0), alt=10.0, rate=False, area=False):
+    def add_location(self,
+                     line=False,
+                     latlon=(0, 0),
+                     alt=10.0,
+                     rate=False,
+                     area=False):
         self.nlocs += 1
-        self.locs.append(ControlLoc(line=line, latlon=latlon,
-                                    alt=alt, rate=rate, area=area))
+        self.locs.append(
+            ControlLoc(
+                line=line, latlon=latlon, alt=alt, rate=rate, area=area))
 
     def remove_locations(self, num=-99):
         if num == -99:
@@ -783,11 +824,11 @@ class HycsControl():
             #fid = open(self.fname, "r")
             content = fid.readlines()
             try:
-                self.date = datetime.datetime.strptime(
-                    content[0].strip(), "%y %m %d %H")
+                self.date = datetime.datetime.strptime(content[0].strip(),
+                                                       "%y %m %d %H")
             except:
-                self.date = datetime.datetime.strptime(
-                    content[0].strip(), "%y %m %d %H %M")
+                self.date = datetime.datetime.strptime(content[0].strip(),
+                                                       "%y %m %d %H %M")
             self.nlocs = int(content[1].strip())
             #self.locs = []
             zz = 2
@@ -840,7 +881,8 @@ class HycsControl():
             temp = int(content[zz].strip())
             if temp != self.num_sp:
                 print(
-                    'warning: number of species for deposition not equal to number of species')
+                    'warning: number of species for deposition not equal to number of species'
+                )
             nn = 0
             for ii in range(zz, zz + 5 * self.num_sp, 5):
                 lines = []
