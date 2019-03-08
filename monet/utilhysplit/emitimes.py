@@ -1,7 +1,8 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 #import sys
-import numpy as np
 import datetime
+
+import numpy as np
 
 
 """
@@ -18,7 +19,7 @@ class EmiTimes(object):
     """
     Class to represent and EMITTIMES file which can be used as input to HYSPLIT.
     Helper classes are EmitCycle which represents one emissions Cycle in the file
-    and EmitLine which represents one line in the file. 
+    and EmitLine which represents one line in the file.
 
 
     General usage is to initialize the class
@@ -92,7 +93,7 @@ class EmiTimes(object):
                     print('NEW CYCLE')
                 ec = EmitCycle()
                 nrecs = ec.parse_header(lines[iii])
-                check = ec.read_cycle(lines[iii + 1: iii + nrecs + 1])
+                check = ec.read_cycle(lines[iii + 1:iii + nrecs + 1])
                 if not check:
                     done = True
                 else:
@@ -118,8 +119,16 @@ class EmiTimes(object):
         for ec in self.cycle_list:
             ec.filter_records(llcrnr, urcrnr)
 
-    def add_record(self, date, duration, lat, lon,
-                   height, rate, area, heat, nanvalue=0):
+    def add_record(self,
+                   date,
+                   duration,
+                   lat,
+                   lon,
+                   height,
+                   rate,
+                   area,
+                   heat,
+                   nanvalue=0):
         """
         adds a record to a cycle based on the date of the record.
         """
@@ -132,9 +141,8 @@ class EmiTimes(object):
         if cycle_number == -1:
             rvalue = False
         else:
-            self.cycle_list[cycle_number].add_record(date, duration, lat, lon,
-                                                     height, rate, area, heat,
-                                                     nanvalue)
+            self.cycle_list[cycle_number].add_record(
+                date, duration, lat, lon, height, rate, area, heat, nanvalue)
             rvalue = True
         return rvalue
 
@@ -145,6 +153,7 @@ class EmitCycle(object):
     Each cycle begins with a line which has the start date, duration
     and number of records. Then the records follow.
     """
+
     # def __init__(self, filename='EMITIMES.txt'):
 
     def __init__(self, sdate=None, duration=None):
@@ -221,7 +230,15 @@ class EmitCycle(object):
         self.dummy_recordra.append(eline)
         self.drecs += 1
 
-    def add_record(self, sdate, duration, lat, lon, ht, rate, area, heat,
+    def add_record(self,
+                   sdate,
+                   duration,
+                   lat,
+                   lon,
+                   ht,
+                   rate,
+                   area,
+                   heat,
                    nanvalue=0):
         """Inputs
         sdate
@@ -293,7 +310,15 @@ class EmitLine(object):
 
     """
 
-    def __init__(self, date, duration, lat, lon, height, rate, area=0, heat=0,
+    def __init__(self,
+                 date,
+                 duration,
+                 lat,
+                 lon,
+                 height,
+                 rate,
+                 area=0,
+                 heat=0,
                  nanvalue=0):
         self.date = date
         self.duration = duration
