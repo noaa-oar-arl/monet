@@ -65,9 +65,9 @@ class Pardump():
                                ('p4', '>l'),
                                ('age', tp2),
                                ('dist', tp2),
-            ('poll', tp2),
-            ('mgrid', tp2),
-            ('sorti', tp2)])
+                               ('poll', tp2),
+                               ('mgrid', tp2),
+                               ('sorti', tp2)])
 
     def write(self, numpar, pmass, lon, lat, ht, pollnum, sdate):
         # numpar - number of particles
@@ -186,14 +186,14 @@ class Pardump():
                                    inplace=True, axis=1)  # drop other fields
                     # drop where the lat field is 0. because
                     par_frame = par_frame.loc[par_frame['lat'] != 0]
-                                                                      # in pardump file particles which have not been
-                                                                       # released yet
+                                                                # in pardump file particles which have not been
+                                                                 # released yet
 
                     if sorti != []:
                         # returns only particles with
                         par_frame = par_frame.loc[par_frame['sorti'].isin(
                             sorti)]
-                                                                                # sort index in list sorti
+                                                                          # sort index in list sorti
                     par_frame['date'] = pdate
                     par_frame.sort('ht', inplace=True)  # sort by height
                     # add a filename key
