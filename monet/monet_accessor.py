@@ -845,9 +845,10 @@ class MONETAccessorDataset(object):
             Description of returned object.
 
         """
-        print('dataframe')
-        print(df)
-        from .util.combinetool import combine_da_to_df_xesmf
+        # from .util.combinetool import combine_da_to_df_xesmf
         for key, val in mapping_table.items():
-            df = combine_da_to_df_xesmf(self.obj[val], df, col=key, **kwargs)
+            print(key, val)
+            print(df.head())
+            df = self.obj[key].monet.combine_point(df, col=val, **kwargs)
+        print(df.head())
         return df
