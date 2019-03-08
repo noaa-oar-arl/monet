@@ -1,8 +1,10 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 #from math import *
-import numpy as np
 import datetime
+
+import numpy as np
 import pandas as pd
+
 
 """
 PGRMMR: Alice Crawford ORG: ARL/CICS
@@ -14,7 +16,7 @@ CLASSES
 
 FUNCTIONS
     none
-    
+
 
 
 """
@@ -31,8 +33,8 @@ class Pardump():
 
     def __init__(self, fname='PARINIT'):
         """
-        ##initializes structures which correspond to the binary records. 
-        ##'p' variables coorespond to padding that fortran adds. 
+        ##initializes structures which correspond to the binary records.
+        ##'p' variables coorespond to padding that fortran adds.
         """
         self.fname = fname
         self.dtfmt = "%Y%m%d%H%M"
@@ -41,32 +43,17 @@ class Pardump():
         tp2 = '>i'  # big endian integer.
 
         # header record in fortran file.
-        self.hdr_dt = np.dtype([('padding', tp2),
-                                ('parnum', tp2),
-                                ('pollnum', tp2),
-                                ('year', tp2),
-                                ('month', tp2),
-                                ('day', tp2),
-                                ('hour', tp2),
-                                ('minute', tp2)
-                                ])
+        self.hdr_dt = np.dtype([('padding', tp2), ('parnum', tp2),
+                                ('pollnum', tp2), ('year', tp2), ('month',
+                                                                  tp2),
+                                ('day', tp2), ('hour', tp2), ('minute', tp2)])
 
         # data record in fortran file.
-        self.pardt = np.dtype([('p1', tp2),
-                               ('p2', tp2),
-                               ('pmass', tp1),
-                               ('p3', '>l'),
-                               ('lat', tp1),
-                               ('lon', tp1),
-                               ('ht', tp1),
-                               ('su', tp1),
-                               ('sv', tp1),
-                               ('sx', tp1),
-                               ('p4', '>l'),
-                               ('age', tp2),
-                               ('dist', tp2),
-                               ('poll', tp2),
-                               ('mgrid', tp2),
+        self.pardt = np.dtype([('p1', tp2), ('p2', tp2), ('pmass', tp1),
+                               ('p3', '>l'), ('lat', tp1), ('lon', tp1),
+                               ('ht', tp1), ('su', tp1), ('sv', tp1),
+                               ('sx', tp1), ('p4', '>l'), ('age', tp2),
+                               ('dist', tp2), ('poll', tp2), ('mgrid', tp2),
                                ('sorti', tp2)])
 
     def write(self, numpar, pmass, lon, lat, ht, pollnum, sdate):
@@ -84,7 +71,7 @@ class Pardump():
             sorti = np.arange(1, numpar + 1)
 
             print(len(lon))
-            a = np.zeros((numpar,), dtype=self.pardt)
+            a = np.zeros((numpar, ), dtype=self.pardt)
             a['p1'] = pad1
             a['p2'] = pad2
             a['p3'] = pad3
@@ -104,7 +91,7 @@ class Pardump():
 
             # print a
 
-            hdr = np.zeros((1,), dtype=self.hdr_dt)
+            hdr = np.zeros((1, ), dtype=self.hdr_dt)
             hdr['padding'] = 28
             hdr['parnum'] = numpar
             hdr['pollnum'] = 1
@@ -130,9 +117,9 @@ class Pardump():
         ##and ending date of the particle positions of interest.
         ##returns a dictionary. The key is the date of the particle positions in YYMMDDHH.
         ##The value is a pandas dataframe object with the particle information.
-        ##sorti is a list of sort indices. If not [] then will only return particles with those sort indices. 
+        ##sorti is a list of sort indices. If not [] then will only return particles with those sort indices.
         ##nsort keeps track of which particle it is throughout the time.
-        ##Could use this to keep track of initial height and time of release. 
+        ##Could use this to keep track of initial height and time of release.
 
 
         """
@@ -155,8 +142,8 @@ class Pardump():
                     year = hdata['year'] + century
                 else:
                     year = hdata['year']
-                pdate = datetime.datetime(
-                    year, hdata['month'], hdata['day'], hdata['hour'], hdata['minute'])
+                pdate = datetime.datetime(year, hdata['month'], hdata['day'],
+                                          hdata['hour'], hdata['minute'])
                 # if drange==[]:
                 #   drange = [pdate, pdate]
                 parnum = hdata['parnum']
@@ -181,9 +168,11 @@ class Pardump():
                         ndata)  # create data frame
                     # drop the fields which were padding
                     par_frame.drop(['p1', 'p2', 'p3', 'p4'],
-                                   inplace=True, axis=1)
+                                   inplace=True,
+                                   axis=1)
                     par_frame.drop(['su', 'sv', 'sx', 'mgrid'],
-                                   inplace=True, axis=1)  # drop other fields
+                                   inplace=True,
+                                   axis=1)  # drop other fields
                     # drop where the lat field is 0. because
                     par_frame = par_frame.loc[par_frame['lat'] != 0]
                     # in pardump file particles which have not been
@@ -200,7 +189,8 @@ class Pardump():
                     par_frame = pd.concat([par_frame], keys=[self.fname])
                     # create dictionary key for output.
                     datekey = pdate.strftime(self.dtfmt)
-                    pframe_hash[datekey] = par_frame  # Add value to dictionary.
+                    pframe_hash[
+                        datekey] = par_frame  # Add value to dictionary.
 
                 # Assume data is written sequentially by date.
                 i += 1
