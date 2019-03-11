@@ -125,8 +125,8 @@ def WDNMB_m(obs, mod, axis=None):
     """ Wind Direction Normalized Mean Bias (%) (avoid single block error in np.ma)"""
     return circlebias_m(mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.
 
-def NMB_TEMP(obs, mod, axis=None):
-    """ Temperature (C) Normalized Mean Bias (%)"""
+def NMB_ABS(obs, mod, axis=None):
+    """ Normalized Mean Bias - Absolute of the denominator (%)"""
     return (mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)) * 100.
 
 def NMdnB(obs, mod, axis=None):
@@ -172,8 +172,8 @@ def NME_m(obs, mod, axis=None):
                    obs.sum(axis=axis))) * 100
     return out
 
-def NME_m_TEMP(obs, mod, axis=None):
-    """ Temperature Normalized Mean Error (%) (avoid single block error in np.ma)"""
+def NME_m_ABS(obs, mod, axis=None):
+    """ Normalized Mean Error (%) - Absolute of the denominator (avoid single block error in np.ma)"""
     out = (old_div(np.abs(mod - obs).sum(axis=axis),
                   np.abs(obs.sum(axis=axis)))) * 100
     return out
