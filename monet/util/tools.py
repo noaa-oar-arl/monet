@@ -76,8 +76,8 @@ def wsdir2uv(ws, wdir):
 
 
 def get_relhum(temp, press, vap):
-    #temp:  temperature (K)
-    #press: pressure (Pa)
+    # temp:  temperature (K)
+    # press: pressure (Pa)
     # vap:   water vapor mixing ratio (kg/kg)
     temp_o = 273.16
     es_vap = 611.0 * np.exp(17.67 * ((temp - temp_o) / (temp - 29.65)))
