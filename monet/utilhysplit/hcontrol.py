@@ -1,11 +1,8 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 import datetime
 
-import numpy as np
-import pandas as pd
 
-
-#from pylab import matrix
+# from pylab import matrix
 """
 PGRMMR: Alice Crawford ORG: ARL/CICS
 PYTHON 3

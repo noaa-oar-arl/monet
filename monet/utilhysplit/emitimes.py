@@ -1,5 +1,3 @@
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-#import sys
 import datetime
 
 import numpy as np
@@ -176,7 +174,7 @@ class EmitCycle(object):
         month = int(temp[1])
         day = int(temp[2])
         hour = int(temp[3])
-        #minute = int(temp[4])
+        # minute = int(temp[4])
         dhour = int(temp[4])
         nrecs = int(temp[5])
         self.sdate = datetime.datetime(year, month, day, hour)
@@ -264,8 +262,8 @@ class EmitCycle(object):
     def read_cycle(self, lines, verbose=False):
         check = True
         recordra = []
-        #header = fid.readline()
-        #if verbose: print('HEADER', header, str(self.nrecs))
+        # header = fid.readline()
+        # if verbose: print('HEADER', header, str(self.nrecs))
         # if not header:
         #  check=False
         # else:
