@@ -847,8 +847,8 @@ class MONETAccessorDataset(object):
         """
         # from .util.combinetool import combine_da_to_df_xesmf
         for key, val in mapping_table.items():
-            print(key, val)
-            print(df.head())
+            # print(key, val)
+            # print(df.head())
             df = self.obj[key].monet.combine_point(df, col=val, **kwargs)
         print(df.head())
         return df
