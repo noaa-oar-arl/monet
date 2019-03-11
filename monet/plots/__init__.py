@@ -51,6 +51,7 @@ def sp_scatter_bias(df,
                     tight=True,
                     global_map=True,
                     map_kwargs={},
+                    cbar_kwargs={},
                     **kwargs):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
@@ -68,7 +69,7 @@ def sp_scatter_bias(df,
             x, y = df.longitude.values, df.latitude.values
             dfnew['sp_diff_size'] = dfnew['sp_diff'].abs() / top * 100.
             dfnew.loc[dfnew['sp_diff_size'] > 300, 'sp_diff_size'] = 300.
-            dfnew.plot.scatter(
+            n = dfnew.plot.scatter(
                 x='longitude',
                 y='latitude',
                 c=dfnew['sp_diff'],
@@ -76,7 +77,9 @@ def sp_scatter_bias(df,
                 vmin=-1 * top,
                 vmax=top,
                 ax=ax,
+                colorbar=False,
                 **kwargs)
+            plt.colorbar(n, **cbar_kwargs)
             if ~outline:
                 ax.outline_patch.set_alpha(0)
             if global_map:
