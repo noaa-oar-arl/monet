@@ -436,7 +436,7 @@ def circlebias(b):
 def WDIOA_m(obs, mod, axis=None):
     """ Wind Direction Index of Agreement, IOA (avoid single block error in np.ma)"""
     obsmean = obs.mean(axis=axis)
-    if not axis is None:
+    if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
     b = circlebias_m(mod - obs)
 
@@ -451,7 +451,7 @@ def WDIOA_m(obs, mod, axis=None):
 def WDIOA(obs, mod, axis=None):
     """ Wind Direction Index of Agreement, IOA"""
     obsmean = obs.mean(axis=axis)
-    if not axis is None:
+    if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
     b = circlebias(mod - obs)
 
@@ -467,7 +467,7 @@ def WDIOA(obs, mod, axis=None):
 def AC(obs, mod, axis=None):
     """ Anomaly Correlation """
     obs_bar = obs.mean(axis=axis)
-    if not axis is None:
+    if axis is not None:
         obs_bar = np.expand_dims(obs_bar, axis=axis)
     p1 = ((mod - obs_bar) * (obs - obs_bar)).sum(axis=axis)
     p2 = (((mod - obs_bar)**2).sum(axis=axis) * (
@@ -478,7 +478,7 @@ def AC(obs, mod, axis=None):
 def WDAC(obs, mod, axis=None):
     """ Wind Direction Anomaly Correlation """
     obs_bar = obs.mean(axis=axis)
-    if not axis is None:
+    if axis is not None:
         obs_bar = np.expand_dims(obs_bar, axis=axis)
     p1 = (circlebias(mod - obs_bar) * circlebias(obs - obs_bar)).sum(axis=axis)
     p2 = ((circlebias(mod - obs_bar)**2).sum(axis=axis) *
