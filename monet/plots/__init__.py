@@ -77,7 +77,7 @@ def sp_scatter_bias(df,
                 vmin=-1 * top,
                 vmax=top,
                 ax=ax,
-                **kwargs)
+                kwargs)
 
             # n = dfnew.plot.scatter(
             #     x='longitude',
@@ -89,7 +89,7 @@ def sp_scatter_bias(df,
             #     ax=ax,
             #     colorbar=False,
             #     **kwargs)
-            plt.colorbar(ax, **cbar_kwargs)
+            plt.colorbar(**cbar_kwargs)
             if ~outline:
                 ax.outline_patch.set_alpha(0)
             if global_map:
