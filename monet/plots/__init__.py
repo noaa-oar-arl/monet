@@ -69,14 +69,13 @@ def sp_scatter_bias(df,
             x, y = df.longitude.values, df.latitude.values
             dfnew['sp_diff_size'] = dfnew['sp_diff'].abs() / top * 100.
             dfnew.loc[dfnew['sp_diff_size'] > 300, 'sp_diff_size'] = 300.
-            ax = plt.scatter(
+            ax = ax.scatter(
                 dfnew.longitude,
                 dfnew.latitude,
                 c=dfnew['sp_diff'],
                 s=dfnew['sp_diff_size'],
                 vmin=-1 * top,
                 vmax=top,
-                ax=ax,
                 **kwargs)
 
             # n = dfnew.plot.scatter(
