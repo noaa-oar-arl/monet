@@ -77,7 +77,7 @@ def sp_scatter_bias(df,
                 vmin=-1 * top,
                 vmax=top,
                 ax=ax,
-                kwargs)
+                **kwargs)
 
             # n = dfnew.plot.scatter(
             #     x='longitude',
