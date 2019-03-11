@@ -28,6 +28,7 @@ def MNE(obs, mod, axis=None):
     return np.ma.masked_invalid(old_div(np.ma.abs(mod - obs),
                                         obs)).mean(axis=axis) * 100.
 
+
 def MdnNB(obs, mod, axis=None):
     """ Median Normalized Bias (%)"""
     return np.ma.median(
@@ -102,6 +103,9 @@ def MdnB(obs, mod, axis=None):
     """ Median Bias"""
     return np.ma.median(mod - obs, axis=axis)
 
+def WDMB_m(obs, mod, axis=None):
+    """ Wind Direction Mean Bias (avoid single block error in np.ma)"""
+    return circlebias_m(mod - obs).mean(axis=axis)
 
 def WDMB(obs, mod, axis=None):
     """ Wind Direction Mean Bias"""
@@ -117,6 +121,13 @@ def NMB(obs, mod, axis=None):
     """ Normalized Mean Bias (%)"""
     return (mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.
 
+def WDNMB_m(obs, mod, axis=None):
+    """ Wind Direction Normalized Mean Bias (%) (avoid single block error in np.ma)"""
+    return circlebias_m(mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.
+
+def NMB_TEMP(obs, mod, axis=None):
+    """ Temperature (C) Normalized Mean Bias (%)"""
+    return (mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)) * 100.
 
 def NMdnB(obs, mod, axis=None):
     """ Normalized Median Bias (%)"""
@@ -140,6 +151,9 @@ def MdnE(obs, mod, axis=None):
     """ Median Gross Error (model and obs unit)"""
     return np.ma.median(np.ma.abs(mod - obs), axis=axis)
 
+def WDME_m(obs, mod, axis=None):
+    """ Wind Direction Mean Gross Error (model and obs unit) (avoid single block error in np.ma)"""
+    return np.abs(circlebias_m(mod - obs)).mean(axis=axis)
 
 def WDME(obs, mod, axis=None):
     """ Wind Direction Mean Gross Error (model and obs unit)"""
@@ -153,11 +167,16 @@ def WDMdnE(obs, mod, axis=None):
 
 
 def NME_m(obs, mod, axis=None):
-    """ Normalized Mean Error (%) (avoid single block error in np.abs)"""
+    """ Normalized Mean Error (%) (avoid single block error in np.ma)"""
     out = (old_div(np.abs(mod - obs).sum(axis=axis),
                    obs.sum(axis=axis))) * 100
     return out
 
+def NME_m_TEMP(obs, mod, axis=None):
+    """ Temperature Normalized Mean Error (%) (avoid single block error in np.ma)"""
+    out = (old_div(np.abs(mod - obs).sum(axis=axis),
+                  np.abs(obs.sum(axis=axis)))) * 100
+    return out
 
 def NME(obs, mod, axis=None):
     """ Normalized Mean Error (%)"""
@@ -304,6 +323,9 @@ def RMSE(obs, mod, axis=None):
     """ Root Mean Square Error (model unit)"""
     return np.ma.sqrt(((mod - obs)**2).mean(axis=axis))
 
+def WDRMSE_m(obs, mod, axis=None):
+    """ Wind Direction Root Mean Square Error (model unit) (avoid single block error in np.ma)"""
+    return np.sqrt(((circlebias_m(mod - obs))**2).mean(axis=axis))
 
 def WDRMSE(obs, mod, axis=None):
     """ Wind Direction Root Mean Square Error (model unit)"""
@@ -366,7 +388,7 @@ def E1(obs, mod, axis=None):
 
 
 def IOA_m(obs, mod, axis=None):
-    """ Index of Agreement, IOA (avoid single block error in np.abs) """
+    """ Index of Agreement, IOA (avoid single block error in np.ma) """
     obsmean = obs.mean(axis=axis)
     if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
@@ -385,12 +407,32 @@ def IOA(obs, mod, axis=None):
         ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) **
          2).sum(axis=axis))
 
+def circlebias_m(b):
+    """ avoid single block error in np.ma"""
+    b = np.where(b > 180, b - 360, b)
+    b = np.where(b < -180, b + 360, b)
+    return b
 
 def circlebias(b):
     b = np.ma.where(b > 180, b - 360, b)
     b = np.ma.where(b < -180, b + 360, b)
     return b
 
+
+def WDIOA_m(obs, mod, axis=None):
+    """ Wind Direction Index of Agreement, IOA (avoid single block error in np.ma)"""
+    obsmean = obs.mean(axis=axis)
+    if not axis is None:
+        obsmean = np.expand_dims(obsmean, axis=axis)
+    b = circlebias_m(mod - obs)
+
+    bhat = circlebias_m(mod - obsmean)
+
+    ohat = circlebias_m(obs - obsmean)
+
+    return 1.0 - old_div(
+        (np.abs(b)**2).sum(axis=axis),
+        ((np.abs(bhat) + np.abs(ohat))**2).sum(axis=axis))
 
 def WDIOA(obs, mod, axis=None):
     """ Wind Direction Index of Agreement, IOA"""

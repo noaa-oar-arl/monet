@@ -74,6 +74,15 @@ def wsdir2uv(ws, wdir):
     v = -ws * cos(wdir * pi / 180.)
     return u, v
 
+def get_relhum(temp, press, vap):
+    #temp:  temperature (K)
+    #press: pressure (Pa)
+    #vap:   water vapor mixing ratio (kg/kg)  
+    temp_o = 273.16
+    es_vap = 611.0*np.exp(17.67*((temp-temp_o)/(temp-29.65)))
+    ws_vap = 0.622*(es_vap/press)
+    relhum = 100.0*(vap/ws_vap)
+    return relhum
 
 def long_to_wide(df):
     from pandas import Series, merge
