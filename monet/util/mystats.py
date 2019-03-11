@@ -103,9 +103,11 @@ def MdnB(obs, mod, axis=None):
     """ Median Bias"""
     return np.ma.median(mod - obs, axis=axis)
 
+
 def WDMB_m(obs, mod, axis=None):
     """ Wind Direction Mean Bias (avoid single block error in np.ma)"""
     return circlebias_m(mod - obs).mean(axis=axis)
+
 
 def WDMB(obs, mod, axis=None):
     """ Wind Direction Mean Bias"""
@@ -121,13 +123,16 @@ def NMB(obs, mod, axis=None):
     """ Normalized Mean Bias (%)"""
     return (mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.
 
+
 def WDNMB_m(obs, mod, axis=None):
     """ Wind Direction Normalized Mean Bias (%) (avoid single block error in np.ma)"""
     return circlebias_m(mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.
 
+
 def NMB_TEMP(obs, mod, axis=None):
     """ Temperature (C) Normalized Mean Bias (%)"""
     return (mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)) * 100.
+
 
 def NMdnB(obs, mod, axis=None):
     """ Normalized Median Bias (%)"""
@@ -172,11 +177,13 @@ def NME_m(obs, mod, axis=None):
                    obs.sum(axis=axis))) * 100
     return out
 
+
 def NME_m_TEMP(obs, mod, axis=None):
     """ Temperature Normalized Mean Error (%) (avoid single block error in np.ma)"""
     out = (old_div(np.abs(mod - obs).sum(axis=axis),
-                  np.abs(obs.sum(axis=axis)))) * 100
+                   np.abs(obs.sum(axis=axis)))) * 100
     return out
+
 
 def NME(obs, mod, axis=None):
     """ Normalized Mean Error (%)"""
@@ -397,6 +404,7 @@ def IOA_m(obs, mod, axis=None):
         ((np.abs(mod - obsmean) + np.abs(obs - obsmean)) **
          2).sum(axis=axis))
 
+
 def IOA(obs, mod, axis=None):
     """ Index of Agreement, IOA"""
     obsmean = obs.mean(axis=axis)
@@ -407,11 +415,13 @@ def IOA(obs, mod, axis=None):
         ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) **
          2).sum(axis=axis))
 
+
 def circlebias_m(b):
     """ avoid single block error in np.ma"""
     b = np.where(b > 180, b - 360, b)
     b = np.where(b < -180, b + 360, b)
     return b
+
 
 def circlebias(b):
     b = np.ma.where(b > 180, b - 360, b)
