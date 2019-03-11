@@ -12,11 +12,14 @@ PYTHON 3
 ABSTRACT: classes and functions for creating HYSPLIT control and setup files.
 
    CLASSES
-   HycsControl: class for reading / writing a HYSPLIT dispersion run  control file
+   HycsControl: class for reading / writing a HYSPLIT dispersion run  control
+                file
    Helper classes for HycsControl class
            ControlLoc: release location for  CONTROL file.
-           Species: class representing pollutant properties as defined in CONTROL file
-           ConcGrid: class representing concentration grid as defined in CONTROL file
+           Species: class representing pollutant properties as defined in
+                    CONTROL file
+           ConcGrid: class representing concentration grid as defined in
+                     CONTROL file
    NameList: class for writing SETUP.CFG file
 
    FUNCTIONS
@@ -46,7 +49,8 @@ def writelanduse(landusedir, working_directory='./'):
 
 
 class ConcGrid():
-    """concentration grid as defined by 10 lines in the HYSPLIT concentration CONTROL file.
+    """concentration grid as defined by 10 lines in the HYSPLIT concentration
+      CONTROL file.
     Methods
     -------
     __init__
@@ -144,7 +148,8 @@ class ConcGrid():
             self.nlev = len(self.levels)
 
     def __str__(self):
-        """string method will output ten lines suitable for inserting into a HYSPLIT control file"""
+        """string method will output ten lines suitable for inserting into a
+        HYSPLIT control file"""
         pnotes = self.annotate
         note = ''
         if pnotes:
@@ -186,7 +191,8 @@ class ConcGrid():
         return returnstr
 
     def describe(self):
-        """describe prints out a description of what the lines in the control file mean"""
+        """describe prints out a description of what the lines in the
+        control file mean"""
         returnstr = "Center of Lat and Lon: " + \
             str(self.centerlat) + ' ' + str(self.centerlon) + '\n'
         returnstr += "Spacing (deg) Lat, Lon: " + \
@@ -230,7 +236,8 @@ class ConcGrid():
         Parameters
         -----------
         lines : string
-        input list of 10 lines of the control file which define a concentration grid
+        input list of 10 lines of the control file which define a concentration
+        grid
 
         Return
         ------
@@ -353,7 +360,8 @@ class Species():
         self.datestr = "00 00 00 00 00"
 
     def definition(self, lines):
-        """input 3 lines from HYSPLIT CONTROL file which define a pollutant/species"""
+        """input 3 lines from HYSPLIT CONTROL file which define a
+        pollutant/species"""
         try:
             self.rate = float(lines[0])
         except:
@@ -380,7 +388,8 @@ class Species():
         return True
 
     def define_dep(self, lines):
-        """input list of 5 lines in CONTROL file that define deposition for pollutant"""
+        """input list of 5 lines in CONTROL file that define deposition for
+        pollutant"""
         temp = lines[0].strip().split()
         try:
             self.psize = float(temp[0])
@@ -403,7 +412,8 @@ class Species():
         return -1
 
     def strpollutant(self, annotate=False):
-        """Prints out three lines which define a species/pollutant in HYSPLIT control file"""
+        """Prints out three lines which define a species/pollutant in HYSPLIT
+        control file"""
         note = ''
         spc = ' ' * 20
         if annotate:
@@ -424,7 +434,8 @@ class Species():
         self.wetdepstr = wstr
 
     def strdep(self, annotate=True):
-        """Prints out five lines which define deposition and gravitational settling for species/pollutant in HYSPLIT control file"""
+        """Prints out five lines which define deposition and gravitational
+        settling for species/pollutant in HYSPLIT control file"""
         note = ''
         spc = ' ' * 20
         if annotate:

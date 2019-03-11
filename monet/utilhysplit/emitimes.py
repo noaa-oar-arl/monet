@@ -18,8 +18,8 @@ Emissions file see https://ready.arl.noaa.gov/hysplitusersguide/S417.htm
 class EmiTimes(object):
     """
     Class to represent and EMITTIMES file which can be used as input to HYSPLIT.
-    Helper classes are EmitCycle which represents one emissions Cycle in the file
-    and EmitLine which represents one line in the file.
+    Helper classes are EmitCycle which represents one emissions Cycle in the
+    file and EmitLine which represents one line in the file.
 
 
     General usage is to initialize the class

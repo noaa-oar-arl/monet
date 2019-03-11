@@ -9,7 +9,8 @@ import pandas as pd
 """
 PGRMMR: Alice Crawford ORG: ARL/CICS
 PYTHON 3
-ABSTRACT: classes and functions for reading and writing binary HYSPLIT PARDUMP file
+ABSTRACT: classes and functions for reading and writing binary HYSPLIT
+PARDUMP file
 
 CLASSES
     Pardump - contains methods to write or read a binary pardump file
@@ -28,7 +29,8 @@ class Pardump():
        write   writes a pardump file.
        read    reads a pardump file. returns a dictionary.
                Keys are the date of the particle positions in YYMMDDHH.
-               Values are pandas dataframe objects with the particle information.
+               Values are pandas dataframe objects with the particle
+               information.
     """
 
     def __init__(self, fname='PARINIT'):
@@ -113,11 +115,14 @@ class Pardump():
     #    read(self, drange=[], verbose=1, century=2000, sorti=[]):
 
     def read(self, drange=[], verbose=1, century=2000, sorti=[]):
-        """ daterange should be a list of two datetime.datetime objects indicating the beginning
+        """ daterange should be a list of two datetime.datetime objects
+        indicating the beginning
         ##and ending date of the particle positions of interest.
-        ##returns a dictionary. The key is the date of the particle positions in YYMMDDHH.
+        ##returns a dictionary. The key is the date of the particle positions in
+        ##YYMMDDHH.
         ##The value is a pandas dataframe object with the particle information.
-        ##sorti is a list of sort indices. If not [] then will only return particles with those sort indices.
+        ##sorti is a list of sort indices. If not [] then will only return
+        ##particles with those sort indices.
         ##nsort keeps track of which particle it is throughout the time.
         ##Could use this to keep track of initial height and time of release.
 
