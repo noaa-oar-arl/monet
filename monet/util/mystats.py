@@ -156,9 +156,11 @@ def MdnE(obs, mod, axis=None):
     """ Median Gross Error (model and obs unit)"""
     return np.ma.median(np.ma.abs(mod - obs), axis=axis)
 
+
 def WDME_m(obs, mod, axis=None):
     """ Wind Direction Mean Gross Error (model and obs unit) (avoid single block error in np.ma)"""
     return np.abs(circlebias_m(mod - obs)).mean(axis=axis)
+
 
 def WDME(obs, mod, axis=None):
     """ Wind Direction Mean Gross Error (model and obs unit)"""
