@@ -79,6 +79,7 @@ def sp_scatter_bias(df,
                 ax=ax,
                 colorbar=False,
                 **kwargs)
+            plt.colorbar(n)
             if ~outline:
                 ax.outline_patch.set_alpha(0)
             if global_map:
