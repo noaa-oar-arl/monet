@@ -815,6 +815,8 @@ class MONETAccessorDataset(object):
                     x1 = self.obj.x.where(self.obj.x >= x_ll, drop=True).values
                     x2 = self.obj.x.where(self.obj.x <= x_ur, drop=True).values
                     xrange = concatenate([x1, x2]).astype(int)
+                    self.obj['longitude'][:] = utils.wrap_longitudes(
+                        self.obj.longitude.values)
                     # xrange = arange(float(x_ur), float(x_ll), dtype=int)
                 else:
                     xrange = slice(x_ll, x_ur)
