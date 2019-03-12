@@ -149,10 +149,12 @@ def download_data(date, resolution='high'):
         # npp_eaot_ip_gridded_0.25_20181222.high.nc
     # print(year, yyyymmdd)
     file = 'npp_eaot_ip_gridded_0.25_{}.high.nc'.format(yyyymmdd)
-    ftp = ftplib.FTP(server)
-    ftp.login()
-    ftp.cwd(base_dir + year)
-    ftp.retrbinary("RETR " + file, open(file, 'wb').write)
+    exists = os.path.isfile(file)
+    if ~exists:
+        ftp = ftplib.FTP(server)
+        ftp.login()
+        ftp.cwd(base_dir + year)
+        ftp.retrbinary("RETR " + file, open(file, 'wb').write)
     return file, date
 
 
