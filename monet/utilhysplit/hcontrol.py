@@ -10,7 +10,7 @@ PGRMMR: Alice Crawford ORG: ARL/CICS
 PYTHON 3
 ABSTRACT: classes and functions for creating HYSPLIT control and setup files.
 
-   CLASSES
+CLASSES
    HycsControl: class for reading / writing a HYSPLIT dispersion run  control file
    Helper classes for HycsControl class
            ControlLoc: release location for  CONTROL file.
@@ -18,7 +18,7 @@ ABSTRACT: classes and functions for creating HYSPLIT control and setup files.
            ConcGrid: class representing concentration grid as defined in CONTROL file
    NameList: class for writing SETUP.CFG file
 
-   FUNCTIONS
+FUNCTIONS
    writelanduse - writes ASCDATA.CFG file.
 """
 
@@ -122,10 +122,7 @@ class ConcGrid():
         """
         write
         """
-        if on:
-            self.annotate = True
-        else:
-            self.annotate = False
+        self.annotate = on
 
     def get_nlev(self):
         """
@@ -172,8 +169,9 @@ class ConcGrid():
         if pnotes:
             note = '  # ' + self.typestr()
         returnstr += "{:02.0f}".format(self.sampletype) + ' '
-        returnstr += "{:02.0f}".format(self.interval[0]) + ' ' + "{:02.0f}".format(self.interval[1]) + \
-            note + '\n'
+        returnstr += "{:02.0f}".format(self.interval[0]) + ' '
+        returnstr += "{:02.0f}".format(self.interval[1]) + ' '
+        returnstr += note + '\n'
         return returnstr
 
     def describe(self):
@@ -206,15 +204,15 @@ class ConcGrid():
         tmstr = str(self.interval[0]).zfill(2) + \
             ':' + str(self.interval[1]).zfill(2)
         if self.sampletype == 0:
-            return 'Average over  ' + tmstr + ' with output every ' + tmstr
+            returnstr = 'Average over  ' + tmstr + ' with output every ' + tmstr
         elif self.sampletype == 1:
-            return 'Snapshot every ' + tmstr
+            returnstr = 'Snapshot every ' + tmstr
         elif self.sampletype == 2:
-            return 'Maximum every ' + tmstr
+            returnstr = 'Maximum every ' + tmstr
         elif self.sampletype < 0:
             returnstr = 'Average over ' + \
                 str(abs(self.sampletype)) + ' hours with output every ' + tmstr
-            return returnstr
+        return returnstr
 
     def definition(self, lines):
         """
@@ -227,41 +225,42 @@ class ConcGrid():
         ------
         boolean
         """
+        ret = True
         temp = lines[0].split()
         try:
             self.centerlat = float(temp[0])
         except TypeError:
             print('warning: center latitude not a float', temp[0])
-            return False
+            ret = False
         try:
             self.centerlon = float(temp[1])
         except TypeError:
             print('warning: center longitude not a float', temp[1])
-            return False
+            ret = False
 
         temp = lines[1].split()
         try:
             self.latdiff = float(temp[0])
         except TypeError:
             print('warning: spacing of latitude not a float', temp[0])
-            return False
+            ret = False
         try:
             self.londiff = float(temp[1])
         except TypeError:
             print('warning: spacing of longitude not a float', temp[1])
-            return False
+            ret = False
 
         temp = lines[2].split()
         try:
             self.latspan = float(temp[0])
         except TypeError:
             print('warning: span of latitude not a float', temp[0])
-            return False
+            ret = False
         try:
             self.lonspan = float(temp[1])
         except TypeError:
             print('warning: span of longitude not a float', temp[1])
-            return False
+            ret = False
 
         self.outdir = lines[3].strip()
         self.outfile = lines[4].strip()
@@ -271,7 +270,7 @@ class ConcGrid():
         except TypeError:
             print('warning: number of levels not an integer', lines[5])
             self.nlev = 0
-            return False
+            ret = False
 
         temp = lines[6].split()
         for lev in temp:
@@ -296,11 +295,12 @@ class ConcGrid():
             self.interval = (int(temp[1]), int(temp[2]))
         except TypeError:
             print('interval not integers', temp[1], temp[2])
-        return True
+        return ret
 
 
 class Species():
-    """Class which contains information to define a species or pollutant in a HYSPLIT control file.
+    """Class which contains information to define a species or pollutant
+       in a HYSPLIT control file.
        Methods
        -------
        __init__   : initialize attributes
@@ -314,9 +314,11 @@ class Species():
 
     @staticmethod
     def status():
+        """ total number of species objects"""
         return Species.total
 
-    def __init__(self, name, psize=0, rate='1', duration=-1, density=2.5, shape=1, date="00 00 00 00 00", wetdep=1,
+    def __init__(self, name, psize=0, rate='1', duration=-1, density=2.5,
+                 shape=1, date="00 00 00 00 00", wetdep=1,
                  vel='0.0 0.0 0.0 0.0 0.0', decay='0.0', resuspension='0.0'):
         self.name = name
         self.rate = rate
@@ -402,10 +404,15 @@ class Species():
         return returnval
 
     def add_wetdep(self, wstr):
+        """add wet deposition line
+           wstr : string
+        """
         self.wetdepstr = wstr
 
     def strdep(self, annotate=True):
-        """Prints out five lines which define deposition and gravitational settling for species/pollutant in HYSPLIT control file"""
+        """Prints out five lines which define deposition
+        and gravitational settling for species/pollutant
+        in HYSPLIT control file"""
         note = ''
         spc = ' ' * 20
         if annotate:
@@ -476,18 +483,31 @@ class NameList():
             self.wdir = working_directory
 
     def _load_descrip(self):
+        """creates dictionary with description of namelist parameters
+        """
         self.descrip['ichem'] = 'Chemistry conversion modules. 0:none, 1:matrix , 2:convert, 3:dust'
         self.descrip['qcycle'] = 'Cycling of emission hours'
         self.descrip['delt'] = 'integration time step (0=autoset, >0= constant ,<0=minimum)'
         self.descrip['kmixd'] = 'mixed layer obtained from 0:input, 1:temperature, 2: TKE'
         self.descrip['kmix0'] = 'mixing depth. 250 minimum'
-        self.descrip['kzmis'] = 'Vertical mixing profile. 0:No adjustments. 1: vertical diffusivity in PBL single average value'
-        self.descrip['kbls'] = 'Stability computed by (1) Heat and momentum fluxes, 2: Wind and temperature profiles'
-        self.descrip[
-            'kblt'] = 'Flag to set vertical turbulence computational method. 1:Beljaars/Holtslag (2):Kanthar/Clayson 3:TKE field 4:Velocity Variances'
+        self.descrip['kzmis'] = ('Vertical mixing profile.',
+                                 ' 0:No adjustments.',
+                                 ' 1: vertical diffusivity in PBL single',
+                                 ' average value')
+        self.descrip['kbls'] = ('Stability computed by'
+                                '(1) Heat and momentum fluxes,',
+                                ' 2: Wind and temperature profiles')
+        self.descrip['kblt'] = (
+            'Flag to set vertical turbulence computational',
+            'method. 1:Beljaars/Holtslag',
+            '(2):Kanthar/Clayson ',
+            ' 3:TKE field 4:Velocity Variances')
         self.descrip['initd'] = 'defines particle or puff mode'
 
     def summary(self):
+        """prints summmary.
+           Currently only prints description of INITD.
+        """
         if 'initd' in list(self.nlist.keys()):
             test = int(self.nlist['initd'])
             if test == 0:
@@ -553,6 +573,7 @@ class ControlLoc():
 
     @staticmethod
     def status():
+        """number of ControlLoc objects"""
         return ControlLoc.total
 
     def __init__(self, line=False, latlon=(-1, -1), alt=10.0, rate=-999,
@@ -573,6 +594,11 @@ class ControlLoc():
         ControlLoc.total += 1
 
     def definition(self, line):
+        """
+        line : string
+        takes line from CONTROL file and converts it to
+        latitude, longitude, altitude, rate, area attributes.
+        """
         temp = line.split()
         try:
             self.lat = float(temp[0])
@@ -597,6 +623,9 @@ class ControlLoc():
         self.latlon = (self.lat, self.lon)
 
     def __str__(self):
+        """
+        Returns string suitable for writing to CONTROL file.
+        """
         spc = " "
         returnstr = "{:.4f}".format(self.latlon[0])
         returnstr += spc
@@ -638,7 +667,6 @@ class HycsControl():
         self.vertical_motion = 1
         self.ztop = 10000
         self.date = None
-        
 
     def rename(self, name, working_directory='./'):
         """create new filename and working directory for the CONTROL file
@@ -692,6 +720,12 @@ class HycsControl():
                 area=area))
 
     def remove_locations(self, num=-99):
+        """
+        remove emission locations.
+        num : integer
+        default is to remove all locations.
+        otherwise remove location with indice num.
+        """
         if num == -99:
             self.nlocs = 0
             self.locs = []
@@ -700,12 +734,25 @@ class HycsControl():
             self.locs.pop(num)
 
     def add_ztop(self, ztop):
+        """
+        set the model top.
+        ztop : integer
+        """
         self.ztop = ztop
 
     def add_vmotion(self, vmotion):
+        """
+        set (or overwrite) the vertical motion method.
+        vmotion : integer
+        """
         self.vertical_motion = vmotion
 
     def add_metfile(self, metdir, metfile):
+        """
+        add an additional meteorological file
+        metdir :  string
+        metfile : string
+        """
         self.num_met += 1
         self.metfiles.append(metfile)
         self.metdirs.append(metdir)
@@ -726,7 +773,7 @@ class HycsControl():
         """will replace the duration if already exists"""
         self.run_duration = duration
 
-    def write(self, verbose=True, annotate=False):
+    def write(self, annotate=False):
         """writes CONTROL file to text file
            self.wdir + self.fname
         """
@@ -824,13 +871,16 @@ class HycsControl():
         print('Num of species ', self.num_sp)
         return True
 
-    def readlocs(self):
-        with open(self.fname, "r") as fid:
-            for line in fid:
-                #temp = line.strip().split(' ')
-                #latlon = (temp[0], temp[1])
-                self.locs.append(line.strip())
-                self.nlocs += 1
+    # def readlocs(self):
+    # """
+    # reads lines specifying locations.
+    # """
+    #    with open(self.fname, "r") as fid:
+    #        for line in fid:
+    #            #temp = line.strip().split(' ')
+    #            #latlon = (temp[0], temp[1])
+    #            self.locs.append(line.strip())
+    #            self.nlocs += 1
 
     def read(self, verbose=False):
         """

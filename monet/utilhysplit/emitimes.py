@@ -59,14 +59,31 @@ class EmiTimes(object):
         self.header = self.header_str()
 
     def header_str(self):
+        """
+        default header string for EMITTIMES file
+        RETURNS
+
+        returnval : str
+        """
         returnval = 'YYYY MM DD HH    DURATION(hhhh) #RECORDS \n'
-        returnval += 'YYYY MM DD HH MM DURATION(hhmm) LAT LON HGT(m) RATE(/h) AREA(m2) HEAT(w)  \n'
+        returnval += 'YYYY MM DD HH MM DURATION(hhmm) '
+        returnval += 'LAT LON HGT(m) RATE(/h) AREA(m2) HEAT(w)  \n'
         return returnval
 
     def modify_header(self, hstring):
         self.header = hstring
 
     def findmaxrec(self):
+        """
+        Find cycle with the most records and return number of records in that
+        cycle.
+        This is used when writing an EmitTimes file since HYSPLIT
+        requires each cycle to have the same number of records.
+        Cycles with less records will have dummy records added.
+        Returns
+        maxrec : int
+           maximum number of records.
+        """
         maxrec = 0
         for ec in self.cycle_list:
             if ec.nrecs > maxrec:
@@ -74,6 +91,10 @@ class EmiTimes(object):
         return maxrec
 
     def write_new(self, filename):
+        """
+        write a new EmitTimes file to filename.
+        filename : str
+        """
         maxrec = self.findmaxrec()
         with open(filename, 'w') as fid:
             fid.write(self.header)
@@ -83,6 +104,10 @@ class EmiTimes(object):
             ecycle.write_new(filename)
 
     def read_file(self, verbose=False):
+        """
+        Reads an EmitTimes file.
+        verbose: boolean
+        """
         with open(self.filename, 'r') as fid:
             lines = fid.readlines()
             #done = False
@@ -102,6 +127,13 @@ class EmiTimes(object):
                 iii += nrecs + 1
 
     def add_cycle(self, sdate, duration):
+        """
+        Adds information on a cycle to an EmiTimes object.
+        sdate: datetime object
+               start time of cycle.
+        duration : integer
+               duratio in hours of cycle.
+        """
         self.ncycles += 1
         ec = EmitCycle(sdate, duration)
         self.cycle_list.append(ec)
@@ -123,6 +155,9 @@ class EmiTimes(object):
                    height, rate, area, heat, nanvalue=0):
         """
         adds a record to a cycle based on the date of the record.
+        Returns:
+           rvalue : boolean
+           False if no cycle could be found to add the record to.
         """
         # This block determines which cycle the record goes into
         # based on the date.
@@ -192,6 +227,13 @@ class EmitCycle(object):
                 fid.write(str(record))
 
     def parse_record(self, record):
+        """
+        Takes a string which is a line in an EMITTIMES file
+        specifying an emission and turn it into an EmitLine object.
+        record : string
+        RETURNS
+        EmitLine object.
+        """
         temp = record.split()
         year = int(temp[0])
         month = int(temp[1])
@@ -240,12 +282,24 @@ class EmitCycle(object):
         self.nrecs += 1
 
     def read_cycle_header(self, header, verbose=False):
+        """
+        Read line containing header information for the emisson cycle.
+        header : str
+        verbose : boolean
+        """
         nrecs = self.parse_header(header)
         if verbose:
             print('HEADER', header)
         return nrecs
 
     def read_cycle(self, lines, verbose=False):
+        """
+        Take lines from an emittimes file and turn them into
+        instances of the EmitLine  class. Add them to the list of
+        EmitLine objects.
+        lines : list of str
+        verbose: boolean
+        """
         check = True
         recordra = []
         #header = fid.readline()
@@ -260,6 +314,7 @@ class EmitCycle(object):
         for temp in lines:
             if verbose:
                 print('Line', temp)
+            #parse record returns EmitLine object.
             recordra.append(self.parse_record(temp))
         self.recordra.extend(recordra)
         return check

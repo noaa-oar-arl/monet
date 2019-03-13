@@ -70,11 +70,17 @@ class Pardump():
                                ('sorti', tp2)])
 
     def write(self, numpar, pmass, lon, lat, ht, pollnum, sdate):
-        # numpar - number of particles
-        # pmass, lon , lat , ht, pollnum , sdate  should all be lists or numpy arrays
-        # mass, longitude, latitude, height (in meters), pollutant index
-        # (integer), date (datetime.datetime object).
-
+        """
+        numpar : integer
+                 number of particles
+        pmass   : lists or numpy array
+        lon     : list or numpy array
+        lat     : list or numpy array
+        ht      : list or numpy array
+        pollnum : integer
+                  pollutant index
+        sdate   : datetime.datetime object
+        """
         with open(self.fname, 'wb') as fp:
             pad1 = np.ones(numpar) * 28
             pad2 = np.ones(numpar) * 4
@@ -127,19 +133,23 @@ class Pardump():
     #    read(self, drange=[], verbose=1, century=2000, sorti=[]):
 
     def read(self, drange=None, verbose=1, century=2000, sorti=None):
-        """ daterange should be a list of two datetime.datetime objects indicating the beginning
-        ##and ending date of the particle positions of interest.
-        ##returns a dictionary. The key is the date of the particle positions in YYMMDDHH.
-        ##The value is a pandas dataframe object with the particle information.
-        ##sorti is a list of sort indices. If not [] then will only return particles with those sort indices.
-        ##nsort keeps track of which particle it is throughout the time.
-        ##Could use this to keep track of initial height and time of release.
-
-
+        """
+        daterange should be a list of two datetime.datetime objects
+        indicating the beginning
+        and ending date of the particle positions of interest.
+        Returns
+           pframehash :  dictionary.
+        The key is the date of the particle positions in YYMMDDHH.
+        The value is a pandas dataframe object with the particle information.
+        sorti is a list of sort indices. If sorti not None then will
+        only return particles
+        with those sort indices.
+        nsort keeps track of which particle it is throughout the time.
+        Could use this to keep track of initial height and time of release.
         """
 
         imax = 100
-        #fp = open(self.fname, 'rb')
+        # fp = open(self.fname, 'rb')
         # returns a dictionary of pandas dataframes. Date valid is the key.
         pframe_hash = {}
         with open(self.fname, 'rb') as fp:
@@ -149,7 +159,7 @@ class Pardump():
                 hdata = np.fromfile(fp, dtype=self.hdr_dt, count=1)
                 if verbose:
                     print('Record Header ', hdata)
-                #if len(hdata) == 0:
+                # if len(hdata) == 0:
                 if not hdata:
                     print('Done reading ', self.fname)
                     break
@@ -167,7 +177,7 @@ class Pardump():
                 #   drange = [pdate, pdate]
                 parnum = hdata['parnum']
                 data = np.fromfile(fp, dtype=self.pardt, count=parnum)
-                #n = parnum - 1
+                # n = parnum - 1
                 # padding at end of each record
                 np.fromfile(fp, dtype='>i', count=1)
                 if verbose:
