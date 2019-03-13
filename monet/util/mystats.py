@@ -332,9 +332,11 @@ def RMSE(obs, mod, axis=None):
     """ Root Mean Square Error (model unit)"""
     return np.ma.sqrt(((mod - obs)**2).mean(axis=axis))
 
+
 def WDRMSE_m(obs, mod, axis=None):
     """ Wind Direction Root Mean Square Error (model unit) (avoid single block error in np.ma)"""
     return np.sqrt(((circlebias_m(mod - obs))**2).mean(axis=axis))
+
 
 def WDRMSE(obs, mod, axis=None):
     """ Wind Direction Root Mean Square Error (model unit)"""
@@ -445,6 +447,7 @@ def WDIOA_m(obs, mod, axis=None):
     return 1.0 - old_div(
         (np.abs(b)**2).sum(axis=axis),
         ((np.abs(bhat) + np.abs(ohat))**2).sum(axis=axis))
+
 
 def WDIOA(obs, mod, axis=None):
     """ Wind Direction Index of Agreement, IOA"""
