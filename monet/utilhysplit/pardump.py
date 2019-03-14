@@ -191,7 +191,7 @@ class Pardump():
                     testdate = True
 
                # Only store data if it is in the daterange specified.
-                if testdate:  
+                if testdate:
                     print('Adding data ', hdata, pdate)
                     # otherwise get endian error message when create dataframe.
                     ndata = data.byteswap().newbyteorder()
