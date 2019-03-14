@@ -1,21 +1,27 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 import datetime
-#import numpy as np
-#import pandas as pd
-#from pylab import matrix
 
 
+# from pylab import matrix
 """
 PGRMMR: Alice Crawford ORG: ARL/CICS
 PYTHON 3
 ABSTRACT: classes and functions for creating HYSPLIT control and setup files.
 
+<<<<<<< HEAD
 CLASSES
    HycsControl: class for reading / writing a HYSPLIT dispersion run  control file
+=======
+   CLASSES
+   HycsControl: class for reading / writing a HYSPLIT dispersion run  control
+                file
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
    Helper classes for HycsControl class
            ControlLoc: release location for  CONTROL file.
-           Species: class representing pollutant properties as defined in CONTROL file
-           ConcGrid: class representing concentration grid as defined in CONTROL file
+           Species: class representing pollutant properties as defined in
+                    CONTROL file
+           ConcGrid: class representing concentration grid as defined in
+                     CONTROL file
    NameList: class for writing SETUP.CFG file
 
 FUNCTIONS
@@ -45,7 +51,8 @@ def writelanduse(landusedir, working_directory='./'):
 
 
 class ConcGrid():
-    """concentration grid as defined by 10 lines in the HYSPLIT concentration CONTROL file.
+    """concentration grid as defined by 10 lines in the HYSPLIT concentration
+      CONTROL file.
     Methods
     -------
     __init__
@@ -74,14 +81,22 @@ class ConcGrid():
     annotate : boolean
     """
 
-    def __init__(self, name, levels=None,
-                 centerlat=0.0, centerlon=0.0,
-                 latdiff=-1.0, londiff=-1.0,
-                 latspan=90.0, lonspan=360.0,
-                 outdir='./', outfile='cdump', nlev=-1,
+    def __init__(self,
+                 name,
+                 levels=None,
+                 centerlat=0.0,
+                 centerlon=0.0,
+                 latdiff=-1.0,
+                 londiff=-1.0,
+                 latspan=90.0,
+                 lonspan=360.0,
+                 outdir='./',
+                 outfile='cdump',
+                 nlev=-1,
                  sample_start='00 00 00 00 00',
                  sample_stop='00 00 00 00 00',
-                 sampletype=0, interval=(-1, -1)):
+                 sampletype=0,
+                 interval=(-1, -1)):
         """
         Parameters
         ----------
@@ -132,7 +147,8 @@ class ConcGrid():
             self.nlev = len(self.levels)
 
     def __str__(self):
-        """string method will output ten lines suitable for inserting into a HYSPLIT control file"""
+        """string method will output ten lines suitable for inserting into a
+        HYSPLIT control file"""
         pnotes = self.annotate
         note = ''
         if pnotes:
@@ -175,7 +191,8 @@ class ConcGrid():
         return returnstr
 
     def describe(self):
-        """describe prints out a description of what the lines in the control file mean"""
+        """describe prints out a description of what the lines in the
+        control file mean"""
         returnstr = "Center of Lat and Lon: " + \
             str(self.centerlat) + ' ' + str(self.centerlon) + '\n'
         returnstr += "Spacing (deg) Lat, Lon: " + \
@@ -219,12 +236,14 @@ class ConcGrid():
         Parameters
         -----------
         lines : string
-        input list of 10 lines of the control file which define a concentration grid
+        input list of 10 lines of the control file which define a concentration
+        grid
 
         Return
         ------
         boolean
         """
+<<<<<<< HEAD
         ret = True
         temp = lines[0].split()
         try:
@@ -261,22 +280,70 @@ class ConcGrid():
         except TypeError:
             print('warning: span of longitude not a float', temp[1])
             ret = False
+=======
+        temp = lines[0].split()
+        try:
+            self.centerlat = float(temp[0])
+        except:
+            print('warning: center latitude not a float', temp[0])
+            return False
+        try:
+            self.centerlon = float(temp[1])
+        except:
+            print('warning: center longitude not a float', temp[1])
+            return False
+
+        temp = lines[1].split()
+        try:
+            self.latdiff = float(temp[0])
+        except:
+            print('warning: spacing of latitude not a float', temp[0])
+            return False
+        try:
+            self.londiff = float(temp[1])
+        except:
+            print('warning: spacing of longitude not a float', temp[1])
+            return False
+
+        temp = lines[2].split()
+        try:
+            self.latspan = float(temp[0])
+        except:
+            print('warning: span of latitude not a float', temp[0])
+            return False
+        try:
+            self.lonspan = float(temp[1])
+        except:
+            print('warning: span of longitude not a float', temp[1])
+            return False
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
 
         self.outdir = lines[3].strip()
         self.outfile = lines[4].strip()
 
         try:
             self.nlev = int(lines[5])
+<<<<<<< HEAD
         except TypeError:
             print('warning: number of levels not an integer', lines[5])
             self.nlev = 0
             ret = False
+=======
+        except:
+            print('warning: number of levels not an integer', lines[5])
+            self.nlev = 0
+            return False
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
 
         temp = lines[6].split()
         for lev in temp:
             try:
                 lev = float(lev)
+<<<<<<< HEAD
             except TypeError:
+=======
+            except:
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
                 print('warning: level not a float', lev)
                 lev = -1
             self.levels.append(lev)
@@ -289,6 +356,7 @@ class ConcGrid():
         temp = lines[9].strip().split()
         try:
             self.sampletype = int(temp[0])
+<<<<<<< HEAD
         except TypeError:
             print('warning: sample type is not an integer', temp[0])
         try:
@@ -296,6 +364,15 @@ class ConcGrid():
         except TypeError:
             print('interval not integers', temp[1], temp[2])
         return ret
+=======
+        except:
+            print('warning: sample type is not an integer', temp[0])
+        try:
+            self.interval = (int(temp[1]), int(temp[2]))
+        except:
+            print('interval not integers', temp[1], temp[2])
+        return True
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
 
 
 class Species():
@@ -317,9 +394,24 @@ class Species():
         """ total number of species objects"""
         return Species.total
 
+<<<<<<< HEAD
     def __init__(self, name, psize=0, rate='1', duration=-1, density=2.5,
                  shape=1, date="00 00 00 00 00", wetdep=1,
                  vel='0.0 0.0 0.0 0.0 0.0', decay='0.0', resuspension='0.0'):
+=======
+    def __init__(self,
+                 name,
+                 psize=0,
+                 rate='1',
+                 duration=-1,
+                 density=2.5,
+                 shape=1,
+                 date="00 00 00 00 00",
+                 wetdep=1,
+                 vel='0.0 0.0 0.0 0.0 0.0',
+                 decay='0.0',
+                 resuspension='0.0'):
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         self.name = name
         self.rate = rate
         self.duration = duration
@@ -336,15 +428,24 @@ class Species():
         self.datestr = "00 00 00 00 00"
 
     def definition(self, lines):
-        """input 3 lines from HYSPLIT CONTROL file which define a pollutant/species"""
+        """input 3 lines from HYSPLIT CONTROL file which define a
+        pollutant/species"""
         try:
             self.rate = float(lines[0])
+<<<<<<< HEAD
         except BaseException:
+=======
+        except:
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
             print("warning: rate is not a float", lines[0])
             return False
         try:
             self.duration = float(lines[1])
+<<<<<<< HEAD
         except BaseException:
+=======
+        except:
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
             print("warning: duration is not a float", lines[1])
             return False
         if lines[2].strip()[0:2] == "00":
@@ -352,10 +453,17 @@ class Species():
             self.datestr = self.date
         else:
             try:
+<<<<<<< HEAD
                 self.date = datetime.datetime.strptime(
                     lines[2].strip(), "%y %m %d %H %M")
                 self.datestr = self.date.strptime("%y %M %D %H")
             except BaseException:
+=======
+                self.date = datetime.datetime.strptime(lines[2].strip(),
+                                                       "%y %m %d %H %M")
+                self.datestr = self.date.strptime("%y %M %D %H")
+            except:
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
                 print("warning: date not valid", lines[2])
                 self.date = lines[2].strip()
                 self.datestr = lines[2].strip()
@@ -363,10 +471,12 @@ class Species():
         return True
 
     def define_dep(self, lines):
-        """input list of 5 lines in CONTROL file that define deposition for pollutant"""
+        """input list of 5 lines in CONTROL file that define deposition for
+        pollutant"""
         temp = lines[0].strip().split()
         try:
             self.psize = float(temp[0])
+<<<<<<< HEAD
         except BaseException:
             print('warning: diameter not a float ', temp[0])
         try:
@@ -376,6 +486,17 @@ class Species():
         try:
             self.shape = float(temp[2])
         except BaseException:
+=======
+        except:
+            print('warning: diameter not a float ', temp[0])
+        try:
+            self.density = float(temp[1])
+        except:
+            print('warning: density not a float ', temp[1])
+        try:
+            self.shape = float(temp[2])
+        except:
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
             print('warning: shape not a float ', temp[2])
         # To do - read these in as floats
         self.vel = lines[1].strip()
@@ -386,7 +507,8 @@ class Species():
         return -1
 
     def strpollutant(self, annotate=False):
-        """Prints out three lines which define a species/pollutant in HYSPLIT control file"""
+        """Prints out three lines which define a species/pollutant in HYSPLIT
+        control file"""
         note = ''
         spc = ' ' * 20
         if annotate:
@@ -404,6 +526,7 @@ class Species():
         return returnval
 
     def add_wetdep(self, wstr):
+<<<<<<< HEAD
         """add wet deposition line
            wstr : string
         """
@@ -413,6 +536,13 @@ class Species():
         """Prints out five lines which define deposition
         and gravitational settling for species/pollutant
         in HYSPLIT control file"""
+=======
+        self.wetdepstr = wstr
+
+    def strdep(self, annotate=True):
+        """Prints out five lines which define deposition and gravitational
+        settling for species/pollutant in HYSPLIT control file"""
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         note = ''
         spc = ' ' * 20
         if annotate:
@@ -455,7 +585,11 @@ class NameList():
 
     def __init__(self, fname='SETUP.CFG', working_directory='./'):
         self.fname = fname
+<<<<<<< HEAD
         self.nlist = {}  # dictionary of lines in the file.
+=======
+        self.nlist = {}  # dictionary
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         self.descrip = {}
         self._load_descrip()
         if working_directory[-1] != '/':
@@ -475,21 +609,32 @@ class NameList():
         self.nlist[name.lower()] = value
 
     def rename(self, name, working_directory=''):
+<<<<<<< HEAD
         """
         create new name and/or working directory for file
         """
+=======
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         self.fname = name
         if working_directory:
             self.wdir = working_directory
 
     def _load_descrip(self):
+<<<<<<< HEAD
         """creates dictionary with description of namelist parameters
         """
         self.descrip['ichem'] = 'Chemistry conversion modules. 0:none, 1:matrix , 2:convert, 3:dust'
+=======
+        self.descrip[
+            'ichem'] = 'Chemistry conversion modules. 0:none, 1:matrix , 2:convert, 3:dust'
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         self.descrip['qcycle'] = 'Cycling of emission hours'
-        self.descrip['delt'] = 'integration time step (0=autoset, >0= constant ,<0=minimum)'
-        self.descrip['kmixd'] = 'mixed layer obtained from 0:input, 1:temperature, 2: TKE'
+        self.descrip[
+            'delt'] = 'integration time step (0=autoset, >0= constant ,<0=minimum)'
+        self.descrip[
+            'kmixd'] = 'mixed layer obtained from 0:input, 1:temperature, 2: TKE'
         self.descrip['kmix0'] = 'mixing depth. 250 minimum'
+<<<<<<< HEAD
         self.descrip['kzmis'] = ('Vertical mixing profile.',
                                  ' 0:No adjustments.',
                                  ' 1: vertical diffusivity in PBL single',
@@ -508,6 +653,17 @@ class NameList():
         """prints summmary.
            Currently only prints description of INITD.
         """
+=======
+        self.descrip[
+            'kzmis'] = 'Vertical mixing profile. 0:No adjustments. 1: vertical diffusivity in PBL single average value'
+        self.descrip[
+            'kbls'] = 'Stability computed by (1) Heat and momentum fluxes, 2: Wind and temperature profiles'
+        self.descrip[
+            'kblt'] = 'Flag to set vertical turbulence computational method. 1:Beljaars/Holtslag (2):Kanthar/Clayson 3:TKE field 4:Velocity Variances'
+        self.descrip['initd'] = 'defines particle or puff mode'
+
+    def summary(self):
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         if 'initd' in list(self.nlist.keys()):
             test = int(self.nlist['initd'])
             if test == 0:
@@ -517,9 +673,19 @@ class NameList():
             elif test == 2:
                 print('Top-Hat horizontal and vertical puff')
             elif test == 3:
+<<<<<<< HEAD
                 print('Gaussian horizontal puff and vertical particle distribution')
             elif test == 4:
                 print('Top-Hat horizontal puff and vertical particle distribution')
+=======
+                print(
+                    'Gaussian horizontal puff and vertical particle distribution'
+                )
+            elif test == 4:
+                print(
+                    'Top-Hat horizontal puff and vertical particle distribution'
+                )
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
             else:
                 print('3D particle horizontal and vertical')
 
@@ -531,9 +697,12 @@ class NameList():
         self.nlist['qcycle'] = '3'
 
     def read(self):
+<<<<<<< HEAD
         """
         read existing SETUP.CFG file.
         """
+=======
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         with open(self.wdir + self.fname, "r") as fid:
             content = fid.readlines()
         for line in content:
@@ -558,9 +727,15 @@ class NameList():
                 kstr = True
                 try:
                     fid.write(key.lower() + '=' + self.nlist[key] + ',\n')
+<<<<<<< HEAD
                 except BaseException:
                     print('WARNING: ' + str(key) + ' ' +
                           str(self.nlist[key]) + ' not str')
+=======
+                except:
+                    print('WARNING: ' + str(key) + ' ' + str(self.nlist[key]) +
+                          ' not str')
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
                     kstr = False
                 if not kstr:
                     fid.write(str(key) + '=' + str(self.nlist[key]) + ',\n')
@@ -576,8 +751,17 @@ class ControlLoc():
         """number of ControlLoc objects"""
         return ControlLoc.total
 
+<<<<<<< HEAD
     def __init__(self, line=False, latlon=(-1, -1), alt=10.0, rate=-999,
                  area=-999):
+=======
+    def __init__(self,
+                 line=False,
+                 latlon=(-1, -1),
+                 alt=10.0,
+                 rate=False,
+                 area=False):
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         """ Can either input a string (line from HYSPLIT CONTROL file) or can enter
             latlon = tuple (default(-1,-1))
             altitude= real (default (10.0))
@@ -632,10 +816,17 @@ class ControlLoc():
         returnstr += "{:.4f}".format(self.latlon[1])
         returnstr += spc
         returnstr += "{:.1f}".format(self.alt)
+<<<<<<< HEAD
         if self.rate != -999:
             returnstr += spc
             returnstr += "{:.0f}".format(self.rate)
         if self.rate != -999 and self.area != -999:
+=======
+        if self.rate:
+            returnstr += spc
+            returnstr += "{:.0f}".format(self.rate)
+        if self.area:
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
             returnstr += spc
             returnstr += "{:.2E}".format(self.area)
         return returnstr
@@ -644,7 +835,13 @@ class ControlLoc():
 class HycsControl():
     """class which represents the HYSPLIT control file and all the information in it"""
 
+<<<<<<< HEAD
     def __init__(self, fname='CONTROL', working_directory='./',
+=======
+    def __init__(self,
+                 fname='CONTROL',
+                 working_directory='./',
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
                  rtype='dispersion'):
         self.fname = fname
         if working_directory[-1] != '/':
@@ -661,6 +858,7 @@ class HycsControl():
         self.num_met = 0  # number of met files
         self.rtype = rtype  # dispersion or trajectory run.
 
+<<<<<<< HEAD
         self.outfile = 'cdump'
         self.outdir = './'
         self.run_duration = 1
@@ -671,6 +869,9 @@ class HycsControl():
     def rename(self, name, working_directory='./'):
         """create new filename and working directory for the CONTROL file
         """
+=======
+    def rename(self, name, working_directory='./'):
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         self.fname = name
         if working_directory[-1] != '/':
             working_directory += '/'
@@ -687,13 +888,17 @@ class HycsControl():
         self.species = []
 
     def add_species(self, species):
+<<<<<<< HEAD
         """add new species.
         species : Species class.
         """
+=======
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         self.num_sp += 1
         self.species.append(species)
 
     def add_cgrid(self, cgrid):
+<<<<<<< HEAD
         """add new concentration grid.
          cgrid : ConcGrid class.
          """
@@ -726,6 +931,23 @@ class HycsControl():
         default is to remove all locations.
         otherwise remove location with indice num.
         """
+=======
+        self.num_grids += 1
+        self.concgrids.append(cgrid)
+
+    def add_location(self,
+                     line=False,
+                     latlon=(0, 0),
+                     alt=10.0,
+                     rate=False,
+                     area=False):
+        self.nlocs += 1
+        self.locs.append(
+            ControlLoc(
+                line=line, latlon=latlon, alt=alt, rate=rate, area=area))
+
+    def remove_locations(self, num=-99):
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         if num == -99:
             self.nlocs = 0
             self.locs = []
@@ -734,6 +956,7 @@ class HycsControl():
             self.locs.pop(num)
 
     def add_ztop(self, ztop):
+<<<<<<< HEAD
         """
         set the model top.
         ztop : integer
@@ -753,6 +976,14 @@ class HycsControl():
         metdir :  string
         metfile : string
         """
+=======
+        self.ztop = ztop
+
+    def add_vmotion(self, vmotion):
+        self.vertical_motion = vmotion
+
+    def add_metfile(self, metdir, metfile):
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         self.num_met += 1
         self.metfiles.append(metfile)
         self.metdirs.append(metdir)
@@ -861,8 +1092,11 @@ class HycsControl():
         return False
 
     def summary(self):
+<<<<<<< HEAD
         """prints out summary of what is in CONTROL file
         """
+=======
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         print('CONTROL FILE')
         print('release start date', self.date)
         print('number of release locations', self.nlocs)
@@ -870,6 +1104,7 @@ class HycsControl():
         print('Num of met grids ', self.num_met)
         print('Num of species ', self.num_sp)
         return True
+<<<<<<< HEAD
 
     # def readlocs(self):
     # """
@@ -886,15 +1121,36 @@ class HycsControl():
         """
         Read in control file.
         """
+=======
+
+    def readlocs(self, fname):
+        with open(self.fname, "r") as fid:
+            for line in fid:
+                temp = line.strip().split(' ')
+                #latlon = (temp[0], temp[1])
+                self.locs.append(line.strip())
+
+                self.nlocs += 1
+
+    def read(self, verbose=False):
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         with open(self.wdir + self.fname, "r") as fid:
             #fid = open(self.fname, "r")
             content = fid.readlines()
             try:
+<<<<<<< HEAD
                 self.date = datetime.datetime.strptime(
                     content[0].strip(), "%y %m %d %H")
             except BaseException:
                 self.date = datetime.datetime.strptime(
                     content[0].strip(), "%y %m %d %H %M")
+=======
+                self.date = datetime.datetime.strptime(content[0].strip(),
+                                                       "%y %m %d %H")
+            except:
+                self.date = datetime.datetime.strptime(content[0].strip(),
+                                                       "%y %m %d %H %M")
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
             self.nlocs = int(content[1].strip())
             #self.locs = []
             zz = 2
@@ -947,7 +1203,12 @@ class HycsControl():
             temp = int(content[zz].strip())
             if temp != self.num_sp:
                 print(
+<<<<<<< HEAD
                     'warning: number of species for deposition not equal to number of species')
+=======
+                    'warning: number of species for deposition not equal to number of species'
+                )
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
             nn = 0
             for ii in range(zz, zz + 5 * self.num_sp, 5):
                 lines = []

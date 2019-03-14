@@ -1,13 +1,19 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 #from math import *
 import datetime
+<<<<<<< HEAD
+=======
+
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
 import numpy as np
 import pandas as pd
+
 
 """
 PGRMMR: Alice Crawford ORG: ARL/CICS
 PYTHON 3
-ABSTRACT: classes and functions for reading and writing binary HYSPLIT PARDUMP file
+ABSTRACT: classes and functions for reading and writing binary HYSPLIT
+PARDUMP file
 
 CLASSES
     Pardump - contains methods to write or read a binary pardump file
@@ -26,7 +32,12 @@ class Pardump():
        write   writes a pardump file.
        read    reads a pardump file. returns a dictionary.
                Keys are the date of the particle positions in YYMMDDHH.
+<<<<<<< HEAD
                Values are pandas dataframe objects with the particle information.
+=======
+               Values are pandas dataframe objects with the particle
+               information.
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
     """
 
     def __init__(self, fname='PARINIT'):
@@ -41,6 +52,7 @@ class Pardump():
         tp2 = '>i'  # big endian integer.
 
         # header record in fortran file.
+<<<<<<< HEAD
         self.hdr_dt = np.dtype([('padding', tp2),
                                 ('parnum', tp2),
                                 ('pollnum', tp2),
@@ -81,6 +93,26 @@ class Pardump():
                   pollutant index
         sdate   : datetime.datetime object
         """
+=======
+        self.hdr_dt = np.dtype([('padding', tp2), ('parnum', tp2),
+                                ('pollnum', tp2), ('year', tp2), ('month',
+                                                                  tp2),
+                                ('day', tp2), ('hour', tp2), ('minute', tp2)])
+
+        # data record in fortran file.
+        self.pardt = np.dtype([('p1', tp2), ('p2', tp2), ('pmass', tp1),
+                               ('p3', '>l'), ('lat', tp1), ('lon', tp1),
+                               ('ht', tp1), ('su', tp1), ('sv', tp1),
+                               ('sx', tp1), ('p4', '>l'), ('age', tp2),
+                               ('dist', tp2), ('poll', tp2), ('mgrid', tp2),
+                               ('sorti', tp2)])
+
+    def write(self, numpar, pmass, lon, lat, ht, pollnum, sdate):
+        # numpar - number of particles
+        # pmass, lon , lat , ht, pollnum , sdate  should all be lists or numpy arrays
+        # mass, longitude, latitude, height (in meters), pollutant index (integer), date (datetime.datetime object).
+
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         with open(self.fname, 'wb') as fp:
             pad1 = np.ones(numpar) * 28
             pad2 = np.ones(numpar) * 4
@@ -91,7 +123,11 @@ class Pardump():
             sorti = np.arange(1, numpar + 1)
 
             print(len(lon))
+<<<<<<< HEAD
             a = np.zeros((numpar,), dtype=self.pardt)
+=======
+            a = np.zeros((numpar, ), dtype=self.pardt)
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
             a['p1'] = pad1
             a['p2'] = pad2
             a['p3'] = pad3
@@ -111,7 +147,7 @@ class Pardump():
 
             # print a
 
-            hdr = np.zeros((1,), dtype=self.hdr_dt)
+            hdr = np.zeros((1, ), dtype=self.hdr_dt)
             hdr['padding'] = 28
             hdr['parnum'] = numpar
             hdr['pollnum'] = 1
@@ -131,6 +167,22 @@ class Pardump():
 
     # def writeascii(self, drange=[], verbose=1, century=2000, sorti=[]):
     #    read(self, drange=[], verbose=1, century=2000, sorti=[]):
+<<<<<<< HEAD
+=======
+
+    def read(self, drange=[], verbose=1, century=2000, sorti=[]):
+        """ daterange should be a list of two datetime.datetime objects
+        indicating the beginning
+        ##and ending date of the particle positions of interest.
+        ##returns a dictionary. The key is the date of the particle positions in
+        ##YYMMDDHH.
+        ##The value is a pandas dataframe object with the particle information.
+        ##sorti is a list of sort indices. If not [] then will only return
+        ##particles with those sort indices.
+        ##nsort keeps track of which particle it is throughout the time.
+        ##Could use this to keep track of initial height and time of release.
+
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
 
     def read(self, drange=None, verbose=1, century=2000, sorti=None):
         """
@@ -149,7 +201,11 @@ class Pardump():
         """
 
         imax = 100
+<<<<<<< HEAD
         # fp = open(self.fname, 'rb')
+=======
+        #fp = open(self.fname, 'rb')
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         # returns a dictionary of pandas dataframes. Date valid is the key.
         pframe_hash = {}
         with open(self.fname, 'rb') as fp:
@@ -159,25 +215,38 @@ class Pardump():
                 hdata = np.fromfile(fp, dtype=self.hdr_dt, count=1)
                 if verbose:
                     print('Record Header ', hdata)
+<<<<<<< HEAD
                 # if len(hdata) == 0:
                 if not hdata:
+=======
+                if len(hdata) == 0:
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
                     print('Done reading ', self.fname)
                     break
                 if hdata['year'] < 1000:
                     year = hdata['year'] + century
                 else:
                     year = hdata['year']
+<<<<<<< HEAD
                 pdate = datetime.datetime(
                     year,
                     hdata['month'],
                     hdata['day'],
                     hdata['hour'],
                     hdata['minute'])
+=======
+                pdate = datetime.datetime(year, hdata['month'], hdata['day'],
+                                          hdata['hour'], hdata['minute'])
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
                 # if drange==[]:
                 #   drange = [pdate, pdate]
                 parnum = hdata['parnum']
                 data = np.fromfile(fp, dtype=self.pardt, count=parnum)
+<<<<<<< HEAD
                 # n = parnum - 1
+=======
+                n = parnum - 1
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
                 # padding at end of each record
                 np.fromfile(fp, dtype='>i', count=1)
                 if verbose:
@@ -197,9 +266,17 @@ class Pardump():
                         ndata)  # create data frame
                     # drop the fields which were padding
                     par_frame.drop(['p1', 'p2', 'p3', 'p4'],
+<<<<<<< HEAD
                                    inplace=True, axis=1)
                     par_frame.drop(['su', 'sv', 'sx', 'mgrid'],
                                    inplace=True, axis=1)  # drop other fields
+=======
+                                   inplace=True,
+                                   axis=1)
+                    par_frame.drop(['su', 'sv', 'sx', 'mgrid'],
+                                   inplace=True,
+                                   axis=1)  # drop other fields
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
                     # drop where the lat field is 0. because
                     par_frame = par_frame.loc[par_frame['lat'] != 0]
                     # in pardump file particles which have not been
@@ -212,6 +289,7 @@ class Pardump():
                         # sort index in list sorti
                     par_frame['date'] = pdate
                     par_frame.sort('ht', inplace=True)  # sort by height
+<<<<<<< HEAD
                     par_frame = pd.concat(
                         [par_frame], keys=[
                             self.fname])  # add a filename key
@@ -219,6 +297,14 @@ class Pardump():
                     datekey = pdate.strftime(self.dtfmt)
                     # Add value to dictionary.
                     pframe_hash[datekey] = par_frame
+=======
+                    # add a filename key
+                    par_frame = pd.concat([par_frame], keys=[self.fname])
+                    # create dictionary key for output.
+                    datekey = pdate.strftime(self.dtfmt)
+                    pframe_hash[
+                        datekey] = par_frame  # Add value to dictionary.
+>>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
 
                 # Assume data is written sequentially by date.
                 i += 1
