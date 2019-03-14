@@ -52,7 +52,7 @@ class Pardump():
                                 ('day', tp2),
                                 ('hour', tp2),
                                 ('minute', tp2)
-                               ])
+                                ])
 
         # data record in fortran file.
         self.pardt = np.dtype([('p1', tp2),
