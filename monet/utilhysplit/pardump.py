@@ -1,5 +1,4 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-#from math import *
 import datetime
 import numpy as np
 import pandas as pd
@@ -191,7 +190,8 @@ class Pardump():
                 elif pdate >= drange[0] and pdate <= drange[1]:
                     testdate = True
 
-                if testdate:  # Only store data if it is in the daterange specified.
+               # Only store data if it is in the daterange specified.
+                if testdate:  
                     print('Adding data ', hdata, pdate)
                     # otherwise get endian error message when create dataframe.
                     ndata = data.byteswap().newbyteorder()

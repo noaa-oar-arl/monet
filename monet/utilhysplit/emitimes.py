@@ -2,8 +2,6 @@
 import datetime
 import numpy as np
 
-import numpy as np
-
 
 """
 Classes to read and write input file for HYSPLIT.
@@ -111,7 +109,6 @@ class EmiTimes(object):
         """
         with open(self.filename, 'r') as fid:
             lines = fid.readlines()
-            #done = False
             iii = 2
             while iii < len(lines):
                 if verbose:
@@ -225,7 +222,7 @@ class EmitCycle(object):
         """
         maxrec = self.nrecs + self.drecs
         datestr = self.sdate.strftime('%Y %m %d %H ')
-        #print('FILENAME EMIT', filename)
+        # print('FILENAME EMIT', filename)
         with open(filename, 'a') as fid:
             # fid.write(self.header_str())
             fid.write(datestr + ' ' + self.duration + ' ' + str(maxrec) + '\n')
@@ -247,8 +244,8 @@ class EmitCycle(object):
         month = int(temp[1])
         day = int(temp[2])
         hour = int(temp[3])
-        #dhour = int(temp[5][0:2])
-        #dmin = int(temp[5][-2:])
+        # dhour = int(temp[5][0:2])
+        # dmin = int(temp[5][-2:])
         duration = temp[5]
         sdate = datetime.datetime(year, month, day, hour)
         lat = float(temp[6])

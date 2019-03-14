@@ -680,7 +680,10 @@ class ControlLoc():
 
 
 class HycsControl():
-    """class which represents the HYSPLIT control file and all the information in it"""
+    """
+       class which represents the HYSPLIT 
+       control file and all the information in it
+    """
 
     def __init__(self,
                  fname='CONTROL',
@@ -930,7 +933,6 @@ class HycsControl():
         Read in control file.
         """
         with open(self.wdir + self.fname, "r") as fid:
-            #fid = open(self.fname, "r")
             content = fid.readlines()
             try:
                 self.date = datetime.datetime.strptime(
@@ -939,11 +941,9 @@ class HycsControl():
                 self.date = datetime.datetime.strptime(
                     content[0].strip(), "%y %m %d %H %M")
             self.nlocs = int(content[1].strip())
-            #self.locs = []
             zz = 2
             for ii in range(zz, zz + self.nlocs):
                 temploc = content[ii].strip()
-                # self.locs.append(content[ii].strip())
                 self.locs.append(ControlLoc(line=temploc))
             zz += self.nlocs
             self.run_duration = content[zz].strip()
