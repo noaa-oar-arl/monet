@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-#import sys
-=======
->>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
 import datetime
 import numpy as np
 
@@ -22,13 +18,8 @@ Emissions file see https://ready.arl.noaa.gov/hysplitusersguide/S417.htm
 class EmiTimes(object):
     """
     Class to represent and EMITTIMES file which can be used as input to HYSPLIT.
-<<<<<<< HEAD
-    Helper classes are EmitCycle which represents one emissions Cycle in the file
-    and EmitLine which represents one line in the file.
-=======
     Helper classes are EmitCycle which represents one emissions Cycle in the
     file and EmitLine which represents one line in the file.
->>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
 
 
     General usage is to initialize the class
@@ -69,7 +60,6 @@ class EmiTimes(object):
         self.header = self.header_str()
 
     def header_str(self):
-<<<<<<< HEAD
         """
         default header string for EMITTIMES file
         RETURNS
@@ -79,17 +69,12 @@ class EmiTimes(object):
         returnval = 'YYYY MM DD HH    DURATION(hhhh) #RECORDS \n'
         returnval += 'YYYY MM DD HH MM DURATION(hhmm) '
         returnval += 'LAT LON HGT(m) RATE(/h) AREA(m2) HEAT(w)  \n'
-=======
-        returnval = 'YYYY MM DD HH    DURATION(hhhh) #RECORDS \n'
-        returnval += 'YYYY MM DD HH MM DURATION(hhmm) LAT LON HGT(m) RATE(/h) AREA(m2) HEAT(w)  \n'
->>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         return returnval
 
     def modify_header(self, hstring):
         self.header = hstring
 
     def findmaxrec(self):
-<<<<<<< HEAD
         """
         Find cycle with the most records and return number of records in that
         cycle.
@@ -100,8 +85,6 @@ class EmiTimes(object):
         maxrec : int
            maximum number of records.
         """
-=======
->>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         maxrec = 0
         for ec in self.cycle_list:
             if ec.nrecs > maxrec:
@@ -109,13 +92,10 @@ class EmiTimes(object):
         return maxrec
 
     def write_new(self, filename):
-<<<<<<< HEAD
         """
         write a new EmitTimes file to filename.
         filename : str
         """
-=======
->>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         maxrec = self.findmaxrec()
         with open(filename, 'w') as fid:
             fid.write(self.header)
@@ -125,7 +105,6 @@ class EmiTimes(object):
             ecycle.write_new(filename)
 
     def read_file(self, verbose=False):
-<<<<<<< HEAD
         """
         Reads an EmitTimes file.
         verbose: boolean
@@ -133,34 +112,21 @@ class EmiTimes(object):
         with open(self.filename, 'r') as fid:
             lines = fid.readlines()
             #done = False
-=======
-        with open(self.filename, 'r') as fid:
-            lines = fid.readlines()
-            done = False
->>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
             iii = 2
             while iii < len(lines):
                 if verbose:
                     print('NEW CYCLE')
                 ec = EmitCycle()
                 nrecs = ec.parse_header(lines[iii])
-<<<<<<< HEAD
                 check = ec.read_cycle(lines[iii + 1: iii + nrecs + 1])
                 if not check:
                     break
-                    #done = True
-=======
-                check = ec.read_cycle(lines[iii + 1:iii + nrecs + 1])
-                if not check:
-                    done = True
->>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
                 else:
                     self.cycle_list.append(ec)
                     self.ncycles += 1
                 iii += nrecs + 1
 
     def add_cycle(self, sdate, duration):
-<<<<<<< HEAD
         """
         Adds information on a cycle to an EmiTimes object.
         sdate: datetime object
@@ -168,8 +134,6 @@ class EmiTimes(object):
         duration : integer
                duratio in hours of cycle.
         """
-=======
->>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         self.ncycles += 1
         ec = EmitCycle(sdate, duration)
         self.cycle_list.append(ec)
@@ -187,10 +151,6 @@ class EmiTimes(object):
         for ec in self.cycle_list:
             ec.filter_records(llcrnr, urcrnr)
 
-<<<<<<< HEAD
-    def add_record(self, date, duration, lat, lon,
-                   height, rate, area, heat, nanvalue=0):
-=======
     def add_record(self,
                    date,
                    duration,
@@ -201,7 +161,6 @@ class EmiTimes(object):
                    area,
                    heat,
                    nanvalue=0):
->>>>>>> a18ce032b4386cf71eedefc6d7f8b99246c39cc7
         """
         adds a record to a cycle based on the date of the record.
         Returns:
@@ -371,7 +330,7 @@ class EmitCycle(object):
         for temp in lines:
             if verbose:
                 print('Line', temp)
-            #parse record returns EmitLine object.
+            # parse record returns EmitLine object.
             recordra.append(self.parse_record(temp))
         self.recordra.extend(recordra)
         return check
