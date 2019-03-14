@@ -76,8 +76,8 @@ def wsdir2uv(ws, wdir):
 
 
 def get_relhum(temp, press, vap):
-    #temp:  temperature (K)
-    #press: pressure (Pa)
+    # temp:  temperature (K)
+    # press: pressure (Pa)
     # vap:   water vapor mixing ratio (kg/kg)
     temp_o = 273.16
     es_vap = 611.0 * np.exp(17.67 * ((temp - temp_o) / (temp - 29.65)))
@@ -95,7 +95,7 @@ def long_to_wide(df):
     g = df.groupby('variable')
     for name, group in g:
         w[name + '_unit'] = group.units.unique()[0]
-    #mergeon = hstack((index.values, df.variable.unique()))
+    # mergeon = hstack((index.values, df.variable.unique()))
     return merge(w, df, on=['siteid', 'time'])
 
 
