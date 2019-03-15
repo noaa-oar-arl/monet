@@ -32,6 +32,7 @@ def open_dataset(date, datapath='.'):
         fname, date = download_data(date)
     else:
         fname, date = download_data(date)
+    print(fname)
     data = read_data(fname, lat, lon, date)
     change_dir(current)
     return data.where(data > 0)
@@ -155,6 +156,8 @@ def download_data(date, resolution='high'):
         ftp.login()
         ftp.cwd(base_dir + year)
         ftp.retrbinary("RETR " + file, open(file, 'wb').write)
+    else:
+        print('File Already Exists! Reading: {}'.format(file))
     return file, date
 
 
