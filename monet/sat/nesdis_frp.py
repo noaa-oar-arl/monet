@@ -16,7 +16,7 @@ def download_data(date, ftype='meanFRP'):
         year = date.strftime('%Y')
         yyyymmdd = date.strftime('%Y%m%d')
     url_ftype = "&files={}.".format(ftype)
-    for i in arange(6, dtype=int).astype(str):
+    for i in arange(1, 7, dtype=int).astype(str):
         tile = ".FV3C384Grid.tile{}.bin".format(i)
         url = "{}{}{}{}{}".format(base_dir, yyyymmdd, url_ftype, yyyymmdd,
                                   tile)
