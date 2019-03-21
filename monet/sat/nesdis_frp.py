@@ -1,5 +1,5 @@
 # server = 'ftp.star.nesdis.noaa.gov'
-#base_dir = https://gsce-dtn.sdstate.edu/index.php/s/e8wPYPOL1bGXk5z/download?path=%2F20190318&files=meanFRP.20190318.FV3.C384Grid.tile6.bin
+# base_dir = https://gsce-dtn.sdstate.edu/index.php/s/e8wPYPOL1bGXk5z/download?path=%2F20190318&files=meanFRP.20190318.FV3.C384Grid.tile6.bin
 base_dir = "https://gsce-dtn.sdstate.edu/index.php/s/e8wPYPOL1bGXk5z/download?path=%2F"
 
 
