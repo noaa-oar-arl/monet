@@ -1,7 +1,7 @@
 import inspect
 import os
-import xarray as xr
 
+import xarray as xr
 
 server = 'ftp.star.nesdis.noaa.gov'
 base_dir = '/pub/smcd/VIIRS_Aerosol/npp.viirs.aerosol.data/epsaot550/'
@@ -31,7 +31,8 @@ def open_dataset(date, datapath='.'):
     if isinstance(date, six.string_types):
         fname, date = download_data(date)
     else:
-        fname, date = download_data(date[0])
+        fname, date = download_data(date)
+    print(fname)
     data = read_data(fname, lat, lon, date)
     change_dir(current)
     return data.where(data > 0)
@@ -56,6 +57,7 @@ def open_mfdataset(dates, datapath='.'):
     from xarray import concat
     das = []
     for i in dates:
+        print(i)
         das.append(open_dataset(i, datapath=datapath))
     ds = concat(das, dim='time')
     return ds
@@ -94,7 +96,8 @@ def read_data(fname, lat, lon, date):
     da.attrs['units'] = ''
     da.name = 'VIIRS EPS AOT'
     da.attrs['long_name'] = 'Aerosol Optical Thickness'
-    da.attrs['source'] = 'ftp://ftp.star.nesdis.noaa.gov/pub/smcd/VIIRS_Aerosol/npp.viirs.aerosol.data/epsaot550'
+    da.attrs[
+        'source'] = 'ftp://ftp.star.nesdis.noaa.gov/pub/smcd/VIIRS_Aerosol/npp.viirs.aerosol.data/epsaot550'
     return da
 
 
@@ -147,10 +150,14 @@ def download_data(date, resolution='high'):
         # npp_eaot_ip_gridded_0.25_20181222.high.nc
     # print(year, yyyymmdd)
     file = 'npp_eaot_ip_gridded_0.25_{}.high.nc'.format(yyyymmdd)
-    ftp = ftplib.FTP(server)
-    ftp.login()
-    ftp.cwd(base_dir + year)
-    ftp.retrbinary("RETR " + file, open(file, 'wb').write)
+    exists = os.path.isfile(file)
+    if ~exists:
+        ftp = ftplib.FTP(server)
+        ftp.login()
+        ftp.cwd(base_dir + year)
+        ftp.retrbinary("RETR " + file, open(file, 'wb').write)
+    else:
+        print('File Already Exists! Reading: {}'.format(file))
     return file, date
 
 

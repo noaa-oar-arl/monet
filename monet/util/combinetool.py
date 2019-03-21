@@ -46,7 +46,7 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     df_interped.drop(drop_cols, axis=1, inplace=True)
     if da.name in df.columns:
         df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
-        print(df_interped.keys())
+        # print(df_interped.keys())
     final_df = df.merge(
         df_interped, on=['latitude', 'longitude', 'time'], how='left')
     return final_df
@@ -104,7 +104,7 @@ def combine_da_to_df_xesmf(da, df, col=None, **kwargs):
     df_interped.drop(drop_cols, axis=1, inplace=True)
     if da.name in df.columns:
         df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
-        print(df_interped.keys())
+        # print(df_interped.keys())
     final_df = df.merge(
         df_interped, on=['latitude', 'longitude', 'time'], how='left')
     return final_df
@@ -176,10 +176,12 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
             columns={da.name: da.name + '_new'}, inplace=True)
         print(df_interped_xyz.keys())
 
-    final_df = merge_asof(df, df_interped_xyz,
-                          by=['latitude', 'longitude', 'altitude'],
-                          on='time',
-                          direction='nearest')
+    final_df = merge_asof(
+        df,
+        df_interped_xyz,
+        by=['latitude', 'longitude', 'altitude'],
+        on='time',
+        direction='nearest')
     return final_df
 
 
@@ -353,7 +355,6 @@ def combine_da_to_height_profile(da, dset, radius_of_influence=12e3):
 #     else:
 #         fac = 1.
 #     return fac
-
 
 # from __future__ import absolute_import, print_function
 #

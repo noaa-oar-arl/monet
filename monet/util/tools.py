@@ -186,7 +186,7 @@ def get_giorgi_region_df(df):
     df.loc[:, 'GIORGI_ACRO'] = None
     for i in range(22):
         latmin, lonmin, latmax, lonmax, acro = get_giorgi_region_bounds(
-            index=i + 1)
+            index=int(i + 1))
         con = (df.longitude <= lonmax) & (df.longitude >= lonmin) & (
             df.latitude <= latmax) & (df.latitude >= latmin)
         df.loc[con, 'GIORGI_INDEX'] = i + 1

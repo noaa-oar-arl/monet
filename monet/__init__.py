@@ -1,6 +1,4 @@
-from . import models, obs, plots, util, sat
-from . import monet_accessor
-from . import grids
+from . import grids, models, monet_accessor, obs, plots, sat, util
 
 # from .monetmodels, obs, plots, util
 

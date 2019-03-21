@@ -51,6 +51,7 @@ def sp_scatter_bias(df,
                     tight=True,
                     global_map=True,
                     map_kwargs={},
+                    cbar_kwargs={},
                     **kwargs):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
@@ -76,6 +77,7 @@ def sp_scatter_bias(df,
                 vmin=-1 * top,
                 vmax=top,
                 ax=ax,
+                colorbar=True,
                 **kwargs)
             if ~outline:
                 ax.outline_patch.set_alpha(0)

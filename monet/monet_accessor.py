@@ -117,6 +117,8 @@ class MONETAccessor(object):
                     x1 = self.obj.x.where(self.obj.x >= x_ll, drop=True).values
                     x2 = self.obj.x.where(self.obj.x <= x_ur, drop=True).values
                     xrange = concatenate([x1, x2]).astype(int)
+                    self.obj['longitude'][:] = utils.wrap_longitudes(
+                        self.obj.longitude.values)
                     # xrange = arange(float(x_ur), float(x_ll), dtype=int)
                 else:
                     xrange = slice(x_ll, x_ur)
@@ -126,7 +128,7 @@ class MONETAccessor(object):
                     yrange = concatenate([y1, y2]).astype(int)
                 else:
                     yrange = slice(y_ll, y_ur)
-                return self.obj.sel(x=xrange, y=yrange)
+                return self.obj.isel(x=xrange, y=yrange)
             else:
                 raise ImportError
         except ImportError:
@@ -289,6 +291,7 @@ class MONETAccessor(object):
         from matplotlib.pyplot import tight_layout
         import cartopy.crs as ccrs
         import seaborn as sns
+        sns.set_context('notebook', font_scale=1.2)
         # sns.set_context('talk', font_scale=.9)
         if 'crs' not in map_kwarg:
             map_kwarg['crs'] = ccrs.PlateCarree()
@@ -812,6 +815,8 @@ class MONETAccessorDataset(object):
                     x1 = self.obj.x.where(self.obj.x >= x_ll, drop=True).values
                     x2 = self.obj.x.where(self.obj.x <= x_ur, drop=True).values
                     xrange = concatenate([x1, x2]).astype(int)
+                    self.obj['longitude'][:] = utils.wrap_longitudes(
+                        self.obj.longitude.values)
                     # xrange = arange(float(x_ur), float(x_ll), dtype=int)
                 else:
                     xrange = slice(x_ll, x_ur)
@@ -845,15 +850,10 @@ class MONETAccessorDataset(object):
             Description of returned object.
 
         """
-        print('dataframe')
-        print(df)
-        from .util.combinetool import combine_da_to_df_xesmf
-        try:
-            if ~isinstance(df, pd.core.frame.DataFrame):
-                raise TypeError
-        except TypeError:
-            print('df must be of type pd.DataFrame')
-        for i in mapping_table:
-            df = combine_da_to_df_xesmf(
-                self.obj[mapping_table[i]], df, col=i, **kwargs)
+        # from .util.combinetool import combine_da_to_df_xesmf
+        for key, val in mapping_table.items():
+            # print(key, val)
+            # print(df.head())
+            df = self.obj[key].monet.combine_point(df, col=val, **kwargs)
+        print(df.head())
         return df

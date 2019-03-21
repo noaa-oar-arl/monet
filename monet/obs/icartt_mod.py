@@ -3,9 +3,10 @@ MONET. The module makes use of Barron Henderson's PseudoNetCDF
 (https://github.com/barronh/pseudonetcdf)and xarray to read the data.  It is
 noti ntended to read more than ONE file at a time """
 
-import xarray as xr
 import os
+
 import pandas as pd
+import xarray as xr
 
 
 class icartt(object):
@@ -33,20 +34,23 @@ class icartt(object):
     def get_data(self, da, lat_label=None, lon_label=None, alt_label=None):
         """ Comes in as an xarray from add_xarray_Data
         Allows for searching or user specified Lat/Lon variable names
-        Sets latitude and longitude as coordinates 
+        Sets latitude and longitude as coordinates
         Reads start date and seconds elapsed, converts time coordinate
         """
-        possible_lats = ['Lat', 'Latitude', 'lat', 'latitude', 'Latitude_Deg',
-                         'Latitude_deg', 'Lat_deg', 'Lat_degree', 'Lat_Degree',
-                         'Latitude_degrees', 'Latitude_Degrees', 'Latitude_degree',
-                         'Latitude_Degree', 'Lat_aircraft', 'Latitude_aircraft'
-                         ]
-        possible_lons = ['Lon', 'Longitude', 'lon', 'longitude',
-                         'Longitude_Deg', 'Longitude_deg', 'Lon_deg', 'Lon_degree', 'Lon_Degree',
-                         'Long', 'Long_Deg', 'Longitude_degrees', 'Longitude_Degrees',
-                         'Longitude_degree', 'Latitude_Degree', 'Lon_aircraft', 'Long_aircraft'
-                         'Longitude_aircraft'
-                         ]
+        possible_lats = [
+            'Lat', 'Latitude', 'lat', 'latitude', 'Latitude_Deg',
+            'Latitude_deg', 'Lat_deg', 'Lat_degree', 'Lat_Degree',
+            'Latitude_degrees', 'Latitude_Degrees', 'Latitude_degree',
+            'Latitude_Degree', 'Lat_aircraft', 'Latitude_aircraft'
+        ]
+        possible_lons = [
+            'Lon', 'Longitude', 'lon', 'longitude', 'Longitude_Deg',
+            'Longitude_deg', 'Lon_deg', 'Lon_degree', 'Lon_Degree', 'Long',
+            'Long_Deg', 'Longitude_degrees', 'Longitude_Degrees',
+            'Longitude_degree', 'Latitude_Degree', 'Lon_aircraft',
+            'Long_aircraft'
+            'Longitude_aircraft'
+        ]
 
         # Get the unknown lat/lon variable names data along flight path
         if lat_label is None and lon_label is None:
@@ -72,12 +76,14 @@ class icartt(object):
 
         # Convert time from start date and TFLAG in UT seconds from midnight
         da['time'] = pd.to_datetime(da.SDATE.replace(
-            ', ', '-')) + pd.to_timedelta(da[da.TFLAG], unit='s')
+            ', ', '-')) + pd.to_timedelta(
+                da[da.TFLAG], unit='s')
 
         # If user sets the specified altitude label it will be a coordinate
         if alt_label is None:
             print(
-                'No alt_label provided...nothing added as z-coordinate (will result in vert_interp error)')
+                'No alt_label provided...nothing added as z-coordinate (will result in vert_interp error)'
+            )
         else:
             # Set specified 'altitude' as z coordinates for the file
             da.coords['altitude'] = da[alt_label]
