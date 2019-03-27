@@ -394,7 +394,8 @@ def taylordiagram(df,
         sns.set_style('ticks')
         obsstd = df[col1].std()
 
-        dia = td.TaylorDiagram(obsstd, scale=scale, fig=f, rect=111, label=label1)
+        dia = td.TaylorDiagram(obsstd, scale=scale, fig=f,
+                               rect=111, label=label1)
         plt.grid(linewidth=1, alpha=.5)
         cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
         dia.add_sample(
