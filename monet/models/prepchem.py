@@ -1,3 +1,4 @@
+import xarray as xr
 from pyresample.utils import wrap_longitudes
 from scipy.io import FortranFile
 
@@ -8,6 +9,7 @@ except ImportError:
     print(
         'Please install the fv3grid from https://github.com/bbakernoaa/fv3grid'
     )
+    print('to gain the full capability of this dataset')
 
 
 def open_dataset(fname, dtype='f4', res='C384', tile=1):
@@ -34,13 +36,16 @@ def open_dataset(fname, dtype='f4', res='C384', tile=1):
     a = w.read_reals(dtype=dtype)
     r = int(res[1:])
     s = a.reshape((r, r), order='F')
-    grid = fg.get_fv3_grid(res=res, tile=tile)
-    grid = grid.set_coords(['latitude', 'longitude', 'grid_lat', 'grid_lon'])
-    grid['longitude'] = wrap_longitudes(grid.longitude)
-    grid = grid.rename({'grid_lat': 'lat_b', 'grid_lon': 'lon_b'})
-    name = fname.split('.bin')[0]
-    grid[name] = (('x', 'y'), s)
-    return grid[name]
+    if has_fv3grid:
+        grid = fg.get_fv3_grid(res=res, tile=tile)
+        #grid = grid.set_coords(['latitude', 'longitude', 'grid_lat', 'grid_lon'])
+        grid['longitude'] = wrap_longitudes(grid.longitude)
+        #grid = grid.rename({'grid_lat': 'lat_b', 'grid_lon': 'lon_b'})
+        name = fname.split('.bin')[0]
+        grid[name] = (('x', 'y'), s)
+        return grid[name]
+    else:
+        return xr.DataArray(s, dims=('x', 'y'))
 
 
 def to_prepchem_binary(data, fname='output.bin', dtype='f4'):
