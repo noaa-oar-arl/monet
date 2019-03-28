@@ -520,13 +520,15 @@ class MONETAccessorDataset(object):
         dataarray = dset[loop_vars[0]]
         da = self._remap_xesmf_dataarray(
             dataarray, self.obj, filename=filename, **kwargs)
-        if da.name in self.obj.variables:
-            da.name = da.name + '_y'
         self.obj[da.name] = da
+        das = {}
+        das[da.name] = da
         for i in loop_vars[1:]:
             dataarray = dset[i]
-            self._remap_xesmf_dataarray(
+            tmp = self._remap_xesmf_dataarray(
                 dataarray, filename=filename, reuse_weights=True, **kwargs)
+            das[tmp.name] = tmp.copy()
+        return xr.Dataset(das)
 
     def _remap_xesmf_dataarray(self,
                                dataarray,
