@@ -10,6 +10,26 @@ __all__ = ['colorbars', 'plots', 'taylordiagram', 'mapgen']
 # This is the driver for all verify objects
 
 
+def _dynamic_fig_size(obj):
+    """Try to determine a generic figure size based on the shape of obj
+
+    Parameters
+    ----------
+    obj : A 2D xarray DataArray
+        Description of parameter `obj`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    nx, ny = len(obj.x), len(obj.y)
+    scale = float(ny) / float(nx)
+    figsize = (10, 10 * scale)
+    return figsize
+
+
 def savefig(fname, loc=1, decorate=True, **kwargs):
     import io
     import os

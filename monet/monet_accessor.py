@@ -288,6 +288,7 @@ class MONETAccessor(object):
 
         """
         from .plots.mapgen import draw_map
+        from .plots import _dynamic_fig_size
         from matplotlib.pyplot import tight_layout
         import cartopy.crs as ccrs
         import seaborn as sns
@@ -298,6 +299,9 @@ class MONETAccessor(object):
         if 'figsize' in kwargs:
             map_kwarg['figsize'] = kwargs['figsize']
             kwargs.pop('figsize', None)
+        else:
+            figsize = _dynamic_fig_size(self.obj)
+            map_kwarg['figsize'] = figsize
         ax = draw_map(**map_kwarg)
         self.obj.plot(
             x='longitude',
