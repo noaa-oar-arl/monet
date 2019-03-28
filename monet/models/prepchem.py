@@ -43,7 +43,7 @@ def open_dataset(fname, dtype='f4', res='C384', tile=1):
     return grid[name]
 
 
-def to_prepchem_binary(data, fname='output.bin', dtype='f4''):
+def to_prepchem_binary(data, fname='output.bin', dtype='f4'):
     """Writes to binary file for prep_chem_sources.
 
     Parameters
