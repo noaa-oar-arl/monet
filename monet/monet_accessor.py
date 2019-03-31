@@ -311,7 +311,7 @@ class MONETAccessor(object):
             infer_intervals=True,
             **kwargs)
         ax.outline_patch.set_alpha(0)
-        tight_layout()
+        tight_layout(pad=0)
         return ax
 
     def _check_swath_def(self, defin):
