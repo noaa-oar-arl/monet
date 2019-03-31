@@ -179,8 +179,7 @@ class AERONET(object):
             Description of returned object.
 
         """
-        self.df['dust'] = (self.df['aod_1020nm']
-                           > 0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
+        self.df['dust'] = (self.df['aod_1020nm'] > 0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
 
     def set_daterange(self, begin='', end=''):
         dates = pd.date_range(
