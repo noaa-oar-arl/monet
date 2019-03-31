@@ -316,15 +316,15 @@ class EmitCycle(object):
         """
         check = True
         recordra = []
-        #header = fid.readline()
-        #if verbose: print('HEADER', header, str(self.nrecs))
-        # if not header:
-        #  check=False
-        # else:
-        #    try:
-        #       nrecs =  self.parse_header(header)
-        #    except:
-        #       return False
+        # header = fid.readline()
+        # if verbose: print('HEADER', header, str(self.nrecs))
+        #  if not header:
+        #   check=False
+        #  else:
+        #     try:
+        #        nrecs =  self.parse_header(header)
+        #     except:
+        #        return False
         for temp in lines:
             if verbose:
                 print('Line', temp)
