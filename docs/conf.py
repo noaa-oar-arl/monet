@@ -47,10 +47,9 @@ release = u''
 # ones.
 extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.napoleon',
-    'sphinx.ext.extlinks', 'sphinx.ext.ifconfig', 'sphinx.ext.intersphinx',
-    'sphinx.ext.todo', 'sphinx.ext.doctest'
+    'sphinx.ext.extlinks'
 ]
-# exclude_patterns = ['_build', '**.ipynb_checkpoints']
+#exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 extlinks = {
     'issue': ('https://github.com/noaa-oar-arl/MONET/issues/%s', 'GH'),

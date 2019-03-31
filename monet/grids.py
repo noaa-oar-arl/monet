@@ -257,12 +257,13 @@ def _hysplit_latlon_grid_from_dataset(ds):
     pargs = dict()
     pargs['lat_0'] = ds.latitude.mean()
     pargs['lon_0'] = ds.longitude.mean()
+
     p4 = '+proj=eqc +lat_ts={lat_0} +lat_0={lat_0} +lon_0={lon_0} ' \
-        '+ellps=WGS84 +datum=WGS84 +units=m +no_defs'.format(**pargs)
+        '+ellps=WGS84 +datum=WGS84 +units=m +no_defs'.format(pargs)
     return p4
 
 
-def get_hysplit_latlon_pyresample_area_def(ds, proj4_srs):
+def get_hysplit_latlon_pyreample_area_def(ds, proj4_srs):
     from pyresample import geometry
     return geometry.SwathDefinition(
         lons=ds.longitude.values, lats=ds.latitude.values)

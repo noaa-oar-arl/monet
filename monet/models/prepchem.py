@@ -38,9 +38,9 @@ def open_dataset(fname, dtype='f4', res='C384', tile=1):
     s = a.reshape((r, r), order='F')
     if has_fv3grid:
         grid = fg.get_fv3_grid(res=res, tile=tile)
-        #grid = grid.set_coords(['latitude', 'longitude', 'grid_lat', 'grid_lon'])
+        # grid = grid.set_coords(['latitude', 'longitude', 'grid_lat', 'grid_lon'])
         grid['longitude'] = wrap_longitudes(grid.longitude)
-        #grid = grid.rename({'grid_lat': 'lat_b', 'grid_lon': 'lon_b'})
+        # grid = grid.rename({'grid_lat': 'lat_b', 'grid_lon': 'lon_b'})
         name = fname.split('.bin')[0]
         grid[name] = (('x', 'y'), s)
         return grid[name]

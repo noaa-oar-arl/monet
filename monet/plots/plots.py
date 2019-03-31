@@ -52,7 +52,6 @@ def make_spatial_plot(modelvar,
     m.drawcountries()
     return f, ax, c, cmap, vmin, vmax
 
-
 def spatial(modelvar, **kwargs):
     if kwargs['ax'] is None:
         f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
@@ -103,28 +102,28 @@ def make_spatial_contours(modelvar,
     return c
 
 
-# def wind_quiver(ws, wdir, gridobj, m, **kwargs):
-#     from . import tools
-#
-#     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
-#     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
-#     # define map and draw boundries
-#     x, y = m(lon, lat)
-#     u, v = tools.wsdir2uv(ws, wdir)
-#     quiv = m.quiver(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15],
-#                     **kwargs)
-#     return quiv
-#
-#
-# def wind_barbs(ws, wdir, gridobj, m, **kwargs):
-#     import tools
-#     lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
-#     lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
-#     # define map and draw boundries
-#     x, y = m(lon, lat)
-#     u, v = tools.wsdir2uv(ws, wdir)
-#     m.barbs(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15],
-#             **kwargs)
+def wind_quiver(ws, wdir, gridobj, m, **kwargs):
+    from . import tools
+
+    lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
+    lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
+    # define map and draw boundries
+    x, y = m(lon, lat)
+    u, v = tools.wsdir2uv(ws, wdir)
+    quiv = m.quiver(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15],
+                    **kwargs)
+    return quiv
+
+
+def wind_barbs(ws, wdir, gridobj, m, **kwargs):
+    import tools
+    lat = gridobj.variables['LAT'][0, 0, :, :].squeeze()
+    lon = gridobj.variables['LON'][0, 0, :, :].squeeze()
+    # define map and draw boundries
+    x, y = m(lon, lat)
+    u, v = tools.wsdir2uv(ws, wdir)
+    m.barbs(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15],
+            **kwargs)
 
 
 def normval(vmin, vmax, cmap):
@@ -133,7 +132,6 @@ def normval(vmin, vmax, cmap):
     bounds = arange(vmin, vmax + 5., 5.)
     norm = BoundaryNorm(boundaries=bounds, ncolors=cmap.N)
     return norm
-
 
 # def spatial_scatter(df, m, discrete=False, plotargs={}, create_cbar=True):
 #     from .colorbars import cmap_discretize
@@ -210,7 +208,6 @@ def spatial_bias_scatter(df,
         plt.close()
     return f, ax, c
 
-
 # def eight_hr_spatial_scatter(df, m, date, savename=''):
 #     fig = plt.figure(figsize=(11, 6), frameon=False)
 #     m.drawcoastlines(linewidth=.3)
@@ -230,22 +227,13 @@ def spatial_bias_scatter(df,
 #         plt.close()
 
 
-def _create_new_figure(ax=None):
-    if ax is None:
-        f, ax = plt.subplots(figsize=(11, 6), frameon=False)
-        sns.set_palette(sns.color_palette(colors))
-        sns.set_style('ticks')
-    return f, ax
-
-
 def timeseries(df,
                x='time',
-               y=None,
+               y='obs',
                ax=None,
                plotargs={},
                fillargs={'alpha': .2},
                title='',
-               fill=False,
                ylabel=None,
                label=None):
     """Short summary.
@@ -275,38 +263,33 @@ def timeseries(df,
         Description of returned object.
 
     """
-    try:
-        if y is None:
-            raise TypeError
-    except TypeError:
-        print('Enter the column for y values')
+    if ax is None:
+        f, ax = plt.subplots(figsize=(11, 6), frameon=False)
 
-    f, ax = _create_new_figure(ax=ax)
-
+    sns.set_palette(sns.color_palette(colors))
+    sns.set_style('ticks')
     df.index = df[x]
     m = df.groupby('time').mean()  # mean values for each sample time period
-    if fill:
-        err = df.groupby('time').std()  # std values for each sample time
-        upper = m[y] + err[y]
-        lower = m[y] - err[y]
-        lower.loc[lower < 0] = 0
-        if 'alpha' not in fillargs:
-            fillargs['alpha'] = 0.1
-    # variable = df.variable[0]
-    # if df.columns.isin(['units']).max():
-    #     unit = df.units[0]
-    # else:
-    # unit = 'None'
-
+    e = df.groupby('time').std()  # std values for each sample time period
+    variable = df.variable[0]
+    if df.columns.isin(['units']).max():
+        unit = df.units[0]
+    else:
+        unit = 'None'
+    upper = m[y] + e[y]
+    lower = m[y] - e[y]
+    lower.loc[lower < 0] = 0
+    lower = lower.values
+    if 'alpha' not in fillargs:
+        fillargs['alpha'] = 0.2
     if label is not None:
         m.rename(columns={y: label}, inplace=True)
     else:
         label = y
     m[label].plot(ax=ax, **plotargs)
-    if fill:
-        ax.fill_between(m[label].index, lower, upper, **fillargs)
+    ax.fill_between(m[label].index, lower, upper, **fillargs)
     if ylabel is None:
-        ax.set_ylabel(y)
+        ax.set_ylabel(variable + ' (' + unit + ')')
     else:
         ax.set_ylabel(label)
     ax.set_xlabel('')
@@ -315,8 +298,7 @@ def timeseries(df,
     plt.tight_layout()
     return ax
 
-
-def kdeplot(df, col=None, title=None, label=None, ax=None, **kwargs):
+def kdeplot(df, title=None, label=None, ax=None, **kwargs):
     """Short summary.
 
     Parameters
@@ -340,8 +322,11 @@ def kdeplot(df, col=None, title=None, label=None, ax=None, **kwargs):
         Description of returned object.
 
     """
-    f, ax = _create_new_figure(ax=ax)
-    sns.despine()
+    sns.set_style('ticks')
+
+    if ax is None:
+        f, ax = plt.subplots(figsize=(11, 6), frameon=False)
+        sns.despine()
 
     ax = sns.kdeplot(df, ax=ax, label=label, **kwargs)
     return ax
