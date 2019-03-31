@@ -2,9 +2,6 @@
 import pandas as pd
 import xarray as xr
 
-from ..grids import (_hysplit_latlon_grid_from_dataset,
-                     get_hysplit_latlon_pyresample_area_def)
-
 
 def open_dataset(fname):
     """Short summary.
@@ -28,7 +25,8 @@ def open_dataset(fname):
 
 
     """
-
+    from ..grids import _hysplit_latlon_grid_from_dataset
+    from ..grids import get_hysplit_latlon_pyresample_area_def
     # open the dataset using xarray
     binfile = ModelBin(fname, verbose=False, readwrite='r')
     dset = binfile.dset

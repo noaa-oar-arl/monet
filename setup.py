@@ -6,7 +6,7 @@ from warnings import warn
 
 try:
     from setuptools import setup, find_packages
-except ImportError:
+except:
     from distutils.core import setup
 
 setup(

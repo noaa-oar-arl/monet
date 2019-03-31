@@ -169,7 +169,6 @@ class AERONET(object):
             550., 500.))**(-self.df['440-870_angstrom_exponent'])
 
     def dust_detect(self):
-<<<<<<< HEAD
         """Detect dust from AERONET. See [Dubovik et al., 2002].
 
         AOD_1020 > 0.3 and AE(440,870) < 0.6
@@ -182,11 +181,6 @@ class AERONET(object):
         """
         self.df['dust'] = (self.df['aod_1020nm']
                            > 0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
-=======
-        """ [Dubovik et al., 2002]. AOD_1020 > 0.3 and AE(440,870) < 0.6"""
-        self.df['dust'] = (self.df['aod_1020nm'] >
-                           0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
->>>>>>> master
 
     def set_daterange(self, begin='', end=''):
         dates = pd.date_range(
