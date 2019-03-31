@@ -17,35 +17,36 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="monet.util package" href="monet.util.html" />
+    <link rel="next" title="monet.sat package" href="monet.sat.html" />
     <link rel="prev" title="monet.obs package" href="monet.obs.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -54,7 +55,7 @@
 
           
             
-            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="../_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -90,37 +91,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html#api">API</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="monet.models.html">monet.models package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.obs.html">monet.obs package</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">monet.plots package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.util.html">monet.util package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.verification.html">monet.verification package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
 </ul>
 
             
@@ -196,6 +172,7 @@
 </div>
 <div class="section" id="module-monet.plots.colorbars">
 <span id="monet-plots-colorbars-module"></span><h2>monet.plots.colorbars module<a class="headerlink" href="#module-monet.plots.colorbars" title="Permalink to this headline">¶</a></h2>
+<p>colorbar helper functions</p>
 <dl class="function">
 <dt id="monet.plots.colorbars.cmap_discretize">
 <code class="descclassname">monet.plots.colorbars.</code><code class="descname">cmap_discretize</code><span class="sig-paren">(</span><em>cmap</em>, <em>N</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.cmap_discretize" title="Permalink to this definition">¶</a></dt>
@@ -218,7 +195,18 @@ imshow(x, cmap=djet)</dd>
 <dl class="function">
 <dt id="monet.plots.colorbars.noxcmap">
 <code class="descclassname">monet.plots.colorbars.</code><code class="descname">noxcmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.noxcmap" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.plots.colorbars.o3cmap">
@@ -238,12 +226,34 @@ imshow(x, cmap=djet)</dd>
 <dl class="function">
 <dt id="monet.plots.colorbars.rhcmap">
 <code class="descclassname">monet.plots.colorbars.</code><code class="descname">rhcmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.rhcmap" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.plots.colorbars.so2cmap">
 <code class="descclassname">monet.plots.colorbars.</code><code class="descname">so2cmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.colorbars.so2cmap" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.plots.colorbars.sradcmap">
@@ -263,9 +273,10 @@ imshow(x, cmap=djet)</dd>
 </div>
 <div class="section" id="module-monet.plots.mapgen">
 <span id="monet-plots-mapgen-module"></span><h2>monet.plots.mapgen module<a class="headerlink" href="#module-monet.plots.mapgen" title="Permalink to this headline">¶</a></h2>
+<p>map utilities</p>
 <dl class="function">
 <dt id="monet.plots.mapgen.draw_map">
-<code class="descclassname">monet.plots.mapgen.</code><code class="descname">draw_map</code><span class="sig-paren">(</span><em>ax=None</em>, <em>crs=None</em>, <em>natural_earth=False</em>, <em>coastlines=True</em>, <em>states=False</em>, <em>countries=True</em>, <em>resolution='10m'</em>, <em>extent=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.mapgen.draw_map" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">monet.plots.mapgen.</code><code class="descname">draw_map</code><span class="sig-paren">(</span><em>crs=None</em>, <em>natural_earth=False</em>, <em>coastlines=True</em>, <em>states=False</em>, <em>countries=True</em>, <em>resolution='10m'</em>, <em>extent=None</em>, <em>figsize=(10</em>, <em>5)</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.mapgen.draw_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Short summary.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -295,14 +306,10 @@ imshow(x, cmap=djet)</dd>
 </div>
 <div class="section" id="module-monet.plots.plots">
 <span id="monet-plots-plots-module"></span><h2>monet.plots.plots module<a class="headerlink" href="#module-monet.plots.plots" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="monet.plots.plots.eight_hr_spatial_scatter">
-<code class="descclassname">monet.plots.plots.</code><code class="descname">eight_hr_spatial_scatter</code><span class="sig-paren">(</span><em>df</em>, <em>m</em>, <em>date</em>, <em>savename=''</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.eight_hr_spatial_scatter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<p>plotting routines</p>
 <dl class="function">
 <dt id="monet.plots.plots.kdeplot">
-<code class="descclassname">monet.plots.plots.</code><code class="descname">kdeplot</code><span class="sig-paren">(</span><em>df</em>, <em>title=None</em>, <em>label=None</em>, <em>ax=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.kdeplot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">monet.plots.plots.</code><code class="descname">kdeplot</code><span class="sig-paren">(</span><em>df</em>, <em>col=None</em>, <em>title=None</em>, <em>label=None</em>, <em>ax=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.kdeplot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Short summary.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -380,23 +387,13 @@ imshow(x, cmap=djet)</dd>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="monet.plots.plots.spatial_scatter">
-<code class="descclassname">monet.plots.plots.</code><code class="descname">spatial_scatter</code><span class="sig-paren">(</span><em>df</em>, <em>m</em>, <em>discrete=False</em>, <em>plotargs={}</em>, <em>create_cbar=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.spatial_scatter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="monet.plots.plots.spatial_stat_scatter">
-<code class="descclassname">monet.plots.plots.</code><code class="descname">spatial_stat_scatter</code><span class="sig-paren">(</span><em>df</em>, <em>m</em>, <em>date</em>, <em>stat=&lt;function MB&gt;</em>, <em>ncolors=15</em>, <em>fact=1.5</em>, <em>cmap='RdYlBu_r'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.spatial_stat_scatter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
 <dt id="monet.plots.plots.taylordiagram">
-<code class="descclassname">monet.plots.plots.</code><code class="descname">taylordiagram</code><span class="sig-paren">(</span><em>df</em>, <em>marker='o'</em>, <em>col1='obs'</em>, <em>col2='model'</em>, <em>label='CMAQ'</em>, <em>addon=False</em>, <em>dia=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.taylordiagram" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">monet.plots.plots.</code><code class="descname">taylordiagram</code><span class="sig-paren">(</span><em>df</em>, <em>marker='o'</em>, <em>col1='obs'</em>, <em>col2='model'</em>, <em>label1='OBS'</em>, <em>label2='MODEL'</em>, <em>addon=False</em>, <em>dia=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.taylordiagram" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="monet.plots.plots.timeseries">
-<code class="descclassname">monet.plots.plots.</code><code class="descname">timeseries</code><span class="sig-paren">(</span><em>df</em>, <em>x='time'</em>, <em>y='obs'</em>, <em>ax=None</em>, <em>plotargs={}</em>, <em>fillargs={'alpha': 0.2}</em>, <em>title=''</em>, <em>ylabel=None</em>, <em>label=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.timeseries" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">monet.plots.plots.</code><code class="descname">timeseries</code><span class="sig-paren">(</span><em>df</em>, <em>x='time'</em>, <em>y=None</em>, <em>ax=None</em>, <em>plotargs={}</em>, <em>fillargs={'alpha': 0.2}</em>, <em>title=''</em>, <em>fill=False</em>, <em>ylabel=None</em>, <em>label=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Short summary.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -423,16 +420,6 @@ imshow(x, cmap=djet)</dd>
 </tbody>
 </table>
 </dd></dl>
-
-<dl class="function">
-<dt id="monet.plots.plots.wind_barbs">
-<code class="descclassname">monet.plots.plots.</code><code class="descname">wind_barbs</code><span class="sig-paren">(</span><em>ws</em>, <em>wdir</em>, <em>gridobj</em>, <em>m</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.wind_barbs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="monet.plots.plots.wind_quiver">
-<code class="descclassname">monet.plots.plots.</code><code class="descname">wind_quiver</code><span class="sig-paren">(</span><em>ws</em>, <em>wdir</em>, <em>gridobj</em>, <em>m</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.plots.wind_quiver" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 <div class="section" id="module-monet.plots.taylordiagram">
@@ -465,11 +452,6 @@ command.</p>
 </div>
 <div class="section" id="module-monet.plots">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-monet.plots" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="monet.plots.taylordiagram">
-<code class="descclassname">monet.plots.</code><code class="descname">taylordiagram</code><span class="sig-paren">(</span><em>df</em>, <em>marker='o'</em>, <em>col1='obs'</em>, <em>col2='model'</em>, <em>label='CMAQ'</em>, <em>addon=False</em>, <em>dia=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.plots.taylordiagram" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
 </div>
 
@@ -481,10 +463,10 @@ command.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="monet.util.html" class="btn btn-neutral float-right" title="monet.util package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="monet.sat.html" class="btn btn-neutral float-right" title="monet.sat package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="monet.obs.html" class="btn btn-neutral" title="monet.obs package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="monet.obs.html" class="btn btn-neutral float-left" title="monet.obs package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -493,7 +475,7 @@ command.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -510,32 +492,16 @@ command.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

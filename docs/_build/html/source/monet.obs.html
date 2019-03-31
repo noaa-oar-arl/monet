@@ -17,13 +17,19 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -31,21 +37,16 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="monet.plots package" href="monet.plots.html" />
     <link rel="prev" title="monet.models package" href="monet.models.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -54,7 +55,7 @@
 
           
             
-            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="../_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -90,37 +91,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html#api">API</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="monet.models.html">monet.models package</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">monet.obs package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.plots.html">monet.plots package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.util.html">monet.util package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.verification.html">monet.verification package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
 </ul>
 
             
@@ -194,20 +170,1899 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="monet-obs-aeronet-module">
-<h2>monet.obs.aeronet module<a class="headerlink" href="#monet-obs-aeronet-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.obs.aeronet_mod">
+<span id="monet-obs-aeronet-mod-module"></span><h2>monet.obs.aeronet_mod module<a class="headerlink" href="#module-monet.obs.aeronet_mod" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="monet.obs.aeronet_mod.AERONET">
+<em class="property">class </em><code class="descclassname">monet.obs.aeronet_mod.</code><code class="descname">AERONET</code><a class="headerlink" href="#monet.obs.aeronet_mod.AERONET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="monet.obs.aeronet_mod.AERONET.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>dates=None</em>, <em>product='AOD15'</em>, <em>latlonbox=None</em>, <em>daily=False</em>, <em>calc_550=True</em>, <em>inv_type=None</em>, <em>freq=None</em>, <em>detect_dust=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aeronet_mod.AERONET.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dates</strong> (<em>type</em>) – Description of parameter <cite>dates</cite>.</li>
+<li><strong>product</strong> (<em>type</em>) – Description of parameter <cite>product</cite>.</li>
+<li><strong>latlonbox</strong> (<em>type</em>) – Description of parameter <cite>latlonbox</cite>.</li>
+<li><strong>daily</strong> (<em>type</em>) – Description of parameter <cite>daily</cite>.</li>
+<li><strong>calc_550</strong> (<em>type</em>) – Description of parameter <cite>calc_550</cite>.</li>
+<li><strong>inv_type</strong> (<em>type</em>) – Description of parameter <cite>inv_type</cite>.</li>
+<li><strong>freq</strong> (<em>type</em>) – Description of parameter <cite>freq</cite>.</li>
+<li><strong>detect_dust</strong> (<em>type</em>) – Description of parameter <cite>detect_dust</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aeronet_mod.AERONET.build_url">
+<code class="descname">build_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aeronet_mod.AERONET.build_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aeronet_mod.AERONET.calc_550nm">
+<code class="descname">calc_550nm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aeronet_mod.AERONET.calc_550nm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Since AOD at 500nm is not calculated we use the extrapolation of
+V. Cesnulyte et al (ACP,2014) for the calculation</p>
+<p>aod550 = aod500 * (550/500) ^ -alpha</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aeronet_mod.AERONET.dust_detect">
+<code class="descname">dust_detect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aeronet_mod.AERONET.dust_detect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detect dust from AERONET. See [Dubovik et al., 2002].</p>
+<p>AOD_1020 &gt; 0.3 and AE(440,870) &lt; 0.6</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aeronet_mod.AERONET.get_columns">
+<code class="descname">get_columns</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aeronet_mod.AERONET.get_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aeronet_mod.AERONET.read_aeronet">
+<code class="descname">read_aeronet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aeronet_mod.AERONET.read_aeronet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aeronet_mod.AERONET.set_daterange">
+<code class="descname">set_daterange</code><span class="sig-paren">(</span><em>begin=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aeronet_mod.AERONET.set_daterange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>begin</strong> (<em>type</em>) – Description of parameter <cite>begin</cite>.</li>
+<li><strong>end</strong> (<em>type</em>) – Description of parameter <cite>end</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.aeronet_mod.dateparse">
+<code class="descclassname">monet.obs.aeronet_mod.</code><code class="descname">dateparse</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aeronet_mod.dateparse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="monet-obs-airnow-module">
-<h2>monet.obs.airnow module<a class="headerlink" href="#monet-obs-airnow-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.obs.airnow">
+<span id="monet-obs-airnow-module"></span><h2>monet.obs.airnow module<a class="headerlink" href="#module-monet.obs.airnow" title="Permalink to this headline">¶</a></h2>
+<p>Short summary.</p>
+<dl class="attribute">
+<dt id="monet.obs.airnow.url">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">url</code><a class="headerlink" href="#monet.obs.airnow.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>url</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow.dates">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">dates</code><a class="headerlink" href="#monet.obs.airnow.dates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>dates</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow.df">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">df</code><a class="headerlink" href="#monet.obs.airnow.df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow.daily">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">daily</code><a class="headerlink" href="#monet.obs.airnow.daily" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>daily</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow.objtype">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">objtype</code><a class="headerlink" href="#monet.obs.airnow.objtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>objtype</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow.filelist">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">filelist</code><a class="headerlink" href="#monet.obs.airnow.filelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>filelist</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow.monitor_file">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">monitor_file</code><a class="headerlink" href="#monet.obs.airnow.monitor_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>monitor_file</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow.__class__">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">__class__</code><a class="headerlink" href="#monet.obs.airnow.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>__class__</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow.monitor_df">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">monitor_df</code><a class="headerlink" href="#monet.obs.airnow.monitor_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>monitor_df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow.savecols">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">savecols</code><a class="headerlink" href="#monet.obs.airnow.savecols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>savecols</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.airnow.add_data">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">add_data</code><span class="sig-paren">(</span><em>dates</em>, <em>download=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dates</strong> (<em>type</em>) – Description of parameter <cite>dates</cite>.</li>
+<li><strong>download</strong> (<em>type</em>) – Description of parameter <cite>download</cite> (the default is False).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.airnow.aggregate_files">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">aggregate_files</code><span class="sig-paren">(</span><em>dates=[datetime.datetime(2016, 6, 6, 12, 0), datetime.datetime(2016, 6, 6, 13, 0)], download=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow.aggregate_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>download</strong> (<em>type</em>) – Description of parameter <cite>download</cite> (the default is False).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.airnow.build_urls">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">build_urls</code><span class="sig-paren">(</span><em>dates</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow.build_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">helper function to build urls</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.airnow.daterange">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">daterange</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow.daterange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>begin</strong> (<em>type</em>) – Description of parameter <cite>begin</cite> (the default is ‘’).</li>
+<li><strong>end</strong> (<em>type</em>) – Description of parameter <cite>end</cite> (the default is ‘’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.airnow.filter_bad_values">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">filter_bad_values</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow.filter_bad_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.airnow.get_station_locations">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">get_station_locations</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow.get_station_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.airnow.get_station_locations_remerge">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">get_station_locations_remerge</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow.get_station_locations_remerge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.airnow.read_csv">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">read_csv</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow.read_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fn</strong> (<em>string</em>) – file name to read</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.airnow.retrieve">
+<code class="descclassname">monet.obs.airnow.</code><code class="descname">retrieve</code><span class="sig-paren">(</span><em>url</em>, <em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow.retrieve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download files from the airnowtech S3 server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>string</em>) – Description of parameter <cite>url</cite>.</li>
+<li><strong>fname</strong> (<em>string</em>) – Description of parameter <cite>fname</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="monet-obs-aqs-module">
-<h2>monet.obs.aqs module<a class="headerlink" href="#monet-obs-aqs-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.obs.airnow_mod">
+<span id="monet-obs-airnow-mod-module"></span><h2>monet.obs.airnow_mod module<a class="headerlink" href="#module-monet.obs.airnow_mod" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="monet.obs.airnow_mod.AirNow">
+<em class="property">class </em><code class="descclassname">monet.obs.airnow_mod.</code><code class="descname">AirNow</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Short summary.</p>
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.url">
+<code class="descname">url</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>url</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.dates">
+<code class="descname">dates</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.dates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>dates</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.datestr">
+<code class="descname">datestr</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.datestr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>datestr</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.df">
+<code class="descname">df</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.daily">
+<code class="descname">daily</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.daily" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>daily</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.objtype">
+<code class="descname">objtype</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.objtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>objtype</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.filelist">
+<code class="descname">filelist</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.filelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>filelist</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.monitor_file">
+<code class="descname">monitor_file</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.monitor_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>monitor_file</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.__class__">
+<code class="descname">__class__</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>__class__</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.monitor_df">
+<code class="descname">monitor_df</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.monitor_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>monitor_df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.airnow_mod.AirNow.savecols">
+<code class="descname">savecols</code><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.savecols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>savecols</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>dates</em>, <em>download=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dates</strong> (<em>type</em>) – Description of parameter <cite>dates</cite>.</li>
+<li><strong>download</strong> (<em>type</em>) – Description of parameter <cite>download</cite> (the default is False).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.aggregate_files">
+<code class="descname">aggregate_files</code><span class="sig-paren">(</span><em>download=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.aggregate_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>download</strong> (<em>type</em>) – Description of parameter <cite>download</cite> (the default is False).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.build_urls">
+<code class="descname">build_urls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.build_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">helper function to build urls</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.convert_dates_tofnames">
+<code class="descname">convert_dates_tofnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.convert_dates_tofnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to create file names</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.filter_bad_values">
+<code class="descname">filter_bad_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.filter_bad_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.get_station_locations">
+<code class="descname">get_station_locations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.get_station_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.get_station_locations_remerge">
+<code class="descname">get_station_locations_remerge</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.get_station_locations_remerge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.read_csv">
+<code class="descname">read_csv</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.read_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fn</strong> (<em>string</em>) – file name to read</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.retrieve">
+<code class="descname">retrieve</code><span class="sig-paren">(</span><em>url</em>, <em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.retrieve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>type</em>) – Description of parameter <cite>url</cite>.</li>
+<li><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.airnow_mod.AirNow.set_daterange">
+<code class="descname">set_daterange</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.airnow_mod.AirNow.set_daterange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>begin</strong> (<em>type</em>) – Description of parameter <cite>begin</cite> (the default is ‘’).</li>
+<li><strong>end</strong> (<em>type</em>) – Description of parameter <cite>end</cite> (the default is ‘’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="monet-obs-cems-module">
-<h2>monet.obs.cems module<a class="headerlink" href="#monet-obs-cems-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.obs.aqs_mod">
+<span id="monet-obs-aqs-mod-module"></span><h2>monet.obs.aqs_mod module<a class="headerlink" href="#module-monet.obs.aqs_mod" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="monet.obs.aqs_mod.AQS">
+<em class="property">class </em><code class="descclassname">monet.obs.aqs_mod.</code><code class="descname">AQS</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Short summary.</p>
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.baseurl">
+<code class="descname">baseurl</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.baseurl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>baseurl</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.objtype">
+<code class="descname">objtype</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.objtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>objtype</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">baseurl</code></dt>
+<dd><p>Description of attribute <cite>baseurl</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.dates">
+<code class="descname">dates</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.dates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>dates</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.renamedhcols">
+<code class="descname">renamedhcols</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.renamedhcols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>renamedhcols</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.renameddcols">
+<code class="descname">renameddcols</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.renameddcols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>renameddcols</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.savecols">
+<code class="descname">savecols</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.savecols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>savecols</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.df">
+<code class="descname">df</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.monitor_file">
+<code class="descname">monitor_file</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.monitor_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>monitor_file</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.__class__">
+<code class="descname">__class__</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>__class__</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.monitor_df">
+<code class="descname">monitor_df</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.monitor_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>monitor_df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.daily">
+<code class="descname">daily</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.daily" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>daily</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.aqs_mod.AQS.d_df">
+<code class="descname">d_df</code><a class="headerlink" href="#monet.obs.aqs_mod.AQS.d_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>d_df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aqs_mod.AQS.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>dates</em>, <em>param=None</em>, <em>daily=False</em>, <em>network=None</em>, <em>download=False</em>, <em>local=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aqs_mod.AQS.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dates</strong> (<em>list of datetime objects</em>) – Description of parameter <cite>dates</cite>.</li>
+<li><strong>param</strong> (<em>list of strings</em>) – Description of parameter <cite>param</cite> (the default is None).</li>
+<li><strong>daily</strong> (<em>boolean</em>) – Description of parameter <cite>daily</cite> (the default is False).</li>
+<li><strong>network</strong> (<em>type</em>) – Description of parameter <cite>network</cite> (the default is None).</li>
+<li><strong>download</strong> (<em>type</em>) – Description of parameter <cite>download</cite> (the default is False).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aqs_mod.AQS.add_data2">
+<code class="descname">add_data2</code><span class="sig-paren">(</span><em>df</em>, <em>daily=False</em>, <em>network=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aqs_mod.AQS.add_data2" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>df</strong> (<em>dataframe</em>)</li>
+<li><strong>daily</strong> (<em>boolean</em>)</li>
+<li><strong>network</strong></li>
+<li><strong>Returns</strong></li>
+<li><strong>self.df.copy()</strong> (<em>dataframe</em>)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aqs_mod.AQS.build_url">
+<code class="descname">build_url</code><span class="sig-paren">(</span><em>param</em>, <em>year</em>, <em>daily=False</em>, <em>download=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aqs_mod.AQS.build_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>param</strong> (<em>type</em>) – Description of parameter <cite>param</cite>.</li>
+<li><strong>year</strong> (<em>type</em>) – Description of parameter <cite>year</cite>.</li>
+<li><strong>daily</strong> (<em>type</em>) – Description of parameter <cite>daily</cite> (the default is False).</li>
+<li><strong>download</strong> (<em>type</em>) – Description of parameter <cite>download</cite> (the default is False).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aqs_mod.AQS.build_urls">
+<code class="descname">build_urls</code><span class="sig-paren">(</span><em>params</em>, <em>dates</em>, <em>daily=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aqs_mod.AQS.build_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>type</em>) – Description of parameter <cite>params</cite>.</li>
+<li><strong>dates</strong> (<em>list of datetime objects</em>) – dates to retrieve data for. Only the years are taken into account.</li>
+<li><strong>daily</strong> (<em>type</em>) – Description of parameter <cite>daily</cite> (the default is False).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="monet.obs.aqs_mod.AQS.change_units">
+<em class="property">static </em><code class="descname">change_units</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aqs_mod.AQS.change_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aqs_mod.AQS.columns_rename">
+<code class="descname">columns_rename</code><span class="sig-paren">(</span><em>columns</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aqs_mod.AQS.columns_rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>rename columns for hourly data.
+:Parameters: * <strong>columns</strong> (<em>list of strings</em>) – list of current columns</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>verbose</strong> (<em>boolean</em>)</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rcolumn</strong> – list of new column names to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list of strings</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aqs_mod.AQS.get_species">
+<code class="descname">get_species</code><span class="sig-paren">(</span><em>df</em>, <em>voc=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aqs_mod.AQS.get_species" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<dl class="docutils">
+<dt>df <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd>Description of parameter <cite>df</cite>.</dd>
+<dt>voc <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd>Description of parameter <cite>voc</cite> (the default is False).</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aqs_mod.AQS.load_aqs_file">
+<code class="descname">load_aqs_file</code><span class="sig-paren">(</span><em>url</em>, <em>network</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aqs_mod.AQS.load_aqs_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>type</em>) – Description of parameter <cite>url</cite>.</li>
+<li><strong>network</strong> (<em>type</em>) – Description of parameter <cite>network</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.aqs_mod.AQS.retrieve">
+<code class="descname">retrieve</code><span class="sig-paren">(</span><em>url</em>, <em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.aqs_mod.AQS.retrieve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>type</em>) – Description of parameter <cite>url</cite>.</li>
+<li><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="monet-obs-crn-module">
-<h2>monet.obs.crn module<a class="headerlink" href="#monet-obs-crn-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.obs.cems_mod">
+<span id="monet-obs-cems-mod-module"></span><h2>monet.obs.cems_mod module<a class="headerlink" href="#module-monet.obs.cems_mod" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="monet.obs.cems_mod.CEMS">
+<em class="property">class </em><code class="descclassname">monet.obs.cems_mod.</code><code class="descname">CEMS</code><a class="headerlink" href="#monet.obs.cems_mod.CEMS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<blockquote>
+<div>Class for data from continuous emission monitoring systems (CEMS).
+Data from power plants can be downloaded from
+<a class="reference external" href="ftp://newftp.epa.gov/DMDNLoad/emissions/">ftp://newftp.epa.gov/DMDNLoad/emissions/</a></div></blockquote>
+<dl class="docutils">
+<dt>Attributes</dt>
+<dd><dl class="first last docutils">
+<dt>efile <span class="classifier-delimiter">:</span> <span class="classifier">type string</span></dt>
+<dd>Description of attribute <cite>efile</cite>.</dd>
+<dt>url <span class="classifier-delimiter">:</span> <span class="classifier">type string</span></dt>
+<dd>Description of attribute <cite>url</cite>.</dd>
+<dt>info <span class="classifier-delimiter">:</span> <span class="classifier">type string</span></dt>
+<dd>Information about data.</dd>
+<dt>df <span class="classifier-delimiter">:</span> <span class="classifier">pandas DataFrame</span></dt>
+<dd>dataframe containing emissions data.</dd>
+</dl>
+</dd>
+<dt>Methods</dt>
+<dd><p class="first">__init__(self)
+add_data(self, rdate, states=[‘md’], download=False, verbose=True):
+load(self, efile, verbose=True):
+retrieve(self, rdate, state, download=True):</p>
+<p class="last">match_column(self, varname):
+get_var(self, varname, loc=None, daterange=None, unitid=-99, verbose=True):
+retrieve(self, rdate, state, download=True):
+create_location_dictionary(self):
+rename(self, ccc, newname, rcolumn, verbose):</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>rdate, states=['md'], download=False, verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>gets the ftp url from the retrieve method and then
+loads the data from the ftp site using the load method.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rdate</strong> (<em>single datetime object of list of datetime objects</em>) – The first datetime object indicates the month and year of the
+first file to retrieve.
+The second datetime object indicates the month and year of the
+last file to retrieve.</li>
+<li><strong>states</strong> (<em>list of strings</em>) – list of two letter state identifications.</li>
+<li><strong>download</strong> (<em>boolean</em>) – if download=True then retrieve will download the files and load
+will read the downloaded files.
+if download=False then retrieve will return the url and load
+will read directly from ftp site.</li>
+<li><strong>verbose</strong> (<em>boolean</em>) – if TRUE prints out additional information.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">boolean True</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.add_info">
+<code class="descname">add_info</code><span class="sig-paren">(</span><em>dftemp</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.add_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>————-Load supplmental data———————–
+Add location (latitude longitude) and time UTC information to dataframe</p>
+<blockquote>
+<div>dftemp.</div></blockquote>
+<dl class="docutils">
+<dt>cemsinfo.csv contains info on facility id, lat, lon, time offset from</dt>
+<dd>UTC.</dd>
+</dl>
+<p>allows transformation from local time to UTC.
+If not all power stations are found in the cemsinfo.csv file,
+then Nan will be written in lat, lon and ‘time’ column.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dftemp</strong> (<em>pandas dataframe</em>)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>dftemp</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pandas dataframe</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.cemspivot">
+<code class="descname">cemspivot</code><span class="sig-paren">(</span><em>varname</em>, <em>daterange=None</em>, <em>unitid=False</em>, <em>stackht=False</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.cemspivot" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last">
+<li><p class="first"><strong>varname</strong> (<em>string</em>) – name of column in the cems dataframe</p>
+</li>
+<li><p class="first"><strong>daterange</strong> (<em>list of two datetime objects</em>) – define a date range</p>
+</li>
+<li><p class="first"><strong>unitid</strong> (<em>boolean.</em>) – If True and unit id columns exist then these will be kept as
+separate columns in the pivot table.</p>
+</li>
+<li><p class="first"><strong>verbose</strong> (<em>boolean</em>) – if true print out extra information.</p>
+</li>
+<li><p class="first"><strong>stackht</strong> (<em>boolean</em>) – NOT IMPLEMENTED YET. if true stack height is in header column.</p>
+</li>
+<li><p class="first"><strong>Returns</strong> (<em>pandas DataFrame object</em>) – returns dataframe with rows time. Columns are (orispl_code,
+unit_id).
+If no unit_id in the file then columns are just orispl_code.
+if unitid flag set to False then sums over unit_id’s that belong to</p>
+<blockquote>
+<div><p>an orispl_code. Values are from the column specified by the
+varname input.</p>
+</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.columns_rename">
+<code class="descname">columns_rename</code><span class="sig-paren">(</span><em>columns</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.columns_rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps columns with one name to a standard name
+Parameters:
+———-
+columns: list of strings</p>
+<p>rcolumn: list of strings</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.create_location_dictionary">
+<code class="descname">create_location_dictionary</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.create_location_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns dictionary withe key orispl_code and value  (latitude,
+longitude) tuple</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.create_name_dictionary">
+<code class="descname">create_name_dictionary</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.create_name_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns dictionary withe key orispl_code and value facility name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.get_var">
+<code class="descname">get_var</code><span class="sig-paren">(</span><em>varname</em>, <em>orisp=None</em>, <em>daterange=None</em>, <em>unitid=-99</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.get_var" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>returns time series with variable indicated by varname.
+returns data frame where rows are date and columns are the
+values of cmatch for each fac_id.</p>
+<p>routine looks for column which contains all strings in varname.
+Currently not case sensitive.</p>
+<p>loc and ORISPL CODES.
+unitid is a unit_id</p>
+<dl class="docutils">
+<dt>if a particular unitid is specified then will return values for that</dt>
+<dd>unit.</dd>
+</dl>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>varname</strong> (<em>string or iteratable of strings</em>) – varname may be string or list of strings.</li>
+<li><strong>loc</strong> (<em>type</em>) – Description of parameter <cite>loc</cite>.</li>
+<li><strong>daterange</strong> (<em>type</em>) – Description of parameter <cite>daterange</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>efile</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>loads information found in efile into a pandas dataframe.
+:Parameters: * <strong>efile</strong> (<em>string</em>) – name of csv file to open or url of csv file.</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>verbose</strong> (<em>boolean</em>) – if TRUE prints out information</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.match_column">
+<code class="descname">match_column</code><span class="sig-paren">(</span><em>varname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.match_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>varname is list of strings.
+returns column name which contains all the strings.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.rename">
+<code class="descname">rename</code><span class="sig-paren">(</span><em>ccc</em>, <em>newname</em>, <em>rcolumn</em>, <em>verbose</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>keeps track of original and new column names in the namehash attribute
+Parameters:
+———-
+ccc: str
+newname: str
+rcolumn: list of str
+verbose: boolean
+:returns: <strong>rcolumn</strong>
+:rtype: list of str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.cems_mod.CEMS.retrieve">
+<code class="descname">retrieve</code><span class="sig-paren">(</span><em>rdate</em>, <em>state</em>, <em>download=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.CEMS.retrieve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rdate</strong> (<em>datetime object</em>) – Uses year and month. Day and hour are not used.</li>
+<li><strong>state</strong> (<em>string</em>) – state abbreviation to retrieve data for</li>
+<li><strong>download</strong> (<em>boolean</em>) – set to True to download
+if download FALSE then returns string with url of ftp
+if download TRUE then returns name of downloaded file</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">if download FALSE then returns string with url of ftp
+if download TRUE then returns name of downloaded file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">efile string</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.cems_mod.addmonth">
+<code class="descclassname">monet.obs.cems_mod.</code><code class="descname">addmonth</code><span class="sig-paren">(</span><em>dt</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.addmonth" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dt</strong> (<em>datetime object</em>)</li>
+<li><strong>Returns</strong> (<em>datetime object</em>)</li>
+<li><strong>datetime that is one month from input datetime.</strong></li>
+<li><strong>handles ambiguities that arise when input date is</strong></li>
+<li><strong>at the end of a month and next month does not have the</strong></li>
+<li><strong>same number of days.</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.cems_mod.get_date_fmt">
+<code class="descclassname">monet.obs.cems_mod.</code><code class="descname">get_date_fmt</code><span class="sig-paren">(</span><em>date</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.get_date_fmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines what format of the date is in.
+In some files year is first and others it is last.
+:Parameters: * <strong>date</strong> (<em>str</em>) – with format either YYYY-mm-DD or mm-DD-YYYY</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>verbose</strong> (<em>boolean</em>) – if TRUE print extra information</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fmt</strong> – string which can be used with datetime object to give format of date
+string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.cems_mod.get_stack_dict">
+<code class="descclassname">monet.obs.cems_mod.</code><code class="descname">get_stack_dict</code><span class="sig-paren">(</span><em>df</em>, <em>orispl=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.get_stack_dict" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df dataframe created with stack_height() call</strong></li>
+<li><strong>orispl</strong> (<em>list</em>) – list of orispl codes to consider</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>stackhash</strong> (<em>dictionary</em>)</li>
+<li><em>key orispl code and value list of tuples with</em></li>
+<li><em>(stackid, stackht (in feet))</em></li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.cems_mod.getdegrees">
+<code class="descclassname">monet.obs.cems_mod.</code><code class="descname">getdegrees</code><span class="sig-paren">(</span><em>degrees</em>, <em>minutes</em>, <em>seconds</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.getdegrees" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>degrees</strong> (<em>integer</em>)</li>
+<li><strong>minutes</strong> (<em>integer</em>)</li>
+<li><strong>seconds</strong> (<em>integer</em>)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">decimal degrees.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.cems_mod.max_stackht">
+<code class="descclassname">monet.obs.cems_mod.</code><code class="descname">max_stackht</code><span class="sig-paren">(</span><em>df</em>, <em>meters=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.max_stackht" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds ‘max_stackht’ column to dataframe returned by stack_height function.
+this column indicates the largest stack height associated with that
+orispl code.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.cems_mod.read_stack_height">
+<code class="descclassname">monet.obs.cems_mod.</code><code class="descname">read_stack_height</code><span class="sig-paren">(</span><em>verbose=False</em>, <em>testing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.cems_mod.read_stack_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads file with information on stack heights and diameters and returns a
+dataframe.
+:Parameters: * <strong>verbose</strong> (<em>boolean</em>) – if true prints out header information in file.</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>testing</strong> (<em>boolean</em>) – if true returns dataframe with more columns</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><strong>df2</strong> (<em>pandas dataframe</em>) – dataframe which contains columns which have stack height and diameter
+for each orispl code and stackid.</li>
+<li><strong>TO DO</strong> (<em>CEMS data contains a unit_id but this doesn’t seem to correspond to</em>)</li>
+<li><em>the ids availble in the ptinv file. Not clear how to match individual units</em></li>
+<li><em>with the same orispl code.</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-monet.obs.crn_mod">
+<span id="monet-obs-crn-mod-module"></span><h2>monet.obs.crn_mod module<a class="headerlink" href="#module-monet.obs.crn_mod" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Data is taken from the Climate Reference Network.  This is to expand validation</dt>
+<dd><p class="first">of the NOAA ARL model validation leveraging inhouse datasets.</p>
+<blockquote class="last">
+<div><p>Data available at <a class="reference external" href="https://www.ncdc.noaa.gov/crn/qcdatasets.html">https://www.ncdc.noaa.gov/crn/qcdatasets.html</a></p>
+<p>Here we use the hourly data.</p>
+<blockquote>
+<div>1    WBANNO                         XXXXX
+2    UTC_DATE                       YYYYMMDD
+3    UTC_TIME                       HHmm
+4    LST_DATE                       YYYYMMDD
+5    LST_TIME                       HHmm
+6    CRX_VN                         XXXXXX
+7    LONGITUDE                      Decimal_degrees
+8    LATITUDE                       Decimal_degrees
+9    T_CALC                         Celsius
+10   T_HR_AVG                       Celsius
+11   T_MAX                          Celsius
+12   T_MIN                          Celsius
+13   P_CALC                         mm
+14   SOLARAD                        W/m^2
+15   SOLARAD_FLAG                   X
+16   SOLARAD_MAX                    W/m^2
+17   SOLARAD_MAX_FLAG               X
+18   SOLARAD_MIN                    W/m^2
+19   SOLARAD_MIN_FLAG               X
+20   SUR_TEMP_TYPE                  X
+21   SUR_TEMP                       Celsius
+22   SUR_TEMP_FLAG                  X
+23   SUR_TEMP_MAX                   Celsius
+24   SUR_TEMP_MAX_FLAG              X
+25   SUR_TEMP_MIN                   Celsius
+26   SUR_TEMP_MIN_FLAG              X
+27   RH_HR_AVG                      %
+28   RH_HR_AVG_FLAG                 X
+29   SOIL_MOISTURE_5                m^3/m^3
+30   SOIL_MOISTURE_10               m^3/m^3
+31   SOIL_MOISTURE_20               m^3/m^3
+32   SOIL_MOISTURE_50               m^3/m^3
+33   SOIL_MOISTURE_100              m^3/m^3
+34   SOIL_TEMP_5                    Celsius
+35   SOIL_TEMP_10                   Celsius
+36   SOIL_TEMP_20                   Celsius
+37   SOIL_TEMP_50                   Celsius
+38   SOIL_TEMP_100                  Celsius</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<div class="section" id="daily-data">
+<h3>Daily Data<a class="headerlink" href="#daily-data" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div>Field#  Name                           Units</div></blockquote>
+<blockquote>
+<div>3    CRX_VN                         XXXXXX
+4    LONGITUDE                      Decimal_degrees
+5    LATITUDE                       Decimal_degrees
+6    T_DAILY_MAX                    Celsius
+7    T_DAILY_MIN                    Celsius
+8    T_DAILY_MEAN                   Celsius
+9    T_DAILY_AVG                    Celsius
+10   P_DAILY_CALC                   mm
+11   SOLARAD_DAILY                  MJ/m^2
+12   SUR_TEMP_DAILY_TYPE            X
+13   SUR_TEMP_DAILY_MAX             Celsius
+14   SUR_TEMP_DAILY_MIN             Celsius
+15   SUR_TEMP_DAILY_AVG             Celsius
+16   RH_DAILY_MAX                   %
+17   RH_DAILY_MIN                   %
+18   RH_DAILY_AVG                   %
+19   SOIL_MOISTURE_5_DAILY          m^3/m^3
+20   SOIL_MOISTURE_10_DAILY         m^3/m^3
+21   SOIL_MOISTURE_20_DAILY         m^3/m^3
+22   SOIL_MOISTURE_50_DAILY         m^3/m^3
+23   SOIL_MOISTURE_100_DAILY        m^3/m^3
+24   SOIL_TEMP_5_DAILY              Celsius
+25   SOIL_TEMP_10_DAILY             Celsius
+26   SOIL_TEMP_20_DAILY             Celsius
+27   SOIL_TEMP_50_DAILY             Celsius
+28   SOIL_TEMP_100_DAILY            Celsius</div></blockquote>
+<blockquote>
+<div>Field#  Name                           Units</div></blockquote>
+<blockquote>
+<div>3    UTC_TIME                       HHmm
+4    LST_DATE                       YYYYMMDD
+5    LST_TIME                       HHmm
+6    CRX_VN                         XXXXXX
+7    LONGITUDE                      Decimal_degrees
+8    LATITUDE                       Decimal_degrees
+9    AIR_TEMPERATURE                Celsius
+10   PRECIPITATION                  mm
+11   SOLAR_RADIATION                W/m^2
+12   SR_FLAG                        X
+13   SURFACE_TEMPERATURE            Celsius
+14   ST_TYPE                        X
+15   ST_FLAG                        X
+16   RELATIVE_HUMIDITY              %
+17   RH_FLAG                        X
+18   SOIL_MOISTURE_5                m^3/m^3
+19   SOIL_TEMPERATURE_5             Celsius
+20   WETNESS                        Ohms
+21   WET_FLAG                       X
+22   WIND_1_5                       m/s
+23   WIND_FLAG                      X</div></blockquote>
+<dl class="class">
+<dt id="monet.obs.crn_mod.crn">
+<em class="property">class </em><code class="descclassname">monet.obs.crn_mod.</code><code class="descname">crn</code><a class="headerlink" href="#monet.obs.crn_mod.crn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="monet.obs.crn_mod.crn.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>dates</em>, <em>daily=False</em>, <em>sub_hourly=False</em>, <em>download=False</em>, <em>latlonbox=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.crn_mod.crn.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dates</strong> (<em>type</em>) – Description of parameter <cite>dates</cite>.</li>
+<li><strong>daily</strong> (<em>type</em>) – Description of parameter <cite>daily</cite> (the default is False).</li>
+<li><strong>sub_hourly</strong> (<em>type</em>) – Description of parameter <cite>sub_hourly</cite> (the default is False).</li>
+<li><strong>download</strong> (<em>type</em>) – Description of parameter <cite>download</cite> (the default is False).</li>
+<li><strong>latlonbox</strong> (<em>type</em>) – Description of parameter <cite>latlonbox</cite> (the default is None).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.crn_mod.crn.build_url">
+<code class="descname">build_url</code><span class="sig-paren">(</span><em>year</em>, <em>state</em>, <em>site</em>, <em>vector</em>, <em>daily=False</em>, <em>sub_hourly=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.crn_mod.crn.build_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.crn_mod.crn.build_urls">
+<code class="descname">build_urls</code><span class="sig-paren">(</span><em>monitors</em>, <em>dates</em>, <em>daily=False</em>, <em>sub_hourly=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.crn_mod.crn.build_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>monitors</strong> (<em>type</em>) – Description of parameter <cite>monitors</cite>.</li>
+<li><strong>dates</strong> (<em>type</em>) – Description of parameter <cite>dates</cite>.</li>
+<li><strong>daily</strong> (<em>type</em>) – Description of parameter <cite>daily</cite> (the default is False).</li>
+<li><strong>sub_hourly</strong> (<em>type</em>) – Description of parameter <cite>sub_hourly</cite> (the default is False).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.crn_mod.crn.change_units">
+<code class="descname">change_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.crn_mod.crn.change_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>param</strong> (<em>type</em>) – Description of parameter <cite>param</cite> (the default is ‘O3’).</li>
+<li><strong>aqs_param</strong> (<em>type</em>) – Description of parameter <cite>aqs_param</cite> (the default is ‘OZONE’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="monet.obs.crn_mod.crn.check_url">
+<em class="property">static </em><code class="descname">check_url</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.crn_mod.crn.check_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> (<em>type</em>) – Description of parameter <cite>url</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.crn_mod.crn.citation2">
+<code class="descname">citation2</code><em class="property"> = None</em><a class="headerlink" href="#monet.obs.crn_mod.crn.citation2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collins, J. H. Lawrimore, R. D. Leeper, M. E. Hall, J. Kochendorfer,</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.crn_mod.crn.citiation">
+<code class="descname">citiation</code><em class="property"> = None</em><a class="headerlink" href="#monet.obs.crn_mod.crn.citiation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lawrimore, T. P. Meyers, M. R. Helfert, G. Goodge, and P. W. Thorne,</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.crn_mod.crn.get_monitor_df">
+<code class="descname">get_monitor_df</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.crn_mod.crn.get_monitor_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.crn_mod.crn.load_file">
+<code class="descname">load_file</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.crn_mod.crn.load_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.crn_mod.crn.retrieve">
+<code class="descname">retrieve</code><span class="sig-paren">(</span><em>url</em>, <em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.crn_mod.crn.retrieve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>type</em>) – Description of parameter <cite>url</cite>.</li>
+<li><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.crn_mod.crn.set_daterange">
+<code class="descname">set_daterange</code><span class="sig-paren">(</span><em>begin=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.crn_mod.crn.set_daterange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>begin</strong> (<em>type</em>) – Description of parameter <cite>begin</cite> (the default is ‘’).</li>
+<li><strong>end</strong> (<em>type</em>) – Description of parameter <cite>end</cite> (the default is ‘’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-monet.obs.epa_util">
 <span id="monet-obs-epa-util-module"></span><h2>monet.obs.epa_util module<a class="headerlink" href="#module-monet.obs.epa_util" title="Permalink to this headline">¶</a></h2>
@@ -394,17 +2249,657 @@ unit.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="monet-obs-improve-module">
-<h2>monet.obs.improve module<a class="headerlink" href="#monet-obs-improve-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.obs.goes">
+<span id="monet-obs-goes-module"></span><h2>monet.obs.goes module<a class="headerlink" href="#module-monet.obs.goes" title="Permalink to this headline">¶</a></h2>
+<p>this will read the modis data</p>
+<dl class="function">
+<dt id="monet.obs.goes.open_files">
+<code class="descclassname">monet.obs.goes.</code><code class="descname">open_files</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.goes.open_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="monet-obs-ish-module">
-<h2>monet.obs.ish module<a class="headerlink" href="#monet-obs-ish-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.obs.icartt_mod">
+<span id="monet-obs-icartt-mod-module"></span><h2>monet.obs.icartt_mod module<a class="headerlink" href="#module-monet.obs.icartt_mod" title="Permalink to this headline">¶</a></h2>
+<p>This module opens data from the ICARTT format and reformats it for use in
+MONET. The module makes use of Barron Henderson’s PseudoNetCDF
+(<a class="reference external" href="https://github.com/barronh/pseudonetcdf)and">https://github.com/barronh/pseudonetcdf)and</a> xarray to read the data.  It is
+noti ntended to read more than ONE file at a time</p>
+<dl class="class">
+<dt id="monet.obs.icartt_mod.icartt">
+<em class="property">class </em><code class="descclassname">monet.obs.icartt_mod.</code><code class="descname">icartt</code><a class="headerlink" href="#monet.obs.icartt_mod.icartt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Short summary.
+Reads icartt data file format and gets/reformats 4D coordinate data used
+to manipulate/analyze and/or combine with model data later</p>
+<dl class="method">
+<dt id="monet.obs.icartt_mod.icartt.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.icartt_mod.icartt.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>This assumes that you have downloaded the specific ICARTT flight data
+Xarray Open/Read the ICARTT flight dataset as pseudonetcdf</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.icartt_mod.icartt.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>da</em>, <em>lat_label=None</em>, <em>lon_label=None</em>, <em>alt_label=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.icartt_mod.icartt.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Comes in as an xarray from add_xarray_Data
+Allows for searching or user specified Lat/Lon variable names
+Sets latitude and longitude as coordinates
+Reads start date and seconds elapsed, converts time coordinate</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="monet-obs-nadp-module">
-<h2>monet.obs.nadp module<a class="headerlink" href="#monet-obs-nadp-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.obs.improve_mod">
+<span id="monet-obs-improve-mod-module"></span><h2>monet.obs.improve_mod module<a class="headerlink" href="#module-monet.obs.improve_mod" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="monet.obs.improve_mod.IMPROVE">
+<em class="property">class </em><code class="descclassname">monet.obs.improve_mod.</code><code class="descname">IMPROVE</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Short summary.</p>
+<dl class="attribute">
+<dt id="monet.obs.improve_mod.IMPROVE.datestr">
+<code class="descname">datestr</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.datestr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>datestr</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.improve_mod.IMPROVE.df">
+<code class="descname">df</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.improve_mod.IMPROVE.daily">
+<code class="descname">daily</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.daily" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>daily</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.improve_mod.IMPROVE.se_states">
+<code class="descname">se_states</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.se_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>se_states</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.improve_mod.IMPROVE.ne_states">
+<code class="descname">ne_states</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.ne_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>ne_states</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.improve_mod.IMPROVE.nc_states">
+<code class="descname">nc_states</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.nc_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>nc_states</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.improve_mod.IMPROVE.sc_states">
+<code class="descname">sc_states</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.sc_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>sc_states</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.improve_mod.IMPROVE.r_states">
+<code class="descname">r_states</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.r_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>r_states</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.improve_mod.IMPROVE.p_states">
+<code class="descname">p_states</code><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.p_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>p_states</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.improve_mod.IMPROVE.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>fname</em>, <em>add_meta=False</em>, <em>delimiter='\t'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>This assumes that you have downloaded the data from</dt>
+<dd><blockquote class="first">
+<div><a class="reference external" href="http://views.cira.colostate.edu/fed/DataWizard/Default.aspx">http://views.cira.colostate.edu/fed/DataWizard/Default.aspx</a></div></blockquote>
+<p class="last">The data is the IMPROVE Aerosol dataset
+Any number of sites
+Parameters included are All
+Fields include Dataset,Site,Date,Parameter,POC,Data_value,Unit,
+Latitude,Longitude,State,EPA Site Code Options are delimited
+‘,’ data only and normalized skinny format</p>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite>.</li>
+<li><strong>output</strong> (<em>type</em>) – Description of parameter <cite>output</cite> (the default is ‘’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.improve_mod.IMPROVE.get_date_range">
+<code class="descname">get_date_range</code><span class="sig-paren">(</span><em>dates</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.get_date_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dates</strong> (<em>type</em>) – Description of parameter <cite>dates</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.improve_mod.IMPROVE.load_hdf">
+<code class="descname">load_hdf</code><span class="sig-paren">(</span><em>fname</em>, <em>dates</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.load_hdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite>.</li>
+<li><strong>dates</strong> (<em>type</em>) – Description of parameter <cite>dates</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.improve_mod.IMPROVE.set_daterange">
+<code class="descname">set_daterange</code><span class="sig-paren">(</span><em>begin=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.improve_mod.IMPROVE.set_daterange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>begin</strong> (<em>type</em>) – Description of parameter <cite>begin</cite> (the default is ‘’).</li>
+<li><strong>end</strong> (<em>type</em>) – Description of parameter <cite>end</cite> (the default is ‘’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="monet-obs-tolnet-module">
-<h2>monet.obs.tolnet module<a class="headerlink" href="#monet-obs-tolnet-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.obs.ish_mod">
+<span id="monet-obs-ish-mod-module"></span><h2>monet.obs.ish_mod module<a class="headerlink" href="#module-monet.obs.ish_mod" title="Permalink to this headline">¶</a></h2>
+<p>Python module for reading NOAA ISH files</p>
+<dl class="class">
+<dt id="monet.obs.ish_mod.ISH">
+<em class="property">class </em><code class="descclassname">monet.obs.ish_mod.</code><code class="descname">ISH</code><a class="headerlink" href="#monet.obs.ish_mod.ISH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Integrated Surface Hourly (also known as ISD, Integrated Surface Data)</p>
+<dl class="attribute">
+<dt id="monet.obs.ish_mod.ISH.WIDTHS">
+<code class="descname">WIDTHS</code><a class="headerlink" href="#monet.obs.ish_mod.ISH.WIDTHS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>WIDTHS</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.ish_mod.ISH.DTYPES">
+<code class="descname">DTYPES</code><a class="headerlink" href="#monet.obs.ish_mod.ISH.DTYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>DTYPES</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.ish_mod.ISH.NAMES">
+<code class="descname">NAMES</code><a class="headerlink" href="#monet.obs.ish_mod.ISH.NAMES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>NAMES</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.ish_mod.ISH.history_file">
+<code class="descname">history_file</code><a class="headerlink" href="#monet.obs.ish_mod.ISH.history_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>history_file</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.ish_mod.ISH.history">
+<code class="descname">history</code><a class="headerlink" href="#monet.obs.ish_mod.ISH.history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>history</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.obs.ish_mod.ISH.daily">
+<code class="descname">daily</code><a class="headerlink" href="#monet.obs.ish_mod.ISH.daily" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>daily</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.ish_mod.ISH.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>dates</em>, <em>box=None</em>, <em>country=None</em>, <em>state=None</em>, <em>site=None</em>, <em>resample=True</em>, <em>window='H'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.ish_mod.ISH.add_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dates</strong> (<em>list of datetime objects</em>)</li>
+<li><strong>box</strong> (<em>list of floats</em>) – [latmin, lonmin, latmax, lonmax]</li>
+<li><strong>country</strong> (<em>type</em>) – Description of parameter <cite>country</cite>.</li>
+<li><strong>state</strong> (<em>type</em>) – Description of parameter <cite>state</cite>.</li>
+<li><strong>site</strong> (<em>type</em>) – Description of parameter <cite>site</cite>.</li>
+<li><strong>resample</strong> (<em>type</em>) – Description of parameter <cite>resample</cite>.</li>
+<li><strong>window</strong> (<em>type</em>) – Description of parameter <cite>window</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.ish_mod.ISH.delimit">
+<code class="descname">delimit</code><span class="sig-paren">(</span><em>file_object</em>, <em>delimiter='</em>, <em>'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.ish_mod.ISH.delimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over the lines in a file yielding comma delimited versions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>file_object</strong> (<em>file or filename</em>) – Description of parameter <cite>file_object</cite>.</li>
+<li><strong>delimiter</strong> (<em>type</em>) – Description of parameter <cite>delimiter</cite>.</li>
+<li><strong>‘</strong> (<em>type</em>) – Description of parameter <cite>‘</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.ish_mod.ISH.get_url_file_objs">
+<code class="descname">get_url_file_objs</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.ish_mod.ISH.get_url_file_objs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<em>type</em>) – Description of parameter <cite>fname</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.ish_mod.ISH.read_data_frame">
+<code class="descname">read_data_frame</code><span class="sig-paren">(</span><em>file_object</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.ish_mod.ISH.read_data_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a data frame from an ISH file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_object</strong> (<em>type</em>) – Description of parameter <cite>file_object</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.ish_mod.ISH.read_ish_history">
+<code class="descname">read_ish_history</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.ish_mod.ISH.read_ish_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>read ISH history file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.ish_mod.ISH.subset_sites">
+<code class="descname">subset_sites</code><span class="sig-paren">(</span><em>latmin=32.65</em>, <em>lonmin=-113.3</em>, <em>latmax=34.5</em>, <em>lonmax=-110.4</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.ish_mod.ISH.subset_sites" title="Permalink to this definition">¶</a></dt>
+<dd><p>find sites within designated region</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-monet.obs.nadp_mod">
+<span id="monet-obs-nadp-mod-module"></span><h2>monet.obs.nadp_mod module<a class="headerlink" href="#module-monet.obs.nadp_mod" title="Permalink to this headline">¶</a></h2>
+<p>READS NAPD DATA</p>
+<dl class="class">
+<dt id="monet.obs.nadp_mod.NADP">
+<em class="property">class </em><code class="descclassname">monet.obs.nadp_mod.</code><code class="descname">NADP</code><a class="headerlink" href="#monet.obs.nadp_mod.NADP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="monet.obs.nadp_mod.NADP.add_data">
+<code class="descname">add_data</code><span class="sig-paren">(</span><em>dates</em>, <em>network='NTN'</em>, <em>siteid=None</em>, <em>weekly=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.nadp_mod.NADP.add_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.nadp_mod.NADP.build_url">
+<code class="descname">build_url</code><span class="sig-paren">(</span><em>network='NTN'</em>, <em>siteid=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.nadp_mod.NADP.build_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.nadp_mod.NADP.network_names">
+<code class="descname">network_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.nadp_mod.NADP.network_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.nadp_mod.NADP.read_airmon">
+<code class="descname">read_airmon</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.nadp_mod.NADP.read_airmon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.nadp_mod.NADP.read_amnet">
+<code class="descname">read_amnet</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.nadp_mod.NADP.read_amnet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.nadp_mod.NADP.read_amon">
+<code class="descname">read_amon</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.nadp_mod.NADP.read_amon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.nadp_mod.NADP.read_mdn">
+<code class="descname">read_mdn</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.nadp_mod.NADP.read_mdn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.nadp_mod.NADP.read_ntn">
+<code class="descname">read_ntn</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.nadp_mod.NADP.read_ntn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="monet.obs.nadp_mod.NADP.set_daterange">
+<code class="descname">set_daterange</code><span class="sig-paren">(</span><em>begin=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.nadp_mod.NADP.set_daterange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-monet.obs.obs_util">
+<span id="monet-obs-obs-util-module"></span><h2>monet.obs.obs_util module<a class="headerlink" href="#module-monet.obs.obs_util" title="Permalink to this headline">¶</a></h2>
+<p>Obs Utilities</p>
+<dl class="function">
+<dt id="monet.obs.obs_util.dropna">
+<code class="descclassname">monet.obs.obs_util.</code><code class="descname">dropna</code><span class="sig-paren">(</span><em>df</em>, <em>inplace=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.obs_util.dropna" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove columns which have all Nans.
+TO DO: is this needed?</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.obs_util.find_near">
+<code class="descclassname">monet.obs.obs_util.</code><code class="descname">find_near</code><span class="sig-paren">(</span><em>df</em>, <em>latlon</em>, <em>distance=100</em>, <em>sid='site_num'</em>, <em>drange=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.obs_util.find_near" title="Permalink to this definition">¶</a></dt>
+<dd><p>find all values in the df dataframe column sid which are within distance
+(km) of lat lon point. output dictionary with key as value in column sid
+and value tuple (latitude, longitude)</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>latlon <span class="classifier-delimiter">:</span> <span class="classifier">tuple or list</span></dt>
+<dd>(longitude, latitude)</dd>
+<dt>distance <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>kilometers</dd>
+<dt>sid: string</dt>
+<dd>name of column</dd>
+<dt>drange: tuple or list with two datetimes</dt>
+<dd>consider rows with dates between these two dates.</dd>
+</dl>
+<dl class="docutils">
+<dt>lhash: dictionary</dt>
+<dd>key is the value in column sid and value is (latitude, longitude)
+position.</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.obs_util.get_lhash">
+<code class="descclassname">monet.obs.obs_util.</code><code class="descname">get_lhash</code><span class="sig-paren">(</span><em>df</em>, <em>idn</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.obs_util.get_lhash" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a dictionary with the key as the input column value and the
+value a tuple of (lat, lon)  Useful for getting lat lon locations of
+different sites in a dataframe.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.obs_util.latlonfilter">
+<code class="descclassname">monet.obs.obs_util.</code><code class="descname">latlonfilter</code><span class="sig-paren">(</span><em>df</em>, <em>llcrnr</em>, <em>urcrnr</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.obs_util.latlonfilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>removes rows from self.df with latitude longitude outside of the box
+described by llcrnr (lower left corner) and urcrnr (upper right corner)
+:Parameters: * <strong>llcrnr</strong> (<em>tuple</em>) – lower left corner. (latitude, longitude)</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>urcrnr</strong> (<em>tuple</em>) – upper right corner (latittude, longitude)</li>
+<li><strong>inplace</strong> (<em>boolean</em>) – if TRUE then replaces self.df attribute</li>
+<li><strong>removes rows with latitude longitude outside of the box</strong></li>
+<li><strong>described by llcrnr (lower left corner) and urcrnr (upper right corner)</strong></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.obs_util.summarize">
+<code class="descclassname">monet.obs.obs_util.</code><code class="descname">summarize</code><span class="sig-paren">(</span><em>df</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.obs_util.summarize" title="Permalink to this definition">¶</a></dt>
+<dd><p>prints list of columns. if verbose prints list of unique values in each
+column</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.obs_util.timefilter">
+<code class="descclassname">monet.obs.obs_util.</code><code class="descname">timefilter</code><span class="sig-paren">(</span><em>df</em>, <em>daterange</em>, <em>inplace=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.obs_util.timefilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>removes rows with dates outside of the daterange from self.df
+:Parameters: * <strong>daterange</strong> (<em>tuple</em>) – (datetime, datetime)</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>inplace</strong> (<em>boolean</em>) – if TRUE then replaces self.df attribute</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.obs.obs_util.write_datem">
+<code class="descclassname">monet.obs.obs_util.</code><code class="descname">write_datem</code><span class="sig-paren">(</span><em>df</em>, <em>obscolumn='obs'</em>, <em>dname='datemfile.txt'</em>, <em>sitename='1'</em>, <em>info=None</em>, <em>drange=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.obs.obs_util.write_datem" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns string in datem format (See NOAA ARL).
+datem format has the following columns:
+Year, Month, Day, Hour, Duration, lat, lon, Concentration (units), site
+id, height</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obscolumn</strong> (<em>string</em>) – name of column with values to write in the Concentration column.</li>
+<li><strong>dname</strong> (<em>string</em>) – name of the output file.</li>
+<li><strong>sitename</strong> (<em>string.</em>) – If it is the name of a column in the dataframe then
+that column will be used to generate the site name column in the
+datem file. If is not the name of a column, then the string will
+be used as the site name.</li>
+<li><strong>info</strong> (<em>string</em>) – will be written to the second line of the header.</li>
+<li><strong>drange</strong> (<em>list of two time stamp objects.</em>)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>runstring</strong> – string in datem format.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-monet.obs">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-monet.obs" title="Permalink to this headline">¶</a></h2>
@@ -422,7 +2917,7 @@ unit.</p>
         <a href="monet.plots.html" class="btn btn-neutral float-right" title="monet.plots package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="monet.models.html" class="btn btn-neutral" title="monet.models package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="monet.models.html" class="btn btn-neutral float-left" title="monet.models package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -431,7 +2926,7 @@ unit.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -448,32 +2943,16 @@ unit.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

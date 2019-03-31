@@ -1,0 +1,685 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>FV3-CHEM in MONET &mdash; MONET  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MONET on WCOSS" href="../monet_wcoss.html" />
+    <link rel="prev" title="NOAA NESDIS AOD" href="NESDIS_VIIRS_AOD.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/MONET-logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why-monet.html">Overview: Why MONET?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet-accessor.html">MONET XArray Accessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="aqs_pams.html">How to read AQS data from PAMS and do a quick analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="improve_trends_kmeans.html">Loading IMPROVE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CMAQ_hi_volcano.html">How to Open and View CMAQ simulations - HI Volcano Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="NESDIS_VIIRS_AOD.html">NOAA NESDIS AOD</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">FV3-CHEM in MONET</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#convert-nemsio2nc4">Convert nemsio2nc4</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-usage">Example Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-fv3grib2nc4">Convert fv3grib2nc4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-monet">Using MONET</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#quick-map-plotting">Quick Map Plotting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nearest-neighbor">Nearest neighbor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#constant-latitude-and-longitude">Constant Latitude and Longitude</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#calculate-pressure-levels">Calculate Pressure Levels</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../monet_wcoss.html">MONET on WCOSS</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help * Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MONET</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../tutorial.html">Tutorial</a> &raquo;</li>
+        
+      <li>FV3-CHEM in MONET</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorial/fv3chem_tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="fv3-chem-in-monet">
+<h1>FV3-CHEM in MONET<a class="headerlink" href="#fv3-chem-in-monet" title="Permalink to this headline">¶</a></h1>
+<p>FV3-CHEM is the experimental implementation of the NASA Gocart model
+into NOAA’s Next Generation Global Prediction System. This tutorial will
+explain how to open read and use MONET to explore output from the
+FV3-CHEM system.</p>
+<p>Currently, FV3 outputs data in three formats, i.e., nemsio, grib2, and
+netcdf. There are slight issues with both the nemsio and grib2 data that
+will be explained below but needless to say they need to be converted
+with precossors.</p>
+<div class="section" id="convert-nemsio2nc4">
+<h2>Convert nemsio2nc4<a class="headerlink" href="#convert-nemsio2nc4" title="Permalink to this headline">¶</a></h2>
+<p>The first format that needs to be converted is the nemsio data. This is
+a binary format used within EMC that is planned to be phased out in
+favor for netCDF. As a work around a converter was created to convert
+the binary nemsio data into netCDF, nemsio2nc4.py.</p>
+<p>This is a command-line script that converts the nemsio data output by
+the FV3 system to netcdf4 files using a combination of mkgfsnemsioctl
+found within the fv3 workflow and the climate data operators (cdo). This
+tool is available on github at <a class="reference external" href="https://github.com/bbakernoaa/nemsio2nc4">https://github.com/bbakernoaa/nemsio2nc4</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nemsio2nc4</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">help</span>
+<span class="n">usage</span><span class="p">:</span> <span class="n">nemsio2nc4</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">-</span><span class="n">f</span> <span class="n">FILES</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NPROCS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span>
+
+<span class="n">convert</span> <span class="n">nemsio</span> <span class="n">file</span> <span class="n">to</span> <span class="n">netCDF4</span> <span class="n">file</span>
+
+<span class="n">optional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">-</span><span class="n">f</span> <span class="n">FILES</span><span class="p">,</span> <span class="o">--</span><span class="n">files</span> <span class="n">FILES</span>
+                        <span class="nb">input</span> <span class="n">nemsio</span> <span class="n">file</span> <span class="n">name</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">v</span><span class="p">,</span> <span class="o">--</span><span class="n">verbose</span>         <span class="nb">print</span> <span class="n">debugging</span> <span class="n">information</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="example-usage">
+<h3>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h3>
+<p>If you want to convert a single nemsio data file to netcdf4, it can be
+done like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nemsio2nc4</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;gfs.t00z.atmf000.nemsio&#39;</span>
+<span class="n">mkgfsnemsioctl</span><span class="p">:</span> <span class="o">/</span><span class="n">gpfs</span><span class="o">/</span><span class="n">hps3</span><span class="o">/</span><span class="n">emc</span><span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">FV3CHEM</span><span class="o">/</span><span class="n">exec</span><span class="o">/</span><span class="n">mkgfsnemsioctl</span>
+<span class="n">cdo</span><span class="p">:</span> <span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">envs</span><span class="o">/</span><span class="n">monet</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">cdo</span>
+<span class="n">Executing</span><span class="p">:</span> <span class="o">/</span><span class="n">gpfs</span><span class="o">/</span><span class="n">hps3</span><span class="o">/</span><span class="n">emc</span><span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">FV3CHEM</span><span class="o">/</span><span class="n">exec</span><span class="o">/</span><span class="n">mkgfsnemsioctl</span> <span class="n">gfs</span><span class="o">.</span><span class="n">t00z</span><span class="o">.</span><span class="n">atmf000</span><span class="o">.</span><span class="n">nemsio</span>
+<span class="n">Executing</span><span class="p">:</span> <span class="o">/</span><span class="n">naqfc</span><span class="o">/</span><span class="n">noscrub</span><span class="o">/</span><span class="n">Barry</span><span class="o">.</span><span class="n">Baker</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">envs</span><span class="o">/</span><span class="n">monet</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">cdo</span> <span class="o">-</span><span class="n">f</span> <span class="n">nc4</span> <span class="n">import_binary</span> <span class="n">gfs</span><span class="o">.</span><span class="n">t00z</span><span class="o">.</span><span class="n">atmf000</span><span class="o">.</span><span class="n">nemsio</span><span class="o">.</span><span class="n">ctl</span> <span class="n">gfs</span><span class="o">.</span><span class="n">t00z</span><span class="o">.</span><span class="n">atmf000</span><span class="o">.</span><span class="n">nemsio</span><span class="o">.</span><span class="n">nc4</span>
+<span class="n">cdo</span> <span class="n">import_binary</span><span class="p">:</span> <span class="n">Processed</span> <span class="mi">35</span> <span class="n">variables</span> <span class="p">[</span><span class="mf">1.56</span><span class="n">s</span> <span class="mi">152</span><span class="n">MB</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To convert multiple files you can simple use the hot keys available in
+linux terminals.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nemsio2nc4</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;gfs.t00z.atmf0*.nemsio&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="convert-fv3grib2nc4">
+<h2>Convert fv3grib2nc4<a class="headerlink" href="#convert-fv3grib2nc4" title="Permalink to this headline">¶</a></h2>
+<p>Although there are several ways in which to read grib data from python
+such as pynio, a converter was created due to the specific need to
+distinguish aerosols which these readers do not process well.</p>
+<p>fv3grib2nc4.py like nemsio2nc4.py tool is a command line tool created to
+convert the grib2 aerosol data to netcdf files. fv3grib2nc4.py will
+create seperate files for each of the three layer types; ‘1 hybrid
+layer’, ‘entire atmosphere’, and ‘surface’. These are the three layers
+that currently hold aerosol data. The tool is available at
+<a class="reference external" href="https://github.com/bbakernoaa/fv3grib2nc4">https://github.com/bbakernoaa/fv3grib2nc4</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>fv3grib2nc4.py --help
+usage: fv3grib2nc4.py [-h] -f FILES [-v]
+
+convert nemsio file to netCDF4 file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FILES, --files FILES
+                        input nemsio file name (default: None)
+  -v, --verbose         print debugging information (default: False) ```
+
+### Example Usage
+
+If you want to convert a single grib2 data file to netcdf4, it can be done like this:
+
+fv3grib2nc4.py -v -f &#39;gfs.t00z.master.grb2f000&#39; wgrib2:
+/nwprod2/grib\_util.v1.0.0/exec/wgrib2 Executing:
+/nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+&quot;entire atmosphere:&quot; -nc\_nlev 1 -append -set\_ext\_name 1 -netcdf
+gfs.t00z.master.grb2f000.entire\_atm.nc Executing:
+/nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+&quot;1 hybrid level:&quot; -append -set\_ext\_name 1 -netcdf
+gfs.t00z.master.grb2f000.hybrid.nc Executing:
+/nwprod2/grib\_util.v1.0.0/exec/wgrib2 gfs.t00z.master.grb2f000 -match
+&quot;surface:&quot; -nc\_nlev 1 -append -set\_ext\_name 1 -netcdf
+gfs.t00z.master.grb2f000.surface.nc\`\`\`
+</pre></div>
+</div>
+<p>To convert multiple files you can simple use the hot keys available in
+linux terminals.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fv3grib2nc4</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;gfs.t00z.master.grb2f0*&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-monet">
+<h2>Using MONET<a class="headerlink" href="#using-monet" title="Permalink to this headline">¶</a></h2>
+<p>Using MONET with FV3-Chem is much like using MONET with other model
+outputs. It tries to recognize where the files came from (nemsio, grib2,
+etc….) and then processes the data, renaming coordinates (lat lon to
+latitude and longitude) and processing varaibles like geopotential
+height and pressure if available. First lets import <code class="docutils literal notranslate"><span class="pre">monet</span></code> and
+<code class="docutils literal notranslate"><span class="pre">fv3chem</span></code> from MONET</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">monet.models</span> <span class="kn">import</span> <span class="n">fv3chem</span>
+</pre></div>
+</div>
+<p>To open a single file</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">fv3chem</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;/Users/barry/Desktop/temp/gfs.t00z.atmf006.nemsio.nc4&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">barry</span><span class="o">/</span><span class="n">Desktop</span><span class="o">/</span><span class="n">temp</span><span class="o">/</span><span class="n">gfs</span><span class="o">.</span><span class="n">t00z</span><span class="o">.</span><span class="n">atmf006</span><span class="o">.</span><span class="n">nemsio</span><span class="o">.</span><span class="n">nc4</span>
+<span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="o">&gt;</span>
+<span class="n">Dimensions</span><span class="p">:</span>    <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">384</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+  <span class="o">*</span> <span class="n">time</span>       <span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span><span class="n">T06</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+  <span class="o">*</span> <span class="n">x</span>          <span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+  <span class="o">*</span> <span class="n">y</span>          <span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">88.36</span> <span class="mf">87.42</span> <span class="mf">86.49</span> <span class="o">...</span> <span class="o">-</span><span class="mf">87.42</span> <span class="o">-</span><span class="mf">88.36</span> <span class="o">-</span><span class="mf">89.28</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+    <span class="n">longitude</span>  <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+    <span class="n">latitude</span>   <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="o">...</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span>
+<span class="n">Data</span> <span class="n">variables</span><span class="p">:</span>
+    <span class="n">ugrd</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">vgrd</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">dzdt</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">delz</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">tmp</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">dpres</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">spfh</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">clwmr</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">rwmr</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">icmr</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">snmr</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">grle</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">cld_amt</span>    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">o3mr</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">so2</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">sulf</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">dms</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">msa</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">pm25</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">bc1</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">bc2</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">oc1</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">oc2</span>        <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">dust1</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">dust2</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">dust3</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">dust4</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">dust5</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">seas1</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">seas2</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">seas3</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">seas4</span>      <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">pm10</span>       <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">pressfc</span>    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">hgtsfc</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+    <span class="n">geohgt</span>     <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float32</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">CDI</span><span class="p">:</span>          <span class="n">Climate</span> <span class="n">Data</span> <span class="n">Interface</span> <span class="n">version</span> <span class="mf">1.9</span><span class="o">.</span><span class="mi">5</span> <span class="p">(</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mpimet</span><span class="o">.</span><span class="n">mpg</span><span class="o">.</span><span class="n">de</span><span class="o">/...</span>
+    <span class="n">Conventions</span><span class="p">:</span>  <span class="n">CF</span><span class="o">-</span><span class="mf">1.6</span>
+    <span class="n">history</span><span class="p">:</span>      <span class="n">Thu</span> <span class="n">Dec</span> <span class="mi">20</span> <span class="mi">17</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">09</span> <span class="mi">2018</span><span class="p">:</span> <span class="n">cdo</span> <span class="o">-</span><span class="n">f</span> <span class="n">nc4</span> <span class="n">import_binary</span> <span class="n">gfs</span><span class="o">.</span><span class="n">t00z</span><span class="o">...</span>
+    <span class="n">CDO</span><span class="p">:</span>          <span class="n">Climate</span> <span class="n">Data</span> <span class="n">Operators</span> <span class="n">version</span> <span class="mf">1.9</span><span class="o">.</span><span class="mi">5</span> <span class="p">(</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mpimet</span><span class="o">.</span><span class="n">mpg</span><span class="o">.</span><span class="n">de</span><span class="o">/...</span>
+</pre></div>
+</div>
+<p>Notice this object f has dimensions of (time,z,y,x) with 2d coordinates
+of latitude and longitude. You can get more infomation on single
+varaibles such as pm25 simply by printing the varaible.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;pm25&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+  <span class="o">*</span> <span class="n">time</span>       <span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span><span class="n">T06</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+  <span class="o">*</span> <span class="n">x</span>          <span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+  <span class="o">*</span> <span class="n">y</span>          <span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">88.36</span> <span class="mf">87.42</span> <span class="mf">86.49</span> <span class="o">...</span> <span class="o">-</span><span class="mf">87.42</span> <span class="o">-</span><span class="mf">88.36</span> <span class="o">-</span><span class="mf">89.28</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+    <span class="n">longitude</span>  <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+    <span class="n">latitude</span>   <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="o">...</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">long_name</span><span class="p">:</span>  <span class="n">model</span> <span class="n">layer</span>
+</pre></div>
+</div>
+<p>Here units are not included because it is not stored in the nemsio
+format.</p>
+<div class="section" id="quick-map-plotting">
+<h3>Quick Map Plotting<a class="headerlink" href="#quick-map-plotting" title="Permalink to this headline">¶</a></h3>
+<p>Now one of the main things that will need to be done is plotting on a
+map. This can be done quickly using the functionallity in MONET. In this
+example we will plot the first layer PM2.5 at time 2018-07-01.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c164f2dd8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/output_8_2.png" src="../_images/output_8_2.png" />
+<p>Adjusting the scale is simple by suppling <code class="docutils literal notranslate"><span class="pre">vmin</span></code> and <code class="docutils literal notranslate"><span class="pre">vmax</span></code>. Lets
+set a minimum of 0 AOD and maximum of 0.5.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">vmax</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c18cbf6d8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/output_10_2.png" src="../_images/output_10_2.png" />
+<p>Now we have all the control that xarray has built into their plotting
+routines. For example, lets have a descrete colorbar with 10 levels,
+<code class="docutils literal notranslate"><span class="pre">levels=10</span></code>, and let it determine the levels by throwing out the top
+and bottom 2% of values using the <code class="docutils literal notranslate"><span class="pre">robust=True</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c1905ce48</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/output_12_2.png" src="../_images/output_12_2.png" />
+<p>Now there are a lot of very low values, since this is at the beginning
+of the simulation so lets mask out values less than 0.015 AOD.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">pm25</span> <span class="o">&gt;</span> <span class="mf">0.015</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cartopy</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">geoaxes</span><span class="o">.</span><span class="n">GeoAxesSubplot</span> <span class="n">at</span> <span class="mh">0x1c19635240</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../_images/output_14_2.png" src="../_images/output_14_2.png" />
+<p>For more information on plotting with xarray and matplotlib some useful
+links are shown below</p>
+<ul class="simple">
+<li><a class="reference external" href="http://xarray.pydata.org/en/stable/plotting.html#two-dimensions">Xarray
+Plotting</a></li>
+<li><a class="reference external" href="https://matplotlib.org/tutorials/colors/colormaps.html">Matplotlib
+Colorbars</a></li>
+</ul>
+</div>
+<div class="section" id="nearest-neighbor">
+<h3>Nearest neighbor<a class="headerlink" href="#nearest-neighbor" title="Permalink to this headline">¶</a></h3>
+<p>Monet has some extra functionality that may be useful for exploritory
+studies such as nearest neighbor finder. Lets find the nearest neighbor
+to NCWCP (38.972 N, 76.9245 W).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">nearest_latlon</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">38.972</span><span class="p">,</span><span class="n">lon</span><span class="o">=-</span><span class="mf">76.9245</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;pm25&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+  <span class="o">*</span> <span class="n">time</span>       <span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span><span class="n">T06</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+    <span class="n">x</span>          <span class="n">float64</span> <span class="mf">283.1</span>
+    <span class="n">y</span>          <span class="n">float64</span> <span class="mf">38.81</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+    <span class="n">longitude</span>  <span class="n">float64</span> <span class="mf">283.1</span>
+    <span class="n">latitude</span>   <span class="n">float64</span> <span class="mf">38.81</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">long_name</span><span class="p">:</span>  <span class="n">model</span> <span class="n">layer</span>
+</pre></div>
+</div>
+<p>Now we can do a quick plot of this vertically, since it was a single
+time step.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x1c194702e8</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../_images/output_19_2.png" src="../_images/output_19_2.png" />
+<p>Now this is a simple plot but it is usually valuable to view the
+vertical coordinate on the y-axis.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x1c1c0bbac8</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="../_images/output_21_2.png" src="../_images/output_21_2.png" />
+<p>Now this is not very useful because the vertical coordinate right now is
+just the layer number. Lets get the geopoential height at this location
+and add it as a coordinate to plot.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">geohgt</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">geohgt</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">nearest_latlon</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">38.972</span><span class="p">,</span><span class="n">lon</span><span class="o">=-</span><span class="mf">76.9245</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+<span class="n">geohgt</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;geohgt&#39;</span> <span class="p">(</span><span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">64</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="p">(</span><span class="mi">64</span><span class="p">,)</span><span class="o">&gt;</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+    <span class="n">time</span>       <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span><span class="n">T06</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+    <span class="n">x</span>          <span class="n">float64</span> <span class="mf">283.1</span>
+    <span class="n">y</span>          <span class="n">float64</span> <span class="mf">38.81</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+    <span class="n">longitude</span>  <span class="n">float64</span> <span class="mf">283.1</span>
+    <span class="n">latitude</span>   <span class="n">float64</span> <span class="mf">38.81</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">long_name</span><span class="p">:</span>  <span class="n">Geopotential</span> <span class="n">Height</span>
+    <span class="n">units</span><span class="p">:</span>      <span class="n">m</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geohgt</span><span class="o">.</span><span class="n">values</span>
+<span class="n">nn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">3000</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.3s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.4s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3000</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/output_24_2.png" src="../_images/output_24_2.png" />
+</div>
+<div class="section" id="constant-latitude-and-longitude">
+<h3>Constant Latitude and Longitude<a class="headerlink" href="#constant-latitude-and-longitude" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes it may be useful to see a latitudinal or longitudinal cross
+section. This feature is included in monet through the
+<code class="docutils literal notranslate"><span class="pre">xr.DataArray.monet</span></code> accessor. Lets take a constant latitude at 10
+degrees N.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pm25_constant_lat</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">pm25</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">interp_constant_lat</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">pm25_constant_lat</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Create</span> <span class="n">weight</span> <span class="n">file</span><span class="p">:</span> <span class="n">bilinear_192x384_192x1</span><span class="o">.</span><span class="n">nc</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;pm25&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">1</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">array</span><span class="p">([[[[</span><span class="mf">8.107865e-02</span><span class="p">],</span>
+         <span class="o">...</span><span class="p">,</span>
+         <span class="p">[</span><span class="mf">4.765707e-02</span><span class="p">]],</span>
+
+        <span class="o">...</span><span class="p">,</span>
+
+        <span class="p">[[</span><span class="mf">9.984020e-05</span><span class="p">],</span>
+         <span class="o">...</span><span class="p">,</span>
+         <span class="p">[</span><span class="mf">9.982444e-05</span><span class="p">]]]])</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+    <span class="n">longitude</span>  <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">1.88</span> <span class="mf">3.76</span> <span class="mf">5.64</span> <span class="o">...</span> <span class="mf">353.4</span> <span class="mf">355.3</span> <span class="mf">357.2</span> <span class="mf">359.1</span>
+    <span class="n">latitude</span>   <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="o">...</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span> <span class="mf">10.0</span>
+  <span class="o">*</span> <span class="n">time</span>       <span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span><span class="n">T06</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+<span class="n">Dimensions</span> <span class="n">without</span> <span class="n">coordinates</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">regrid_method</span><span class="p">:</span>  <span class="n">bilinear</span>
+</pre></div>
+</div>
+<p>Like before lets go ahead and get the geopotential height along this
+latitude.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">geoght_constant_lat</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">geohgt</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">interp_constant_lat</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">pm25_constant_lat</span><span class="p">[</span><span class="s1">&#39;geohgt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geoght_constant_lat</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Overwrite</span> <span class="n">existing</span> <span class="n">file</span><span class="p">:</span> <span class="n">bilinear_192x384_192x1</span><span class="o">.</span><span class="n">nc</span>
+ <span class="n">You</span> <span class="n">can</span> <span class="nb">set</span> <span class="n">reuse_weights</span><span class="o">=</span><span class="kc">True</span> <span class="n">to</span> <span class="n">save</span> <span class="n">computing</span> <span class="n">time</span><span class="o">.</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.7s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.8s</span>
+</pre></div>
+</div>
+<p>Let us plot the 2D cross track (height vs longitude).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pm25_constant_lat</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;geohgt&#39;</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">ylim</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">50000</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50000</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/output_30_1.png" src="../_images/output_30_1.png" />
+</div>
+<div class="section" id="calculate-pressure-levels">
+<h3>Calculate Pressure Levels<a class="headerlink" href="#calculate-pressure-levels" title="Permalink to this headline">¶</a></h3>
+<p>By default pressure levels are not calculated due to processing time,
+however, MONET does include a helper function in the fv3chem module,
+<code class="docutils literal notranslate"><span class="pre">fv3chem.calc_nemsio_pressure</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">fv3chem</span><span class="o">.</span><span class="n">calc_nemsio_pressure</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">f</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.1s</span>
+<span class="p">[</span><span class="c1">########################################] | 100% Completed |  0.2s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span> <span class="s1">&#39;press&#39;</span> <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">192</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="mi">384</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="n">array</span><span class="p">([[[[</span><span class="mf">1.002220e+03</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mf">1.002230e+03</span><span class="p">],</span>
+         <span class="o">...</span><span class="p">,</span>
+         <span class="p">[</span><span class="mf">6.768812e+02</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mf">6.770022e+02</span><span class="p">]],</span>
+
+        <span class="o">...</span><span class="p">,</span>
+
+        <span class="p">[[</span><span class="mf">2.037354e-01</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mf">2.038117e-01</span><span class="p">],</span>
+         <span class="o">...</span><span class="p">,</span>
+         <span class="p">[</span><span class="mf">3.515549e-01</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mf">3.512193e-01</span><span class="p">]]]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">Coordinates</span><span class="p">:</span>
+  <span class="o">*</span> <span class="n">time</span>       <span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="n">datetime64</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">01</span><span class="n">T06</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span>
+  <span class="o">*</span> <span class="n">x</span>          <span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+  <span class="o">*</span> <span class="n">y</span>          <span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">88.36</span> <span class="mf">87.42</span> <span class="mf">86.49</span> <span class="o">...</span> <span class="o">-</span><span class="mf">87.42</span> <span class="o">-</span><span class="mf">88.36</span> <span class="o">-</span><span class="mf">89.28</span>
+  <span class="o">*</span> <span class="n">z</span>          <span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">1.0</span> <span class="mf">2.0</span> <span class="mf">3.0</span> <span class="mf">4.0</span> <span class="mf">5.0</span> <span class="mf">6.0</span> <span class="o">...</span> <span class="mf">60.0</span> <span class="mf">61.0</span> <span class="mf">62.0</span> <span class="mf">63.0</span> <span class="mf">64.0</span>
+    <span class="n">longitude</span>  <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">0.0</span> <span class="mf">0.9375</span> <span class="mf">1.875</span> <span class="mf">2.812</span> <span class="o">...</span> <span class="mf">356.2</span> <span class="mf">357.2</span> <span class="mf">358.1</span> <span class="mf">359.1</span>
+    <span class="n">latitude</span>   <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="n">float64</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="mf">89.28</span> <span class="o">...</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span> <span class="o">-</span><span class="mf">89.28</span>
+<span class="n">Attributes</span><span class="p">:</span>
+    <span class="n">units</span><span class="p">:</span>      <span class="n">mb</span>
+    <span class="n">long_name</span><span class="p">:</span>  <span class="n">Mid</span> <span class="n">Layer</span> <span class="n">Pressure</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../monet_wcoss.html" class="btn btn-neutral float-right" title="MONET on WCOSS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="NESDIS_VIIRS_AOD.html" class="btn btn-neutral float-left" title="NOAA NESDIS AOD" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Barry Baker
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

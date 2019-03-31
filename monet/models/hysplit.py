@@ -1,11 +1,9 @@
 """ HYPSLIT MODEL READER """
-from ..grids import _hysplit_latlon_grid_from_dataset
-from ..grids import get_hysplit_latlon_pyreample_area_def
 import pandas as pd
 import xarray as xr
 
 
-def open_files(fname):
+def open_dataset(fname):
     """Short summary.
 
     Parameters
@@ -27,7 +25,8 @@ def open_files(fname):
 
 
     """
-
+    from ..grids import _hysplit_latlon_grid_from_dataset
+    from ..grids import get_hysplit_latlon_pyresample_area_def
     # open the dataset using xarray
     binfile = ModelBin(fname, verbose=False, readwrite='r')
     dset = binfile.dset
@@ -494,6 +493,10 @@ class ModelBin(object):
                         concframe.rename(
                             columns={'conc': col_name}, inplace=True)
                         dset = xr.Dataset.from_dataframe(concframe)
+                        print('Combining datasets', 'Pollutant', pollutant,
+                              'Level', lev)
+                        if fillra:
+                            dset = dset.combine_first(emptyra)
                         # if this is the first time through. create dataframe
                         # for first level and pollutant.
                         if self.dset is None:

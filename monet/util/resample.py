@@ -1,7 +1,10 @@
-from pyresample.kd_tree import XArrayResamplerNN
-from pyresample.bilinear.xarr import XArrayResamplerBilinear
-import xarray as xr
-from pyresample.geometry import SwathDefinition, AreaDefinition
+try:
+    from pyresample.kd_tree import XArrayResamplerNN
+    from pyresample.geometry import SwathDefinition, AreaDefinition
+    has_pyresample = True
+except ImportError:
+    print('PyResample not installed.  Some functionality will be lost')
+    has_pyresample = False
 
 
 def _ensure_swathdef_compatability(defin):
@@ -18,6 +21,7 @@ def _ensure_swathdef_compatability(defin):
         Description of returned object.
 
     """
+    import xarray as xr
     if isinstance(defin.lons, xr.DataArray):
         return defin  # do nothing
     else:
@@ -81,7 +85,34 @@ def _reformat_resampled_data(orig, new, target_grid):
     return new
 
 
+def resample_stratify(da, levels, vertical, axis=1):
+    import stratify
+    import xarray as xr
+    result = stratify.interpolate(
+        levels, vertical.chunk(), da.chunk(), axis=axis)
+    dims = da.dims
+    out = xr.DataArray(result, dims=dims)
+    for i in dims:
+        if i != 'z':
+            out[i] = da[i]
+    out.attrs = da.attrs.copy()
+    if len(da.coords) > 0:
+        for i in da.coords:
+            if i != 'z':
+                out.coords[i] = da.coords[i]
+    return out
+
+
+def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
+    import xesmf as xe
+    regridder = xe.Regridder(source_da, target_da, **kwargs)
+    if cleanup:
+        regridder.clean_weight_file()
+    return regridder(source_da)
+
+
 def resample_dataset(data,
+                     source_grid,
                      target_grid,
                      radius_of_influence=100e3,
                      resample_cache=None,
@@ -91,9 +122,7 @@ def resample_dataset(data,
                      interp='nearest'):
     # first get the source grid definition
     try:
-        if 'area' in data.attrs:
-            source_grid = data.attrs['area']
-        else:
+        if source_grid is None:
             raise RuntimeError
     except RuntimeError:
         print('Must include pyresample.gemoetry in the data.attrs area_def or '
@@ -113,11 +142,11 @@ def resample_dataset(data,
         epsilon=epsilon)
     if interp is 'nearest':
         resampler = XArrayResamplerNN(**kwargs)
-    else:
-        resampler = XArrayResamplerBilinear(**kwargs)
+    # else:
+    # resampler = XArrayResamplerBilinear(**kwargs)
 
     # check if resample cash is none else assume it is a dict with keys
-    #[valid_input_index, valid_output_index, index_array, distance_array]
+    # [valid_input_index, valid_output_index, index_array, distance_array]
     # else generate the data
     if resample_cache is None:
         valid_input_index, valid_output_index, index_array, distance_array = resampler.get_neighbour_info(

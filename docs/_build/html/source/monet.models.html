@@ -17,13 +17,19 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -31,21 +37,16 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="monet.obs package" href="monet.obs.html" />
     <link rel="prev" title="monet package" href="monet.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -54,7 +55,7 @@
 
           
             
-            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="../_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -90,37 +91,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html#api">API</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">monet.models package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.obs.html">monet.obs package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.plots.html">monet.plots package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.util.html">monet.util package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.verification.html">monet.verification package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
 </ul>
 
             
@@ -194,20 +170,185 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="monet-models-basemodel-module">
-<h2>monet.models.basemodel module<a class="headerlink" href="#monet-models-basemodel-module" title="Permalink to this headline">¶</a></h2>
-</div>
 <div class="section" id="module-monet.models.camx">
 <span id="monet-models-camx-module"></span><h2>monet.models.camx module<a class="headerlink" href="#module-monet.models.camx" title="Permalink to this headline">¶</a></h2>
+<p>CAMx File Reader</p>
+<dl class="function">
+<dt id="monet.models.camx.add_lazy_clf">
+<code class="descclassname">monet.models.camx.</code><code class="descname">add_lazy_clf</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.add_lazy_clf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add up Cl particles</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.models.camx.add_lazy_nox">
+<code class="descclassname">monet.models.camx.</code><code class="descname">add_lazy_nox</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.add_lazy_nox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate NOx</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.models.camx.add_lazy_noy">
+<code class="descclassname">monet.models.camx.</code><code class="descname">add_lazy_noy</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.add_lazy_noy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate NOy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.models.camx.add_lazy_pm10">
+<code class="descclassname">monet.models.camx.</code><code class="descname">add_lazy_pm10</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.add_lazy_pm10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add up PM2.5 for a variable lazily</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.models.camx.add_lazy_pm25">
+<code class="descclassname">monet.models.camx.</code><code class="descname">add_lazy_pm25</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.add_lazy_pm25" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add up PM2.5 for a variable lazily</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>xarray.Dataset</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">xarray.Dataset</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.models.camx.add_lazy_pm_course">
+<code class="descclassname">monet.models.camx.</code><code class="descname">add_lazy_pm_course</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.add_lazy_pm_course" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add up just the coarse mode PM</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="monet.models.camx.add_multiple_lazy">
 <code class="descclassname">monet.models.camx.</code><code class="descname">add_multiple_lazy</code><span class="sig-paren">(</span><em>dset</em>, <em>variables</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.add_multiple_lazy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utility function to add multiple variables with weights if needed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dset</strong> (<em>type</em>) – Description of parameter <cite>dset</cite>.</li>
+<li><strong>variables</strong> (<em>type</em>) – Description of parameter <cite>variables</cite>.</li>
+<li><strong>weights</strong> (<em>type</em>) – Description of parameter <cite>weights</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.camx.can_do">
 <code class="descclassname">monet.models.camx.</code><code class="descname">can_do</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.can_do" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utility function to see if something is possible in the Xarray object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>type</em>) – Description of parameter <cite>index</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.models.camx.open_dataset">
+<code class="descclassname">monet.models.camx.</code><code class="descname">open_dataset</code><span class="sig-paren">(</span><em>fname</em>, <em>earth_radius=6370000</em>, <em>convert_to_ppb=True</em>, <em>drop_duplicates=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.open_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to open CMAQ IOAPI netcdf files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fname</strong> (<em>string or list</em>) – fname is the path to the file or files.  It will accept hot keys in
+strings as well.</li>
+<li><strong>earth_radius</strong> (<em>float</em>) – The earth radius used for the map projection</li>
+<li><strong>convert_to_ppb</strong> (<em>boolean</em>) – If true the units of the gas species will be converted to ppbV</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xarray.DataSet</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.camx.open_files">
@@ -233,48 +374,179 @@
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="monet.models.camx.open_mfdataset">
+<code class="descclassname">monet.models.camx.</code><code class="descname">open_mfdataset</code><span class="sig-paren">(</span><em>fname</em>, <em>earth_radius=6370000</em>, <em>convert_to_ppb=True</em>, <em>drop_duplicates=False</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.camx.open_mfdataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to open CMAQ IOAPI netcdf files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fname</strong> (<em>string or list</em>) – fname is the path to the file or files.  It will accept hot keys in
+strings as well.</li>
+<li><strong>earth_radius</strong> (<em>float</em>) – The earth radius used for the map projection</li>
+<li><strong>convert_to_ppb</strong> (<em>boolean</em>) – If true the units of the gas species will be converted to ppbV</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xarray.DataSet</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-monet.models.cmaq">
 <span id="monet-models-cmaq-module"></span><h2>monet.models.cmaq module<a class="headerlink" href="#module-monet.models.cmaq" title="Permalink to this headline">¶</a></h2>
+<p>CMAQ File Reader</p>
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_caf">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_caf</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_caf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_clf">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_clf</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_clf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_naf">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_naf</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_naf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_nh4f">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_nh4f</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_nh4f" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_no3f">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_no3f</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_no3f" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_nox">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_nox</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_nox" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_noy">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_noy</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_noy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_pm10">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_pm10</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_pm10" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_pm25">
@@ -297,22 +569,81 @@
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_pm_course">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_pm_course</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_pm_course" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_rh">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_rh</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_rh" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_lazy_so4f">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_lazy_so4f</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_lazy_so4f" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>d</strong> (<em>type</em>) – Description of parameter <cite>d</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.add_multiple_lazy">
 <code class="descclassname">monet.models.cmaq.</code><code class="descname">add_multiple_lazy</code><span class="sig-paren">(</span><em>dset</em>, <em>variables</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.add_multiple_lazy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dset</strong> (<em>type</em>) – Description of parameter <cite>dset</cite>.</li>
+<li><strong>variables</strong> (<em>type</em>) – Description of parameter <cite>variables</cite>.</li>
+<li><strong>weights</strong> (<em>type</em>) – Description of parameter <cite>weights</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="monet.models.cmaq.can_do">
@@ -320,15 +651,42 @@
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="monet.models.cmaq.open_files">
-<code class="descclassname">monet.models.cmaq.</code><code class="descname">open_files</code><span class="sig-paren">(</span><em>fname</em>, <em>earth_radius=6370000</em>, <em>convert_to_ppb=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.open_files" title="Permalink to this definition">¶</a></dt>
+<dt id="monet.models.cmaq.open_dataset">
+<code class="descclassname">monet.models.cmaq.</code><code class="descname">open_dataset</code><span class="sig-paren">(</span><em>fname</em>, <em>earth_radius=6370000</em>, <em>convert_to_ppb=True</em>, <em>drop_duplicates=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.open_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to open CMAQ IOAPI netcdf files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>fname</strong> (<em>string or list</em>) – fname is the path to the file or files.  It will accept hot keys in strings as well.</li>
+<li><strong>fname</strong> (<em>string or list</em>) – fname is the path to the file or files.  It will accept hot keys in
+strings as well.</li>
+<li><strong>earth_radius</strong> (<em>float</em>) – The earth radius used for the map projection</li>
+<li><strong>convert_to_ppb</strong> (<em>boolean</em>) – If true the units of the gas species will be converted to ppbV</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xarray.DataSet</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.models.cmaq.open_mfdataset">
+<code class="descclassname">monet.models.cmaq.</code><code class="descname">open_mfdataset</code><span class="sig-paren">(</span><em>fname</em>, <em>earth_radius=6370000</em>, <em>convert_to_ppb=True</em>, <em>drop_duplicates=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.cmaq.open_mfdataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to open CMAQ IOAPI netcdf files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fname</strong> (<em>string or list</em>) – fname is the path to the file or files.  It will accept hot keys in
+strings as well.</li>
 <li><strong>earth_radius</strong> (<em>float</em>) – The earth radius used for the map projection</li>
 <li><strong>convert_to_ppb</strong> (<em>boolean</em>) – If true the units of the gas species will be converted to ppbV</li>
 </ul>
@@ -345,16 +703,171 @@
 </dd></dl>
 
 </div>
+<div class="section" id="module-monet.models.fv3chem">
+<span id="monet-models-fv3chem-module"></span><h2>monet.models.fv3chem module<a class="headerlink" href="#module-monet.models.fv3chem" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.models.fv3chem.calc_nemsio_pressure">
+<code class="descclassname">monet.models.fv3chem.</code><code class="descname">calc_nemsio_pressure</code><span class="sig-paren">(</span><em>dset</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.fv3chem.calc_nemsio_pressure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the pressure in mb form a nemsio file xarray.Dataset.
+Currently a slow loop.  Looking for a way to speed this up.  Recommend not
+using this for large datasets.  First subset your data and then use to not
+run out of memory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dset</strong> (<em>xarray.Dataset</em>) – nemsio dataset opened</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">xarray.DataArray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.models.fv3chem.open_dataset">
+<code class="descclassname">monet.models.fv3chem.</code><code class="descname">open_dataset</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.fv3chem.open_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a single dataset from fv3chem outputs (nemsio or grib2 currently)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<em>string</em>) – Filename to be opened</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">xarray.Dataset</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.models.fv3chem.open_mfdataset">
+<code class="descclassname">monet.models.fv3chem.</code><code class="descname">open_mfdataset</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.fv3chem.open_mfdataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a multiple files from fv3chem outputs (nemsio or grib2 currently)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<em>string</em>) – Filenames to be opened</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Description of returned object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">xarray.Dataset</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="module-monet.models.hysplit">
 <span id="monet-models-hysplit-module"></span><h2>monet.models.hysplit module<a class="headerlink" href="#module-monet.models.hysplit" title="Permalink to this headline">¶</a></h2>
+<p>HYPSLIT MODEL READER</p>
 <dl class="class">
 <dt id="monet.models.hysplit.ModelBin">
 <em class="property">class </em><code class="descclassname">monet.models.hysplit.</code><code class="descname">ModelBin</code><span class="sig-paren">(</span><em>filename</em>, <em>drange=None</em>, <em>century=None</em>, <em>verbose=False</em>, <em>readwrite='r'</em>, <em>fillra=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.hysplit.ModelBin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>represents a binary cdump (concentration) output file from HYSPLIT
-methods:
+<dl class="docutils">
+<dt>represents a binary cdump (concentration) output file from HYSPLIT</dt>
+<dd>methods:
 readfile - opens and reads contents of cdump file into an xarray
-self.dset</p>
+self.dset</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<em>type</em>) – Description of parameter <cite>filename</cite>.</li>
+<li><strong>drange</strong> (<em>type</em>) – Description of parameter <cite>drange</cite>.</li>
+<li><strong>century</strong> (<em>type</em>) – Description of parameter <cite>century</cite>.</li>
+<li><strong>verbose</strong> (<em>type</em>) – Description of parameter <cite>verbose</cite>.</li>
+<li><strong>readwrite</strong> (<em>type</em>) – Description of parameter <cite>readwrite</cite>.</li>
+<li><strong>fillra</strong> (<em>type</em>) – Description of parameter <cite>fillra</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="monet.models.hysplit.ModelBin.zeroconcdates">
+<code class="descname">zeroconcdates</code><a class="headerlink" href="#monet.models.hysplit.ModelBin.zeroconcdates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>zeroconcdates</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.models.hysplit.ModelBin.nonzeroconcdates">
+<code class="descname">nonzeroconcdates</code><a class="headerlink" href="#monet.models.hysplit.ModelBin.nonzeroconcdates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>nonzeroconcdates</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.models.hysplit.ModelBin.dataflag">
+<code class="descname">dataflag</code><a class="headerlink" href="#monet.models.hysplit.ModelBin.dataflag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>dataflag</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.models.hysplit.ModelBin.readfile">
+<code class="descname">readfile</code><a class="headerlink" href="#monet.models.hysplit.ModelBin.readfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>readfile</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="monet.models.hysplit.ModelBin.drange">
+<code class="descname">drange</code><a class="headerlink" href="#monet.models.hysplit.ModelBin.drange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="monet.models.hysplit.ModelBin.filename">
+<code class="descname">filename</code><a class="headerlink" href="#monet.models.hysplit.ModelBin.filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="monet.models.hysplit.ModelBin.century">
+<code class="descname">century</code><a class="headerlink" href="#monet.models.hysplit.ModelBin.century" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="monet.models.hysplit.ModelBin.verbose">
+<code class="descname">verbose</code><a class="headerlink" href="#monet.models.hysplit.ModelBin.verbose" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="monet.models.hysplit.ModelBin.define_struct">
 <em class="property">static </em><code class="descname">define_struct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.hysplit.ModelBin.define_struct" title="Permalink to this definition">¶</a></dt>
@@ -365,27 +878,38 @@ a numpy dtype object for each record in the binary file.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="monet.models.hysplit.ModelBin.readfile">
-<code class="descname">readfile</code><span class="sig-paren">(</span><em>filename</em>, <em>drange</em>, <em>verbose</em>, <em>century</em>, <em>fillra=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.hysplit.ModelBin.readfile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Data from the file is stored in an xarray, self.dset
-returns False if all concentrations are zero else returns True.
-INPUTS
-filename - name of cdump file to open
-drange - [date1, date2] - range of dates to load data for. if [] then loads all data.</p>
-<blockquote>
-<div>date1 and date2  should be datetime ojbects.</div></blockquote>
-<p>verbose - turns on print statements
-century - if None will try to guess the century by looking at the last two digits of the year.
-For python 3 the numpy char4 are read in as a <a href="#id1"><span class="problematic" id="id2">numpy.bytes_</span></a> class and need to be converted to a python
-string by using decode(‘UTF-8’).
-fillra : if True will return complete concentration grid  array with zero cocenctrations filled in</p>
+<dt>
+<code class="descname">readfile</code><span class="sig-paren">(</span><em>filename</em>, <em>drange</em>, <em>verbose</em>, <em>century</em>, <em>fillra=True</em><span class="sig-paren">)</span></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>type</em>) – Description of parameter <cite>filename</cite>.</li>
+<li><strong>drange</strong> (<em>type</em>) – [date1, date2] - range of dates to load data for. if [] then loads all data.
+date1 and date2  should be datetime ojbects.</li>
+<li><strong>verbose</strong> (<em>type</em>) – Description of parameter <cite>verbose</cite>.</li>
+<li><strong>century</strong> (<em>type</em>) – Description of parameter <cite>century</cite>.</li>
+<li><strong>fillra</strong> (<em>type</em>) – Description of parameter <cite>fillra</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
-<dt id="monet.models.hysplit.open_files">
-<code class="descclassname">monet.models.hysplit.</code><code class="descname">open_files</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.hysplit.open_files" title="Permalink to this definition">¶</a></dt>
+<dt id="monet.models.hysplit.open_dataset">
+<code class="descclassname">monet.models.hysplit.</code><code class="descname">open_dataset</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.models.hysplit.open_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Short summary.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -397,10 +921,14 @@ fillra : if True will return complete concentration grid  array with zero cocenc
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>type</em> – Description of returned object.</li>
+<li><em>CHANGES for PYTHON 3</em></li>
+<li><em>For python 3 the numpy char4 are read in as a numpy.bytes_ class and need to</em></li>
+<li><em>be converted to a python</em></li>
+<li><em>string by using decode(‘UTF-8’)</em></li>
+</ul>
+</p>
 </td>
 </tr>
 </tbody>
@@ -424,7 +952,7 @@ fillra : if True will return complete concentration grid  array with zero cocenc
         <a href="monet.obs.html" class="btn btn-neutral float-right" title="monet.obs package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="monet.html" class="btn btn-neutral" title="monet package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="monet.html" class="btn btn-neutral float-left" title="monet package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -433,7 +961,7 @@ fillra : if True will return complete concentration grid  array with zero cocenc
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -450,32 +978,16 @@ fillra : if True will return complete concentration grid  array with zero cocenc
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

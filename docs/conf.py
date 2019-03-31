@@ -14,8 +14,17 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../'))
+from unittest.mock import MagicMock
 
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+
+#sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = u'MONET'
@@ -47,11 +56,11 @@ extlinks = {
     'pull': ('https://github.com/noaa-oar-arl/MONET/pull/%s', 'PR'),
 }
 
-autosummary_generate = True
+autosummary_generate = False  # True
 numpydoc_class_members_toctree = True
 napoleon_google_docstring = False
 napoleon_use_param = False
-napoleon_use_ivar = True
+napoleon_use_ivar = False  # True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -118,18 +127,18 @@ html_theme_options = {
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+# html_theme_path = []
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+# html_title = None
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
+# html_short_title = None
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "_static/noaa.png"
+html_logo = "_static/MONET-logo.png"
 
 # -- Options for LaTeX output ------------------------------------------------
 

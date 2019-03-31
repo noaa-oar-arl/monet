@@ -10,7 +10,7 @@ Required dependencies
 - `xarray <http://xarray.pydata.org/>`__ (0.10 or later)
 - `dask <http://dask.pydata.org/>`__
 - `pseudonetcdf <https://github.com/barronh/pseudonetcdf/>`__
-- `pyresample <https://github.com/pytroll/pyresample/>`__ (1.9.0 or later)
+- `xesmf <https://github.com/pytroll/pyresample/>`__ (1.9.0 or later)
 - `netcdf4 <http://unidata.github.io/netcdf4-python/>`__
 - `matplotlib <https://matplotlib.org/>`__
 - `seaborn <https://seaborn.pydata.org/>`__
@@ -39,7 +39,7 @@ MONET itself is a pure Python package, but some of it's dependencies may not be.
 The easiest way to install it's dependencies is to use conda_. To install the
 dependencies we recommend usingthe the following command.::
 
-    $ conda install xarray dask netCDF4 bottleneck pseudonetcdf seaborn matplotlib numpy pandas cartopy pyresample
+    $ conda install xarray dask netCDF4 bottleneck pseudonetcdf seaborn matplotlib numpy pandas cartopy xesmf
 
 .. _conda: http://conda.io/
 

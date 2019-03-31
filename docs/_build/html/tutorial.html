@@ -17,13 +17,19 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/style.css" type="text/css" />
@@ -31,21 +37,16 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="How to read AQS data from PAMS and do a quick analysis" href="tutorial/aqs_pams.html" />
     <link rel="prev" title="Models" href="models.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -54,7 +55,7 @@
 
           
             
-            <img src="_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -93,8 +94,11 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorial/aqs_pams.html">How to read AQS data from PAMS and do a quick analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial/improve_trends_kmeans.html">Loading IMPROVE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial/CMAQ_hi_volcano.html">How to Open and View CMAQ simulations - HI Volcano Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/NESDIS_VIIRS_AOD.html">NOAA NESDIS AOD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/fv3chem_tutorial.html">FV3-CHEM in MONET</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
 <ul>
@@ -184,6 +188,29 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorial/CMAQ_hi_volcano.html#overlaying-observations-on-contour-plots">Overlaying Observations on Contour Plots</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/NESDIS_VIIRS_AOD.html">NOAA NESDIS AOD</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/NESDIS_VIIRS_AOD.html#viirs-edr">VIIRS EDR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/NESDIS_VIIRS_AOD.html#open-multiple-days">Open Multiple Days</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/NESDIS_VIIRS_AOD.html#viirs-eps">VIIRS EPS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/fv3chem_tutorial.html">FV3-CHEM in MONET</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#convert-nemsio2nc4">Convert nemsio2nc4</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#example-usage">Example Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#convert-fv3grib2nc4">Convert fv3grib2nc4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#using-monet">Using MONET</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#quick-map-plotting">Quick Map Plotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#nearest-neighbor">Nearest neighbor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#constant-latitude-and-longitude">Constant Latitude and Longitude</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#calculate-pressure-levels">Calculate Pressure Levels</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -199,7 +226,7 @@
         <a href="tutorial/aqs_pams.html" class="btn btn-neutral float-right" title="How to read AQS data from PAMS and do a quick analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="models.html" class="btn btn-neutral" title="Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="models.html" class="btn btn-neutral float-left" title="Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -208,7 +235,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -225,32 +252,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

@@ -1,13 +1,22 @@
-""" This is a module that will derive the proj4 string and
-    pyesample.geometry.AreaDefinition for any gridded dataset (satellite,
-    models, etc....)
-
-    """
 import os
+
 path = os.path.abspath(__file__)
 
 
 def _geos_16_grid(dset):
+    """Short summary.
+
+    Parameters
+    ----------
+    dset : type
+        Description of parameter `dset`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     from pyresample import geometry
     from numpy import asarray
     projection = dset.goes_imager_projection
@@ -42,19 +51,23 @@ def _geos_16_grid(dset):
 
 
 def _get_sinu_grid_df():
+    """Short summary.
+
+    Parameters
+    ----------
+
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     from pandas import read_csv
-    """This function finds the modis grid tiles found within
-        the defined grid.
-        input:
-        lon = gridded longitude - numpy array
-        lat = gridded latitude - numpy array
-        output:
-        pandas dataframe of tiles
-        """
     f = path[:-8] + 'data/sn_bound_10deg.txt'
     td = read_csv(f, skiprows=4, delim_whitespace=True)
-    td = td.assign(ihiv='h' + td.ih.astype(str).str.zfill(2) + 'v' +
-                   td.iv.astype(str).str.zfill(2))
+    td = td.assign(ihiv='h' + td.ih.astype(str).str.zfill(2) +
+                   'v' + td.iv.astype(str).str.zfill(2))
     return td
 
 
@@ -140,8 +153,72 @@ def get_ioapi_pyresample_area_def(ds, proj4_srs):
     return area_def
 
 
+def get_generic_projection_from_proj4(lat, lon, proj4_srs):
+    """Short summary.
+
+    Parameters
+    ----------
+    lat : type
+        Description of parameter `lat`.
+    lon : type
+        Description of parameter `lon`.
+    proj4_srs : type
+        Description of parameter `proj4_srs`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    try:
+        from pyresample.utils import proj4_str_to_dict
+        from pyresample.geometry import SwathDefinition
+    except ImportError:
+        print('please install pyresample to use this functionality')
+    swath = SwathDefinition(lats=lat, lons=lon)
+    area = swath.compute_optimal_bb_area(proj4_str_to_dict(proj4_srs))
+    return area
+
+
+def get_optimal_cartopy_proj(lat, lon, proj4_srs):
+    """Short summary.
+
+    Parameters
+    ----------
+    lat : type
+        Description of parameter `lat`.
+    lon : type
+        Description of parameter `lon`.
+    proj4_srs : type
+        Description of parameter `proj4_srs`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    area = get_generic_projection_from_proj4(lat, lon, proj4_srs)
+    return area.to_cartopy_crs()
+
+
 def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
-    """Get the IOAPI projection out of the file into proj4."""
+    """SGet the IOAPI projection out of the file into proj4.
+
+    Parameters
+    ----------
+    ds : type
+        Description of parameter `ds`.
+    earth_radius : type
+        Description of parameter `earth_radius`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
 
     pargs = dict()
     pargs['lat_1'] = ds.P_ALP
@@ -173,7 +250,7 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
     else:
         raise NotImplementedError('IOAPI proj not implemented yet: '
                                   '{}'.format(proj_id))
-    #area_def = _get_ioapi_pyresample_area_def(ds)
+    # area_def = _get_ioapi_pyresample_area_def(ds)
     return p4  # , area_def
 
 
@@ -194,11 +271,20 @@ def get_hysplit_latlon_pyreample_area_def(ds, proj4_srs):
 
 
 def grid_from_dataset(ds, earth_radius=6370000):
-    """Find out if the dataset contains enough info for Salem to understand.
+    """Short summary.
 
-    ``ds`` can be an xarray dataset
+    Parameters
+    ----------
+    ds : type
+        Description of parameter `ds`.
+    earth_radius : type
+        Description of parameter `earth_radius`.
 
-    Returns a :py:string:`proj4_string` if successful, ``None`` otherwise
+    Returns
+    -------
+    type
+        Description of returned object.
+
     """
     # maybe its an IOAPI file
     if hasattr(ds, 'IOAPI_VERSION') or hasattr(ds, 'P_ALP'):

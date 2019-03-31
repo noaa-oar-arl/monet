@@ -17,34 +17,35 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Overview: Why MONET?" href="why-monet.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -53,7 +54,7 @@
 
           
             
-            <img src="_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -89,6 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="observations.html">Observations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
 <ul>
@@ -237,10 +239,13 @@ Transport Models.” Atmosphere 8, no. 11: 210</p>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="observations.html#improve">IMPROVE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="observations.html#openaq">OpenAQ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="observations.html#cems">CEMS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="observations.html#climate-reference-network">Climate Reference Network</a></li>
-<li class="toctree-l2"><a class="reference internal" href="observations.html#integrated-surface-database">Integrated Surface Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="observations.html#integrated-surface-database">Integrated Surface Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="observations.html#id5">Available Measurements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="observations.html#icartt">ICARTT</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
@@ -266,6 +271,34 @@ Transport Models.” Atmosphere 8, no. 11: 210</p>
 <li class="toctree-l3"><a class="reference internal" href="tutorial/CMAQ_hi_volcano.html#overlaying-observations-on-contour-plots">Overlaying Observations on Contour Plots</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/NESDIS_VIIRS_AOD.html">NOAA NESDIS AOD</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/NESDIS_VIIRS_AOD.html#viirs-edr">VIIRS EDR</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorial/NESDIS_VIIRS_AOD.html#open-multiple-days">Open Multiple Days</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/NESDIS_VIIRS_AOD.html#viirs-eps">VIIRS EPS</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/fv3chem_tutorial.html">FV3-CHEM in MONET</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#convert-nemsio2nc4">Convert nemsio2nc4</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#example-usage">Example Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#convert-fv3grib2nc4">Convert fv3grib2nc4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#using-monet">Using MONET</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#quick-map-plotting">Quick Map Plotting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#nearest-neighbor">Nearest neighbor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#constant-latitude-and-longitude">Constant Latitude and Longitude</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorial/fv3chem_tutorial.html#calculate-pressure-levels">Calculate Pressure Levels</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="monet_wcoss.html">MONET on WCOSS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monet_wcoss.html#create-condarc">Create .condarc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet_wcoss.html#activate-monet-environment">Activate MONET Environment</a></li>
 </ul>
 </li>
 </ul>
@@ -307,25 +340,31 @@ Transport Models.” Atmosphere 8, no. 11: 210</p>
 <li class="toctree-l3"><a class="reference internal" href="source/monet.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/monet.models.html">monet.models package</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="source/monet.models.html#submodules">Submodules</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.models.html#monet-models-basemodel-module">monet.models.basemodel module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/monet.models.html#module-monet.models.camx">monet.models.camx module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/monet.models.html#module-monet.models.cmaq">monet.models.cmaq module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.models.html#module-monet.models.fv3chem">monet.models.fv3chem module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/monet.models.html#module-monet.models.hysplit">monet.models.hysplit module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/monet.models.html#module-monet.models">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="source/monet.obs.html">monet.obs package</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#submodules">Submodules</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#monet-obs-aeronet-module">monet.obs.aeronet module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#monet-obs-airnow-module">monet.obs.airnow module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#monet-obs-aqs-module">monet.obs.aqs module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#monet-obs-cems-module">monet.obs.cems module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#monet-obs-crn-module">monet.obs.crn module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.aeronet_mod">monet.obs.aeronet_mod module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.airnow">monet.obs.airnow module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.airnow_mod">monet.obs.airnow_mod module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.aqs_mod">monet.obs.aqs_mod module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.cems_mod">monet.obs.cems_mod module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.crn_mod">monet.obs.crn_mod module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#daily-data">Daily Data</a></li>
+</ul>
+</li>
 <li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.epa_util">monet.obs.epa_util module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#monet-obs-improve-module">monet.obs.improve module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#monet-obs-ish-module">monet.obs.ish module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#monet-obs-nadp-module">monet.obs.nadp module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#monet-obs-tolnet-module">monet.obs.tolnet module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.goes">monet.obs.goes module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.icartt_mod">monet.obs.icartt_mod module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.improve_mod">monet.obs.improve_mod module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.ish_mod">monet.obs.ish_mod module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.nadp_mod">monet.obs.nadp_mod module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.obs_util">monet.obs.obs_util module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html#module-monet.obs">Module contents</a></li>
 </ul>
 </li>
@@ -338,92 +377,30 @@ Transport Models.” Atmosphere 8, no. 11: 210</p>
 <li class="toctree-l5"><a class="reference internal" href="source/monet.plots.html#module-monet.plots">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="source/monet.util.html">monet.util package</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#submodules">Submodules</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#monet-util-combine-module">monet.util.combine module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#monet-util-interp-module">monet.util.interp module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#module-monet.util.mystats">monet.util.mystats module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#module-monet.util.tools">monet.util.tools module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#module-monet.util">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/monet.sat.html">monet.sat package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.sat.html#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.sat.html#module-monet.sat.modis_swath">monet.sat.modis_swath module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.sat.html#module-monet.sat.nesdis_edr_viirs">monet.sat.nesdis_edr_viirs module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.sat.html#module-monet.sat.nesdis_eps_viirs">monet.sat.nesdis_eps_viirs module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.sat.html#module-monet.sat">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="source/monet.verification.html">monet.verification package</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.verification.html#submodules">Submodules</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.verification.html#monet-verification-combine-module">monet.verification.combine module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.verification.html#monet-verification-interpolation-module">monet.verification.interpolation module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.verification.html#monet-verification-obsdata-module">monet.verification.obsdata module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.verification.html#module-monet.verification.verify">monet.verification.verify module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.verification.html#module-monet.verification">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/monet.util.html">monet.util package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#module-monet.util.combinetool">monet.util.combinetool module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#module-monet.util.interp_util">monet.util.interp_util module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#module-monet.util.mystats">monet.util.mystats module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#module-monet.util.resample">monet.util.resample module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#module-monet.util.tools">monet.util.tools module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html#module-monet.util">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/monet.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="source/monet.html#monet-monet-module">monet.monet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/monet.html#module-monet.grids">monet.grids module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/monet.html#module-monet.monet_accessor">monet.monet_accessor module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="source/monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="source/modules.html">monet</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="source/monet.html">monet package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="source/monet.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.models.html">monet.models package</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.models.html#submodules">Submodules</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.models.html#monet-models-basemodel-module">monet.models.basemodel module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.models.html#module-monet.models.camx">monet.models.camx module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.models.html#module-monet.models.cmaq">monet.models.cmaq module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.models.html#module-monet.models.hysplit">monet.models.hysplit module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.models.html#module-monet.models">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.obs.html">monet.obs package</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#submodules">Submodules</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#monet-obs-aeronet-module">monet.obs.aeronet module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#monet-obs-airnow-module">monet.obs.airnow module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#monet-obs-aqs-module">monet.obs.aqs module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#monet-obs-cems-module">monet.obs.cems module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#monet-obs-crn-module">monet.obs.crn module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#module-monet.obs.epa_util">monet.obs.epa_util module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#monet-obs-improve-module">monet.obs.improve module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#monet-obs-ish-module">monet.obs.ish module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#monet-obs-nadp-module">monet.obs.nadp module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#monet-obs-tolnet-module">monet.obs.tolnet module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.obs.html#module-monet.obs">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.plots.html">monet.plots package</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.plots.html#submodules">Submodules</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.plots.html#module-monet.plots.colorbars">monet.plots.colorbars module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.plots.html#module-monet.plots.mapgen">monet.plots.mapgen module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.plots.html#module-monet.plots.plots">monet.plots.plots module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.plots.html#module-monet.plots.taylordiagram">monet.plots.taylordiagram module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.plots.html#module-monet.plots">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.util.html">monet.util package</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.util.html#submodules">Submodules</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.util.html#monet-util-combine-module">monet.util.combine module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.util.html#monet-util-interp-module">monet.util.interp module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.util.html#module-monet.util.mystats">monet.util.mystats module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.util.html#module-monet.util.tools">monet.util.tools module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.util.html#module-monet.util">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="source/monet.verification.html">monet.verification package</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.verification.html#submodules">Submodules</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.verification.html#monet-verification-combine-module">monet.verification.combine module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.verification.html#monet-verification-interpolation-module">monet.verification.interpolation module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.verification.html#monet-verification-obsdata-module">monet.verification.obsdata module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.verification.html#module-monet.verification.verify">monet.verification.verify module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="source/monet.verification.html#module-monet.verification">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="source/monet.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="source/monet.html#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="source/monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -452,7 +429,7 @@ Transport Models.” Atmosphere 8, no. 11: 210</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -469,32 +446,16 @@ Transport Models.” Atmosphere 8, no. 11: 210</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

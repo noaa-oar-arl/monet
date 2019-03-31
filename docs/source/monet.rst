@@ -9,8 +9,8 @@ Subpackages
     monet.models
     monet.obs
     monet.plots
+    monet.sat
     monet.util
-    monet.verification
 
 Submodules
 ----------

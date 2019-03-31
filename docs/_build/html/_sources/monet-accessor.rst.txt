@@ -21,7 +21,7 @@ All you have to do is import monet after you import xarray.
 
     from monet.models import cmaq
 
-    c = cmaq.open_files(cmaqfile)
+    c = cmaq.open_dataset(cmaqfile)
 
     c.O3[0,0,:,:].monet.quick_map()
 
@@ -150,6 +150,7 @@ If you wanted to only find the nearest location for a single variable you can
 use the accessor on the :py:class:`~xarray.DataArray`.
 
 .. code:: python
+
     c.O3.monet.nearest_latlon(lat=20.5,lon=-157.4)
 
 .. parsed-literal::

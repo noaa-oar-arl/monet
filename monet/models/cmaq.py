@@ -1,8 +1,9 @@
 """ CMAQ File Reader """
+import xarray as xr
 from numpy import array, concatenate
 from pandas import Series, to_datetime
-import xarray as xr
-from ..grids import grid_from_dataset, get_ioapi_pyresample_area_def
+
+from ..grids import get_ioapi_pyresample_area_def, grid_from_dataset
 
 
 def can_do(index):
@@ -12,7 +13,11 @@ def can_do(index):
         return False
 
 
-def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
+def open_dataset(fname,
+                 earth_radius=6370000,
+                 convert_to_ppb=True,
+                 drop_duplicates=False,
+                 **kwargs):
     """Method to open CMAQ IOAPI netcdf files.
 
     Parameters
@@ -33,11 +38,8 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     """
 
     # open the dataset using xarray
-    dset = xr.open_mfdataset(fname)
+    dset = xr.open_dataset(fname, **kwargs)
 
-    # set log pressure as coordinate
-    if 'PRES' in dset.variables:
-        dset.coords['logp'] = xr.ufuncs.log(dset.PRES.chunk())
     # add lazy diagnostic variables
     dset = add_lazy_pm25(dset)
     dset = add_lazy_pm10(dset)
@@ -61,17 +63,17 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
         dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
         for j in dset[i].attrs:
             dset[i].attrs[j] = dset[i].attrs[j].strip()
-        dset[i] = dset[i].assign_attrs({'area': area_def})
-    dset = dset.assign_attrs(area=area_def)
+        # dset[i] = dset[i].assign_attrs({'area': area_def})
+    # dset = dset.assign_attrs(area=area_def)
 
     # get the times
-    dset = _get_times(dset)
+    dset = _get_times(dset, drop_duplicates=drop_duplicates)
 
     # get the lat lon
-    dset = _get_latlon(dset)
+    dset = _get_latlon(dset, area_def)
 
     # get Predefined mapping tables for observations
-    dset = _predefined_mapping_tables(dset)
+    # dset = _predefined_mapping_tables(dset)
 
     # rename dimensions
     dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
@@ -93,7 +95,88 @@ def open_files(fname, earth_radius=6370000, convert_to_ppb=True):
     return dset
 
 
-def _get_times(d):
+def open_mfdataset(fname,
+                   earth_radius=6370000,
+                   convert_to_ppb=True,
+                   drop_duplicates=False,
+                   **kwargs):
+    """Method to open CMAQ IOAPI netcdf files.
+
+    Parameters
+    ----------
+    fname : string or list
+        fname is the path to the file or files.  It will accept hot keys in
+        strings as well.
+    earth_radius : float
+        The earth radius used for the map projection
+    convert_to_ppb : boolean
+        If true the units of the gas species will be converted to ppbV
+
+    Returns
+    -------
+    xarray.DataSet
+
+
+    """
+
+    # open the dataset using xarray
+    dset = xr.open_mfdataset(fname, concat_dim='TSTEP', **kwargs)
+
+    # add lazy diagnostic variables
+    dset = add_lazy_pm25(dset)
+    dset = add_lazy_pm10(dset)
+    dset = add_lazy_pm_course(dset)
+    dset = add_lazy_clf(dset)
+    dset = add_lazy_naf(dset)
+    dset = add_lazy_caf(dset)
+    dset = add_lazy_noy(dset)
+    dset = add_lazy_nox(dset)
+    dset = add_lazy_no3f(dset)
+    dset = add_lazy_nh4f(dset)
+    dset = add_lazy_so4f(dset)
+    dset = add_lazy_rh(dset)
+
+    # get the grid information
+    grid = grid_from_dataset(dset, earth_radius=earth_radius)
+    area_def = get_ioapi_pyresample_area_def(dset, grid)
+    # assign attributes for dataset and all DataArrays
+    dset = dset.assign_attrs({'proj4_srs': grid})
+    for i in dset.variables:
+        dset[i] = dset[i].assign_attrs({'proj4_srs': grid})
+        for j in dset[i].attrs:
+            dset[i].attrs[j] = dset[i].attrs[j].strip()
+        # dset[i] = dset[i].assign_attrs({'area': area_def})
+    # dset = dset.assign_attrs(area=area_def)
+
+    # get the times
+    dset = _get_times(dset, drop_duplicates=drop_duplicates)
+
+    # get the lat lon
+    dset = _get_latlon(dset, area_def)
+
+    # get Predefined mapping tables for observations
+    # d set = _predefined_mapping_tables(dset)
+    # rename dimensions
+    dset = dset.rename({'COL': 'x', 'ROW': 'y', 'LAY': 'z'})
+
+    # convert all gas species to ppbv
+    if convert_to_ppb:
+        for i in dset.variables:
+            if 'units' in dset[i].attrs:
+                if 'ppmV' in dset[i].attrs['units']:
+                    dset[i] *= 1000.
+                    dset[i].attrs['units'] = 'ppbV'
+
+    # convert 'micrograms to \mu g'
+    for i in dset.variables:
+        if 'units' in dset[i].attrs:
+            if 'micrograms' in dset[i].attrs['units']:
+                dset[i].attrs['units'] = '$\mu g m^{-3}$'
+
+    return dset
+
+
+def _get_times(d, drop_duplicates):
     idims = len(d.TFLAG.dims)
     if idims == 2:
         tflag1 = Series(d['TFLAG'][:, 0]).astype(str).str.zfill(7)
@@ -103,13 +186,16 @@ def _get_times(d):
         tflag2 = Series(d['TFLAG'][:, 0, 1]).astype(str).str.zfill(6)
     date = to_datetime(
         [i + j for i, j in zip(tflag1, tflag2)], format='%Y%j%H%M%S')
-    indexdates = Series(date).drop_duplicates(keep='last').index.values
-    d = d.isel(TSTEP=indexdates)
-    d['TSTEP'] = date[indexdates]
+    if drop_duplicates:
+        indexdates = Series(date).drop_duplicates(keep='last').index.values
+        d = d.isel(TSTEP=indexdates)
+        d['TSTEP'] = date[indexdates]
+    else:
+        d['TSTEP'] = date
     return d.rename({'TSTEP': 'time'})
 
 
-def _get_latlon(dset):
+def _get_latlon(dset, area):
     """gets the lat and lons from the pyreample.geometry.AreaDefinition
 
     Parameters
@@ -123,7 +209,7 @@ def _get_latlon(dset):
         Description of returned object.
 
     """
-    lon, lat = dset.area.get_lonlats()
+    lon, lat = area.get_lonlats()
     dset['longitude'] = xr.DataArray(lon[::-1, :], dims=['ROW', 'COL'])
     dset['latitude'] = xr.DataArray(lat[::-1, :], dims=['ROW', 'COL'])
     dset = dset.assign_coords(longitude=dset.longitude, latitude=dset.latitude)
@@ -153,8 +239,7 @@ def add_lazy_pm25(d):
         1., 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2
     ])
     if 'PM25_TOT' in keys:
-        d['PM25'] = d['PM25_TOT'].chunk()
-
+        d['PM25'] = d['PM25_TOT']
     else:
         index = allvars.isin(keys)
         if can_do(index):
@@ -173,7 +258,7 @@ def add_lazy_pm10(d):
     keys = Series([i for i in d.variables])
     allvars = Series(concatenate([aitken, accumulation, coarse]))
     if 'PM_TOT' in keys:
-        d['PM10'] = d['PM_TOT'].chunk()
+        d['PM10'] = d['PM_TOT']
     else:
         index = allvars.isin(keys)
         if can_do(index):
@@ -360,9 +445,12 @@ def add_multiple_lazy(dset, variables, weights=None):
     from numpy import ones
     if weights is None:
         weights = ones(len(variables))
+    else:
+        weights = weights.values
+    variables = variables.values
     new = dset[variables[0]].copy() * weights[0]
     for i, j in zip(variables[1:], weights[1:]):
-        new = new + dset[i].chunk() * j
+        new = new + dset[i] * j
     return new
 
 

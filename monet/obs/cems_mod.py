@@ -157,7 +157,8 @@ class CEMS(object):
             for st in states:
                 url = self.retrieve(rd, st, download=download, verbose=verbose)
                 self.load(url, verbose=verbose)
-        return True
+        return self.df
+
 
     def match_column(self, varname):
         """varname is list of strings.

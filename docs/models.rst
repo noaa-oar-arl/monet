@@ -24,7 +24,7 @@ First we will set the path to the data files
 
     from monet.models import cmaq, hysplit, camx
 
-    c = cmaq.open_files(cmaqfile)
+    c = cmaq.open_dataset(cmaqfile)
 
 
 This will return an :py:class:`~xarray.Dataset`.  The dataset is also still stored
@@ -127,13 +127,12 @@ will not actually do the computation (not stored in memory) until needed:
 
     pm25 = cmaq.PM25
 
-where nox is a :py:class:`~xarray.DataArray` as it is a single variable.  To quickly plot this on a map we can use the utility function
-in :py:class:`~monet.plots.mapgen`.
+where pm25 is a :py:class:`~xarray.DataArray` as it is a single variable.  To quickly plot this on a map we can use the MONETAccessor used to extend
+Xarray
 
 .. code:: python
 
-  ax = monet.plots.draw_map()
-  pm25[10,0,:,:].plot(x='longitude',y='latitude',ax=ax)
+  ax = pm25.monet.quick_map()
 
 CAMx
 ----

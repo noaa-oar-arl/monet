@@ -17,13 +17,19 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/style.css" type="text/css" />
@@ -31,21 +37,16 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Observations" href="observations.html" />
     <link rel="prev" title="Installation" href="installing.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -54,7 +55,7 @@
 
           
             
-            <img src="_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -97,6 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="observations.html">Observations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
 <ul>
@@ -181,7 +183,7 @@ xarray.Dataset objects after a simple import monet in your code.</p>
 
 <span class="kn">from</span> <span class="nn">monet.models</span> <span class="kn">import</span> <span class="n">cmaq</span>
 
-<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_files</span><span class="p">(</span><span class="n">cmaqfile</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">cmaqfile</span><span class="p">)</span>
 
 <span class="n">c</span><span class="o">.</span><span class="n">O3</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">quick_map</span><span class="p">()</span>
 </pre></div>
@@ -302,6 +304,9 @@ Attributes:
 <p>Notice that the length of the dimensions are now (time: 48, x: 1, y: 1, z: 1).
 If you wanted to only find the nearest location for a single variable you can
 use the accessor on the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">O3</span><span class="o">.</span><span class="n">monet</span><span class="o">.</span><span class="n">nearest_latlon</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="mf">20.5</span><span class="p">,</span><span class="n">lon</span><span class="o">=-</span><span class="mf">157.4</span><span class="p">)</span>
+</pre></div>
+</div>
 <pre class="literal-block">
 &lt;xarray.DataArray 'O3' (time: 48, z: 1, y: 1, x: 1)&gt;
 dask.array&lt;shape=(48, 1, 1, 1), dtype=float32, chunksize=(48, 1, 1, 1)&gt;
@@ -333,7 +338,7 @@ Attributes:
         <a href="observations.html" class="btn btn-neutral float-right" title="Observations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="installing.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="installing.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -342,7 +347,7 @@ Attributes:
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -359,32 +364,16 @@ Attributes:
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

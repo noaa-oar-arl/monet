@@ -4,14 +4,14 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 
 
-def draw_map(ax=None,
-             crs=None,
+def draw_map(crs=None,
              natural_earth=False,
              coastlines=True,
              states=False,
              countries=True,
              resolution='10m',
              extent=None,
+             figsize=(10, 5),
              **kwargs):
     """Short summary.
 
@@ -39,17 +39,17 @@ def draw_map(ax=None,
 
     """
     con2 = 'subplot_kw' in kwargs and 'projection' not in kwargs['subplot_kw']
-    if ax is None and kwargs is not None and crs is None:
+    if kwargs is not None and crs is None:
         if 'subplot_kw' not in kwargs:
             kwargs['subplot_kw'] = {'projection': ccrs.PlateCarree()}
         elif con2:
             kwargs['subplot_kw']['projection'] = ccrs.PlateCarree()
-        f, ax = plt.subplots(figsize=(10, 5), **kwargs)
-    elif ax is None and crs is not None:
-        f, ax = plt.subplots(figsize=(10, 5), subplot_kw={'projection': crs})
+        f, ax = plt.subplots(figsize=figsize, **kwargs)
+    elif crs is not None:
+        f, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': crs})
     else:
         f, ax = plt.subplots(
-            figsize=(10, 5), subplot_kw={'projection': ccrs.PlateCarree()})
+            figsize=figsize, subplot_kw={'projection': ccrs.PlateCarree()})
     if natural_earth:
         # ax.stock_img()
         ax.add_feature(cfeature.OCEAN)

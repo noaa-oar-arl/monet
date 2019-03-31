@@ -17,33 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -52,7 +53,7 @@
 
           
             
-            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="../_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -88,6 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
 <ul>
@@ -175,7 +177,7 @@ First we will set the path to the data files</p>
 
 <span class="kn">from</span> <span class="nn">monet.models</span> <span class="kn">import</span> <span class="o">*</span>
 
-<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_files</span><span class="p">(</span><span class="n">flist</span><span class="o">=</span><span class="n">cmaqfile</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">gridcro2d</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">cmaq</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">flist</span><span class="o">=</span><span class="n">cmaqfile</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">gridcro2d</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This will return an <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.  The dataset is also still stored
@@ -198,7 +200,7 @@ in the <code class="xref py py-class docutils literal notranslate"><span class="
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -215,32 +217,16 @@ in the <code class="xref py py-class docutils literal notranslate"><span class="
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

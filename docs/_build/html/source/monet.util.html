@@ -17,35 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="monet.verification package" href="monet.verification.html" />
-    <link rel="prev" title="monet.plots package" href="monet.plots.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+    <link rel="prev" title="monet.sat package" href="monet.sat.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -54,7 +54,7 @@
 
           
             
-            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="../_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -90,37 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html#api">API</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="monet.models.html">monet.models package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.obs.html">monet.obs package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.plots.html">monet.plots package</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">monet.util package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.verification.html">monet.verification package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="monet.html">monet package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="monet.html#subpackages">Subpackages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.html#module-monet">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
 </ul>
 
             
@@ -194,11 +169,315 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="monet-util-combine-module">
-<h2>monet.util.combine module<a class="headerlink" href="#monet-util-combine-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.util.combinetool">
+<span id="monet-util-combinetool-module"></span><h2>monet.util.combinetool module<a class="headerlink" href="#module-monet.util.combinetool" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.util.combinetool.combine_da_to_df">
+<code class="descclassname">monet.util.combinetool.</code><code class="descname">combine_da_to_df</code><span class="sig-paren">(</span><em>da</em>, <em>df</em>, <em>col=None</em>, <em>radius_of_influence=12000.0</em>, <em>merge=True</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.combinetool.combine_da_to_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will combine an xarray data array with spatial information
+point observations in <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>da</strong> (<em>xr.DataArray</em>) – Description of parameter <cite>da</cite>.</li>
+<li><strong>df</strong> (<em>pd.DataFrame</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>lay</strong> (<em>iterable, default = [0]</em>) – Description of parameter <cite>lay</cite>.</li>
+<li><strong>radius</strong> (<em>integer or float, default = 12e3</em>) – Description of parameter <cite>radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.combinetool.combine_da_to_df_xesmf">
+<code class="descclassname">monet.util.combinetool.</code><code class="descname">combine_da_to_df_xesmf</code><span class="sig-paren">(</span><em>da</em>, <em>df</em>, <em>col=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.combinetool.combine_da_to_df_xesmf" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will combine an xarray data array with spatial information
+point observations in <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>da</strong> (<em>xr.DataArray</em>) – Description of parameter <cite>da</cite>.</li>
+<li><strong>df</strong> (<em>pd.DataFrame</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>lay</strong> (<em>iterable, default = [0]</em>) – Description of parameter <cite>lay</cite>.</li>
+<li><strong>radius</strong> (<em>integer or float, default = 12e3</em>) – Description of parameter <cite>radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.combinetool.combine_da_to_df_xesmf_strat">
+<code class="descclassname">monet.util.combinetool.</code><code class="descname">combine_da_to_df_xesmf_strat</code><span class="sig-paren">(</span><em>da</em>, <em>daz</em>, <em>df</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.combinetool.combine_da_to_df_xesmf_strat" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will combine an xarray data array with spatial information
+point observations in <cite>df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>da</strong> (<em>xr.DataArray</em>) – Description of parameter <cite>da</cite>.</li>
+<li><strong>daz</strong> (<em>xr.DataArray</em>) – Description of parameter <cite>daz</cite>.</li>
+<li><strong>df</strong> (<em>pd.DataFrame</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>lay</strong> (<em>iterable, default = [0]</em>) – Description of parameter <cite>lay</cite>.</li>
+<li><strong>radius</strong> (<em>integer or float, default = 12e3</em>) – Description of parameter <cite>radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.combinetool.combine_da_to_height_profile">
+<code class="descclassname">monet.util.combinetool.</code><code class="descname">combine_da_to_height_profile</code><span class="sig-paren">(</span><em>da</em>, <em>dset</em>, <em>radius_of_influence=12000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.combinetool.combine_da_to_height_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will combine an xarray.DataArray to a 2d dataset with
+dimensions (time,z)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>da</strong> (<em>xarray.DataArray</em>) – Description of parameter <cite>da</cite>.</li>
+<li><strong>dset</strong> (<em>xarray.Dataset</em>) – Description of parameter <cite>dset</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">returns the xarray.Dataset with the <cite>da</cite> added as an additional
+variable.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xarray.Dataset</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="monet-util-interp-module">
-<h2>monet.util.interp module<a class="headerlink" href="#monet-util-interp-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.util.interp_util">
+<span id="monet-util-interp-util-module"></span><h2>monet.util.interp_util module<a class="headerlink" href="#module-monet.util.interp_util" title="Permalink to this headline">¶</a></h2>
+<p>Interpolation functions</p>
+<dl class="function">
+<dt id="monet.util.interp_util.constant_1d_xesmf">
+<code class="descclassname">monet.util.interp_util.</code><code class="descname">constant_1d_xesmf</code><span class="sig-paren">(</span><em>longitude=None</em>, <em>latitude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.interp_util.constant_1d_xesmf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pyreample.geometry.SwathDefinition with a constant latitude along
+the longitude array.  Longitude can be a 1d or 2d np.array or xr.DataArray</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>longitude</strong> (<em>numpy.array or xarray.DataArray</em>) – Array of longitude values</li>
+<li><strong>latitude</strong> (<em>float</em>) – latitude for constant</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pyreample.geometry.SwathDefinition</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.interp_util.constant_lat_swathdefition">
+<code class="descclassname">monet.util.interp_util.</code><code class="descname">constant_lat_swathdefition</code><span class="sig-paren">(</span><em>longitude=None</em>, <em>latitude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.interp_util.constant_lat_swathdefition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pyreample.geometry.SwathDefinition with a constant latitude along
+the longitude array.  Longitude can be a 1d or 2d np.array or xr.DataArray</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>longitude</strong> (<em>numpy.array or xarray.DataArray</em>) – Array of longitude values</li>
+<li><strong>latitude</strong> (<em>float</em>) – latitude for constant</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pyreample.geometry.SwathDefinition</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.interp_util.constant_lon_swathdefition">
+<code class="descclassname">monet.util.interp_util.</code><code class="descname">constant_lon_swathdefition</code><span class="sig-paren">(</span><em>longitude=None</em>, <em>latitude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.interp_util.constant_lon_swathdefition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pyreample.geometry.SwathDefinition with a constant longitude along
+the latitude array.  latitude can be a 1d or 2d np.array or xr.DataArray</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>longitude</strong> – latitude for constant</li>
+<li><strong>latitude</strong> (<em>numpy.array or xarray.DataArray</em>) – Array of longitude values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pyreample.geometry.SwathDefinition</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.interp_util.get_gfs_area_def">
+<code class="descclassname">monet.util.interp_util.</code><code class="descname">get_gfs_area_def</code><span class="sig-paren">(</span><em>nx=1440</em>, <em>ny=721</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.interp_util.get_gfs_area_def" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nx</strong> (<em>type</em>) – Description of parameter <cite>nx</cite> (the default is 1440).</li>
+<li><strong>ny</strong> (<em>type</em>) – Description of parameter <cite>ny</cite> (the default is 721).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.interp_util.get_smops_area_def">
+<code class="descclassname">monet.util.interp_util.</code><code class="descname">get_smops_area_def</code><span class="sig-paren">(</span><em>nx=1440</em>, <em>ny=720</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.interp_util.get_smops_area_def" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nx</strong> (<em>type</em>) – Description of parameter <cite>nx</cite> (the default is 1440).</li>
+<li><strong>ny</strong> (<em>type</em>) – Description of parameter <cite>ny</cite> (the default is 720).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.interp_util.lonlat_to_swathdefinition">
+<code class="descclassname">monet.util.interp_util.</code><code class="descname">lonlat_to_swathdefinition</code><span class="sig-paren">(</span><em>longitude=None</em>, <em>latitude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.interp_util.lonlat_to_swathdefinition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>longitude</strong> (<em>type</em>) – Description of parameter <cite>longitude</cite>.</li>
+<li><strong>latitude</strong> (<em>type</em>) – Description of parameter <cite>latitude</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.interp_util.lonlat_to_xesmf">
+<code class="descclassname">monet.util.interp_util.</code><code class="descname">lonlat_to_xesmf</code><span class="sig-paren">(</span><em>longitude=None</em>, <em>latitude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.interp_util.lonlat_to_xesmf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an empty xarray.Dataset with the coordinate (longitude, latitude).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>longitude</strong> (<em>type</em>) – Description of parameter <cite>longitude</cite>.</li>
+<li><strong>latitude</strong> (<em>type</em>) – Description of parameter <cite>latitude</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.interp_util.nearest_point_swathdefinition">
+<code class="descclassname">monet.util.interp_util.</code><code class="descname">nearest_point_swathdefinition</code><span class="sig-paren">(</span><em>longitude=None</em>, <em>latitude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.interp_util.nearest_point_swathdefinition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pyreample.geometry.SwathDefinition for a single point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>longitude</strong> (<em>float</em>) – longitude.</li>
+<li><strong>latitude</strong> (<em>float</em>) – latitude.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pyreample.geometry.SwathDefinition</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-monet.util.mystats">
 <span id="monet-util-mystats-module"></span><h2>monet.util.mystats module<a class="headerlink" href="#module-monet.util.mystats" title="Permalink to this headline">¶</a></h2>
@@ -384,6 +663,12 @@
 <dt id="monet.util.mystats.NMdnE">
 <code class="descclassname">monet.util.mystats.</code><code class="descname">NMdnE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NMdnE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalized Median Error (%)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.util.mystats.NMdnGE">
+<code class="descclassname">monet.util.mystats.</code><code class="descname">NMdnGE</code><span class="sig-paren">(</span><em>obs</em>, <em>mod</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.mystats.NMdnGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized Median Gross Error (%)</p>
 </dd></dl>
 
 <dl class="function">
@@ -598,6 +883,24 @@
 <dd></dd></dl>
 
 </div>
+<div class="section" id="module-monet.util.resample">
+<span id="monet-util-resample-module"></span><h2>monet.util.resample module<a class="headerlink" href="#module-monet.util.resample" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.util.resample.resample_dataset">
+<code class="descclassname">monet.util.resample.</code><code class="descname">resample_dataset</code><span class="sig-paren">(</span><em>data</em>, <em>source_grid</em>, <em>target_grid</em>, <em>radius_of_influence=100000.0</em>, <em>resample_cache=None</em>, <em>return_neighbor_info=False</em>, <em>neighbours=1</em>, <em>epsilon=0</em>, <em>interp='nearest'</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.resample.resample_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.resample.resample_stratify">
+<code class="descclassname">monet.util.resample.</code><code class="descname">resample_stratify</code><span class="sig-paren">(</span><em>da</em>, <em>levels</em>, <em>vertical</em>, <em>axis=1</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.resample.resample_stratify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.util.resample.resample_xesmf">
+<code class="descclassname">monet.util.resample.</code><code class="descname">resample_xesmf</code><span class="sig-paren">(</span><em>source_da</em>, <em>target_da</em>, <em>cleanup=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.util.resample.resample_xesmf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
 <div class="section" id="module-monet.util.tools">
 <span id="monet-util-tools-module"></span><h2>monet.util.tools module<a class="headerlink" href="#module-monet.util.tools" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -644,10 +947,8 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="monet.verification.html" class="btn btn-neutral float-right" title="monet.verification package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="monet.plots.html" class="btn btn-neutral" title="monet.plots package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="monet.sat.html" class="btn btn-neutral float-left" title="monet.sat package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -656,7 +957,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -673,32 +974,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

@@ -17,13 +17,19 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -31,21 +37,16 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="monet.models package" href="monet.models.html" />
     <link rel="prev" title="Get in touch" href="../api.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -54,7 +55,7 @@
 
           
             
-            <img src="../_static/noaa.png" class="logo" alt="Logo"/>
+            <img src="../_static/MONET-logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -90,37 +91,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../observations.html">Observations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monet_wcoss.html">MONET on WCOSS</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help * Reference</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Get in touch</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html#api">API</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">monet package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="monet.models.html">monet.models package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.obs.html">monet.obs package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.plots.html">monet.plots package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.util.html">monet.util package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="monet.verification.html">monet.verification package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-monet">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2 current"><a class="reference internal" href="modules.html">monet</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">monet package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#monet-monet-module">monet.monet module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-monet">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#api">API</a></li>
 </ul>
 
             
@@ -195,25 +171,31 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="monet.models.html">monet.models package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="monet.models.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.models.html#monet-models-basemodel-module">monet.models.basemodel module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="monet.models.html#module-monet.models.camx">monet.models.camx module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="monet.models.html#module-monet.models.cmaq">monet.models.cmaq module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.models.html#module-monet.models.fv3chem">monet.models.fv3chem module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="monet.models.html#module-monet.models.hysplit">monet.models.hysplit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="monet.models.html#module-monet.models">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="monet.obs.html">monet.obs package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="monet.obs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#monet-obs-aeronet-module">monet.obs.aeronet module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#monet-obs-airnow-module">monet.obs.airnow module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#monet-obs-aqs-module">monet.obs.aqs module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#monet-obs-cems-module">monet.obs.cems module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#monet-obs-crn-module">monet.obs.crn module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.aeronet_mod">monet.obs.aeronet_mod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.airnow">monet.obs.airnow module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.airnow_mod">monet.obs.airnow_mod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.aqs_mod">monet.obs.aqs_mod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.cems_mod">monet.obs.cems_mod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.crn_mod">monet.obs.crn_mod module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="monet.obs.html#daily-data">Daily Data</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.epa_util">monet.obs.epa_util module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#monet-obs-improve-module">monet.obs.improve module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#monet-obs-ish-module">monet.obs.ish module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#monet-obs-nadp-module">monet.obs.nadp module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#monet-obs-tolnet-module">monet.obs.tolnet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.goes">monet.obs.goes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.icartt_mod">monet.obs.icartt_mod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.improve_mod">monet.obs.improve_mod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.ish_mod">monet.obs.ish_mod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.nadp_mod">monet.obs.nadp_mod module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs.obs_util">monet.obs.obs_util module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="monet.obs.html#module-monet.obs">Module contents</a></li>
 </ul>
 </li>
@@ -226,22 +208,22 @@
 <li class="toctree-l2"><a class="reference internal" href="monet.plots.html#module-monet.plots">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="monet.util.html">monet.util package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="monet.util.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.util.html#monet-util-combine-module">monet.util.combine module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.util.html#monet-util-interp-module">monet.util.interp module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.util.html#module-monet.util.mystats">monet.util.mystats module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.util.html#module-monet.util.tools">monet.util.tools module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.util.html#module-monet.util">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monet.sat.html">monet.sat package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monet.sat.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.sat.html#module-monet.sat.modis_swath">monet.sat.modis_swath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.sat.html#module-monet.sat.nesdis_edr_viirs">monet.sat.nesdis_edr_viirs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.sat.html#module-monet.sat.nesdis_eps_viirs">monet.sat.nesdis_eps_viirs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.sat.html#module-monet.sat">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="monet.verification.html">monet.verification package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="monet.verification.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.verification.html#monet-verification-combine-module">monet.verification.combine module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.verification.html#monet-verification-interpolation-module">monet.verification.interpolation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.verification.html#monet-verification-obsdata-module">monet.verification.obsdata module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.verification.html#module-monet.verification.verify">monet.verification.verify module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="monet.verification.html#module-monet.verification">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monet.util.html">monet.util package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monet.util.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.util.html#module-monet.util.combinetool">monet.util.combinetool module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.util.html#module-monet.util.interp_util">monet.util.interp_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.util.html#module-monet.util.mystats">monet.util.mystats module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.util.html#module-monet.util.resample">monet.util.resample module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.util.html#module-monet.util.tools">monet.util.tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monet.util.html#module-monet.util">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -250,8 +232,587 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="monet-monet-module">
-<h2>monet.monet module<a class="headerlink" href="#monet-monet-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-monet.grids">
+<span id="monet-grids-module"></span><h2>monet.grids module<a class="headerlink" href="#module-monet.grids" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="monet.grids.get_generic_projection_from_proj4">
+<code class="descclassname">monet.grids.</code><code class="descname">get_generic_projection_from_proj4</code><span class="sig-paren">(</span><em>lat</em>, <em>lon</em>, <em>proj4_srs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.grids.get_generic_projection_from_proj4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite>.</li>
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite>.</li>
+<li><strong>proj4_srs</strong> (<em>type</em>) – Description of parameter <cite>proj4_srs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.grids.get_hysplit_latlon_pyresample_area_def">
+<code class="descclassname">monet.grids.</code><code class="descname">get_hysplit_latlon_pyresample_area_def</code><span class="sig-paren">(</span><em>ds</em>, <em>proj4_srs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.grids.get_hysplit_latlon_pyresample_area_def" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.grids.get_ioapi_pyresample_area_def">
+<code class="descclassname">monet.grids.</code><code class="descname">get_ioapi_pyresample_area_def</code><span class="sig-paren">(</span><em>ds</em>, <em>proj4_srs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.grids.get_ioapi_pyresample_area_def" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.grids.get_modis_latlon_from_swath_hv">
+<code class="descclassname">monet.grids.</code><code class="descname">get_modis_latlon_from_swath_hv</code><span class="sig-paren">(</span><em>h</em>, <em>v</em>, <em>dset</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.grids.get_modis_latlon_from_swath_hv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.grids.get_optimal_cartopy_proj">
+<code class="descclassname">monet.grids.</code><code class="descname">get_optimal_cartopy_proj</code><span class="sig-paren">(</span><em>lat</em>, <em>lon</em>, <em>proj4_srs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.grids.get_optimal_cartopy_proj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite>.</li>
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite>.</li>
+<li><strong>proj4_srs</strong> (<em>type</em>) – Description of parameter <cite>proj4_srs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.grids.get_sinu_area_def">
+<code class="descclassname">monet.grids.</code><code class="descname">get_sinu_area_def</code><span class="sig-paren">(</span><em>dset</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.grids.get_sinu_area_def" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.grids.get_sinu_area_extent">
+<code class="descclassname">monet.grids.</code><code class="descname">get_sinu_area_extent</code><span class="sig-paren">(</span><em>lonmin</em>, <em>latmin</em>, <em>lonmax</em>, <em>latmax</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.grids.get_sinu_area_extent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="monet.grids.grid_from_dataset">
+<code class="descclassname">monet.grids.</code><code class="descname">grid_from_dataset</code><span class="sig-paren">(</span><em>ds</em>, <em>earth_radius=6370000</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.grids.grid_from_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ds</strong> (<em>type</em>) – Description of parameter <cite>ds</cite>.</li>
+<li><strong>earth_radius</strong> (<em>type</em>) – Description of parameter <cite>earth_radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-monet.monet_accessor">
+<span id="monet-monet-accessor-module"></span><h2>monet.monet_accessor module<a class="headerlink" href="#module-monet.monet_accessor" title="Permalink to this headline">¶</a></h2>
+<p>MONET Accessor</p>
+<dl class="class">
+<dt id="monet.monet_accessor.MONETAccessor">
+<em class="property">class </em><code class="descclassname">monet.monet_accessor.</code><code class="descname">MONETAccessor</code><span class="sig-paren">(</span><em>xray_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>xray_obj</strong> (<em>type</em>) – Description of parameter <cite>xray_obj</cite>.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="monet.monet_accessor.MONETAccessor.obj">
+<code class="descname">obj</code><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>obj</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessor.combine_point">
+<code class="descname">combine_point</code><span class="sig-paren">(</span><em>data</em>, <em>col=None</em>, <em>pyresample=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.combine_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>type</em>) – Description of parameter <cite>data</cite>.</li>
+<li><strong>col</strong> (<em>type</em>) – Description of parameter <cite>col</cite>.</li>
+<li><strong>radius</strong> (<em>type</em>) – Description of parameter <cite>radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessor.interp_constant_lat">
+<code class="descname">interp_constant_lat</code><span class="sig-paren">(</span><em>lat=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.interp_constant_lat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpolates the data array to constant longitude.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lon</strong> (<em>float</em>) – Latitude on which to interpolate to</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DataArray of at constant longitude</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataArray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessor.interp_constant_lon">
+<code class="descname">interp_constant_lon</code><span class="sig-paren">(</span><em>lon=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.interp_constant_lon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpolates the data array to constant longitude.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lon</strong> (<em>float</em>) – Latitude on which to interpolate to</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DataArray of at constant longitude</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataArray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessor.nearest_latlon">
+<code class="descname">nearest_latlon</code><span class="sig-paren">(</span><em>lat=None</em>, <em>lon=None</em>, <em>cleanup=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.nearest_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses xesmf to intepolate to a given latitude and longitude.  Note
+that the conservative method is not available.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite>.</li>
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite>.</li>
+<li><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessor.quick_map">
+<code class="descname">quick_map</code><span class="sig-paren">(</span><em>map_kwarg={}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.quick_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>map_kwarg</strong> (<em>type</em>) – Description of parameter <cite>map_kwarg</cite>.</li>
+<li><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessor.remap_data">
+<code class="descname">remap_data</code><span class="sig-paren">(</span><em>dataarray</em>, <em>grid=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.remap_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>remaps from another grid to the current grid of self using pyresample.
+it assumes that the dimensions are ordered in ROW,COL,CHANNEL per
+pyresample docs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>grid</strong> (<em>pyresample grid (SwathDefinition or AreaDefinition)</em>) – Description of parameter <cite>grid</cite>.</li>
+<li><strong>da</strong> (<em>ndarray or xarray DataArray</em>) – Description of parameter <cite>dset</cite>.</li>
+<li><strong>radius_of_influence</strong> (<em>float or integer</em>) – radius of influcence for pyresample in meters.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">resampled object on current grid.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xarray.DataArray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessor.remap_xesmf">
+<code class="descname">remap_xesmf</code><span class="sig-paren">(</span><em>dataarray</em>, <em>method='bilinear'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.remap_xesmf" title="Permalink to this definition">¶</a></dt>
+<dd><p>remaps from another grid to the current grid of self using xesmf</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>daaarray</strong> (<em>ndarray or xarray DataArray</em>) – Description of parameter <cite>dset</cite>.</li>
+<li><strong>radius_of_influence</strong> (<em>float or integer</em>) – radius of influcence for pyresample in meters.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">resampled object on current grid.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xarray.DataArray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessor.stratify">
+<code class="descname">stratify</code><span class="sig-paren">(</span><em>levels</em>, <em>vertical</em>, <em>axis=1</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.stratify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>levels</strong> (<em>type</em>) – Description of parameter <cite>levels</cite>.</li>
+<li><strong>vertical</strong> (<em>type</em>) – Description of parameter <cite>vertical</cite>.</li>
+<li><strong>axis</strong> (<em>type</em>) – Description of parameter <cite>axis</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessor.window">
+<code class="descname">window</code><span class="sig-paren">(</span><em>lat_min=None</em>, <em>lon_min=None</em>, <em>lat_max=None</em>, <em>lon_max=None</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessor.window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to window, ie select a specific region, given the lower left
+latitude and longitude and the upper right latitude and longitude</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat_min</strong> (<em>float</em>) – lower left latitude .</li>
+<li><strong>lon_min</strong> (<em>float</em>) – lower left longitude.</li>
+<li><strong>lat_max</strong> (<em>float</em>) – upper right latitude.</li>
+<li><strong>lon_max</strong> (<em>float</em>) – upper right longitude.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">returns the windowed object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xr.DataArray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="monet.monet_accessor.MONETAccessorDataset">
+<em class="property">class </em><code class="descclassname">monet.monet_accessor.</code><code class="descname">MONETAccessorDataset</code><span class="sig-paren">(</span><em>xray_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>xray_obj</strong> (<em>type</em>) – Description of parameter <cite>xray_obj</cite>.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="monet.monet_accessor.MONETAccessorDataset.obj">
+<code class="descname">obj</code><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset.obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of attribute <cite>obj</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessorDataset.combine_point">
+<code class="descname">combine_point</code><span class="sig-paren">(</span><em>df</em>, <em>mapping_table=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset.combine_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>type</em>) – Description of parameter <cite>df</cite>.</li>
+<li><strong>mapping_table</strong> (<em>type</em>) – Description of parameter <cite>mapping_table</cite>.</li>
+<li><strong>radius</strong> (<em>type</em>) – Description of parameter <cite>radius</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessorDataset.interp_constant_lat">
+<code class="descname">interp_constant_lat</code><span class="sig-paren">(</span><em>lat=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset.interp_constant_lat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite>.</li>
+<li><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessorDataset.interp_constant_lon">
+<code class="descname">interp_constant_lon</code><span class="sig-paren">(</span><em>lon=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset.interp_constant_lon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite>.</li>
+<li><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessorDataset.nearest_latlon">
+<code class="descname">nearest_latlon</code><span class="sig-paren">(</span><em>lat=None</em>, <em>lon=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset.nearest_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat</strong> (<em>type</em>) – Description of parameter <cite>lat</cite>.</li>
+<li><strong>lon</strong> (<em>type</em>) – Description of parameter <cite>lon</cite>.</li>
+<li><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessorDataset.remap_data">
+<code class="descname">remap_data</code><span class="sig-paren">(</span><em>data</em>, <em>grid=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset.remap_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>type</em>) – Description of parameter <cite>data</cite>.</li>
+<li><strong>grid</strong> (<em>type</em>) – Description of parameter <cite>grid</cite>.</li>
+<li><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessorDataset.remap_xesmf">
+<code class="descname">remap_xesmf</code><span class="sig-paren">(</span><em>data</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset.remap_xesmf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>type</em>) – Description of parameter <cite>data</cite>.</li>
+<li><strong>**kwargs</strong> (<em>type</em>) – Description of parameter <cite>**kwargs</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessorDataset.stratify">
+<code class="descname">stratify</code><span class="sig-paren">(</span><em>levels</em>, <em>vertical</em>, <em>axis=1</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset.stratify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short summary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>levels</strong> (<em>type</em>) – Description of parameter <cite>levels</cite>.</li>
+<li><strong>vertical</strong> (<em>type</em>) – Description of parameter <cite>vertical</cite>.</li>
+<li><strong>axis</strong> (<em>type</em>) – Description of parameter <cite>axis</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of returned object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">type</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="monet.monet_accessor.MONETAccessorDataset.window">
+<code class="descname">window</code><span class="sig-paren">(</span><em>lat_min</em>, <em>lon_min</em>, <em>lat_max</em>, <em>lon_max</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.MONETAccessorDataset.window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to window, ie select a specific region, given the lower left
+latitude and longitude and the upper right latitude and longitude</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat_min</strong> (<em>float</em>) – lower left latitude .</li>
+<li><strong>lon_min</strong> (<em>float</em>) – lower left longitude.</li>
+<li><strong>lat_max</strong> (<em>float</em>) – upper right latitude.</li>
+<li><strong>lon_max</strong> (<em>float</em>) – upper right longitude.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">returns the windowed object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xr.DataSet</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="monet.monet_accessor.rename_latlon">
+<code class="descclassname">monet.monet_accessor.</code><code class="descname">rename_latlon</code><span class="sig-paren">(</span><em>ds</em><span class="sig-paren">)</span><a class="headerlink" href="#monet.monet_accessor.rename_latlon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-monet">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-monet" title="Permalink to this headline">¶</a></h2>
@@ -269,7 +830,7 @@
         <a href="monet.models.html" class="btn btn-neutral float-right" title="monet.models package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../api.html" class="btn btn-neutral" title="Get in touch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../api.html" class="btn btn-neutral float-left" title="Get in touch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -278,7 +839,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Barry Baker.
+        &copy; Copyright 2018, Barry Baker
 
     </p>
   </div>
@@ -295,32 +856,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

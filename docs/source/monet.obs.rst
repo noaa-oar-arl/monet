@@ -20,6 +20,14 @@ monet.obs.airnow module
     :undoc-members:
     :show-inheritance:
 
+monet.obs.airnow\_mod module
+----------------------------
+
+.. automodule:: monet.obs.airnow
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 monet.obs.aqs module
 --------------------
 
@@ -52,8 +60,24 @@ monet.obs.epa\_util module
     :undoc-members:
     :show-inheritance:
 
-monet.obs.improve module
-------------------------
+monet.obs.goes module
+---------------------
+
+.. automodule:: monet.obs.goes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+monet.obs.icartt\_mod module
+----------------------------
+
+.. automodule:: monet.obs.icartt_mod
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+monet.obs.improve\_mod module
+-----------------------------
 
 .. automodule:: monet.obs.improve
     :members:
@@ -68,18 +92,18 @@ monet.obs.ish module
     :undoc-members:
     :show-inheritance:
 
-monet.obs.nadp module
----------------------
+monet.obs.nadp\_mod module
+--------------------------
 
-.. automodule:: monet.obs.nadp
+.. automodule:: monet.obs.nadp_mod
     :members:
     :undoc-members:
     :show-inheritance:
 
-monet.obs.tolnet module
------------------------
+monet.obs.obs\_util module
+--------------------------
 
-.. automodule:: monet.obs.tolnet
+.. automodule:: monet.obs.nadp
     :members:
     :undoc-members:
     :show-inheritance:
