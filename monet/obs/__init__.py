@@ -1,8 +1,9 @@
 from __future__ import absolute_import, print_function
+
 # from . import aeronet_mod, airnow_mod, aqs_mod, crn_mod, epa_util, improve_mod
 # from . import ish_mod, tolnet_mod, cems_mod, nadp_mod, modis_swath, icartt_mod
-from . import aeronet_mod, airnow, aqs_mod, crn_mod, epa_util, improve_mod
-from . import ish_mod, cems_mod, nadp_mod, icartt_mod
+from . import (aeronet_mod, airnow, aqs_mod, cems_mod, crn_mod, epa_util,
+               icartt_mod, improve_mod, ish_mod, nadp_mod)
 
 __all__ = [
     'aeronet_mod', 'airnow', 'aqs_mod', 'crn_mod', 'epa_util',

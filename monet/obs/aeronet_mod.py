@@ -33,14 +33,6 @@ class AERONET(object):
         self.url = None
 
     def build_url(self):
-        """Short summary.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
         sy = self.dates.min().strftime('%Y')
         sm = self.dates.min().strftime('%m').zfill(2)
         sd = self.dates.min().strftime('%d').zfill(2)
@@ -92,14 +84,6 @@ class AERONET(object):
             inv_type + time + latlonbox + '&if_no_html=1'
 
     def read_aeronet(self):
-        """Short summary.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
         print('Reading Aeronet Data...')
         # header = self.get_columns()
         df = pd.read_csv(
@@ -127,14 +111,6 @@ class AERONET(object):
         self.df = df
 
     def get_columns(self):
-        """Short summary.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
         header = pd.read_csv(
             self.url, skiprows=5, header=None, nrows=1).values.flatten()
         final = ['time']
@@ -154,33 +130,6 @@ class AERONET(object):
                  inv_type=None,
                  freq=None,
                  detect_dust=False):
-        """Short summary.
-
-        Parameters
-        ----------
-        dates : type
-            Description of parameter `dates`.
-        product : type
-            Description of parameter `product`.
-        latlonbox : type
-            Description of parameter `latlonbox`.
-        daily : type
-            Description of parameter `daily`.
-        calc_550 : type
-            Description of parameter `calc_550`.
-        inv_type : type
-            Description of parameter `inv_type`.
-        freq : type
-            Description of parameter `freq`.
-        detect_dust : type
-            Description of parameter `detect_dust`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
         self.latlonbox = latlonbox
         if dates is None:  # get the current day
             self.dates = pd.date_range(
@@ -215,12 +164,6 @@ class AERONET(object):
         V. Cesnulyte et al (ACP,2014) for the calculation
 
         aod550 = aod500 * (550/500) ^ -alpha
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
         """
         self.df['aod_550nm'] = self.df.aod_500nm * (old_div(
             550., 500.))**(-self.df['440-870_angstrom_exponent'])
@@ -236,25 +179,9 @@ class AERONET(object):
             Description of returned object.
 
         """
-        self.df['dust'] = (self.df['aod_1020nm']
-                           > 0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
+        self.df['dust'] = (self.df['aod_1020nm'] > 0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
 
     def set_daterange(self, begin='', end=''):
-        """Short summary.
-
-        Parameters
-        ----------
-        begin : type
-            Description of parameter `begin`.
-        end : type
-            Description of parameter `end`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
         dates = pd.date_range(
             start=begin, end=end, freq='H').values.astype('M8[s]').astype('O')
         self.dates = dates

@@ -6,12 +6,12 @@ from warnings import warn
 
 try:
     from setuptools import setup, find_packages
-except ImportError:
+except:
     from distutils.core import setup
 
 setup(
     name='monet',
-    version='2.1.1',
+    version='2.1.2',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
     include_package_data=True,

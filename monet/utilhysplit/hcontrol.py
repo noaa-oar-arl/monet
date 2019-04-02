@@ -681,7 +681,7 @@ class ControlLoc():
 
 class HycsControl():
     """
-       class which represents the HYSPLIT 
+       class which represents the HYSPLIT
        control file and all the information in it
     """
 

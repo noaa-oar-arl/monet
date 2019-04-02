@@ -47,10 +47,9 @@ release = u''
 # ones.
 extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.napoleon',
-    'sphinx.ext.extlinks', 'sphinx.ext.ifconfig', 'sphinx.ext.intersphinx',
-    'sphinx.ext.todo', 'sphinx.ext.doctest'
+    'sphinx.ext.extlinks'
 ]
-# exclude_patterns = ['_build', '**.ipynb_checkpoints']
+#exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 extlinks = {
     'issue': ('https://github.com/noaa-oar-arl/MONET/issues/%s', 'GH'),
@@ -128,14 +127,14 @@ html_theme_options = {
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+# html_theme_path = []
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+# html_title = None
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
+# html_short_title = None
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
