@@ -87,9 +87,9 @@ def sp_scatter_bias(df,
             dfnew['sp_diff'] = (dfnew[col2] - dfnew[col1])
             top = score(dfnew['sp_diff'].abs(), per=95)
             if 'vmin' in kwargs:
-                top = abs(vmin)
+                top = abs(kwargs['vmin'])
             elif 'vmax' in kwargs:
-                top = abs(vmax)
+                top = abs(kwargs['vmax'])
             x, y = df.longitude.values, df.latitude.values
             dfnew['sp_diff_size'] = dfnew['sp_diff'].abs() / top * 100.
             dfnew.loc[dfnew['sp_diff_size'] > 300, 'sp_diff_size'] = 300.
