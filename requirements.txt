@@ -8,3 +8,4 @@ cartopy
 matplotlib
 seaborn
 sklearn
+pyproj
