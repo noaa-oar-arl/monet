@@ -6,8 +6,8 @@ datetime
 future
 pyproj
 proj
-GEOS
-PROJ.4
+geos
+shapely
 cartopy
 matplotlib
 seaborn
