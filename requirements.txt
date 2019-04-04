@@ -1,5 +1,3 @@
-os
-sys
 unittest
 numpy
 pandas
@@ -11,7 +9,4 @@ builtins
 cartopy
 matplotlib
 seaborn
-inspect
-past
 sklearn
-glob
