@@ -3,7 +3,7 @@ pandas
 xarray
 dask
 datetime
-futurize
+future
 builtins
 cartopy
 matplotlib
