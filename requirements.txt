@@ -5,9 +5,8 @@ numpy
 pandas
 xarray
 dask
-__future__
 datetime
-future
+futurize
 builtins
 cartopy
 matplotlib
