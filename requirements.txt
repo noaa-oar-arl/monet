@@ -4,8 +4,8 @@ xarray
 dask
 datetime
 future
+pyproj
 cartopy
 matplotlib
 seaborn
 sklearn
-pyproj
