@@ -5,6 +5,7 @@ dask
 datetime
 future
 pyproj
+geos
 cartopy
 matplotlib
 seaborn
