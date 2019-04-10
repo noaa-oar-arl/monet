@@ -268,8 +268,8 @@ class EmitCycle(object):
         # need to make lat lon slightly different or HYSPLIT
         # will think these are line sources and not calculate number
         # of particles to emit correctly in emstmp.f
-        lat = rc.lat + np.random.rand(1)[0]*10
-        lon = rc.lon + np.random.rand(1)[0]*10
+        lat = rc.lat + np.random.rand(1)[0] * 10
+        lon = rc.lon + np.random.rand(1)[0] * 10
         eline = EmitLine(rc.date, "0100", lat, lon, 0, 0, 0, 0)
         self.dummy_recordra.append(eline)
         self.drecs += 1
