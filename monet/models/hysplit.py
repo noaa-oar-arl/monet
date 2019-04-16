@@ -18,11 +18,12 @@ def _hysplit_latlon_grid_from_dataset(ds):
 
 def get_hysplit_latlon_pyresample_area_def(ds, proj4_srs):
     from pyresample import geometry
-    mgrid = np.meshgrid(ds.longitude.values, ds.latitude.values)
-   # return geometry.SwathDefinition(
-   #     lons=ds.longitude.values, lats=ds.latitude.values)
+    
+   # mgrid = np.meshgrid(ds.longitude.values, ds.latitude.values)
     return geometry.SwathDefinition(
-        lons=mgrid[0], lats=mgrid[1])
+        lons=ds.longitude.values, lats=ds.latitude.values)
+   # return geometry.SwathDefinition(
+   #     lons=mgrid[0], lats=mgrid[1])
 
 
 def check_drange(drange, pdate1, pdate2, verbose):
@@ -371,30 +372,59 @@ class ModelBin(object):
         )  # otherwise get endian error.
         concframe = pd.DataFrame.from_records(ndata)
         # add latitude longitude columns
+        #lat = arange(self.llcrnr_lat,
+        #             self.llcrnr_lat + self.nlat * self.dlat,
+        #             self.dlat)
+        #lon = arange(self.llcrnr_lon,
+        #             self.llcrnr_lon + self.nlon * self.dlon,
+        #             self.dlon)
+
+        #def flat(x):
+        #    return lat[x - 1]
+        #
+        #def flon(x):
+        #    return lon[x - 1]
+
+        #concframe['latitude'] = concframe['jndx'].apply(flat)
+        #concframe['longitude'] = concframe['indx'].apply(flon)
+        #concframe.drop(['jndx', 'indx'], axis=1, inplace=True)
+        concframe['levels'] = lev_name
+        concframe['time'] = pdate1
+
+        #rename jndx x
+        #rename indx y
+        names = concframe.columns.values
+        names = ['y' if x=='jndx' else x for x in names] 
+        names = ['x' if x=='indx' else x for x in names] 
+        names = ['z' if x=='levels' else x for x in names] 
+        concframe.columns = names    
+        concframe.set_index(
+            #['time', 'levels', 'longitude', 'latitude'],
+            #['time', 'levels', 'longitude', 'latitude','x','y'],
+            ['time', 'z', 'y','x'],
+            inplace=True)
+        concframe.rename(
+            columns={'conc': col_name}, inplace=True)
+        #mgrid = np.meshgrid(lat, lon)
+        return concframe
+
+
+
+
+    def makegrid(self,xindx,yindx):
         lat = arange(self.llcrnr_lat,
                      self.llcrnr_lat + self.nlat * self.dlat,
                      self.dlat)
         lon = arange(self.llcrnr_lon,
                      self.llcrnr_lon + self.nlon * self.dlon,
                      self.dlon)
-
-        def flat(x):
-            return lat[x - 1]
-
-        def flon(x):
-            return lon[x - 1]
-
-        concframe['latitude'] = concframe['jndx'].apply(flat)
-        concframe['longitude'] = concframe['indx'].apply(flon)
-        concframe.drop(['jndx', 'indx'], axis=1, inplace=True)
-        concframe['levels'] = lev_name
-        concframe['time'] = pdate1
-        concframe.set_index(
-            ['time', 'levels', 'longitude', 'latitude'],
-            inplace=True)
-        concframe.rename(
-            columns={'conc': col_name}, inplace=True)
-        return concframe
+        print('Number lat', len(lat), self.nlat)
+        print('Number lon', len(lon), self.nlon)
+        lonlist = [lon[x-1] for x in xindx]        
+        latlist = [lat[x-1] for x in yindx]        
+        mgrid = np.meshgrid(lonlist, latlist)
+        return mgrid
+ 
 
     def readfile(self, filename, drange, verbose, century):
         """Data from the file is stored in an xarray, self.dset
@@ -475,7 +505,7 @@ class ModelBin(object):
             if not check:
                 break
             testf, savedata = check_drange(drange, pdate1, pdate2, verbose)
-
+            print('PDATE', pdate1)
             # datelist = []
             self.atthash['Species ID'] = []
             inc_iii = False
@@ -522,7 +552,6 @@ class ModelBin(object):
                             # self.dset = xr.concat([self.dset, dset],'levels')
                             self.dset = xr.merge([self.dset, dset])
                         ii += 1
-
                 # END LOOP to go through each pollutant
             # END LOOP to go through each level
             # safety check - will stop sampling time while loop if goes over
@@ -537,6 +566,14 @@ class ModelBin(object):
         # END OF Loop to go through each sampling time
         if self.dset:
             self.dset.attrs = self.atthash
+            mgrid = self.makegrid(self.dset.coords['x'], self.dset.coords['y'])
+            self.dset =\
+                   self.dset.assign_coords(longitude=(('y','x'),mgrid[1]))
+            self.dset =\
+                   self.dset.assign_coords(latitude=(('y','x'),mgrid[0]))
+
+            self.dset = self.dset.reset_coords()
+            self.dset = self.dset.set_coords(['time','latitude','longitude'])
         if verbose:
             print(self.dset)
         if iii == 0:
