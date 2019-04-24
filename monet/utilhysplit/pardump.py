@@ -22,7 +22,7 @@ FUNCTIONS
 """
 
 
-class Pardump:
+class Pardump():
     """methods for writing and reading a pardump file.
        __init__  initializes structure of binary file.
        write   writes a pardump file.
@@ -32,7 +32,7 @@ class Pardump:
                information.
     """
 
-    def __init__(self, fname="PARINIT"):
+    def __init__(self, fname='PARINIT'):
         """
         ##initializes structures which correspond to the binary records.
         ##'p' variables coorespond to padding that fortran adds.
@@ -40,44 +40,37 @@ class Pardump:
         self.fname = fname
         self.dtfmt = "%Y%m%d%H%M"
 
-        tp1 = ">f"  # big endian float.
-        tp2 = ">i"  # big endian integer.
+        tp1 = '>f'  # big endian float.
+        tp2 = '>i'  # big endian integer.
 
         # header record in fortran file.
-        self.hdr_dt = np.dtype(
-            [
-                ("padding", tp2),
-                ("parnum", tp2),
-                ("pollnum", tp2),
-                ("year", tp2),
-                ("month", tp2),
-                ("day", tp2),
-                ("hour", tp2),
-                ("minute", tp2),
-            ]
-        )
+        self.hdr_dt = np.dtype([('padding', tp2),
+                                ('parnum', tp2),
+                                ('pollnum', tp2),
+                                ('year', tp2),
+                                ('month', tp2),
+                                ('day', tp2),
+                                ('hour', tp2),
+                                ('minute', tp2)
+                                ])
 
         # data record in fortran file.
-        self.pardt = np.dtype(
-            [
-                ("p1", tp2),
-                ("p2", tp2),
-                ("pmass", tp1),
-                ("p3", ">l"),
-                ("lat", tp1),
-                ("lon", tp1),
-                ("ht", tp1),
-                ("su", tp1),
-                ("sv", tp1),
-                ("sx", tp1),
-                ("p4", ">l"),
-                ("age", tp2),
-                ("dist", tp2),
-                ("poll", tp2),
-                ("mgrid", tp2),
-                ("sorti", tp2),
-            ]
-        )
+        self.pardt = np.dtype([('p1', tp2),
+                               ('p2', tp2),
+                               ('pmass', tp1),
+                               ('p3', '>l'),
+                               ('lat', tp1),
+                               ('lon', tp1),
+                               ('ht', tp1),
+                               ('su', tp1),
+                               ('sv', tp1),
+                               ('sx', tp1),
+                               ('p4', '>l'),
+                               ('age', tp2),
+                               ('dist', tp2),
+                               ('poll', tp2),
+                               ('mgrid', tp2),
+                               ('sorti', tp2)])
 
     def write(self, numpar, pmass, lon, lat, ht, pollnum, sdate):
         """
@@ -91,7 +84,7 @@ class Pardump:
                   pollutant index
         sdate   : datetime.datetime object
         """
-        with open(self.fname, "wb") as fp:
+        with open(self.fname, 'wb') as fp:
             pad1 = np.ones(numpar) * 28
             pad2 = np.ones(numpar) * 4
             pad3 = np.ones(numpar) * 17179869208
@@ -101,38 +94,38 @@ class Pardump:
             sorti = np.arange(1, numpar + 1)
 
             print(len(lon))
-            a = np.zeros((numpar,), dtype=self.pardt)
-            a["p1"] = pad1
-            a["p2"] = pad2
-            a["p3"] = pad3
-            a["p4"] = pad4
+            a = np.zeros((numpar, ), dtype=self.pardt)
+            a['p1'] = pad1
+            a['p2'] = pad2
+            a['p3'] = pad3
+            a['p4'] = pad4
 
-            a["lat"] = lat
-            a["lon"] = lon
-            a["ht"] = ht
-            a["pmass"] = pmass
-            a["poll"] = pollnum
+            a['lat'] = lat
+            a['lon'] = lon
+            a['ht'] = ht
+            a['pmass'] = pmass
+            a['poll'] = pollnum
 
-            a["age"] = zrs
-            a["dist"] = zrs
+            a['age'] = zrs
+            a['dist'] = zrs
 
-            a["mgrid"] = ones
-            a["sorti"] = sorti
+            a['mgrid'] = ones
+            a['sorti'] = sorti
 
             # print a
 
-            hdr = np.zeros((1,), dtype=self.hdr_dt)
-            hdr["padding"] = 28
-            hdr["parnum"] = numpar
-            hdr["pollnum"] = 1
-            hdr["year"] = sdate.year
-            hdr["month"] = sdate.month
-            hdr["day"] = sdate.day
-            hdr["hour"] = sdate.hour
-            hdr["minute"] = sdate.minute
+            hdr = np.zeros((1, ), dtype=self.hdr_dt)
+            hdr['padding'] = 28
+            hdr['parnum'] = numpar
+            hdr['pollnum'] = 1
+            hdr['year'] = sdate.year
+            hdr['month'] = sdate.month
+            hdr['day'] = sdate.day
+            hdr['hour'] = sdate.hour
+            hdr['minute'] = sdate.minute
             print(hdr)
 
-            endrec = np.array([20], dtype=">i")
+            endrec = np.array([20], dtype='>i')
 
             fp.write(hdr)
             fp.write(a)
@@ -162,32 +155,35 @@ class Pardump:
         imax = 100
         # returns a dictionary of pandas dataframes. Date valid is the key.
         pframe_hash = {}
-        with open(self.fname, "rb") as fp:
+        with open(self.fname, 'rb') as fp:
             i = 0
             testf = True
             while testf:
                 hdata = np.fromfile(fp, dtype=self.hdr_dt, count=1)
                 if verbose:
-                    print("Record Header ", hdata)
+                    print('Record Header ', hdata)
                 if not hdata:
-                    print("Done reading ", self.fname)
+                    print('Done reading ', self.fname)
                     break
-                if hdata["year"] < 1000:
-                    year = hdata["year"] + century
+                if hdata['year'] < 1000:
+                    year = hdata['year'] + century
                 else:
-                    year = hdata["year"]
+                    year = hdata['year']
                 pdate = datetime.datetime(
-                    year, hdata["month"], hdata["day"], hdata["hour"], hdata["minute"]
-                )
+                    year,
+                    hdata['month'],
+                    hdata['day'],
+                    hdata['hour'],
+                    hdata['minute'])
                 # if drange==[]:
                 #   drange = [pdate, pdate]
-                parnum = hdata["parnum"]
+                parnum = hdata['parnum']
                 data = np.fromfile(fp, dtype=self.pardt, count=parnum)
                 # n = parnum - 1
                 # padding at end of each record
-                np.fromfile(fp, dtype=">i", count=1)
+                np.fromfile(fp, dtype='>i', count=1)
                 if verbose:
-                    print("Date ", pdate, " **** ", drange)
+                    print('Date ', pdate, ' **** ', drange)
 
                 testdate = False
                 if drange == []:
@@ -195,31 +191,35 @@ class Pardump:
                 elif pdate >= drange[0] and pdate <= drange[1]:
                     testdate = True
 
-                # Only store data if it is in the daterange specified.
+               # Only store data if it is in the daterange specified.
                 if testdate:
-                    print("Adding data ", hdata, pdate)
+                    print('Adding data ', hdata, pdate)
                     # otherwise get endian error message when create dataframe.
                     ndata = data.byteswap().newbyteorder()
-                    par_frame = pd.DataFrame.from_records(ndata)  # create data frame
+                    par_frame = pd.DataFrame.from_records(
+                        ndata)  # create data frame
                     # drop the fields which were padding
-                    par_frame.drop(["p1", "p2", "p3", "p4"], inplace=True, axis=1)
-                    par_frame.drop(
-                        ["su", "sv", "sx", "mgrid"], inplace=True, axis=1
-                    )  # drop other fields
+                    par_frame.drop(['p1', 'p2', 'p3', 'p4'],
+                                   inplace=True,
+                                   axis=1)
+                    par_frame.drop(['su', 'sv', 'sx', 'mgrid'],
+                                   inplace=True,
+                                   axis=1)  # drop other fields
                     # drop where the lat field is 0. because
-                    par_frame = par_frame.loc[par_frame["lat"] != 0]
+                    par_frame = par_frame.loc[par_frame['lat'] != 0]
                     # in pardump file particles which have not been
                     # released yet
 
                     if sorti != []:
                         # returns only particles with
-                        par_frame = par_frame.loc[par_frame["sorti"].isin(sorti)]
+                        par_frame = par_frame.loc[par_frame['sorti'].isin(
+                            sorti)]
                         # sort index in list sorti
-                    par_frame["date"] = pdate
-                    par_frame.sort("ht", inplace=True)  # sort by height
+                    par_frame['date'] = pdate
+                    par_frame.sort('ht', inplace=True)  # sort by height
                     par_frame = pd.concat(
-                        [par_frame], keys=[self.fname]
-                    )  # add a filename key
+                        [par_frame], keys=[
+                            self.fname])  # add a filename key
                     # create dictionary key for output.
                     datekey = pdate.strftime(self.dtfmt)
                     # Add value to dictionary.
@@ -238,6 +238,6 @@ class Pardump:
                     #   if verbose:
                     #      print "Before date. Closing file"
                 if i > imax:
-                    print("Read pardump. Limited to 100 iterations. Stopping")
+                    print('Read pardump. Limited to 100 iterations. Stopping')
                     testf = False
         return pframe_hash

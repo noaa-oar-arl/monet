@@ -22,15 +22,13 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
     """
     import xarray as xr
     from numpy import asarray
-
     lat = asarray(latitude)
     lon = asarray(longitude)
     dset = xr.Dataset(
         coords={
-            "lon": (["x", "y"], lon.reshape(1, 1)),
-            "lat": (["x", "y"], lat.reshape(1, 1)),
-        }
-    )
+            'lon': (['x', 'y'], lon.reshape(1, 1)),
+            'lat': (['x', 'y'], lat.reshape(1, 1))
+        })
     return dset
 
 
@@ -52,7 +50,6 @@ def lonlat_to_swathdefinition(longitude=None, latitude=None):
     """
     from pyresample.geometry import SwathDefinition
     from numpy import vstack
-
     if len(longitude.shape) < 2:
         lons = vstack(longitude)
         lats = vstack(latitude)
@@ -80,7 +77,6 @@ def nearest_point_swathdefinition(longitude=None, latitude=None):
     """
     from pyresample.geometry import SwathDefinition
     from numpy import vstack
-
     lons = vstack([longitude])
     lats = vstack([latitude])
     return SwathDefinition(lons=lons, lats=lats)
@@ -104,16 +100,14 @@ def constant_1d_xesmf(longitude=None, latitude=None):
     """
     import xarray as xr
     from numpy import asarray
-
     lat = asarray(latitude)
     lon = asarray(longitude)
     s = lat.shape[0]
     dset = xr.Dataset(
         coords={
-            "lon": (["x", "y"], lon.reshape(s, 1)),
-            "lat": (["x", "y"], lat.reshape(s, 1)),
-        }
-    )
+            'lon': (['x', 'y'], lon.reshape(s, 1)),
+            'lat': (['x', 'y'], lat.reshape(s, 1))
+        })
     return dset
 
 
@@ -136,14 +130,13 @@ def constant_lat_swathdefition(longitude=None, latitude=None):
     from pyresample import geometry
     from xarray import DataArray
     from numpy import vstack
-
     if len(longitude.shape) < 2:
         lons = vstack(longitude)
     else:
         lons = longitude
-    lats = lons * 0.0 + latitude
+    lats = lons * 0. + latitude
     if isinstance(lats, DataArray):
-        lats.name = "lats"
+        lats.name = 'lats'
     return geometry.SwathDefinition(lons=lons, lats=lats)
 
 
@@ -166,14 +159,13 @@ def constant_lon_swathdefition(longitude=None, latitude=None):
     from pyresample import geometry
     from xarray import DataArray
     from numpy import vstack
-
     if len(latitude.shape) < 2:
         lats = vstack(latitude)
     else:
         lats = latitude
-    lons = lats * 0.0 + longitude
+    lons = lats * 0. + longitude
     if isinstance(lats, DataArray):
-        lons.name = "lons"
+        lons.name = 'lons'
     return geometry.SwathDefinition(lons=lons, lats=lats)
 
 
@@ -195,27 +187,24 @@ def get_smops_area_def(nx=1440, ny=720):
     """
     from pyproj import Proj
     from pyresample import utils
-
     p = Proj(
-        proj="eqc",
-        lat_ts=0.0,
-        lat_0=0.0,
-        lon_0=0.0,
-        x_0=0.0,
-        y_0=0.0,
+        proj='eqc',
+        lat_ts=0.,
+        lat_0=0.,
+        lon_0=0.,
+        x_0=0.,
+        y_0=0.,
         a=6378137,
         b=6378137,
-        units="m",
-    )
+        units='m')
     proj4_args = p.srs
-    area_name = "Global .25 degree SMOPS Grid"
-    area_id = "smops"
+    area_name = 'Global .25 degree SMOPS Grid'
+    area_id = 'smops'
     proj_id = area_id
     aa = p([-180, 180], [-90, 90])
     area_extent = (aa[0][0], aa[1][0], aa[0][1], aa[1][1])
-    area_def = utils.get_area_def(
-        area_id, area_name, proj_id, proj4_args, nx, ny, area_extent
-    )
+    area_def = utils.get_area_def(area_id, area_name, proj_id, proj4_args, nx,
+                                  ny, area_extent)
     return area_def
 
 
@@ -237,31 +226,27 @@ def get_gfs_area_def(nx=1440, ny=721):
     """
     from pyresample import utils
     from pyproj import Proj
-
     # proj4_args = '+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0
     # +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m'
     p = Proj(
-        proj="eqc",
-        lat_ts=0.0,
-        lat_0=0.0,
-        lon_0=0.0,
-        x_0=0.0,
-        y_0=0.0,
+        proj='eqc',
+        lat_ts=0.,
+        lat_0=0.,
+        lon_0=0.,
+        x_0=0.,
+        y_0=0.,
         a=6378137,
         b=6378137,
-        units="m",
-    )
+        units='m')
     proj4_args = p.srs
-    area_name = "Global .25 degree SMOPS Grid"
-    area_id = "smops"
+    area_name = 'Global .25 degree SMOPS Grid'
+    area_id = 'smops'
     proj_id = area_id
-    aa = p([0, 360 - 0.25], [-90, 90.0])
+    aa = p([0, 360 - .25], [-90, 90.])
     area_extent = (aa[0][0], aa[1][0], aa[0][1], aa[1][1])
-    area_def = utils.get_area_def(
-        area_id, area_name, proj_id, proj4_args, nx, ny, area_extent
-    )
+    area_def = utils.get_area_def(area_id, area_name, proj_id, proj4_args, nx,
+                                  ny, area_extent)
     return area_def
-
 
 #
 # def geotiff_meta_to_areadef(meta):
