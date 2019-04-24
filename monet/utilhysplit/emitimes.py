@@ -1,6 +1,5 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 import datetime
-
 import numpy as np
 
 
@@ -266,7 +265,12 @@ class EmitCycle(object):
     def add_dummy_record(self):
         """uses last record in the recordra to get date and position"""
         rc = self.recordra[-1]
-        eline = EmitLine(rc.date, "0100", rc.lat, rc.lon, 0, 0, 0, 0)
+        # need to make lat lon slightly different or HYSPLIT
+        # will think these are line sources and not calculate number
+        # of particles to emit correctly in emstmp.f
+        lat = rc.lat + np.random.rand(1)[0] * 10
+        lon = rc.lon + np.random.rand(1)[0] * 10
+        eline = EmitLine(rc.date, "0100", lat, lon, 0, 0, 0, 0)
         self.dummy_recordra.append(eline)
         self.drecs += 1
 
@@ -316,15 +320,6 @@ class EmitCycle(object):
         """
         check = True
         recordra = []
-        # header = fid.readline()
-        # if verbose: print('HEADER', header, str(self.nrecs))
-        #  if not header:
-        #   check=False
-        #  else:
-        #     try:
-        #        nrecs =  self.parse_header(header)
-        #     except:
-        #        return False
         for temp in lines:
             if verbose:
                 print('Line', temp)
@@ -413,8 +408,8 @@ class EmitLine(object):
         """
         returnstr = self.date.strftime("%Y %m %d %H %M ")
         returnstr += self.duration + ' '
-        returnstr += str(self.lat) + ' '
-        returnstr += str(self.lon) + ' '
+        returnstr += '{:1.4f}'.format(self.lat) + ' '
+        returnstr += '{:1.4f}'.format(self.lon) + ' '
         returnstr += str(self.height) + ' '
         returnstr += '{:1.2e}'.format(self.rate) + ' '
         returnstr += '{:1.2e}'.format(self.area) + ' '
