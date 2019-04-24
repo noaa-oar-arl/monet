@@ -1,5 +1,6 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 import datetime
+
 import numpy as np
 
 
@@ -47,7 +48,7 @@ class EmiTimes(object):
 
     """
 
-    def __init__(self, filename='EMITIMES.txt', nanvalue=None):
+    def __init__(self, filename="EMITIMES.txt", nanvalue=None):
         self.filename = filename
         self.cycle_list = []  # list of EmitCycle objects.
         self.ncycles = 0
@@ -64,9 +65,9 @@ class EmiTimes(object):
 
         returnval : str
         """
-        returnval = 'YYYY MM DD HH    DURATION(hhhh) #RECORDS \n'
-        returnval += 'YYYY MM DD HH MM DURATION(hhmm) '
-        returnval += 'LAT LON HGT(m) RATE(/h) AREA(m2) HEAT(w)  \n'
+        returnval = "YYYY MM DD HH    DURATION(hhhh) #RECORDS \n"
+        returnval += "YYYY MM DD HH MM DURATION(hhmm) "
+        returnval += "LAT LON HGT(m) RATE(/h) AREA(m2) HEAT(w)  \n"
         return returnval
 
     def modify_header(self, hstring):
@@ -95,7 +96,7 @@ class EmiTimes(object):
         filename : str
         """
         maxrec = self.findmaxrec()
-        with open(filename, 'w') as fid:
+        with open(filename, "w") as fid:
             fid.write(self.header)
         for ecycle in self.cycle_list:
             for iii in range(0, maxrec - ecycle.nrecs):
@@ -107,15 +108,15 @@ class EmiTimes(object):
         Reads an EmitTimes file.
         verbose: boolean
         """
-        with open(self.filename, 'r') as fid:
+        with open(self.filename, "r") as fid:
             lines = fid.readlines()
             iii = 2
             while iii < len(lines):
                 if verbose:
-                    print('NEW CYCLE')
+                    print("NEW CYCLE")
                 ec = EmitCycle()
                 nrecs = ec.parse_header(lines[iii])
-                check = ec.read_cycle(lines[iii + 1: iii + nrecs + 1])
+                check = ec.read_cycle(lines[iii + 1 : iii + nrecs + 1])
                 if not check:
                     break
                 else:
@@ -148,16 +149,9 @@ class EmiTimes(object):
         for ec in self.cycle_list:
             ec.filter_records(llcrnr, urcrnr)
 
-    def add_record(self,
-                   date,
-                   duration,
-                   lat,
-                   lon,
-                   height,
-                   rate,
-                   area,
-                   heat,
-                   nanvalue=0):
+    def add_record(
+        self, date, duration, lat, lon, height, rate, area, heat, nanvalue=0
+    ):
         """
         adds a record to a cycle based on the date of the record.
         Returns:
@@ -174,7 +168,8 @@ class EmiTimes(object):
             rvalue = False
         else:
             self.cycle_list[cycle_number].add_record(
-                date, duration, lat, lon, height, rate, area, heat, nanvalue)
+                date, duration, lat, lon, height, rate, area, heat, nanvalue
+            )
             rvalue = True
         return rvalue
 
@@ -221,11 +216,11 @@ class EmitCycle(object):
         write new emittimes file.
         """
         maxrec = self.nrecs + self.drecs
-        datestr = self.sdate.strftime('%Y %m %d %H ')
+        datestr = self.sdate.strftime("%Y %m %d %H ")
         # print('FILENAME EMIT', filename)
-        with open(filename, 'a') as fid:
+        with open(filename, "a") as fid:
             # fid.write(self.header_str())
-            fid.write(datestr + ' ' + self.duration + ' ' + str(maxrec) + '\n')
+            fid.write(datestr + " " + self.duration + " " + str(maxrec) + "\n")
             for record in self.recordra:
                 fid.write(str(record))
             for record in self.dummy_recordra:
@@ -265,25 +260,11 @@ class EmitCycle(object):
     def add_dummy_record(self):
         """uses last record in the recordra to get date and position"""
         rc = self.recordra[-1]
-        # need to make lat lon slightly different or HYSPLIT
-        # will think these are line sources and not calculate number
-        # of particles to emit correctly in emstmp.f
-        lat = rc.lat + np.random.rand(1)[0] * 10
-        lon = rc.lon + np.random.rand(1)[0] * 10
-        eline = EmitLine(rc.date, "0100", lat, lon, 0, 0, 0, 0)
+        eline = EmitLine(rc.date, "0100", rc.lat, rc.lon, 0, 0, 0, 0)
         self.dummy_recordra.append(eline)
         self.drecs += 1
 
-    def add_record(self,
-                   sdate,
-                   duration,
-                   lat,
-                   lon,
-                   ht,
-                   rate,
-                   area,
-                   heat,
-                   nanvalue=0):
+    def add_record(self, sdate, duration, lat, lon, ht, rate, area, heat, nanvalue=0):
         """Inputs
         sdate
         duration
@@ -294,8 +275,7 @@ class EmitCycle(object):
         area
         heat
         """
-        eline = EmitLine(sdate, duration, lat, lon, ht, rate, area, heat,
-                         nanvalue)
+        eline = EmitLine(sdate, duration, lat, lon, ht, rate, area, heat, nanvalue)
         self.recordra.append(eline)
         self.nrecs += 1
 
@@ -307,7 +287,7 @@ class EmitCycle(object):
         """
         nrecs = self.parse_header(header)
         if verbose:
-            print('HEADER', header)
+            print("HEADER", header)
         return nrecs
 
     def read_cycle(self, lines, verbose=False):
@@ -320,9 +300,18 @@ class EmitCycle(object):
         """
         check = True
         recordra = []
+        # header = fid.readline()
+        # if verbose: print('HEADER', header, str(self.nrecs))
+        #  if not header:
+        #   check=False
+        #  else:
+        #     try:
+        #        nrecs =  self.parse_header(header)
+        #     except:
+        #        return False
         for temp in lines:
             if verbose:
-                print('Line', temp)
+                print("Line", temp)
             # parse record returns EmitLine object.
             recordra.append(self.parse_record(temp))
         self.recordra.extend(recordra)
@@ -358,16 +347,9 @@ class EmitLine(object):
 
     """
 
-    def __init__(self,
-                 date,
-                 duration,
-                 lat,
-                 lon,
-                 height,
-                 rate,
-                 area=0,
-                 heat=0,
-                 nanvalue=0):
+    def __init__(
+        self, date, duration, lat, lon, height, rate, area=0, heat=0, nanvalue=0
+    ):
         self.date = date
         self.duration = duration
         self.lat = lat
@@ -376,11 +358,15 @@ class EmitLine(object):
         self.rate = rate
         self.area = area
         self.heat = heat
-        self.message = ''
+        self.message = ""
         nanpresent = self.checknan(nanvalue)
         if nanpresent:
-            print('WARNING: EmitFile NaNs present. \
-          Being changed to ' + str(nanvalue) + self.message)
+            print(
+                "WARNING: EmitFile NaNs present. \
+          Being changed to "
+                + str(nanvalue)
+                + self.message
+            )
 
     def checknan(self, nanvalue):
         """
@@ -391,11 +377,11 @@ class EmitLine(object):
         if np.isnan(self.area):
             self.area = nanvalue
             nanpresent = True
-            self.message += 'area is Nan \n'
+            self.message += "area is Nan \n"
         if np.isnan(self.rate):
             self.rate = nanvalue
             nanpresent = True
-            self.message += 'rate is Nan \n'
+            self.message += "rate is Nan \n"
         # if np.isnan(self.heat):
         #   self.heat = nanvalue
         #   nanpresent=True
@@ -407,14 +393,14 @@ class EmitLine(object):
         output in correct format for EMITTIMES file.
         """
         returnstr = self.date.strftime("%Y %m %d %H %M ")
-        returnstr += self.duration + ' '
-        returnstr += '{:1.4f}'.format(self.lat) + ' '
-        returnstr += '{:1.4f}'.format(self.lon) + ' '
-        returnstr += str(self.height) + ' '
-        returnstr += '{:1.2e}'.format(self.rate) + ' '
-        returnstr += '{:1.2e}'.format(self.area) + ' '
+        returnstr += self.duration + " "
+        returnstr += str(self.lat) + " "
+        returnstr += str(self.lon) + " "
+        returnstr += str(self.height) + " "
+        returnstr += "{:1.2e}".format(self.rate) + " "
+        returnstr += "{:1.2e}".format(self.area) + " "
         try:
-            returnstr += '{:1.2e}'.format(self.heat) + ' \n'
+            returnstr += "{:1.2e}".format(self.heat) + " \n"
         except BaseException:
-            returnstr += str(self.heat) + ' \n'
+            returnstr += str(self.heat) + " \n"
         return returnstr

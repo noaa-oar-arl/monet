@@ -3,11 +3,11 @@ import os
 
 import xarray as xr
 
-server = 'ftp.star.nesdis.noaa.gov'
-base_dir = '/pub/smcd/VIIRS_Aerosol/npp.viirs.aerosol.data/epsaot550/'
+server = "ftp.star.nesdis.noaa.gov"
+base_dir = "/pub/smcd/VIIRS_Aerosol/npp.viirs.aerosol.data/epsaot550/"
 
 
-def open_dataset(date, datapath='.'):
+def open_dataset(date, datapath="."):
     """Short summary.
 
     Parameters
@@ -24,6 +24,7 @@ def open_dataset(date, datapath='.'):
 
     """
     import six
+
     current = change_dir(datapath)
     nlat = 720
     nlon = 1440
@@ -38,7 +39,7 @@ def open_dataset(date, datapath='.'):
     return data.where(data > 0)
 
 
-def open_mfdataset(dates, datapath='.'):
+def open_mfdataset(dates, datapath="."):
     """Short summary.
 
     Parameters
@@ -55,11 +56,12 @@ def open_mfdataset(dates, datapath='.'):
 
     """
     from xarray import concat
+
     das = []
     for i in dates:
         print(i)
         das.append(open_dataset(i, datapath=datapath))
-    ds = concat(das, dim='time')
+    ds = concat(das, dim="time")
     return ds
 
 
@@ -85,19 +87,21 @@ def read_data(fname, lat, lon, date):
     """
     from numpy import nan
     from pandas import to_datetime
+
     f = xr.open_dataset(fname)
     datearr = to_datetime([date])
-    da = f['aot_ip_out']
-    da = da.rename({'nlat': 'y', 'nlon': 'x'})
-    da['latitude'] = (('y', 'x'), lat)
-    da['longitude'] = (('y', 'x'), lon)
-    da = da.expand_dims('time')
-    da['time'] = datearr
-    da.attrs['units'] = ''
-    da.name = 'VIIRS EPS AOT'
-    da.attrs['long_name'] = 'Aerosol Optical Thickness'
+    da = f["aot_ip_out"]
+    da = da.rename({"nlat": "y", "nlon": "x"})
+    da["latitude"] = (("y", "x"), lat)
+    da["longitude"] = (("y", "x"), lon)
+    da = da.expand_dims("time")
+    da["time"] = datearr
+    da.attrs["units"] = ""
+    da.name = "VIIRS EPS AOT"
+    da.attrs["long_name"] = "Aerosol Optical Thickness"
     da.attrs[
-        'source'] = 'ftp://ftp.star.nesdis.noaa.gov/pub/smcd/VIIRS_Aerosol/npp.viirs.aerosol.data/epsaot550'
+        "source"
+    ] = "ftp://ftp.star.nesdis.noaa.gov/pub/smcd/VIIRS_Aerosol/npp.viirs.aerosol.data/epsaot550"
     return da
 
 
@@ -120,7 +124,7 @@ def change_dir(to_path):
     return current
 
 
-def download_data(date, resolution='high'):
+def download_data(date, resolution="high"):
     """Short summary.
 
     Parameters
@@ -139,25 +143,27 @@ def download_data(date, resolution='high'):
     import ftplib
     from datetime import datetime
     from pandas import DatetimeIndex
+
     if isinstance(date, datetime) or isinstance(date, DatetimeIndex):
-        year = date.strftime('%Y')
-        yyyymmdd = date.strftime('%Y%m%d')
+        year = date.strftime("%Y")
+        yyyymmdd = date.strftime("%Y%m%d")
     else:
         from pandas import Timestamp
+
         date = Timestamp(date)
-        year = date.strftime('%Y')
-        yyyymmdd = date.strftime('%Y%m%d')
+        year = date.strftime("%Y")
+        yyyymmdd = date.strftime("%Y%m%d")
         # npp_eaot_ip_gridded_0.25_20181222.high.nc
     # print(year, yyyymmdd)
-    file = 'npp_eaot_ip_gridded_0.25_{}.high.nc'.format(yyyymmdd)
+    file = "npp_eaot_ip_gridded_0.25_{}.high.nc".format(yyyymmdd)
     exists = os.path.isfile(file)
     if ~exists:
         ftp = ftplib.FTP(server)
         ftp.login()
         ftp.cwd(base_dir + year)
-        ftp.retrbinary("RETR " + file, open(file, 'wb').write)
+        ftp.retrbinary("RETR " + file, open(file, "wb").write)
     else:
-        print('File Already Exists! Reading: {}'.format(file))
+        print("File Already Exists! Reading: {}".format(file))
     return file, date
 
 
@@ -178,10 +184,11 @@ def _get_latlons(nlat, nlon):
 
     """
     from numpy import linspace, meshgrid
+
     lon_min = -179.875
     lon_max = -1 * lon_min
     lat_min = -89.875
-    lat_max = -1. * lat_min
+    lat_max = -1.0 * lat_min
     lons = linspace(lon_min, lon_max, nlon)
     lats = linspace(lat_max, lat_min, nlat)
     lon, lat = meshgrid(lons, lats)

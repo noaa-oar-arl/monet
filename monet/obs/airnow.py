@@ -28,6 +28,7 @@ from __future__ import print_function
 
 import inspect
 import os
+
 # this is written to retrive airnow data concatenate and add to pandas array
 # for usage
 from builtins import object
@@ -36,21 +37,33 @@ from datetime import datetime
 import pandas as pd
 
 
-datadir = '.'
+datadir = "."
 cwd = os.getcwd()
 url = None
 dates = [
-    datetime.strptime('2016-06-06 12:00:00', '%Y-%m-%d %H:%M:%S'),
-    datetime.strptime('2016-06-06 13:00:00', '%Y-%m-%d %H:%M:%S')
+    datetime.strptime("2016-06-06 12:00:00", "%Y-%m-%d %H:%M:%S"),
+    datetime.strptime("2016-06-06 13:00:00", "%Y-%m-%d %H:%M:%S"),
 ]
 daily = False
-objtype = 'AirNow'
+objtype = "AirNow"
 filelist = None
 monitor_df = None
 savecols = [
-    'time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs',
-    'time_local', 'latitude', 'longitude', 'cmsa_name', 'msa_code',
-    'msa_name', 'state_name', 'epa_region'
+    "time",
+    "siteid",
+    "site",
+    "utcoffset",
+    "variable",
+    "units",
+    "obs",
+    "time_local",
+    "latitude",
+    "longitude",
+    "cmsa_name",
+    "msa_code",
+    "msa_name",
+    "state_name",
+    "epa_region",
 ]
 
 
@@ -65,12 +78,12 @@ def build_urls(dates):
 
     furls = []
     fnames = []
-    print('Building AIRNOW URLs...')
+    print("Building AIRNOW URLs...")
     # 2017/20170131/HourlyData_2017012408.dat
-    url = 'https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/'
+    url = "https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/"
     for i in dates:
-        f = url + i.strftime('%Y/%Y%m%d/HourlyData_%Y%m%d%H.dat')
-        fname = i.strftime('HourlyData_%Y%m%d%H.dat')
+        f = url + i.strftime("%Y/%Y%m%d/HourlyData_%Y%m%d%H.dat")
+        fname = i.strftime("HourlyData_%Y%m%d%H.dat")
         furls.append(f)
         fnames.append(fname)
     # https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/2017/20170108/HourlyData_2016121506.dat
@@ -97,25 +110,36 @@ def read_csv(fn):
     """
     try:
         dft = pd.read_csv(
-            fn,
-            delimiter='|',
-            header=None,
-            error_bad_lines=False,
-            encoding='ISO-8859-1')
+            fn, delimiter="|", header=None, error_bad_lines=False, encoding="ISO-8859-1"
+        )
         cols = [
-            'date', 'time', 'siteid', 'site', 'utcoffset', 'variable',
-            'units', 'obs', 'source'
+            "date",
+            "time",
+            "siteid",
+            "site",
+            "utcoffset",
+            "variable",
+            "units",
+            "obs",
+            "source",
         ]
         dft.columns = cols
     except Exception:
         cols = [
-            'date', 'time', 'siteid', 'site', 'utcoffset', 'variable',
-            'units', 'obs', 'source'
+            "date",
+            "time",
+            "siteid",
+            "site",
+            "utcoffset",
+            "variable",
+            "units",
+            "obs",
+            "source",
         ]
         dft = pd.DataFrame(columns=cols)
-    dft['obs'] = dft.obs.astype(float)
-    dft['siteid'] = dft.siteid.str.zfill(9)
-    dft['utcoffset'] = dft.utcoffset.astype(int)
+    dft["obs"] = dft.obs.astype(float)
+    dft["siteid"] = dft.siteid.str.zfill(9)
+    dft["utcoffset"] = dft.utcoffset.astype(int)
     return dft
 
 
@@ -137,13 +161,13 @@ def retrieve(url, fname):
     import requests
 
     if not os.path.isfile(fname):
-        print('\n Retrieving: ' + fname)
+        print("\n Retrieving: " + fname)
         print(url)
-        print('\n')
+        print("\n")
         r = requests.get(url)
-        open(fname, 'wb').write(r.content)
+        open(fname, "wb").write(r.content)
     else:
-        print('\n File Exists: ' + fname)
+        print("\n File Exists: " + fname)
 
 
 def aggregate_files(dates=dates, download=False):
@@ -163,7 +187,7 @@ def aggregate_files(dates=dates, download=False):
     import dask
     import dask.dataframe as dd
 
-    print('Aggregating AIRNOW files...')
+    print("Aggregating AIRNOW files...")
     urls, fnames = build_urls(dates)
     if download:
         for url, fname in zip(url, fnames):
@@ -173,14 +197,12 @@ def aggregate_files(dates=dates, download=False):
         dfs = [dask.delayed(read_csv)(f) for f in urls]
     dff = dd.from_delayed(dfs)
     df = dff.compute()
-    df['time'] = pd.to_datetime(
-        df.date + ' ' + df.time,
-        format='%m/%d/%y %H:%M',
-        exact=True,
-        box=False)
-    df.drop(['date'], axis=1, inplace=True)
-    df['time_local'] = df.time + pd.to_timedelta(df.utcoffset, unit='H')
-    print('    Adding in Meta-data')
+    df["time"] = pd.to_datetime(
+        df.date + " " + df.time, format="%m/%d/%y %H:%M", exact=True, box=False
+    )
+    df.drop(["date"], axis=1, inplace=True)
+    df["time_local"] = df.time + pd.to_timedelta(df.utcoffset, unit="H")
+    print("    Adding in Meta-data")
     df = get_station_locations(df)
     df = df[savecols]
     df.drop_duplicates(inplace=True)
@@ -219,7 +241,8 @@ def filter_bad_values(df):
 
     """
     from numpy import NaN
-    df.loc[(df.obs > 3000) | (df.obs < 0), 'obs'] = NaN
+
+    df.loc[(df.obs > 3000) | (df.obs < 0), "obs"] = NaN
     return df
 
 
@@ -252,8 +275,9 @@ def get_station_locations(df):
 
     """
     from .epa_util import read_monitor_file
+
     monitor_df = read_monitor_file(airnow=True)
-    df = pd.merge(df, monitor_df, on='siteid')  # , how='left')
+    df = pd.merge(df, monitor_df, on="siteid")  # , how='left')
     return df
 
 
@@ -271,7 +295,8 @@ def get_station_locations_remerge(df):
         Description of returned object.
 
     """
-    df = pd.merge(df, monitor_df.drop(['Latitude', 'Longitude'], axis=1),
-                  on='siteid')  # ,
+    df = pd.merge(
+        df, monitor_df.drop(["Latitude", "Longitude"], axis=1), on="siteid"
+    )  # ,
     # how='left')
     return df

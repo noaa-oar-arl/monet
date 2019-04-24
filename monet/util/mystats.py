@@ -18,34 +18,41 @@ def STDP(obs, mod, axis=None):
 
 def MNB(obs, mod, axis=None):
     """ Mean Normalized Bias (%)"""
-    return np.ma.masked_invalid(old_div(
-        (mod - obs), obs)).mean(axis=axis) * 100.
-
+    return np.ma.masked_invalid(old_div((mod - obs), obs)).mean(axis=axis) * 100.0
 
 
 def MNE(obs, mod, axis=None):
     """ Mean Normalized Gross Error (%)"""
-    return np.ma.masked_invalid(old_div(np.ma.abs(mod - obs),
-                                        obs)).mean(axis=axis) * 100.
+    return (
+        np.ma.masked_invalid(old_div(np.ma.abs(mod - obs), obs)).mean(axis=axis) * 100.0
+    )
 
 
 def MdnNB(obs, mod, axis=None):
     """ Median Normalized Bias (%)"""
-    return np.ma.median(
-        np.ma.masked_invalid(old_div((mod - obs), obs)), axis=axis) * 100.
+    return (
+        np.ma.median(np.ma.masked_invalid(old_div((mod - obs), obs)), axis=axis) * 100.0
+    )
+
 
 def MdnNE(obs, mod, axis=None):
     """ Median Normalized Gross Error (%)"""
-    return np.ma.median(
-        np.ma.masked_invalid(old_div(np.ma.abs(mod - obs), obs)),
-        axis=axis) * 100.
+    return (
+        np.ma.median(
+            np.ma.masked_invalid(old_div(np.ma.abs(mod - obs), obs)), axis=axis
+        )
+        * 100.0
+    )
 
 
 def NMdnGE(obs, mod, axis=None):
     """ Normalized Median Gross Error (%)"""
-    return np.ma.masked_invalid(
-        old_div(np.ma.abs(mod - obs).mean(axis=axis),
-                obs.mean(axis=axis))) * 100.
+    return (
+        np.ma.masked_invalid(
+            old_div(np.ma.abs(mod - obs).mean(axis=axis), obs.mean(axis=axis))
+        )
+        * 100.0
+    )
 
 
 def NO(obs, mod, axis=None):
@@ -121,30 +128,29 @@ def WDMdnB(obs, mod, axis=None):
 
 def NMB(obs, mod, axis=None):
     """ Normalized Mean Bias (%)"""
-    return (mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.
+    return (mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.0
 
 
 def WDNMB_m(obs, mod, axis=None):
     """ Wind Direction Normalized Mean Bias (%) (avoid single block error in np.ma)"""
-    return circlebias_m(mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.
+    return circlebias_m(mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.0
 
 
 def NMB_ABS(obs, mod, axis=None):
     """ Normalized Mean Bias - Absolute of the denominator (%)"""
-    return (mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)) * 100.
+    return (mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)) * 100.0
 
 
 def NMdnB(obs, mod, axis=None):
     """ Normalized Median Bias (%)"""
-    return np.ma.median(
-        mod - obs, axis=axis) / np.ma.median(
-            obs, axis=axis) * 100.
+    return np.ma.median(mod - obs, axis=axis) / np.ma.median(obs, axis=axis) * 100.0
 
 
 def FB(obs, mod, axis=None):
     """ Fractional Bias (%)"""
-    return ((np.ma.masked_invalid(old_div(
-        (mod - obs), (mod + obs)))).mean(axis=axis) * 2.) * 100.
+    return (
+        (np.ma.masked_invalid(old_div((mod - obs), (mod + obs)))).mean(axis=axis) * 2.0
+    ) * 100.0
 
 
 def ME(obs, mod, axis=None):
@@ -175,107 +181,126 @@ def WDMdnE(obs, mod, axis=None):
 
 def NME_m(obs, mod, axis=None):
     """ Normalized Mean Error (%) (avoid single block error in np.ma)"""
-    out = (old_div(np.abs(mod - obs).sum(axis=axis),
-                   obs.sum(axis=axis))) * 100
+    out = (old_div(np.abs(mod - obs).sum(axis=axis), obs.sum(axis=axis))) * 100
     return out
 
 
 def NME_m_ABS(obs, mod, axis=None):
     """ Normalized Mean Error (%) - Absolute of the denominator (avoid single block error in np.ma)"""
-    out = (old_div(np.abs(mod - obs).sum(axis=axis),
-                   np.abs(obs.sum(axis=axis)))) * 100
+    out = (old_div(np.abs(mod - obs).sum(axis=axis), np.abs(obs.sum(axis=axis)))) * 100
     return out
 
 
 def NME(obs, mod, axis=None):
     """ Normalized Mean Error (%)"""
-    out = (old_div(np.ma.abs(mod - obs).sum(axis=axis),
-                   obs.sum(axis=axis))) * 100
+    out = (old_div(np.ma.abs(mod - obs).sum(axis=axis), obs.sum(axis=axis))) * 100
     return out
 
 
 def NMdnE(obs, mod, axis=None):
     """ Normalized Median Error (%)"""
-    out = np.ma.median(
-        np.ma.abs(mod - obs), axis=axis) / np.ma.median(
-            obs, axis=axis) * 100
+    out = (
+        np.ma.median(np.ma.abs(mod - obs), axis=axis)
+        / np.ma.median(obs, axis=axis)
+        * 100
+    )
     return out
 
 
 def FE(obs, mod, axis=None):
     """ Fractional Error (%)"""
-    return (old_div(np.ma.abs(mod - obs),
-                    (mod + obs))).mean(axis=axis) * 2. * 100.
+    return (old_div(np.ma.abs(mod - obs), (mod + obs))).mean(axis=axis) * 2.0 * 100.0
 
 
 def USUTPB(obs, mod, axis=None):
     """ Unpaired Space/Unpaired Time Peak Bias (%)"""
-    return (old_div(
-        (mod.max(axis=axis) - obs.max(axis=axis)), obs.max(axis=axis))) * 100.
+    return (
+        old_div((mod.max(axis=axis) - obs.max(axis=axis)), obs.max(axis=axis))
+    ) * 100.0
 
 
 def USUTPE(obs, mod, axis=None):
     """ Unpaired Space/Unpaired Time Peak Error (%)"""
-    return (old_div(
-        np.ma.abs(mod.max(axis=axis) - obs.max(axis=axis)),
-        obs.max(axis=axis))) * 100.
+    return (
+        old_div(np.ma.abs(mod.max(axis=axis) - obs.max(axis=axis)), obs.max(axis=axis))
+    ) * 100.0
 
 
 def MNPB(obs, mod, paxis, axis=None):
     """ Mean Normalized Peak Bias (%)"""
-    return (old_div(
-        (mod.max(axis=paxis) - obs.max(axis=paxis)),
-        obs.max(axis=paxis))).mean(axis=axis) * 100.
+    return (
+        old_div((mod.max(axis=paxis) - obs.max(axis=paxis)), obs.max(axis=paxis))
+    ).mean(axis=axis) * 100.0
 
 
 def MdnNPB(obs, mod, paxis, axis=None):
     """ Median Normalized Peak Bias (%)"""
-    return np.ma.median(
-        old_div(
-            (mod.max(axis=paxis) - obs.max(axis=paxis)), obs.max(axis=paxis)),
-        axis=axis) * 100.
+    return (
+        np.ma.median(
+            old_div((mod.max(axis=paxis) - obs.max(axis=paxis)), obs.max(axis=paxis)),
+            axis=axis,
+        )
+        * 100.0
+    )
 
 
 def MNPE(obs, mod, paxis, axis=None):
     """ Mean Normalized Peak Error (%)"""
-    return (old_div(
-        (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))),
-        obs.max(axis=paxis))).mean(axis=axis) * 100.
+    return (
+        old_div(
+            (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))), obs.max(axis=paxis)
+        )
+    ).mean(axis=axis) * 100.0
+
 
 def MdnNPE(obs, mod, paxis, axis=None):
     """ Median Normalized Peak Bias (%)"""
-    return np.ma.median(
-        old_div(
-            (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))),
-            obs.max(axis=paxis)),
-        axis=axis) * 100.
+    return (
+        np.ma.median(
+            old_div(
+                (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))),
+                obs.max(axis=paxis),
+            ),
+            axis=axis,
+        )
+        * 100.0
+    )
 
 
 def NMPB(obs, mod, paxis, axis=None):
     """ Normalized Mean Peak Bias (%)"""
-    return (mod.max(axis=paxis) - obs.max(axis=paxis)
-            ).mean(axis=axis) / obs.max(axis=paxis).mean(axis=axis) * 100.
+    return (
+        (mod.max(axis=paxis) - obs.max(axis=paxis)).mean(axis=axis)
+        / obs.max(axis=paxis).mean(axis=axis)
+        * 100.0
+    )
 
 
 def NMdnPB(obs, mod, paxis, axis=None):
     """ Normalized Median Peak Bias (%)"""
-    return np.ma.median(
-        (mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis) / np.ma.median(
-            obs.max(axis=paxis), axis=axis) * 100.
+    return (
+        np.ma.median((mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis)
+        / np.ma.median(obs.max(axis=paxis), axis=axis)
+        * 100.0
+    )
 
 
 def NMPE(obs, mod, paxis, axis=None):
     """ Normalized Mean Peak Error (%)"""
-    return (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))
-            ).mean(axis=axis) / obs.max(axis=paxis).mean(axis=axis) * 100.
+    return (
+        (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))).mean(axis=axis)
+        / obs.max(axis=paxis).mean(axis=axis)
+        * 100.0
+    )
 
 
 def NMdnPE(obs, mod, paxis, axis=None):
     """ Normalized Median Peak Bias (%)"""
-    return np.ma.median(
-        np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis)),
-        axis=axis) / np.ma.median(
-            obs.max(axis=paxis), axis=axis) * 100.
+    return (
+        np.ma.median(np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis)
+        / np.ma.median(obs.max(axis=paxis), axis=axis)
+        * 100.0
+    )
 
 
 def PSUTMNPB(obs, mod, axis=None):
@@ -321,26 +346,27 @@ def PSUTNMdnPE(obs, mod, axis=None):
 def R2(obs, mod, axis=None):
     """ Coefficient of Determination (unit squared)"""
     from scipy.stats import pearsonr
+
     if axis is None:
         obsc, modc = matchedcompressed(obs, mod)
-        return pearsonr(obsc, modc)[0]**2
+        return pearsonr(obsc, modc)[0] ** 2
     else:
-        raise ValueError('Not ready yet')
+        raise ValueError("Not ready yet")
 
 
 def RMSE(obs, mod, axis=None):
     """ Root Mean Square Error (model unit)"""
-    return np.ma.sqrt(((mod - obs)**2).mean(axis=axis))
+    return np.ma.sqrt(((mod - obs) ** 2).mean(axis=axis))
 
 
 def WDRMSE_m(obs, mod, axis=None):
     """ Wind Direction Root Mean Square Error (model unit) (avoid single block error in np.ma)"""
-    return np.sqrt(((circlebias_m(mod - obs))**2).mean(axis=axis))
+    return np.sqrt(((circlebias_m(mod - obs)) ** 2).mean(axis=axis))
 
 
 def WDRMSE(obs, mod, axis=None):
     """ Wind Direction Root Mean Square Error (model unit)"""
-    return np.ma.sqrt(((circlebias(mod - obs))**2).mean(axis=axis))
+    return np.ma.sqrt(((circlebias(mod - obs)) ** 2).mean(axis=axis))
 
 
 def RMSEs(obs, mod, axis=None):
@@ -348,6 +374,7 @@ def RMSEs(obs, mod, axis=None):
     if axis is None:
         try:
             from scipy.stats import linregress
+
             obsc, modc = matchedcompressed(obs, mod)
             m, b, rval, pval, stderr = linregress(obsc, modc)
             mod_hat = b + m * obs
@@ -355,7 +382,7 @@ def RMSEs(obs, mod, axis=None):
         except ValueError:
             return None
     else:
-        raise ValueError('Not ready yet')
+        raise ValueError("Not ready yet")
 
 
 def matchmasks(a1, a2):
@@ -373,6 +400,7 @@ def RMSEu(obs, mod, axis=None):
     if axis is None:
         try:
             from scipy.stats import linregress
+
             obsc, modc = matchedcompressed(obs, mod)
             m, b, rval, pval, stderr = linregress(obsc, modc)
             mod_hat = b + m * obs
@@ -380,22 +408,25 @@ def RMSEu(obs, mod, axis=None):
         except ValueError:
             return None
     else:
-        raise ValueError('Not ready yet')
+        raise ValueError("Not ready yet")
 
 
 def d1(obs, mod, axis=None):
     """ Modified Index of Agreement, d1"""
     return 1.0 - old_div(
         (np.ma.abs(obs - mod)).sum(axis=axis),
-        (np.ma.abs(mod - obs.mean(axis=axis)) +
-         np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
+        (
+            np.ma.abs(mod - obs.mean(axis=axis)) + np.ma.abs(obs - obs.mean(axis=axis))
+        ).sum(axis=axis),
+    )
 
 
 def E1(obs, mod, axis=None):
     """ Modified Coefficient of Efficiency, E1"""
     return 1.0 - old_div(
         (np.ma.abs(obs - mod)).sum(axis=axis),
-        (np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
+        (np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis),
+    )
 
 
 def IOA_m(obs, mod, axis=None):
@@ -404,9 +435,9 @@ def IOA_m(obs, mod, axis=None):
     if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
     return 1.0 - old_div(
-        (np.abs(obs - mod)**2).sum(axis=axis),
-        ((np.abs(mod - obsmean) + np.abs(obs - obsmean)) **
-         2).sum(axis=axis))
+        (np.abs(obs - mod) ** 2).sum(axis=axis),
+        ((np.abs(mod - obsmean) + np.abs(obs - obsmean)) ** 2).sum(axis=axis),
+    )
 
 
 def IOA(obs, mod, axis=None):
@@ -415,9 +446,9 @@ def IOA(obs, mod, axis=None):
     if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
     return 1.0 - old_div(
-        (np.ma.abs(obs - mod)**2).sum(axis=axis),
-        ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) **
-         2).sum(axis=axis))
+        (np.ma.abs(obs - mod) ** 2).sum(axis=axis),
+        ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis),
+    )
 
 
 def circlebias_m(b):
@@ -445,8 +476,9 @@ def WDIOA_m(obs, mod, axis=None):
     ohat = circlebias_m(obs - obsmean)
 
     return 1.0 - old_div(
-        (np.abs(b)**2).sum(axis=axis),
-        ((np.abs(bhat) + np.abs(ohat))**2).sum(axis=axis))
+        (np.abs(b) ** 2).sum(axis=axis),
+        ((np.abs(bhat) + np.abs(ohat)) ** 2).sum(axis=axis),
+    )
 
 
 def WDIOA(obs, mod, axis=None):
@@ -461,8 +493,9 @@ def WDIOA(obs, mod, axis=None):
     ohat = circlebias(obs - obsmean)
 
     return 1.0 - old_div(
-        (np.ma.abs(b)**2).sum(axis=axis),
-        ((np.ma.abs(bhat) + np.ma.abs(ohat))**2).sum(axis=axis))
+        (np.ma.abs(b) ** 2).sum(axis=axis),
+        ((np.ma.abs(bhat) + np.ma.abs(ohat)) ** 2).sum(axis=axis),
+    )
 
 
 def AC(obs, mod, axis=None):
@@ -471,8 +504,9 @@ def AC(obs, mod, axis=None):
     if axis is not None:
         obs_bar = np.expand_dims(obs_bar, axis=axis)
     p1 = ((mod - obs_bar) * (obs - obs_bar)).sum(axis=axis)
-    p2 = (((mod - obs_bar)**2).sum(axis=axis) * (
-        (obs - obs_bar)**2).sum(axis=axis))**0.5
+    p2 = (
+        ((mod - obs_bar) ** 2).sum(axis=axis) * ((obs - obs_bar) ** 2).sum(axis=axis)
+    ) ** 0.5
     return old_div(p1, p2)
 
 
@@ -482,8 +516,10 @@ def WDAC(obs, mod, axis=None):
     if axis is not None:
         obs_bar = np.expand_dims(obs_bar, axis=axis)
     p1 = (circlebias(mod - obs_bar) * circlebias(obs - obs_bar)).sum(axis=axis)
-    p2 = ((circlebias(mod - obs_bar)**2).sum(axis=axis) *
-          (circlebias(obs - obs_bar)**2).sum(axis=axis))**0.5
+    p2 = (
+        (circlebias(mod - obs_bar) ** 2).sum(axis=axis)
+        * (circlebias(obs - obs_bar) ** 2).sum(axis=axis)
+    ) ** 0.5
     return old_div(p1, p2)
 
 
@@ -498,7 +534,7 @@ def HSS(obs, mod, minval, maxval):
     """
     a, b, c, d = scores(obs, mod, minval, maxval=maxval)
     hss = 2 * (a * d - b * c) / ((a + c) * (c + d) + (a + b) * (b + d))
-    print('HSS for range ' + str(minval) + ' --> ' + str(maxval) + ': ' + hss)
+    print("HSS for range " + str(minval) + " --> " + str(maxval) + ": " + hss)
     return hss
 
 
@@ -514,43 +550,45 @@ def ETS(obs, mod, minval, maxval):
     a, b, c, d = scores(obs, mod, minval, maxval=maxval)
     ar = (a + b) * (a + c) / (a + b + c + d)
     ets = old_div((a - ar), (a + b + c - ar))
-    print('ETS for range ' + str(minval) + ' --> ' + str(maxval) + ': ' + ets)
+    print("ETS for range " + str(minval) + " --> " + str(maxval) + ": " + ets)
     return ets
 
 
 def scores(obs, mod, minval, maxval=1.0e5):
     d = {}
-    d['obs'] = obs
-    d['mod'] = mod
+    d["obs"] = obs
+    d["mod"] = mod
     df = DataFrame(d)
     ct = crosstab(
-        (df['mod'] > minval) & (df['mod'] < maxval),
-        (df['obs'] > minval) & (df['obs'] < maxval),
-        margins=True)
+        (df["mod"] > minval) & (df["mod"] < maxval),
+        (df["obs"] > minval) & (df["obs"] < maxval),
+        margins=True,
+    )
     #    print ct
-    a = ct[1][1].astype('float')
-    b = ct[1][0].astype('float')
-    c = ct[0][1].astype('float')
-    d = ct[0][0].astype('float')
+    a = ct[1][1].astype("float")
+    b = ct[1][0].astype("float")
+    c = ct[0][1].astype("float")
+    d = ct[0][0].astype("float")
     return a, b, c, d
 
 
 def stats(df, minval, maxval):
     from numpy import sqrt
+
     dd = {}
-    dd['N'] = df.Obs.dropna().count()
-    dd['Obs'] = df.Obs.mean()
-    dd['Mod'] = df.CMAQ.mean()
-    dd['MB'] = MB(df.Obs.values, df.CMAQ.values)  # mean bias
-    dd['R'] = sqrt(R2(df.Obs.values, df.CMAQ.values))  # pearsonr ** 2
-    dd['IOA'] = IOA(df.Obs.values, df.CMAQ.values)  # Index of Agreement
-    dd['RMSE'] = RMSE(df.Obs.values, df.CMAQ.values)
-    dd['NMB'] = NMB(df.Obs.values, df.CMAQ.values)
+    dd["N"] = df.Obs.dropna().count()
+    dd["Obs"] = df.Obs.mean()
+    dd["Mod"] = df.CMAQ.mean()
+    dd["MB"] = MB(df.Obs.values, df.CMAQ.values)  # mean bias
+    dd["R"] = sqrt(R2(df.Obs.values, df.CMAQ.values))  # pearsonr ** 2
+    dd["IOA"] = IOA(df.Obs.values, df.CMAQ.values)  # Index of Agreement
+    dd["RMSE"] = RMSE(df.Obs.values, df.CMAQ.values)
+    dd["NMB"] = NMB(df.Obs.values, df.CMAQ.values)
     try:
         a, b, c, d = scores(df.Obs.values, df.CMAQ.values, 70, 1000)
-        dd['POD'] = old_div(a, (a + b))
-        dd['FAR'] = old_div(c, (a + c))
+        dd["POD"] = old_div(a, (a + b))
+        dd["FAR"] = old_div(c, (a + c))
     except:
-        dd['POD'] = 1.
-        dd['FAR'] = 0.
+        dd["POD"] = 1.0
+        dd["FAR"] = 0.0
     return dd

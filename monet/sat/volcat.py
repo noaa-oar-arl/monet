@@ -1,25 +1,28 @@
 #!/n-home/alicec/anaconda/bin/python
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 from math import *
-#import sys
-#from scipy.io import netcdf
-#from netCDF4 import Dataset
-#from pylab import *
+
+# import sys
+# from scipy.io import netcdf
+# from netCDF4 import Dataset
+# from pylab import *
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
-#import string
-#import datetime
-#from matplotlib.path import Path
-#import map_projections
-#from plume_models import usgstable
-#from meteorology import *
-#from mytools import emap
-#import pandas as pd
-#from pyhysplit.netcdf.netcdf import NCfile
+
+# import string
+# import datetime
+# from matplotlib.path import Path
+# import map_projections
+# from plume_models import usgstable
+# from meteorology import *
+# from mytools import emap
+# import pandas as pd
+# from pyhysplit.netcdf.netcdf import NCfile
 from pyhdf.SD import SD, SDC
-#from pyhdf.HDF import *
-#from pyhdf.VS import *
+
+# from pyhdf.HDF import *
+# from pyhdf.VS import *
 
 
 # ModisHDF class -  gets satellite retrieval information from HDF file.
@@ -28,10 +31,10 @@ from pyhdf.SD import SD, SDC
 class VolcatHDF(object):
     """reads data from a hdf file"""
 
-    def __init__(self, fname, verbose=0, datatype='532'):
+    def __init__(self, fname, verbose=0, datatype="532"):
         self.fname = fname
         self.missing = -999
-        self.version = 'vcat_ashprop_13_15_16'
+        self.version = "vcat_ashprop_13_15_16"
         # self.version='volcld_ret_14_15_16'
         self.lat = []
         self.lon = []
@@ -46,28 +49,28 @@ class VolcatHDF(object):
         a = dset.datasets()
         self.attributes = dset.attributes()
         if verbose:
-            print('ATTRIBUTES')
+            print("ATTRIBUTES")
             print(self.attributes)
             print(a)
             for key in self.attributes.keys():
                 print(key)
-                #temp = dset.select(key)
+                # temp = dset.select(key)
                 # print temp.info()
-        lat = dset.select('pixel_latitude')
-        lon = dset.select('pixel_longitude')
-        self.lat = lat.attributes()['scale_factor'] * lat[:, :]
-        self.lon = lon.attributes()['scale_factor'] * lon[:, :]
+        lat = dset.select("pixel_latitude")
+        lon = dset.select("pixel_longitude")
+        self.lat = lat.attributes()["scale_factor"] * lat[:, :]
+        self.lon = lon.attributes()["scale_factor"] * lon[:, :]
 
-        self.height = dset.select(self.version + '_ash_top_height')[:, :]
-        self.radius = dset.select(self.version + '_ash_effective_radius')[:, :]
-        self.mass = dset.select(self.version + '_ash_mass_loading')[:, :]
+        self.height = dset.select(self.version + "_ash_top_height")[:, :]
+        self.radius = dset.select(self.version + "_ash_effective_radius")[:, :]
+        self.mass = dset.select(self.version + "_ash_mass_loading")[:, :]
         return 1
 
-    def get_radius(self, units='um'):
+    def get_radius(self, units="um"):
         rval = ma.masked_equal(self.radius[:, :], self.missing)
         return rval
 
-    def get_mass_loading(self, units='g/m2'):
+    def get_mass_loading(self, units="g/m2"):
         rval = ma.masked_equal(self.mass[:, :], self.missing)
         return rval
 
@@ -75,7 +78,7 @@ class VolcatHDF(object):
         """Returns 2d arrays of latitude and longitude"""
         return self.lat, self.lon
 
-    def get_height(self, units='km'):
+    def get_height(self, units="km"):
         """Returns array with retrieved height of the highest layer of ash."""
         """ Default units is km above sea-level"""
         rval = ma.masked_equal(self.height[:, :], self.missing)
@@ -87,10 +90,10 @@ class VolcatHDF(object):
         lat, lon = self.get_latlon()
         cb = plt.pcolormesh(lon, lat, val)
         plt.colorbar(cb)
-        plt.title('height')
+        plt.title("height")
         fig = plt.figure(2)
         val = self.get_mass_loading()
         cb = plt.pcolormesh(lon, lat, val)
         plt.colorbar(cb)
-        plt.title('mass')
+        plt.title("mass")
         plt.show()
