@@ -215,6 +215,9 @@ def _get_latlon(dset, area):
     dset = dset.assign_coords(longitude=dset.longitude, latitude=dset.latitude)
     return dset
 
+def _get_keys(d):
+    keys = Series([i for i in d.data_vars.keys()])
+    return keys 
 
 def add_lazy_pm25(d):
     """Short summary.
@@ -230,7 +233,7 @@ def add_lazy_pm25(d):
         Description of returned object.
 
     """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(concatenate([aitken, accumulation, coarse]))
     weights = Series([
         1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
@@ -255,7 +258,7 @@ def add_lazy_pm25(d):
 
 
 def add_lazy_pm10(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(concatenate([aitken, accumulation, coarse]))
     if 'PM_TOT' in keys:
         d['PM10'] = d['PM_TOT']
@@ -276,7 +279,7 @@ def add_lazy_pm10(d):
 
 
 def add_lazy_pm_course(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(coarse)
     index = allvars.isin(keys)
     if can_do(index):
@@ -294,7 +297,7 @@ def add_lazy_pm_course(d):
 
 
 def add_lazy_clf(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ACLI', 'ACLJ', 'ACLK'])
     weights = Series([1, 1, .2])
     index = allvars.isin(keys)
@@ -314,7 +317,7 @@ def add_lazy_clf(d):
 
 
 def add_lazy_caf(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ACAI', 'ACAJ', 'ASEACAT', 'ASOIL', 'ACORS'])
     weights = Series(
         [1, 1, .2 * 32. / 1000., .2 * 83.8 / 1000., .2 * 56.2 / 1000.])
@@ -335,7 +338,7 @@ def add_lazy_caf(d):
 
 
 def add_lazy_naf(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ANAI', 'ANAJ', 'ASEACAT', 'ASOIL', 'ACORS'])
     weights = Series(
         [1, 1, .2 * 837.3 / 1000., .2 * 62.6 / 1000., .2 * 2.3 / 1000.])
@@ -353,7 +356,7 @@ def add_lazy_naf(d):
 
 
 def add_lazy_so4f(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ASO4I', 'ASO4J', 'ASO4K'])
     weights = Series([1., 1., .2])
     index = allvars.isin(keys)
@@ -370,7 +373,7 @@ def add_lazy_so4f(d):
 
 
 def add_lazy_nh4f(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ANH4I', 'ANH4J', 'ANH4K'])
     weights = Series([1., 1., .2])
     index = allvars.isin(keys)
@@ -387,7 +390,7 @@ def add_lazy_nh4f(d):
 
 
 def add_lazy_no3f(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ANO3I', 'ANO3J', 'ANO3K'])
     weights = Series([1., 1., .2])
     index = allvars.isin(keys)
@@ -404,7 +407,7 @@ def add_lazy_no3f(d):
 
 
 def add_lazy_noy(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(noy_gas)
     index = allvars.isin(keys)
     if can_do(index):
@@ -431,7 +434,7 @@ def add_lazy_rh(d):
 
 
 def add_lazy_nox(d):
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['NO', 'NOX'])
     index = allvars.isin(keys)
     if can_do(index):
