@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import inspect
 import os
+
 # this is written to retrive airnow data concatenate and add to pandas array
 # for usage
 from builtins import object
@@ -52,8 +53,9 @@ class AirNow(object):
         self.daily = False
         self.objtype = "AirNow"
         self.filelist = None
-        self.monitor_file = (inspect.getfile(self.__class__)[:-13] +
-                             "data/monitoring_site_locations.dat")
+        self.monitor_file = (
+            inspect.getfile(self.__class__)[:-13] + "data/monitoring_site_locations.dat"
+        )
         self.monitor_df = None
         self.savecols = [
             "time",
@@ -217,10 +219,8 @@ class AirNow(object):
         dff = dd.from_delayed(dfs)
         df = dff.compute()
         df["time"] = pd.to_datetime(
-            df.date + " " + df.time,
-            format="%m/%d/%y %H:%M",
-            exact=True,
-            box=False)
+            df.date + " " + df.time, format="%m/%d/%y %H:%M", exact=True, box=False
+        )
         df.drop(["date"], axis=1, inplace=True)
         df["time_local"] = df.time + pd.to_timedelta(df.utcoffset, unit="H")
         self.df = df
@@ -295,8 +295,7 @@ class AirNow(object):
         from .epa_util import read_monitor_file
 
         self.monitor_df = read_monitor_file(airnow=True)
-        self.df = pd.merge(
-            self.df, self.monitor_df, on="siteid")  # , how='left')
+        self.df = pd.merge(self.df, self.monitor_df, on="siteid")  # , how='left')
 
     def get_station_locations_remerge(self, df):
         """Short summary.
@@ -313,8 +312,7 @@ class AirNow(object):
 
         """
         df = pd.merge(
-            df,
-            self.monitor_df.drop(["Latitude", "Longitude"], axis=1),
-            on="siteid")  # ,
+            df, self.monitor_df.drop(["Latitude", "Longitude"], axis=1), on="siteid"
+        )  # ,
         # how='left')
         return df

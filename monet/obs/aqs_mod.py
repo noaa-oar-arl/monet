@@ -2,9 +2,9 @@ from __future__ import print_function
 
 import inspect
 import os
+
 # this is a class to deal with aqs data
 from builtins import object, zip
-
 import pandas as pd
 from dask.diagnostics import ProgressBar
 
@@ -101,8 +101,9 @@ class AQS(object):
             "variable",
         ]
         self.df = pd.DataFrame()  # hourly dataframe
-        self.monitor_file = (inspect.getfile(self.__class__)[:-10] +
-                             "data/monitoring_site_locations.dat")
+        self.monitor_file = (
+            inspect.getfile(self.__class__)[:-10] + "data/monitoring_site_locations.dat"
+        )
         self.monitor_df = None
         self.daily = False
         self.d_df = None  # daily dataframe
@@ -160,11 +161,7 @@ class AQS(object):
                 url,
                 parse_dates={"time_local": ["Date Local"]},
                 date_parser=dateparse,
-                dtype={
-                    0: str,
-                    1: str,
-                    2: str
-                },
+                dtype={0: str, 1: str, 2: str},
                 encoding="ISO-8859-1",
             )
             df.columns = self.renameddcols
@@ -183,9 +180,11 @@ class AQS(object):
             # print(df.columns.values)
             df.columns = self.columns_rename(df.columns.values)
 
-        df["siteid"] = (df.state_code.astype(str).str.zfill(2) +
-                        df.county_code.astype(str).str.zfill(3) +
-                        df.site_num.astype(str).str.zfill(4))
+        df["siteid"] = (
+            df.state_code.astype(str).str.zfill(2)
+            + df.county_code.astype(str).str.zfill(3)
+            + df.site_num.astype(str).str.zfill(4)
+        )
         # df['siteid'] = df.state_code + df.county_code + df.site_num
         df.drop(["state_name", "county_name"], axis=1, inplace=True)
         df.columns = [i.lower() for i in df.columns]
@@ -253,9 +252,11 @@ class AQS(object):
             code = "TEMP_"
         elif param.upper() == "RHDP":
             code = "RH_DP_"
-        elif ((param.upper() == "WIND")
-              | (param.upper() == "WS")
-              | (param.upper() == "WDIR")):
+        elif (
+            (param.upper() == "WIND")
+            | (param.upper() == "WS")
+            | (param.upper() == "WDIR")
+        ):
             code = "WIND_"
         url = beginning + code + year + ".zip"
         fname = fname + code + year + ".zip"
@@ -316,13 +317,9 @@ class AQS(object):
         else:
             print("\n File Exists: " + fname)
 
-    def add_data(self,
-                 dates,
-                 param=None,
-                 daily=False,
-                 network=None,
-                 download=False,
-                 local=False):
+    def add_data(
+        self, dates, param=None, daily=False, network=None, download=False, local=False
+    ):
         """Short summary.
 
         Parameters
@@ -368,13 +365,9 @@ class AQS(object):
         if download:
             for url, fname in zip(urls, fnames):
                 self.retrieve(url, fname)
-            dfs = [
-                dask.delayed(self.load_aqs_file)(i, network) for i in fnames
-            ]
+            dfs = [dask.delayed(self.load_aqs_file)(i, network) for i in fnames]
         elif local:
-            dfs = [
-                dask.delayed(self.load_aqs_file)(i, network) for i in fnames
-            ]
+            dfs = [dask.delayed(self.load_aqs_file)(i, network) for i in fnames]
         else:
             dfs = [dask.delayed(self.load_aqs_file)(i, network) for i in urls]
         dff = dd.from_delayed(dfs)
@@ -413,14 +406,16 @@ class AQS(object):
         #     monitor_drop = [u'datum']
         #     self.monitor_df.drop(monitor_drop, axis=1, inplace=True)
         if network is not None:
-            monitors = self.monitor_df.loc[self.monitor_df.isin(
-                [network])].drop_duplicates(subset=["siteid"])
+            monitors = self.monitor_df.loc[
+                self.monitor_df.isin([network])
+            ].drop_duplicates(subset=["siteid"])
         else:
             monitors = self.monitor_df.drop_duplicates(subset=["siteid"])
         self.df = pd.merge(self.df, monitors, on=["siteid"], how="left")
         if daily:
             self.df["time"] = self.df.time_local - pd.to_timedelta(
-                self.df.gmt_offset, unit="H")
+                self.df.gmt_offset, unit="H"
+            )
         # if pd.Series(self.df.columns).isin(['parameter_name']).max():
         # self.df.drop('parameter_name', axis=1, inplace=True)
         return self.df.copy()

@@ -13,12 +13,7 @@ sns.set_context("poster")
 
 
 # CMAQ Spatial Plots
-def make_spatial_plot(modelvar,
-                      m,
-                      dpi=None,
-                      plotargs={},
-                      ncolors=15,
-                      discrete=False):
+def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
     f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
     # determine colorbar
     if "cmap" not in plotargs:
@@ -39,7 +34,8 @@ def make_spatial_plot(modelvar,
         temp = m.imshow(modelvar, **plotargs)
         vmin, vmax = temp.get_clim()
         c, cmap = colorbar_index(
-            ncolors, plotargs["cmap"], minval=vmin, maxval=vmax, basemap=m)
+            ncolors, plotargs["cmap"], minval=vmin, maxval=vmax, basemap=m
+        )
         plotargs["cmap"] = cmap
         m.imshow(modelvar, vmin=vmin, vmax=vmax, **plotargs)
     else:
@@ -62,16 +58,18 @@ def spatial(modelvar, **kwargs):
     return ax
 
 
-def make_spatial_contours(modelvar,
-                          gridobj,
-                          date,
-                          m,
-                          dpi=None,
-                          savename="",
-                          discrete=True,
-                          ncolors=None,
-                          dtype="int",
-                          **kwargs):
+def make_spatial_contours(
+    modelvar,
+    gridobj,
+    date,
+    m,
+    dpi=None,
+    savename="",
+    discrete=True,
+    ncolors=None,
+    dtype="int",
+    **kwargs
+):
     plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
     lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
@@ -86,12 +84,8 @@ def make_spatial_contours(modelvar,
     levels = kwargs["levels"]
     if discrete:
         c, cmap = colorbar_index(
-            ncolors,
-            cmap,
-            minval=levels[0],
-            maxval=levels[-1],
-            basemap=m,
-            dtype=dtype)
+            ncolors, cmap, minval=levels[0], maxval=levels[-1], basemap=m, dtype=dtype
+        )
     else:
         c = m.colorbar()
     titstring = date.strftime("%B %d %Y %H")
@@ -112,8 +106,9 @@ def wind_quiver(ws, wdir, gridobj, m, **kwargs):
     # define map and draw boundries
     x, y = m(lon, lat)
     u, v = tools.wsdir2uv(ws, wdir)
-    quiv = m.quiver(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15],
-                    **kwargs)
+    quiv = m.quiver(
+        x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs
+    )
     return quiv
 
 
@@ -125,8 +120,7 @@ def wind_barbs(ws, wdir, gridobj, m, **kwargs):
     # define map and draw boundries
     x, y = m(lon, lat)
     u, v = tools.wsdir2uv(ws, wdir)
-    m.barbs(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15],
-            **kwargs)
+    m.barbs(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
 
 
 def normval(vmin, vmax, cmap):
@@ -169,15 +163,9 @@ def normval(vmin, vmax, cmap):
 #     ss = (new.Obs - new.CMAQ).abs() * fact
 
 
-def spatial_bias_scatter(df,
-                         m,
-                         date,
-                         vmin=None,
-                         vmax=None,
-                         savename="",
-                         ncolors=15,
-                         fact=1.5,
-                         cmap="RdBu_r"):
+def spatial_bias_scatter(
+    df, m, date, vmin=None, vmax=None, savename="", ncolors=15, fact=1.5, cmap="RdBu_r"
+):
 
     from scipy.stats import scoreatpercentile as score
     from numpy import around
@@ -189,8 +177,7 @@ def spatial_bias_scatter(df,
     top = around(score(diff.abs(), per=95))
     new = df[df.datetime == date]
     x, y = m(new.longitude.values, new.latitude.values)
-    c, cmap = colorbar_index(
-        ncolors, cmap, minval=top * -1, maxval=top, basemap=m)
+    c, cmap = colorbar_index(ncolors, cmap, minval=top * -1, maxval=top, basemap=m)
 
     c.ax.tick_params(labelsize=13)
     #    cmap = cmap_discretize(cmap, ncolors)
@@ -236,15 +223,15 @@ def spatial_bias_scatter(df,
 
 
 def timeseries(
-        df,
-        x="time",
-        y="obs",
-        ax=None,
-        plotargs={},
-        fillargs={"alpha": 0.2},
-        title="",
-        ylabel=None,
-        label=None,
+    df,
+    x="time",
+    y="obs",
+    ax=None,
+    plotargs={},
+    fillargs={"alpha": 0.2},
+    title="",
+    ylabel=None,
+    label=None,
 ):
     """Short summary.
 
@@ -373,15 +360,15 @@ def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
 
 
 def taylordiagram(
-        df,
-        marker="o",
-        col1="obs",
-        col2="model",
-        label1="OBS",
-        label2="MODEL",
-        scale=1.5,
-        addon=False,
-        dia=None,
+    df,
+    marker="o",
+    col1="obs",
+    col2="model",
+    label1="OBS",
+    label2="MODEL",
+    scale=1.5,
+    addon=False,
+    dia=None,
 ):
     from numpy import corrcoef
 
@@ -392,12 +379,12 @@ def taylordiagram(
         sns.set_style("ticks")
         obsstd = df[col1].std()
 
-        dia = td.TaylorDiagram(
-            obsstd, scale=scale, fig=f, rect=111, label=label1)
+        dia = td.TaylorDiagram(obsstd, scale=scale, fig=f, rect=111, label=label1)
         plt.grid(linewidth=1, alpha=0.5)
         cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
         dia.add_sample(
-            df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label2)
+            df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label2
+        )
         contours = dia.add_contours(colors="0.5")
         plt.clabel(contours, inline=1, fontsize=10)
         plt.grid(alpha=0.5)
@@ -405,15 +392,14 @@ def taylordiagram(
     #        plt.tight_layout()
 
     elif not addon and dia is not None:
-        print("Do you want to add this on? if so please turn "
-              "the addon keyword to True")
+        print(
+            "Do you want to add this on? if so please turn " "the addon keyword to True"
+        )
     elif addon and dia is None:
-        print("Please pass the previous Taylor Diagram Instance with dia "
-              "keyword...")
+        print("Please pass the previous Taylor Diagram Instance with dia " "keyword...")
     else:
         cc = corrcoef(df.Obs.values, df.CMAQ.values)[0, 1]
-        dia.add_sample(
-            df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
+        dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
         plt.legend(fontsize="small", loc="best")
         plt.tight_layout()
     return dia

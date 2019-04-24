@@ -43,15 +43,15 @@ class AERONET(object):
         ed = self.dates.max().strftime("%d").zfill(2)
         eh = self.dates.max().strftime("%H").zfill(2)
         if self.prod in [
-                "AOD10",
-                "AOD15",
-                "AOD20",
-                "SDA10",
-                "SDA15",
-                "SDA20",
-                "TOT10",
-                "TOT15",
-                "TOT20",
+            "AOD10",
+            "AOD15",
+            "AOD20",
+            "SDA10",
+            "SDA15",
+            "SDA20",
+            "TOT10",
+            "TOT15",
+            "TOT20",
         ]:
             base_url = "https://aeronet.gsfc.nasa.gov/cgi-bin/print_web_data_v3?"
             inv_type = None
@@ -62,8 +62,23 @@ class AERONET(object):
             else:
                 inv_type = "&AML20=1"
         date_portion = (
-            "year=" + sy + "&month=" + sm + "&day=" + sd + "&hour=" + sh +
-            "&year2=" + ey + "&month2=" + em + "&day2=" + ed + "&hour2=" + eh)
+            "year="
+            + sy
+            + "&month="
+            + sm
+            + "&day="
+            + sd
+            + "&hour="
+            + sh
+            + "&year2="
+            + ey
+            + "&month2="
+            + em
+            + "&day2="
+            + ed
+            + "&hour2="
+            + eh
+        )
         # print(self.prod, inv_type)
         if self.inv_type is not None:
             product = "&product=" + self.prod
@@ -78,8 +93,9 @@ class AERONET(object):
             lon1 = str(self.latlonbox[1])
             lat2 = str(self.latlonbox[2])
             lon2 = str(self.latlonbox[3])
-            latlonbox = ("&lat1=" + lat1 + "&lat2=" + lat2 + "&lon1=" + lon1 +
-                         "&lon2=" + lon2)
+            latlonbox = (
+                "&lat1=" + lat1 + "&lat2=" + lat2 + "&lon1=" + lon1 + "&lon2=" + lon2
+            )
         # print(base_url)
         # print(date_portion)
         # print(product)
@@ -88,8 +104,15 @@ class AERONET(object):
         # print(latlonbox)
         if inv_type is None:
             inv_type = ""
-        self.url = (base_url + date_portion + product + inv_type + time +
-                    latlonbox + "&if_no_html=1")
+        self.url = (
+            base_url
+            + date_portion
+            + product
+            + inv_type
+            + time
+            + latlonbox
+            + "&if_no_html=1"
+        )
 
     def read_aeronet(self):
         print("Reading Aeronet Data...")
@@ -122,7 +145,8 @@ class AERONET(object):
 
     def get_columns(self):
         header = pd.read_csv(
-            self.url, skiprows=5, header=None, nrows=1).values.flatten()
+            self.url, skiprows=5, header=None, nrows=1
+        ).values.flatten()
         final = ["time"]
         for i in header:
             if "Date(" in i or "Time(" in i:
@@ -132,22 +156,21 @@ class AERONET(object):
         return final
 
     def add_data(
-            self,
-            dates=None,
-            product="AOD15",
-            latlonbox=None,
-            daily=False,
-            calc_550=True,
-            inv_type=None,
-            freq=None,
-            detect_dust=False,
+        self,
+        dates=None,
+        product="AOD15",
+        latlonbox=None,
+        daily=False,
+        calc_550=True,
+        inv_type=None,
+        freq=None,
+        detect_dust=False,
     ):
         self.latlonbox = latlonbox
         if dates is None:  # get the current day
             self.dates = pd.date_range(
-                start=pd.to_datetime("today"),
-                end=pd.to_datetime("now"),
-                freq="H")
+                start=pd.to_datetime("today"), end=pd.to_datetime("now"), freq="H"
+            )
         else:
             self.dates = dates
         self.prod = product.upper()
@@ -163,8 +186,7 @@ class AERONET(object):
         # print(self.url)
         self.read_aeronet()
         if freq is not None:
-            self.df = self.df.groupby("siteid").resample(
-                freq).mean().reset_index()
+            self.df = self.df.groupby("siteid").resample(freq).mean().reset_index()
         if detect_dust:
             self.dust_detect()
         if calc_550:
@@ -177,8 +199,9 @@ class AERONET(object):
 
         aod550 = aod500 * (550/500) ^ -alpha
         """
-        self.df["aod_550nm"] = self.df.aod_500nm * (old_div(
-            550.0, 500.0))**(-self.df["440-870_angstrom_exponent"])
+        self.df["aod_550nm"] = self.df.aod_500nm * (old_div(550.0, 500.0)) ** (
+            -self.df["440-870_angstrom_exponent"]
+        )
 
     def dust_detect(self):
         """Detect dust from AERONET. See [Dubovik et al., 2002].
@@ -191,10 +214,14 @@ class AERONET(object):
             Description of returned object.
 
         """
-        self.df["dust"] = (self.df["aod_1020nm"] >
-                           0.3) & (self.df["440-870_angstrom_exponent"] < 0.6)
+        self.df["dust"] = (self.df["aod_1020nm"] > 0.3) & (
+            self.df["440-870_angstrom_exponent"] < 0.6
+        )
 
     def set_daterange(self, begin="", end=""):
-        dates = (pd.date_range(start=begin, end=end,
-                               freq="H").values.astype("M8[s]").astype("O"))
+        dates = (
+            pd.date_range(start=begin, end=end, freq="H")
+            .values.astype("M8[s]")
+            .astype("O")
+        )
         self.dates = dates

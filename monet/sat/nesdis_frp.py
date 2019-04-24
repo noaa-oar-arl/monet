@@ -20,8 +20,7 @@ def download_data(date, ftype="meanFRP"):
     url_ftype = "&files={}.".format(ftype)
     for i in arange(1, 7, dtype=int).astype(str):
         tile = ".FV3C384Grid.tile{}.bin".format(i)
-        url = "{}{}{}{}{}".format(base_dir, yyyymmdd, url_ftype, yyyymmdd,
-                                  tile)
+        url = "{}{}{}{}{}".format(base_dir, yyyymmdd, url_ftype, yyyymmdd, tile)
         fname = "{}.{}.FV3.C384Grid.tile{}.bin".format(ftype, yyyymmdd, i)
         print("Retrieving file:", fname)
         r = rq.get(url)

@@ -29,11 +29,23 @@ class NADP(object):
             url = "http://nadp.slh.wisc.edu/datalib/AIRMoN/AIRMoN-ALL.csv"
         else:
             if self.weekly:
-                url = (baseurl + network.lower() + "/weekly/" + siteid +
-                       network.upper() + "-All-w.csv")
+                url = (
+                    baseurl
+                    + network.lower()
+                    + "/weekly/"
+                    + siteid
+                    + network.upper()
+                    + "-All-w.csv"
+                )
             else:
-                url = (baseurl + network.lower() + "/annual/" + siteid +
-                       network.upper() + "-All-a.csv")
+                url = (
+                    baseurl
+                    + network.lower()
+                    + "/annual/"
+                    + siteid
+                    + network.upper()
+                    + "-All-a.csv"
+                )
         return url
 
     def network_names(self):
@@ -45,11 +57,7 @@ class NADP(object):
         # header = self.get_columns()
         df = pd.read_csv(url, infer_datetime_format=True, parse_dates=[2, 3])
         df.columns = [i.lower() for i in df.columns]
-        df.rename(
-            columns={
-                "dateon": "time",
-                "dateoff": "time_off"
-            }, inplace=True)
+        df.rename(columns={"dateon": "time", "dateoff": "time_off"}, inplace=True)
         try:
             meta = pd.read_csv("https://bit.ly/2sPMvaO")
         except RuntimeError:
@@ -74,11 +82,7 @@ class NADP(object):
         # header = self.get_columns()
         df = pd.read_csv(url, infer_datetime_format=True, parse_dates=[1, 2])
         df.columns = [i.lower() for i in df.columns]
-        df.rename(
-            columns={
-                "dateon": "time",
-                "dateoff": "time_off"
-            }, inplace=True)
+        df.rename(columns={"dateon": "time", "dateoff": "time_off"}, inplace=True)
         try:
             meta = pd.read_csv("https://bit.ly/2Lq6kgq")
             meta.drop(["startdate", "stopdate"], axis=1, inplace=True)
@@ -88,8 +92,7 @@ class NADP(object):
         meta.columns = [i.lower() for i in meta.columns]
         dfn = pd.merge(df, meta, on="siteid", how="left")
         dfn.dropna(subset=["latitude", "longitude"], inplace=True)
-        dfn.loc[dfn.qr ==
-                "C", ["rgppt", "svol", "subppt", "hgconc", "hgdep"]] = NaN
+        dfn.loc[dfn.qr == "C", ["rgppt", "svol", "subppt", "hgconc", "hgdep"]] = NaN
         return dfn
 
     def read_airmon(self, url):
@@ -97,11 +100,7 @@ class NADP(object):
         # header = self.get_columns()
         df = pd.read_csv(url, infer_datetime_format=True, parse_dates=[2, 3])
         df.columns = [i.lower() for i in df.columns]
-        df.rename(
-            columns={
-                "dateon": "time",
-                "dateoff": "time_off"
-            }, inplace=True)
+        df.rename(columns={"dateon": "time", "dateoff": "time_off"}, inplace=True)
         try:
             meta = pd.read_csv("https://bit.ly/2xMlgTW")
             meta.drop(["startdate", "stopdate"], axis=1, inplace=True)
@@ -111,25 +110,28 @@ class NADP(object):
         meta.columns = [i.lower() for i in meta.columns]
         dfn = pd.merge(df, meta, on="siteid", how="left")
         dfn.dropna(subset=["latitude", "longitude"], inplace=True)
-        dfn.loc[dfn.qrcode == "C", [
-            "subppt",
-            "pptnws",
-            "pptbel",
-            "svol",
-            "ca",
-            "mg",
-            "k",
-            "na",
-            "nh4",
-            "no3",
-            "cl",
-            "so4",
-            "po4",
-            "phlab",
-            "phfield",
-            "conduclab",
-            "conducfield",
-        ], ] = NaN
+        dfn.loc[
+            dfn.qrcode == "C",
+            [
+                "subppt",
+                "pptnws",
+                "pptbel",
+                "svol",
+                "ca",
+                "mg",
+                "k",
+                "na",
+                "nh4",
+                "no3",
+                "cl",
+                "so4",
+                "po4",
+                "phlab",
+                "phfield",
+                "conduclab",
+                "conducfield",
+            ],
+        ] = NaN
         return dfn
 
     def read_amon(self, url):
@@ -137,11 +139,7 @@ class NADP(object):
         # header = self.get_columns()
         df = pd.read_csv(url, infer_datetime_format=True, parse_dates=[2, 3])
         df.columns = [i.lower() for i in df.columns]
-        df.rename(
-            columns={
-                "startdate": "time",
-                "enddate": "time_off"
-            }, inplace=True)
+        df.rename(columns={"startdate": "time", "enddate": "time_off"}, inplace=True)
         try:
             meta = pd.read_csv("https://bit.ly/2sJmkCg")
             meta.drop(["startdate", "stopdate"], axis=1, inplace=True)
@@ -159,11 +157,7 @@ class NADP(object):
         # header = self.get_columns()
         df = pd.read_csv(url, infer_datetime_format=True, parse_dates=[2, 3])
         df.columns = [i.lower() for i in df.columns]
-        df.rename(
-            columns={
-                "startdate": "time",
-                "enddate": "time_off"
-            }, inplace=True)
+        df.rename(columns={"startdate": "time", "enddate": "time_off"}, inplace=True)
         try:
             meta = pd.read_csv("https://bit.ly/2sJmkCg")
             meta.drop(["startdate", "stopdate"], axis=1, inplace=True)
@@ -189,8 +183,9 @@ class NADP(object):
         else:
             df = self.read_amnet(url)
         self.df = df
-        self.df = self.df.loc[(self.df.time >= dates.min())
-                              & (self.df.time_off <= dates.max())]
+        self.df = self.df.loc[
+            (self.df.time >= dates.min()) & (self.df.time_off <= dates.max())
+        ]
 
         return df
 

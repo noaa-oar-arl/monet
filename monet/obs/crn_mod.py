@@ -130,30 +130,23 @@ class crn(object):
         self.ftp = None
         self.df = pd.DataFrame()
         self.se_states = array(
-            ["AL", "FL", "GA", "MS", "NC", "SC", "TN", "VA", "WV"],
-            dtype="|S14")
+            ["AL", "FL", "GA", "MS", "NC", "SC", "TN", "VA", "WV"], dtype="|S14"
+        )
         self.ne_states = array(
-            [
-                "CT", "DE", "DC", "ME", "MD", "MA", "NH", "NJ", "NY", "PA",
-                "RI", "VT"
-            ],
+            ["CT", "DE", "DC", "ME", "MD", "MA", "NH", "NJ", "NY", "PA", "RI", "VT"],
             dtype="|S20",
         )
         self.nc_states = array(
-            ["IL", "IN", "IA", "KY", "MI", "MN", "MO", "OH", "WI"],
-            dtype="|S9")
+            ["IL", "IN", "IA", "KY", "MI", "MN", "MO", "OH", "WI"], dtype="|S9"
+        )
         self.sc_states = array(["AR", "LA", "OK", "TX"], dtype="|S9")
         self.r_states = array(
-            [
-                "AZ", "CO", "ID", "KS", "MT", "NE", "NV", "NM", "ND", "SD",
-                "UT", "WY"
-            ],
+            ["AZ", "CO", "ID", "KS", "MT", "NE", "NV", "NM", "ND", "SD", "UT", "WY"],
             dtype="|S12",
         )
         self.p_states = array(["CA", "OR", "WA"], dtype="|S10")
         self.objtype = "CRN"
-        self.monitor_file = inspect.getfile(
-            self.__class__)[:-18] + "data/stations.tsv"
+        self.monitor_file = inspect.getfile(self.__class__)[:-18] + "data/stations.tsv"
         self.monitor_df = None
         self.baseurl = "https://www1.ncdc.noaa.gov/pub/data/uscrn/products/"
         self.hcols = [
@@ -304,13 +297,7 @@ class crn(object):
             )
         return df
 
-    def build_url(self,
-                  year,
-                  state,
-                  site,
-                  vector,
-                  daily=False,
-                  sub_hourly=False):
+    def build_url(self, year, state, site, vector, daily=False, sub_hourly=False):
         if daily:
             beginning = self.baseurl + "daily01/" + year + "/"
             fname = "CRND0103-"
@@ -377,7 +364,8 @@ class crn(object):
                 site = monitors.iloc[i].LOCATION.replace(" ", "_")
                 vector = monitors.iloc[i].VECTOR.replace(" ", "_")
                 url, fname = self.build_url(
-                    y, state, site, vector, daily=daily, sub_hourly=sub_hourly)
+                    y, state, site, vector, daily=daily, sub_hourly=sub_hourly
+                )
                 if self.check_url(url):
                     urls.append(url)
                     fnames.append(fname)
@@ -414,12 +402,9 @@ class crn(object):
         else:
             print("File Exists: " + fname)
 
-    def add_data(self,
-                 dates,
-                 daily=False,
-                 sub_hourly=False,
-                 download=False,
-                 latlonbox=None):
+    def add_data(
+        self, dates, daily=False, sub_hourly=False, download=False, latlonbox=None
+    ):
         """Short summary.
 
         Parameters
@@ -448,15 +433,18 @@ class crn(object):
             self.get_monitor_df()
         if latlonbox is not None:  # get them all[latmin,lonmin,latmax,lonmax]
             mdf = self.monitor_df
-            con = ((mdf.LATITUDE >= latlonbox[0])
-                   & (mdf.LATITUDE <= latlonbox[2])
-                   & (mdf.LONGITUDE >= latlonbox[1])
-                   & (mdf.LONGITUDE <= latlonbox[3]))
+            con = (
+                (mdf.LATITUDE >= latlonbox[0])
+                & (mdf.LATITUDE <= latlonbox[2])
+                & (mdf.LONGITUDE >= latlonbox[1])
+                & (mdf.LONGITUDE <= latlonbox[3])
+            )
             monitors = mdf.loc[con].copy()
         else:
             monitors = self.monitor_df.copy()
         urls, fnames = self.build_urls(
-            monitors, dates, daily=daily, sub_hourly=sub_hourly)
+            monitors, dates, daily=daily, sub_hourly=sub_hourly
+        )
         if download:
             for url, fname in zip(urls, fnames):
                 self.retrieve(url, fname)
@@ -466,19 +454,17 @@ class crn(object):
         dff = dd.from_delayed(dfs)
         self.df = dff.compute()
         self.df = pd.merge(
-            self.df,
-            monitors,
-            how="left",
-            on=["WBANNO", "LATITUDE", "LONGITUDE"])
+            self.df, monitors, how="left", on=["WBANNO", "LATITUDE", "LONGITUDE"]
+        )
         if ~self.df.columns.isin(["time"]).max():
             self.df["time"] = self.df.time_local + pd.to_timedelta(
-                self.df.GMT_OFFSET, unit="H")
-        id_vars = self.monitor_df.columns.append(
-            pd.Index(["time", "time_local"]))
+                self.df.GMT_OFFSET, unit="H"
+            )
+        id_vars = self.monitor_df.columns.append(pd.Index(["time", "time_local"]))
         keys = self.df.columns[self.df.columns.isin(id_vars)]
         self.df = pd.melt(
-            self.df, id_vars=keys, var_name="variable",
-            value_name="obs")  # this stacks columns to be inline with MONET
+            self.df, id_vars=keys, var_name="variable", value_name="obs"
+        )  # this stacks columns to be inline with MONET
         self.df.rename(columns={"WBANNO": "siteid"}, inplace=True)
         self.change_units()
         self.df.columns = [i.lower() for i in self.df.columns]
@@ -536,8 +522,11 @@ class crn(object):
             Description of returned object.
 
         """
-        dates = (pd.date_range(start=begin, end=end,
-                               freq="H").values.astype("M8[s]").astype("O"))
+        dates = (
+            pd.date_range(start=begin, end=end, freq="H")
+            .values.astype("M8[s]")
+            .astype("O")
+        )
         self.dates = dates
 
     def get_monitor_df(self):

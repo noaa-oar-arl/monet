@@ -26,8 +26,7 @@ class TOLNet(object):
     def __init__(self):
         self.objtype = "TOLNET"
         self.cwd = os.getcwd()
-        self.dates = pd.date_range(
-            start="2017-09-25", end="2017-09-26", freq="H")
+        self.dates = pd.date_range(start="2017-09-25", end="2017-09-26", freq="H")
         self.dset = None
         self.daily = False
 

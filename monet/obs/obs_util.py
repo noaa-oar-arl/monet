@@ -1,11 +1,9 @@
 """ Obs Utilities """
 
 from __future__ import print_function
-
+import numpy as np
 import datetime
 import sys
-
-import numpy as np
 
 
 def find_near(df, latlon, distance=100, sid="site_num", drange=None):
@@ -35,21 +33,17 @@ def find_near(df, latlon, distance=100, sid="site_num", drange=None):
         df = timefilter(df.copy(), drange)
     lhash = get_lhash(df, sid)
     for key in lhash.keys:
-        xd = (lhash[key][1] - latlon[1]) * degree2km * np.cos(
-            latlon[1] * np.pi / 180.0)
+        xd = (lhash[key][1] - latlon[1]) * degree2km * np.cos(latlon[1] * np.pi / 180.0)
         yd = (lhash[key][0] - latlon[0]) * degree2km
-        dd = (xd**2 + yd**2)**0.5
+        dd = (xd ** 2 + yd ** 2) ** 0.5
         if dd > distance:
             lhash.pop(key, None)
     return lhash
 
 
-def write_datem(df,
-                obscolumn="obs",
-                dname="datemfile.txt",
-                sitename="1",
-                info=None,
-                drange=None):
+def write_datem(
+    df, obscolumn="obs", dname="datemfile.txt", sitename="1", info=None, drange=None
+):
     """returns string in datem format (See NOAA ARL).
      datem format has the following columns:
      Year, Month, Day, Hour, Duration, lat, lon, Concentration (units), site
@@ -85,8 +79,7 @@ def write_datem(df,
     ustr = ""
     for uuu in units:
         ustr += uuu + " "
-    runstring = "Beginning date " + sdate.strftime(
-        "%Y %m %d %H:%M") + " UTC ---"
+    runstring = "Beginning date " + sdate.strftime("%Y %m %d %H:%M") + " UTC ---"
     runstring += "Information "
     if info:
         runstring += info + "\n"
@@ -94,7 +87,9 @@ def write_datem(df,
         runstring += "\n"
     runstring += (
         "Year, Month, Day, Hour:Minute (UTC), Dur(hhmm) ,  LAT, LON, Concentration ("
-        + ustr + "), sid, height\n")
+        + ustr
+        + "), sid, height\n"
+    )
     lat = df["latitude"]
     lon = df["longitude"]
     cval = df[obscolumn]
@@ -117,11 +112,16 @@ def write_datem(df,
             print(type(val[2]))
             sys.exit()
         if isinstance(val[4], str):
-            runstring += "{:.3f}".format(
-                val[3]) + " " + val[4] + " " + height + "\n"
+            runstring += "{:.3f}".format(val[3]) + " " + val[4] + " " + height + "\n"
         else:
-            runstring += ("{:.3f}".format(val[3]) + " " + "{0:d}".format(
-                val[4]) + " " + height + "\n")
+            runstring += (
+                "{:.3f}".format(val[3])
+                + " "
+                + "{0:d}".format(val[4])
+                + " "
+                + height
+                + "\n"
+            )
 
     with open(dname, "w") as fid:
         fid.write(runstring)

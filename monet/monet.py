@@ -46,13 +46,7 @@ class MONET(object):
             m = self.add_camx(**kwargs)
         return m
 
-    def add_cmaq(self,
-                 gridcro2d=None,
-                 emission=None,
-                 metcro2d=None,
-                 metcro3d=None,
-                 depn=None,
-                 conc=None):
+    def add_cmaq(self, gridcro2d=None, emission=None, metcro2d=None, metcro3d=None, depn=None, conc=None):
         """Short summary.
 
         Parameters
@@ -92,15 +86,7 @@ class MONET(object):
             model.open_cmaq(conc)
         return model
 
-    def add_camx(self,
-                 met2d=None,
-                 sfc2d=None,
-                 cld3d=None,
-                 kv=None,
-                 met3d=None,
-                 avrg=None,
-                 emission=None,
-                 depn=None):
+    def add_camx(self, met2d=None, sfc2d=None, cld3d=None, kv=None, met3d=None, avrg=None, emission=None, depn=None):
         """Short summary.
 
         Parameters

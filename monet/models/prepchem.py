@@ -7,9 +7,7 @@ try:
 
     has_fv3grid = True
 except ImportError:
-    print(
-        "Please install the fv3grid from https://github.com/bbakernoaa/fv3grid"
-    )
+    print("Please install the fv3grid from https://github.com/bbakernoaa/fv3grid")
     print("to gain the full capability of this dataset")
 
 

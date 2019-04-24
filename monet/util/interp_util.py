@@ -29,7 +29,8 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
         coords={
             "lon": (["x", "y"], lon.reshape(1, 1)),
             "lat": (["x", "y"], lat.reshape(1, 1)),
-        })
+        }
+    )
     return dset
 
 
@@ -111,7 +112,8 @@ def constant_1d_xesmf(longitude=None, latitude=None):
         coords={
             "lon": (["x", "y"], lon.reshape(s, 1)),
             "lat": (["x", "y"], lat.reshape(s, 1)),
-        })
+        }
+    )
     return dset
 
 
@@ -211,8 +213,9 @@ def get_smops_area_def(nx=1440, ny=720):
     proj_id = area_id
     aa = p([-180, 180], [-90, 90])
     area_extent = (aa[0][0], aa[1][0], aa[0][1], aa[1][1])
-    area_def = utils.get_area_def(area_id, area_name, proj_id, proj4_args, nx,
-                                  ny, area_extent)
+    area_def = utils.get_area_def(
+        area_id, area_name, proj_id, proj4_args, nx, ny, area_extent
+    )
     return area_def
 
 
@@ -254,8 +257,9 @@ def get_gfs_area_def(nx=1440, ny=721):
     proj_id = area_id
     aa = p([0, 360 - 0.25], [-90, 90.0])
     area_extent = (aa[0][0], aa[1][0], aa[0][1], aa[1][1])
-    area_def = utils.get_area_def(area_id, area_name, proj_id, proj4_args, nx,
-                                  ny, area_extent)
+    area_def = utils.get_area_def(
+        area_id, area_name, proj_id, proj4_args, nx, ny, area_extent
+    )
     return area_def
 
 

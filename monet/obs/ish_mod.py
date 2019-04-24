@@ -1,6 +1,5 @@
 """Python module for reading NOAA ISH files"""
 from __future__ import division, print_function
-
 from builtins import object, zip
 
 import dask
@@ -110,7 +109,7 @@ class ISH(object):
             items = []
             index = 0
             for w in self.WIDTHS:
-                items.append(line[index:index + w])
+                items.append(line[index : index + w])
                 index = index + w
             yield ",".join(items)
 
@@ -140,14 +139,14 @@ class ISH(object):
         frame = self._clean_column_by_name(frame, "vsb", missing=999999)
         frame = self._clean_column_by_name(frame, "t", multiplier=10)
         frame = self._clean_column_by_name(frame, "dpt", multiplier=10)
-        frame = self._clean_column_by_name(
-            frame, "p", multiplier=10, missing=99999)
+        frame = self._clean_column_by_name(frame, "p", multiplier=10, missing=99999)
         return frame
 
     def read_data_frame(self, file_object):
         """Create a data frame from an ISH file."""
         frame_as_array = np.genfromtxt(
-            file_object, delimiter=self.WIDTHS, dtype=self.DTYPES)
+            file_object, delimiter=self.WIDTHS, dtype=self.DTYPES
+        )
         frame = pd.DataFrame.from_records(frame_as_array)
         df = self._clean(frame)
         df.drop(["latitude", "longitude"], axis=1, inplace=True)
@@ -165,35 +164,28 @@ class ISH(object):
         """ read ISH history file """
         fname = self.history_file
         self.history = pd.read_csv(
-            fname, parse_dates=["BEGIN", "END"], infer_datetime_format=True)
+            fname, parse_dates=["BEGIN", "END"], infer_datetime_format=True
+        )
         self.history.columns = [i.lower() for i in self.history.columns]
 
-        index1 = (self.history.end >= self.dates.min()) & (self.history.begin
-                                                           <= self.dates.max())
-        self.history = self.history.loc[index1, :].dropna(
-            subset=["lat", "lon"])
+        index1 = (self.history.end >= self.dates.min()) & (
+            self.history.begin <= self.dates.max()
+        )
+        self.history = self.history.loc[index1, :].dropna(subset=["lat", "lon"])
 
-        self.history.loc[:, "usaf"] = self.history.usaf.astype(
-            "str").str.zfill(6)
-        self.history.loc[:, "wban"] = self.history.wban.astype(
-            "str").str.zfill(5)
+        self.history.loc[:, "usaf"] = self.history.usaf.astype("str").str.zfill(6)
+        self.history.loc[:, "wban"] = self.history.wban.astype("str").str.zfill(5)
         self.history["station_id"] = self.history.usaf + self.history.wban
         self.history.rename(
-            columns={
-                "lat": "latitude",
-                "lon": "longitude"
-            }, inplace=True)
+            columns={"lat": "latitude", "lon": "longitude"}, inplace=True
+        )
 
-    def subset_sites(self,
-                     latmin=32.65,
-                     lonmin=-113.3,
-                     latmax=34.5,
-                     lonmax=-110.4):
+    def subset_sites(self, latmin=32.65, lonmin=-113.3, latmax=34.5, lonmax=-110.4):
         """ find sites within designated region"""
-        latindex = (self.history.latitude >= latmin) & (self.history.latitude
-                                                        <= latmax)
-        lonindex = (self.history.longitude >= lonmin) & (self.history.longitude
-                                                         <= lonmax)
+        latindex = (self.history.latitude >= latmin) & (self.history.latitude <= latmax)
+        lonindex = (self.history.longitude >= lonmin) & (
+            self.history.longitude <= lonmax
+        )
         dfloc = self.history.loc[latindex & lonindex, :]
         print("SUBSET")
         print(dfloc.latitude.unique())
@@ -201,14 +193,14 @@ class ISH(object):
         return dfloc
 
     def add_data(
-            self,
-            dates,
-            box=None,
-            country=None,
-            state=None,
-            site=None,
-            resample=True,
-            window="H",
+        self,
+        dates,
+        box=None,
+        country=None,
+        state=None,
+        site=None,
+        resample=True,
+        window="H",
     ):
         """
         dates : list of datetime objects
@@ -229,14 +221,16 @@ class ISH(object):
         url = "https://www1.ncdc.noaa.gov/pub/data/noaa/" + year + "/"
         if self.history is None:
             self.read_ish_history()
-        self.history["fname"] = (url + self.history.usaf + "-" +
-                                 self.history.wban + "-" + year + ".gz")
+        self.history["fname"] = (
+            url + self.history.usaf + "-" + self.history.wban + "-" + year + ".gz"
+        )
         dfloc = self.history.copy()
         # if isinstance(box, None):  # type(box) is not type(None):
         if box is not None:  # type(box) is not type(None):
             print("Retrieving Sites in: " + " ".join(map(str, box)))
             dfloc = self.subset_sites(
-                latmin=box[0], lonmin=box[1], latmax=box[2], lonmax=box[3])
+                latmin=box[0], lonmin=box[1], latmax=box[2], lonmax=box[3]
+            )
         elif country is not None:
             print("Retrieving Country: " + country)
             dfloc = self.history.loc[self.history.ctry == country, :]
@@ -264,8 +258,7 @@ class ISH(object):
         if resample:
             print("  Resampling to every " + window)
             self.df.index = self.df.time
-            self.df = self.df.groupby("station_id").resample(
-                "H").mean().reset_index()
+            self.df = self.df.groupby("station_id").resample("H").mean().reset_index()
         # this was encoded as byte literal but in dfloc it is a string so could
         # not merge on station_id correctly.
         try:
