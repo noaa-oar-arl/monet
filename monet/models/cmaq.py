@@ -260,7 +260,7 @@ def add_lazy_pm25(d):
 def add_lazy_pm10(d):
     keys = _get_keys(d)
     allvars = Series(concatenate([aitken, accumulation, coarse]))
-    if 'PM_TOT' in keys.to_list():
+    if 'PMC_TOT' in keys.to_list():
         d['PM10'] = d['PMC_TOT']
     else:
         index = allvars.isin(keys)
