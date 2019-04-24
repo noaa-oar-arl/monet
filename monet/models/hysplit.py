@@ -83,7 +83,7 @@ def open_dataset(fname, drange=None, verbose=False):
     dset = binfile.dset
     # return dset
     # get the grid information
-    ## May not need the proj4 definitions now that lat lon defined properly.
+    # May not need the proj4 definitions now that lat lon defined properly.
     p4 = _hysplit_latlon_grid_from_dataset(dset)
     swath = get_hysplit_latlon_pyresample_area_def(dset, p4)
 
