@@ -49,7 +49,8 @@ class TaylorDiagram(object):
         self.smax = scale * self.refstd
         ghelper = FA.GridHelperCurveLinear(
             tr,
-            extremes=(0, old_div(NP.pi, 2), self.smin, self.smax),  # 1st quadrant
+            extremes=(0, old_div(NP.pi, 2), self.smin,
+                      self.smax),  # 1st quadrant
             grid_locator1=gl1,
             tick_formatter1=tf1,
         )
@@ -84,7 +85,13 @@ class TaylorDiagram(object):
 
         # Add reference point and stddev contour
         print("Reference std:", self.refstd)
-        l, = self.ax.plot([0], self.refstd, "r*", ls="", ms=14, label=label, zorder=10)
+        l, = self.ax.plot([0],
+                          self.refstd,
+                          "r*",
+                          ls="",
+                          ms=14,
+                          label=label,
+                          zorder=10)
         t = NP.linspace(0, old_div(NP.pi, 2))
         r = NP.zeros_like(t) + self.refstd
         self.ax.plot(t, r, "k--", label="_")
@@ -96,9 +103,8 @@ class TaylorDiagram(object):
         """Add sample (stddev,corrcoeff) to the Taylor diagram. args
         and kwargs are directly propagated to the Figure.plot
         command."""
-        l, = self.ax.plot(
-            NP.arccos(corrcoef), stddev, *args, **kwargs
-        )  # (theta,radius)
+        l, = self.ax.plot(NP.arccos(corrcoef), stddev, *args,
+                          **kwargs)  # (theta,radius)
         self.samplePoints.append(l)
 
         return l
@@ -107,10 +113,11 @@ class TaylorDiagram(object):
         """Add constant centered RMS difference contours."""
 
         rs, ts = NP.meshgrid(
-            NP.linspace(self.smin, self.smax), NP.linspace(0, old_div(NP.pi, 2))
-        )
+            NP.linspace(self.smin, self.smax), NP.linspace(
+                0, old_div(NP.pi, 2)))
         # Compute centered RMS difference
-        rms = NP.sqrt(self.refstd ** 2 + rs ** 2 - 2 * self.refstd * rs * NP.cos(ts))
+        rms = NP.sqrt(self.refstd**2 + rs**2 -
+                      2 * self.refstd * rs * NP.cos(ts))
 
         contours = self.ax.contour(ts, rs, rms, levels, **kwargs)
 

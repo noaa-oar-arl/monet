@@ -104,10 +104,14 @@ class IMPROVE(object):
         if add_meta:
             monitor_df = read_monitor_file(network="IMPROVE")  # .drop(
             # dropkeys, axis=1)
-            df = df.merge(monitor_df, how="left", left_on="epaid", right_on="siteid")
+            df = df.merge(
+                monitor_df, how="left", left_on="epaid", right_on="siteid")
             df.drop(["siteid_y", "state_name_y"], inplace=True, axis=1)
             df.rename(
-                columns={"siteid_x": "siteid", "state_name_x": "state_name"},
+                columns={
+                    "siteid_x": "siteid",
+                    "state_name_x": "state_name"
+                },
                 inplace=True,
             )
 
@@ -171,9 +175,6 @@ class IMPROVE(object):
             Description of returned object.
 
         """
-        dates = (
-            pd.date_range(start=begin, end=end, freq="H")
-            .values.astype("M8[s]")
-            .astype("O")
-        )
+        dates = (pd.date_range(start=begin, end=end,
+                               freq="H").values.astype("M8[s]").astype("O"))
         self.dates = dates

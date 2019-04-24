@@ -27,7 +27,8 @@ class icartt(object):
 
         """
         # Xarray Open/Read the ICARTT flight dataset as pseudonetcdf engine
-        self.dset = xr.open_dataset(fname, engine="pseudonetcdf", decode_times=False)
+        self.dset = xr.open_dataset(
+            fname, engine="pseudonetcdf", decode_times=False)
         return self.dset
 
     def get_data(self, da, lat_label=None, lon_label=None, alt_label=None):
@@ -70,15 +71,18 @@ class icartt(object):
             "Longitude_degree",
             "Latitude_Degree",
             "Lon_aircraft",
-            "Long_aircraft" "Longitude_aircraft",
+            "Long_aircraft"
+            "Longitude_aircraft",
         ]
 
         # Get the unknown lat/lon variable names data along flight path
         if lat_label is None and lon_label is None:
             #   Change to dataframe to search the columns for possible lat lons
             dfset = da.to_dataframe()
-            dfset["latitude"] = dfset[dfset.columns[dfset.columns.isin(possible_lats)]]
-            dfset["longitude"] = dfset[dfset.columns[dfset.columns.isin(possible_lons)]]
+            dfset["latitude"] = dfset[dfset.columns[dfset.columns.isin(
+                possible_lats)]]
+            dfset["longitude"] = dfset[dfset.columns[dfset.columns.isin(
+                possible_lons)]]
             #   Place latitude/longitude back into xarray
             da["latitude"] = dfset["latitude"]
             da["longitude"] = dfset["longitude"]
@@ -94,9 +98,9 @@ class icartt(object):
         da = da.rename({"POINTS": "time"}, inplace=True)
 
         # Convert time from start date and TFLAG in UT seconds from midnight
-        da["time"] = pd.to_datetime(da.SDATE.replace(", ", "-")) + pd.to_timedelta(
-            da[da.TFLAG], unit="s"
-        )
+        da["time"] = pd.to_datetime(da.SDATE.replace(
+            ", ", "-")) + pd.to_timedelta(
+                da[da.TFLAG], unit="s")
 
         # If user sets the specified altitude label it will be a coordinate
         if alt_label is None:

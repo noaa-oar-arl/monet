@@ -65,20 +65,18 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
             img.save(fname, "JPEG")
 
 
-def sp_scatter_bias(
-    df,
-    col1=None,
-    col2=None,
-    ax=None,
-    outline=False,
-    tight=True,
-    global_map=True,
-    map_kwargs={},
-    cbar_kwargs={},
-    val_max=None,
-    val_min=None,
-    **kwargs
-):
+def sp_scatter_bias(df,
+                    col1=None,
+                    col2=None,
+                    ax=None,
+                    outline=False,
+                    tight=True,
+                    global_map=True,
+                    map_kwargs={},
+                    cbar_kwargs={},
+                    val_max=None,
+                    val_min=None,
+                    **kwargs):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
 
@@ -89,7 +87,8 @@ def sp_scatter_bias(
             print("User must specify col1 and col2 in the dataframe")
             raise ValueError
         else:
-            dfnew = df[["latitude", "longitude", col1, col2]].dropna().copy(deep=True)
+            dfnew = df[["latitude", "longitude", col1,
+                        col2]].dropna().copy(deep=True)
             dfnew["sp_diff"] = dfnew[col2] - dfnew[col1]
             top = score(dfnew["sp_diff"].abs(), per=95)
             if val_max is not None:
@@ -106,8 +105,7 @@ def sp_scatter_bias(
                 vmax=top,
                 ax=ax,
                 colorbar=True,
-                **kwargs
-            )
+                **kwargs)
             if ~outline:
                 ax.outline_patch.set_alpha(0)
             if global_map:

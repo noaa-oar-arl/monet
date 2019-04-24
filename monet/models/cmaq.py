@@ -13,9 +13,11 @@ def can_do(index):
         return False
 
 
-def open_dataset(
-    fname, earth_radius=6370000, convert_to_ppb=True, drop_duplicates=False, **kwargs
-):
+def open_dataset(fname,
+                 earth_radius=6370000,
+                 convert_to_ppb=True,
+                 drop_duplicates=False,
+                 **kwargs):
     """Method to open CMAQ IOAPI netcdf files.
 
     Parameters
@@ -93,9 +95,11 @@ def open_dataset(
     return dset
 
 
-def open_mfdataset(
-    fname, earth_radius=6370000, convert_to_ppb=True, drop_duplicates=False, **kwargs
-):
+def open_mfdataset(fname,
+                   earth_radius=6370000,
+                   convert_to_ppb=True,
+                   drop_duplicates=False,
+                   **kwargs):
     """Method to open CMAQ IOAPI netcdf files.
 
     Parameters
@@ -180,7 +184,8 @@ def _get_times(d, drop_duplicates):
     else:
         tflag1 = Series(d["TFLAG"][:, 0, 0]).astype(str).str.zfill(7)
         tflag2 = Series(d["TFLAG"][:, 0, 1]).astype(str).str.zfill(6)
-    date = to_datetime([i + j for i, j in zip(tflag1, tflag2)], format="%Y%j%H%M%S")
+    date = to_datetime([i + j for i, j in zip(tflag1, tflag2)],
+                       format="%Y%j%H%M%S")
     if drop_duplicates:
         indexdates = Series(date).drop_duplicates(keep="last").index.values
         d = d.isel(TSTEP=indexdates)
@@ -232,72 +237,70 @@ def add_lazy_pm25(d):
     """
     keys = _get_keys(d)
     allvars = Series(concatenate([aitken, accumulation, coarse]))
-    weights = Series(
-        [
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            0.2,
-            0.2,
-            0.2,
-            0.2,
-            0.2,
-            0.2,
-            0.2,
-        ]
-    )
+    weights = Series([
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+    ])
     if "PM25_TOT" in keys.to_list():
         d["PM25"] = d["PM25_TOT"]
     else:
@@ -306,9 +309,11 @@ def add_lazy_pm25(d):
             newkeys = allvars.loc[index]
             newweights = weights.loc[index]
             d["PM25"] = add_multiple_lazy(d, newkeys, weights=newweights)
-            d["PM25"] = d["PM25"].assign_attrs(
-                {"units": "$\mu g m^{-3}$", "name": "PM2.5", "long_name": "PM2.5"}
-            )
+            d["PM25"] = d["PM25"].assign_attrs({
+                "units": "$\mu g m^{-3}$",
+                "name": "PM2.5",
+                "long_name": "PM2.5"
+            })
     return d
 
 
@@ -322,13 +327,14 @@ def add_lazy_pm10(d):
         if can_do(index):
             newkeys = allvars.loc[index]
             d["PM10"] = add_multiple_lazy(d, newkeys)
-            d["PM10"] = d["PM10"].assign_attrs(
-                {
-                    "units": "$\mu g m^{-3}$",
-                    "name": "PM10",
-                    "long_name": "Particulate Matter < 10 microns",
-                }
-            )
+            d["PM10"] = d["PM10"].assign_attrs({
+                "units":
+                "$\mu g m^{-3}$",
+                "name":
+                "PM10",
+                "long_name":
+                "Particulate Matter < 10 microns",
+            })
     return d
 
 
@@ -339,13 +345,14 @@ def add_lazy_pm_course(d):
     if can_do(index):
         newkeys = allvars.loc[index]
         d["PM_COURSE"] = add_multiple_lazy(d, newkeys)
-        d["PM_COURSE"] = d["PM_COURSE"].assign_attrs(
-            {
-                "units": "$\mu g m^{-3}$",
-                "name": "PM_COURSE",
-                "long_name": "Course Mode Particulate Matter",
-            }
-        )
+        d["PM_COURSE"] = d["PM_COURSE"].assign_attrs({
+            "units":
+            "$\mu g m^{-3}$",
+            "name":
+            "PM_COURSE",
+            "long_name":
+            "Course Mode Particulate Matter",
+        })
     return d
 
 
@@ -358,13 +365,14 @@ def add_lazy_clf(d):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d["CLf"] = add_multiple_lazy(d, newkeys, weights=neww)
-        d["CLf"] = d["CLf"].assign_attrs(
-            {
-                "units": "$\mu g m^{-3}$",
-                "name": "CLf",
-                "long_name": "Fine Mode particulate Cl",
-            }
-        )
+        d["CLf"] = d["CLf"].assign_attrs({
+            "units":
+            "$\mu g m^{-3}$",
+            "name":
+            "CLf",
+            "long_name":
+            "Fine Mode particulate Cl",
+        })
     return d
 
 
@@ -372,20 +380,20 @@ def add_lazy_caf(d):
     keys = _get_keys(d)
     allvars = Series(["ACAI", "ACAJ", "ASEACAT", "ASOIL", "ACORS"])
     weights = Series(
-        [1, 1, 0.2 * 32.0 / 1000.0, 0.2 * 83.8 / 1000.0, 0.2 * 56.2 / 1000.0]
-    )
+        [1, 1, 0.2 * 32.0 / 1000.0, 0.2 * 83.8 / 1000.0, 0.2 * 56.2 / 1000.0])
     index = allvars.isin(keys)
     if can_do(index):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d["CAf"] = add_multiple_lazy(d, newkeys, weights=neww)
-        d["CAf"] = d["CAf"].assign_attrs(
-            {
-                "units": "$\mu g m^{-3}$",
-                "name": "CAf",
-                "long_name": "Fine Mode particulate CA",
-            }
-        )
+        d["CAf"] = d["CAf"].assign_attrs({
+            "units":
+            "$\mu g m^{-3}$",
+            "name":
+            "CAf",
+            "long_name":
+            "Fine Mode particulate CA",
+        })
     return d
 
 
@@ -393,16 +401,17 @@ def add_lazy_naf(d):
     keys = _get_keys(d)
     allvars = Series(["ANAI", "ANAJ", "ASEACAT", "ASOIL", "ACORS"])
     weights = Series(
-        [1, 1, 0.2 * 837.3 / 1000.0, 0.2 * 62.6 / 1000.0, 0.2 * 2.3 / 1000.0]
-    )
+        [1, 1, 0.2 * 837.3 / 1000.0, 0.2 * 62.6 / 1000.0, 0.2 * 2.3 / 1000.0])
     index = allvars.isin(keys)
     if can_do(index):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d["NAf"] = add_multiple_lazy(d, newkeys, weights=neww)
-        d["NAf"] = d["NAf"].assign_attrs(
-            {"units": "$\mu g m^{-3}$", "name": "NAf", "long_name": "NAf"}
-        )
+        d["NAf"] = d["NAf"].assign_attrs({
+            "units": "$\mu g m^{-3}$",
+            "name": "NAf",
+            "long_name": "NAf"
+        })
     return d
 
 
@@ -415,9 +424,11 @@ def add_lazy_so4f(d):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d["SO4f"] = add_multiple_lazy(d, newkeys, weights=neww)
-        d["SO4f"] = d["SO4f"].assign_attrs(
-            {"units": "$\mu g m^{-3}$", "name": "SO4f", "long_name": "SO4f"}
-        )
+        d["SO4f"] = d["SO4f"].assign_attrs({
+            "units": "$\mu g m^{-3}$",
+            "name": "SO4f",
+            "long_name": "SO4f"
+        })
     return d
 
 
@@ -430,9 +441,11 @@ def add_lazy_nh4f(d):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d["NH4f"] = add_multiple_lazy(d, newkeys, weights=neww)
-        d["NH4f"] = d["NH4f"].assign_attrs(
-            {"units": "$\mu g m^{-3}$", "name": "NH4f", "long_name": "NH4f"}
-        )
+        d["NH4f"] = d["NH4f"].assign_attrs({
+            "units": "$\mu g m^{-3}$",
+            "name": "NH4f",
+            "long_name": "NH4f"
+        })
     return d
 
 
@@ -445,9 +458,11 @@ def add_lazy_no3f(d):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d["NO3f"] = add_multiple_lazy(d, newkeys, weights=neww)
-        d["NO3f"] = d["NO3f"].assign_attrs(
-            {"units": "$\mu g m^{-3}$", "name": "NO3f", "long_name": "NO3f"}
-        )
+        d["NO3f"] = d["NO3f"].assign_attrs({
+            "units": "$\mu g m^{-3}$",
+            "name": "NO3f",
+            "long_name": "NO3f"
+        })
     return d
 
 
@@ -606,139 +621,131 @@ def _predefined_mapping_tables(dset):
 
 
 # Arrays for different gasses and pm groupings
-accumulation = array(
-    [
-        "AALJ",
-        "AALK1J",
-        "AALK2J",
-        "ABNZ1J",
-        "ABNZ2J",
-        "ABNZ3J",
-        "ACAJ",
-        "ACLJ",
-        "AECJ",
-        "AFEJ",
-        "AISO1J",
-        "AISO2J",
-        "AISO3J",
-        "AKJ",
-        "AMGJ",
-        "AMNJ",
-        "ANAJ",
-        "ANH4J",
-        "ANO3J",
-        "AOLGAJ",
-        "AOLGBJ",
-        "AORGCJ",
-        "AOTHRJ",
-        "APAH1J",
-        "APAH2J",
-        "APAH3J",
-        "APNCOMJ",
-        "APOCJ",
-        "ASIJ",
-        "ASO4J",
-        "ASQTJ",
-        "ATIJ",
-        "ATOL1J",
-        "ATOL2J",
-        "ATOL3J",
-        "ATRP1J",
-        "ATRP2J",
-        "AXYL1J",
-        "AXYL2J",
-        "AXYL3J",
-        "AORGAJ",
-        "AORGPAJ",
-        "AORGBJ",
-    ]
-)
-aitken = array(
-    [
-        "ACLI",
-        "AECI",
-        "ANAI",
-        "ANH4I",
-        "ANO3I",
-        "AOTHRI",
-        "APNCOMI",
-        "APOCI",
-        "ASO4I",
-        "AORGAI",
-        "AORGPAI",
-        "AORGBI",
-    ]
-)
-coarse = array(["ACLK", "ACORS", "ANH4K", "ANO3K", "ASEACAT", "ASO4K", "ASOIL"])
-noy_gas = array(
-    [
-        "NO",
-        "NO2",
-        "NO3",
-        "N2O5",
-        "HONO",
-        "HNO3",
-        "PAN",
-        "PANX",
-        "PNA",
-        "NTR",
-        "CRON",
-        "CRN2",
-        "CRNO",
-        "CRPX",
-        "OPAN",
-    ]
-)
+accumulation = array([
+    "AALJ",
+    "AALK1J",
+    "AALK2J",
+    "ABNZ1J",
+    "ABNZ2J",
+    "ABNZ3J",
+    "ACAJ",
+    "ACLJ",
+    "AECJ",
+    "AFEJ",
+    "AISO1J",
+    "AISO2J",
+    "AISO3J",
+    "AKJ",
+    "AMGJ",
+    "AMNJ",
+    "ANAJ",
+    "ANH4J",
+    "ANO3J",
+    "AOLGAJ",
+    "AOLGBJ",
+    "AORGCJ",
+    "AOTHRJ",
+    "APAH1J",
+    "APAH2J",
+    "APAH3J",
+    "APNCOMJ",
+    "APOCJ",
+    "ASIJ",
+    "ASO4J",
+    "ASQTJ",
+    "ATIJ",
+    "ATOL1J",
+    "ATOL2J",
+    "ATOL3J",
+    "ATRP1J",
+    "ATRP2J",
+    "AXYL1J",
+    "AXYL2J",
+    "AXYL3J",
+    "AORGAJ",
+    "AORGPAJ",
+    "AORGBJ",
+])
+aitken = array([
+    "ACLI",
+    "AECI",
+    "ANAI",
+    "ANH4I",
+    "ANO3I",
+    "AOTHRI",
+    "APNCOMI",
+    "APOCI",
+    "ASO4I",
+    "AORGAI",
+    "AORGPAI",
+    "AORGBI",
+])
+coarse = array(
+    ["ACLK", "ACORS", "ANH4K", "ANO3K", "ASEACAT", "ASO4K", "ASOIL"])
+noy_gas = array([
+    "NO",
+    "NO2",
+    "NO3",
+    "N2O5",
+    "HONO",
+    "HNO3",
+    "PAN",
+    "PANX",
+    "PNA",
+    "NTR",
+    "CRON",
+    "CRN2",
+    "CRNO",
+    "CRPX",
+    "OPAN",
+])
 pec = array(["AECI", "AECJ"])
 pso4 = array(["ASO4I", "ASO4J"])
 pno3 = array(["ANO3I", "ANO3J"])
 pnh4 = array(["ANH4I", "ANH4J"])
 pcl = array(["ACLI", "ACLJ"])
-poc = array(
-    [
-        "AOTHRI",
-        "APNCOMI",
-        "APOCI",
-        "AORGAI",
-        "AORGPAI",
-        "AORGBI",
-        "ATOL1J",
-        "ATOL2J",
-        "ATOL3J",
-        "ATRP1J",
-        "ATRP2J",
-        "AXYL1J",
-        "AXYL2J",
-        "AXYL3J",
-        "AORGAJ",
-        "AORGPAJ",
-        "AORGBJ",
-        "AOLGAJ",
-        "AOLGBJ",
-        "AORGCJ",
-        "AOTHRJ",
-        "APAH1J",
-        "APAH2J",
-        "APAH3J",
-        "APNCOMJ",
-        "APOCJ",
-        "ASQTJ",
-        "AISO1J",
-        "AISO2J",
-        "AISO3J",
-        "AALK1J",
-        "AALK2J",
-        "ABNZ1J",
-        "ABNZ2J",
-        "ABNZ3J",
-        "AORGAI",
-        "AORGAJ",
-        "AORGPAI",
-        "AORGPAJ",
-        "AORGBI",
-        "AORGBJ",
-    ]
-)
+poc = array([
+    "AOTHRI",
+    "APNCOMI",
+    "APOCI",
+    "AORGAI",
+    "AORGPAI",
+    "AORGBI",
+    "ATOL1J",
+    "ATOL2J",
+    "ATOL3J",
+    "ATRP1J",
+    "ATRP2J",
+    "AXYL1J",
+    "AXYL2J",
+    "AXYL3J",
+    "AORGAJ",
+    "AORGPAJ",
+    "AORGBJ",
+    "AOLGAJ",
+    "AOLGBJ",
+    "AORGCJ",
+    "AOTHRJ",
+    "APAH1J",
+    "APAH2J",
+    "APAH3J",
+    "APNCOMJ",
+    "APOCJ",
+    "ASQTJ",
+    "AISO1J",
+    "AISO2J",
+    "AISO3J",
+    "AALK1J",
+    "AALK2J",
+    "ABNZ1J",
+    "ABNZ2J",
+    "ABNZ3J",
+    "AORGAI",
+    "AORGAJ",
+    "AORGPAI",
+    "AORGPAJ",
+    "AORGBI",
+    "AORGBJ",
+])
 minerals = array(
-    ["AALJ", "ACAJ", "AFEJ", "AKJ", "AMGJ", "AMNJ", "ANAJ", "ATIJ", "ASIJ"]
-)
+    ["AALJ", "ACAJ", "AFEJ", "AKJ", "AMGJ", "AMNJ", "ANAJ", "ATIJ", "ASIJ"])

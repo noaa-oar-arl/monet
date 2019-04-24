@@ -1,8 +1,11 @@
 from __future__ import print_function
-import os
+
 import datetime
-import pandas as pd
+import os
+
 import numpy as np
+import pandas as pd
+
 
 """
 NAME: cems_mod.py
@@ -99,7 +102,8 @@ class CEMS(object):
         self.info = "Data from continuous emission monitoring systems (CEMS)\n"
         self.info += self.url + "\n"
         self.df = pd.DataFrame()
-        self.namehash = {}  # if columns are renamed keeps track of original names.
+        self.namehash = {
+        }  # if columns are renamed keeps track of original names.
         # Each facility may have more than one unit which is specified by the
         # unit id.
 
@@ -230,7 +234,12 @@ class CEMS(object):
             )
         return pivot
 
-    def get_var(self, varname, orisp=None, daterange=None, unitid=-99, verbose=True):
+    def get_var(self,
+                varname,
+                orisp=None,
+                daterange=None,
+                unitid=-99,
+                verbose=True):
         """
            returns time series with variable indicated by varname.
            returns data frame where rows are date and columns are the
@@ -323,9 +332,8 @@ class CEMS(object):
         """
         if "latitude" in list(self.df.columns.values):
             dftemp = self.df.copy()
-            pairs = zip(
-                dftemp["orispl_code"], zip(dftemp["latitude"], dftemp["longitude"])
-            )
+            pairs = zip(dftemp["orispl_code"],
+                        zip(dftemp["latitude"], dftemp["longitude"]))
             pairs = list(set(pairs))
             lhash = dict(pairs)  # key is facility id and value is name.
             if verbose:
@@ -368,21 +376,16 @@ class CEMS(object):
                 rcolumn = self.rename(ccc, "orispl_code", rcolumn, verbose)
             elif "facility" in ccc.lower() and "id" in ccc.lower():
                 rcolumn = self.rename(ccc, "fac_id", rcolumn, verbose)
-            elif (
-                "so2" in ccc.lower()
-                and ("lbs" in ccc.lower() or "pounds" in ccc.lower())
-                and ("rate" not in ccc.lower())
-            ):
+            elif ("so2" in ccc.lower()
+                  and ("lbs" in ccc.lower() or "pounds" in ccc.lower())
+                  and ("rate" not in ccc.lower())):
                 rcolumn = self.rename(ccc, "so2_lbs", rcolumn, verbose)
-            elif (
-                "nox" in ccc.lower()
-                and ("lbs" in ccc.lower() or "pounds" in ccc.lower())
-                and ("rate" not in ccc.lower())
-            ):
+            elif ("nox" in ccc.lower()
+                  and ("lbs" in ccc.lower() or "pounds" in ccc.lower())
+                  and ("rate" not in ccc.lower())):
                 rcolumn = self.rename(ccc, "nox_lbs", rcolumn, verbose)
-            elif "co2" in ccc.lower() and (
-                "short" in ccc.lower() and "tons" in ccc.lower()
-            ):
+            elif "co2" in ccc.lower() and ("short" in ccc.lower()
+                                           and "tons" in ccc.lower()):
                 rcolumn = self.rename(ccc, "co2_short_tons", rcolumn, verbose)
             elif "date" in ccc.lower():
                 rcolumn = self.rename(ccc, "date", rcolumn, verbose)
@@ -472,8 +475,7 @@ class CEMS(object):
                 # this runs ok but fails pytest
                 def utc(x):
                     return pd.Timestamp(x["time local"]) + datetime.timedelta(
-                        hours=x["time_offset"]
-                    )
+                        hours=x["time_offset"])
 
                 dfnew["time"] = dfnew.apply(utc, axis=1)
             elif method == 3:
@@ -482,14 +484,15 @@ class CEMS(object):
                     return x + datetime.timedelta(hours=y)
 
                 dfnew["time"] = dfnew.apply(
-                    lambda row: utc(row["time local"], row["time_offset"]), axis=1
-                )
+                    lambda row: utc(row["time local"], row["time_offset"]),
+                    axis=1)
             # remove the time_offset column.
             dfnew.drop(["time_offset"], axis=1, inplace=True)
             mlist = dftemp.columns.values.tolist()
             # merge the dataframes back together to include rows with no info
             # in the cemsinfo.csv
-            dftemp = pd.merge(dftemp, dfnew, how="left", left_on=mlist, right_on=mlist)
+            dftemp = pd.merge(
+                dftemp, dfnew, how="left", left_on=mlist, right_on=mlist)
         return dftemp
         # return dfnew
 

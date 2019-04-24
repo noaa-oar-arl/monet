@@ -57,7 +57,6 @@ def _force_forder(x):
 
 def kolmogorov_zurbenko_filter(df, window, iterations):
     import pandas as pd
-
     """KZ filter implementation
         series is a pandas series
         window is the filter window m in the units of the data (m = 2q+1)
@@ -92,8 +91,8 @@ def long_to_wide(df):
     from pandas import Series, merge
 
     w = df.pivot_table(
-        values="obs", index=["time", "siteid"], columns="variable"
-    ).reset_index()
+        values="obs", index=["time", "siteid"],
+        columns="variable").reset_index()
     cols = Series(df.columns)
     g = df.groupby("variable")
     for name, group in g:
@@ -104,19 +103,10 @@ def long_to_wide(df):
 
 def calc_8hr_rolling_max(df, col=None, window=None):
     df.index = df.time_local
-    df_rolling = (
-        df.groupby("siteid")[col]
-        .rolling(window, center=True, win_type="boxcar")
-        .mean()
-        .reset_index()
-        .dropna()
-    )
-    df_rolling_max = (
-        df_rolling.groupby("siteid")
-        .resample("D", on="time_local")
-        .max()
-        .reset_index(drop=True)
-    )
+    df_rolling = (df.groupby("siteid")[col].rolling(
+        window, center=True, win_type="boxcar").mean().reset_index().dropna())
+    df_rolling_max = (df_rolling.groupby("siteid").resample(
+        "D", on="time_local").max().reset_index(drop=True))
     df = df.reset_index(drop=True)
     return df.merge(df_rolling_max, on=["siteid", "time_local"])
 
@@ -137,7 +127,8 @@ def calc_3hr_ave(df, col=None):
 
 def calc_annual_ave(df, col=None):
     df.index = df.time_local
-    df_annual_ave = df.groupby("siteid")[col].resample("A").mean().reset_index()
+    df_annual_ave = df.groupby("siteid")[col].resample(
+        "A").mean().reset_index()
     df = df.reset_index(drop=True)
     return df.merge(df_annual_ave, on=["siteid", "time_local"])
 
@@ -145,7 +136,10 @@ def calc_annual_ave(df, col=None):
 def get_giorgi_region_bounds(index=None, acronym=None):
     import pandas as pd
 
-    i = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+    i = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22
+    ]
     acro = [
         "NAU",
         "SAU",
@@ -296,14 +290,11 @@ def get_giorgi_region_df(df):
     df.loc[:, "GIORGI_ACRO"] = None
     for i in range(22):
         latmin, lonmin, latmax, lonmax, acro = get_giorgi_region_bounds(
-            index=int(i + 1)
-        )
-        con = (
-            (df.longitude <= lonmax)
-            & (df.longitude >= lonmin)
-            & (df.latitude <= latmax)
-            & (df.latitude >= latmin)
-        )
+            index=int(i + 1))
+        con = ((df.longitude <= lonmax)
+               & (df.longitude >= lonmin)
+               & (df.latitude <= latmax)
+               & (df.latitude >= latmin))
         df.loc[con, "GIORGI_INDEX"] = i + 1
         df.loc[con, "GIORGI_ACRO"] = acro
     return df
@@ -418,13 +409,12 @@ def get_epa_region_df(df):
     df.loc[:, "EPA_INDEX"] = None
     df.loc[:, "EPA_ACRO"] = None
     for i in range(13):
-        latmin, lonmin, latmax, lonmax, acro = get_epa_region_bounds(index=int(i + 1))
-        con = (
-            (df.longitude <= lonmax)
-            & (df.longitude >= lonmin)
-            & (df.latitude <= latmax)
-            & (df.latitude >= latmin)
-        )
+        latmin, lonmin, latmax, lonmax, acro = get_epa_region_bounds(
+            index=int(i + 1))
+        con = ((df.longitude <= lonmax)
+               & (df.longitude >= lonmin)
+               & (df.latitude <= latmax)
+               & (df.latitude >= latmin))
         df.loc[con, "EPA_INDEX"] = i + 1
         df.loc[con, "EPA_ACRO"] = acro
     return df

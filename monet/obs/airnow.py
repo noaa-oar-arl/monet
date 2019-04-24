@@ -28,14 +28,12 @@ from __future__ import print_function
 
 import inspect
 import os
-
 # this is written to retrive airnow data concatenate and add to pandas array
 # for usage
 from builtins import object
 from datetime import datetime
 
 import pandas as pd
-
 
 datadir = "."
 cwd = os.getcwd()
@@ -110,8 +108,11 @@ def read_csv(fn):
     """
     try:
         dft = pd.read_csv(
-            fn, delimiter="|", header=None, error_bad_lines=False, encoding="ISO-8859-1"
-        )
+            fn,
+            delimiter="|",
+            header=None,
+            error_bad_lines=False,
+            encoding="ISO-8859-1")
         cols = [
             "date",
             "time",
@@ -198,8 +199,10 @@ def aggregate_files(dates=dates, download=False):
     dff = dd.from_delayed(dfs)
     df = dff.compute()
     df["time"] = pd.to_datetime(
-        df.date + " " + df.time, format="%m/%d/%y %H:%M", exact=True, box=False
-    )
+        df.date + " " + df.time,
+        format="%m/%d/%y %H:%M",
+        exact=True,
+        box=False)
     df.drop(["date"], axis=1, inplace=True)
     df["time_local"] = df.time + pd.to_timedelta(df.utcoffset, unit="H")
     print("    Adding in Meta-data")
@@ -296,7 +299,7 @@ def get_station_locations_remerge(df):
 
     """
     df = pd.merge(
-        df, monitor_df.drop(["Latitude", "Longitude"], axis=1), on="siteid"
-    )  # ,
+        df, monitor_df.drop(["Latitude", "Longitude"], axis=1),
+        on="siteid")  # ,
     # how='left')
     return df

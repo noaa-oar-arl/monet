@@ -1,6 +1,6 @@
 from __future__ import absolute_import, print_function
 
-from . import mystats, tools, interp_util, resample, combinetool
+from . import combinetool, interp_util, mystats, resample, tools
 
 __all__ = ["mystats", "tools", "interp_util", "resample", "combinetool"]
 

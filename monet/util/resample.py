@@ -55,9 +55,8 @@ def _check_swath_or_area(defin):
         else:
             raise RuntimeError
     except RuntimeError:
-        print(
-            "grid definition must be a pyresample SwathDefinition or " "AreaDefinition"
-        )
+        print("grid definition must be a pyresample SwathDefinition or "
+              "AreaDefinition")
         return
     return newswath
 
@@ -92,7 +91,8 @@ def resample_stratify(da, levels, vertical, axis=1):
     import stratify
     import xarray as xr
 
-    result = stratify.interpolate(levels, vertical.chunk(), da.chunk(), axis=axis)
+    result = stratify.interpolate(
+        levels, vertical.chunk(), da.chunk(), axis=axis)
     dims = da.dims
     out = xr.DataArray(result, dims=dims)
     for i in dims:
@@ -116,22 +116,23 @@ def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
 
 
 def resample_dataset(
-    data,
-    source_grid,
-    target_grid,
-    radius_of_influence=100e3,
-    resample_cache=None,
-    return_neighbor_info=False,
-    neighbours=1,
-    epsilon=0,
-    interp="nearest",
+        data,
+        source_grid,
+        target_grid,
+        radius_of_influence=100e3,
+        resample_cache=None,
+        return_neighbor_info=False,
+        neighbours=1,
+        epsilon=0,
+        interp="nearest",
 ):
     # first get the source grid definition
     try:
         if source_grid is None:
             raise RuntimeError
     except RuntimeError:
-        print("Must include pyresample.gemoetry in the data.attrs area_def or " "area")
+        print("Must include pyresample.gemoetry in the data.attrs area_def or "
+              "area")
         return
 
     # check for SwathDefinition or AreaDefinition
@@ -156,8 +157,7 @@ def resample_dataset(
     # else generate the data
     if resample_cache is None:
         valid_input_index, valid_output_index, index_array, distance_array = (
-            resampler.get_neighbour_info()
-        )
+            resampler.get_neighbour_info())
     else:
         resampler.valid_input_index = resample_cache["valid_input_index"]
         resampler.valid_output_index = resample_cache["valid_output_index"]

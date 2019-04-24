@@ -4,17 +4,15 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 
 
-def draw_map(
-    crs=None,
-    natural_earth=False,
-    coastlines=True,
-    states=False,
-    countries=True,
-    resolution="10m",
-    extent=None,
-    figsize=(10, 5),
-    **kwargs
-):
+def draw_map(crs=None,
+             natural_earth=False,
+             coastlines=True,
+             states=False,
+             countries=True,
+             resolution="10m",
+             extent=None,
+             figsize=(10, 5),
+             **kwargs):
     """Short summary.
 
     Parameters
@@ -51,8 +49,7 @@ def draw_map(
         f, ax = plt.subplots(figsize=figsize, subplot_kw={"projection": crs})
     else:
         f, ax = plt.subplots(
-            figsize=figsize, subplot_kw={"projection": ccrs.PlateCarree()}
-        )
+            figsize=figsize, subplot_kw={"projection": ccrs.PlateCarree()})
     if natural_earth:
         # ax.stock_img()
         ax.add_feature(cfeature.OCEAN)

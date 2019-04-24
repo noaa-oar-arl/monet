@@ -1,9 +1,10 @@
 """ HYPSLIT MODEL READER """
 import datetime
+
+import numpy as np
 import pandas as pd
 import xarray as xr
-import numpy as np
-from numpy import fromfile, arange
+from numpy import arange, fromfile
 
 
 def _hysplit_latlon_grid_from_dataset(ds):
@@ -11,17 +12,16 @@ def _hysplit_latlon_grid_from_dataset(ds):
     pargs["lat_0"] = ds.latitude.mean()
     pargs["lon_0"] = ds.longitude.mean()
 
-    p4 = (
-        "+proj=eqc +lat_ts={lat_0} +lat_0={lat_0} +lon_0={lon_0} "
-        "+ellps=WGS84 +datum=WGS84 +units=m +no_defs".format(**pargs)
-    )
+    p4 = ("+proj=eqc +lat_ts={lat_0} +lat_0={lat_0} +lon_0={lon_0} "
+          "+ellps=WGS84 +datum=WGS84 +units=m +no_defs".format(**pargs))
     return p4
 
 
 def get_hysplit_latlon_pyresample_area_def(ds, proj4_srs):
     from pyresample import geometry
 
-    return geometry.SwathDefinition(lons=ds.longitude.values, lats=ds.latitude.values)
+    return geometry.SwathDefinition(
+        lons=ds.longitude.values, lats=ds.latitude.values)
 
 
 def check_drange(drange, pdate1, pdate2, verbose):
@@ -113,9 +113,12 @@ class ModelBin(object):
        self.dset
     """
 
-    def __init__(
-        self, filename, drange=None, century=None, verbose=True, readwrite="r"
-    ):
+    def __init__(self,
+                 filename,
+                 drange=None,
+                 century=None,
+                 verbose=True,
+                 readwrite="r"):
         """
         drange :  list of two datetime objects.
         The read method will store data from the cdump file for which the
@@ -153,8 +156,7 @@ class ModelBin(object):
 
         if readwrite == "r":
             self.dataflag = self.readfile(
-                filename, drange, verbose=verbose, century=century
-            )
+                filename, drange, verbose=verbose, century=century)
 
     @staticmethod
     def define_struct():
@@ -169,104 +171,90 @@ class ModelBin(object):
         int2 = ">i2"
         char4 = ">a4"
 
-        rec1 = dtype(
-            [
-                ("pad1", int4),
-                ("model_id", char4),  # meteorological model id
-                ("met_year", int4),  # meteorological model starting time
-                ("met_month", int4),
-                ("met_day", int4),
-                ("met_hr", int4),
-                ("met_fhr", int4),  # forecast hour
-                ("start_loc", int4),  # number of starting locations
-                ("conc_pack", int4),  # concentration packing flag (0=no, 1=yes)
-                ("pad2", int4),
-            ]
-        )
+        rec1 = dtype([
+            ("pad1", int4),
+            ("model_id", char4),  # meteorological model id
+            ("met_year", int4),  # meteorological model starting time
+            ("met_month", int4),
+            ("met_day", int4),
+            ("met_hr", int4),
+            ("met_fhr", int4),  # forecast hour
+            ("start_loc", int4),  # number of starting locations
+            ("conc_pack", int4),  # concentration packing flag (0=no, 1=yes)
+            ("pad2", int4),
+        ])
 
         # start_loc in rec1 tell how many rec there are.
-        rec2 = dtype(
-            [
-                ("pad1", int4),
-                ("r_year", int4),  # release starting time
-                ("r_month", int4),
-                ("r_day", int4),
-                ("r_hr", int4),
-                ("s_lat", real4),  # Release location
-                ("s_lon", real4),
-                ("s_ht", real4),
-                ("r_min", int4),  # release startime time (minutes)
-                ("pad2", int4),
-            ]
-        )
+        rec2 = dtype([
+            ("pad1", int4),
+            ("r_year", int4),  # release starting time
+            ("r_month", int4),
+            ("r_day", int4),
+            ("r_hr", int4),
+            ("s_lat", real4),  # Release location
+            ("s_lon", real4),
+            ("s_ht", real4),
+            ("r_min", int4),  # release startime time (minutes)
+            ("pad2", int4),
+        ])
 
-        rec3 = dtype(
-            [
-                ("pad1", int4),
-                ("nlat", int4),
-                ("nlon", int4),
-                ("dlat", real4),
-                ("dlon", real4),
-                ("llcrnr_lat", real4),
-                ("llcrnr_lon", real4),
-                ("pad2", int4),
-            ]
-        )
+        rec3 = dtype([
+            ("pad1", int4),
+            ("nlat", int4),
+            ("nlon", int4),
+            ("dlat", real4),
+            ("dlon", real4),
+            ("llcrnr_lat", real4),
+            ("llcrnr_lon", real4),
+            ("pad2", int4),
+        ])
 
-        rec4a = dtype(
-            [
-                ("pad1", int4),
-                ("nlev", int4),  # number of vertical levels in concentration grid
-            ]
-        )
+        rec4a = dtype([
+            ("pad1", int4),
+            ("nlev", int4),  # number of vertical levels in concentration grid
+        ])
 
-        rec4b = dtype([("levht", int4)])  # height of each level (meters above ground)
+        rec4b = dtype([("levht",
+                        int4)])  # height of each level (meters above ground)
 
-        rec5a = dtype(
-            [
-                ("pad1", int4),
-                ("pad2", int4),
-                ("pollnum", int4),  # number of different pollutants
-            ]
-        )
+        rec5a = dtype([
+            ("pad1", int4),
+            ("pad2", int4),
+            ("pollnum", int4),  # number of different pollutants
+        ])
 
-        rec5b = dtype([("pname", char4)])  # identification string for each pollutant
+        rec5b = dtype([("pname",
+                        char4)])  # identification string for each pollutant
 
         rec5c = dtype([("pad2", int4)])
 
-        rec6 = dtype(
-            [
-                ("pad1", int4),
-                ("oyear", int4),  # sample start time.
-                ("omonth", int4),
-                ("oday", int4),
-                ("ohr", int4),
-                ("omin", int4),
-                ("oforecast", int4),
-                ("pad3", int4),
-            ]
-        )
+        rec6 = dtype([
+            ("pad1", int4),
+            ("oyear", int4),  # sample start time.
+            ("omonth", int4),
+            ("oday", int4),
+            ("ohr", int4),
+            ("omin", int4),
+            ("oforecast", int4),
+            ("pad3", int4),
+        ])
 
         # rec7 has same form as rec6.            #sample stop time.
 
         # record 8 is pollutant type identification string, output level.
 
-        rec8a = dtype(
-            [
-                ("pad1", int4),
-                ("poll", char4),  # pollutant identification string
-                ("lev", int4),
-                ("ne", int4),  # number of elements
-            ]
-        )
+        rec8a = dtype([
+            ("pad1", int4),
+            ("poll", char4),  # pollutant identification string
+            ("lev", int4),
+            ("ne", int4),  # number of elements
+        ])
 
-        rec8b = dtype(
-            [
-                ("indx", int2),  # longitude index
-                ("jndx", int2),  # latitude index
-                ("conc", real4),
-            ]
-        )
+        rec8b = dtype([
+            ("indx", int2),  # longitude index
+            ("jndx", int2),  # latitude index
+            ("conc", real4),
+        ])
 
         rec8c = dtype([("pad2", int4)])
         recs = (
@@ -295,15 +283,15 @@ class ModelBin(object):
         if len(hdata1["start_loc"]) != 1:
             print(
                 "WARNING in ModelBin _readfile - number of starting locations "
-                "incorrect"
-            )
+                "incorrect")
             print(hdata1["start_loc"])
         # in python 3 np.fromfile reads the record into a list even if it is
         # just one number.
         # so if the length of this record is greater than one something is
         # wrong.
         nstartloc = hdata1["start_loc"][0]
-        self.atthash["Meteorological Model ID"] = hdata1["model_id"][0].decode("UTF-8")
+        self.atthash["Meteorological Model ID"] = hdata1["model_id"][0].decode(
+            "UTF-8")
         self.atthash["Number Start Locations"] = nstartloc
         return nstartloc
 
@@ -315,9 +303,8 @@ class ModelBin(object):
             self.slat.append(hdata2["s_lat"][nnn])
             self.slon.append(hdata2["s_lon"][nnn])
             self.sht.append(hdata2["s_ht"][nnn])
-            self.atthash["Starting Locations"].append(
-                (hdata2["s_lat"][nnn], hdata2["s_lon"][nnn])
-            )
+            self.atthash["Starting Locations"].append((hdata2["s_lat"][nnn],
+                                                       hdata2["s_lon"][nnn]))
 
             # try to guess century if century not given
             if century is None:
@@ -326,8 +313,8 @@ class ModelBin(object):
                 else:
                     century = 1900
                 print(
-                    "WARNING: Guessing Century for HYSPLIT concentration file", century
-                )
+                    "WARNING: Guessing Century for HYSPLIT concentration file",
+                    century)
             # add sourcedate which is datetime.datetime object
             sourcedate = datetime.datetime(
                 century + hdata2["r_year"][nnn],
@@ -373,12 +360,10 @@ class ModelBin(object):
         #    print(hdata7)
         # pdate1 is the sample start
         # pdate2 is the sample stop
-        pdate1 = datetime.datetime(
-            century + hdata6["oyear"], hdata6["omonth"], hdata6["oday"], hdata6["ohr"]
-        )
-        pdate2 = datetime.datetime(
-            century + hdata7["oyear"], hdata7["omonth"], hdata7["oday"], hdata7["ohr"]
-        )
+        pdate1 = datetime.datetime(century + hdata6["oyear"], hdata6["omonth"],
+                                   hdata6["oday"], hdata6["ohr"])
+        pdate2 = datetime.datetime(century + hdata7["oyear"], hdata7["omonth"],
+                                   hdata7["oday"], hdata7["ohr"])
         self.atthash["Sampling Time"] = pdate2 - pdate1
         return True, pdate1, pdate2
 
@@ -393,7 +378,8 @@ class ModelBin(object):
         """
         lev_name = hdata8a["lev"][0]
         col_name = hdata8a["poll"][0].decode("UTF-8")
-        ndata = hdata8b.byteswap().newbyteorder()  # otherwise get endian error.
+        ndata = hdata8b.byteswap().newbyteorder(
+        )  # otherwise get endian error.
         concframe = pd.DataFrame.from_records(ndata)
         # add latitude longitude columns
         # lat = arange(self.llcrnr_lat,
@@ -433,12 +419,10 @@ class ModelBin(object):
         return concframe
 
     def makegrid(self, xindx, yindx):
-        lat = arange(
-            self.llcrnr_lat, self.llcrnr_lat + self.nlat * self.dlat, self.dlat
-        )
-        lon = arange(
-            self.llcrnr_lon, self.llcrnr_lon + self.nlon * self.dlon, self.dlon
-        )
+        lat = arange(self.llcrnr_lat, self.llcrnr_lat + self.nlat * self.dlat,
+                     self.dlat)
+        lon = arange(self.llcrnr_lon, self.llcrnr_lon + self.nlon * self.dlon,
+                     self.dlon)
         lonlist = [lon[x - 1] for x in xindx]
         latlist = [lat[x - 1] for x in yindx]
         mgrid = np.meshgrid(lonlist, latlist)
@@ -493,8 +477,8 @@ class ModelBin(object):
         # read record 4 which gives information about vertical levels.
         hdata4a = fromfile(fp, dtype=rec4a, count=1)  # gets nmber of levels
         hdata4b = fromfile(
-            fp, dtype=rec4b, count=hdata4a["nlev"][0]
-        )  # reads levels, count is number of levels.
+            fp, dtype=rec4b, count=hdata4a["nlev"]
+            [0])  # reads levels, count is number of levels.
         self.parse_hdata4(hdata4a, hdata4b)
 
         # read record 5 which gives information about pollutants / species.
@@ -518,7 +502,8 @@ class ModelBin(object):
         while testf:
             hdata6 = fromfile(fp, dtype=rec6, count=1)
             hdata7 = fromfile(fp, dtype=rec6, count=1)
-            check, pdate1, pdate2 = self.parse_hdata6and7(hdata6, hdata7, century)
+            check, pdate1, pdate2 = self.parse_hdata6and7(
+                hdata6, hdata7, century)
             if not check:
                 break
             testf, savedata = check_drange(drange, pdate1, pdate2, verbose)
@@ -534,12 +519,12 @@ class ModelBin(object):
                     # elements greater than 0 than there are concentrations.
                     hdata8a = fromfile(fp, dtype=rec8a, count=1)
                     self.atthash["Species ID"].append(
-                        hdata8a["poll"][0].decode("UTF-8")
-                    )
+                        hdata8a["poll"][0].decode("UTF-8"))
                     # if number of elements is nonzero then
                     if hdata8a["ne"] >= 1:
                         # get rec8 - indx and jndx
-                        hdata8b = fromfile(fp, dtype=rec8b, count=hdata8a["ne"][0])
+                        hdata8b = fromfile(
+                            fp, dtype=rec8b, count=hdata8a["ne"][0])
                         # add sample start time to list of start times with
                         # non zero conc
                         self.nonzeroconcdates.append(pdate1)
@@ -558,7 +543,8 @@ class ModelBin(object):
                         concframe = self.parse_hdata8(hdata8a, hdata8b, pdate1)
                         dset = xr.Dataset.from_dataframe(concframe)
                         if verbose:
-                            print("Adding ", "Pollutant", pollutant, "Level", lev)
+                            print("Adding ", "Pollutant", pollutant, "Level",
+                                  lev)
                         # if this is the first time through. create dataframe
                         # for first level and pollutant.
                         if self.dset is None:
@@ -578,13 +564,16 @@ class ModelBin(object):
                 iii += 1
         self.atthash["Concentration Grid"] = ahash
         self.atthash["Species ID"] = list(set(self.atthash["Species ID"]))
-        self.atthash["Coordinate time description"] = "Beginning of sampling time"
+        self.atthash[
+            "Coordinate time description"] = "Beginning of sampling time"
         # END OF Loop to go through each sampling time
         if self.dset.variables:
             self.dset.attrs = self.atthash
             mgrid = self.makegrid(self.dset.coords["x"], self.dset.coords["y"])
-            self.dset = self.dset.assign_coords(longitude=(("y", "x"), mgrid[0]))
-            self.dset = self.dset.assign_coords(latitude=(("y", "x"), mgrid[1]))
+            self.dset = self.dset.assign_coords(
+                longitude=(("y", "x"), mgrid[0]))
+            self.dset = self.dset.assign_coords(
+                latitude=(("y", "x"), mgrid[1]))
 
             self.dset = self.dset.reset_coords()
             self.dset = self.dset.set_coords(["time", "latitude", "longitude"])

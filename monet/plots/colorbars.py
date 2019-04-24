@@ -1,5 +1,6 @@
 """ colorbar helper functions"""
 from builtins import range
+
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 from numpy import arange, linspace, vstack
@@ -61,6 +62,7 @@ def cmap_discretize(cmap, N):
                       for i in range(N + 1)]
     # Return colormap object.
     return mcolors.LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)
+
 
 # def o3cmap():
 #     import matplotlib.cm as cm

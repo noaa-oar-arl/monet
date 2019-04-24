@@ -1,6 +1,7 @@
 # MODIS Swath data
 """ this will read the modis data"""
 import xarray as xr
+
 from ..grids import get_modis_latlon_from_swath_hv, get_sinu_area_def
 
 

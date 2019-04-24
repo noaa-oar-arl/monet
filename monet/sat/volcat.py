@@ -1,29 +1,7 @@
-#!/n-home/alicec/anaconda/bin/python
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-from math import *
-
-# import sys
-# from scipy.io import netcdf
-# from netCDF4 import Dataset
-# from pylab import *
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
-
-# import string
-# import datetime
-# from matplotlib.path import Path
-# import map_projections
-# from plume_models import usgstable
-# from meteorology import *
-# from mytools import emap
-# import pandas as pd
-# from pyhysplit.netcdf.netcdf import NCfile
 from pyhdf.SD import SD, SDC
-
-# from pyhdf.HDF import *
-# from pyhdf.VS import *
-
 
 # ModisHDF class -  gets satellite retrieval information from HDF file.
 

@@ -1,8 +1,9 @@
 """ CAMx File Reader """
+import xarray as xr
 from numpy import array, concatenate
 from pandas import Series, to_datetime
-import xarray as xr
-from ..grids import grid_from_dataset, get_ioapi_pyresample_area_def
+
+from ..grids import get_ioapi_pyresample_area_def, grid_from_dataset
 
 
 def can_do(index):
@@ -12,9 +13,10 @@ def can_do(index):
         return False
 
 
-def open_dataset(
-    fname, earth_radius=6370000, convert_to_ppb=True, drop_duplicates=False
-):
+def open_dataset(fname,
+                 earth_radius=6370000,
+                 convert_to_ppb=True,
+                 drop_duplicates=False):
     """Method to open CMAQ IOAPI netcdf files.
 
     Parameters
@@ -36,8 +38,7 @@ def open_dataset(
 
     # open the dataset using xarray
     dset = xr.open_dataset(
-        fname, engine="pseudonetcdf", backend_kwargs={"format": "uamiv"}
-    )
+        fname, engine="pseudonetcdf", backend_kwargs={"format": "uamiv"})
 
     # get the grid information
     grid = grid_from_dataset(dset, earth_radius=earth_radius)
@@ -73,9 +74,10 @@ def open_dataset(
     return dset
 
 
-def open_mfdataset(
-    fname, earth_radius=6370000, convert_to_ppb=True, drop_duplicates=False
-):
+def open_mfdataset(fname,
+                   earth_radius=6370000,
+                   convert_to_ppb=True,
+                   drop_duplicates=False):
     """Method to open CMAQ IOAPI netcdf files.
 
     Parameters
@@ -97,8 +99,7 @@ def open_mfdataset(
 
     # open the dataset using xarray
     dset = xr.open_mfdataset(
-        fname, engine="pseudonetcdf", backend_kwargs={"format": "uamiv"}
-    )
+        fname, engine="pseudonetcdf", backend_kwargs={"format": "uamiv"})
 
     # get the grid information
     grid = grid_from_dataset(dset, earth_radius=earth_radius)
@@ -152,8 +153,7 @@ def open_files(fname, earth_radius=6370000):
     """
     # open the dataset using xarray
     dset = xr.open_mfdataset(
-        fname, engine="pseudonetcdf", backend_kwargs={"format": "uamiv"}
-    )
+        fname, engine="pseudonetcdf", backend_kwargs={"format": "uamiv"})
 
     # get the grid information
     grid = grid_from_dataset(dset, earth_radius=earth_radius)
@@ -197,7 +197,8 @@ def _get_times(d):
     else:
         tflag1 = Series(d["TFLAG"][:, 0, 0]).astype(str).str.zfill(7)
         tflag2 = Series(d["TFLAG"][:, 0, 1]).astype(str).str.zfill(6)
-    date = to_datetime([i + j for i, j in zip(tflag1, tflag2)], format="%Y%j%H%M%S")
+    date = to_datetime([i + j for i, j in zip(tflag1, tflag2)],
+                       format="%Y%j%H%M%S")
     indexdates = Series(date).drop_duplicates(keep="last").index.values
     d = d.isel(TSTEP=indexdates)
     d["TSTEP"] = date[indexdates]
@@ -261,9 +262,12 @@ def add_lazy_pm10(d):
         if can_do(index):
             newkeys = allvars.loc[index]
             d["PM10"] = add_multiple_lazy(d, newkeys)
-            d["PM10"] = d["PM10"].assign_attrs(
-                {"name": "PM10", "long_name": "Particulate Matter < 10 microns"}
-            )
+            d["PM10"] = d["PM10"].assign_attrs({
+                "name":
+                "PM10",
+                "long_name":
+                "Particulate Matter < 10 microns"
+            })
     return d
 
 
@@ -274,9 +278,12 @@ def add_lazy_pm_course(d):
     if can_do(index):
         newkeys = allvars.loc[index]
         d["PM_COURSE"] = add_multiple_lazy(d, newkeys)
-        d["PM_COURSE"] = d["PM_COURSE"].assign_attrs(
-            {"name": "PM_COURSE", "long_name": "Course Mode Particulate Matter"}
-        )
+        d["PM_COURSE"] = d["PM_COURSE"].assign_attrs({
+            "name":
+            "PM_COURSE",
+            "long_name":
+            "Course Mode Particulate Matter"
+        })
     return d
 
 
@@ -289,9 +296,12 @@ def add_lazy_clf(d):
         newkeys = allvars.loc[index]
         neww = weights.loc[index]
         d["CLf"] = add_multiple_lazy(d, newkeys, weights=neww)
-        d["CLf"] = d["CLf"].assign_attrs(
-            {"name": "CLf", "long_name": "Fine Mode particulate Cl"}
-        )
+        d["CLf"] = d["CLf"].assign_attrs({
+            "name":
+            "CLf",
+            "long_name":
+            "Fine Mode particulate Cl"
+        })
     return d
 
 
@@ -440,40 +450,36 @@ def _predefined_mapping_tables(dset):
 
 # Arrays for different gasses and pm groupings
 coarse = array(["CPRM", "CCRS"])
-fine = array(
-    [
-        "NA",
-        "PSO4",
-        "PNO3",
-        "PNH4",
-        "PH2O",
-        "PCL",
-        "PEC",
-        "FPRM",
-        "FCRS",
-        "SOA1",
-        "SOA2",
-        "SOA3",
-        "SOA4",
-    ]
-)
-noy_gas = array(
-    [
-        "NO",
-        "NO2",
-        "NO3",
-        "N2O5",
-        "HONO",
-        "HNO3",
-        "PAN",
-        "PANX",
-        "PNA",
-        "NTR",
-        "CRON",
-        "CRN2",
-        "CRNO",
-        "CRPX",
-        "OPAN",
-    ]
-)
+fine = array([
+    "NA",
+    "PSO4",
+    "PNO3",
+    "PNH4",
+    "PH2O",
+    "PCL",
+    "PEC",
+    "FPRM",
+    "FCRS",
+    "SOA1",
+    "SOA2",
+    "SOA3",
+    "SOA4",
+])
+noy_gas = array([
+    "NO",
+    "NO2",
+    "NO3",
+    "N2O5",
+    "HONO",
+    "HNO3",
+    "PAN",
+    "PANX",
+    "PNA",
+    "NTR",
+    "CRON",
+    "CRN2",
+    "CRNO",
+    "CRPX",
+    "OPAN",
+])
 poc = array(["SOA1", "SOA2", "SOA3", "SOA4"])

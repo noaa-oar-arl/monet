@@ -24,10 +24,8 @@ def open_dataset(fname):
         else:
             raise ValueError
     except ValueError:
-        print(
-            """File format not recognized. Note that you must preprocess the
-              files with nemsio2nc4 or fv3grib2nc4 available on github."""
-        )
+        print("""File format not recognized. Note that you must preprocess the
+              files with nemsio2nc4 or fv3grib2nc4 available on github.""")
     return f
 
 
@@ -53,11 +51,10 @@ def open_mfdataset(fname):
         else:
             raise ValueError
     except ValueError:
-        print(
-            """File format not recognized. Note that you must preprocess the
+        print("""File format not recognized. Note that you must preprocess the
              files with nemsio2nc4 or fv3grib2nc4 available on github. Do not
              mix and match file types.  Ensure all are the same file format."""
-        )
+              )
     return f
 
 
