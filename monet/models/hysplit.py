@@ -17,10 +17,12 @@ def _hysplit_latlon_grid_from_dataset(ds):
     )
     return p4
 
+
 def get_hysplit_latlon_pyresample_area_def(ds, proj4_srs):
     from pyresample import geometry
 
     return geometry.SwathDefinition(lons=ds.longitude.values, lats=ds.latitude.values)
+
 
 def check_drange(drange, pdate1, pdate2, verbose):
     """

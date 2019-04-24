@@ -215,9 +215,11 @@ def _get_latlon(dset, area):
     dset = dset.assign_coords(longitude=dset.longitude, latitude=dset.latitude)
     return dset
 
+
 def _get_keys(d):
     keys = Series([i for i in d.data_vars.keys()])
-    return keys 
+    return keys
+
 
 def add_lazy_pm25(d):
     """Short summary.
@@ -250,10 +252,10 @@ def add_lazy_pm25(d):
             newweights = weights.loc[index]
             d['PM25'] = add_multiple_lazy(d, newkeys, weights=newweights)
             d['PM25'] = d['PM25'].assign_attrs({
-                        'units': '$\mu g m^{-3}$',
-                        'name': 'PM2.5',
+                'units': '$\mu g m^{-3}$',
+                'name': 'PM2.5',
                         'long_name': 'PM2.5'
-                        })
+            })
     return d
 
 
