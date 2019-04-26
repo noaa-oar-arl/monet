@@ -378,6 +378,35 @@ class MONETAccessor(object):
             out = resample.resample_dataset(dataarray, grid, target, **kwargs)
         return out
 
+    def remap_nearest(self, dataarray, radius_of_influence=1e6):
+        """remaps from another grid to the current grid of self using pyresample.
+            it assumes that the dimensions are ordered in y,x,z per
+        pyresample docs
+
+        Parameters
+        ----------
+        da : ndarray or xarray DataArray
+            Description of parameter `dset`.
+        radius_of_influence : float or integer
+            radius of influcence for pyresample in meters.
+
+        Returns
+        -------
+        xarray.DataArray
+            resampled object on current grid.
+
+        """
+        from pyresample import utils
+        from .util import resample
+        # from .grids import get_generic_projection_from_proj4
+        # check to see if grid is supplied
+        dataarray = _rename_to_monet_latlon(dataarray)
+        lons_t, lats_t = utils.check_and_wrap(self.obj.longitude.values,
+                                              self.obj.latitude.values)
+        self.obj = _rename_to_monet_latlon(self.obj)
+        return resample.resample_nearest_neighbor_pyresample_dask(
+            dataarray, self.obj, radius_of_influence=radius_of_influence)
+
     def remap_xesmf(self, dataarray, method='bilinear', **kwargs):
         """remaps from another grid to the current grid of self using xesmf
 
@@ -557,6 +586,65 @@ class MONETAccessorDataset(object):
             out.name = out.name + '_y'
         self.obj[out.name] = out
         return out
+
+    def remap_nearest(self,dset,radius_of_influence=1e6):
+        try:
+            if isinstance(data, xr.DataArray):
+                data = rename_latlon(data)
+                self._remap_xesmf_dataarray(data, **kwargs)
+            elif isinstance(data, xr.Dataset):
+                data = rename_latlon(data)
+                self._remap_xesmf_dataset(data, **kwargs)
+            else:
+                raise TypeError
+        except TypeError:
+            print('data must be an xarray.DataArray or xarray.Dataset')
+
+    def _remap_nearest_dataset(self,dset,radius_of_influence=1e6):
+        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG','z']
+        vars = pd.Series(dset.variables)
+        loop_vars = vars.loc[~vars.isin(skip_keys)]
+        dataarray = dset[loop_vars[0]]
+        da = self._remap_nearest_dataarray(
+            dataarray, self.obj, radius_of_influence=radius_of_influence)
+        self.obj[da.name] = da
+        das = {}
+        das[da.name] = da
+        for i in loop_vars[1:]:
+            dataarray = dset[i]
+            tmp = self._remap_nearest_dataarray(
+                dataarray radius_of_influence=radius_of_influence)
+            das[tmp.name] = tmp.copy()
+        return xr.Dataset(das)
+
+    def _remap_nearest_dataarray(self, dataarray, radius_of_influence=1e6):
+        """remaps from another grid to the current grid of self using pyresample.
+            it assumes that the dimensions are ordered in y,x,z per
+        pyresample docs
+
+        Parameters
+        ----------
+        da : ndarray or xarray DataArray
+            Description of parameter `dset`.
+        radius_of_influence : float or integer
+            radius of influcence for pyresample in meters.
+
+        Returns
+        -------
+        xarray.DataArray
+            resampled object on current grid.
+
+        """
+        from pyresample import utils
+        from .util import resample
+        # from .grids import get_generic_projection_from_proj4
+        # check to see if grid is supplied
+        dataarray = _rename_to_monet_latlon(dataarray)
+        lons_t, lats_t = utils.check_and_wrap(self.obj.longitude.values,
+                                              self.obj.latitude.values)
+        self.obj = _rename_to_monet_latlon(self.obj)
+        return resample.resample_nearest_neighbor_pyresample_dask(
+            dataarray, self.obj, radius_of_influence=radius_of_influence)
 
     def _remap_dataset(self, dset, grid=None, **kwargs):
         """Resample the entire dset (xarray.Dataset) to the current dataset object.
