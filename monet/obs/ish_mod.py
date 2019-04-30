@@ -49,8 +49,7 @@ class ISH(object):
                        ('dpt', 'i2'), ('dpt_quality',
                                        'S1'), ('p', 'i4'), ('p_quality', 'S1')]
         self.NAMES, _ = list(zip(*self.DTYPES))
-        self.history_file = 'https://www1.ncdc.noaa.gov/pub/data/noaa/'
-        'isd-history.csv'
+        self.history_file = 'https://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.csv'
         self.history = None
         self.daily = False
 
