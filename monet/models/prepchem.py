@@ -6,10 +6,7 @@ try:
     import fv3grid as fg
     has_fv3grid = True
 except ImportError:
-    print(
-        'Please install the fv3grid from https://github.com/bbakernoaa/fv3grid'
-    )
-    print('to gain the full capability of this dataset')
+    has_fv3grid = False
 
 
 def open_dataset(fname, dtype='f4', res='C384', tile=1):
@@ -45,6 +42,10 @@ def open_dataset(fname, dtype='f4', res='C384', tile=1):
         grid[name] = (('x', 'y'), s)
         return grid[name]
     else:
+        print(
+            'Please install the fv3grid from https://github.com/bbakernoaa/fv3grid'
+        )
+        print('to gain the full capability of this dataset')
         return xr.DataArray(s, dims=('x', 'y'))
 
 
