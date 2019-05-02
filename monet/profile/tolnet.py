@@ -10,6 +10,16 @@ def open_dataset(fname):
     return t.add_data(fname)
 
 
+def open_mfdataset(fname):
+    from glob import glob
+    from numpy import sort
+    t = TOLNet()
+    dsets = []
+    for i in sort(glob(fname)):
+        dsets.append(t.add_data(i))
+    return xr.concat(dsets, dim='time')
+
+
 def tolnet_colormap():
     from matplotlib.colors import ListedColormap
     from numpy import array
@@ -138,6 +148,7 @@ class TOLNet(object):
             Description of returned object.
 
         """
+        from numpy import array, ndarray
         # altitude variables
         alt = data['ALT'][:].squeeze()
         altvars = [
@@ -156,24 +167,44 @@ class TOLNet(object):
         dataset = xr.Dataset()
         dataset['z'] = (('z'), alt)
         dataset['time'] = (('time'), time)
+        dataset['x'] = (('x'), [0])
+        dataset['y'] = (('y'), [0])
         for i in ovars:
-            dataset[i] = (('z', 'time'), data[i][:])
+            if data[i].shape == (len(alt), len(time)):
+                dataset[i] = (('z', 'time'), data[i][:])
+            elif data[i].shape == (len(alt), 1):
+                dataset[i] = (('z'), data[i][:].squeeze())
+            else:
+                dataset[i] = (('time'), data[i][:].squeeze())
             dataset[i] = dataset[i].where(dataset[i] > -990)
         for i in altvars:
-            print(i)
+            # print(i)
             dataset[i] = (('z'), data[i][:].squeeze())
 
         for i in list(atts.attrs.keys()):
-            dataset.attrs[i] = atts.attrs[i][0]
+            # print(type(atts.attrs[i]))
+            if isinstance(atts.attrs[i], list) or isinstance(
+                    atts.attrs[i], ndarray):
+                # print('here')
+                dataset.attrs[i] = atts.attrs[i][0]
+            else:
+                dataset.attrs[i] = atts.attrs[i]
 
+        # print(dataset)
         a, b = dataset.Location_Latitude.decode('ascii').split()
         if b == 'S':
-            dataset['latitude'] = -1 * float(a)
+            latitude = -1 * float(a)
         else:
-            dataset['latitude'] = float(a)
+            latitude = float(a)
         a, b = dataset.Location_Longitude.decode('ascii').split()
         if b == 'W':
-            dataset['longitude'] = -1 * float(a)
+            longitude = -1 * float(a)
         else:
-            dataset['longitude'] = float(a)
+            longitude = float(a)
+        # dataset = dataset.expand_dims('x')
+        # dataset = dataset.expand_dims('y')
+        dataset.coords['latitude'] = (('y', 'x'), array(latitude).reshape(
+            1, 1))
+        dataset.coords['longitude'] = (('y', 'x'), array(longitude).reshape(
+            1, 1))
         return dataset
