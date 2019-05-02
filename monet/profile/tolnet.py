@@ -13,43 +13,45 @@ def open_dataset(fname):
 def tolnet_colormap():
     from matplotlib.colors import ListedColormap
     from numpy import array
-    Colors = [array([255, 140, 255]) / 255.,
-              array([221, 111, 242]) / 255.,
-              array([187, 82, 229]) / 255.,
-              array([153, 53, 216]) / 255.,
-              array([119, 24, 203]) / 255.,
-              array([0, 0, 187]) / 255.,
-              array([0, 44, 204]) / 255.,
-              array([0, 88, 221]) / 255.,
-              array([0, 132, 238]) / 255.,
-              array([0, 175, 255]) / 255.,
-              array([0, 235, 255]) / 255.,
-              array([39, 255, 215]) / 255.,
-              array([99, 255, 155]) / 255.,
-              array([163, 255, 91]) / 255.,
-              array([211, 255, 43]) / 255.,
-              array([255, 255, 0]) / 255.,
-              array([255, 207, 0]) / 255.,
-              array([255, 159, 0]) / 255.,
-              array([255, 111, 0]) / 255.,
-              array([255, 63, 0]) / 255.,
-              array([255, 0, 0]) / 255.,
-              array([216, 0, 15]) / 255.,
-              array([178, 0, 31]) / 255.,
-              array([140, 0, 47]) / 255.,
-              array([102, 0, 63]) / 255.,
-              array([52, 52, 52]) / 255.,
-              array([52, 52, 52]) / 255.,
-              array([52, 52, 52]) / 255.,
-              array([52, 52, 52]) / 255.,
-              array([52, 52, 52]) / 255.,
-              array([52, 52, 52]) / 255.,
-              array([96, 96, 96]) / 255.,
-              array([96, 96, 96]) / 255.,
-              array([96, 96, 96]) / 255.,
-              array([96, 96, 96]) / 255.,
-              array([96, 96, 96]) / 255.,
-              array([96, 96, 96]) / 255.]
+    Colors = [
+        array([255, 140, 255]) / 255.,
+        array([221, 111, 242]) / 255.,
+        array([187, 82, 229]) / 255.,
+        array([153, 53, 216]) / 255.,
+        array([119, 24, 203]) / 255.,
+        array([0, 0, 187]) / 255.,
+        array([0, 44, 204]) / 255.,
+        array([0, 88, 221]) / 255.,
+        array([0, 132, 238]) / 255.,
+        array([0, 175, 255]) / 255.,
+        array([0, 235, 255]) / 255.,
+        array([39, 255, 215]) / 255.,
+        array([99, 255, 155]) / 255.,
+        array([163, 255, 91]) / 255.,
+        array([211, 255, 43]) / 255.,
+        array([255, 255, 0]) / 255.,
+        array([255, 207, 0]) / 255.,
+        array([255, 159, 0]) / 255.,
+        array([255, 111, 0]) / 255.,
+        array([255, 63, 0]) / 255.,
+        array([255, 0, 0]) / 255.,
+        array([216, 0, 15]) / 255.,
+        array([178, 0, 31]) / 255.,
+        array([140, 0, 47]) / 255.,
+        array([102, 0, 63]) / 255.,
+        array([52, 52, 52]) / 255.,
+        array([52, 52, 52]) / 255.,
+        array([52, 52, 52]) / 255.,
+        array([52, 52, 52]) / 255.,
+        array([52, 52, 52]) / 255.,
+        array([52, 52, 52]) / 255.,
+        array([96, 96, 96]) / 255.,
+        array([96, 96, 96]) / 255.,
+        array([96, 96, 96]) / 255.,
+        array([96, 96, 96]) / 255.,
+        array([96, 96, 96]) / 255.,
+        array([96, 96, 96]) / 255.
+    ]
     TNcmap = ListedColormap(Colors)
     TNcmap.set_under([1, 1, 1])
     TNcmap.set_over([0, 0, 0])
@@ -136,7 +138,6 @@ class TOLNet(object):
             Description of returned object.
 
         """
-        from numpy import NaN
         # altitude variables
         alt = data['ALT'][:].squeeze()
         altvars = [
@@ -147,8 +148,10 @@ class TOLNet(object):
         tseries = pd.Series(data["TIME_MID_UT_UNIX"][:].squeeze())
         time = pd.Series(pd.to_datetime(tseries, unit='ms'), name='time')
         # all other variables
-        ovars = ['O3MR', 'O3ND', 'O3NDUncert',
-                 'O3MRUncert', 'O3NDResol', 'Precision']
+        ovars = [
+            'O3MR', 'O3ND', 'O3NDUncert', 'O3MRUncert', 'O3NDResol',
+            'Precision'
+        ]
 
         dataset = xr.Dataset()
         dataset['z'] = (('z'), alt)
@@ -174,32 +177,3 @@ class TOLNet(object):
         else:
             dataset['longitude'] = float(a)
         return dataset
-        # dset = {}
-        # for i in ovars:
-        #     val = data[i][:]
-        #     val[data[i][:] < -1.] = NaN
-        #     dset[i] = (['z', 't'], val)
-        # for i in altvars:
-        #     dset[i] = (['z'], data[i][:].squeeze())
-
-    # coords = {'time': time, 'z': alt, 'start_time': stime, 'end_time': etime}
-        # attributes = {}
-        # for i in list(atts.attrs.keys()):
-        #     attributes[i] = atts.attrs[i]
-        # dataset = xr.Dataset(data_vars=dset, attrs=attributes)
-        # dataset['time'] = (['t'], time)
-        # dataset['t'] = dataset['time']
-        # dataset = dataset.drop('time').rename({'t': 'time'})
-        # dataset['z'] = alt
-        # # get latlon
-        # a, b = dataset.Location_Latitude.decode('ascii').split()
-        # if b == 'S':
-        #     dataset['latitude'] = -1 * float(a)
-        # else:
-        #     dataset['latitude'] = float(a)
-        # a, b = dataset.Location_Longitude.decode('ascii').split()
-        # if b == 'W':
-        #     dataset['longitude'] = -1 * float(a)
-        # else:
-        #     dataset['longitude'] = float(a)
-        # return dataset
