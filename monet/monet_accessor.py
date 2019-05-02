@@ -587,7 +587,7 @@ class MONETAccessorDataset(object):
         self.obj[out.name] = out
         return out
 
-    def remap_nearest(self,dset,radius_of_influence=1e6):
+    def remap_nearest(self, dset, radius_of_influence=1e6):
         try:
             if isinstance(data, xr.DataArray):
                 data = rename_latlon(data)
@@ -600,8 +600,8 @@ class MONETAccessorDataset(object):
         except TypeError:
             print('data must be an xarray.DataArray or xarray.Dataset')
 
-    def _remap_nearest_dataset(self,dset,radius_of_influence=1e6):
-        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG','z']
+    def _remap_nearest_dataset(self, dset, radius_of_influence=1e6):
+        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG', 'z']
         vars = pd.Series(dset.variables)
         loop_vars = vars.loc[~vars.isin(skip_keys)]
         dataarray = dset[loop_vars[0]]

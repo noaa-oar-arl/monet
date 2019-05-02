@@ -118,7 +118,7 @@ def resample_nearest_neighbor_pyresample_dask(source_da,
     import xarray as xr
     from numpy import empty_like
 
-    #stack the dims so it is 'x','y','temporary_dim' if len(dim) > 2
+    # stack the dims so it is 'x','y','temporary_dim' if len(dim) > 2
     stacked_source_da, stack = _stack_dims_xarray(source_da)
     # print(stacked_source_da)
     rnnp = dask.delayed(
@@ -126,7 +126,7 @@ def resample_nearest_neighbor_pyresample_dask(source_da,
             stacked_source_da,
             target_da,
             radius_of_influence=radius_of_influence))
-    #find correct shape
+    # find correct shape
     if stack:
         len_stacked = len(stacked_source_da.temporary_dim)
         target_shape = (len(target_da.y), len(target_da.x), len_stacked)
@@ -136,7 +136,7 @@ def resample_nearest_neighbor_pyresample_dask(source_da,
         darray = dask.array.from_delayed(
             rnnp, target_da.shape, dtype=source_da.dtype)
 
-    #check if stacked
+    # check if stacked
     if stack:
         out_array = xr.DataArray(darray, dims=('y', 'x', 'temporary_dim'))
         out_array.coords['temporary_dim'] = stacked_source_da.coords[
@@ -148,7 +148,7 @@ def resample_nearest_neighbor_pyresample_dask(source_da,
         out_array.coords[i] = target_da.coords[i]
 
     print(out_array)
-    #unstack
+    # unstack
     if stack:
         out_array = out_array.unstack('temporary_dim')
 
