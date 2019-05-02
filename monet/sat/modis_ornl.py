@@ -362,7 +362,14 @@ def get_available_bands(product='MOD12A2H'):
     print(client.service.getbands(product))
 
 
-def _get_single_retrieval(date, product='MOD12A2H', band='Lai_500m', quality_control=None, lat=0, lon=0, kmAboveBelow=100, kmLeftRight=100):
+def _get_single_retrieval(date,
+                          product='MOD12A2H',
+                          band='Lai_500m',
+                          quality_control=None,
+                          lat=0,
+                          lon=0,
+                          kmAboveBelow=100,
+                          kmLeftRight=100):
     import pandas as pd
     client = setClient()
     prodList = modisClient(client)
@@ -370,20 +377,49 @@ def _get_single_retrieval(date, product='MOD12A2H', band='Lai_500m', quality_con
     dateList = modisClient(
         client, product='MOD15A2H', band='Lai_500m', lat=lat, lon=lon)
     dates = pd.to_datetime(dateList, format='A%Y%j')
-    dates = _nearest(dates, pd.Timestamp(date))
-    m = modisClient(
-        client,
-        product='MOD15A2H',
-        band='Lai_500m',
-        lat=lat,
-        lon=lon,
-        startDate=int(dates.strftime('%Y%j')),
-        endDate=int((dates + pd.Timedelta(1, units='D')).strftime('%Y%j')),
-        kmAboveBelow=kmAboveBelow,
-        kmLeftRight=kmLeftRight)
+    date = pd.to_datetime(date)
+    if isinstance(date, pd.Timestamp):
+        dates = _nearest(dates, date)
+        m = modisClient(
+            client,
+            product='MOD15A2H',
+            band='Lai_500m',
+            lat=lat,
+            lon=lon,
+            startDate=int(dates.strftime('%Y%j')),
+            endDate=int((dates + pd.Timedelta(1, units='D')).strftime('%Y%j')),
+            kmAboveBelow=kmAboveBelow,
+            kmLeftRight=kmLeftRight)
+    else:
+        if dates.max() > date.max():
+            m = modisClient(
+                client,
+                product='MOD15A2H',
+                band='Lai_500m',
+                lat=lat,
+                lon=lon,
+                startDate=int(dates.min().strftime('%Y%j')),
+                endDate=int(date.max().strftime('%Y%j')),
+                kmAboveBelow=kmAboveBelow,
+                kmLeftRight=kmLeftRight)
+        else:
+            m = modisClient(
+                client,
+                product='MOD15A2H',
+                band='Lai_500m',
+                lat=lat,
+                lon=lon,
+                startDate=int(date.min().strftime('%Y%j')),
+                endDate=int(date.max().strftime('%Y%j')),
+                kmAboveBelow=kmAboveBelow,
+                kmLeftRight=kmLeftRight)
     if quality_control is not None:
-        modisGetQA(m, 'FparLai_QC', client=client,
-                   kmAboveBelow=kmAboveBelow, kmLeftRight=kmLeftRight)
+        modisGetQA(
+            m,
+            'FparLai_QC',
+            client=client,
+            kmAboveBelow=kmAboveBelow,
+            kmLeftRight=kmLeftRight)
 
     m.applyScale()
     return m
@@ -394,15 +430,31 @@ def _fix_array(m):
 
 
 def _make_xarray_dataarray(m):
+    """Takes the modis object and creates an xarray DataArray.
+
+    Parameters
+    ----------
+    m : type
+        Description of parameter `m`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     import xarray as xr
-    da = xr.DataArray(m.data.reshape(
-        m.ncols, m.nrows, order='C')[::-1, :], dims=('x', 'y'))
-    da.attrs['long_name'] = m.product
+    from pandas import to_datetime
+    da = xr.DataArray(
+        m.data.reshape(m.ncols, m.nrows, order='C')[::-1, :], dims=('x', 'y'))
+    da.attrs['long_name'] = r m.product
     da.attrs['cellsize'] = m.cellsize
     da.attrs['units'] = m.units
     da.attrs['server'] = m.server
-    lon, lat = _get_latlon(m.xllcorner, m.yllcorner,
-                           m.cellsize, m.ncols, m.nrows)
+    lon, lat = _get_latlon(m.xllcorner, m.yllcorner, m.cellsize, m.ncols,
+                           m.nrows)
+    da.name = m.band
+    da['time'] = to_datetime(str(m.dateInt[0]), format='%Y%j')
     # print(da)
     # print(lon.shape)
     da.coords['longitude'] = (('x', 'y'), lon)
@@ -411,6 +463,27 @@ def _make_xarray_dataarray(m):
 
 
 def _get_latlon(xll, yll, cell_width, nx, ny):
+    """get the latitude and longitude from a sinusoidal projection.
+
+    Parameters
+    ----------
+    xll : float
+        Description of parameter `xll`.
+    yll : float
+        Description of parameter `yll`.
+    cell_width : float
+        Description of parameter `cell_width`.
+    nx : int
+        Description of parameter `nx`.
+    ny : int
+        Description of parameter `ny`.
+
+    Returns
+    -------
+    (float,float)
+        returns the 2d arrays of lon, lat
+
+    """
     from pyproj import Proj
     from numpy import linspace, meshgrid
     sinu = Proj(
@@ -422,40 +495,20 @@ def _get_latlon(xll, yll, cell_width, nx, ny):
     return lon, lat
 
 
-# def open_dataset(date, product='MOD12A2H', band='Lai_500m', qaulity_contral=None, lat=0, lon=0, kmAboveBelow=100, kmLeftRight=100):
-#     _get_single_retrieval(
+def open_dataset(date, **kwargs):
+    import pandas as pd
+    date = pd.to_datetime(date)
+    m = _get_single_retrieval(date, **kwargs)
+    da = _make_xarray_dataarray(m)
+    return da
 
 
-# if __name__ == "__main__":
-#
-#     client=setClient()
-#
-#     prodList=modisClient(client)
-#     printList(prodList)
-#
-#     bandList=modisClient(client, product='MOD15A2H')
-#     printList(bandList)
-#
-#     dateList=modisClient(
-#         client, product='MOD15A2H', band='Lai_500m', lat=52, lon=0)
-#     printList(dateList)
-#
-#     dx=100
-#     dy=100
-#     m=modisClient(
-#         client,
-#         product='MOD15A2H',
-#         band='Lai_500m',
-#         lat=52,
-#         lon=-2,
-#         startDate=2018178,
-#         endDate=2018185,
-#         kmAboveBelow=dy,
-#         kmLeftRight=dx)
-#
-#     modisGetQA(m, 'FparLai_QC', client=client, kmAboveBelow=dy, kmLeftRight=dx)
-#
-#     m.applyScale()
-# #    m.filterQA(range(0, 2**16, 2), fill=-1)
-#
-#     printModisData(m)
+def open_mfdataset(dates, **kwargs):
+    import pandas as pd
+    import xarray as xr
+    import dask
+    dates = pd.to_datetime(dates)
+    od = dask.delayed(open_dataset)
+
+    das = dask.delayed([open_dataset(i, **kwargs) for i in dates])
+    return xr.concat(das.compute(), dim='time')
