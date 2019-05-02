@@ -613,7 +613,7 @@ class MONETAccessorDataset(object):
         for i in loop_vars[1:]:
             dataarray = dset[i]
             tmp = self._remap_nearest_dataarray(
-                dataarray radius_of_influence=radius_of_influence)
+                dataarray, radius_of_influence=radius_of_influence)
             das[tmp.name] = tmp.copy()
         return xr.Dataset(das)
 
