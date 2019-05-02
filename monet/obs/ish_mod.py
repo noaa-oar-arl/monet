@@ -1,5 +1,6 @@
 """Python module for reading NOAA ISH files"""
 from __future__ import division, print_function
+
 from builtins import object, zip
 
 import dask
@@ -15,6 +16,51 @@ standard_library.install_aliases()
 ProgressBar().register()
 
 
+def add_data(self,
+             dates,
+             box=None,
+             country=None,
+             state=None,
+             site=None,
+             resample=True,
+             window='H'):
+    """Add data from integrated surface database.
+
+    Parameters
+    ----------
+    dates : type
+        Description of parameter `dates`.
+    box : type
+        Description of parameter `box`.
+    country : type
+        Description of parameter `country`.
+    state : type
+        Description of parameter `state`.
+    site : type
+        Description of parameter `site`.
+    resample : type
+        Description of parameter `resample`.
+    window : type
+        Description of parameter `window`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    ish = ISH()
+    df = ish.add_data(
+        dates,
+        box=None,
+        country=None,
+        state=None,
+        site=None,
+        resample=True,
+        window='H')
+    return df
+
+
 class ISH(object):
     """
     Integrated Surface Hourly (also known as ISD, Integrated Surface Data)
@@ -25,29 +71,21 @@ class ISH(object):
             4, 11, 8, 4, 1, 6, 7, 5, 5, 5, 4, 3, 1, 1, 4, 1, 5, 1, 1, 1, 6, 1,
             1, 1, 5, 1, 5, 1, 5, 1
         ]
-        self.DTYPES = [('varlength', 'i2'), ('station_id',
-                                             'S11'), ('date', 'i4'), ('htime',
-                                                                      'i2'),
-                       ('source_flag',
-                        'S1'), ('latitude', 'float'), ('longitude', 'float'),
+        self.DTYPES = [('varlength', 'i2'), ('station_id', 'S11'),
+                       ('date', 'i4'), ('htime', 'i2'), ('source_flag', 'S1'),
+                       ('latitude', 'float'), ('longitude', 'float'),
                        ('code', 'S5'), ('elev', 'i2'), ('call_letters', 'S5'),
-                       ('qc_process',
-                        'S4'), ('wdir', 'i2'), ('wdir_quality',
-                                                'S1'), ('wdir_type',
-                                                        'S1'), ('ws', 'i2'),
-                       ('ws_quality',
-                        'S1'), ('ceiling',
-                                'i4'), ('ceiling_quality',
-                                        'S1'), ('ceiling_code',
-                                                'S1'), ('ceiling_cavok',
-                                                        'S1'), ('vsb', 'i4'),
-                       ('vsb_quality',
-                        'S1'), ('vsb_variability',
-                                'S1'), ('vsb_variability_quality',
-                                        'S1'), ('t', 'i2'), ('t_quality',
-                                                             'S1'),
-                       ('dpt', 'i2'), ('dpt_quality',
-                                       'S1'), ('p', 'i4'), ('p_quality', 'S1')]
+                       ('qc_process', 'S4'), ('wdir', 'i2'),
+                       ('wdir_quality', 'S1'), ('wdir_type', 'S1'), ('ws',
+                                                                     'i2'),
+                       ('ws_quality', 'S1'), ('ceiling', 'i4'),
+                       ('ceiling_quality', 'S1'), ('ceiling_code', 'S1'),
+                       ('ceiling_cavok', 'S1'), ('vsb', 'i4'),
+                       ('vsb_quality', 'S1'), ('vsb_variability', 'S1'),
+                       ('vsb_variability_quality', 'S1'), ('t', 'i2'),
+                       ('t_quality', 'S1'), ('dpt', 'i2'), ('dpt_quality',
+                                                            'S1'), ('p', 'i4'),
+                       ('p_quality', 'S1')]
         self.NAMES, _ = list(zip(*self.DTYPES))
         self.history_file = 'https://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.csv'
         self.history = None
