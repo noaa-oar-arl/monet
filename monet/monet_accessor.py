@@ -587,7 +587,7 @@ class MONETAccessorDataset(object):
         self.obj[out.name] = out
         return out
 
-    def remap_nearest(self, dset, radius_of_influence=1e6):
+    def remap_nearest(self, data, radius_of_influence=1e6):
         try:
             if isinstance(data, xr.DataArray):
                 data = rename_latlon(data)
