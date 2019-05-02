@@ -1,5 +1,7 @@
 from __future__ import absolute_import, print_function
 
+import numpy as np
+
 from . import combinetool, interp_util, mystats, resample, tools
 
 __all__ = ['mystats', 'tools', 'interp_util', 'resample', 'combinetool']
@@ -154,7 +156,7 @@ def get_giorgi_region_bounds(index=None, acronym=None):
         'lonmax': lonmax,
         'acronym': acro
     },
-        index=i)
+                      index=i)
     try:
         if index is None and acronym is None:
             print('either index or acronym needs to be supplied')
