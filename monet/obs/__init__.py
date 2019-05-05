@@ -6,9 +6,7 @@ from . import ish_mod, cems_mod, nadp_mod, icartt_mod
 
 __all__ = [
     'aeronet', 'airnow', 'aqs_mod', 'crn_mod', 'epa_util',
-    # 'improve_mod', 'ish_mod', 'tolnet_mod', 'cems_mod', 'nadp_mod',
     'improve_mod', 'ish_mod', 'cems_mod', 'nadp_mod',
-    # 'modis_swath', 'icartt_mod'
     'icartt_mod'
 ]
 
