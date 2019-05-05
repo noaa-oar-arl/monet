@@ -303,7 +303,7 @@ class MONETAccessor(object):
             figsize = _dynamic_fig_size(self.obj)
             map_kwarg['figsize'] = figsize
         ax = draw_map(**map_kwarg)
-        self.obj.plot(
+        _rename_to_monet_latlon(self.obj).plot(
             x='longitude',
             y='latitude',
             ax=ax,
