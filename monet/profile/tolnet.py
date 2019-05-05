@@ -68,15 +68,19 @@ def tolnet_colormap():
     return TNcmap
 
 
-def tolnet_plot(dset, var='O3MR', units='ppbv'):
+def tolnet_plot(dset, var='O3MR', units='ppbv', tolnet_cmap=True, **kwargs):
     import matplotlib.pyplot as plt
     import seaborn as sns
     sns.set_context('notebook')
     cmap = tolnet_colormap()
     Fig, Ax = plt.subplots(figsize=(9, 6))
-    dset['z'] /= 1000.  # put in km
-    dset[var].attrs['units'] = units
-    dset[var].plot(x='time', y='z', cmap=cmap, vmin=0, vmax=300, ax=Ax)
+    dsett = dset.copy()
+    dsett['z'] /= 1000.  # put in km
+    dsett[var].attrs['units'] = units
+    if tolnet_cmap:
+        dsett[var].plot(x='time', y='z', cmap=cmap, vmin=0, vmax=300, ax=Ax)
+    else:
+        dsett[var].plot(x='time', y='z', **kwargs)
     plt.ylabel("Altitude [km]")
     plt.xlabel("Time [UTC]")
     sns.despine()
