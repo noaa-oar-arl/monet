@@ -7,6 +7,12 @@ import pandas as pd
 from numpy import NaN
 
 
+def add_data(dates, network='NTN', siteid=None, weekly=True):
+    n = NADP()
+    df = n.add_data(dates, network=network, siteid=siteid, weekly=weekly)
+    return df
+
+
 class NADP(object):
     def __init__(self):
         self.weekly = True
@@ -88,8 +94,8 @@ class NADP(object):
         meta.columns = [i.lower() for i in meta.columns]
         dfn = pd.merge(df, meta, on='siteid', how='left')
         dfn.dropna(subset=['latitude', 'longitude'], inplace=True)
-        dfn.loc[dfn.qr == 'C', ['rgppt', 'svol', 'subppt', 'hgconc', 'hgdep'
-                                ]] = NaN
+        dfn.loc[dfn.qr ==
+                'C', ['rgppt', 'svol', 'subppt', 'hgconc', 'hgdep']] = NaN
         return dfn
 
     def read_airmon(self, url):

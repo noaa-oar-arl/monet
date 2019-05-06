@@ -9,6 +9,10 @@ __all__ = ['mystats', 'tools', 'interp_util', 'resample', 'combinetool']
 #__name__ = 'util'
 
 
+def nearest(items, pivot):
+    return min(items, key=lambda x: abs(x - pivot))
+
+
 def search_listinlist(array1, array2):
     # find intersections
 

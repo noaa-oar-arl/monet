@@ -9,7 +9,18 @@ import pandas as pd
 import xarray as xr
 
 
-class icartt(object):
+def add_data(fname):
+    ic = icartt()
+    dset = ic.add_data(fname)
+    return dset
+
+
+def xarray_flight_to_pandas(**kwargs):
+    ic = icartt()
+    return ic.get_data(**kwargs)
+
+
+class ICARTT(object):
     """Short summary.
     Reads icartt data file format and gets/reformats 4D coordinate data used
     to manipulate/analyze and/or combine with model data later
