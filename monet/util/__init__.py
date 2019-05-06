@@ -9,6 +9,10 @@ __all__ = ['mystats', 'tools', 'interp_util', 'resample', 'combinetool']
 #__name__ = 'util'
 
 
+def nearest(items, pivot):
+    return min(items, key=lambda x: abs(x - pivot))
+
+
 def search_listinlist(array1, array2):
     # find intersections
 
@@ -156,7 +160,7 @@ def get_giorgi_region_bounds(index=None, acronym=None):
         'lonmax': lonmax,
         'acronym': acro
     },
-        index=i)
+                      index=i)
     try:
         if index is None and acronym is None:
             print('either index or acronym needs to be supplied')
