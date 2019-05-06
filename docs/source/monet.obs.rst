@@ -4,10 +4,10 @@ monet.obs package
 Submodules
 ----------
 
-monet.obs.aeronet\_mod module
------------------------------
+monet.obs.aeronet module
+------------------------
 
-.. automodule:: monet.obs.aeronet_mod
+.. automodule:: monet.obs.aeronet
     :members:
     :undoc-members:
     :show-inheritance:
@@ -23,31 +23,31 @@ monet.obs.airnow module
 monet.obs.airnow\_mod module
 ----------------------------
 
-.. automodule:: monet.obs.airnow_mod
+.. automodule:: monet.obs.airnow
     :members:
     :undoc-members:
     :show-inheritance:
 
-monet.obs.aqs\_mod module
--------------------------
+monet.obs.aqs module
+--------------------
 
-.. automodule:: monet.obs.aqs_mod
+.. automodule:: monet.obs.aqs
     :members:
     :undoc-members:
     :show-inheritance:
 
-monet.obs.cems\_mod module
---------------------------
+monet.obs.cems module
+---------------------
 
-.. automodule:: monet.obs.cems_mod
+.. automodule:: monet.obs.cems
     :members:
     :undoc-members:
     :show-inheritance:
 
-monet.obs.crn\_mod module
--------------------------
+monet.obs.crn module
+--------------------
 
-.. automodule:: monet.obs.crn_mod
+.. automodule:: monet.obs.crn
     :members:
     :undoc-members:
     :show-inheritance:
@@ -79,15 +79,15 @@ monet.obs.icartt\_mod module
 monet.obs.improve\_mod module
 -----------------------------
 
-.. automodule:: monet.obs.improve_mod
+.. automodule:: monet.obs.improve
     :members:
     :undoc-members:
     :show-inheritance:
 
-monet.obs.ish\_mod module
--------------------------
+monet.obs.ish module
+--------------------
 
-.. automodule:: monet.obs.ish_mod
+.. automodule:: monet.obs.ish
     :members:
     :undoc-members:
     :show-inheritance:
@@ -103,7 +103,7 @@ monet.obs.nadp\_mod module
 monet.obs.obs\_util module
 --------------------------
 
-.. automodule:: monet.obs.obs_util
+.. automodule:: monet.obs.nadp
     :members:
     :undoc-members:
     :show-inheritance:

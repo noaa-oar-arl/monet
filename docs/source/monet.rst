@@ -15,18 +15,10 @@ Subpackages
 Submodules
 ----------
 
-monet.grids module
+monet.monet module
 ------------------
 
-.. automodule:: monet.grids
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-monet.monet\_accessor module
-----------------------------
-
-.. automodule:: monet.monet_accessor
+.. automodule:: monet.monet
     :members:
     :undoc-members:
     :show-inheritance:

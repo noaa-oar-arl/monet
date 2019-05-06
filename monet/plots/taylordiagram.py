@@ -24,7 +24,7 @@ class TaylorDiagram(object):
     r=stddev and theta=arccos(correlation).
     """
 
-    def __init__(self, refstd, fig=None, rect=111, label='_'):
+    def __init__(self, refstd, scale=1.5, fig=None, rect=111, label='_'):
         """Set up Taylor diagram axes, i.e. single quadrant polar
         plot, using mpl_toolkits.axisartist.floating_axes. refstd is
         the reference standard deviation to be compared to.
@@ -46,7 +46,7 @@ class TaylorDiagram(object):
 
         # Standard deviation axis extent
         self.smin = 0
-        self.smax = 1.5 * self.refstd
+        self.smax = scale * self.refstd
         ghelper = FA.GridHelperCurveLinear(
             tr,
             extremes=(

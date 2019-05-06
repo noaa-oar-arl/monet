@@ -4,18 +4,18 @@ monet.models package
 Submodules
 ----------
 
-monet.models.camx module
-------------------------
+monet.models.basemodel module
+-----------------------------
 
-.. automodule:: monet.models.camx
+.. automodule:: monet.models.basemodel
     :members:
     :undoc-members:
     :show-inheritance:
 
-monet.models.cmaq module
+monet.models.camx module
 ------------------------
 
-.. automodule:: monet.models.cmaq
+.. automodule:: monet.models.camx
     :members:
     :undoc-members:
     :show-inheritance:

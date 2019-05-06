@@ -62,23 +62,8 @@ def add_data(self,
 
 
 class ISH(object):
-    """Integrated Surface Hourly (also known as ISD, Integrated Surface Data)
-
-    Attributes
-    ----------
-    WIDTHS : type
-        Description of attribute `WIDTHS`.
-    DTYPES : type
-        Description of attribute `DTYPES`.
-    NAMES : type
-        Description of attribute `NAMES`.
-    history_file : type
-        Description of attribute `history_file`.
-    history : type
-        Description of attribute `history`.
-    daily : type
-        Description of attribute `daily`.
-
+    """
+    Integrated Surface Hourly (also known as ISD, Integrated Surface Data)
     """
 
     def __init__(self):
@@ -109,19 +94,9 @@ class ISH(object):
     def delimit(self, file_object, delimiter=','):
         """Iterate over the lines in a file yielding comma delimited versions.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         file_object : file or filename
-            Description of parameter `file_object`.
-        delimiter : type
-            Description of parameter `delimiter`.
-        ' : type
-            Description of parameter `'`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
 
         """
 
@@ -169,19 +144,7 @@ class ISH(object):
         return frame
 
     def read_data_frame(self, file_object):
-        """Create a data frame from an ISH file.
-
-        Parameters
-        ----------
-        file_object : type
-            Description of parameter `file_object`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
+        """Create a data frame from an ISH file."""
         frame_as_array = np.genfromtxt(
             file_object, delimiter=self.WIDTHS, dtype=self.DTYPES)
         frame = pd.DataFrame.from_records(frame_as_array)
@@ -198,14 +161,7 @@ class ISH(object):
         return df.loc[index, :].reset_index()
 
     def read_ish_history(self):
-        """read ISH history file
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
+        """ read ISH history file """
         fname = self.history_file
         self.history = pd.read_csv(
             fname, parse_dates=['BEGIN', 'END'], infer_datetime_format=True)
@@ -251,29 +207,16 @@ class ISH(object):
                  site=None,
                  resample=True,
                  window='H'):
-        """Short summary.
-
-        Parameters
-        ----------
+        """
         dates : list of datetime objects
+               description
         box : list of floats
              [latmin, lonmin, latmax, lonmax]
-        country : type
-            Description of parameter `country`.
-        state : type
-            Description of parameter `state`.
-        site : type
-            Description of parameter `site`.
-        resample : type
-            Description of parameter `resample`.
-        window : type
-            Description of parameter `window`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
+        country :
+        state :
+        site :
+        resample : boolean
+        window :
         """
         from numpy import NaN
         self.dates = pd.to_datetime(dates)
@@ -333,17 +276,7 @@ class ISH(object):
         return self.df.copy()
 
     def get_url_file_objs(self, fname):
-        """Short summary.
-
-        Parameters
-        ----------
-        fname : type
-            Description of parameter `fname`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
+        """
 
         """
         import gzip

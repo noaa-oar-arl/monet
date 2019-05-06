@@ -303,7 +303,7 @@ class MONETAccessor(object):
             figsize = _dynamic_fig_size(self.obj)
             map_kwarg['figsize'] = figsize
         ax = draw_map(**map_kwarg)
-        self.obj.plot(
+        _rename_to_monet_latlon(self.obj).plot(
             x='longitude',
             y='latitude',
             ax=ax,
@@ -581,7 +581,6 @@ class MONETAccessorDataset(object):
         target = self.obj
         out = resample.resample_xesmf(
             dataarray, target, method=method, filename=filename, **kwargs)
-        print(out)
         if out.name in self.obj.variables:
             out.name = out.name + '_y'
         self.obj[out.name] = out
@@ -946,8 +945,5 @@ class MONETAccessorDataset(object):
         """
         # from .util.combinetool import combine_da_to_df_xesmf
         for key, val in mapping_table.items():
-            # print(key, val)
-            # print(df.head())
             df = self.obj[key].monet.combine_point(df, col=val, **kwargs)
-        print(df.head())
         return df

@@ -1,4 +1,5 @@
 import os
+
 path = os.path.abspath(__file__)
 
 
@@ -65,8 +66,8 @@ def _get_sinu_grid_df():
     from pandas import read_csv
     f = path[:-8] + 'data/sn_bound_10deg.txt'
     td = read_csv(f, skiprows=4, delim_whitespace=True)
-    td = td.assign(ihiv='h' + td.ih.astype(str).str.zfill(2) + 'v'
-                   + td.iv.astype(str).str.zfill(2))
+    td = td.assign(ihiv='h' + td.ih.astype(str).str.zfill(2) +
+                   'v' + td.iv.astype(str).str.zfill(2))
     return td
 
 
@@ -251,21 +252,6 @@ def _ioapi_grid_from_dataset(ds, earth_radius=6370000):
                                   '{}'.format(proj_id))
     # area_def = _get_ioapi_pyresample_area_def(ds)
     return p4  # , area_def
-
-
-def _hysplit_latlon_grid_from_dataset(ds):
-    pargs = dict()
-    pargs['lat_0'] = ds.latitude.mean()
-    pargs['lon_0'] = ds.longitude.mean()
-    p4 = '+proj=eqc +lat_ts={lat_0} +lat_0={lat_0} +lon_0={lon_0} ' \
-        '+ellps=WGS84 +datum=WGS84 +units=m +no_defs'.format(**pargs)
-    return p4
-
-
-def get_hysplit_latlon_pyresample_area_def(ds, proj4_srs):
-    from pyresample import geometry
-    return geometry.SwathDefinition(
-        lons=ds.longitude.values, lats=ds.latitude.values)
 
 
 def grid_from_dataset(ds, earth_radius=6370000):

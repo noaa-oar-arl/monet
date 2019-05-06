@@ -1,8 +1,9 @@
 """ CMAQ File Reader """
+import xarray as xr
 from numpy import array, concatenate
 from pandas import Series, to_datetime
-import xarray as xr
-from ..grids import grid_from_dataset, get_ioapi_pyresample_area_def
+
+from ..grids import get_ioapi_pyresample_area_def, grid_from_dataset
 
 
 def can_do(index):
@@ -215,6 +216,11 @@ def _get_latlon(dset, area):
     return dset
 
 
+def _get_keys(d):
+    keys = Series([i for i in d.data_vars.keys()])
+    return keys
+
+
 def add_lazy_pm25(d):
     """Short summary.
 
@@ -229,7 +235,7 @@ def add_lazy_pm25(d):
         Description of returned object.
 
     """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(concatenate([aitken, accumulation, coarse]))
     weights = Series([
         1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
@@ -237,7 +243,7 @@ def add_lazy_pm25(d):
         1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
         1., 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2
     ])
-    if 'PM25_TOT' in keys:
+    if 'PM25_TOT' in keys.to_list():
         d['PM25'] = d['PM25_TOT']
     else:
         index = allvars.isin(keys)
@@ -248,29 +254,16 @@ def add_lazy_pm25(d):
             d['PM25'] = d['PM25'].assign_attrs({
                 'units': '$\mu g m^{-3}$',
                 'name': 'PM2.5',
-                'long_name': 'PM2.5'
+                        'long_name': 'PM2.5'
             })
     return d
 
 
 def add_lazy_pm10(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(concatenate([aitken, accumulation, coarse]))
-    if 'PM_TOT' in keys:
-        d['PM10'] = d['PM_TOT']
+    if 'PMC_TOT' in keys.to_list():
+        d['PM10'] = d['PMC_TOT']
     else:
         index = allvars.isin(keys)
         if can_do(index):
@@ -288,20 +281,7 @@ def add_lazy_pm10(d):
 
 
 def add_lazy_pm_course(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(coarse)
     index = allvars.isin(keys)
     if can_do(index):
@@ -319,20 +299,7 @@ def add_lazy_pm_course(d):
 
 
 def add_lazy_clf(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ACLI', 'ACLJ', 'ACLK'])
     weights = Series([1, 1, .2])
     index = allvars.isin(keys)
@@ -352,20 +319,7 @@ def add_lazy_clf(d):
 
 
 def add_lazy_caf(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ACAI', 'ACAJ', 'ASEACAT', 'ASOIL', 'ACORS'])
     weights = Series(
         [1, 1, .2 * 32. / 1000., .2 * 83.8 / 1000., .2 * 56.2 / 1000.])
@@ -386,20 +340,7 @@ def add_lazy_caf(d):
 
 
 def add_lazy_naf(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ANAI', 'ANAJ', 'ASEACAT', 'ASOIL', 'ACORS'])
     weights = Series(
         [1, 1, .2 * 837.3 / 1000., .2 * 62.6 / 1000., .2 * 2.3 / 1000.])
@@ -417,20 +358,7 @@ def add_lazy_naf(d):
 
 
 def add_lazy_so4f(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ASO4I', 'ASO4J', 'ASO4K'])
     weights = Series([1., 1., .2])
     index = allvars.isin(keys)
@@ -447,20 +375,7 @@ def add_lazy_so4f(d):
 
 
 def add_lazy_nh4f(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ANH4I', 'ANH4J', 'ANH4K'])
     weights = Series([1., 1., .2])
     index = allvars.isin(keys)
@@ -477,20 +392,7 @@ def add_lazy_nh4f(d):
 
 
 def add_lazy_no3f(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['ANO3I', 'ANO3J', 'ANO3K'])
     weights = Series([1., 1., .2])
     index = allvars.isin(keys)
@@ -507,20 +409,7 @@ def add_lazy_no3f(d):
 
 
 def add_lazy_noy(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(noy_gas)
     index = allvars.isin(keys)
     if can_do(index):
@@ -531,19 +420,6 @@ def add_lazy_noy(d):
 
 
 def add_lazy_rh(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
     # keys = Series([i for i in d.variables])
     # allvars = Series(['TEMP', 'Q', 'PRES'])
     # index = allvars.isin(keys)
@@ -560,20 +436,7 @@ def add_lazy_rh(d):
 
 
 def add_lazy_nox(d):
-    """Short summary.
-
-    Parameters
-    ----------
-    d : type
-        Description of parameter `d`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    keys = Series([i for i in d.variables])
+    keys = _get_keys(d)
     allvars = Series(['NO', 'NOX'])
     index = allvars.isin(keys)
     if can_do(index):
@@ -584,23 +447,6 @@ def add_lazy_nox(d):
 
 
 def add_multiple_lazy(dset, variables, weights=None):
-    """Short summary.
-
-    Parameters
-    ----------
-    dset : type
-        Description of parameter `dset`.
-    variables : type
-        Description of parameter `variables`.
-    weights : type
-        Description of parameter `weights`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
     from numpy import ones
     if weights is None:
         weights = ones(len(variables))
@@ -632,6 +478,7 @@ def _predefined_mapping_tables(dset):
         'NOY': ['NOy'],
         'NOX': ['NOx'],
         'SO2': ['SO2'],
+        'NOX': ['NOx'],
         'NO': ['NO'],
         'NO2': ['NO2'],
         'SO4f': ['SO4f'],
@@ -665,6 +512,7 @@ def _predefined_mapping_tables(dset):
         'NOY': ['NOy'],
         'NOX': ['NOx'],
         'SO2': ['SO2'],
+        'NOX': ['NOx'],
         'NO': ['NO'],
         'NO2': ['NO2'],
         'SO4f': ['SO4f'],

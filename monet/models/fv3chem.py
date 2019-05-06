@@ -1,6 +1,4 @@
 # FV3-CHEM READER
-
-import dask
 import xarray as xr
 
 
