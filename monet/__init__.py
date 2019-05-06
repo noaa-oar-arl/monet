@@ -1,11 +1,11 @@
 from . import grids, models, monet_accessor, obs, plots, profile, sat, util
 from .plots import savefig
 
-<<<<<<< HEAD
-=======
+<< << << < HEAD
+== == == =
 # from .monetmodels, obs, plots, util
 
->>>>>>> develop
+>>>>>> > develop
 # __all__ = ['models', 'obs', 'plots', 'sat',
 #            'verification', 'util', 'monet_accessor', 'grids']
 __all__ = [
