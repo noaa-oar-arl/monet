@@ -10,13 +10,13 @@ import xarray as xr
 
 
 def add_data(fname):
-    ic = icartt()
+    ic = ICARTT()
     dset = ic.add_data(fname)
     return dset
 
 
 def xarray_flight_to_pandas(**kwargs):
-    ic = icartt()
+    ic = ICARTT()
     return ic.get_data(**kwargs)
 
 

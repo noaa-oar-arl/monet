@@ -15,50 +15,7 @@ standard_library.install_aliases()
 
 ProgressBar().register()
 
-
-def add_data(self,
-             dates,
-             box=None,
-             country=None,
-             state=None,
-             site=None,
-             resample=True,
-             window='H'):
-    """Add data from integrated surface database.
-
-    Parameters
-    ----------
-    dates : type
-        Description of parameter `dates`.
-    box : type
-        Description of parameter `box`.
-    country : type
-        Description of parameter `country`.
-    state : type
-        Description of parameter `state`.
-    site : type
-        Description of parameter `site`.
-    resample : type
-        Description of parameter `resample`.
-    window : type
-        Description of parameter `window`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    ish = ISH()
-    df = ish.add_data(
-        dates,
-        box=None,
-        country=None,
-        state=None,
-        site=None,
-        resample=True,
-        window='H')
-    return df
+# def add_data(dates,bbox=None):
 
 
 class ISH(object):
@@ -83,7 +40,7 @@ class ISH(object):
 
     def __init__(self):
         self.WIDTHS = [
-            4, 11, 8, 4, 1, 6, 7, 5, 5, 5, 4, 3, 1, 1, 4, 1, 5, 1, 1, 1, 6, 1,
+            4, 2, 8, 4, 1, 6, 7, 5, 5, 5, 4, 3, 1, 1, 4, 1, 5, 1, 1, 1, 6, 1,
             1, 1, 5, 1, 5, 1, 5, 1
         ]
         self.DTYPES = [('varlength', 'i2'), ('station_id', 'S11'),
@@ -105,68 +62,6 @@ class ISH(object):
         self.history_file = 'https://www1.ncdc.noaa.gov/pub/data/noaa/isd-history.csv'
         self.history = None
         self.daily = False
-
-    def delimit(self, file_object, delimiter=','):
-        """Iterate over the lines in a file yielding comma delimited versions.
-
-        Parameters
-        ----------
-        file_object : file or filename
-            Description of parameter `file_object`.
-        delimiter : type
-            Description of parameter `delimiter`.
-        ' : type
-            Description of parameter `'`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
-
-        try:
-            file_object = open(file_object)
-        except TypeError:
-            pass
-
-        for line in file_object:
-            items = []
-            index = 0
-            for w in self.WIDTHS:
-                items.append(line[index:index + w])
-                index = index + w
-            yield ','.join(items)
-
-    def _clean_column(self, series, missing=9999, multiplier=1):
-        series = series.apply(float)
-        series[series == missing] = np.nan
-        return old_div(series, multiplier)
-
-    def _clean_column_by_name(self, frame, name, *args, **kwargs):
-        frame[name] = self._clean_column(frame[name], *args, **kwargs)
-        return frame
-
-    def _clean(self, frame):
-        """Clean up the data frame"""
-
-        # index by time
-        frame['time'] = [
-            pd.Timestamp('{:08}{:04}'.format(date, htime))
-            for date, htime in zip(frame['date'], frame['htime'])
-        ]
-        # these fields were combined into 'time'
-        frame.drop(['date', 'htime'], axis=1, inplace=True)
-        frame.set_index('time', drop=True, inplace=True)
-        frame = self._clean_column_by_name(frame, 'wdir', missing=999)
-        frame = self._clean_column_by_name(frame, 'ws', multiplier=10)
-        frame = self._clean_column_by_name(frame, 'ceiling', missing=99999)
-        frame = self._clean_column_by_name(frame, 'vsb', missing=999999)
-        frame = self._clean_column_by_name(frame, 't', multiplier=10)
-        frame = self._clean_column_by_name(frame, 'dpt', multiplier=10)
-        frame = self._clean_column_by_name(
-            frame, 'p', multiplier=10, missing=99999)
-        return frame
 
     def read_data_frame(self, file_object):
         """Create a data frame from an ISH file.
@@ -243,6 +138,66 @@ class ISH(object):
         print(dfloc.longitude.unique())
         return dfloc
 
+    def build_urls(self, dates, dfloc):
+        """Short summary.
+
+        Returns
+        -------
+        helper function to build urls
+
+        """
+
+        furls = []
+        fnames = []
+        print('Building AIRNOW URLs...')
+        url = 'https://www1.ncdc.noaa.gov/pub/data/noaa/isd-lite'
+        dfloc['fname'] = dfloc.usaf.astype(str) + "-" + dfloc.wban.astype(
+            str) + "-"
+        for date in self.dates.unique().astype(str):
+            dfloc['fname'] = dfloc.usaf.astype(str) + "-" + dfloc.wban.astype(
+                str) + "-" + date + ".gz"
+            for fname in dfloc.fname.values:
+                furls.append("{}/{}/{}".format(url, date, fname))
+            # f = url + i.strftime('%Y/%Y%m%d/HourlyData_%Y%m%d%H.dat')
+            # fname = i.strftime('HourlyData_%Y%m%d%H.dat')
+            # furls.append(f)
+            # fnames.append(fname)
+        # https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/2017/20170108/HourlyData_2016121506.dat
+
+        # files needed for comparison
+        url = pd.Series(furls, index=None)
+        return url
+
+    def read_csv(self, fname):
+        from numpy import NaN
+        columns = [
+            'year', 'month', 'day', 'hour', 'temp', 'dew_pt_temp', 'press',
+            'wdir', 'ws', 'sky_condition', 'precip_1hr', 'precip_6hr'
+        ]
+        df = pd.read_csv(
+            fname,
+            delim_whitespace=True,
+            header=None,
+            names=columns,
+            parse_dates={'time': [0, 1, 2, 3]},
+            infer_datetime_format=True)
+        df['temp'] /= 10.
+        df['dew_pt_temp'] /= 10.
+        df['press'] /= 10.
+        df['ws'] /= 10.
+        df['precip_1hr'] /= 10.
+        df['precip_6hr'] /= 10.
+        df = df.replace(-9999, NaN)
+        return df
+
+    def aggregrate_files(self, urls):
+        import dask
+        import dask.dataframe as dd
+        dfs = [dask.delayed(read_csv)(f) for f in urls]
+        dff = dd.from_delayed(dfs)
+        df = dff.compute()
+        return df
+
     def add_data(self,
                  dates,
                  box=None,
@@ -275,17 +230,9 @@ class ISH(object):
             Description of returned object.
 
         """
-        from numpy import NaN
-        self.dates = pd.to_datetime(dates)
-        idate = dates[0]
-        year = idate.strftime('%Y')
-        url = 'https://www1.ncdc.noaa.gov/pub/data/noaa/' + year + '/'
         if self.history is None:
             self.read_ish_history()
-        self.history['fname'] = url + self.history.usaf + \
-            '-' + self.history.wban + '-' + year + '.gz'
         dfloc = self.history.copy()
-        # if isinstance(box, None):  # type(box) is not type(None):
         if box is not None:  # type(box) is not type(None):
             print('Retrieving Sites in: ' + ' '.join(map(str, box)))
             dfloc = self.subset_sites(
@@ -299,38 +246,8 @@ class ISH(object):
         elif site is not None:
             print('Retrieving Site: ' + site)
             dfloc = self.history.loc[self.history.station_id == site, :]
-        print(dfloc.fname.unique())
-        objs = self.get_url_file_objs(dfloc.fname.unique())
-        # return objs,size,self.history.fname
-        # dfs = []
-        # for f in objs:
-        #     try:
-        #         dfs.append(self.read_data_frame(f))
-        #     except:
-        #         pass
-
-        print('  Reading ISH into pandas DataFrame...')
-        dfs = [dask.delayed(self.read_data_frame)(f) for f in objs]
-        dff = dd.from_delayed(dfs)
-        self.df = dff.compute()
-        self.df.loc[self.df.vsb == 99999, 'vsb'] = NaN
-        if resample:
-            print('  Resampling to every ' + window)
-            self.df.index = self.df.time
-            self.df = self.df.groupby('station_id').resample(
-                'H').mean().reset_index()
-        # this was encoded as byte literal but in dfloc it is a string so could
-        # not merge on station_id correctly.
-        try:
-            self.df['station_id'] = self.df['station_id'].str.decode("utf-8")
-        except RuntimeError:
-            pass
-        self.df = self.df.merge(
-            dfloc[['station_id', 'latitude', 'longitude', 'station name']],
-            on=['station_id'],
-            how='left')
-
-        return self.df.copy()
+        urls = self.build_urls(dates, dfloc)
+        return self.aggregrate_files(urls)
 
     def get_url_file_objs(self, fname):
         """Short summary.
