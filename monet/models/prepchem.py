@@ -40,7 +40,7 @@ def open_dataset(fname, dtype='f4', res='C384', tile=1):
         # grid = grid.rename({'grid_lat': 'lat_b', 'grid_lon': 'lon_b'})
         name = fname.split('.bin')[0]
         grid[name] = (('x', 'y'), s)
-        return grid[name]
+        return grid
     else:
         print(
             'Please install the fv3grid from https://github.com/bbakernoaa/fv3grid'
