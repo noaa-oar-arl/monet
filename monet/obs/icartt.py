@@ -15,9 +15,9 @@ def add_data(fname):
     return dset
 
 
-def xarray_flight_to_pandas(**kwargs):
+def xarray_flight_to_pandas(da, **kwargs):
     ic = ICARTT()
-    return ic.get_data(**kwargs)
+    return ic.get_data(da, **kwargs)
 
 
 class ICARTT(object):
