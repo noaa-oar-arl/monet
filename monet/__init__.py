@@ -1,10 +1,6 @@
 from . import grids, models, monet_accessor, obs, plots, profile, sat, util
 from .plots import savefig
 
-# from .monetmodels, obs, plots, util
-
-# __all__ = ['models', 'obs', 'plots', 'sat',
-#            'verification', 'util', 'monet_accessor', 'grids']
 __all__ = [
     'models', 'obs', 'plots', 'sat', 'util', 'monet_accessor', 'grids',
     'profile'

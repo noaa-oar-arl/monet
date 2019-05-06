@@ -122,8 +122,22 @@ from numpy import array
 
 standard_library.install_aliases()
 
+def add_data(dates,
+                 param=None,
+                 daily=False,
+                 sub_hourly=False,
+                 download=False,
+                 latlonbox=None):
+    a = CRN()
+    df = a.add_data(dates,
+                 daily=daily,
+                 sub_hourly=sub_hourly,
+                 download=download,
+                 latlonbox=latlonbox)
+    return df
 
-class crn(object):
+
+class CRN(object):
     def __init__(self):
         self.dates = None
         self.daily = False

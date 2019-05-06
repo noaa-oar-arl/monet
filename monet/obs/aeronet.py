@@ -13,6 +13,25 @@ def dateparse(x):
     return pd.datetime.strptime(x, '%d:%m:%Y %H:%M:%S')
 
 
+def add_data( dates=None,
+                 product='AOD15',
+                 latlonbox=None,
+                 daily=False,
+                 calc_550=True,
+                 inv_type=None,
+                 freq=None,
+                 detect_dust=False):
+    a = AERONET()
+    df = a.add_data( dates=dates,
+                 product=product,
+                 latlonbox=latlonbox,
+                 daily=daily,
+                 calc_550=calc_550,
+                 inv_type=inv_type,
+                 freq=freq,
+                 detect_dust=detect_dust)
+    return df
+
 class AERONET(object):
     def __init__(self):
         from numpy import concatenate, arange

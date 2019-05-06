@@ -188,7 +188,7 @@ def aggregate_files(dates=dates, download=False):
     return df
 
 
-def add_data(dates, download=False):
+def add_data(dates, download=False, wide_fmt=True):
     """Short summary.
 
     Parameters
@@ -204,8 +204,12 @@ def add_data(dates, download=False):
         Description of returned object.
 
     """
-
+    from ..util import long_to_wide
     df = aggregate_files(dates=dates, download=download)
+    if wide_fmt:
+        return long_to_wide(df)
+    else:
+        return df
     return df
 
 
