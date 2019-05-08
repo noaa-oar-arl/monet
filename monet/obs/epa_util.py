@@ -1,9 +1,7 @@
-from __future__ import print_function
-from ..util import mystats
-from future import standard_library
 import pandas as pd
 
-standard_library.install_aliases()
+from ..util import mystats
+
 
 def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3'):
     """
@@ -42,6 +40,7 @@ def convert_epa_unit(df, obscolumn='SO2', unit='UG/M3'):
         df = df[df['units'] == ugm3]  # find columns with units of 'ppb'
         df[obscolumn] = df[obscolumn] / factor
     return df
+
 
 def check_cmaq_units(df, param='O3', aqs_param='OZONE'):
     """Short summary.
@@ -107,7 +106,6 @@ def ensure_values_indomain(df, lon, lat):
 
     df = df[con].copy()
     return df
-
 
 
 def write_table(self,
@@ -359,21 +357,22 @@ def get_epa_location_df(df,
         df2 = new[new['msa_name'] == name].copy().drop_duplicates()
         title = name
     elif state != '':
-        df2 = new[new['state_name'].str.upper() ==
-                  state.upper()].copy().drop_duplicates()
+        df2 = new[new['state_name'].str.upper() == state.
+                  upper()].copy().drop_duplicates()
         title = 'STATE: ' + state.upper()
     elif region != '':
-        df2 = new[new['Region'].str.upper() ==
-                  region.upper()].copy().drop_duplicates()
+        df2 = new[new['Region'].str.upper() == region.
+                  upper()].copy().drop_duplicates()
         title = 'REGION: ' + region.upper()
     elif epa_region != '':
-        df2 = new[new['EPA_region'].str.upper() ==
-                  epa_region.upper()].copy().drop_duplicates()
+        df2 = new[new['EPA_region'].str.upper() == epa_region.
+                  upper()].copy().drop_duplicates()
         title = 'EPA_REGION: ' + epa_region.upper()
     else:
         df2 = new
         title = 'Domain'
     return df2, title
+
 
 def regulatory_resample(df, col='model', pollutant_standard=None):
     from pandas import to_timedelta, concat
@@ -604,7 +603,7 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
         drop_latlon = False
         if drop_latlon:
             if pd.Series(sss.keys()).isin(['latitude', 'longitude']):
-                return sss.drop(
-                    ['latitude', 'longitude'], axis=1).drop_duplicates()
+                return sss.drop(['latitude', 'longitude'],
+                                axis=1).drop_duplicates()
         else:
             return sss.drop_duplicates()
