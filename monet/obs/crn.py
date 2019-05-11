@@ -148,7 +148,7 @@ class CRN(object):
             'CT', 'DE', 'DC', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI',
             'VT'
         ],
-                               dtype='|S20')
+            dtype='|S20')
         self.nc_states = array(
             ['IL', 'IN', 'IA', 'KY', 'MI', 'MN', 'MO', 'OH', 'WI'],
             dtype='|S9')
@@ -157,7 +157,7 @@ class CRN(object):
             'AZ', 'CO', 'ID', 'KS', 'MT', 'NE', 'NV', 'NM', 'ND', 'SD', 'UT',
             'WY'
         ],
-                              dtype='|S12')
+            dtype='|S12')
         self.p_states = array(['CA', 'OR', 'WA'], dtype='|S10')
         self.objtype = 'CRN'
         self.monitor_file = inspect.getfile(

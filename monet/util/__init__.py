@@ -158,7 +158,7 @@ def get_giorgi_region_bounds(index=None, acronym=None):
         'lonmax': lonmax,
         'acronym': acro
     },
-                      index=i)
+        index=i)
     try:
         if index is None and acronym is None:
             print('either index or acronym needs to be supplied')
