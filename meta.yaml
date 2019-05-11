@@ -3,11 +3,11 @@
 
 package:
   name: monet
-  version: 2.1.2
+  version: 2.1.3.dev
 
 source:
-  url: https://github.com/noaa-oar-arl/MONET/archive/2.1.2.tar.gz
-  sha256: a7680978c064f5f0c21a0a8be8a96b9dfacd65d68992e5603c203639dcdc1f7b
+  url: https://github.com/noaa-oar-arl/MONET/archive/v2.1.3-dev.tar.gz
+  sha256: 7027a0478cab0f877ebc7e412a0249d0578c0944fab4da6f341175995b957931
 
 build:
   number: 0
@@ -28,6 +28,7 @@ requirements:
     - pseudonetcdf
     - pyresample
     - xesmf
+    - python-stratify
   run:
     - python
 
