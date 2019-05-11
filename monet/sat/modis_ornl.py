@@ -13,8 +13,8 @@ __version__ = "0.4 (29.07.2010)"
 __email__ = "barry.baker@noaa.gov"
 # Modified P. Campbell 2019-04-03
 
-import optparse
-import os
+# import optparse
+# import os
 import pickle
 import sys
 from copy import copy
@@ -90,7 +90,7 @@ class modisData(object):
 
     def applyScale(self):
 
-        if self.isScaled == False:
+        if self.isScaled is False:
             self.data = self.data * self.scale
             self.isScaled = True
 
@@ -235,24 +235,24 @@ def modisClient(client=None,
     m.kmABoveBelow = kmAboveBelow
     m.kmLeftRight = kmLeftRight
 
-    if client == None:
+    if client is None:
         client = setClient()
 
     m.server = client.wsdl.url
 
-    if product == None:
+    if product is None:
         prodList = client.service.getproducts()
         return prodList
 
     m.product = product
 
-    if band == None:
+    if band is None:
         bandList = client.service.getbands(product)
         return bandList
 
     m.band = band
 
-    if lat == None or lon == None:
+    if lat is None or lon is None:
         latLonErr()
 
     m.latitude = lat
@@ -263,7 +263,7 @@ def modisClient(client=None,
 
     dateList = client.service.getdates(lat, lon, product)
 
-    if startDate == None or endDate == None:
+    if startDate is None or endDate is None:
         return dateList
 
     # count up the total number of dates
@@ -376,8 +376,8 @@ def _get_single_retrieval(date,
                           kmLeftRight=100):
     import pandas as pd
     client = setClient()
-    prodList = modisClient(client)
-    bandList = modisClient(client, product='MOD15A2H')
+    # prodList = modisClient(client)
+    # bandList = modisClient(client, product='MOD15A2H')
     dateList = modisClient(
         client, product='MOD15A2H', band='Lai_500m', lat=lat, lon=lon)
     dates = pd.to_datetime(dateList, format='A%Y%j')

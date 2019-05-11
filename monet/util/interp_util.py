@@ -1,7 +1,5 @@
 """ Interpolation functions """
 
-from builtins import str, zip
-
 
 def lonlat_to_xesmf(longitude=None, latitude=None):
     """Creates an empty xarray.Dataset with the coordinate (longitude, latitude).
