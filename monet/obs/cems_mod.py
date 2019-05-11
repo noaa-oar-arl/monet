@@ -1,8 +1,10 @@
-from __future__ import print_function
-import os
 import datetime
-import pandas as pd
+import os
+
 import numpy as np
+import pandas as pd
+
+
 """
 NAME: cems_mod.py
 PGRMMER: Alice Crawford   ORG: ARL
@@ -158,7 +160,6 @@ class CEMS(object):
                 url = self.retrieve(rd, st, download=download, verbose=verbose)
                 self.load(url, verbose=verbose)
         return self.df
-
 
     def match_column(self, varname):
         """varname is list of strings.

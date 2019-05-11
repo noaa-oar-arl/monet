@@ -1,5 +1,4 @@
 """Python module for reading NOAA ISH files"""
-from __future__ import division, print_function
 
 from builtins import object, zip
 
@@ -8,10 +7,6 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 from dask.diagnostics import ProgressBar
-from future import standard_library
-from past.utils import old_div
-
-standard_library.install_aliases()
 
 ProgressBar().register()
 

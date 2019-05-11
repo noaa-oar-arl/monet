@@ -1,5 +1,6 @@
-""" this will read the modis data"""
+""" this will read the goes_r data"""
 import xarray as xr
+
 from ..grids import _geos_16_grid
 
 

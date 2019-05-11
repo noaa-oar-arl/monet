@@ -1,9 +1,9 @@
 """ Obs Utilities """
 
-from __future__ import print_function
-import numpy as np
 import datetime
 import sys
+
+import numpy as np
 
 
 def find_near(df, latlon, distance=100, sid='site_num', drange=None):

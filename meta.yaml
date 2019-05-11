@@ -1,0 +1,42 @@
+{% set name = "monet" %}
+{% set version = "2.1.2" %}
+
+package:
+  name: monet
+  version: 2.1.2
+
+source:
+  url: https://github.com/noaa-oar-arl/MONET/archive/2.1.2.tar.gz
+  sha256: a7680978c064f5f0c21a0a8be8a96b9dfacd65d68992e5603c203639dcdc1f7b
+
+build:
+  number: 0
+  noarch: python
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+
+requirements:
+  host:
+    - git
+    - python
+    - numpy
+    - pandas
+    - xarray
+    - dask
+    - cartopy
+    - matplotlib
+    - seaborn
+    - pseudonetcdf
+    - pyresample
+    - xesmf
+  run:
+    - python
+
+# test:
+#   imports:
+#     - click
+
+about:
+  home: https://monet-arl.readthedocs-io
+  license: MIT
+  license_family: MIT
+  summary: The Model and ObservatioN Evaluation Tool - for meteorology and AQ

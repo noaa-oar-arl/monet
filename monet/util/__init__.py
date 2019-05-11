@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function
-
 import numpy as np
 
 from . import combinetool, interp_util, mystats, resample, tools

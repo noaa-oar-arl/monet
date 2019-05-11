@@ -24,8 +24,6 @@
         Description of attribute `savecols`.
     """
 
-from __future__ import print_function
-
 import inspect
 import os
 # this is written to retrive airnow data concatenate and add to pandas array
@@ -34,7 +32,6 @@ from builtins import object
 from datetime import datetime
 
 import pandas as pd
-
 
 datadir = '.'
 cwd = os.getcwd()
@@ -49,8 +46,8 @@ filelist = None
 monitor_df = None
 savecols = [
     'time', 'siteid', 'site', 'utcoffset', 'variable', 'units', 'obs',
-    'time_local', 'latitude', 'longitude', 'cmsa_name', 'msa_code',
-    'msa_name', 'state_name', 'epa_region'
+    'time_local', 'latitude', 'longitude', 'cmsa_name', 'msa_code', 'msa_name',
+    'state_name', 'epa_region'
 ]
 
 
@@ -103,14 +100,14 @@ def read_csv(fn):
             error_bad_lines=False,
             encoding='ISO-8859-1')
         cols = [
-            'date', 'time', 'siteid', 'site', 'utcoffset', 'variable',
-            'units', 'obs', 'source'
+            'date', 'time', 'siteid', 'site', 'utcoffset', 'variable', 'units',
+            'obs', 'source'
         ]
         dft.columns = cols
     except Exception:
         cols = [
-            'date', 'time', 'siteid', 'site', 'utcoffset', 'variable',
-            'units', 'obs', 'source'
+            'date', 'time', 'siteid', 'site', 'utcoffset', 'variable', 'units',
+            'obs', 'source'
         ]
         dft = pd.DataFrame(columns=cols)
     dft['obs'] = dft.obs.astype(float)
@@ -275,7 +272,8 @@ def get_station_locations_remerge(df):
         Description of returned object.
 
     """
-    df = pd.merge(df, monitor_df.drop(['Latitude', 'Longitude'], axis=1),
-                  on='siteid')  # ,
+    df = pd.merge(
+        df, monitor_df.drop(['Latitude', 'Longitude'], axis=1),
+        on='siteid')  # ,
     # how='left')
     return df

@@ -1,5 +1,3 @@
-from __future__ import division, print_function
-
 # this is written to retrive airnow data concatenate and add to pandas array
 # for usage
 from builtins import object, str
@@ -13,24 +11,26 @@ def dateparse(x):
     return pd.datetime.strptime(x, '%d:%m:%Y %H:%M:%S')
 
 
-def add_data( dates=None,
-                 product='AOD15',
-                 latlonbox=None,
-                 daily=False,
-                 calc_550=True,
-                 inv_type=None,
-                 freq=None,
-                 detect_dust=False):
+def add_data(dates=None,
+             product='AOD15',
+             latlonbox=None,
+             daily=False,
+             calc_550=True,
+             inv_type=None,
+             freq=None,
+             detect_dust=False):
     a = AERONET()
-    df = a.add_data( dates=dates,
-                 product=product,
-                 latlonbox=latlonbox,
-                 daily=daily,
-                 calc_550=calc_550,
-                 inv_type=inv_type,
-                 freq=freq,
-                 detect_dust=detect_dust)
+    df = a.add_data(
+        dates=dates,
+        product=product,
+        latlonbox=latlonbox,
+        daily=daily,
+        calc_550=calc_550,
+        inv_type=inv_type,
+        freq=freq,
+        detect_dust=detect_dust)
     return df
+
 
 class AERONET(object):
     def __init__(self):
@@ -184,8 +184,8 @@ class AERONET(object):
 
         aod550 = aod500 * (550/500) ^ -alpha
         """
-        self.df['aod_550nm'] = self.df.aod_500nm * (old_div(
-            550., 500.))**(-self.df['440-870_angstrom_exponent'])
+        self.df['aod_550nm'] = self.df.aod_500nm * (550. / 500.)**(
+            -self.df['440-870_angstrom_exponent'])
 
     def dust_detect(self):
         """Detect dust from AERONET. See [Dubovik et al., 2002].
@@ -198,7 +198,8 @@ class AERONET(object):
             Description of returned object.
 
         """
-        self.df['dust'] = (self.df['aod_1020nm'] > 0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
+        self.df['dust'] = (self.df['aod_1020nm'] >
+                           0.3) & (self.df['440-870_angstrom_exponent'] < 0.6)
 
     def set_daterange(self, begin='', end=''):
         dates = pd.date_range(
