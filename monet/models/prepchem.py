@@ -69,3 +69,4 @@ def to_prepchem_binary(data, fname='output.bin', dtype='f4'):
     """
     f = FortranFile(fname, 'w')
     f.write_record(data.astype(dtype))
+    f.close()
