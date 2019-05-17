@@ -27,7 +27,7 @@ requirements:
     - seaborn
     - pseudonetcdf
     - pyresample
-    - xesmf
+    - xesmf # [not win]
     - python-stratify
   run:
     - python
