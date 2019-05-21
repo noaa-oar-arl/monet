@@ -9,9 +9,11 @@ import pandas as pd
 import xarray as xr
 
 
-def add_data(fname):
+def add_data(fname, lat_label=None, lon_label=None, alt_label=None):
     ic = ICARTT()
     dset = ic.add_data(fname)
+    dset = ic._rename_to_monet(
+        dset, lat_label=lat_label, lon_label=lon_label, alt_label=alt_label)
     return dset
 
 
@@ -28,21 +30,50 @@ class ICARTT(object):
 
     def __init__(self):
         self.objtype = 'ICARTT'
-        self.cwd = os.getcwd()
-        self.dset = None
 
-    def add_data(self, fname):
+    def add_data(self, fname, lat_label=None, lon_label=None, alt_label=None):
         """ This assumes that you have downloaded the specific ICARTT flight data
         Xarray Open/Read the ICARTT flight dataset as pseudonetcdf
 
 
         """
         # Xarray Open/Read the ICARTT flight dataset as pseudonetcdf engine
-        self.dset = xr.open_dataset(
+        dset = xr.open_dataset(
             fname, engine='pseudonetcdf', decode_times=False)
-        return self.dset
+        return dset
 
-    def get_data(self, da, lat_label=None, lon_label=None, alt_label=None):
+    def _rename_to_monet(d):
+        possible_lats = [
+            'Lat', 'Latitude', 'lat', 'latitude', 'Latitude_Deg',
+            'Latitude_deg', 'Lat_deg', 'Lat_degree', 'Lat_Degree',
+            'Latitude_degrees', 'Latitude_Degrees', 'Latitude_degree',
+            'Latitude_Degree', 'Lat_aircraft', 'Latitude_aircraft'
+        ]
+        possible_lons = [
+            'Lon', 'Longitude', 'lon', 'longitude', 'Longitude_Deg',
+            'Longitude_deg', 'Lon_deg', 'Lon_degree', 'Lon_Degree', 'Long',
+            'Long_Deg', 'Longitude_degrees', 'Longitude_Degrees',
+            'Longitude_degree', 'Latitude_Degree', 'Lon_aircraft',
+            'Long_aircraft'
+            'Longitude_aircraft'
+        ]
+        lat_name = pd.Series(d.data_vars)[pd.Series(
+            d.data_vars).isin(possible_lats)].values[0]
+        lon_name = pd.Series(d.data_vars)[pd.Series(
+            d.data_vars).isin(possible_lons)].values[0]
+        d.coords['latitude'] = d[lat_name]
+        d.coords['longitude'] = d[lon_name]
+        d = d.rename({'POINTS': 'time'})
+        d['time'] = pd.to_datetime(d.SDATE.replace(', ',
+                                                   '-')) + pd.to_timedelta(
+                                                       d[d.TFLAG], unit='s')
+        return d
+
+    def _rename_data_arrays(self,
+                            da,
+                            lat_label=None,
+                            lon_label=None,
+                            alt_label=None):
         """ Comes in as an xarray from add_xarray_Data
         Allows for searching or user specified Lat/Lon variable names
         Sets latitude and longitude as coordinates
