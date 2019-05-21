@@ -1,0 +1,23 @@
+language: python
+
+
+branches:
+  only:
+  - master
+  - develop
+
+before_install:
+  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update --yes conda
+
+
+install:
+  # Install Anaconda
+  -
+
+after_success:
+  - test $TRAVIS_BRANCH = "master" && conda install conda-build && conda install anaconda-client && bash conda/conda_upload.sh
