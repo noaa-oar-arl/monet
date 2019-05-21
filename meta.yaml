@@ -29,6 +29,7 @@ requirements:
     - pyresample
     - xesmf # [not win]
     - python-stratify
+    - pytables
   run:
     - python
 
