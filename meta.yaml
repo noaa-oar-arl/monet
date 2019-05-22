@@ -1,20 +1,24 @@
 {% set name = "monet" %}
-{% set version = "2.1.2" %}
+{% set version = "2.1.10" %}
 
 package:
   name: monet
-  version: 2.1.3.dev
+  version: {{ version }}
 
 source:
-  url: https://github.com/noaa-oar-arl/MONET/archive/v2.1.3-dev.tar.gz
-  sha256: 7027a0478cab0f877ebc7e412a0249d0578c0944fab4da6f341175995b957931
+  git_url: https://github.com/noaa-oar-arl/MONET.git
+  git_tag: develop
+  #url: https://github.com/noaa-oar-arl/MONET/archive/v2.1.3-dev.2.tar.gz
+  # sha256: 7027a0478cab0f877ebc7e412a0249d0578c0944fab4da6f341175995b957931
 
 build:
   number: 0
   noarch: python
-  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+  script: "{{ PYTHON }} -m pip install . -vv"
 
 requirements:
+  build:
+    - {{ compiler('c') }}
   host:
     - git
     - python
@@ -33,12 +37,15 @@ requirements:
   run:
     - python
 
-# test:
-#   imports:
-#     - click
-
 about:
-  home: https://monet-arl.readthedocs-io
-  license: MIT
+  home: https://monet-arl.readthedocs.io
+  license: MIT License
   license_family: MIT
+  license_file: LICENSE
   summary: The Model and ObservatioN Evaluation Tool - for meteorology and AQ
+
+extra:
+  recipe-maintainers:
+    # GitHub IDs for maintainers of the recipe.
+    # Always check with the people listed below if they are OK becoming maintainers of the recipe. (There will be spam!)
+    - bbakernoaa
