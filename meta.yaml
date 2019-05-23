@@ -20,7 +20,11 @@ requirements:
   build:
     - {{ compiler('c') }}
     - python
-    - setuptools
+  host:
+    - git
+    - python
+  run:
+    - python
     - numpy
     - scipy
     - pandas
@@ -34,11 +38,6 @@ requirements:
     - xesmf # [not win]
     - python-stratify
     - pytables
-  host:
-    - git
-    - python
-  run:
-    - python
 
 about:
   home: https://monet-arl.readthedocs.io
