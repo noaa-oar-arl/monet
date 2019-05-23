@@ -14,19 +14,15 @@ source:
 build:
   number: 0
   noarch: python
-  script: "{{ PYTHON }} setup.py install"
+  script: "{{ PYTHON }} -m pip install . -vv"
 
 requirements:
   build:
     - {{ compiler('c') }}
-    - python
   host:
     - git
     - python
-  run:
-    - python
     - numpy
-    - scipy
     - pandas
     - xarray
     - dask
@@ -38,6 +34,8 @@ requirements:
     - xesmf # [not win]
     - python-stratify
     - pytables
+  run:
+    - python
 
 about:
   home: https://monet-arl.readthedocs.io
