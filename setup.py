@@ -31,5 +31,20 @@ setup(
     description='The Model and Observation Evaluation Toolkit (MONET)',
     install_requires=[
         'pandas', 'netcdf4', 'xarray', 'dask', 'xesmf', 'pyresample',
-        'matplotlib', 'seaborn', 'future', 'cartopy'
+        'matplotlib', 'seaborn', 'cartopy', 'python-stratify', 'pytables'
     ])
+
+# - python
+# - setuptools
+# - numpy
+# - pandas
+# - xarray
+# - dask
+# - cartopy
+# - matplotlib
+# - seaborn
+# - pseudonetcdf
+# - pyresample
+# - xesmf # [not win]
+# - python-stratify
+# - pytables
