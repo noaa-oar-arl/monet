@@ -37,7 +37,7 @@ class TaylorDiagram(object):
         tr = PolarAxes.PolarTransform()
 
         # Correlation labels
-        rlocs = NP.concatenate((old_div(NP.arange(10), 10.), [0.95, 0.99]))
+        rlocs = NP.concatenate((NP.arange(10) / 10., [0.95, 0.99]))
         tlocs = NP.arccos(rlocs)  # Conversion to polar angles
         gl1 = GF.FixedLocator(tlocs)  # Positions
         tf1 = GF.DictFormatter(dict(list(zip(tlocs, list(map(str, rlocs))))))
@@ -49,7 +49,7 @@ class TaylorDiagram(object):
             tr,
             extremes=(
                 0,
-                old_div(NP.pi, 2),  # 1st quadrant
+                NP.pi / 2,  # 1st quadrant
                 self.smin,
                 self.smax),
             grid_locator1=gl1,
@@ -93,7 +93,7 @@ class TaylorDiagram(object):
                           ms=14,
                           label=label,
                           zorder=10)
-        t = NP.linspace(0, old_div(NP.pi, 2))
+        t = NP.linspace(0, NP.pi / 2)
         r = NP.zeros_like(t) + self.refstd
         self.ax.plot(t, r, 'k--', label='_')
 
@@ -114,8 +114,7 @@ class TaylorDiagram(object):
         """Add constant centered RMS difference contours."""
 
         rs, ts = NP.meshgrid(
-            NP.linspace(self.smin, self.smax), NP.linspace(
-                0, old_div(NP.pi, 2)))
+            NP.linspace(self.smin, self.smax), NP.linspace(0, NP.pi / 2))
         # Compute centered RMS difference
         rms = NP.sqrt(self.refstd**2 + rs**2 -
                       2 * self.refstd * rs * NP.cos(ts))
