@@ -22,6 +22,8 @@ requirements:
   host:
     - git
     - python
+  run:
+    - python
     - numpy
     - pandas
     - xarray
@@ -34,8 +36,6 @@ requirements:
     - xesmf # [not win]
     - python-stratify
     - pytables
-  run:
-    - python
 
 about:
   home: https://monet-arl.readthedocs.io
