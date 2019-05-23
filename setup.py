@@ -1,7 +1,3 @@
-import os
-import sys
-from warnings import warn
-
 try:
     from setuptools import setup, find_packages
 except ImportError:
