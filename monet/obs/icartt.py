@@ -1,9 +1,7 @@
 """ This module opens data from the ICARTT format and reformats it for use in
 MONET. The module makes use of Barron Henderson's PseudoNetCDF
 (https://github.com/barronh/pseudonetcdf)and xarray to read the data.  It is
-noti ntended to read more than ONE file at a time """
-
-import os
+not intended to read more than ONE file at a time """
 
 import pandas as pd
 import xarray as xr
