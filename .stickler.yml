@@ -9,6 +9,7 @@ linters:
       - 'E128'
       - 'E501'
       - 'E122'
+      - 'W503'
 fixers:
   enable: true
 review:
