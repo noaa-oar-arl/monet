@@ -1,9 +1,8 @@
-from __future__ import print_function
-
 import inspect
 import os
 # this is a class to deal with aqs data
 from builtins import object, zip
+
 import pandas as pd
 from dask.diagnostics import ProgressBar
 
@@ -12,26 +11,29 @@ from .epa_util import read_monitor_file
 pbar = ProgressBar()
 pbar.register()
 
+
 def add_data(dates,
-                 param=None,
-                 daily=False,
-                 network=None,
-                 download=False,
-                 local=False,
-                 wide_fmt=True):
+             param=None,
+             daily=False,
+             network=None,
+             download=False,
+             local=False,
+             wide_fmt=True):
     from ..util import long_to_wide
     a = AQS()
-    df = a.add_data(dates,
-                 param=param,
-                 daily=daily,
-                 network=network,
-                 download=download,
-                 local=local)
-    
+    df = a.add_data(
+        dates,
+        param=param,
+        daily=daily,
+        network=network,
+        download=download,
+        local=local)
+
     if wide_fmt:
         return long_to_wide(df)
     else:
         return df
+
 
 class AQS(object):
     """Short summary.
@@ -100,7 +102,7 @@ class AQS(object):
 
     def columns_rename(self, columns, verbose=False):
         """
-        rename columns for hourly data. 
+        rename columns for hourly data.
         Parameters
         ----------
         columns : list of strings
@@ -355,7 +357,7 @@ class AQS(object):
             dfs = [dask.delayed(self.load_aqs_file)(i, network) for i in urls]
         dff = dd.from_delayed(dfs)
         dfff = dff.compute()
-        return(self.add_data2(dfff, daily, network))
+        return (self.add_data2(dfff, daily, network))
 
     def add_data2(self, df, daily=False, network=None):
         """
@@ -363,10 +365,10 @@ class AQS(object):
         ------------
         df : dataframe
         daily : boolean
-        network : 
+        network :
 
         Returns:
-        self.df.copy() : dataframe 
+        self.df.copy() : dataframe
         """
         self.df = df
         self.df = self.change_units(self.df)
@@ -390,7 +392,10 @@ class AQS(object):
                 [network])].drop_duplicates(subset=['siteid'])
         else:
             monitors = self.monitor_df.drop_duplicates(subset=['siteid'])
-        self.df = pd.merge(self.df, monitors, on=['siteid'], how='left')
+        # AMC - merging only on siteid was causing latitude_x latitude_y to be
+        # created.
+        mlist = ['siteid', 'latitude', 'longitude']
+        self.df = pd.merge(self.df, monitors, on=mlist, how='left')
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')

@@ -1,17 +1,11 @@
-from __future__ import print_function
-
-import os
-import sys
-from warnings import warn
-
 try:
     from setuptools import setup, find_packages
-except:
+except ImportError:
     from distutils.core import setup
 
 setup(
     name='monet',
-    version='2.1.2',
+    version='2.1.3-dev',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
     include_package_data=True,
@@ -33,5 +27,20 @@ setup(
     description='The Model and Observation Evaluation Toolkit (MONET)',
     install_requires=[
         'pandas', 'netcdf4', 'xarray', 'dask', 'xesmf', 'pyresample',
-        'matplotlib', 'seaborn', 'future', 'cartopy'
+        'matplotlib', 'seaborn', 'cartopy'
     ])
+
+# - python
+# - setuptools
+# - numpy
+# - pandas
+# - xarray
+# - dask
+# - cartopy
+# - matplotlib
+# - seaborn
+# - pseudonetcdf
+# - pyresample
+# - xesmf # [not win]
+# - python-stratify
+# - pytables

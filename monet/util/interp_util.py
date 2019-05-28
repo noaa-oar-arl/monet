@@ -1,7 +1,4 @@
 """ Interpolation functions """
-from __future__ import print_function
-
-from builtins import str, zip
 
 
 def lonlat_to_xesmf(longitude=None, latitude=None):

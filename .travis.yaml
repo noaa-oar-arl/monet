@@ -1,0 +1,21 @@
+language: python
+
+
+branches:
+  only:
+  - master
+  - develop
+
+before_install:
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update --yes conda
+
+
+install:
+  - conda install -c bbakernoaa monet
+
+# after_success:
+#   - test $TRAVIS_BRANCH = "master" && conda install conda-build && conda install anaconda-client && bash conda/conda_upload.sh

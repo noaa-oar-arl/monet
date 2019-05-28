@@ -1,7 +1,5 @@
 "MONET Accessor"
 
-from __future__ import print_function
-
 import pandas as pd
 import xarray as xr
 
@@ -590,10 +588,12 @@ class MONETAccessorDataset(object):
         try:
             if isinstance(data, xr.DataArray):
                 data = rename_latlon(data)
-                self._remap_nearest_dataarray(data, radius_of_influence=radius_of_influence)
+                self._remap_nearest_dataarray(
+                    data, radius_of_influence=radius_of_influence)
             elif isinstance(data, xr.Dataset):
                 data = rename_latlon(data)
-                self._remap_nearest_dataset(data, radius_of_influence=radius_of_influence)
+                self._remap_nearest_dataset(
+                    data, radius_of_influence=radius_of_influence)
             else:
                 raise TypeError
         except TypeError:

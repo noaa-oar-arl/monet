@@ -13,13 +13,14 @@ __version__ = "0.4 (29.07.2010)"
 __email__ = "barry.baker@noaa.gov"
 # Modified P. Campbell 2019-04-03
 
-import optparse
-import os
+# import optparse
+# import os
 import pickle
 import sys
 from copy import copy
 
 import numpy as np
+from dask.diagnostics import ProgressBar
 
 try:
     from suds.client import *
@@ -29,6 +30,9 @@ except ImportError:
 DEBUG_PRINTING = False
 
 defaultURL = 'https://modis.ornl.gov/cgi-bin/MODIS/soapservice/MODIS_soapservice.wsdl'
+
+pbar = ProgressBar()
+pbar.register()
 
 
 class modisData(object):
@@ -86,7 +90,7 @@ class modisData(object):
 
     def applyScale(self):
 
-        if self.isScaled == False:
+        if self.isScaled is False:
             self.data = self.data * self.scale
             self.isScaled = True
 
@@ -231,24 +235,24 @@ def modisClient(client=None,
     m.kmABoveBelow = kmAboveBelow
     m.kmLeftRight = kmLeftRight
 
-    if client == None:
+    if client is None:
         client = setClient()
 
     m.server = client.wsdl.url
 
-    if product == None:
+    if product is None:
         prodList = client.service.getproducts()
         return prodList
 
     m.product = product
 
-    if band == None:
+    if band is None:
         bandList = client.service.getbands(product)
         return bandList
 
     m.band = band
 
-    if lat == None or lon == None:
+    if lat is None or lon is None:
         latLonErr()
 
     m.latitude = lat
@@ -259,7 +263,7 @@ def modisClient(client=None,
 
     dateList = client.service.getdates(lat, lon, product)
 
-    if startDate == None or endDate == None:
+    if startDate is None or endDate is None:
         return dateList
 
     # count up the total number of dates
@@ -372,8 +376,8 @@ def _get_single_retrieval(date,
                           kmLeftRight=100):
     import pandas as pd
     client = setClient()
-    prodList = modisClient(client)
-    bandList = modisClient(client, product='MOD15A2H')
+    # prodList = modisClient(client)
+    # bandList = modisClient(client, product='MOD15A2H')
     dateList = modisClient(
         client, product='MOD15A2H', band='Lai_500m', lat=lat, lon=lon)
     dates = pd.to_datetime(dateList, format='A%Y%j')
@@ -391,28 +395,16 @@ def _get_single_retrieval(date,
             kmAboveBelow=kmAboveBelow,
             kmLeftRight=kmLeftRight)
     else:
-        if dates.max() > date.max():
-            m = modisClient(
-                client,
-                product='MOD15A2H',
-                band='Lai_500m',
-                lat=lat,
-                lon=lon,
-                startDate=int(dates.min().strftime('%Y%j')),
-                endDate=int(date.max().strftime('%Y%j')),
-                kmAboveBelow=kmAboveBelow,
-                kmLeftRight=kmLeftRight)
-        else:
-            m = modisClient(
-                client,
-                product='MOD15A2H',
-                band='Lai_500m',
-                lat=lat,
-                lon=lon,
-                startDate=int(date.min().strftime('%Y%j')),
-                endDate=int(date.max().strftime('%Y%j')),
-                kmAboveBelow=kmAboveBelow,
-                kmLeftRight=kmLeftRight)
+        m = modisClient(
+            client,
+            product='MOD15A2H',
+            band='Lai_500m',
+            lat=lat,
+            lon=lon,
+            startDate=int(dates.min().strftime('%Y%j')),
+            endDate=int(date.max().strftime('%Y%j')),
+            kmAboveBelow=kmAboveBelow,
+            kmLeftRight=kmLeftRight)
     if quality_control is not None:
         modisGetQA(
             m,
@@ -447,7 +439,8 @@ def _make_xarray_dataarray(m):
     from pandas import to_datetime
     da = xr.DataArray(
         m.data.reshape(m.ncols, m.nrows, order='C')[::-1, :], dims=('x', 'y'))
-    da.attrs['long_name'] = r m.product
+    da.attrs['long_name'] = m.band
+    da.attrs['product'] = m.product
     da.attrs['cellsize'] = m.cellsize
     da.attrs['units'] = m.units
     da.attrs['server'] = m.server
@@ -495,20 +488,52 @@ def _get_latlon(xll, yll, cell_width, nx, ny):
     return lon, lat
 
 
-def open_dataset(date, **kwargs):
+def open_dataset(date,
+                 product='MOD12A2H',
+                 band='Lai_500m',
+                 quality_control=None,
+                 latitude=0,
+                 longitude=0,
+                 kmAboveBelow=100,
+                 kmLeftRight=100):
     import pandas as pd
     date = pd.to_datetime(date)
-    m = _get_single_retrieval(date, **kwargs)
+    m = _get_single_retrieval(
+        date,
+        product=product,
+        band=band,
+        quality_control=quality_control,
+        lat=latitude,
+        lon=longitude,
+        kmAboveBelow=kmAboveBelow,
+        kmLeftRight=kmLeftRight)
     da = _make_xarray_dataarray(m)
     return da
 
 
-def open_mfdataset(dates, **kwargs):
+def open_mfdataset(dates,
+                   product='MOD12A2H',
+                   band='Lai_500m',
+                   quality_control=None,
+                   latitude=0,
+                   longitude=0,
+                   kmAboveBelow=100,
+                   kmLeftRight=100):
     import pandas as pd
     import xarray as xr
     import dask
     dates = pd.to_datetime(dates)
     od = dask.delayed(open_dataset)
-
-    das = dask.delayed([open_dataset(i, **kwargs) for i in dates])
-    return xr.concat(das.compute(), dim='time')
+    das = dask.delayed([
+        od(i,
+           product=product,
+           band=band,
+           quality_control=quality_control,
+           latitude=latitude,
+           longitude=longitude,
+           kmAboveBelow=kmAboveBelow,
+           kmLeftRight=kmLeftRight) for i in dates
+    ])
+    da = xr.concat(das.compute(), dim='time')
+    da['time'] = dates
+    return da

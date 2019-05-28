@@ -2,14 +2,12 @@
 Taylor diagram (Taylor, 2001) test implementation.
 http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm
 """
-from __future__ import division, print_function
 
 from builtins import map, object, zip
 
 import matplotlib.pyplot as PLT
 import numpy as NP
 import seaborn as sns
-from past.utils import old_div
 
 __version__ = "Time-stamp: <2012-02-17 20:59:35 ycopin>"
 __author__ = "Yannick Copin <yannick.copin@laposte.net>"
@@ -39,7 +37,7 @@ class TaylorDiagram(object):
         tr = PolarAxes.PolarTransform()
 
         # Correlation labels
-        rlocs = NP.concatenate((old_div(NP.arange(10), 10.), [0.95, 0.99]))
+        rlocs = NP.concatenate((NP.arange(10) / 10., [0.95, 0.99]))
         tlocs = NP.arccos(rlocs)  # Conversion to polar angles
         gl1 = GF.FixedLocator(tlocs)  # Positions
         tf1 = GF.DictFormatter(dict(list(zip(tlocs, list(map(str, rlocs))))))
@@ -51,7 +49,7 @@ class TaylorDiagram(object):
             tr,
             extremes=(
                 0,
-                old_div(NP.pi, 2),  # 1st quadrant
+                NP.pi / 2,  # 1st quadrant
                 self.smin,
                 self.smax),
             grid_locator1=gl1,
@@ -88,9 +86,14 @@ class TaylorDiagram(object):
 
         # Add reference point and stddev contour
         print("Reference std:", self.refstd)
-        l, = self.ax.plot(
-            [0], self.refstd, 'r*', ls='', ms=14, label=label, zorder=10)
-        t = NP.linspace(0, old_div(NP.pi, 2))
+        l, = self.ax.plot([0],
+                          self.refstd,
+                          'r*',
+                          ls='',
+                          ms=14,
+                          label=label,
+                          zorder=10)
+        t = NP.linspace(0, NP.pi / 2)
         r = NP.zeros_like(t) + self.refstd
         self.ax.plot(t, r, 'k--', label='_')
 
@@ -111,8 +114,7 @@ class TaylorDiagram(object):
         """Add constant centered RMS difference contours."""
 
         rs, ts = NP.meshgrid(
-            NP.linspace(self.smin, self.smax), NP.linspace(
-                0, old_div(NP.pi, 2)))
+            NP.linspace(self.smin, self.smax), NP.linspace(0, NP.pi / 2))
         # Compute centered RMS difference
         rms = NP.sqrt(self.refstd**2 + rs**2 -
                       2 * self.refstd * rs * NP.cos(ts))
@@ -120,6 +122,7 @@ class TaylorDiagram(object):
         contours = self.ax.contour(ts, rs, rms, levels, **kwargs)
 
         return contours
+
 
 # if __name__ == '__main__':
 

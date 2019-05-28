@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function
-
 from pandas import Series, merge_asof
 
 # from ..util import interp_util as interpo

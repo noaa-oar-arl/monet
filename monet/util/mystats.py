@@ -1,201 +1,783 @@
-from __future__ import division
-from __future__ import print_function
-from builtins import str
-from past.utils import old_div
 import numpy as np
 from pandas import DataFrame, crosstab
 
 
 def STDO(obs, mod, axis=None):
-    """ Standard deviation of Observations """
+    """ Standard deviation of Observations
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.std(obs, axis=axis)
 
 
 def STDP(obs, mod, axis=None):
-    """ Standard deviation of Predictions """
+    """ Standard deviation of Predictions
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.std(mod, axis=axis)
 
 
 def MNB(obs, mod, axis=None):
-    """ Mean Normalized Bias (%)"""
-    return np.ma.masked_invalid(old_div(
-        (mod - obs), obs)).mean(axis=axis) * 100.
+    """ Mean Normalized Bias (%)
 
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return np.ma.masked_invalid((mod - obs) / obs).mean(axis=axis) * 100.
 
 
 def MNE(obs, mod, axis=None):
-    """ Mean Normalized Gross Error (%)"""
-    return np.ma.masked_invalid(old_div(np.ma.abs(mod - obs),
-                                        obs)).mean(axis=axis) * 100.
+    """ Mean Normalized Gross Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    ans = np.ma.masked_invalid(
+        np.ma.abs(mod - obs) / obs).mean(axis=axis) * 100.
+    return ans
 
 
 def MdnNB(obs, mod, axis=None):
-    """ Median Normalized Bias (%)"""
+    """ Median Normalized Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(
-        np.ma.masked_invalid(old_div((mod - obs), obs)), axis=axis) * 100.
+        np.ma.masked_invalid(((mod - obs) / obs)), axis=axis) * 100.
+
 
 def MdnNE(obs, mod, axis=None):
-    """ Median Normalized Gross Error (%)"""
+    """ Median Normalized Gross Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(
-        np.ma.masked_invalid(old_div(np.ma.abs(mod - obs), obs)),
-        axis=axis) * 100.
+        np.ma.masked_invalid((np.ma.abs(mod - obs) / obs)), axis=axis) * 100.
 
 
 def NMdnGE(obs, mod, axis=None):
-    """ Normalized Median Gross Error (%)"""
+    """ Normalized Median Gross Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.masked_invalid(
-        old_div(np.ma.abs(mod - obs).mean(axis=axis),
-                obs.mean(axis=axis))) * 100.
+        (np.ma.abs(mod - obs).mean(axis=axis) / obs.mean(axis=axis))) * 100.
 
 
 def NO(obs, mod, axis=None):
-    """ N Observations (#)"""
+    """ N Observations (#)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return (np.ma.getmaskarray(obs) == False).sum(axis=axis)
 
 
 def NOP(obs, mod, axis=None):
-    """ N Observations/Prediction Pairs (#)"""
+    """ N Observations/Prediction Pairs (#)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     obsc, modc = matchmasks(obs, mod)
     return (np.ma.getmaskarray(obsc) == False).sum(axis=axis)
 
 
 def NP(obs, mod, axis=None):
-    """ N Predictions (#)"""
+    """ N Predictions (#)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     return (np.ma.getmaskarray(mod) == False).sum(axis=axis)
 
 
 def MO(obs, mod, axis=None):
-    """ Mean Observations (obs unit)"""
+    """ Mean Observations (obs unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     return obs.mean(axis=axis)
 
 
 def MP(obs, mod, axis=None):
-    """ Mean Predictions (model unit)"""
+    """ Mean Predictions (model unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     return mod.mean(axis=axis)
 
 
 def MdnO(obs, mod, axis=None):
-    """ Median Observations (obs unit)"""
+    """ Median Observations (obs unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     return np.ma.median(obs, axis=axis)
 
 
 def MdnP(obs, mod, axis=None):
-    """ Median Predictions (model unit)"""
+    """ Median Predictions (model unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(mod, axis=axis)
 
 
 def RM(obs, mod, axis=None):
-    """ Mean Ratio Observations/Predictions (none)"""
-    return np.ma.masked_invalid(old_div(obs, mod)).mean(axis=axis)
+    """ Mean Ratio Observations/Predictions (none)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return np.ma.masked_invalid((obs / mod)).mean(axis=axis)
 
 
 def RMdn(obs, mod, axis=None):
-    """ Median Ratio Observations/Predictions (none)"""
-    return np.ma.median(np.ma.masked_invalid(old_div(obs, mod)), axis=axis)
+    """ Median Ratio Observations/Predictions (none)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return np.ma.median(np.ma.masked_invalid((obs / mod)), axis=axis)
 
 
 def MB(obs, mod, axis=None):
-    """ Mean Bias"""
+    """ Mean Bias
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return (mod - obs).mean(axis=axis)
 
 
 def MdnB(obs, mod, axis=None):
-    """ Median Bias"""
+    """ Median Bias
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(mod - obs, axis=axis)
 
 
 def WDMB_m(obs, mod, axis=None):
-    """ Wind Direction Mean Bias (avoid single block error in np.ma)"""
+    """ Wind Direction Mean Bias (avoid single block error in np.ma)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return circlebias_m(mod - obs).mean(axis=axis)
 
 
 def WDMB(obs, mod, axis=None):
-    """ Wind Direction Mean Bias"""
+    """ Wind Direction Mean Bias
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return circlebias(mod - obs).mean(axis=axis)
 
 
 def WDMdnB(obs, mod, axis=None):
-    """ Wind Direction Median Bias"""
+    """ Wind Direction Median Bias
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(circlebias(mod - obs), axis=axis)
 
 
 def NMB(obs, mod, axis=None):
-    """ Normalized Mean Bias (%)"""
+    """ Normalized Mean Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return (mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.
 
 
 def WDNMB_m(obs, mod, axis=None):
-    """ Wind Direction Normalized Mean Bias (%) (avoid single block error in np.ma)"""
+    """ Wind Direction Normalized Mean Bias (%) (avoid single block error in np.ma)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return circlebias_m(mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.
 
 
 def NMB_ABS(obs, mod, axis=None):
-    """ Normalized Mean Bias - Absolute of the denominator (%)"""
+    """ Normalized Mean Bias - Absolute of the denominator (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return (mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)) * 100.
 
 
 def NMdnB(obs, mod, axis=None):
-    """ Normalized Median Bias (%)"""
+    """ Normalized Median Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(
         mod - obs, axis=axis) / np.ma.median(
             obs, axis=axis) * 100.
 
 
 def FB(obs, mod, axis=None):
-    """ Fractional Bias (%)"""
-    return ((np.ma.masked_invalid(old_div(
-        (mod - obs), (mod + obs)))).mean(axis=axis) * 2.) * 100.
+    """ Fractional Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return ((np.ma.masked_invalid(
+        ((mod - obs) / (mod + obs)))).mean(axis=axis) * 2.) * 100.
 
 
 def ME(obs, mod, axis=None):
-    """ Mean Gross Error (model and obs unit)"""
+    """ Mean Gross Error (model and obs unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.abs(mod - obs).mean(axis=axis)
 
 
 def MdnE(obs, mod, axis=None):
-    """ Median Gross Error (model and obs unit)"""
+    """ Median Gross Error (model and obs unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(np.ma.abs(mod - obs), axis=axis)
 
 
 def WDME_m(obs, mod, axis=None):
-    """ Wind Direction Mean Gross Error (model and obs unit) (avoid single block error in np.ma)"""
+    """ Wind Direction Mean Gross Error (model and obs unit)
+    (avoid single block error in np.ma)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.abs(circlebias_m(mod - obs)).mean(axis=axis)
 
 
 def WDME(obs, mod, axis=None):
-    """ Wind Direction Mean Gross Error (model and obs unit)"""
+    """Wind Direction Mean Gross Error (model and obs unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     return np.ma.abs(circlebias(mod - obs)).mean(axis=axis)
 
 
 def WDMdnE(obs, mod, axis=None):
-    """ Wind Direction Median Gross Error (model and obs unit)"""
+    """Wind Direction Median Gross Error (model and obs unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     cb = circlebias(mod - obs)
     return np.ma.median(np.ma.abs(cb), axis=axis)
 
 
 def NME_m(obs, mod, axis=None):
-    """ Normalized Mean Error (%) (avoid single block error in np.ma)"""
-    out = (old_div(np.abs(mod - obs).sum(axis=axis),
-                   obs.sum(axis=axis))) * 100
+    """ Normalized Mean Error (%) (avoid single block error in np.ma)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    out = ((np.abs(mod - obs).sum(axis=axis) / obs.sum(axis=axis))) * 100
     return out
 
 
 def NME_m_ABS(obs, mod, axis=None):
-    """ Normalized Mean Error (%) - Absolute of the denominator (avoid single block error in np.ma)"""
-    out = (old_div(np.abs(mod - obs).sum(axis=axis),
-                   np.abs(obs.sum(axis=axis)))) * 100
+    """ Normalized Mean Error (%) - Absolute of the denominator
+    (avoid single block error in np.ma)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    out = (
+        (np.abs(mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)))) * 100
     return out
 
 
 def NME(obs, mod, axis=None):
-    """ Normalized Mean Error (%)"""
-    out = (old_div(np.ma.abs(mod - obs).sum(axis=axis),
-                   obs.sum(axis=axis))) * 100
+    """ Normalized Mean Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    out = ((np.ma.abs(mod - obs).sum(axis=axis) / obs.sum(axis=axis))) * 100
     return out
 
 
 def NMdnE(obs, mod, axis=None):
-    """ Normalized Median Error (%)"""
+    """ Normalized Median Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     out = np.ma.median(
         np.ma.abs(mod - obs), axis=axis) / np.ma.median(
             obs, axis=axis) * 100
@@ -203,75 +785,272 @@ def NMdnE(obs, mod, axis=None):
 
 
 def FE(obs, mod, axis=None):
-    """ Fractional Error (%)"""
-    return (old_div(np.ma.abs(mod - obs),
-                    (mod + obs))).mean(axis=axis) * 2. * 100.
+    """ Fractional Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return ((np.ma.abs(mod - obs) / (mod + obs))).mean(axis=axis) * 2. * 100.
 
 
 def USUTPB(obs, mod, axis=None):
-    """ Unpaired Space/Unpaired Time Peak Bias (%)"""
-    return (old_div(
-        (mod.max(axis=axis) - obs.max(axis=axis)), obs.max(axis=axis))) * 100.
+    """ Unpaired Space/Unpaired Time Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return ((
+        (mod.max(axis=axis) - obs.max(axis=axis)) / obs.max(axis=axis))) * 100.
 
 
 def USUTPE(obs, mod, axis=None):
-    """ Unpaired Space/Unpaired Time Peak Error (%)"""
-    return (old_div(
-        np.ma.abs(mod.max(axis=axis) - obs.max(axis=axis)),
-        obs.max(axis=axis))) * 100.
+    """ Unpaired Space/Unpaired Time Peak Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return ((np.ma.abs(mod.max(axis=axis) - obs.max(axis=axis)) /
+             obs.max(axis=axis))) * 100.
 
 
 def MNPB(obs, mod, paxis, axis=None):
-    """ Mean Normalized Peak Bias (%)"""
-    return (old_div(
-        (mod.max(axis=paxis) - obs.max(axis=paxis)),
-        obs.max(axis=paxis))).mean(axis=axis) * 100.
+    """ Mean Normalized Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return (((mod.max(axis=paxis) - obs.max(axis=paxis)) /
+             obs.max(axis=paxis))).mean(axis=axis) * 100.
 
 
 def MdnNPB(obs, mod, paxis, axis=None):
-    """ Median Normalized Peak Bias (%)"""
+    """ Median Normalized Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(
-        old_div(
-            (mod.max(axis=paxis) - obs.max(axis=paxis)), obs.max(axis=paxis)),
+        ((mod.max(axis=paxis) - obs.max(axis=paxis)) / obs.max(axis=paxis)),
         axis=axis) * 100.
 
 
 def MNPE(obs, mod, paxis, axis=None):
-    """ Mean Normalized Peak Error (%)"""
-    return (old_div(
-        (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))),
-        obs.max(axis=paxis))).mean(axis=axis) * 100.
+    """ Mean Normalized Peak Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return (((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))) /
+             obs.max(axis=paxis))).mean(axis=axis) * 100.
+
 
 def MdnNPE(obs, mod, paxis, axis=None):
-    """ Median Normalized Peak Bias (%)"""
-    return np.ma.median(
-        old_div(
-            (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))),
-            obs.max(axis=paxis)),
-        axis=axis) * 100.
+    """ Median Normalized Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return np.ma.median(((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis)))
+                         / obs.max(axis=paxis)),
+                        axis=axis) * 100.
 
 
 def NMPB(obs, mod, paxis, axis=None):
-    """ Normalized Mean Peak Bias (%)"""
-    return (mod.max(axis=paxis) - obs.max(axis=paxis)
-            ).mean(axis=axis) / obs.max(axis=paxis).mean(axis=axis) * 100.
+    """ Normalized Mean Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return (mod.max(axis=paxis) - obs.max(axis=paxis)).mean(
+        axis=axis) / obs.max(axis=paxis).mean(axis=axis) * 100.
 
 
 def NMdnPB(obs, mod, paxis, axis=None):
-    """ Normalized Median Peak Bias (%)"""
+    """ Normalized Median Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(
         (mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis) / np.ma.median(
             obs.max(axis=paxis), axis=axis) * 100.
 
 
 def NMPE(obs, mod, paxis, axis=None):
-    """ Normalized Mean Peak Error (%)"""
-    return (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))
-            ).mean(axis=axis) / obs.max(axis=paxis).mean(axis=axis) * 100.
+    """ Normalized Mean Peak Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
+    return (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))).mean(
+        axis=axis) / obs.max(axis=paxis).mean(axis=axis) * 100.
 
 
 def NMdnPE(obs, mod, paxis, axis=None):
-    """ Normalized Median Peak Bias (%)"""
+    """ Normalized Median Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return np.ma.median(
         np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis)),
         axis=axis) / np.ma.median(
@@ -279,47 +1058,200 @@ def NMdnPE(obs, mod, paxis, axis=None):
 
 
 def PSUTMNPB(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Mean Normalized Peak Bias (%)"""
+    """ Paired Space/Unpaired Time Mean Normalized Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return MNPB(obs, mod, paxis=0, axis=None)
 
 
 def PSUTMdnNPB(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Median Normalized Peak Bias (%)"""
+    """ Paired Space/Unpaired Time Median Normalized Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return MdnNPB(obs, mod, paxis=0, axis=None)
 
 
 def PSUTMNPE(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Mean Normalized Peak Error (%)"""
+    """ Paired Space/Unpaired Time Mean Normalized Peak Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return MNPE(obs, mod, paxis=0, axis=None)
 
 
 def PSUTMdnNPE(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Median Normalized Peak Error (%)"""
+    """ Paired Space/Unpaired Time Median Normalized Peak Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return MdnNPE(obs, mod, paxis=0, axis=None)
 
 
 def PSUTNMPB(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Normalized Mean Peak Bias (%)"""
+    """ Paired Space/Unpaired Time Normalized Mean Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return NMPB(obs, mod, paxis=0, axis=None)
 
 
 def PSUTNMPE(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Normalized Mean Peak Error (%)"""
+    """ Paired Space/Unpaired Time Normalized Mean Peak Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return NMPE(obs, mod, paxis=0, axis=None)
 
 
 def PSUTNMdnPB(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Normalized Median Peak Bias (%)"""
+    """ Paired Space/Unpaired Time Normalized Median Peak Bias (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return NMdnPB(obs, mod, paxis=0, axis=None)
 
 
 def PSUTNMdnPE(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Normalized Median Peak Error (%)"""
+    """ Paired Space/Unpaired Time Normalized Median Peak Error (%)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     return NMdnPE(obs, mod, paxis=0, axis=None)
 
 
 def R2(obs, mod, axis=None):
-    """ Coefficient of Determination (unit squared)"""
+    """ Coefficient of Determination (unit squared)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+
     from scipy.stats import pearsonr
     if axis is None:
         obsc, modc = matchedcompressed(obs, mod)
@@ -329,22 +1261,86 @@ def R2(obs, mod, axis=None):
 
 
 def RMSE(obs, mod, axis=None):
-    """ Root Mean Square Error (model unit)"""
+    """Root Mean Square Error (model unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     return np.ma.sqrt(((mod - obs)**2).mean(axis=axis))
 
 
 def WDRMSE_m(obs, mod, axis=None):
-    """ Wind Direction Root Mean Square Error (model unit) (avoid single block error in np.ma)"""
+    """ Wind Direction Root Mean Square Error (model unit) (avoid single block error in np.ma)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     return np.sqrt(((circlebias_m(mod - obs))**2).mean(axis=axis))
 
 
 def WDRMSE(obs, mod, axis=None):
-    """ Wind Direction Root Mean Square Error (model unit)"""
+    """Wind Direction Root Mean Square Error (model unit)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     return np.ma.sqrt(((circlebias(mod - obs))**2).mean(axis=axis))
 
 
 def RMSEs(obs, mod, axis=None):
-    """Root Mean Squared Error (obs, mod_hat)"""
+    """Root Mean Squared Error (obs, mod_hat)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     if axis is None:
         try:
             from scipy.stats import linregress
@@ -359,17 +1355,63 @@ def RMSEs(obs, mod, axis=None):
 
 
 def matchmasks(a1, a2):
+    """Short summary.
+
+    Parameters
+    ----------
+    a1 : type
+        Description of parameter `a1`.
+    a2 : type
+        Description of parameter `a2`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     mask = np.ma.getmaskarray(a1) | np.ma.getmaskarray(a2)
     return np.ma.masked_where(mask, a1), np.ma.masked_where(mask, a2)
 
 
 def matchedcompressed(a1, a2):
+    """Short summary.
+
+    Parameters
+    ----------
+    a1 : type
+        Description of parameter `a1`.
+    a2 : type
+        Description of parameter `a2`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     a1, a2 = matchmasks(a1, a2)
     return a1.compressed(), a2.compressed()
 
 
 def RMSEu(obs, mod, axis=None):
-    """Root Mean Squared Error (mod_hat, mod)"""
+    """Root Mean Squared Error (mod_hat, mod)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     if axis is None:
         try:
             from scipy.stats import linregress
@@ -384,57 +1426,157 @@ def RMSEu(obs, mod, axis=None):
 
 
 def d1(obs, mod, axis=None):
-    """ Modified Index of Agreement, d1"""
-    return 1.0 - old_div(
-        (np.ma.abs(obs - mod)).sum(axis=axis),
-        (np.ma.abs(mod - obs.mean(axis=axis)) +
-         np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
+    """ Modified Index of Agreement, d1
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    return 1.0 - ((np.ma.abs(obs - mod)).sum(axis=axis) /
+                  (np.ma.abs(mod - obs.mean(axis=axis)) +
+                   np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
 
 
 def E1(obs, mod, axis=None):
-    """ Modified Coefficient of Efficiency, E1"""
-    return 1.0 - old_div(
-        (np.ma.abs(obs - mod)).sum(axis=axis),
-        (np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
+    """Modified Coefficient of Efficiency, E1
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    return 1.0 - ((np.ma.abs(obs - mod)).sum(axis=axis) /
+                  (np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
 
 
 def IOA_m(obs, mod, axis=None):
-    """ Index of Agreement, IOA (avoid single block error in np.ma) """
+    """Index of Agreement, IOA (avoid single block error in np.ma)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     obsmean = obs.mean(axis=axis)
     if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
-    return 1.0 - old_div(
-        (np.abs(obs - mod)**2).sum(axis=axis),
-        ((np.abs(mod - obsmean) + np.abs(obs - obsmean)) **
-         2).sum(axis=axis))
+    return 1.0 - ((np.abs(obs - mod)**2).sum(axis=axis) / (
+        (np.abs(mod - obsmean) + np.abs(obs - obsmean))**2).sum(axis=axis))
 
 
 def IOA(obs, mod, axis=None):
-    """ Index of Agreement, IOA"""
+    """Index of Agreement, IOA
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     obsmean = obs.mean(axis=axis)
     if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
-    return 1.0 - old_div(
-        (np.ma.abs(obs - mod)**2).sum(axis=axis),
-        ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) **
-         2).sum(axis=axis))
+    return 1.0 - ((np.ma.abs(obs - mod)**2).sum(axis=axis) / (
+        (np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) **
+        2).sum(axis=axis))
 
 
 def circlebias_m(b):
-    """ avoid single block error in np.ma"""
+    """avoid single block error in np.ma
+
+    Parameters
+    ----------
+    b : type
+        Description of parameter `b`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     b = np.where(b > 180, b - 360, b)
     b = np.where(b < -180, b + 360, b)
     return b
 
 
 def circlebias(b):
+    """Short summary.
+
+    Parameters
+    ----------
+    b : type
+        Description of parameter `b`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     b = np.ma.where(b > 180, b - 360, b)
     b = np.ma.where(b < -180, b + 360, b)
     return b
 
 
 def WDIOA_m(obs, mod, axis=None):
-    """ Wind Direction Index of Agreement, IOA (avoid single block error in np.ma)"""
+    """Wind Direction Index of Agreement, IOA (avoid single block error in np.ma)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     obsmean = obs.mean(axis=axis)
     if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
@@ -444,13 +1586,28 @@ def WDIOA_m(obs, mod, axis=None):
 
     ohat = circlebias_m(obs - obsmean)
 
-    return 1.0 - old_div(
-        (np.abs(b)**2).sum(axis=axis),
-        ((np.abs(bhat) + np.abs(ohat))**2).sum(axis=axis))
+    return 1.0 - ((np.abs(b)**2).sum(axis=axis) / (
+        (np.abs(bhat) + np.abs(ohat))**2).sum(axis=axis))
 
 
 def WDIOA(obs, mod, axis=None):
-    """ Wind Direction Index of Agreement, IOA"""
+    """Wind Direction Index of Agreement, IOA
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     obsmean = obs.mean(axis=axis)
     if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
@@ -460,41 +1617,83 @@ def WDIOA(obs, mod, axis=None):
 
     ohat = circlebias(obs - obsmean)
 
-    return 1.0 - old_div(
-        (np.ma.abs(b)**2).sum(axis=axis),
-        ((np.ma.abs(bhat) + np.ma.abs(ohat))**2).sum(axis=axis))
+    return 1.0 - ((np.ma.abs(b)**2).sum(axis=axis) / (
+        (np.ma.abs(bhat) + np.ma.abs(ohat))**2).sum(axis=axis))
 
 
 def AC(obs, mod, axis=None):
-    """ Anomaly Correlation """
+    """Anomaly Correlation
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     obs_bar = obs.mean(axis=axis)
     if axis is not None:
         obs_bar = np.expand_dims(obs_bar, axis=axis)
     p1 = ((mod - obs_bar) * (obs - obs_bar)).sum(axis=axis)
     p2 = (((mod - obs_bar)**2).sum(axis=axis) * (
         (obs - obs_bar)**2).sum(axis=axis))**0.5
-    return old_div(p1, p2)
+    return p1 / p2
 
 
 def WDAC(obs, mod, axis=None):
-    """ Wind Direction Anomaly Correlation """
+    """Wind Direction Anomaly Correlation
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     obs_bar = obs.mean(axis=axis)
     if axis is not None:
         obs_bar = np.expand_dims(obs_bar, axis=axis)
     p1 = (circlebias(mod - obs_bar) * circlebias(obs - obs_bar)).sum(axis=axis)
     p2 = ((circlebias(mod - obs_bar)**2).sum(axis=axis) *
           (circlebias(obs - obs_bar)**2).sum(axis=axis))**0.5
-    return old_div(p1, p2)
+    return p1 / p2
 
 
 def HSS(obs, mod, minval, maxval):
-    """
-    Heidke Skill Score (1 is perfect - below zero means no confidence)
-    :param obs:
-    :param mod:
-    :param minval:
-    :param maxval:
-    :return: HSS
+    """Heidke Skill Score (1 is perfect - below zero means no confidence)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    minval : type
+        Description of parameter `minval`.
+    maxval : type
+        Description of parameter `maxval`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
     """
     a, b, c, d = scores(obs, mod, minval, maxval=maxval)
     hss = 2 * (a * d - b * c) / ((a + c) * (c + d) + (a + b) * (b + d))
@@ -503,22 +1702,52 @@ def HSS(obs, mod, minval, maxval):
 
 
 def ETS(obs, mod, minval, maxval):
-    """
-    Equitable Threat Score (1 is perfect - Range -1/3 -> 1)
-    :param obs:
-    :param mod:
-    :param minval:
-    :param maxval:
-    :return: HSS
+    """Equitable Threat Score (1 is perfect - Range -1/3 -> 1)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    minval : type
+        Description of parameter `minval`.
+    maxval : type
+        Description of parameter `maxval`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
     """
     a, b, c, d = scores(obs, mod, minval, maxval=maxval)
     ar = (a + b) * (a + c) / (a + b + c + d)
-    ets = old_div((a - ar), (a + b + c - ar))
+    ets = (a - ar) / (a + b + c - ar)
     print('ETS for range ' + str(minval) + ' --> ' + str(maxval) + ': ' + ets)
     return ets
 
 
 def scores(obs, mod, minval, maxval=1.0e5):
+    """Short summary.
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    minval : type
+        Description of parameter `minval`.
+    maxval : type
+        Description of parameter `maxval`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     d = {}
     d['obs'] = obs
     d['mod'] = mod
@@ -536,6 +1765,23 @@ def scores(obs, mod, minval, maxval=1.0e5):
 
 
 def stats(df, minval, maxval):
+    """Short summary.
+
+    Parameters
+    ----------
+    df : type
+        Description of parameter `df`.
+    minval : type
+        Description of parameter `minval`.
+    maxval : type
+        Description of parameter `maxval`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     from numpy import sqrt
     dd = {}
     dd['N'] = df.Obs.dropna().count()
@@ -548,8 +1794,8 @@ def stats(df, minval, maxval):
     dd['NMB'] = NMB(df.Obs.values, df.CMAQ.values)
     try:
         a, b, c, d = scores(df.Obs.values, df.CMAQ.values, 70, 1000)
-        dd['POD'] = old_div(a, (a + b))
-        dd['FAR'] = old_div(c, (a + c))
+        dd['POD'] = a / (a + b)
+        dd['FAR'] = c / (a + c)
     except:
         dd['POD'] = 1.
         dd['FAR'] = 0.
