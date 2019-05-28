@@ -14,9 +14,6 @@ fixers:
 review:
   fail_on_comments: false
 files:
-    # Ignore the files that match these glob patterns.
-    # Be careful to quote strings as `*` has special
-    # meaning in YAML files.
     ignore:
         - 'docs/**/*'
         - 'monet/data/*'
