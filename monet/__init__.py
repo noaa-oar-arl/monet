@@ -31,7 +31,7 @@ def rename_to_monet_latlon(ds):
         return ds
 
 
-def coards_to_netcdf(dset,lat_name='lat',lon_name='lon'):
+def coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
     from numpy import meshgrid, arange
     lon = dset[lon_name]
     lat = dset[lat_name]

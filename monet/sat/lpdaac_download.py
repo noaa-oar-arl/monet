@@ -31,8 +31,7 @@ parser.add_argument(
     '-f',
     '--files',
     required=True,
-    help=
-    'A single granule URL, or the location of textfile containing granule URLs'
+    help='A single granule URL, or the location of textfile containing granule URLs'
 )
 args = parser.parse_args()
 

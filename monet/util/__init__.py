@@ -158,7 +158,7 @@ def get_giorgi_region_bounds(index=None, acronym=None):
         'lonmax': lonmax,
         'acronym': acro
     },
-                      index=i)
+        index=i)
     try:
         if index is None and acronym is None:
             print('either index or acronym needs to be supplied')
@@ -221,11 +221,11 @@ def calc_13_category_usda_soil_type(clay, sand, silt):
     """
     from numpy import zeros, where
     stype = zeros(clay.shape)
-    stype[where((silt + clay * 1.5 < 15.) & (clay != 255))] = 1.  #SAND
+    stype[where((silt + clay * 1.5 < 15.) & (clay != 255))] = 1.  # SAND
     stype[where((silt + 1.5 * clay >= 15.) & (silt + 1.5 * clay < 30) &
-                (clay != 255))] = 2.  #Loamy Sand
+                (clay != 255))] = 2.  # Loamy Sand
     stype[where((clay >= 7.) & (clay < 20) & (sand > 52) & (
-        silt + 2 * clay >= 30) & (clay != 255))] = 3.  #Sandy Loam (cond 1)
+        silt + 2 * clay >= 30) & (clay != 255))] = 3.  # Sandy Loam (cond 1)
     stype[where((clay < 7) & (silt < 50) & (silt + 2 * clay >= 30) &
                 (clay != 255))] = 3  # sandy loam (cond 2)
     stype[where((silt >= 50) & (clay >= 12) & (clay < 27) &

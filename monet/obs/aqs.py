@@ -392,9 +392,9 @@ class AQS(object):
                 [network])].drop_duplicates(subset=['siteid'])
         else:
             monitors = self.monitor_df.drop_duplicates(subset=['siteid'])
-        #AMC - merging only on siteid was causing latitude_x latitude_y to be
-        #created.
-        mlist=['siteid','latitude','longitude']
+        # AMC - merging only on siteid was causing latitude_x latitude_y to be
+        # created.
+        mlist = ['siteid', 'latitude', 'longitude']
         self.df = pd.merge(self.df, monitors, on=mlist, how='left')
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
