@@ -379,15 +379,15 @@ def _get_single_retrieval(date,
     # prodList = modisClient(client)
     # bandList = modisClient(client, product='MOD15A2H')
     dateList = modisClient(
-        client, product='MOD15A2H', band='Lai_500m', lat=lat, lon=lon)
+        client, product=product, band=band, lat=lat, lon=lon)
     dates = pd.to_datetime(dateList, format='A%Y%j')
     date = pd.to_datetime(date)
     if isinstance(date, pd.Timestamp):
         dates = _nearest(dates, date)
         m = modisClient(
             client,
-            product='MOD15A2H',
-            band='Lai_500m',
+            product=product,
+            band=band,
             lat=lat,
             lon=lon,
             startDate=int(dates.strftime('%Y%j')),
@@ -397,8 +397,8 @@ def _get_single_retrieval(date,
     else:
         m = modisClient(
             client,
-            product='MOD15A2H',
-            band='Lai_500m',
+            product=product,
+            band=band,
             lat=lat,
             lon=lon,
             startDate=int(dates.min().strftime('%Y%j')),
@@ -408,7 +408,7 @@ def _get_single_retrieval(date,
     if quality_control is not None:
         modisGetQA(
             m,
-            'FparLai_QC',
+            quality_control,
             client=client,
             kmAboveBelow=kmAboveBelow,
             kmLeftRight=kmLeftRight)
