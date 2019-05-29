@@ -22,7 +22,7 @@ requirements:
   host:
     - git
     - python
-  run:
+  run: # [not win]
     - python
     - numpy
     - pandas
@@ -33,7 +33,20 @@ requirements:
     - seaborn
     - pseudonetcdf
     - pyresample
-    - xesmf # [not win]
+    - xesmf
+    - python-stratify
+    - pytables
+  run: # [win]
+    - python
+    - numpy
+    - pandas
+    - xarray
+    - dask
+    - cartopy
+    - matplotlib
+    - seaborn
+    - pseudonetcdf
+    - pyresample
     - python-stratify
     - pytables
 
