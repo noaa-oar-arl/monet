@@ -1,5 +1,5 @@
 {% set name = "monet" %}
-{% set version = "2.1.10" %}
+{% set version = "2.1.9" %}
 
 package:
   name: monet
@@ -20,23 +20,9 @@ requirements:
   build:
     - {{ compiler('c') }}
   host:
+    - python
+  run:
     - git
-    - python
-  run: # [not win]
-    - python
-    - numpy
-    - pandas
-    - xarray
-    - dask
-    - cartopy
-    - matplotlib
-    - seaborn
-    - pseudonetcdf
-    - pyresample
-    - xesmf
-    - python-stratify
-    - pytables
-  run: # [win]
     - python
     - numpy
     - pandas

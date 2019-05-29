@@ -16,10 +16,10 @@ def open_dataset(fname):
         Description of returned object.
 
     """
-    names, grib = _ensure_mfdataset_filenames(fname, engine='pynio')
+    names, grib = _ensure_mfdataset_filenames(fname)
     try:
         if grib:
-            f = xr.open_mfdataset(names)
+            f = xr.open_mfdataset(names, engine='pynio')
             f = _fix_grib2(f)
         else:
             raise ValueError
