@@ -22,7 +22,8 @@ requirements:
   host:
     - git
     - python
-  run: # [not win]
+  run:
+    - git
     - python
     - numpy
     - pandas
@@ -33,22 +34,9 @@ requirements:
     - seaborn
     - pseudonetcdf
     - pyresample
+    - python-stratify
+    - pytables
     - xesmf
-    - python-stratify
-    - pytables
-  run: # [win]
-    - python
-    - numpy
-    - pandas
-    - xarray
-    - dask
-    - cartopy
-    - matplotlib
-    - seaborn
-    - pseudonetcdf
-    - pyresample
-    - python-stratify
-    - pytables
 
 about:
   home: https://monet-arl.readthedocs.io
