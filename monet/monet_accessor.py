@@ -269,7 +269,7 @@ class MONETAccessor(object):
             kwargs['filename'] = 'monet_xesmf_regrid_file.nc'
         return kwargs
 
-    def quick_map(self, map_kwarg={}, **kwargs):
+    def quick_map(self, map_kwarg={}, center=True, **kwargs):
         """Short summary.
 
         Parameters
@@ -287,20 +287,25 @@ class MONETAccessor(object):
         """
         from .plots.mapgen import draw_map
         from .plots import _dynamic_fig_size
-        from matplotlib.pyplot import tight_layout
         import cartopy.crs as ccrs
         import seaborn as sns
         sns.set_context('notebook', font_scale=1.2)
         # sns.set_context('talk', font_scale=.9)
         if 'crs' not in map_kwarg:
-            map_kwarg['crs'] = ccrs.PlateCarree()
+            if ~center:
+                central_longitude = float(
+                    _rename_to_monet_latlon(self.obj).longitude.mean().values)
+                map_kwarg['crs'] = ccrs.PlateCarree(
+                    central_longitude=central_longitude)
+            else:
+                map_kwarg['crs'] = ccrs.PlateCarree()
         if 'figsize' in kwargs:
             map_kwarg['figsize'] = kwargs['figsize']
             kwargs.pop('figsize', None)
         else:
             figsize = _dynamic_fig_size(self.obj)
             map_kwarg['figsize'] = figsize
-        ax = draw_map(**map_kwarg)
+        f, ax = draw_map(return_fig=True, **map_kwarg)
         _rename_to_monet_latlon(self.obj).plot(
             x='longitude',
             y='latitude',
@@ -309,8 +314,12 @@ class MONETAccessor(object):
             infer_intervals=True,
             **kwargs)
         ax.outline_patch.set_alpha(0)
-        tight_layout(pad=0)
+        self._tight_layout()
         return ax
+
+    def _tight_layout(self):
+        from matplotlib.pyplot import subplots_adjust
+        subplots_adjust(0, 0, 1, 1)
 
     def _check_swath_def(self, defin):
         """checks if it is a pyresample SwathDefinition or AreaDefinition.
@@ -333,8 +342,8 @@ class MONETAccessor(object):
             return False
 
     def remap_data(self, dataarray, grid=None, **kwargs):
-        """remaps from another grid to the current grid of self using pyresample.
-        it assumes that the dimensions are ordered in ROW,COL,CHANNEL per
+        """remaps from another grid to the current grid of self using
+        pyresample. It assumes that the dimensions are ordered in ROW,COL,CHANNEL per
         pyresample docs
 
         Parameters
