@@ -149,7 +149,7 @@ class ICARTT(object):
                 d.data_vars).isin(possible_lats)].values[0]
         else:
             lat_name = lat_label
-        if lat_label is None:
+        if lon_label is None:
             lon_name = pd.Series(d.data_vars)[pd.Series(
                 d.data_vars).isin(possible_lons)].values[0]
         else:
@@ -157,9 +157,9 @@ class ICARTT(object):
         d.coords['latitude'] = d[lat_name]
         d.coords['longitude'] = d[lon_name]
         d = d.rename({'POINTS': 'time'})
-        d['time'] = pd.to_datetime(d.SDATE.replace(', ',
-                                                   '-')) + pd.to_timedelta(
-                                                       d[d.TFLAG], unit='s')
+        d['time'] = pd.to_datetime(d.SDATE.replace(',', '-').replace(
+            ' ', '')) + pd.to_timedelta(
+                d[d.TFLAG].to_index(), unit='s')
         if alt_label is not None:
             d.coords['altitude'] = d[alt_label]
 
