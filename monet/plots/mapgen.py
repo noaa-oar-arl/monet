@@ -12,7 +12,6 @@ def draw_map(crs=None,
              resolution='10m',
              extent=None,
              figsize=(10, 5),
-             return_fig=False,
              **kwargs):
     """Short summary.
 
@@ -78,7 +77,4 @@ def draw_map(crs=None,
     if extent is not None:
         ax.set_extent(extent)
 
-    if return_fig:
-        return f, ax
-    else:
-        return ax
+    return ax
