@@ -24,9 +24,9 @@ from dask.diagnostics import ProgressBar
 
 try:
     from suds.client import *
+    has_suds = True
 except ImportError:
-    print('please install suds SOAP client to use the modis_ornl daac')
-
+    has_suds = False
 DEBUG_PRINTING = False
 
 defaultURL = 'https://modis.ornl.gov/cgi-bin/MODIS/soapservice/MODIS_soapservice.wsdl'
@@ -497,6 +497,11 @@ def open_dataset(date,
                  kmAboveBelow=100,
                  kmLeftRight=100):
     import pandas as pd
+    try:
+        if has_suds is False:
+            raise ImportError
+    except ImportError:
+        print('Please install a suds client')
     date = pd.to_datetime(date)
     m = _get_single_retrieval(
         date,
