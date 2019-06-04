@@ -663,7 +663,7 @@ class Emissions:
         year,
         quarter,
         logfile="warnings.emit.txt",
-        ):
+    ):
         """
         oris : int
         locationID : str
@@ -809,7 +809,7 @@ class MonitoringPlan(EpaApiObject):
         except BaseException:
             pass
         if not self.dfall.empty:
-            df = pd.concat([self.dfall, self.df],sort=True )
+            df = pd.concat([self.dfall, self.df], sort=True)
             df = df.drop_duplicates(subset=["oris", "mid"])
             df.to_csv(self.fname)
         else:
@@ -1189,12 +1189,12 @@ class CEMS:
                             "CEMS class WARNING: more than one \
                               Monitoring location for this unit\n"
                         )
-                        print(str(oris) + ' ' +  str(mid) + '---')
+                        print(str(oris) + ' ' + str(mid) + '---')
                         for val in mhash.keys():
                             print(val, mhash[val])
                         print('-------------------------------')
-                            #print(
-                            #    "unit " + val["name"] + " oris " + str(oris))
+                        # print(
+                        #    "unit " + val["name"] + " oris " + str(oris))
                         sys.exit()
                     else:
                         mhash = mhash[0]
@@ -1217,7 +1217,7 @@ class CEMS:
                         write_status_message(status, oris, mid, quarter, "log.txt")
                     else:
                         write_status_message(plan.status_code, oris, 'no mp ' +
-                                         str(mid), quarter, "log.txt")
+                                             str(mid), quarter, "log.txt")
         # merge stack height data into the facilities information data frame.
         tempdf = pd.DataFrame(dflist, columns=["oris", "unit", "stackht"])
         # facdf contains latitutde longitude information.
