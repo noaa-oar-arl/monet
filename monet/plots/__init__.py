@@ -31,6 +31,25 @@ def _dynamic_fig_size(obj):
 
 
 def savefig(fname, loc=1, decorate=True, **kwargs):
+    """save figure and add the MONET logo .
+
+    Parameters
+    ----------
+    fname : str
+        output file name.
+    loc : int
+        the location for the monet logo.
+    decorate : bool
+        Description of parameter `decorate`.
+    **kwargs : dict
+        kwargs for the matplotlib.pyplot.savefig function.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     import io
     import os
     import sys
