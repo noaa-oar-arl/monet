@@ -77,23 +77,23 @@ class ConcGrid:
     """
 
     def __init__(
-            self,
-            name,
-            levels=None,
-            centerlat=0.0,
-            centerlon=0.0,
-            latdiff=-1.0,
-            londiff=-1.0,
-            latspan=90.0,
-            lonspan=360.0,
-            outdir="./",
-            outfile="cdump",
-            nlev=-1,
-            sample_start="00 00 00 00 00",
-            sample_stop="00 00 00 00 00",
-            sampletype=0,
-            interval=(-1, -1),
-        ):
+        self,
+        name,
+        levels=None,
+        centerlat=0.0,
+        centerlon=0.0,
+        latdiff=-1.0,
+        londiff=-1.0,
+        latspan=90.0,
+        lonspan=360.0,
+        outdir="./",
+        outfile="cdump",
+        nlev=-1,
+        sample_start="00 00 00 00 00",
+        sample_stop="00 00 00 00 00",
+        sampletype=0,
+        interval=(-1, -1),
+    ):
 
         # self.name, self.levels, self.centerlat, self.centerlon,
         # self.latdiff, self.londiff, self.latspan, self.lonspan,
@@ -382,19 +382,19 @@ class Species:
         return Species.total
 
     def __init__(
-            self,
-            name,
-            psize=0,
-            rate="1",
-            duration=-1,
-            density=2.5,
-            shape=1,
-            date="00 00 00 00 00",
-            wetdepstr="0.0 0.0 0.0",
-            vel="0.0 0.0 0.0 0.0 0.0",
-            decay="0.0",
-            resuspension="0.0",
-        ):
+        self,
+        name,
+        psize=0,
+        rate="1",
+        duration=-1,
+        density=2.5,
+        shape=1,
+        date="00 00 00 00 00",
+        wetdepstr="0.0 0.0 0.0",
+        vel="0.0 0.0 0.0 0.0 0.0",
+        decay="0.0",
+        resuspension="0.0",
+    ):
 
         self.name = name
         self.rate = rate
@@ -1142,7 +1142,7 @@ def getmetfiles(
         mfmt,
         warn_file="MetFileWarning.txt",
         mdir="./",
-        ):
+):
     """
        INPUTS:
        sdate : start date (datetime object)
