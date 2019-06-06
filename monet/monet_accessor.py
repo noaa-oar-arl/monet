@@ -109,48 +109,55 @@ class MONETAccessor(object):
                 lon = dset.longitude.isel(y=0).values
                 dset['x'] = lon
                 dset['y'] = lat
-                dset = dset.drop(['latitude','longitude'])
-        # check if latitude is in the correct order
-                if dset.latitude.isel(x=0).values[0] > dset.latitude.isel(x=0).values[-1]:
+                dset = dset.drop(['latitude', 'longitude'])
+                # check if latitude is in the correct order
+                if dset.latitude.isel(x=0).values[0] > dset.latitude.isel(
+                        x=0).values[-1]:
                     lat_min_copy = lat_min
                     lat_min = lat_max
                     lat_max = lat_min_copy
-                d = dset.sel(x=slice(lon_min,lon_max),y=slice(lat_min,lat_max))
-                return monet.coards_to_netcdf(d.rename({'x':'lon','y':'lat'}))
+                d = dset.sel(
+                    x=slice(lon_min, lon_max), y=slice(lat_min, lat_max))
+                return monet.coards_to_netcdf(
+                    d.rename({
+                        'x': 'lon',
+                        'y': 'lat'
+                    }))
             elif has_pyresample:
-                    lons, lats = utils.check_and_wrap(self.obj.longitude.values,
-                                                      self.obj.latitude.values)
-                    swath = llsd(longitude=lons, latitude=lats)
-                    pswath_ll = npsd(
-                        longitude=float(lon_min), latitude=float(lat_min))
-                    pswath_ur = npsd(
-                        longitude=float(lon_max), latitude=float(lat_max))
-                    row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                        swath, pswath_ll, 1e6)
-                    y_ll, x_ll = row[0][0], col[0][0]
-                    row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                        swath, pswath_ur, 1e6)
-                    y_ur, x_ur = row[0][0], col[0][0]
-                    if x_ur < x_ll:
-                        x1 = self.obj.x.where(self.obj.x >= x_ll, drop=True).values
-                        x2 = self.obj.x.where(self.obj.x <= x_ur, drop=True).values
-                        xrange = concatenate([x1, x2]).astype(int)
-                        self.obj['longitude'][:] = utils.wrap_longitudes(
-                            self.obj.longitude.values)
-                        # xrange = arange(float(x_ur), float(x_ll), dtype=int)
-                    else:
-                        xrange = slice(x_ll, x_ur)
-                    if y_ur < y_ll:
-                        y1 = self.obj.y.where(self.obj.y >= y_ll, drop=True).values
-                        y2 = self.obj.y.where(self.obj.y <= y_ur, drop=True).values
-                        yrange = concatenate([y1, y2]).astype(int)
-                    else:
-                        yrange = slice(y_ll, y_ur)
-                    return self.obj.isel(x=xrange, y=yrange)
+                lons, lats = utils.check_and_wrap(self.obj.longitude.values,
+                                                  self.obj.latitude.values)
+                swath = llsd(longitude=lons, latitude=lats)
+                pswath_ll = npsd(
+                    longitude=float(lon_min), latitude=float(lat_min))
+                pswath_ur = npsd(
+                    longitude=float(lon_max), latitude=float(lat_max))
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ll, 1e6)
+                y_ll, x_ll = row[0][0], col[0][0]
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ur, 1e6)
+                y_ur, x_ur = row[0][0], col[0][0]
+                if x_ur < x_ll:
+                    x1 = self.obj.x.where(self.obj.x >= x_ll, drop=True).values
+                    x2 = self.obj.x.where(self.obj.x <= x_ur, drop=True).values
+                    xrange = concatenate([x1, x2]).astype(int)
+                    self.obj['longitude'][:] = utils.wrap_longitudes(
+                        self.obj.longitude.values)
+                    # xrange = arange(float(x_ur), float(x_ll), dtype=int)
                 else:
-                    raise ImportError
+                    xrange = slice(x_ll, x_ur)
+                if y_ur < y_ll:
+                    y1 = self.obj.y.where(self.obj.y >= y_ll, drop=True).values
+                    y2 = self.obj.y.where(self.obj.y <= y_ur, drop=True).values
+                    yrange = concatenate([y1, y2]).astype(int)
+                else:
+                    yrange = slice(y_ll, y_ur)
+                return self.obj.isel(x=xrange, y=yrange)
+            else:
+                raise ImportError
         except ImportError:
-            print("""If this is a rectilinear grid and you don't have pyresample
+            print(
+                """If this is a rectilinear grid and you don't have pyresample
                   please add the rectilinear=True to the call.  Otherwise the window
                   functionality is unavailable without pyresample""")
 
