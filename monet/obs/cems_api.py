@@ -286,27 +286,41 @@ def get_so2(df):
 
 
 class EpaApiObject:
-    def __init__(self, fname=None, save=True, prompt=False):
+    def __init__(self, fname=None, save=True, prompt=False, fdir=None):
         """
         Base class for all classes that send request to EpaApi.
         to avoid sending repeat requests to the api, the default option
         is to save the data in a file - specified by fname.
+
+        fname : str
+        fdir : str
+        save : boolean
+        prompt : boolean
+
         """
 
         # fname is name of file that data would be saved to.
         self.status_code = None
         self.df = pd.DataFrame()
         self.fname = fname
+        if fdir:
+            self.fdir = fdir
+        else:
+            self.fdir = './apifiles/'
+        if self.fdir[-1] != '/':
+            self.fdir += '/'
         # returns None if filename does not exist.
         # if prompt True then will ask for new filename if does not exist.
-        fname = get_filename(fname, prompt)
+        fname2 = get_filename(self.fdir + fname, prompt)
         self.getstr = self.create_getstr()
         # if the file exists load data from it.
         getboolean = True
-        if fname:
-            print("Loading from file ", self.fname)
-            self.fname = fname
+        if fname2:
+            print("Loading from file ", self.fdir + self.fname)
+            self.fname = fname2
             self.df, getboolean = self.load()
+        elif fname:
+            self.fname = self.fdir + fname
         # if it doesn't load then get it from the api.
         # if save is True then save.
         if self.df.empty and getboolean:
@@ -426,12 +440,24 @@ class EmissionsCall(EpaApiObject):
         # print(df[0:10])
         # if not df.empty:
         if convert and not df.empty:
-
+            # check for  two date formats.
             def newdate(x):
-                datefmt = "%Y-%m-%d %H:%M:00"
-                return datetime.datetime.strptime(x["time local"], datefmt)
+                #datefmt = "%Y-%m-%d %H:%M:%S"
+                datefmt2 = "%Y %m %d %H:%M:%S"
+                rval = x["time local"]
+                rval = rval.replace('-', ' ')
+                rval = rval.strip()
+                try:
+                    rval = datetime.datetime.strptime(rval, datefmt2)
+                except:
+                    print(self.fname)
+                    print('Could not parse date ' + rval)
+                    sys.exit()
+                return rval
 
             df["time local"] = df.apply(newdate, axis=1)
+            if 'DateHour' in df.columns:
+                df = df.drop(['DateHour'], axis=1)
         # df = pd.read_csv(self.fname, index_col=[0])
         return df, False
 
