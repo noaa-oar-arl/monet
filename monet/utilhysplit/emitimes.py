@@ -657,7 +657,7 @@ class EmitLine(object):
         returnstr += "{:1.2e}".format(self.area) + " "
         try:
             returnstr += "{:1.2e}".format(self.heat)
-            # returnstr += " \n"
+            returnstr += " \n"
         except BaseException:
             returnstr += str(self.heat)
             returnstr += '\n'
