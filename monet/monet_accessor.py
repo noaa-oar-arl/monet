@@ -465,7 +465,12 @@ class MONETAccessor(object):
         out = resample.resample_xesmf(source, target, method=method, **kwargs)
         return _rename_to_monet_latlon(out)
 
-    def combine_point(self, data, col=None, pyresample=False, **kwargs):
+    def combine_point(self,
+                      data,
+                      col=None,
+                      suffix=None,
+                      pyresample=False,
+                      **kwargs):
         """Short summary.
 
         Parameters
@@ -492,7 +497,7 @@ class MONETAccessor(object):
                 if pyresample:
                     return combine_da_to_df()
                 return combine_da_to_df_xesmf(
-                    self.obj, data, col=col, **kwargs)
+                    self.obj, data, col=col, suffix=suffix, **kwargs)
             except RuntimeError:
                 print('Must enter col...')
         else:
@@ -962,7 +967,7 @@ class MONETAccessorDataset(object):
         except ImportError:
             print('Window functionality is unavailable without pyresample')
 
-    def combine_point(self, data, suffix=None, **kwargs):
+    def combine_point(self, data, col=None, suffix=None, **kwargs):
         """Short summary.
 
         Parameters
