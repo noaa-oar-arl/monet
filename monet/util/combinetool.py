@@ -59,7 +59,7 @@ def _rename_latlon(ds):
         return ds
 
 
-def combine_da_to_df_xesmf(da, df, col=None, **kwargs):
+def combine_da_to_df_xesmf(da, df, col=None, suffix=None, **kwargs):
     """This function will combine an xarray data array with spatial information
     point observations in `df`.
 
@@ -80,11 +80,6 @@ def combine_da_to_df_xesmf(da, df, col=None, **kwargs):
     """
     from ..util.interp_util import constant_1d_xesmf
     from ..util.resample import resample_xesmf
-    try:
-        if col is None:
-            raise RuntimeError
-    except RuntimeError:
-        print('Must enter column name')
     # dfn = df.dropna(subset=[col])
     dfnn = df.drop_duplicates(subset=['latitude', 'longitude'])
     # unit = dfnn[col + '_unit'].unique()[0]
@@ -96,15 +91,25 @@ def combine_da_to_df_xesmf(da, df, col=None, **kwargs):
     da = _rename_latlon(da)  # check to rename latitude and longitude
     da_interped = resample_xesmf(da, target, **kwargs)
     da_interped = _rename_latlon(da_interped)  # check to change back
+    if suffix is None:
+        suffix = '_new'
+    rename_dict = {}
+    for i in da_interped.data_vars.keys():
+        rename_dict[i.name] = i.name + suffix
+    da_interped = da_interped.rename(rename_dict)
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
     df_interped.drop(drop_cols, axis=1, inplace=True)
-    if da.name in df.columns:
-        df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
-        # print(df_interped.keys())
+
+    # if da.name in df.columns:
+    #     df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
+    # print(df_interped.keys())
     final_df = df.merge(
-        df_interped, on=['latitude', 'longitude', 'time'], how='left')
+        df_interped,
+        on=['latitude', 'longitude', 'time'],
+        how='left',
+        suffixes=('', suffix))
     return final_df
 
 
