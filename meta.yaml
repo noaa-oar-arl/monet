@@ -35,6 +35,7 @@ requirements:
     - pyresample
     - python-stratify
     - pytables
+    - xesmf
 
 about:
   home: https://monet-arl.readthedocs.io
