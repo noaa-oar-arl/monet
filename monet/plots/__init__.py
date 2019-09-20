@@ -24,8 +24,12 @@ def _dynamic_fig_size(obj):
         Description of returned object.
 
     """
-    nx, ny = len(obj.x), len(obj.y)
-    scale = float(ny) / float(nx)
+    if 'x' in obj.dim:
+        nx, ny = len(obj.x), len(obj.y)
+        scale = float(ny) / float(nx)
+    elif 'latitude' in obj.dim:
+        nx, ny = len(obj.longitude), len(obj.latitude)
+        scale = float(ny) / float(nx)
     figsize = (10, 10 * scale)
     return figsize
 
