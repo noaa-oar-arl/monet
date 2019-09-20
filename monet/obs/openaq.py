@@ -87,7 +87,6 @@ class OPENAQ():
         },
             axis=1,
             inplace=True)
-        print(dff.keys())
         dff['time'] = pd.to_datetime(dff.time)
         dff['time_local'] = pd.to_datetime(dff.time_local)
         zzz = z.join(dff).drop(
