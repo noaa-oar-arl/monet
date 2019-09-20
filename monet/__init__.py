@@ -60,9 +60,10 @@ def rename_to_monet_latlon(ds):
 def dataset_to_monet(dset, lat_name='lat', lon_name='lon', latlon2d=False):
     if len(dset[lat_name].shape) != 2:
         latlon2d = False
-    if latlon2d=False
-        dset = coards_to_netcdf(dset,lat_name=lat_name,lon_name=lon_name)
+    if latlon2d is False:
+        dset = coards_to_netcdf(dset, lat_name=lat_name, lon_name=lon_name)
     return dset
+
 
 def coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
     from numpy import meshgrid, arange
