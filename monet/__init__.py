@@ -8,6 +8,19 @@ __all__ = [
 
 
 def rename_latlon(ds):
+    """Short summary.
+
+    Parameters
+    ----------
+    ds : type
+        Description of parameter `ds`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     if 'latitude' in ds.coords:
         return ds.rename({'latitude': 'lat', 'longitude': 'lon'})
     elif 'Latitude' in ds.coords:
@@ -19,6 +32,19 @@ def rename_latlon(ds):
 
 
 def rename_to_monet_latlon(ds):
+    """Short summary.
+
+    Parameters
+    ----------
+    ds : type
+        Description of parameter `ds`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     if 'lat' in ds.coords:
         return ds.rename({'lat': 'latitude', 'lon': 'longitude'})
     elif 'Latitude' in ds.coords:
@@ -30,6 +56,13 @@ def rename_to_monet_latlon(ds):
     else:
         return ds
 
+
+def dataset_to_monet(dset, lat_name='lat', lon_name='lon', latlon2d=False):
+    if len(dset[lat_name].shape) != 2:
+        latlon2d = False
+    if latlon2d=False
+        dset = coards_to_netcdf(dset,lat_name=lat_name,lon_name=lon_name)
+    return dset
 
 def coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
     from numpy import meshgrid, arange
