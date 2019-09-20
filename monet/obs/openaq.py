@@ -147,12 +147,12 @@ class OPENAQ():
                                'sourceType', 'city', 'country', 'time_local'
                            ],
                            columns='parameter').reset_index()
-        w = df.rename(dict(co='co_ppm',
-                           o3='o3_ppm',
-                           no2='no2_ppm',
-                           so2='so2_ppm',
-                           bc='bc_umg3',
-                           pm25='pm25_ugm3',
-                           pm10='pm10_ugm3'),
-                      axis=1)
+        w = w.rename(dict(co='co_ppm',
+                          o3='o3_ppm',
+                          no2='no2_ppm',
+                          so2='so2_ppm',
+                          bc='bc_umg3',
+                          pm25='pm25_ugm3',
+                          pm10='pm10_ugm3'),
+                     axis=1)
         return w
