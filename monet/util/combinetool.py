@@ -95,7 +95,8 @@ def combine_da_to_df_xesmf(da, df, col=None, suffix=None, **kwargs):
         suffix = '_new'
     rename_dict = {}
     for i in da_interped.data_vars.keys():
-        rename_dict[i.name] = i.name + suffix
+        if i in dfnn.keys():
+            rename_dict[i.name] = i.name + suffix
     da_interped = da_interped.rename(rename_dict)
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
