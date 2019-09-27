@@ -1,5 +1,5 @@
 {% set name = "monet" %}
-{% set version = "2.1.4" %}
+{% set version = "2.1.5" %}
 
 package:
   name: monet
@@ -36,6 +36,8 @@ requirements:
     - python-stratify
     - pytables
     - xesmf
+    - pydecorate
+    - s3fs
 
 about:
   home: https://monet-arl.readthedocs.io
