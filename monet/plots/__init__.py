@@ -24,7 +24,7 @@ def _dynamic_fig_size(obj):
         Description of returned object.
 
     """
-    if 'x' in obj.dim:
+    if 'x' in obj.dims:
         nx, ny = len(obj.x), len(obj.y)
         scale = float(ny) / float(nx)
     elif 'latitude' in obj.dim:
@@ -116,16 +116,15 @@ def sp_scatter_bias(df,
             x, y = df.longitude.values, df.latitude.values
             dfnew['sp_diff_size'] = dfnew['sp_diff'].abs() / top * 100.
             dfnew.loc[dfnew['sp_diff_size'] > 300, 'sp_diff_size'] = 300.
-            dfnew.plot.scatter(
-                x='longitude',
-                y='latitude',
-                c=dfnew['sp_diff'],
-                s=dfnew['sp_diff_size'],
-                vmin=-1 * top,
-                vmax=top,
-                ax=ax,
-                colorbar=True,
-                **kwargs)
+            dfnew.plot.scatter(x='longitude',
+                               y='latitude',
+                               c=dfnew['sp_diff'],
+                               s=dfnew['sp_diff_size'],
+                               vmin=-1 * top,
+                               vmax=top,
+                               ax=ax,
+                               colorbar=True,
+                               **kwargs)
             if ~outline:
                 ax.outline_patch.set_alpha(0)
             if global_map:
