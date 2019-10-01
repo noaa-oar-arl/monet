@@ -18,16 +18,17 @@ def add_data(dates,
              network=None,
              download=False,
              local=False,
-             wide_fmt=True):
+             wide_fmt=True,
+             n_procs=1):
     from ..util import long_to_wide
     a = AQS()
-    df = a.add_data(
-        dates,
-        param=param,
-        daily=daily,
-        network=network,
-        download=download,
-        local=local)
+    df = a.add_data(dates,
+                    param=param,
+                    daily=daily,
+                    network=network,
+                    download=download,
+                    local=local,
+                    n_procs=n_procs)
 
     if wide_fmt:
         return long_to_wide(df)
@@ -149,28 +150,26 @@ class AQS(object):
             def dateparse(x):
                 return pd.datetime.strptime(x, '%Y-%m-%d')
 
-            df = pd.read_csv(
-                url,
-                parse_dates={'time_local': ["Date Local"]},
-                date_parser=dateparse,
-                dtype={
-                    0: str,
-                    1: str,
-                    2: str
-                },
-                encoding='ISO-8859-1')
+            df = pd.read_csv(url,
+                             parse_dates={'time_local': ["Date Local"]},
+                             date_parser=dateparse,
+                             dtype={
+                                 0: str,
+                                 1: str,
+                                 2: str
+                             },
+                             encoding='ISO-8859-1')
             df.columns = self.renameddcols
             df['pollutant_standard'] = df.pollutant_standard.astype(str)
             self.daily = True
             # df.rename(columns={'parameter_name':'variable'})
         else:
-            df = pd.read_csv(
-                url,
-                parse_dates={
-                    'time': ['Date GMT', 'Time GMT'],
-                    'time_local': ["Date Local", "Time Local"]
-                },
-                infer_datetime_format=True)
+            df = pd.read_csv(url,
+                             parse_dates={
+                                 'time': ['Date GMT', 'Time GMT'],
+                                 'time_local': ["Date Local", "Time Local"]
+                             },
+                             infer_datetime_format=True)
             # print(df.columns.values)
             df.columns = self.columns_rename(df.columns.values)
 
@@ -311,7 +310,8 @@ class AQS(object):
                  daily=False,
                  network=None,
                  download=False,
-                 local=False):
+                 local=False,
+                 n_procs=1):
         """Short summary.
 
         Parameters
@@ -356,7 +356,7 @@ class AQS(object):
         else:
             dfs = [dask.delayed(self.load_aqs_file)(i, network) for i in urls]
         dff = dd.from_delayed(dfs)
-        dfff = dff.compute()
+        dfff = dff.compute(num_workers=n_procs)
         return (self.add_data2(dfff, daily, network))
 
     def add_data2(self, df, daily=False, network=None):
