@@ -93,12 +93,11 @@ def read_csv(fn):
 
     """
     try:
-        dft = pd.read_csv(
-            fn,
-            delimiter='|',
-            header=None,
-            error_bad_lines=False,
-            encoding='ISO-8859-1')
+        dft = pd.read_csv(fn,
+                          delimiter='|',
+                          header=None,
+                          error_bad_lines=False,
+                          encoding='ISO-8859-1')
         cols = [
             'date', 'time', 'siteid', 'site', 'utcoffset', 'variable', 'units',
             'obs', 'source'
@@ -143,7 +142,7 @@ def retrieve(url, fname):
         print('\n File Exists: ' + fname)
 
 
-def aggregate_files(dates=dates, download=False):
+def aggregate_files(dates=dates, download=False, n_procs=1):
     """Short summary.
 
     Parameters
@@ -169,12 +168,11 @@ def aggregate_files(dates=dates, download=False):
     else:
         dfs = [dask.delayed(read_csv)(f) for f in urls]
     dff = dd.from_delayed(dfs)
-    df = dff.compute()
-    df['time'] = pd.to_datetime(
-        df.date + ' ' + df.time,
-        format='%m/%d/%y %H:%M',
-        exact=True,
-        box=False)
+    df = dff.compute(num_workers=n_procs)
+    df['time'] = pd.to_datetime(df.date + ' ' + df.time,
+                                format='%m/%d/%y %H:%M',
+                                exact=True,
+                                box=False)
     df.drop(['date'], axis=1, inplace=True)
     df['time_local'] = df.time + pd.to_timedelta(df.utcoffset, unit='H')
     print('    Adding in Meta-data')
@@ -185,7 +183,7 @@ def aggregate_files(dates=dates, download=False):
     return df
 
 
-def add_data(dates, download=False, wide_fmt=True):
+def add_data(dates, download=False, wide_fmt=True, n_procs=1):
     """Short summary.
 
     Parameters
@@ -202,7 +200,7 @@ def add_data(dates, download=False, wide_fmt=True):
 
     """
     from ..util import long_to_wide
-    df = aggregate_files(dates=dates, download=download)
+    df = aggregate_files(dates=dates, download=download, n_procs=n_procs)
     if wide_fmt:
         return long_to_wide(df)
     else:
@@ -272,8 +270,8 @@ def get_station_locations_remerge(df):
         Description of returned object.
 
     """
-    df = pd.merge(
-        df, monitor_df.drop(['Latitude', 'Longitude'], axis=1),
-        on='siteid')  # ,
+    df = pd.merge(df,
+                  monitor_df.drop(['Latitude', 'Longitude'], axis=1),
+                  on='siteid')  # ,
     # how='left')
     return df
