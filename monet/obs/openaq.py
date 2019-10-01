@@ -31,9 +31,24 @@ import pandas as pd
 from numpy import NaN, vectorize
 
 
-def add_data(dates):
+def add_data(dates, n_procs=1):
+    """add openaq data from the amazon s3 server.
+
+    Parameters
+    ----------
+    dates : pd.DateTimeIndex or list of datatime objects
+        this is a list of dates to download
+    n_procs : type
+        Description of parameter `n_procs`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     a = OPENAQ()
-    return a.add_data(dates)
+    return a.add_data(dates, num_workers=n_procs)
 
 
 class OPENAQ():
@@ -70,12 +85,15 @@ class OPENAQ():
             urls = pd.merge(urls, furls, how='outer')
         return urls.url.values
 
-    def add_data(self, dates):
+    def add_data(self, dates, num_workers=1):
         import dask.dataframe as dd
+        import dask
 
         urls = self.build_urls(dates).tolist()
-        z = dd.read_json(urls).compute()
-
+        # z = dd.read_json(urls).compute()
+        dfs = [dask.delayed(self.read_json)(f) for f in urls]
+        dff = dd.from_delayed(dfs)
+        z = dff.compute(num_workers=num_workers)
         z.coordinates.replace(to_replace=[None], value=pd.np.nan, inplace=True)
         z = z.dropna().reset_index(drop=True)
         js = json.loads(z[['coordinates', 'date']].to_json(orient='records'))
@@ -93,6 +111,9 @@ class OPENAQ():
             columns=['coordinates', 'date', 'attribution', 'averagingPeriod'])
 
         return self._pivot_table(zzz)
+
+    def read_json(self, url):
+        return pd.read_json(url, lines=True).dropna().sort_index(axis=1)
 
     # def read_json(self, url):
     #     df = pd.read_json(url, lines=True).dropna()
