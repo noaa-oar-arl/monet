@@ -90,7 +90,6 @@ class OPENAQ():
         import dask
 
         urls = self.build_urls(dates).tolist()
-        print(urls)
         # z = dd.read_json(urls).compute()
         dfs = [dask.delayed(self.read_json)(f) for f in urls]
         dff = dd.from_delayed(dfs)
