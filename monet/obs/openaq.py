@@ -106,8 +106,8 @@ class OPENAQ():
             axis=1,
             inplace=True)
 
-        #dff['time'] = pd.to_datetime(dff.time)
-        #dff['time_local'] = pd.to_datetime(dff.time_local)
+        dff['time'] = pd.to_datetime(dff.time)
+        dff['time_local'] = pd.to_datetime(dff.time_local)
         zzz = z.join(dff).drop(
             columns=['coordinates', 'date', 'attribution', 'averagingPeriod'])
         zp = self._pivot_table(zzz)
