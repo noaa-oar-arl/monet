@@ -90,6 +90,7 @@ class OPENAQ():
         import dask
 
         urls = self.build_urls(dates).tolist()
+        print(urls)
         # z = dd.read_json(urls).compute()
         dfs = [dask.delayed(self.read_json)(f) for f in urls]
         dff = dd.from_delayed(dfs)
@@ -105,12 +106,14 @@ class OPENAQ():
         },
             axis=1,
             inplace=True)
-        dff['time'] = pd.to_datetime(dff.time)
-        dff['time_local'] = pd.to_datetime(dff.time_local)
+
+        #dff['time'] = pd.to_datetime(dff.time)
+        #dff['time_local'] = pd.to_datetime(dff.time_local)
         zzz = z.join(dff).drop(
             columns=['coordinates', 'date', 'attribution', 'averagingPeriod'])
+        zp = self._pivot_table(zzz)
 
-        return self._pivot_table(zzz)
+        return zp.loc[zp.time > dates.min()]
 
     def read_json(self, url):
         return pd.read_json(url, lines=True).dropna().sort_index(axis=1)
