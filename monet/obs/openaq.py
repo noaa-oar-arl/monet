@@ -113,7 +113,7 @@ class OPENAQ():
             columns=['coordinates', 'date', 'attribution', 'averagingPeriod'])
         zp = self._pivot_table(zzz)
 
-        return zp.loc[zp.time > dates.min()]
+        return zp.loc[zp.time >= dates.min().tz_localize('utc')]
 
     def read_json(self, url):
         return pd.read_json(url, lines=True).dropna().sort_index(axis=1)
