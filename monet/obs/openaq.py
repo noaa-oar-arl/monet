@@ -114,9 +114,10 @@ class OPENAQ():
         zp = self._pivot_table(zzz)
         zp['siteid'] = zp.country + '_' + zp.latitude.round(3).astype(
             str) + 'N_' + zp.longitude.round(3).astype(str) + 'E'
-        zp.loc[zp.time >= dates.min().tz_localize('utc')]
-        zp['time'] = zp.time.tz_localize(None)
-        return zp
+
+        zp['time'] = zp.time.dt.tz_localize(None)
+
+        return zp.loc[zp.time >= dates.min()]
 
     def read_json(self, url):
         return pd.read_json(url, lines=True).dropna().sort_index(axis=1)
