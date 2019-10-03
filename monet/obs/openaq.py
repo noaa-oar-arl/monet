@@ -116,7 +116,8 @@ class OPENAQ():
             str) + 'N_' + zp.longitude.round(3).astype(str) + 'E'
 
         zp['time'] = zp.time.dt.tz_localize(None)
-
+        tzinfo = zp.time_local.apply(lambda x: x.tzinfo.utcoffset(x))
+        zp['time_local'] = zp['time'] + tzinfo
         return zp.loc[zp.time >= dates.min()]
 
     def read_json(self, url):
