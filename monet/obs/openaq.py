@@ -62,7 +62,8 @@ class OPENAQ():
         folders = self.fs.ls(self.s3bucket)
         days = [j.split('/')[2] for j in folders]
         avail_dates = pd.to_datetime(days, format='%Y-%m-%d', errors='coerce')
-        d = pd.Series(dates, name='dates')
+        dates = pd.to_datetime(dates).floor(freq='D')
+        d = pd.Series(dates, name='dates').drop_duplicates()
         ad = pd.Series(avail_dates, name='dates')
         return pd.merge(d, ad, how='inner')
 
@@ -81,7 +82,7 @@ class OPENAQ():
                           'https://openaq-fetches.s3.amazonaws.com')
                 for f in files
             ],
-                              name='url')
+                name='url')
             urls = pd.merge(urls, furls, how='outer')
         return urls.url.values
 
@@ -103,8 +104,8 @@ class OPENAQ():
             'local': 'time_local',
             'utc': 'time'
         },
-                   axis=1,
-                   inplace=True)
+            axis=1,
+            inplace=True)
 
         dff['time'] = pd.to_datetime(dff.time)
         dff['time_local'] = pd.to_datetime(dff.time_local)
@@ -113,8 +114,7 @@ class OPENAQ():
         zp = self._pivot_table(zzz)
         zp['siteid'] = zp.country + '_' + zp.latitude.round(3).astype(
             str) + 'N_' + zp.longitude.round(3).astype(str) + 'E'
-        return zp.loc[zp.time >= dates.min().tz_localize('utc')].reset_index(
-            drop=True)
+        return zp.loc[zp.time >= dates.min().tz_localize('utc')]
 
     def read_json(self, url):
         return pd.read_json(url, lines=True).dropna().sort_index(axis=1)
