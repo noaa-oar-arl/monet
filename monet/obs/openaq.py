@@ -81,7 +81,7 @@ class OPENAQ():
                           'https://openaq-fetches.s3.amazonaws.com')
                 for f in files
             ],
-                name='url')
+                              name='url')
             urls = pd.merge(urls, furls, how='outer')
         return urls.url.values
 
@@ -103,16 +103,18 @@ class OPENAQ():
             'local': 'time_local',
             'utc': 'time'
         },
-            axis=1,
-            inplace=True)
+                   axis=1,
+                   inplace=True)
 
         dff['time'] = pd.to_datetime(dff.time)
         dff['time_local'] = pd.to_datetime(dff.time_local)
         zzz = z.join(dff).drop(
             columns=['coordinates', 'date', 'attribution', 'averagingPeriod'])
         zp = self._pivot_table(zzz)
-
-        return zp.loc[zp.time >= dates.min().tz_localize('utc')]
+        zp['siteid'] = zp.country + '_' + zp.latitude.round(3).astype(
+            str) + 'N_' + zp.longitude.round(3).astype(str) + 'E'
+        return zp.loc[zp.time >= dates.min().tz_localize('utc')].reset_index(
+            drop=True)
 
     def read_json(self, url):
         return pd.read_json(url, lines=True).dropna().sort_index(axis=1)
