@@ -40,7 +40,7 @@ The easiest way to install it's dependencies is to use conda_.
 
 The simplest way to install MONET is to install it from the channel `bbakernoaa`
 
-.. _conda install -c bbakernoaa monet
+.. _conda: install -c bbakernoaa monet
 
 This will install all of the dependencies needed by MONET and
 
