@@ -36,7 +36,7 @@ Instructions
 ------------
 
 MONET itself is a pure Python package, but some of it's dependencies may not be.
-The simplest way to install MONET is to install it from the channel `bbakernoaa`
+The simplest way to install MONET is to install it from the channel bbakernoaa.
 
     $ conda install -c bbakernoaa monet
 
