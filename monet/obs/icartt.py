@@ -110,7 +110,7 @@ class ICARTT(object):
             fname, engine='pseudonetcdf', decode_times=False)
         return dset
 
-    def _rename_to_monet(self,d, lat_label=None, lon_label=None, alt_label=None):
+    def _rename_to_monet(self, d, lat_label=None, lon_label=None, alt_label=None):
         """Short summary.
 
         Parameters
