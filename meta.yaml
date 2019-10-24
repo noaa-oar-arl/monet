@@ -20,7 +20,8 @@ requirements:
   build:
     - {{ compiler('c') }}
   host:
-    - python
+    - git
+
   run:
     - git
     - python
