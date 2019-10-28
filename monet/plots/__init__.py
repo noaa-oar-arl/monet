@@ -24,13 +24,36 @@ def _dynamic_fig_size(obj):
         Description of returned object.
 
     """
-    nx, ny = len(obj.x), len(obj.y)
-    scale = float(ny) / float(nx)
+    if 'x' in obj.dims:
+        nx, ny = len(obj.x), len(obj.y)
+        scale = float(ny) / float(nx)
+    elif 'latitude' in obj.dim:
+        nx, ny = len(obj.longitude), len(obj.latitude)
+        scale = float(ny) / float(nx)
     figsize = (10, 10 * scale)
     return figsize
 
 
 def savefig(fname, loc=1, decorate=True, **kwargs):
+    """save figure and add the MONET logo .
+
+    Parameters
+    ----------
+    fname : str
+        output file name.
+    loc : int
+        the location for the monet logo.
+    decorate : bool
+        Description of parameter `decorate`.
+    **kwargs : dict
+        kwargs for the matplotlib.pyplot.savefig function.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     import io
     import os
     import sys
@@ -93,16 +116,15 @@ def sp_scatter_bias(df,
             x, y = df.longitude.values, df.latitude.values
             dfnew['sp_diff_size'] = dfnew['sp_diff'].abs() / top * 100.
             dfnew.loc[dfnew['sp_diff_size'] > 300, 'sp_diff_size'] = 300.
-            dfnew.plot.scatter(
-                x='longitude',
-                y='latitude',
-                c=dfnew['sp_diff'],
-                s=dfnew['sp_diff_size'],
-                vmin=-1 * top,
-                vmax=top,
-                ax=ax,
-                colorbar=True,
-                **kwargs)
+            dfnew.plot.scatter(x='longitude',
+                               y='latitude',
+                               c=dfnew['sp_diff'],
+                               s=dfnew['sp_diff_size'],
+                               vmin=-1 * top,
+                               vmax=top,
+                               ax=ax,
+                               colorbar=True,
+                               **kwargs)
             if ~outline:
                 ax.outline_patch.set_alpha(0)
             if global_map:

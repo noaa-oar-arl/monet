@@ -18,16 +18,19 @@ def add_data(dates,
              network=None,
              download=False,
              local=False,
-             wide_fmt=True):
+             wide_fmt=True,
+             n_procs=1,
+             meta=False):
     from ..util import long_to_wide
     a = AQS()
-    df = a.add_data(
-        dates,
-        param=param,
-        daily=daily,
-        network=network,
-        download=download,
-        local=local)
+    df = a.add_data(dates,
+                    param=param,
+                    daily=daily,
+                    network=network,
+                    download=download,
+                    local=local,
+                    n_procs=n_procs,
+                    meta=meta)
 
     if wide_fmt:
         return long_to_wide(df)
@@ -149,28 +152,26 @@ class AQS(object):
             def dateparse(x):
                 return pd.datetime.strptime(x, '%Y-%m-%d')
 
-            df = pd.read_csv(
-                url,
-                parse_dates={'time_local': ["Date Local"]},
-                date_parser=dateparse,
-                dtype={
-                    0: str,
-                    1: str,
-                    2: str
-                },
-                encoding='ISO-8859-1')
+            df = pd.read_csv(url,
+                             parse_dates={'time_local': ["Date Local"]},
+                             date_parser=dateparse,
+                             dtype={
+                                 0: str,
+                                 1: str,
+                                 2: str
+                             },
+                             encoding='ISO-8859-1')
             df.columns = self.renameddcols
             df['pollutant_standard'] = df.pollutant_standard.astype(str)
             self.daily = True
             # df.rename(columns={'parameter_name':'variable'})
         else:
-            df = pd.read_csv(
-                url,
-                parse_dates={
-                    'time': ['Date GMT', 'Time GMT'],
-                    'time_local': ["Date Local", "Time Local"]
-                },
-                infer_datetime_format=True)
+            df = pd.read_csv(url,
+                             parse_dates={
+                                 'time': ['Date GMT', 'Time GMT'],
+                                 'time_local': ["Date Local", "Time Local"]
+                             },
+                             infer_datetime_format=True)
             # print(df.columns.values)
             df.columns = self.columns_rename(df.columns.values)
 
@@ -187,7 +188,7 @@ class AQS(object):
         else:
             voc = False
         df = self.get_species(df, voc=voc)
-        return df
+        return df.drop('date_of_last_change', axis=1)
 
     def build_url(self, param, year, daily=False, download=False):
         """Short summary.
@@ -209,6 +210,8 @@ class AQS(object):
             Description of returned object.
 
         """
+        import requests
+        from numpy import NaN
         if daily:
             beginning = self.baseurl + 'daily_'
             fname = 'daily_'
@@ -249,6 +252,7 @@ class AQS(object):
             code = 'WIND_'
         url = beginning + code + year + '.zip'
         fname = fname + code + year + '.zip'
+
         return url, fname
 
     def build_urls(self, params, dates, daily=False):
@@ -269,14 +273,21 @@ class AQS(object):
             Description of returned object.
 
         """
+        import requests
         years = pd.DatetimeIndex(dates).year.unique().astype(str)
         urls = []
         fnames = []
         for i in params:
             for y in years:
                 url, fname = self.build_url(i, y, daily=daily)
-                urls.append(url)
-                fnames.append(fname)
+                if int(
+                        requests.get(
+                            url, stream=True).headers['Content-Length']) < 500:
+                    print('File is Empty. Not Processing', url)
+                else:
+                    urls.append(url)
+                    fnames.append(fname)
+
         return urls, fnames
 
     def retrieve(self, url, fname):
@@ -311,7 +322,9 @@ class AQS(object):
                  daily=False,
                  network=None,
                  download=False,
-                 local=False):
+                 local=False,
+                 n_procs=1,
+                 meta=False):
         """Short summary.
 
         Parameters
@@ -356,8 +369,11 @@ class AQS(object):
         else:
             dfs = [dask.delayed(self.load_aqs_file)(i, network) for i in urls]
         dff = dd.from_delayed(dfs)
-        dfff = dff.compute()
-        return (self.add_data2(dfff, daily, network))
+        dfff = dff.compute(num_workers=n_procs)
+        if meta:
+            return (self.add_data2(dfff, daily, network))
+        else:
+            return dfff
 
     def add_data2(self, df, daily=False, network=None):
         """
@@ -394,14 +410,14 @@ class AQS(object):
             monitors = self.monitor_df.drop_duplicates(subset=['siteid'])
         # AMC - merging only on siteid was causing latitude_x latitude_y to be
         # created.
-        mlist = ['siteid', 'latitude', 'longitude']
+        mlist = ['siteid']
         self.df = pd.merge(self.df, monitors, on=mlist, how='left')
         if daily:
             self.df['time'] = self.df.time_local - pd.to_timedelta(
                 self.df.gmt_offset, unit='H')
-        # if pd.Series(self.df.columns).isin(['parameter_name']).max():
-        # self.df.drop('parameter_name', axis=1, inplace=True)
-        return self.df.copy()
+        if pd.Series(self.df.columns).isin(['parameter_name']).max():
+            self.df.drop('parameter_name', axis=1, inplace=True)
+        return self.df  # .copy()
 
     def get_species(self, df, voc=False):
         """Short summary.

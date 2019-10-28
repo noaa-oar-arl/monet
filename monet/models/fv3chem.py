@@ -277,6 +277,16 @@ def _fix_grib2(f):
         'sfc_salt25',
         'PMTF_chemical_Total_Aerosol_aerosol_size__2_5e_06_aerosol_wavelength_____code_table_4_91_255_surface':
         'sfc_pm25',
+        'PMTF_aerosol_EQ_Total_Aerosol_aerosol_size_LT_2D5eM06_surface':
+        'sfc_pm25',
+        'PMTC_aerosol_EQ_Total_Aerosol_aerosol_size_LT_1eM05_surface':
+        'sfc_pm10',
+        'PMTC_chemical_Total_Aerosol_aerosol_size__1e_05_aerosol_wavelength_____code_table_4_91_255_surface':
+        'sfc_pm10',
+        'PMTF_aerosol_EQ_Sea_Salt_Dry_aerosol_size_LT_2D5eM06_surface':
+        'sfc_salt25',
+        'PMTF_aerosol_EQ_Dust_Dry_aerosol_size_LT_2D5eM06_surface':
+        'sfc_dust25',
         'PMTF_chemical_Dust_Dry_aerosol_size___2e_07__2e_06_aerosol_wavelength_____code_table_4_91_255_1hybridlevel':
         'dustmr1p1',
         'PMTF_chemical_Dust_Dry_aerosol_size___2e_06__3_6e_06_aerosol_wavelength_____code_table_4_91_255_1hybridlevel':

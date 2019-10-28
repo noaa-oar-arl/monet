@@ -36,12 +36,16 @@ Instructions
 ------------
 
 MONET itself is a pure Python package, but some of it's dependencies may not be.
-The easiest way to install it's dependencies is to use conda_. To install the
-dependencies we recommend usingthe the following command.::
+The simplest way to install MONET is to install it from the channel bbakernoaa::
 
-    $ conda install xarray dask netCDF4 bottleneck pseudonetcdf seaborn matplotlib numpy pandas cartopy xesmf
+    $ conda install -c bbakernoaa monet
 
-.. _conda: http://conda.io/
+This will install all of the dependencies needed by MONET and MONET itself.
+
+If you choose to install it manually you can install the dependencies we recommend using the the following command::
+
+    $ conda config --add channels conda-forge
+    $ conda install xarray dask netCDF4 bottleneck pseudonetcdf seaborn matplotlib numpy pandas cartopy xesmf s3fs
 
 We recommend using the community maintained `conda-forge <https://conda-forge.github.io/>`_ channel
 if you need difficult\-to\-build dependencies such as cartopy, pynio or PseudoNetCDF::

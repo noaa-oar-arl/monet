@@ -99,9 +99,8 @@ def ensure_values_indomain(df, lon, lat):
         Description of returned object.
 
     """
-    con = ((df.Latitude.values > lat.min()) &
-           (df.Latitude.values < lat.max()) &
-           (df.Longitude.values > lon.min()) &
+    con = ((df.Latitude.values > lat.min()) & (df.Latitude.values < lat.max())
+           & (df.Longitude.values > lon.min()) &
            (df.Longitude.values < lon.max()))
 
     df = df[con].copy()
@@ -228,12 +227,11 @@ def write_table(self,
             'IOA', 'POD', 'FAR'
         ]
         if append:
-            dff = pd.read_csv(
-                fname + '.txt',
-                skiprows=3,
-                index_col=0,
-                sep='\s+',
-                names=stats)
+            dff = pd.read_csv(fname + '.txt',
+                              skiprows=3,
+                              index_col=0,
+                              sep='\s+',
+                              names=stats)
             dd = pd.concat([dd, dff]).sort_values(by=['Region'])
 
         out = StringIO()
@@ -357,16 +355,16 @@ def get_epa_location_df(df,
         df2 = new[new['msa_name'] == name].copy().drop_duplicates()
         title = name
     elif state != '':
-        df2 = new[new['state_name'].str.upper() == state.
-                  upper()].copy().drop_duplicates()
+        df2 = new[new['state_name'].str.upper() ==
+                  state.upper()].copy().drop_duplicates()
         title = 'STATE: ' + state.upper()
     elif region != '':
-        df2 = new[new['Region'].str.upper() == region.
-                  upper()].copy().drop_duplicates()
+        df2 = new[new['Region'].str.upper() ==
+                  region.upper()].copy().drop_duplicates()
         title = 'REGION: ' + region.upper()
     elif epa_region != '':
-        df2 = new[new['EPA_region'].str.upper() == epa_region.
-                  upper()].copy().drop_duplicates()
+        df2 = new[new['EPA_region'].str.upper() ==
+                  epa_region.upper()].copy().drop_duplicates()
         title = 'EPA_REGION: ' + epa_region.upper()
     else:
         df2 = new
@@ -416,9 +414,7 @@ def calc_daily_max(df, param=None, rolling_frequency=8):
             level=1).reset_index(drop='siteid').dropna()
     else:
         k = temp.groupby('siteid')['model', 'gmt_offset'].resample(
-            'D').max().reset_index().rename({
-                'level_1': 'time_local'
-            })
+            'D').max().reset_index().rename({'level_1': 'time_local'})
     columnstomerge = temp.columns[~temp.columns.isin(k.columns) *
                                   (temp.columns != 'time')].append(
                                       Index(['siteid']))
@@ -505,13 +501,12 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
             0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
             20, 21
         ]
-        airnow = pd.read_csv(
-            monitor_airnow_url,
-            delimiter='|',
-            header=None,
-            usecols=colsinuse,
-            dtype={0: str},
-            encoding="ISO-8859-1")
+        airnow = pd.read_csv(monitor_airnow_url,
+                             delimiter='|',
+                             header=None,
+                             usecols=colsinuse,
+                             dtype={0: str},
+                             encoding="ISO-8859-1")
         airnow.columns = [
             'siteid', 'Site_Code', 'Site_Name', 'Status', 'Agency',
             'Agency_Name', 'EPA_region', 'latitude', 'longitude', 'Elevation',
@@ -527,8 +522,9 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
             basedir = os.path.abspath(os.path.dirname(__file__))[:-3]
             fname = os.path.join(basedir, 'data',
                                  'monitoring_site_locations.hdf')
-            print('Monitor File Path: ' + fname)
-            sss = pd.read_hdf(fname)
+            if os.path.isfile(fname):
+                print('Monitor File Path: ' + fname)
+                sss = pd.read_hdf(fname)
             # monitor_drop = ['state_code', u'county_code']
             # s.drop(monitor_drop, axis=1, inplace=True)
         except Exception:
@@ -543,13 +539,12 @@ def read_monitor_file(network=None, airnow=False, drop_latlon=True):
                 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
                 19, 20, 21
             ]
-            airnow = pd.read_csv(
-                monitor_airnow_url,
-                delimiter='|',
-                header=None,
-                usecols=colsinuse,
-                dtype={0: str},
-                encoding="ISO-8859-1")
+            airnow = pd.read_csv(monitor_airnow_url,
+                                 delimiter='|',
+                                 header=None,
+                                 usecols=colsinuse,
+                                 dtype={0: str},
+                                 encoding="ISO-8859-1")
             airnow.columns = [
                 'siteid', 'Site_Code', 'Site_Name', 'Status', 'Agency',
                 'Agency_Name', 'EPA_region', 'latitude', 'longitude',
