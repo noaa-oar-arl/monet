@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name='monet',
-    version='2.1.4-dev',
+    version='2.1.51',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
     include_package_data=True,
