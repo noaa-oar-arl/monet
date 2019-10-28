@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name='monet',
-    version='2.1.51',
+    version='2.1.6',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
     include_package_data=True,
@@ -30,18 +30,3 @@ setup(
         'seaborn', 'cartopy', 'pydecorate'
     ],
     extra_requires={'xesmf;platform_system!="Windows"'})
-
-# - python
-# - setuptools
-# - numpy
-# - pandas
-# - xarray
-# - dask
-# - cartopy
-# - matplotlib
-# - seaborn
-# - pseudonetcdf
-# - pyresample
-# - xesmf # [not win]
-# - python-stratify
-# - pytables
