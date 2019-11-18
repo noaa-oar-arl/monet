@@ -105,10 +105,19 @@ def resample_stratify(da, levels, vertical, axis=1):
 
 def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
     import xesmf as xe
+    import xarray as xr
     regridder = xe.Regridder(source_da, target_da, **kwargs)
     if cleanup:
         regridder.clean_weight_file()
-    return regridder(source_da)
+    if isinstance(source_da, xr.Dataset):
+        das = {}
+        for name, i in source_da.data_vars.items():
+            das[name] = regridder(i)
+        ds = xr.Dataset(das)
+        ds.attrs = source_da.attrs
+        return ds
+    else:
+        return regridder(source_da)
 
 
 def resample_nearest_neighbor_pyresample_dask(source_da,

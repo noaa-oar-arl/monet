@@ -1,5 +1,5 @@
 {% set name = "monet" %}
-{% set version = "2.1.9" %}
+{% set version = "2.1.5" %}
 
 package:
   name: monet
@@ -20,7 +20,8 @@ requirements:
   build:
     - {{ compiler('c') }}
   host:
-    - python
+    - git
+
   run:
     - git
     - python
@@ -35,6 +36,9 @@ requirements:
     - pyresample
     - python-stratify
     - pytables
+    - xesmf
+    - pydecorate
+    - s3fs
 
 about:
   home: https://monet-arl.readthedocs.io

@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name='monet',
-    version='2.1.3-dev',
+    version='2.1.4-dev',
     url='https://github.com/noaa-oar-arl/MONET',
     license='MIT',
     include_package_data=True,
@@ -27,7 +27,7 @@ setup(
     description='The Model and Observation Evaluation Toolkit (MONET)',
     install_requires=[
         'pandas', 'netcdf4', 'xarray', 'dask', 'pyresample', 'matplotlib',
-        'seaborn', 'cartopy'
+        'seaborn', 'cartopy', 'pydecorate'
     ],
     extra_requires={'xesmf;platform_system!="Windows"'})
 

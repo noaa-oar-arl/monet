@@ -45,7 +45,8 @@ Features include:
   * fixes to observational datasets including Airnow, AQS, Aeronet, and ISH
   * Added GEOS-R Level NESDIS netCDF data reader
   * Simplified combine tool to combine point source data with multidimensional xarray objects
-  * icartt reader using Barron Hendersons PseudoNetCDF   
+  * icartt reader using Barron Hendersons PseudoNetCDF
+  * OpenAQ reader to read directly from the OpenAQ Amazon S3 server
 
 Reference
 ^^^^^^^^^

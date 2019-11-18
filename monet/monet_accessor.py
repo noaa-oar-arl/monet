@@ -67,7 +67,12 @@ class MONETAccessor(object):
         out = resample_stratify(self.obj, levels, vertical, axis=1)
         return out
 
-    def window(self, lat_min=None, lon_min=None, lat_max=None, lon_max=None):
+    def window(self,
+               lat_min=None,
+               lon_min=None,
+               lat_max=None,
+               lon_max=None,
+               rectilinear=False):
         """Function to window, ie select a specific region, given the lower left
         latitude and longitude and the upper right latitude and longitude
 
@@ -81,6 +86,8 @@ class MONETAccessor(object):
             upper right latitude.
         lon_max : float
             upper right longitude.
+        rectilinear : bool
+            flag if this is a rectilinear lat lon grid
 
         Returns
         -------
@@ -97,14 +104,33 @@ class MONETAccessor(object):
         except ImportError:
             has_pyresample = False
         try:
-            if has_pyresample:
+            if rectilinear:
+                lat = dset.latitude.isel(x=0).values
+                lon = dset.longitude.isel(y=0).values
+                dset['x'] = lon
+                dset['y'] = lat
+                dset = dset.drop(['latitude', 'longitude'])
+                # check if latitude is in the correct order
+                if dset.latitude.isel(x=0).values[0] > dset.latitude.isel(
+                        x=0).values[-1]:
+                    lat_min_copy = lat_min
+                    lat_min = lat_max
+                    lat_max = lat_min_copy
+                d = dset.sel(x=slice(lon_min, lon_max),
+                             y=slice(lat_min, lat_max))
+                return monet.coards_to_netcdf(
+                    d.rename({
+                        'x': 'lon',
+                        'y': 'lat'
+                    }))
+            elif has_pyresample:
                 lons, lats = utils.check_and_wrap(self.obj.longitude.values,
                                                   self.obj.latitude.values)
                 swath = llsd(longitude=lons, latitude=lats)
-                pswath_ll = npsd(
-                    longitude=float(lon_min), latitude=float(lat_min))
-                pswath_ur = npsd(
-                    longitude=float(lon_max), latitude=float(lat_max))
+                pswath_ll = npsd(longitude=float(lon_min),
+                                 latitude=float(lat_min))
+                pswath_ur = npsd(longitude=float(lon_max),
+                                 latitude=float(lat_max))
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
                     swath, pswath_ll, 1e6)
                 y_ll, x_ll = row[0][0], col[0][0]
@@ -130,7 +156,10 @@ class MONETAccessor(object):
             else:
                 raise ImportError
         except ImportError:
-            print('Window functionality is unavailable without pyresample')
+            print(
+                """If this is a rectilinear grid and you don't have pyresample
+                  please add the rectilinear=True to the call.  Otherwise the window
+                  functionality is unavailable without pyresample""")
 
     def interp_constant_lat(self, lat=None, **kwargs):
         """Interpolates the data array to constant longitude.
@@ -253,8 +282,10 @@ class MONETAccessor(object):
             target = lonlat_to_xesmf(longitude=lon, latitude=lat)
             output = resample_xesmf(self.obj, target, **kwargs)
             if cleanup:
-                output = resample_xesmf(
-                    self.obj, target, cleanup=True, **kwargs)
+                output = resample_xesmf(self.obj,
+                                        target,
+                                        cleanup=True,
+                                        **kwargs)
             return rename_latlon(output.squeeze())
 
     @staticmethod
@@ -290,7 +321,6 @@ class MONETAccessor(object):
         import cartopy.crs as ccrs
         import seaborn as sns
         sns.set_context('notebook', font_scale=1.2)
-        # sns.set_context('talk', font_scale=.9)
         if 'crs' not in map_kwarg:
             if ~center:
                 central_longitude = float(
@@ -306,14 +336,17 @@ class MONETAccessor(object):
             figsize = _dynamic_fig_size(self.obj)
             map_kwarg['figsize'] = figsize
         f, ax = draw_map(return_fig=True, **map_kwarg)
-        _rename_to_monet_latlon(self.obj).plot(
+        ax = _rename_to_monet_latlon(self.obj).plot(
             x='longitude',
             y='latitude',
             ax=ax,
             transform=ccrs.PlateCarree(),
             infer_intervals=True,
             **kwargs)
-        ax.outline_patch.set_alpha(0)
+        try:
+            ax.axes.outline_patch.set_alpha(0)
+        except:
+            ax.outline_patch.set_alpha(0)
         self._tight_layout()
         return ax
 
@@ -437,7 +470,12 @@ class MONETAccessor(object):
         out = resample.resample_xesmf(source, target, method=method, **kwargs)
         return _rename_to_monet_latlon(out)
 
-    def combine_point(self, data, col=None, pyresample=False, **kwargs):
+    def combine_point(self,
+                      data,
+                      col=None,
+                      suffix=None,
+                      pyresample=False,
+                      **kwargs):
         """Short summary.
 
         Parameters
@@ -463,8 +501,11 @@ class MONETAccessor(object):
                     raise RuntimeError
                 if pyresample:
                     return combine_da_to_df()
-                return combine_da_to_df_xesmf(
-                    self.obj, data, col=col, **kwargs)
+                return combine_da_to_df_xesmf(self.obj,
+                                              data,
+                                              col=col,
+                                              suffix=suffix,
+                                              **kwargs)
             except RuntimeError:
                 print('Must enter col...')
         else:
@@ -554,15 +595,19 @@ class MONETAccessorDataset(object):
         vars = pd.Series(dset.variables)
         loop_vars = vars.loc[~vars.isin(skip_keys)]
         dataarray = dset[loop_vars[0]]
-        da = self._remap_xesmf_dataarray(
-            dataarray, self.obj, filename=filename, **kwargs)
+        da = self._remap_xesmf_dataarray(dataarray,
+                                         self.obj,
+                                         filename=filename,
+                                         **kwargs)
         self.obj[da.name] = da
         das = {}
         das[da.name] = da
         for i in loop_vars[1:]:
             dataarray = dset[i]
-            tmp = self._remap_xesmf_dataarray(
-                dataarray, filename=filename, reuse_weights=True, **kwargs)
+            tmp = self._remap_xesmf_dataarray(dataarray,
+                                              filename=filename,
+                                              reuse_weights=True,
+                                              **kwargs)
             das[tmp.name] = tmp.copy()
         return xr.Dataset(das)
 
@@ -586,8 +631,11 @@ class MONETAccessorDataset(object):
         """
         from .util import resample
         target = self.obj
-        out = resample.resample_xesmf(
-            dataarray, target, method=method, filename=filename, **kwargs)
+        out = resample.resample_xesmf(dataarray,
+                                      target,
+                                      method=method,
+                                      filename=filename,
+                                      **kwargs)
         if out.name in self.obj.variables:
             out.name = out.name + '_y'
         self.obj[out.name] = out
@@ -676,8 +724,10 @@ class MONETAccessorDataset(object):
         # get the first one in the loop and get the resample_cache data
         dataarray = dset[loop_vars[0]]
 
-        da, resample_cache = self._remap_dataarray(
-            dataarray, grid=grid, return_neighbor_info=True, **kwargs)
+        da, resample_cache = self._remap_dataarray(dataarray,
+                                                   grid=grid,
+                                                   return_neighbor_info=True,
+                                                   **kwargs)
         if da.name in self.obj.variables:
             da.name = da.name + '_y'
         self.obj[da.name] = da
@@ -759,11 +809,15 @@ class MONETAccessorDataset(object):
             dset = orig.to_dataset()
             dset.attrs = self.obj.attrs.copy()
             for i in loop_vars[1:-1].values:
-                dset[i] = self.obj[i].monet.nearest_latlon(
-                    lat=lat, lon=lon, cleanup=False, **kwargs)
+                dset[i] = self.obj[i].monet.nearest_latlon(lat=lat,
+                                                           lon=lon,
+                                                           cleanup=False,
+                                                           **kwargs)
             i = loop_vars.values[-1]
-            dset[i] = self.obj[i].monet.nearest_latlon(
-                lat=lat, lon=lon, cleanup=True, **kwargs)
+            dset[i] = self.obj[i].monet.nearest_latlon(lat=lat,
+                                                       lon=lon,
+                                                       cleanup=True,
+                                                       **kwargs)
             return dset
 
     @staticmethod
@@ -807,8 +861,9 @@ class MONETAccessorDataset(object):
         for i in loop_vars[1:-1].values:
             dset[i] = self.obj[i].monet.interp_constant_lat(lat=lat, **kwargs)
         i = loop_vars.values[-1]
-        dset[i] = self.obj[i].monet.interp_constant_lat(
-            lat=lat, cleanup=True, **kwargs)
+        dset[i] = self.obj[i].monet.interp_constant_lat(lat=lat,
+                                                        cleanup=True,
+                                                        **kwargs)
         return dset
 
     def interp_constant_lon(self, lon=None, **kwargs):
@@ -832,15 +887,16 @@ class MONETAccessorDataset(object):
         loop_vars = vars.loc[~vars.isin(skip_keys)]
         kwargs = self._check_kwargs_and_set_defaults(**kwargs)
         kwargs['reuse_weights'] = True
-        orig = self.obj[loop_vars[0]].monet.interp_constant_lon(
-            lon=lon, **kwargs)
+        orig = self.obj[loop_vars[0]].monet.interp_constant_lon(lon=lon,
+                                                                **kwargs)
         dset = orig.to_dataset()
         dset.attrs = self.obj.attrs.copy()
         for i in loop_vars[1:-1].values:
             dset[i] = self.obj[i].monet.interp_constant_lon(lon=lon, **kwargs)
         i = loop_vars.values[-1]
-        dset[i] = self.obj[i].monet.interp_constant_lon(
-            lon=lon, cleanup=True, **kwargs)
+        dset[i] = self.obj[i].monet.interp_constant_lon(lon=lon,
+                                                        cleanup=True,
+                                                        **kwargs)
         return dset
 
     def stratify(self, levels, vertical, axis=1):
@@ -903,10 +959,10 @@ class MONETAccessorDataset(object):
                 lons, lats = utils.check_and_wrap(self.obj.longitude.values,
                                                   self.obj.latitude.values)
                 swath = llsd(longitude=lons, latitude=lats)
-                pswath_ll = npsd(
-                    longitude=float(lon_min), latitude=float(lat_min))
-                pswath_ur = npsd(
-                    longitude=float(lon_max), latitude=float(lat_max))
+                pswath_ll = npsd(longitude=float(lon_min),
+                                 latitude=float(lat_min))
+                pswath_ur = npsd(longitude=float(lon_max),
+                                 latitude=float(lat_max))
                 row, col = utils.generate_nearest_neighbour_linesample_arrays(
                     swath, pswath_ll, float(1e6))
                 y_ll, x_ll = row[0][0], col[0][0]
@@ -934,13 +990,13 @@ class MONETAccessorDataset(object):
         except ImportError:
             print('Window functionality is unavailable without pyresample')
 
-    def combine_point(self, df, mapping_table=None, **kwargs):
+    def combine_point(self, data, col=None, suffix=None, **kwargs):
         """Short summary.
 
         Parameters
         ----------
-        df : type
-            Description of parameter `df`.
+        data : type
+            Description of parameter `data`.
         mapping_table : type
             Description of parameter `mapping_table`.
         radius : type
@@ -952,7 +1008,5 @@ class MONETAccessorDataset(object):
             Description of returned object.
 
         """
-        # from .util.combinetool import combine_da_to_df_xesmf
-        for key, val in mapping_table.items():
-            df = self.obj[key].monet.combine_point(df, col=val, **kwargs)
-        return df
+        from .util.combinetool import combine_da_to_df_xesmf
+        return combine_da_to_df_xesmf(self.obj, data, suffix=suffix, **kwargs)

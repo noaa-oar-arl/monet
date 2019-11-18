@@ -30,7 +30,7 @@ def add_data(fname, lat_label=None, lon_label=None, alt_label=None):
     ic = ICARTT()
     dset = ic.add_data(fname)
     dset = ic._rename_to_monet(
-        dset, lat_label=lat_label, lon_label=lon_label, alt_label=alt_label)
+        dset)
     return dset
 
 
@@ -110,7 +110,7 @@ class ICARTT(object):
             fname, engine='pseudonetcdf', decode_times=False)
         return dset
 
-    def _rename_to_monet(d, lat_label=None, lon_label=None, alt_label=None):
+    def _rename_to_monet(self, d, lat_label=None, lon_label=None, alt_label=None):
         """Short summary.
 
         Parameters
