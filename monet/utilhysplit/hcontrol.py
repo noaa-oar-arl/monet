@@ -23,8 +23,43 @@ FUNCTIONS
    writelanduse - writes ASCDATA.CFG file.
 """
 
+def writeover(name, overwrite, query, verbose=False):
+    """
+    checks if file already exits.
+    Inputs
+    name : str
+           filename
+    overwrite: boolean  
+           if True then will overwrite file if it exists.
+    query : boolean
+           if True then will ask for user input before overwriting a file
+    verbose : boolean  
+           if True will write messages
+    Outputs
+    rval : int
+    """
+    rval = 1
+    if path.isfile(name):
+          print('file already exists ' +  name)
+          fexists = True
+          if query:
+            istr= " Press y to overwrite file \n"
+            istr+= " Press any other key to continue without overwriting "
+            answer = input(istr)
+            if answer.strip().lower() != 'y':
+               overwrite=False 
+            else:
+               overwrite=True
+          if overwrite:
+             if verbose: print('overwriting existing file')
+             rval = 1
+          else:
+             if verbose: print('Continuing without overwriting file')
+             rval = -1   
+    return rval
 
-def writelanduse(landusedir, working_directory="./"):
+def writelanduse(landusedir, working_directory="./", overwrite=True,
+                 query=False, silent=False):
     """writes an ASCDATA.CFG file in the outdir. The landusedir must
        be the name of the directory where the landuse files are located.
     Parameters
@@ -36,13 +71,17 @@ def writelanduse(landusedir, working_directory="./"):
     ----------
     None
     """
-    with open(working_directory + "ASCDATA.CFG", "w") as fid:
+    rval = writeover(working_directory + 'ASCDATA.CFG', overwrite, query,
+                         verbose=silent)
+    with open(path.join(working_directory,"ASCDATA.CFG"), "w") as fid:
         fid.write("-90.0  -180.0 \n")
         fid.write("1.0    1.0    \n")
         fid.write("180    360    \n")
         fid.write("2 \n")
         fid.write("0.2 \n")
-        fid.write(landusedir + "/bdyfiles/ \n")
+        fid.write(landusedir +" \n")
+        if  not path.isdir(landusedir) and not silent:
+            print('writelanduse function WARNING: landuse directory does not exist', landusedir)
 
 
 class ConcGrid:
@@ -77,23 +116,23 @@ class ConcGrid:
     """
 
     def __init__(
-        self,
-        name,
-        levels=None,
-        centerlat=0.0,
-        centerlon=0.0,
-        latdiff=-1.0,
-        londiff=-1.0,
-        latspan=90.0,
-        lonspan=360.0,
-        outdir="./",
-        outfile="cdump",
-        nlev=-1,
-        sample_start="00 00 00 00 00",
-        sample_stop="00 00 00 00 00",
-        sampletype=0,
-        interval=(-1, -1),
-    ):
+            self,
+            name,
+            levels=None,
+            centerlat=0.0,
+            centerlon=0.0,
+            latdiff=-1.0,
+            londiff=-1.0,
+            latspan=90.0,
+            lonspan=360.0,
+            outdir="./",
+            outfile="cdump",
+            nlev=-1,
+            sample_start="00 00 00 00 00",
+            sample_stop="00 00 00 00 00",
+            sampletype=0,
+            interval=(-1, -1),
+        ):
 
         # self.name, self.levels, self.centerlat, self.centerlon,
         # self.latdiff, self.londiff, self.latspan, self.lonspan,
@@ -382,19 +421,19 @@ class Species:
         return Species.total
 
     def __init__(
-        self,
-        name,
-        psize=0,
-        rate="1",
-        duration=-1,
-        density=2.5,
-        shape=1,
-        date="00 00 00 00 00",
-        wetdepstr="0.0 0.0 0.0",
-        vel="0.0 0.0 0.0 0.0 0.0",
-        decay="0.0",
-        resuspension="0.0",
-    ):
+            self,
+            name,
+            psize=0,
+            rate="1",
+            duration=-1,
+            density=2.5,
+            shape=1,
+            date="00 00 00 00 00",
+            wetdepstr="0.0 0.0 0.0",
+            vel="0.0 0.0 0.0 0.0 0.0",
+            decay="0.0",
+            resuspension="0.0",
+        ):
 
         self.name = name
         self.rate = rate
@@ -637,7 +676,7 @@ class NameList:
         )
         self.descrip["kbls"] = (
             "Stability computed by" "(1) Heat and momentum fluxes," +
-            " 2: Wind and temperature profiles" +
+            " 2: Wind and temperature profiles" 
         )
         self.descrip["kblt"] = (
             "Flag to set vertical turbulence computational" +
@@ -687,13 +726,20 @@ class NameList:
                     key = key.lower()
                 self.nlist[key] = temp[1].strip(",")
 
-    def write(self, order=None, gem=False, verbose=False):
+    def write(self, order=None, gem=False, verbose=False, overwrite=True,
+              query=False):
         """ if gem=True then will write &GENPARM at beginning of file rather than &SETUP"""
+
+        rval = writeover(self.wdir + self.fname, overwrite, query,
+                         verbose=verbose)
+        if rval==-1:
+           return rval
+
         if order is None:
             order = []
         if verbose:
             print("WRITING SETUP FILE", self.wdir + self.fname)
-        with open(self.wdir + self.fname, "w") as fid:
+        with open(path.join(self.wdir,self.fname), "w") as fid:
             if gem:
                 fid.write("&GEMPARM \n")
             else:
@@ -740,6 +786,10 @@ class ControlLoc(object):
             self.area = area
         ControlLoc.total += 1
 
+    def copy(self):
+        return ControlLoc(False, self.latlon, self.alt,
+               self.rate, self.area)
+
     def definition(self, line):
         """
         line : string
@@ -779,10 +829,10 @@ class ControlLoc(object):
         returnstr += "{:.4f}".format(self.latlon[1])
         returnstr += spc
         returnstr += "{:.1f}".format(self.alt)
-        if self.rate != -999:
-            returnstr += spc
-            returnstr += "{:.0f}".format(self.rate)
-        if self.rate != -999 and self.area != -999:
+        if self.rate != -999 and self.rate != False:
+                returnstr += spc
+                returnstr += "{:.0f}".format(self.rate)
+        if self.rate != -999 and self.area != -999 and self.rate != False:
             returnstr += spc
             returnstr += "{:.2E}".format(self.area)
         return returnstr
@@ -812,7 +862,7 @@ class HycsControl(object):
         self.num_grids = 0  # number of concentration grids.
         self.num_sp = 0  # number of pollutants / species
         self.num_met = 0  # number of met files
-        self.rtype = rtype  # dispersion or trajectory run.
+        self.rtype = rtype  # dispersion or trajectory run or vmixing.
 
         self.outfile = "cdump"
         self.outdir = "./"
@@ -853,6 +903,12 @@ class HycsControl(object):
          """
         self.num_grids += 1
         self.concgrids.append(cgrid)
+
+    def add_dummy_location(self):
+        newloc = self.locs[0].copy()
+        self.locs.append(newloc)
+        self.nlocs += 1 
+        
 
     def add_location(
             self,
@@ -929,14 +985,24 @@ class HycsControl(object):
         """will replace the duration if already exists"""
         self.run_duration = duration
 
-    def write(self, annotate=False):
+    def write(self, annotate=False, metgrid=False, verbose=False, overwrite=True, query=False):
         """writes CONTROL file to text file
            self.wdir + self.fname
+           metgrid option will write a 1 before the number of met files.
+           overwrite - if False then will not overwrite an exisitng file
+           query - if True will ask before overwriting an exisiting file.
         """
         note = ""
         sp28 = " " * 28
-        with open(self.wdir + self.fname, "w") as fid:
-            fid.write(self.date.strftime("%y %m %d %H"))
+ 
+        rval = writeover(self.wdir + self.fname, overwrite, query,
+                         verbose=verbose)
+        if rval==-1:
+           return rval
+                     
+
+        with open(path.join(self.wdir,self.fname), "w") as fid:
+            fid.write(self.date.strftime("%y %m %d %H %M"))
             if annotate:
                 note = " " * 18 + "#Start date of simulation"
             fid.write(note + "\n")
@@ -965,6 +1031,8 @@ class HycsControl(object):
             fid.write(str(self.ztop) + note + "\n")
             if annotate:
                 note = sp28 + "#Number of Meteorological Data Files"
+            if metgrid:
+               fid.write('1 ')
             fid.write(str(self.num_met) + note + "\n")
             iii = 0
             for met in self.metfiles:
@@ -981,6 +1049,10 @@ class HycsControl(object):
                 fid.write(met)
                 fid.write(note + "\n")
                 iii += 1
+
+            # done writing if using for vmixing.
+            if self.rtype == 'vmixing':
+               return False
 
             if self.rtype == "trajectory":
                 fid.write(self.outdir + "\n")
@@ -1038,6 +1110,17 @@ class HycsControl(object):
     #            self.locs.append(line.strip())
     #            self.nlocs += 1
 
+
+
+    def parse_num_met(self, line):
+        temp = line.split()
+        num1 = int(temp[0])
+        try:
+           num2 = int(temp[1])
+        except: 
+           num2 = 1
+        return num2 * num1
+
     def read(self, verbose=False):
         """
         Read in control file.
@@ -1064,7 +1147,13 @@ class HycsControl(object):
             self.run_duration = content[zz].strip()
             self.vertical_motion = content[zz + 1].strip()
             self.ztop = content[zz + 2].strip()
-            self.num_met = int(content[zz + 3].strip())
+
+            num_met = content[zz+3].strip()
+            self.num_met = self.parse_num_met(num_met) 
+            #self.num_met = int(content[zz + 3].strip())
+
+
+
             zz = zz + 4
             for ii in range(zz, zz + 2 * self.num_met, 2):
                 self.metdirs.append(content[ii].strip())
@@ -1072,6 +1161,8 @@ class HycsControl(object):
             zz = zz + 2 * self.num_met
             # if it is a trajectory control file then just
             # two more lines
+            if self.rtype == 'vmixing': 
+                return "Vmixing"
             if self.rtype == "trajectory":
                 self.outdir = content[zz]
                 self.outfile = content[zz + 1]
@@ -1155,7 +1246,7 @@ def getmetfiles(
         mfmt,
         warn_file="MetFileWarning.txt",
         mdir="./",
-):
+        ):
     """
        INPUTS:
        sdate : start date (datetime object)
