@@ -21,24 +21,26 @@ CLASSES
 
 """
 
+
 class VmixingRun:
-        
-    def __init__(self, fname, cname='CONTROL', cdir='./',  pid=None,
+
+    def __init__(self, fname, cname='CONTROL', cdir='./', pid=None,
                  kbls=1, kblt=2, cameo=2, tkemin=None, verbose=True):
         self.control = HycsControl(fname=cname, rtype='vmixing')
-        self.pid = self.control.replace('CONTROL.','')
-        self.kbls = kbls #1 fluxes  #2 wind/temp profile
-        self.kblt = kblt #1 BJ #2 KC #3 TKE.
-        self.cameo= cameo #0 no #1 yes #2 yes + wdir
-        self.tkemin = tkemin 
-        self.woption = woption #output extra file
+        self.pid = self.control.replace('CONTROL.', '')
+        self.kbls = kbls  # 1 fluxes  #2 wind/temp profile
+        self.kblt = kblt  # 1 BJ #2 KC #3 TKE.
+        self.cameo = cameo  # 0 no #1 yes #2 yes + wdir
+        self.tkemin = tkemin
+        self.woption = woption  # output extra file
         self.cdir = cdir
 
     def readcontrol(self):
         self.control.read()
 
     def writecontrol(self, cname=None, cdir=None):
-        if not cdir: cdir = self.cdir
+        if not cdir:
+            cdir = self.cdir
         if cname:
             self.control.rename(cname, working_directory=cdir)
         self.control.write()
@@ -50,16 +52,17 @@ class VmixingRun:
 
     def make_runstr(self, hdir):
         rstr = hdir
-        if rstr[-1] != '/': rstr.append('/')
+        if rstr[-1] != '/':
+            rstr.append('/')
         rstr += 'vmixing '
         if self.pid:
             rstr += '-p' + str(self.pid)
-            rstr +=  '-s' + str(self.kbls)
-            rstr +=  '-t' + str(self.kblt)
-            rstr +=  '-a' + str(self.cameo)
-            if tkemin: 
-               rstr +=  '-m' + str(self.tkemin)
-            rstr +=  '-w' + str(self.woption)
+            rstr += '-s' + str(self.kbls)
+            rstr += '-t' + str(self.kblt)
+            rstr += '-a' + str(self.cameo)
+            if tkemin:
+                rstr += '-m' + str(self.tkemin)
+            rstr += '-w' + str(self.woption)
         return rstr
 
 
@@ -69,7 +72,8 @@ class VmixingData:
         make_dummies (NOT FUNCTIONAL)
         readfile  
     """
-    def __init__(self,  century=2000, verbose=True):
+
+    def __init__(self, century=2000, verbose=True):
         """fname : name of file output by xtrct_stn
            valra : list of values that are in fname
            century : fname lists year by last two digits only. century is needed to process date.
@@ -77,29 +81,29 @@ class VmixingData:
         self.units = None
         self.df = pd.DataFrame()
 
-    def add_data(self, fname,  vdir='./', century=2000, verbose=False, sid=None):
-            df = self.readfile(fname, vdir, century, verbose)   
-            if sid:
-               df['sid'] = sid
-            if self.df.empty:
-               self.df = df
-            else:
-               self.df = pd.concat([self.df, df], axis=0)
-               #print(self.df)
-               #import sys
-               #sys.exit()
-            return self.df
+    def add_data(self, fname, vdir='./', century=2000, verbose=False, sid=None):
+        df = self.readfile(fname, vdir, century, verbose)
+        if sid:
+            df['sid'] = sid
+        if self.df.empty:
+            self.df = df
+        else:
+            self.df = pd.concat([self.df, df], axis=0)
+            # print(self.df)
+            #import sys
+            # sys.exit()
+        return self.df
 
     def make_dummies(self, data_ra=[-999]):
         """instead of running,  write a dummy file like the one vmixing would write.
            Used for testing.
-        """    
+        """
         #sdate = datetime.datetime()
         #dt = datetime.timedelta(hour=1)
-        #iii=1
-        #with open(self.fname) as fid:
+        # iii=1
+        # with open(self.fname) as fid:
         #     fid.write(str(iii) + sdate.strftime(" %y %m %d %h"))
-        #     iii+=1 
+        #     iii+=1
         return -1
 
     def get_location(self, head1):
@@ -122,49 +126,50 @@ class VmixingData:
         units.extend(temp3)
         return cols, units
 
-
-    def readfile(self,  fname, vdir='./', century=2000, verbose=False):
+    def readfile(self, fname, vdir='./', century=2000, verbose=False):
         """Reads file and returns True if the file exists.
            returns False if file is not found"""
         df = pd.DataFrame()
         if path.isfile(vdir + fname):
-            if verbose: print('Adding', vdir + fname)
+            if verbose:
+                print('Adding', vdir + fname)
             data = []
             with open(vdir + fname, "r") as fid:
-                 head1 = fid.readline()
-                 head2 = fid.readline()
-                 head3 = fid.readline()
-                 try:
-                     lat, lon, met = self.get_location(head1)
-                 except:
-                     print('problem with vmixing file ', fname, vdir)
-                     print('header ', head1)
-                     return df
-                     #sys.exit()
-                 cols, units = self.parse_header(head2,head3)
-                 for line in fid.readlines():
-                     # get the date for the line
-                     temp = line.split()
-                     try:
+                head1 = fid.readline()
+                head2 = fid.readline()
+                head3 = fid.readline()
+                try:
+                    lat, lon, met = self.get_location(head1)
+                except:
+                    print('problem with vmixing file ', fname, vdir)
+                    print('header ', head1)
+                    return df
+                    # sys.exit()
+                cols, units = self.parse_header(head2, head3)
+                for line in fid.readlines():
+                    # get the date for the line
+                    temp = line.split()
+                    try:
                         vals = [self.line2date(line, century)]
-                     except:
+                    except:
                         return False
-                     temp2=[] 
-                     for val in temp[6:]:
-                         try:
+                    temp2 = []
+                    for val in temp[6:]:
+                        try:
                             temp2.append(float(val))
-                         except:
-                            temp2.append(val) 
-                     vals.extend(temp2) 
-                     data.append(vals) 
+                        except:
+                            temp2.append(val)
+                    vals.extend(temp2)
+                    data.append(vals)
             df = pd.DataFrame.from_records(data)
             df.columns = cols
             df['latitude'] = lat
             df['longitude'] = lon
             df['met'] = met
             self.units = zip(cols, units)
-        else: 
-            if verbose: print('Cannot Find ', vdir + fname)
+        else:
+            if verbose:
+                print('Cannot Find ', vdir + fname)
         return df
 
     def line2date(self, line, century):
@@ -172,11 +177,8 @@ class VmixingData:
         temp = line.strip().split()
         year = int(temp[1]) + century
         month = int(temp[2])
-        day =   int(temp[3])
-        hour =  int(temp[4])
+        day = int(temp[3])
+        hour = int(temp[4])
         minute = int(temp[5])
-        vdate = datetime.datetime(year, month, day , hour, minute)
+        vdate = datetime.datetime(year, month, day, hour, minute)
         return vdate
-
- 
-

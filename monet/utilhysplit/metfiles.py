@@ -197,8 +197,8 @@ class MetFiles:
         for temp in nlist:
             sii = [x for x, char in enumerate(temp) if char == "/"]
             sii = sii[-1]
-            fname = temp[sii + 1 :]
-            mdir = temp[0 : sii + 1]
+            fname = temp[sii + 1:]
+            mdir = temp[0: sii + 1]
             mfiles.append(fname)
             mdirlist.append(mdir)
         return list(zip(mdirlist, mfiles))
