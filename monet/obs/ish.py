@@ -11,8 +11,7 @@ from dask.diagnostics import ProgressBar
 ProgressBar().register()
 
 
-def add_data(self,
-             dates,
+def add_data(dates,
              box=None,
              country=None,
              state=None,
