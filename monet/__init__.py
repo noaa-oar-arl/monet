@@ -1,10 +1,7 @@
 from . import grids, models, monet_accessor, obs, plots, profile, sat, util
 from .plots import savefig
 
-__all__ = [
-    'models', 'obs', 'plots', 'sat', 'util', 'monet_accessor', 'grids',
-    'profile'
-]
+__all__ = ['plots', 'sat', 'util', 'monet_accessor']
 
 
 def rename_latlon(ds):

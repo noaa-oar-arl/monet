@@ -1,3 +1,4 @@
+from numpy import ones
 from pandas import Series, merge_asof
 
 # from ..util import interp_util as interpo
@@ -32,13 +33,10 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
         print('Must enter column name')
     dfn = df.dropna(subset=[col])
     dfnn = dfn.drop_duplicates(subset=['latitude', 'longitude'])
-    # unit = dfnn[col + '_unit'].unique()[0]
-    target_grid = lonlat_to_swathdefinition(longitude=dfnn.longitude.values,
-                                            latitude=dfnn.latitude.values)
-    da_interped = resample_dataset(da.compute(),
-                                   target_grid,
-                                   radius_of_influence=radius_of_influence)
-    # add model if da.name is the same as column
+    dfda = xr.DataArray(np.ones(len(dfnn), len(dfnn)),
+                        dims=['lon', 'lat'],
+                        coords=[dfnn.longitude.values, dfnn.latitude.values])
+    da_interped = dfda.remap_nearest(da).compute()
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
@@ -46,10 +44,13 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     if da.name in df.columns:
         df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
         # print(df_interped.keys())
-    final_df = df.merge(df_interped,
-                        on=['latitude', 'longitude', 'time'],
-                        how='left')
-    return final_df
+    if merge:
+        final_df = df.merge(df_interped,
+                            on=['latitude', 'longitude', 'time'],
+                            how='left')
+        return final_df
+    else:
+        return df_interped
 
 
 def _rename_latlon(ds):
