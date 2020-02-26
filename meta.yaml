@@ -31,13 +31,10 @@ requirements:
     - cartopy
     - matplotlib
     - seaborn
-    - pseudonetcdf
     - pyresample
     - python-stratify
-    - pytables
-    - xesmf
+    - xesmf # [not win]
     - pydecorate
-    - s3fs
 
 about:
   home: https://monet-arl.readthedocs.io
