@@ -570,7 +570,7 @@ class MONETAccessor(object):
         if has_pyresample:
             lons, lats = utils.check_and_wrap(self._obj.longitude.values,
                                               self._obj.latitude.values)
-            swath = self._get_CoordinateDefinition()
+            swath = self._get_CoordinateDefinition(d)
             pswath = npsd(longitude=float(lon), latitude=float(lat))
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, **kwargs)
@@ -674,7 +674,7 @@ class MONETAccessor(object):
         else:
             return False
 
-    def _get_CoordinateDefinition(self):
+    def _get_CoordinateDefinition(self, data=None):
         """Creates a pyresample CoordinateDefinition
 
         Returns
@@ -682,9 +682,14 @@ class MONETAccessor(object):
         pyreseample.geometry.CoordinateDefinition
 
         """
-        from pyresample import geometry
-        return geometry.CoordinateDefinition(lats=self._obj.latitude,
-                                             lons=self._obj.longitude)
+        from pyresample import geometry as geo
+        if data is not None:
+            g = geo.CoordinateDefinition(lats=data.latitude,
+                                         lons=data.longitude)
+        else:
+            g = geo.CoordinateDefinition(lats=self._obj.latitude,
+                                         lons=self._obj.longitude)
+        return g
 
     def remap_nearest(self, data, radius_of_influence=1e6):
         """Interpolates from another grid (data) to the current grid of self using pyresample.
@@ -713,8 +718,8 @@ class MONETAccessor(object):
         print(d1)
         d2 = _dataset_to_monet(self._obj)
         print(d2)
-        source = d1._get_CoordinateDefinition()
-        target = d2._get_CoordinateDefinition()
+        source = self._get_CoordinateDefinition(data=d1)
+        target = self._get_CoordinateDefinition(data=d2)
         r = kd_tree.XArrayResamplerNN(source,
                                       target,
                                       radius_of_influence=radius_of_influence)
@@ -965,8 +970,12 @@ class MONETAccessorDataset(object):
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
         try:
-            if not isinstance(data, xr.DataArray) or not isinstance(
-                    data, xr.Dataset):
+            check_error = False
+            if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
+                check_error = False
+            else:
+                check_error = True
+            if check_error:
                 raise TypeError
         except TypeError:
             print('data must be either an Xarray.DataArray or Xarray.Dataset')
@@ -1082,7 +1091,7 @@ class MONETAccessorDataset(object):
 
         d = self.structure_for_monet(self._obj, return_obj=True)
         if has_pyresample:
-            swath = self._get_CoordinateDefinition()
+            swath = self._get_CoordinateDefinition(d)
             pswath = npsd(longitude=float(lon), latitude=float(lat))
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, **kwargs)
