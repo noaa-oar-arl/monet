@@ -941,6 +941,18 @@ class MONETAccessorDataset(object):
         self._obj[out.name] = out
         return out
 
+    def _get_CoordinateDefinition(self):
+        """Creates a pyresample CoordinateDefinition
+
+        Returns
+        -------
+        pyreseample.geometry.CoordinateDefinition
+
+        """
+        from pyresample import geometry
+        return geometry.CoordinateDefinition(lats=self._obj.latitude,
+                                             lons=self._obj.longitude)
+
     def remap_nearest(self, data, radius_of_influence=1e6):
         from pyresample import utils
         from pyresample import kd_tree
@@ -957,7 +969,7 @@ class MONETAccessorDataset(object):
         d2 = _dataset_to_monet(self._obj)
         print(d1)
         print(d2)
-        source = d1._get_CoordinateDefinition()
+        # source = d1._get_CoordinateDefinition()
         target = d2._get_CoordinateDefinition()
         r = kd_tree.XArrayResamplerNN(source,
                                       target,
@@ -1260,18 +1272,6 @@ class MONETAccessorDataset(object):
                 raise ImportError
         except ImportError:
             print('Window functionality is unavailable without pyresample')
-
-    def _get_CoordinateDefinition(self):
-        """Creates a pyresample CoordinateDefinition
-
-        Returns
-        -------
-        pyreseample.geometry.CoordinateDefinition
-
-        """
-        from pyresample import geometry
-        return geometry.CoordinateDefinition(lats=self._obj.latitude,
-                                             lons=self._obj.longitude)
 
     def combine_point(self, data, col=None, suffix=None, **kwargs):
         """Short summary.
