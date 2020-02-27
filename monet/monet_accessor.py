@@ -975,7 +975,7 @@ class MONETAccessorDataset(object):
         print(d1)
         print(d2)
         # source = d1._get_CoordinateDefinition()
-        target = d2._get_CoordinateDefinition()
+        target = self._get_CoordinateDefinition(d2)
         r = kd_tree.XArrayResamplerNN(source,
                                       target,
                                       radius_of_influence=radius_of_influence)
