@@ -710,8 +710,9 @@ class MONETAccessor(object):
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
         d1 = _dataset_to_monet(data)
+        print(d1)
         d2 = _dataset_to_monet(self._obj)
-
+        print(d2)
         source = d1._get_CoordinateDefinition()
         target = d2._get_CoordinateDefinition()
         r = kd_tree.XArrayResamplerNN(source,
