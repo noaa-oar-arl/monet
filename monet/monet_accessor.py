@@ -941,7 +941,7 @@ class MONETAccessorDataset(object):
         self._obj[out.name] = out
         return out
 
-    def _get_CoordinateDefinition(self):
+    def _get_CoordinateDefinition(self, data=None):
         """Creates a pyresample CoordinateDefinition
 
         Returns
@@ -949,9 +949,14 @@ class MONETAccessorDataset(object):
         pyreseample.geometry.CoordinateDefinition
 
         """
-        from pyresample import geometry
-        return geometry.CoordinateDefinition(lats=self._obj.latitude,
-                                             lons=self._obj.longitude)
+        from pyresample import geometry as geo
+        if data is not None:
+            g = geo.CoordinateDefinition(lats=data.latitude,
+                                         lons=data.longitude)
+        else:
+            g = geo.CoordinateDefinition(lats=self._obj.latitude,
+                                         lons=self._obj.longitude)
+        return g
 
     def remap_nearest(self, data, radius_of_influence=1e6):
         from pyresample import utils
