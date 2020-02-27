@@ -163,20 +163,20 @@ class MONETAccessorPandas:
         df = self.rename_for_monet(self._obj)
         if has_pyresample:
             from .util.interp_util import nearest_point_swathdefinition as npsd
-        return nspd(latitude=df.latitude.values,longitude=df.longitude.values)
+        return nspd(latitude=df.latitude.values, longitude=df.longitude.values)
 
-    def _df_to_da(self,d):
+    def _df_to_da(self, d):
         import xarray as xr
         index_name = 'index'
         if d.index.name is not None:
             index_name = d.index.name
-        ds = d.to_xarray().rename({'index','x'}).expand_dims('y')
+        ds = d.to_xarray().rename({'index', 'x'}).expand_dims('y')
         if 'time' in ds.data_vars.keys():
-            ds['time'] = ds.time.squeeze() # it is only 1D
+            ds['time'] = ds.time.squeeze()  # it is only 1D
 
         return ds
 
-    def remap_nearest(self,df,radius_of_influence=1e5, combine=False):
+    def remap_nearest(self, df, radius_of_influence=1e5, combine=False):
         """Remap df to find nearest sites
 
         Parameters
@@ -201,16 +201,19 @@ class MONETAccessorPandas:
             ds2 = self._df_to_da(d2)
             source = ds1._get_CoordinateDefinition()
             target = ds2._get_CoordinateDefinition()
-            res = pr.kd_tree.XArrayResamplerNN(source,target,radius_of_influence=radius_of_influence)
+            res = pr.kd_tree.XArrayResamplerNN(
+                source, target, radius_of_influence=radius_of_influence)
             res.get_neighbour_info()
             #interpolate just the make_fake_index variable
             r = res.get_sample_from_neighbour_info(ds1.make_fake_index)
             # now merge back from original DataFrame
             q = r.compute()
             v = q.squeeze().to_dataframe()
-            result = v.merge(df1,how='left',on='monet_fake_index').drop('monet_fake_index',axis=1)
+            result = v.merge(df1, how='left',
+                             on='monet_fake_index').drop('monet_fake_index',
+                                                         axis=1)
             if combine:
-                return d2.merge_asof(result,how='left')
+                return d2.merge_asof(result, how='left')
             else:
                 return result
 
@@ -219,7 +222,7 @@ class MONETAccessorPandas:
         column = df.columns[0]
         fake_index = arange(len(self._obj))
         column_name = 'monet_fake_index'
-        r = pd.Series(fake_index.astype(float),index = df.index)
+        r = pd.Series(fake_index.astype(float), index=df.index)
         r.name = column_name
         df[column_name] = r
         return df
@@ -243,7 +246,10 @@ class MONETAccessor(object):
     def __init__(self, xray_obj):
         self._obj = xray_obj
 
-    def structure_for_monet(self,lat_name='lat',lon_name='lon', return_obj=True):
+    def structure_for_monet(self,
+                            lat_name='lat',
+                            lon_name='lon',
+                            return_obj=True):
         """This will attempt to restucture a given DataArray for use within MONET.
 
         Parameters
@@ -262,9 +268,13 @@ class MONETAccessor(object):
 
         """
         if return_obj:
-            return _dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
+            return _dataset_to_monet(self._obj,
+                                     lat_name=lat_name,
+                                     lon_name=lon_name)
         else:
-            self._obj = _dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
+            self._obj = _dataset_to_monet(self._obj,
+                                          lat_name=lat_name,
+                                          lon_name=lon_name)
 
     def stratify(self, levels, vertical, axis=1):
         """Short summary.
@@ -817,7 +827,10 @@ class MONETAccessorDataset(object):
     def __init__(self, xray_obj):
         self._obj = xray_obj
 
-    def structure_for_monet(self,lat_name='lat',lon_name='lon', return=True):
+    def structure_for_monet(self,
+                            lat_name='lat',
+                            lon_name='lon',
+                            return_obj=True):
         """This will attempt to restucture a given DataArray for use within MONET.
 
         Parameters
@@ -835,10 +848,14 @@ class MONETAccessorDataset(object):
             Description of returned object.
 
         """
-        if return:
-            return _dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
+        if return_obj:
+            return _dataset_to_monet(self._obj,
+                                     lat_name=lat_name,
+                                     lon_name=lon_name)
         else:
-            self._obj = _dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
+            self._obj = _dataset_to_monet(self._obj,
+                                          lat_name=lat_name,
+                                          lon_name=lon_name)
 
     def remap_xesmf(self, data, **kwargs):
         """Short summary.
@@ -930,7 +947,8 @@ class MONETAccessorDataset(object):
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
         try:
-            if not isinstance(data, xr.DataArray) or not isinstance(data,xr.Dataset):
+            if not isinstance(data, xr.DataArray) or not isinstance(
+                    data, xr.Dataset):
                 raise TypeError
         except TypeError:
             print('data must be either an Xarray.DataArray or Xarray.Dataset')
