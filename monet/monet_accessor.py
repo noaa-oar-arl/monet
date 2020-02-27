@@ -683,8 +683,8 @@ class MONETAccessor(object):
 
         """
         from pyresample import geometry
-        return geometry.CoordinateDefinition(lats=self.latitude,
-                                             lons=self.longitude)
+        return geometry.CoordinateDefinition(lats=self._obj.latitude,
+                                             lons=self._obj.longitude)
 
     def remap_nearest(self, data, radius_of_influence=1e6):
         """Interpolates from another grid (data) to the current grid of self using pyresample.
@@ -1324,8 +1324,8 @@ class MONETAccessorDataset(object):
 
         """
         from pyresample import geometry
-        return geometry.CoordinateDefinition(lats=self.latitude,
-                                             lons=self.longitude)
+        return geometry.CoordinateDefinition(lats=self._obj.latitude,
+                                             lons=self._obj.longitude)
 
     def combine_point(self, data, col=None, suffix=None, **kwargs):
         """Short summary.
