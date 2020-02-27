@@ -972,9 +972,7 @@ class MONETAccessorDataset(object):
             print('data must be either an Xarray.DataArray or Xarray.Dataset')
         d1 = _dataset_to_monet(data)
         d2 = _dataset_to_monet(self._obj)
-        print(d1)
-        print(d2)
-        # source = d1._get_CoordinateDefinition()
+        source = self._get_CoordinateDefinition(d1)
         target = self._get_CoordinateDefinition(d2)
         r = kd_tree.XArrayResamplerNN(source,
                                       target,
