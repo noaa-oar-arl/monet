@@ -955,7 +955,8 @@ class MONETAccessorDataset(object):
             print('data must be either an Xarray.DataArray or Xarray.Dataset')
         d1 = _dataset_to_monet(data)
         d2 = _dataset_to_monet(self._obj)
-
+        print(d1)
+        print(d2)
         source = d1._get_CoordinateDefinition()
         target = d2._get_CoordinateDefinition()
         r = kd_tree.XArrayResamplerNN(source,
@@ -978,62 +979,6 @@ class MONETAccessorDataset(object):
             result.coords['longitude'] = d2.longitude
 
         return result
-
-    def nearest_latlon(self, lat=None, lon=None, **kwargs):
-        """Short summary.
-
-        Parameters
-        ----------
-        lat : type
-            Description of parameter `lat`.
-        lon : type
-            Description of parameter `lon`.
-        **kwargs : type
-            Description of parameter `**kwargs`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
-        try:
-            from pyresample import utils
-            from .util.interp_util import nearest_point_swathdefinition as npsd
-            from .util.interp_util import lonlat_to_swathdefinition as llsd
-            has_pyresample = True
-        except ImportError:
-            has_pyresample = False
-        if has_pyresample:
-            lons, lats = utils.check_and_wrap(self._obj.longitude.values,
-                                              self._obj.latitude.values)
-            swath = llsd(longitude=lons, latitude=lats)
-            pswath = npsd(longitude=float(lon), latitude=float(lat))
-            row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                swath, pswath, float(1e6))
-            y, x = row[0][0], col[0][0]
-            return self._obj.isel(x=x, y=y)
-        else:
-            vars = pd.Series(self._obj.variables)
-            skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
-            loop_vars = vars.loc[~vars.isin(skip_keys)]
-            kwargs = self._check_kwargs_and_set_defaults(**kwargs)
-            kwargs['reuse_weights'] = True
-            orig = self._obj[loop_vars.iloc[0]].monet.nearest_latlon(
-                lat=lat, lon=lon, cleanup=False, **kwargs)
-            dset = orig.to_dataset()
-            dset.attrs = self._obj.attrs.copy()
-            for i in loop_vars[1:-1].values:
-                dset[i] = self._obj[i].monet.nearest_latlon(lat=lat,
-                                                            lon=lon,
-                                                            cleanup=False,
-                                                            **kwargs)
-            i = loop_vars.values[-1]
-            dset[i] = self._obj[i].monet.nearest_latlon(lat=lat,
-                                                        lon=lon,
-                                                        cleanup=True,
-                                                        **kwargs)
-            return dset
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Uses pyresample to intepolate to find the i, j index of grid with respect to the given lat lon.
