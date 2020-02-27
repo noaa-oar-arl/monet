@@ -55,9 +55,9 @@ def _dataset_to_monet(dset, lat_name='lat', lon_name='lon', latlon2d=False):
                                                    lat_name=lat_name,
                                                    lon_name=lon_name)
             elif isinstance(dset, xr.Dataset):
-                dset = coards_to_netcdf(dset,
-                                        lat_name=lat_name,
-                                        lon_name=lon_name)
+                dset = _coards_to_netcdf(dset,
+                                         lat_name=lat_name,
+                                         lon_name=lon_name)
             else:
                 raise ValueError
         except ValueError:
@@ -1314,6 +1314,18 @@ class MONETAccessorDataset(object):
                 raise ImportError
         except ImportError:
             print('Window functionality is unavailable without pyresample')
+
+    def _get_CoordinateDefinition(self):
+        """Creates a pyresample CoordinateDefinition
+
+        Returns
+        -------
+        pyreseample.geometry.CoordinateDefinition
+
+        """
+        from pyresample import geometry
+        return geometry.CoordinateDefinition(lats=self.latitude,
+                                             lons=self.longitude)
 
     def combine_point(self, data, col=None, suffix=None, **kwargs):
         """Short summary.
