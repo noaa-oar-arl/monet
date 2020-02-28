@@ -204,13 +204,11 @@ class MONETAccessorPandas:
             # now merge back from original DataFrame
             q = r.compute()
             v = q.squeeze().to_dataframe()
-            print(d1.columns)
-            print(v.columns)
             result = v.merge(d1, how='left',
                              on='monet_fake_index').drop('monet_fake_index',
                                                          axis=1)
             if combine:
-                return d2.merge_asof(result, how='left')
+                return pd.merge_asof(d2, result, how='left')
             else:
                 return result
 
