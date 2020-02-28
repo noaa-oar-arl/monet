@@ -198,8 +198,8 @@ class MONETAccessorPandas:
             # #interpolate just the make_fake_index variable
             # # print(ds1)
             # r = res.get_sample_from_neighbour_info(ds1.monet_fake_index)
-            r = df2.monet.remap_nearest(
-                df1, radius_of_influence=radius_of_influence)
+            r = ds2.monet.remap_nearest(
+                ds1, radius_of_influence=radius_of_influence)
             # now merge back from original DataFrame
             q = r.compute()
             v = q.squeeze().to_dataframe()
