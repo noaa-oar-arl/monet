@@ -190,17 +190,21 @@ class MONETAccessorPandas:
             d1 = self._make_fake_index_var(d1)
             ds1 = self._df_to_da(d1)
             ds2 = self._df_to_da(d2)
-            source = ds1.monet._get_CoordinateDefinition(ds1)
-            target = ds2.monet._get_CoordinateDefinition(ds2)
-            res = pr.kd_tree.XArrayResamplerNN(
-                source, target, radius_of_influence=radius_of_influence)
-            res.get_neighbour_info()
-            #interpolate just the make_fake_index variable
-            # print(ds1)
-            r = res.get_sample_from_neighbour_info(ds1.monet_fake_index)
+            # source = ds1.monet._get_CoordinateDefinition(ds1)
+            # target = ds2.monet._get_CoordinateDefinition(ds2)
+            # res = pr.kd_tree.XArrayResamplerNN(
+            #     source, target, radius_of_influence=radius_of_influence)
+            # res.get_neighbour_info()
+            # #interpolate just the make_fake_index variable
+            # # print(ds1)
+            # r = res.get_sample_from_neighbour_info(ds1.monet_fake_index)
+            r = df2.monet.remap_nearest(
+                df1, radius_of_influence=radius_of_influence)
             # now merge back from original DataFrame
             q = r.compute()
             v = q.squeeze().to_dataframe()
+            print(d1.columns)
+            print(v.columns)
             result = v.merge(d1, how='left',
                              on='monet_fake_index').drop('monet_fake_index',
                                                          axis=1)
