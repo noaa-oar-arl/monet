@@ -26,7 +26,10 @@ def _rename_latlon(ds):
         return ds
 
 
-def _dataset_to_monet(dset, lat_name='lat', lon_name='lon', latlon2d=False):
+def _dataset_to_monet(dset,
+                      lat_name='latitude',
+                      lon_name='longitude',
+                      latlon2d=False):
     """Renames XArray DataArray or Dataset for use with monet functions
 
     Parameters
@@ -46,6 +49,7 @@ def _dataset_to_monet(dset, lat_name='lat', lon_name='lon', latlon2d=False):
         Description of returned object.
 
     """
+    dset = _rename_to_monet_latlon(dset)
     if len(dset[lat_name].shape) != 2:
         latlon2d = False
     if latlon2d is False:
