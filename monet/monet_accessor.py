@@ -135,7 +135,7 @@ class MONETAccessorPandas:
             df = self._obj
         if 'lat' in df.columns:
             df = df.rename({'lat': 'latitude', 'lon': 'longitude'})
-        elif 'Latitude' in ds.columns:
+        elif 'Latitude' in df.columns:
             df = df.rename({'Latitude': 'latitude', 'Longitude': 'longitude'})
         elif 'Lat' in df.columns:
             df = df.rename({'Lat': 'latitude', 'Lon': 'longitude'})
