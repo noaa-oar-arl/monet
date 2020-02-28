@@ -128,9 +128,11 @@ class MONETAccessorPandas:
         lon = self._obj.longitude
         return (float(lon.mean()), float(lat.mean()))
 
-    def rename_for_monet(self, df):
+    def rename_for_monet(self, df=None):
         """Rename latitude and longitude columns in the DataFrame
         """
+        if df is None:
+            df = self._obj
         if 'lat' in df.columns:
             df = df.rename({'lat': 'latitude', 'lon': 'longitude'})
         elif 'Latitude' in ds.columns:
