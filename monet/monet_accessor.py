@@ -208,7 +208,12 @@ class MONETAccessorPandas:
                              on='monet_fake_index').drop('monet_fake_index',
                                                          axis=1)
             if combine:
-                return pd.merge_asof(d2, result)
+                columns_to_use = result.columns.difference(d2.columns)
+                return pd.merge(d2,
+                                result[columns_to_use],
+                                left_index=True,
+                                right_index=True,
+                                how='outer')
             else:
                 return result
 
