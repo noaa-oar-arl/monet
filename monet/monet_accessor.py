@@ -215,8 +215,8 @@ class MONETAccessorPandas:
         column_name = 'monet_fake_index'
         r = pd.Series(fake_index.astype(float), index=self._obj.index)
         r.name = column_name
-        df[column_name] = r
-        return df
+        self._obj[column_name] = r
+        return self._obj
 
 
 @xr.register_dataarray_accessor('monet')
