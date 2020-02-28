@@ -210,10 +210,10 @@ class MONETAccessorPandas:
 
     def _make_fake_index_var(self):
         from numpy import arange
-        column = df.columns[0]
+        column = self._obj.columns[0]
         fake_index = arange(len(self._obj))
         column_name = 'monet_fake_index'
-        r = pd.Series(fake_index.astype(float), index=df.index)
+        r = pd.Series(fake_index.astype(float), index=self._obj.index)
         r.name = column_name
         df[column_name] = r
         return df
