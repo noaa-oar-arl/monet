@@ -187,7 +187,7 @@ class MONETAccessorPandas:
         d2 = self.rename_for_monet(self._obj)
         if has_pyresample:
             #make fake index
-            d1['monet_fake_index'] = self._make_fake_index_var(d1)
+            d1 = self._make_fake_index_var(d1)
             ds1 = self._df_to_da(d1)
             ds2 = self._df_to_da(d2)
             source = ds1.monet._get_CoordinateDefinition(ds1)
@@ -196,6 +196,7 @@ class MONETAccessorPandas:
                 source, target, radius_of_influence=radius_of_influence)
             res.get_neighbour_info()
             #interpolate just the make_fake_index variable
+            print(ds1)
             r = res.get_sample_from_neighbour_info(ds1.make_fake_index)
             # now merge back from original DataFrame
             q = r.compute()
