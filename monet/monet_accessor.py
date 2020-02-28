@@ -190,8 +190,8 @@ class MONETAccessorPandas:
             d1['monet_fake_index'] = self._make_fake_index_var(d1)
             ds1 = self._df_to_da(d1)
             ds2 = self._df_to_da(d2)
-            source = ds1._get_CoordinateDefinition(ds1)
-            target = ds2._get_CoordinateDefinition(ds2)
+            source = ds1.monet._get_CoordinateDefinition(ds1)
+            target = ds2.monet._get_CoordinateDefinition(ds2)
             res = pr.kd_tree.XArrayResamplerNN(
                 source, target, radius_of_influence=radius_of_influence)
             res.get_neighbour_info()
