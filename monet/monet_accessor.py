@@ -128,29 +128,18 @@ class MONETAccessorPandas:
         lon = self._obj.longitude
         return (float(lon.mean()), float(lat.mean()))
 
-    def rename_for_monet(self):
+    def rename_for_monet(self, df):
         """Rename latitude and longitude columns in the DataFrame
         """
-        if 'lat' in self._obj.columns:
-            self._obj = self._obj.rename({
-                'lat': 'latitude',
-                'lon': 'longitude'
-            })
+        if 'lat' in df.columns:
+            df = df.rename({'lat': 'latitude', 'lon': 'longitude'})
         elif 'Latitude' in ds.columns:
-            self._obj = self._obj.rename({
-                'Latitude': 'latitude',
-                'Longitude': 'longitude'
-            })
-        elif 'Lat' in self._obj.columns:
-            self._obj = self._obj.rename({
-                'Lat': 'latitude',
-                'Lon': 'longitude'
-            })
-        elif 'LAT' in self._obj.columns:
-            self._obj = self._obj.rename({
-                'LAT': 'latitude',
-                'LON': 'longitude'
-            })
+            df = df.rename({'Latitude': 'latitude', 'Longitude': 'longitude'})
+        elif 'Lat' in df.columns:
+            df = df.rename({'Lat': 'latitude', 'Lon': 'longitude'})
+        elif 'LAT' in df.columns:
+            df = df.rename({'LAT': 'latitude', 'LON': 'longitude'})
+        return df
 
     def get_sparse_SwathDefinition(self):
         """Creates a pyreample.geometry.SwathDefinition for a single point.
