@@ -209,7 +209,7 @@ class MONETAccessorPandas:
                 return result
 
     def _make_fake_index_var(self):
-        from nunmpy import arange
+        from numpy import arange
         column = df.columns[0]
         fake_index = arange(len(self._obj))
         column_name = 'monet_fake_index'
