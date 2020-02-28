@@ -187,11 +187,11 @@ class MONETAccessorPandas:
         d2 = self.rename_for_monet(self._obj)
         if has_pyresample:
             #make fake index
-            d1['monet_fake_index'] = self._make_fake_index_var()
+            d1['monet_fake_index'] = self._make_fake_index_var(d1)
             ds1 = self._df_to_da(d1)
             ds2 = self._df_to_da(d2)
-            source = ds1._get_CoordinateDefinition()
-            target = ds2._get_CoordinateDefinition()
+            source = ds1._get_CoordinateDefinition(ds1)
+            target = ds2._get_CoordinateDefinition(ds2)
             res = pr.kd_tree.XArrayResamplerNN(
                 source, target, radius_of_influence=radius_of_influence)
             res.get_neighbour_info()
@@ -208,15 +208,15 @@ class MONETAccessorPandas:
             else:
                 return result
 
-    def _make_fake_index_var(self):
+    def _make_fake_index_var(self, df):
         from numpy import arange
-        column = self._obj.columns[0]
-        fake_index = arange(len(self._obj))
+        column = df.columns[0]
+        fake_index = arange(len(df))
         column_name = 'monet_fake_index'
-        r = pd.Series(fake_index.astype(float), index=self._obj.index)
+        r = pd.Series(fake_index.astype(float), index=df.index)
         r.name = column_name
-        self._obj[column_name] = r
-        return self._obj
+        df[column_name] = r
+        return df
 
 
 @xr.register_dataarray_accessor('monet')
