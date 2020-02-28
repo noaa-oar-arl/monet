@@ -161,7 +161,7 @@ class MONETAccessorPandas:
         index_name = 'index'
         if d.index.name is not None:
             index_name = d.index.name
-        ds = d.to_xarray().rename({'index', 'x'}).expand_dims('y')
+        ds = d.to_xarray().rename({index_name: 'x'}).expand_dims('y')
         if 'time' in ds.data_vars.keys():
             ds['time'] = ds.time.squeeze()  # it is only 1D
 
