@@ -50,7 +50,9 @@ def _dataset_to_monet(dset,
 
     """
     dset = _rename_to_monet_latlon(dset)
+    latlon2d = True
     if len(dset[lat_name].shape) != 2:
+        print(dset[lat_name].shape)
         latlon2d = False
     if latlon2d is False:
         try:
