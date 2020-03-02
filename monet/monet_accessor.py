@@ -394,6 +394,7 @@ class MONETAccessor(object):
             has_pyresample = False
         try:
             if rectilinear:
+                dset = self.structure_for_monet()
                 lat = dset.latitude.isel(x=0).values
                 lon = dset.longitude.isel(y=0).values
                 dset['x'] = lon
@@ -413,6 +414,7 @@ class MONETAccessor(object):
                         'y': 'lat'
                     }))
             elif has_pyresample:
+                dset = self.structure_for_monet()
                 lons, lats = utils.check_and_wrap(self._obj.longitude.values,
                                                   self._obj.latitude.values)
                 swath = llsd(longitude=lons, latitude=lats)
@@ -456,8 +458,8 @@ class MONETAccessor(object):
 
     def interp_constant_lat(self,
                             lat=None,
-                            lat_name='lat',
-                            lon_name='lon',
+                            lat_name='latitude',
+                            lon_name='longitude',
                             **kwargs):
         """Interpolates the data array to constant longitude.
 
@@ -495,7 +497,7 @@ class MONETAccessor(object):
                             dims=['lon', 'lat'],
                             coordinates=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
-            result = d2.remap_nearest(d1)
+            result = d2.monet.remap_nearest(d1)
             return result
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
@@ -535,7 +537,7 @@ class MONETAccessor(object):
                                 dims=['lon', 'lat'],
                                 coordinates=[longitude, latitude])
                 d2 = _dataset_to_monet(d2)
-                result = d2.remap_nearest(d1)
+                result = d2.monet.remap_nearest(d1)
                 return result
             elif has_xesmf:
                 output = constant_1d_xesmf(latitude=latitude,
@@ -1150,14 +1152,17 @@ class MONETAccessorDataset(object):
         except RuntimeError:
             print('Must provide latitude and longitude')
 
-        d = self.structure_for_monet(self._obj, return_obj=True)
+        # d = self.structure_for_monet(self._obj, return_obj=True)
         if has_pyresample:
-            swath = self._get_CoordinateDefinition(d)
+            dset = _dataset_to_monet(self._obj)
+            lons, lats = utils.check_and_wrap(dset.longitude.values,
+                                              dset.latitude.values)
+            swath = llsd(longitude=lons, latitude=lats)
             pswath = npsd(longitude=float(lon), latitude=float(lat))
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                swath, pswath, **kwargs)
+                swath, pswath, float(1e6))
             y, x = row[0][0], col[0][0]
-            return self._obj.sel(x=x, y=y)
+            return dset.isel(x=x).isel(y=y)
         elif has_xesmf:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
             self._obj = rename_latlon(self._obj)
