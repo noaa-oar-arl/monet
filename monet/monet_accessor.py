@@ -497,7 +497,7 @@ class MONETAccessor(object):
                               dims=['lon', 'lat'],
                               coords=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
-            result = d2.monet.remap_nearest(d1)
+            result = d1.monet.remap_nearest(d2)
             return result
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
