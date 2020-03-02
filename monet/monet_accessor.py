@@ -493,9 +493,9 @@ class MONETAccessor(object):
         longitude = linspace(d1.longitude.min(), d1.longitude.max(), len(d1.x))
         latitude = ones(longitude.shape) * asarray(lat)
         if has_pyresample:
-            d2 = xr.Dataset(ones((len(longitude), len(longitude))),
-                            dims=['lon', 'lat'],
-                            coordinates=[longitude, latitude])
+            d2 = xr.DataArray(ones((len(longitude), len(longitude))),
+                              dims=['lon', 'lat'],
+                              coordinates=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
             return result
