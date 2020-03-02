@@ -494,10 +494,10 @@ class MONETAccessor(object):
         latitude = ones(longitude.shape) * asarray(lat)
         if has_pyresample:
             d2 = xr.DataArray(ones((len(longitude), len(longitude))),
-                              dims=['lon', 'lat'],
+                              dims=['lat', 'lon'],
                               coords=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
-            result = d1.monet.remap_nearest(d2)
+            result = d2.monet.remap_nearest(d1)
             return result
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
@@ -778,9 +778,9 @@ class MONETAccessor(object):
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
         d1 = _dataset_to_monet(data)
-        print(d1)
+        # print(d1)
         d2 = _dataset_to_monet(self._obj)
-        print(d2)
+        # print(d2)
         source = self._get_CoordinateDefinition(data=d1)
         target = self._get_CoordinateDefinition(data=d2)
         r = kd_tree.XArrayResamplerNN(source,
