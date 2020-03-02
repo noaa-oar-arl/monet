@@ -73,6 +73,8 @@ def _dataset_to_monet(dset,
         dset = dset.set_coords(['XLAT_M', 'XLONG_M'])
     dset = _rename_to_monet_latlon(dset)
     latlon2d = True
+    print(len(dset[lat_name].shape))
+    print(dset)
     if len(dset[lat_name].shape) != 2:
         print(dset[lat_name].shape)
         latlon2d = False
