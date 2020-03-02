@@ -615,7 +615,6 @@ class MONETAccessor(object):
         """
         try:
             from pyresample import geometry, utils
-            from .util.resample import resample_dataset
             from .util.interp_util import nearest_point_swathdefinition as npsd
             from .util.interp_util import lonlat_to_swathdefinition as llsd
             has_pyresample = True
@@ -632,14 +631,14 @@ class MONETAccessor(object):
 
         d = self.structure_for_monet(self._obj, return_obj=True)
         if has_pyresample:
-            lons, lats = utils.check_and_wrap(self._obj.longitude.values,
-                                              self._obj.latitude.values)
+            lons, lats = utils.check_and_wrap(d.longitude.values,
+                                              d.latitude.values)
             swath = self._get_CoordinateDefinition(d)
             pswath = npsd(longitude=float(lon), latitude=float(lat))
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, **kwargs)
             y, x = row[0][0], col[0][0]
-            return self._obj.sel(x=x, y=y)
+            return self._obj.isel(x=x, y=y)
         elif has_xesmf:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
             self._obj = rename_latlon(self._obj)
@@ -1162,10 +1161,7 @@ class MONETAccessorDataset(object):
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, float(1e6))
             y, x = row[0][0], col[0][0]
-            print(dset)
-            print(dset.isel(y=y))
-            print(dset.isel(y=y, x=x))
-            return dset.isel(x=x).isel(y=y)
+            return self._obj.isel(x=x).isel(y=y)
         elif has_xesmf:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
             self._obj = rename_latlon(self._obj)
