@@ -561,7 +561,7 @@ class MONETAccessor(object):
             Returns the i (x index) and j (y index) of the given latitude longitude value
 
         """
-        if has_pyresample:
+        try:
             from pyresample import geometry, utils
             from .util.resample import resample_dataset
             from .util.interp_util import nearest_point_swathdefinition as npsd
