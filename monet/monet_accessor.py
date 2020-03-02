@@ -100,9 +100,9 @@ def _rename_to_monet_latlon(ds):
     elif 'Lat' in ds.coords:
         return ds.rename({'Lat': 'latitude', 'Lon': 'longitude'})
     elif 'XLAT_M' in ds.data_vars or 'XLAT_M' in ds.coords:
-        return ds.rename({'XLAT_M': 'latitude', 'XLON_M': 'longtiude'})
+        return ds.rename({'XLAT_M': 'latitude', 'XLONG_M': 'longtiude'})
     elif 'XLAT' in ds.data_vars or 'XLAT' in ds.coords:
-        return ds.rename({'XLAT': 'latitude', 'XLON': 'longtiude'})
+        return ds.rename({'XLAT': 'latitude', 'XLONG': 'longtiude'})
     else:
         return ds
 
