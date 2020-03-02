@@ -1080,15 +1080,12 @@ class MONETAccessorDataset(object):
             Returns the i (x index) and j (y index) of the given latitude longitude value
 
         """
-        try:
+        if has_pyresample:
             from pyresample import geometry, utils
             from .util.resample import resample_dataset
             from .util.interp_util import nearest_point_swathdefinition as npsd
             from .util.interp_util import lonlat_to_swathdefinition as llsd
             has_pyresample = True
-        except ImportError:
-            has_pyresample = False
-            print('requires pyresample to be installed')
 
         try:
             if lat is None or lon is None:
