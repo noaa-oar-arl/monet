@@ -99,18 +99,27 @@ def _dataset_to_monet(dset,
 
 
 def _rename_to_monet_latlon(ds):
-    if 'lat' in ds.coords:
-        return ds.rename({'lat': 'latitude', 'lon': 'longitude'})
-    elif 'Latitude' in ds.coords:
-        return ds.rename({'Latitude': 'latitude', 'Longitude': 'longitude'})
-    elif 'Lat' in ds.coords:
-        return ds.rename({'Lat': 'latitude', 'Lon': 'longitude'})
-    elif 'XLAT_M' in ds.data_vars or 'XLAT_M' in ds.coords:
-        return ds.rename({'XLAT_M': 'latitude', 'XLONG_M': 'longitude'})
-    elif 'XLAT' in ds.data_vars or 'XLAT' in ds.coords:
-        return ds.rename({'XLAT': 'latitude', 'XLONG': 'longitude'})
+    if isinstance(ds, xr.DataArray):
+        if 'XLAT_M' in ds.data_vars:
+            return ds.rename({'XLAT_M': 'latitude', 'XLONG_M': 'longitude'})
+        elif 'XLAT' in ds.data_vars:
+            return ds.rename({'XLAT': 'latitude', 'XLONG': 'longitude'})
     else:
-        return ds
+        if 'lat' in ds.coords:
+            return ds.rename({'lat': 'latitude', 'lon': 'longitude'})
+        elif 'Latitude' in ds.coords:
+            return ds.rename({
+                'Latitude': 'latitude',
+                'Longitude': 'longitude'
+            })
+        elif 'Lat' in ds.coords:
+            return ds.rename({'Lat': 'latitude', 'Lon': 'longitude'})
+        elif 'XLAT_M' in ds.data_vars or 'XLAT_M' in ds.coords:
+            return ds.rename({'XLAT_M': 'latitude', 'XLONG_M': 'longitude'})
+        elif 'XLAT' in ds.data_vars or 'XLAT' in ds.coords:
+            return ds.rename({'XLAT': 'latitude', 'XLONG': 'longitude'})
+        else:
+            return ds
 
 
 def _coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
