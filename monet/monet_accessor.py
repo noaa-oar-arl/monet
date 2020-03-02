@@ -638,7 +638,7 @@ class MONETAccessor(object):
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, **kwargs)
             y, x = row[0][0], col[0][0]
-            return self._obj.isel(x=x, y=y)
+            return dset.isel(x=x, y=y)
         elif has_xesmf:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
             self._obj = rename_latlon(self._obj)
@@ -1161,7 +1161,7 @@ class MONETAccessorDataset(object):
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, float(1e6))
             y, x = row[0][0], col[0][0]
-            return self._obj.isel(x=x).isel(y=y)
+            return dset.isel(x=x).isel(y=y)
         elif has_xesmf:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
             self._obj = rename_latlon(self._obj)
