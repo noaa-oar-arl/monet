@@ -521,7 +521,7 @@ class MONETAccessor(object):
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf
-        from numpy import linspace, ones
+        from numpy import linspace, ones, asarray
         try:
             if lon is None:
                 raise RuntimeError
@@ -1251,7 +1251,7 @@ class MONETAccessorDataset(object):
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf
-        from numpy import linspace, ones
+        from numpy import linspace, ones, asarray
         try:
             if lon is None:
                 raise RuntimeError
