@@ -105,9 +105,9 @@ def _dataset_to_monet(dset,
 
 def _rename_to_monet_latlon(ds):
     if isinstance(ds, xr.DataArray):
-        if 'XLAT_M' in ds.data_vars:
+        if 'XLAT_M' in ds.coords:
             return ds.rename({'XLAT_M': 'latitude', 'XLONG_M': 'longitude'})
-        elif 'XLAT' in ds.data_vars:
+        elif 'XLAT' in ds.coords:
             return ds.rename({'XLAT': 'latitude', 'XLONG': 'longitude'})
     else:
         if 'lat' in ds.coords:
