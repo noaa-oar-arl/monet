@@ -577,8 +577,9 @@ class MONETAccessor(object):
             print('Must provide latitude and longitude')
 
         if has_pyresample:
-            lons, lats = utils.check_and_wrap(self._obj.longitude.values,
-                                              self._obj.latitude.values)
+            dset = _dataset_to_monet(self._obj)
+            lons, lats = utils.check_and_wrap(dset.longitude.values,
+                                              dset.latitude.values)
             swath = llsd(longitude=lons, latitude=lats)
             pswath = npsd(longitude=float(lon), latitude=float(lat))
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
@@ -1098,8 +1099,9 @@ class MONETAccessorDataset(object):
             print('Must provide latitude and longitude')
 
         if has_pyresample:
-            lons, lats = utils.check_and_wrap(self._obj.longitude.values,
-                                              self._obj.latitude.values)
+            dset = _dataset_to_monet(self._obj)
+            lons, lats = utils.check_and_wrap(dset.longitude.values,
+                                              dset.latitude.values)
             swath = llsd(longitude=lons, latitude=lats)
             pswath = npsd(longitude=float(lon), latitude=float(lat))
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
