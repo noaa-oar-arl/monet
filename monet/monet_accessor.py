@@ -1162,6 +1162,9 @@ class MONETAccessorDataset(object):
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, float(1e6))
             y, x = row[0][0], col[0][0]
+            print(dset)
+            print(dset.isel(y=y))
+            print(dset.isel(y=y, x=x))
             return dset.isel(x=x).isel(y=y)
         elif has_xesmf:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
