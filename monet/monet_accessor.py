@@ -1155,6 +1155,7 @@ class MONETAccessorDataset(object):
         # d = self.structure_for_monet(self._obj, return_obj=True)
         if has_pyresample:
             dset = _dataset_to_monet(self._obj)
+            print(dset)
             lons, lats = utils.check_and_wrap(dset.longitude.values,
                                               dset.latitude.values)
             swath = llsd(longitude=lons, latitude=lats)
