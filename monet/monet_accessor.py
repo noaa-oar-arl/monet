@@ -498,7 +498,7 @@ class MONETAccessor(object):
                               coords=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
-            return result
+            return result.isel(x=0)
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
@@ -533,12 +533,12 @@ class MONETAccessor(object):
         if has_pyresample:
 
             if has_pyresample:
-                d2 = xr.Dataset(ones((len(longitude), len(longitude))),
-                                dims=['lon', 'lat'],
-                                coordinates=[longitude, latitude])
+                d2 = xr.DataArray(ones((len(longitude), len(longitude))),
+                                  dims=['lon', 'lat'],
+                                  cords=[longitude, latitude])
                 d2 = _dataset_to_monet(d2)
                 result = d2.monet.remap_nearest(d1)
-                return result
+                return result.isel(y=0)
             elif has_xesmf:
                 output = constant_1d_xesmf(latitude=latitude,
                                            longitude=longitude)
@@ -1186,72 +1186,94 @@ class MONETAccessorDataset(object):
             kwargs['filename'] = 'monet_xesmf_regrid_file.nc'
         return kwargs
 
-    def interp_constant_lat(self, lat=None, **kwargs):
-        """Short summary.
+    def interp_constant_lat(self,
+                            lat=None,
+                            lat_name='latitude',
+                            lon_name='longitude',
+                            **kwargs):
+        """Interpolates the data array to constant longitude.
 
-        Parameters
-        ----------
-        lat : type
-            Description of parameter `lat`.
-        **kwargs : type
-            Description of parameter `**kwargs`.
+            Parameters
+            ----------
+            lon : float
+                Latitude on which to interpolate to
 
-        Returns
-        -------
-        type
-            Description of returned object.
+            Returns
+            -------
+            DataArray
+                DataArray of at constant longitude
 
-        """
-        vars = pd.Series(self._obj.variables)
-        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
-        loop_vars = vars.loc[~vars.isin(skip_keys)]
-        kwargs = self._check_kwargs_and_set_defaults(**kwargs)
-        kwargs['reuse_weights'] = True
-        orig = self._obj[loop_vars.iloc[0]].monet.interp_constant_lat(
-            lat=lat, cleanup=False, **kwargs)
+            """
+        from numpy import linspace, ones, asarray
+        try:
+            import pyresample as pr
+            has_pyresample = True
+        except ImportError:
+            has_pyresample = False
+        if has_xesmf:
+            from .util.interp_util import constant_1d_xesmf
+            from .util.resample import resample_xesmf
 
-        dset = orig.to_dataset()
-        dset.attrs = self._obj.attrs.copy()
-        for i in loop_vars[1:-1].values:
-            dset[i] = self._obj[i].monet.interp_constant_lat(lat=lat, **kwargs)
-        i = loop_vars.values[-1]
-        dset[i] = self._obj[i].monet.interp_constant_lat(lat=lat,
-                                                         cleanup=True,
-                                                         **kwargs)
-        return dset
+        try:
+            if lat is None:
+                raise RuntimeError
+        except RuntimeError:
+            print('Must enter lat value')
+        d1 = _dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
+        longitude = linspace(d1.longitude.min(), d1.longitude.max(), len(d1.x))
+        latitude = ones(longitude.shape) * asarray(lat)
+        if has_pyresample:
+            d2 = xr.DataArray(ones((len(longitude), len(longitude))),
+                              dims=['lat', 'lon'],
+                              coords=[longitude, latitude])
+            d2 = _dataset_to_monet(d2)
+            result = d2.monet.remap_nearest(d1)
+            return result.isel(x=0)
+        elif has_xesmf:
+            output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
+            out = resample_xesmf(self._obj, output, **kwargs)
+            return rename_latlon(out)
 
     def interp_constant_lon(self, lon=None, **kwargs):
-        """Short summary.
+        """Interpolates the data array to constant longitude.
 
-        Parameters
-        ----------
-        lon : type
-            Description of parameter `lon`.
-        **kwargs : type
-            Description of parameter `**kwargs`.
+            Parameters
+            ----------
+            lon : float
+                Latitude on which to interpolate to
 
-        Returns
-        -------
-        type
-            Description of returned object.
+            Returns
+            -------
+            xr.Dataset or xr.DataArray
+                DataArray of at constant longitude
 
-        """
-        vars = pd.Series(self._obj.variables)
-        skip_keys = ['latitude', 'longitude', 'time', 'TFLAG']
-        loop_vars = vars.loc[~vars.isin(skip_keys)]
-        kwargs = self._check_kwargs_and_set_defaults(**kwargs)
-        kwargs['reuse_weights'] = True
-        orig = self._obj[loop_vars[0]].monet.interp_constant_lon(lon=lon,
-                                                                 **kwargs)
-        dset = orig.to_dataset()
-        dset.attrs = self._obj.attrs.copy()
-        for i in loop_vars[1:-1].values:
-            dset[i] = self._obj[i].monet.interp_constant_lon(lon=lon, **kwargs)
-        i = loop_vars.values[-1]
-        dset[i] = self._obj[i].monet.interp_constant_lon(lon=lon,
-                                                         cleanup=True,
-                                                         **kwargs)
-        return dset
+            """
+        if has_xesmf:
+            from .util.interp_util import constant_1d_xesmf
+            from .util.resample import resample_xesmf
+        from numpy import linspace, ones
+        try:
+            if lon is None:
+                raise RuntimeError
+        except RuntimeError:
+            print('Must enter lon value')
+        d1 = _dataset_to_monet(self._obj)
+        latitude = linspace(d1.latitude.min(), d1.latitude.max(), len(d1.y))
+        longitude = ones(latitude.shape) * asarray(lon)
+        if has_pyresample:
+
+            if has_pyresample:
+                d2 = xr.DataArray(ones((len(longitude), len(longitude))),
+                                  dims=['lon', 'lat'],
+                                  cords=[longitude, latitude])
+                d2 = _dataset_to_monet(d2)
+                result = d2.monet.remap_nearest(d1)
+                return result.isel(y=0)
+            elif has_xesmf:
+                output = constant_1d_xesmf(latitude=latitude,
+                                           longitude=longitude)
+                out = resample_xesmf(self._obj, output, **kwargs)
+                return rename_latlon(out)
 
     def stratify(self, levels, vertical, axis=1):
         """Short summary.
