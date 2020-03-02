@@ -1137,7 +1137,6 @@ class MONETAccessorDataset(object):
         """
         try:
             from pyresample import geometry, utils
-            from .util.resample import resample_dataset
             from .util.interp_util import nearest_point_swathdefinition as npsd
             from .util.interp_util import lonlat_to_swathdefinition as llsd
             has_pyresample = True
