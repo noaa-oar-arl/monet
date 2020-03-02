@@ -495,7 +495,7 @@ class MONETAccessor(object):
         if has_pyresample:
             d2 = xr.DataArray(ones((len(longitude), len(longitude))),
                               dims=['lon', 'lat'],
-                              coordinates=[longitude, latitude])
+                              coords=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
             return result
