@@ -10,6 +10,7 @@ except ImportError:
     has_xesmf = False
 try:
     import pyresample as pr
+    from pyresample.utils import wrap_longitudes
     has_pyresample = True
 except ImportError:
     has_pyresample = False
@@ -63,6 +64,9 @@ def _dataset_to_monet(dset,
                 raise ValueError
         except ValueError:
             print('dset must be an Xarray.DataArray or Xarray.Dataset')
+    if 'south_north' in dset.dims and 'XLAT_M' in dset.data_vars.keys(
+    ):  # WRF WPS file
+        dset = dset.rename(dict(south_north='y', west_east='x'))
     dset = _rename_to_monet_latlon(dset)
     latlon2d = True
     if len(dset[lat_name].shape) != 2:
@@ -84,6 +88,7 @@ def _dataset_to_monet(dset,
             print('dset must be an Xarray.DataArray or Xarray.Dataset')
     else:
         dset = _rename_to_monet_latlon(dset)
+    dset['longitude'] = wrap_longitudes(dset['longitude'])
     return dset
 
 
@@ -94,13 +99,17 @@ def _rename_to_monet_latlon(ds):
         return ds.rename({'Latitude': 'latitude', 'Longitude': 'longitude'})
     elif 'Lat' in ds.coords:
         return ds.rename({'Lat': 'latitude', 'Lon': 'longitude'})
+    elif 'XLAT_M' in ds.data_vars or 'XLAT_M' in ds.coords:
+        return ds.rename({'XLAT_M': 'latitude', 'XLON_M': 'longtiude'})
+    elif 'XLAT' in ds.data_vars or 'XLAT' in ds.coords:
+        return ds.rename({'XLAT': 'latitude', 'XLON': 'longtiude'})
     else:
         return ds
 
 
 def _coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
     from numpy import meshgrid, arange
-    lon = dset[lon_name]
+    lon = wrap_longitudes(dset[lon_name])
     lat = dset[lat_name]
     lons, lats = meshgrid(lon, lat)
     x = arange(len(lon))
@@ -116,7 +125,7 @@ def _coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
 
 def _dataarray_coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
     from numpy import meshgrid, arange
-    lon = dset[lon_name]
+    lon = wrap_longitudes(dset[lon_name])
     lat = dset[lat_name]
     lons, lats = meshgrid(lon, lat)
     x = arange(len(lon))
