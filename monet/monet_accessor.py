@@ -67,6 +67,7 @@ def _dataset_to_monet(dset,
     if 'south_north' in dset.dims and 'XLAT_M' in dset.data_vars.keys(
     ):  # WRF WPS file
         dset = dset.rename(dict(south_north='y', west_east='x'))
+        dset = dset.set_coords(['XLAT_M', 'XLONG_M'])
     dset = _rename_to_monet_latlon(dset)
     latlon2d = True
     if len(dset[lat_name].shape) != 2:
