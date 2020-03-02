@@ -49,6 +49,20 @@ def _dataset_to_monet(dset,
         Description of returned object.
 
     """
+    if 'grid_xt' in dset.dims:  # GFS v16 file
+        try:
+            if isinstance(dset, xr.DataArray):
+                dset = _dataarray_coards_to_netcdf(dset,
+                                                   lat_name='grid_yt',
+                                                   lon_name='grid_xt')
+            elif isinstance(dset, xr.Dataset):
+                dset = _dataarray_coards_to_netcdf(dset,
+                                                   lat_name='grid_yt',
+                                                   lon_name='grid_xt')
+            else:
+                raise ValueError
+        except ValueError:
+            print('dset must be an Xarray.DataArray or Xarray.Dataset')
     dset = _rename_to_monet_latlon(dset)
     latlon2d = True
     if len(dset[lat_name].shape) != 2:
@@ -173,7 +187,12 @@ class MONETAccessorPandas:
 
         return ds
 
-    def remap_nearest(self, df, radius_of_influence=1e5, combine=False):
+    def remap_nearest(self,
+                      df,
+                      radius_of_influence=1e5,
+                      combine=False,
+                      lat_name=None,
+                      lon_name=None):
         """Remap df to find nearest sites
 
         Parameters
@@ -402,7 +421,11 @@ class MONETAccessor(object):
                   please add the rectilinear=True to the call.  Otherwise the window
                   functionality is unavailable without pyresample""")
 
-    def interp_constant_lat(self, lat=None, **kwargs):
+    def interp_constant_lat(self,
+                            lat=None,
+                            lat_name='lat',
+                            lon_name='lon',
+                            **kwargs):
         """Interpolates the data array to constant longitude.
 
             Parameters
@@ -431,7 +454,7 @@ class MONETAccessor(object):
                 raise RuntimeError
         except RuntimeError:
             print('Must enter lat value')
-        d1 = _dataset_to_monet(self._obj)
+        d1 = _dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
         longitude = linspace(d1.longitude.min(), d1.longitude.max(), len(d1.x))
         latitude = ones(longitude.shape) * asarray(lat)
         if has_pyresample:
