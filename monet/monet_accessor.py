@@ -64,18 +64,23 @@ def _dataset_to_monet(dset,
                 raise ValueError
         except ValueError:
             print('dset must be an Xarray.DataArray or Xarray.Dataset')
-    if 'south_north' in dset.dims and 'XLAT_M' in dset.data_vars.keys(
-    ):  # WRF WPS file
+
+    if 'south_north' in dset.dims:  # WRF WPS file
         dset = dset.rename(dict(south_north='y', west_east='x'))
-        if 'XLAT_M' in dset.data_vars:
-            dset['XLAT_M'] = dset.XLAT_M.squeeze()
-            dset['XLONG_M'] = dset.XLONG_M.squeeze()
-        dset = dset.set_coords(['XLAT_M', 'XLONG_M'])
+        if isinstance(dset, xr.Dataset):
+            if 'XLAT_M' in dset.data_vars:
+                dset['XLAT_M'] = dset.XLAT_M.squeeze()
+                dset['XLONG_M'] = dset.XLONG_M.squeeze()
+                dset = dset.set_coords(['XLAT_M', 'XLONG_M'])
+            elif 'XLAT' in dset.data_vars:
+                dset['XLAT'] = dset.XLAT.squeeze()
+                dset['XLONG'] = dset.XLONG.squeeze()
+                dset = dset.set_coords(['XLAT', 'XLONG'])
     dset = _rename_to_monet_latlon(dset)
     latlon2d = True
     # print(len(dset[lat_name].shape))
     # print(dset)
-    if len(dset[lat_name].shape) != 2:
+    if len(dset[lat_name].shape) < 2:
         print(dset[lat_name].shape)
         latlon2d = False
     if latlon2d is False:
