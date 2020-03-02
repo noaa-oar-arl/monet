@@ -67,15 +67,28 @@ def _dataset_to_monet(dset,
 
     if 'south_north' in dset.dims:  # WRF WPS file
         dset = dset.rename(dict(south_north='y', west_east='x'))
-        if isinstance(dset, xr.Dataset):
-            if 'XLAT_M' in dset.data_vars:
-                dset['XLAT_M'] = dset.XLAT_M.squeeze()
-                dset['XLONG_M'] = dset.XLONG_M.squeeze()
-                dset = dset.set_coords(['XLAT_M', 'XLONG_M'])
-            elif 'XLAT' in dset.data_vars:
-                dset['XLAT'] = dset.XLAT.squeeze()
-                dset['XLONG'] = dset.XLONG.squeeze()
-                dset = dset.set_coords(['XLAT', 'XLONG'])
+        try:
+            if isinstance(dset, xr.Dataset):
+                if 'XLAT_M' in dset.data_vars:
+                    dset['XLAT_M'] = dset.XLAT_M.squeeze()
+                    dset['XLONG_M'] = dset.XLONG_M.squeeze()
+                    dset = dset.set_coords(['XLAT_M', 'XLONG_M'])
+                elif 'XLAT' in dset.data_vars:
+                    dset['XLAT'] = dset.XLAT.squeeze()
+                    dset['XLONG'] = dset.XLONG.squeeze()
+                    dset = dset.set_coords(['XLAT', 'XLONG'])
+            elif isinstance(dset, xr.DataArray):
+                if 'XLAT_M' in dset.coords:
+                    dset['XLAT_M'] = dset.XLAT_M.squeeze()
+                    dset['XLONG_M'] = dset.XLONG_M.squeeze()
+                elif 'XLAT' in dset.coords:
+                    dset['XLAT_M'] = dset.XLAT_M.squeeze()
+                    dset['XLONG_M'] = dset.XLONG_M.squeeze()
+            else:
+                raise ValueError
+        except ValueError:
+            print('dset must be an Xarray.DataArray or Xarray.Dataset')
+
     dset = _rename_to_monet_latlon(dset)
     latlon2d = True
     #print(len(dset[lat_name].shape))
@@ -104,27 +117,18 @@ def _dataset_to_monet(dset,
 
 
 def _rename_to_monet_latlon(ds):
-    if isinstance(ds, xr.DataArray):
-        if 'XLAT_M' in ds.coords:
-            return ds.rename({'XLAT_M': 'latitude', 'XLONG_M': 'longitude'})
-        elif 'XLAT' in ds.coords:
-            return ds.rename({'XLAT': 'latitude', 'XLONG': 'longitude'})
+    if 'lat' in ds.coords:
+        return ds.rename({'lat': 'latitude', 'lon': 'longitude'})
+    elif 'Latitude' in ds.coords:
+        return ds.rename({'Latitude': 'latitude', 'Longitude': 'longitude'})
+    elif 'Lat' in ds.coords:
+        return ds.rename({'Lat': 'latitude', 'Lon': 'longitude'})
+    elif 'XLAT_M' in ds.coords:
+        return ds.rename({'XLAT_M': 'latitude', 'XLONG_M': 'longitude'})
+    elif 'XLAT' in ds.coords:
+        return ds.rename({'XLAT': 'latitude', 'XLONG': 'longitude'})
     else:
-        if 'lat' in ds.coords:
-            return ds.rename({'lat': 'latitude', 'lon': 'longitude'})
-        elif 'Latitude' in ds.coords:
-            return ds.rename({
-                'Latitude': 'latitude',
-                'Longitude': 'longitude'
-            })
-        elif 'Lat' in ds.coords:
-            return ds.rename({'Lat': 'latitude', 'Lon': 'longitude'})
-        elif 'XLAT_M' in ds.data_vars or 'XLAT_M' in ds.coords:
-            return ds.rename({'XLAT_M': 'latitude', 'XLONG_M': 'longitude'})
-        elif 'XLAT' in ds.data_vars or 'XLAT' in ds.coords:
-            return ds.rename({'XLAT': 'latitude', 'XLONG': 'longitude'})
-        else:
-            return ds
+        return ds
 
 
 def _coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
