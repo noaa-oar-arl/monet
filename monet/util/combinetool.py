@@ -25,7 +25,6 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     pandas.DataFrame
     """
     from ..util.interp_util import lonlat_to_swathdefinition
-    from ..util.resample import resample_dataset
     try:
         if col is None:
             raise RuntimeError
@@ -36,7 +35,7 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     dfda = xr.DataArray(np.ones(len(dfnn), len(dfnn)),
                         dims=['lon', 'lat'],
                         coords=[dfnn.longitude.values, dfnn.latitude.values])
-    da_interped = dfda.remap_nearest(da).compute()
+    da_interped = dfda.monet.remap_nearest(da).compute()
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
