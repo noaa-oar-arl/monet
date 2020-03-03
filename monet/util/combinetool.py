@@ -6,7 +6,7 @@ from pandas import Series, merge_asof
 # from ..obs import epa_util
 
 
-def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
+def combine_da_to_df(da, df, col=None, merge=True, **kwargs):
     """This function will combine an xarray data array with spatial information
     point observations in `df`.
 
@@ -38,7 +38,7 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     dfda = xr.DataArray(ones((len(dfnn), len(dfnn))),
                         dims=['lon', 'lat'],
                         coords=[dfnn.longitude.values, dfnn.latitude.values])
-    da_interped = dfda.monet.remap_nearest(da).compute()
+    da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]

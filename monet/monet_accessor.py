@@ -754,7 +754,7 @@ class MONETAccessor(object):
                                          lons=self._obj.longitude)
         return g
 
-    def remap_nearest(self, data, radius_of_influence=1e6):
+    def remap_nearest(self, data, **kwargs):
         """Interpolates from another grid (data) to the current grid of self using pyresample.
             it assumes that the dimensions are ordered in y,x,z per
         pyresample docs
@@ -783,9 +783,7 @@ class MONETAccessor(object):
         # print(d2)
         source = self._get_CoordinateDefinition(data=d1)
         target = self._get_CoordinateDefinition(data=d2)
-        r = kd_tree.XArrayResamplerNN(source,
-                                      target,
-                                      radius_of_influence=radius_of_influence)
+        r = kd_tree.XArrayResamplerNN(source, target, **kwargs)
         r.get_neighbour_info()
         if isinstance(d1, xr.DataArray):
             result = r.get_sample_from_neighbour_info(d1)
