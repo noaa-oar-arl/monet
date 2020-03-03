@@ -35,9 +35,7 @@ def combine_da_to_df(da, df, col=None, merge=True, **kwargs):
     # dfn = df.dropna(subset=[col])
     dfnn = df.drop_duplicates(subset=['latitude', 'longitude']).dropna(
         subset=['latitude', 'longitude'])
-    dfda = xr.DataArray(ones((len(dfnn), len(dfnn))),
-                        dims=['lon', 'lat'],
-                        coords=[dfnn.longitude.values, dfnn.latitude.values])
+    dfda = dfnn.monet._df_to_da()
     da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)

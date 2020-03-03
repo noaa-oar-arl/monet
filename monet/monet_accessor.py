@@ -209,15 +209,18 @@ class MONETAccessorPandas:
             from .util.interp_util import nearest_point_swathdefinition as npsd
         return nspd(latitude=df.latitude.values, longitude=df.longitude.values)
 
-    def _df_to_da(self, d):
+    def _df_to_da(self, d=None):
         import xarray as xr
         index_name = 'index'
+        if d is None:
+            d = self._obj
         if d.index.name is not None:
             index_name = d.index.name
         ds = d.to_xarray().rename({index_name: 'x'}).expand_dims('y')
         if 'time' in ds.data_vars.keys():
             ds['time'] = ds.time.squeeze()  # it is only 1D
-
+        if 'latitude' in ds.data_vars.keys():
+            ds = ds.set_coords(['latitude', 'longitude'])
         return ds
 
     def remap_nearest(self,
