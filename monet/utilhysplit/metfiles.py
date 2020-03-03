@@ -70,7 +70,7 @@ class MetFiles:
         # seeing which spacing produces a new file name.
         #testdate = datetime.datetime(2010,1,1)
         if "%H" in self.strfmt:
-            mdtlist = [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12]
+            mdtlist = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
             testdate = self.handle_hourA(testdate)
         else:
             mdtlist = [1, 24, 24 * 7, 24 * 31, 24 * 356]
