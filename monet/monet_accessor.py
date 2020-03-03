@@ -865,11 +865,7 @@ class MONETAccessor(object):
                 if col is None:
                     raise RuntimeError
                 if has_pyresample and pyresample:
-                    return combine_da_to_df(da,
-                                            data,
-                                            merge=True,
-                                            suffix=suffix,
-                                            **kwargs)
+                    return combine_da_to_df(da, data, merge=True, **kwargs)
                 else:  #xesmf resample
                     return combine_da_to_df_xesmf(da,
                                                   data,
