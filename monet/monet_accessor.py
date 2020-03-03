@@ -835,7 +835,7 @@ class MONETAccessor(object):
                       data,
                       col=None,
                       suffix=None,
-                      pyresample=False,
+                      pyresample=True,
                       **kwargs):
         """Short summary.
 
@@ -854,6 +854,8 @@ class MONETAccessor(object):
             Description of returned object.
 
         """
+        if has_pyresample:
+            from .util.combinetool import combine_da_to_df
         if has_xesmf:
             from .util.combinetool import combine_da_to_df_xesmf
         # point source data
@@ -861,17 +863,18 @@ class MONETAccessor(object):
             try:
                 if col is None:
                     raise RuntimeError
-                if has_pyresample:
+                if has_pyresample and pyresample:
                     return combine_da_to_df(self._obj,
                                             data,
                                             merge=True,
                                             suffix=suffix,
                                             **kwargs)
-                return combine_da_to_df_xesmf(self._obj,
-                                              data,
-                                              col=col,
-                                              suffix=suffix,
-                                              **kwargs)
+                else:  #xesmf resample
+                    return combine_da_to_df_xesmf(self._obj,
+                                                  data,
+                                                  col=col,
+                                                  suffix=suffix,
+                                                  **kwargs)
             except RuntimeError:
                 print('Must enter col...')
         else:
