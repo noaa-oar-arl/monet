@@ -116,9 +116,9 @@ def findcycles_archive(dstart, dend, metdata, direction):
                 tmpdate = dstart
                 for x in range(0, dstep + 1):
                     if (direction == 'Forward'):
-                        tmpdate = tmpdate + td(days=7*x)
+                        tmpdate = tmpdate + td(days=7 * x)
                     if (direction == 'Back'):
-                        tmpdate = tmpdate - td(days=7*x)
+                        tmpdate = tmpdate - td(days=7 * x)
                     tmpweek = (tmpdate.day - 1) // 7 + 1
                     tmpmonyr = tmpdate.strftime('%b%y').lower()
                     metdirlist.append(metdir1)
