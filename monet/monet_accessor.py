@@ -859,7 +859,7 @@ class MONETAccessor(object):
         if has_xesmf:
             from .util.combinetool import combine_da_to_df_xesmf
         # point source data
-        da = self.structure_for_monet(self._obj)
+        da = _dataset_to_monet(self._obj)
         if isinstance(data, pd.DataFrame):
             try:
                 if col is None:
