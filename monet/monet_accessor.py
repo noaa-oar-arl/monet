@@ -859,18 +859,19 @@ class MONETAccessor(object):
         if has_xesmf:
             from .util.combinetool import combine_da_to_df_xesmf
         # point source data
+        da = self.structure_for_monet(self._obj)
         if isinstance(data, pd.DataFrame):
             try:
                 if col is None:
                     raise RuntimeError
                 if has_pyresample and pyresample:
-                    return combine_da_to_df(self._obj,
+                    return combine_da_to_df(da,
                                             data,
                                             merge=True,
                                             suffix=suffix,
                                             **kwargs)
                 else:  #xesmf resample
-                    return combine_da_to_df_xesmf(self._obj,
+                    return combine_da_to_df_xesmf(da,
                                                   data,
                                                   col=col,
                                                   suffix=suffix,
