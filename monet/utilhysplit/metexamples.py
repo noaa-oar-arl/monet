@@ -1,7 +1,7 @@
 import monet.utilhysplit.metfiles as mf
 import datetime
 
-d1 = datetime.datetime(2017,12,5,2)
+d1 = datetime.datetime(2017, 12, 5, 2)
 runtime = 50
 mdir = '/pub/archives/'
 m2dir = mdir + 'wrf27km/%Y/wrfout_d01_%Y%m%d.ARL'
