@@ -278,6 +278,14 @@ class MONETAccessorPandas:
             else:
                 return result
 
+    def cftime_to_datetime64(self, col=None):
+        df = self._obj
+        cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
+        if col is None:  # assume 'time' is the column name to transform
+            col = 'time'
+        df[col] = df[col].apply(cf_to_dt64)
+        return df
+
     def _make_fake_index_var(self, df):
         from numpy import arange
         column = df.columns[0]
@@ -306,6 +314,14 @@ class MONETAccessor(object):
     """
     def __init__(self, xray_obj):
         self._obj = xray_obj
+
+    def cftime_to_datetime64(self, name=None):
+        da = self._obj
+        cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
+        if name is None:  # assume 'time' is the column name to transform
+            name = 'time'
+        da[name] = da[name].apply(cf_to_dt64)
+        return da
 
     def structure_for_monet(self,
                             lat_name='lat',
@@ -896,6 +912,14 @@ class MONETAccessorDataset(object):
     """
     def __init__(self, xray_obj):
         self._obj = xray_obj
+
+    def cftime_to_datetime64(self, name=None):
+        da = self._obj
+        cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
+        if name is None:  # assume 'time' is the column name to transform
+            name = 'time'
+        da[name] = da[name].apply(cf_to_dt64)
+        return da
 
     def structure_for_monet(self,
                             lat_name='lat',
