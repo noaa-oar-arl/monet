@@ -178,7 +178,7 @@ class Pardump():
                 # if drange==[]:
                 #   drange = [pdate, pdate]
                 parnum = hdata['parnum']
-                data = np.fromfile(fp, dtype=self.pardt, count=parnum)
+                data = np.fromfile(fp, dtype=self.pardt, count=parnum[0])
                 # n = parnum - 1
                 # padding at end of each record
                 np.fromfile(fp, dtype='>i', count=1)
@@ -186,7 +186,7 @@ class Pardump():
                     print('Date ', pdate, ' **** ', drange)
 
                 testdate = False
-                if drange == []:
+                if not drange:
                     testdate = True
                 elif pdate >= drange[0] and pdate <= drange[1]:
                     testdate = True
@@ -210,13 +210,13 @@ class Pardump():
                     # in pardump file particles which have not been
                     # released yet
 
-                    if sorti != []:
+                    if sorti:
                         # returns only particles with
                         par_frame = par_frame.loc[par_frame['sorti'].isin(
                             sorti)]
                         # sort index in list sorti
                     par_frame['date'] = pdate
-                    par_frame.sort('ht', inplace=True)  # sort by height
+                    #par_frame.sort('ht', inplace=True)  # sort by height
                     par_frame = pd.concat(
                         [par_frame], keys=[
                             self.fname])  # add a filename key
@@ -228,7 +228,7 @@ class Pardump():
                 # Assume data is written sequentially by date.
                 i += 1
 
-                if drange != []:
+                if drange:
                     if pdate > drange[1]:
                         testf = False
                         if verbose:
