@@ -94,6 +94,7 @@ def combine_da_to_df_xesmf(da, df, col=None, suffix=None, **kwargs):
     da = _rename_latlon(da)  # check to rename latitude and longitude
     da_interped = resample_xesmf(da, target, **kwargs)
     da_interped = _rename_latlon(da_interped)  # check to change back
+    print(da_interped)
     if suffix is None:
         suffix = '_new'
     rename_dict = {}
