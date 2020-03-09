@@ -16,6 +16,10 @@ except ImportError:
     has_pyresample = False
 
 
+def wrap_longitudes(lons):
+    return (lons + 180) % 360 - 180
+
+
 def _rename_latlon(ds):
     if 'latitude' in ds.coords:
         return ds.rename({'latitude': 'lat', 'longitude': 'lon'})
@@ -112,7 +116,7 @@ def _dataset_to_monet(dset,
             print('dset must be an Xarray.DataArray or Xarray.Dataset')
     else:
         dset = _rename_to_monet_latlon(dset)
-    #dset['longitude'] = wrap_longitudes(dset['longitude'])
+    dset['longitude'] = wrap_longitudes(dset['longitude'])
     return dset
 
 
