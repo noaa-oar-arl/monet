@@ -98,10 +98,14 @@ def combine_da_to_df_xesmf(da, df, col=None, suffix=None, **kwargs):
     if suffix is None:
         suffix = '_new'
     rename_dict = {}
-    for i in da_interped.data_vars.keys():
-        if i in dfnn.keys():
-            rename_dict[i] = i + suffix
-    da_interped = da_interped.rename(rename_dict)
+    if isinstance(da_interped, xr.DataArray):
+        if da_interped.name in dfnn.keys():
+            da_interped.name = df_interped.name + suffix
+    else:
+        for i in da_interped.data_vars.keys():
+            if i in dfnn.keys():
+                rename_dict[i] = i + suffix
+        da_interped = da_interped.rename(rename_dict)
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
