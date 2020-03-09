@@ -321,7 +321,8 @@ class MONETAccessor(object):
         cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
         if name is None:  # assume 'time' is the column name to transform
             name = 'time'
-        da[name] = xr.apply_ufunc(vectorize(cf_to_dt64), da[name])
+        if isinstance(da[name].to_index(), xr.CFTimeIndex):
+            da[name] = xr.apply_ufunc(vectorize(cf_to_dt64), da[name])
         return da
 
     def structure_for_monet(self,
@@ -920,7 +921,8 @@ class MONETAccessorDataset(object):
         cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
         if name is None:  # assume 'time' is the column name to transform
             name = 'time'
-        da[name] = xr.apply_ufunc(vectorize(cf_to_dt64), da[name])
+        if isinstance(da[name].to_index(), xr.CFTimeIndex):  # assume cftime
+            da[name] = xr.apply_ufunc(vectorize(cf_to_dt64), da[name])
         return da
 
     def structure_for_monet(self,
