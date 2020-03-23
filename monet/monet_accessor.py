@@ -1246,6 +1246,21 @@ class MONETAccessorDataset(object):
         return g
 
     def remap_nearest(self, data, radius_of_influence=1e6):
+        """Will remap data to the current dataset using the pyresample.kd_tree nearest neighbor interpolation.
+
+        Parameters
+        ----------
+        data : xarray.DataArray or xarray.Dataset
+            geospatial dataset that includes the latitude and longtide coordinates
+        radius_of_influence : float
+            radius_of_influence kwarg for pyresample.kd_tree. Default (1e6)
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            The interpolated xarray object
+
+        """
         from pyresample import utils
         from pyresample import kd_tree
         from .util import resample
@@ -1395,6 +1410,19 @@ class MONETAccessorDataset(object):
 
     @staticmethod
     def _check_kwargs_and_set_defaults(**kwargs):
+        """Short summary.
+
+        Parameters
+        ----------
+        **kwargs : type
+            Description of parameter `**kwargs`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         if 'reuse_weights' not in kwargs:
             kwargs['reuse_weights'] = False
         if 'method' not in kwargs:
