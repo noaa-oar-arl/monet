@@ -17,10 +17,36 @@ except ImportError:
 
 
 def wrap_longitudes(lons):
+    """Short summary.
+
+    Parameters
+    ----------
+    lons : type
+        Description of parameter `lons`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     return (lons + 180) % 360 - 180
 
 
 def _rename_latlon(ds):
+    """Short summary.
+
+    Parameters
+    ----------
+    ds : type
+        Description of parameter `ds`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     if 'latitude' in ds.coords:
         return ds.rename({'latitude': 'lat', 'longitude': 'lon'})
     elif 'Latitude' in ds.coords:
@@ -121,6 +147,19 @@ def _dataset_to_monet(dset,
 
 
 def _rename_to_monet_latlon(ds):
+    """Short summary.
+
+    Parameters
+    ----------
+    ds : type
+        Description of parameter `ds`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     if 'lat' in ds.coords:
         return ds.rename({'lat': 'latitude', 'lon': 'longitude'})
     elif 'Latitude' in ds.coords:
@@ -152,6 +191,23 @@ def _coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
 
 
 def _dataarray_coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
+    """Short summary.
+
+    Parameters
+    ----------
+    dset : type
+        Description of parameter `dset`.
+    lat_name : type
+        Description of parameter `lat_name`.
+    lon_name : type
+        Description of parameter `lon_name`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     from numpy import meshgrid, arange
     lon = wrap_longitudes(dset[lon_name])
     lat = dset[lat_name]
@@ -174,19 +230,51 @@ class MONETAccessorPandas:
 
     @staticmethod
     def _validate(obj):
+        """Short summary.
+
+        Parameters
+        ----------
+        obj : type
+            Description of parameter `obj`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         # verify there is a column latitude and a column longitude
         if 'latitude' not in obj.columns or 'longitude' not in obj.columns:
             raise AttributeError("Must have 'latitude' and 'longitude'.")
 
     @property
     def center(self):
+        """Short summary.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         # return the geographic center point of this DataFrame
         lat = self._obj.latitude
         lon = self._obj.longitude
         return (float(lon.mean()), float(lat.mean()))
 
     def rename_for_monet(self, df=None):
-        """Rename latitude and longitude columns in the DataFrame
+        """Rename latitude and longitude columns in the DataFrame.
+
+        Parameters
+        ----------
+        df : type
+            Description of parameter `df`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
         """
         if df is None:
             df = self._obj
@@ -214,6 +302,19 @@ class MONETAccessorPandas:
         return nspd(latitude=df.latitude.values, longitude=df.longitude.values)
 
     def _df_to_da(self, d=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        d : type
+            Description of parameter `d`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         import xarray as xr
         index_name = 'index'
         if d is None:
@@ -283,6 +384,19 @@ class MONETAccessorPandas:
                 return result
 
     def cftime_to_datetime64(self, col=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        col : type
+            Description of parameter `col`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         df = self._obj
         cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
         if col is None:  # assume 'time' is the column name to transform
@@ -291,6 +405,19 @@ class MONETAccessorPandas:
         return df
 
     def _make_fake_index_var(self, df):
+        """Short summary.
+
+        Parameters
+        ----------
+        df : type
+            Description of parameter `df`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         from numpy import arange
         column = df.columns[0]
         fake_index = arange(len(df))
@@ -320,6 +447,19 @@ class MONETAccessor(object):
         self._obj = xray_obj
 
     def cftime_to_datetime64(self, name=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        name : type
+            Description of parameter `name`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         from numpy import vectorize
         da = self._obj
         cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
@@ -689,19 +829,19 @@ class MONETAccessor(object):
         return kwargs
 
     def quick_map(self, map_kwarg={}, center=True, **kwargs):
-        """Short summary.
+        """Creates a quick map view of a given data array.
 
         Parameters
         ----------
-        map_kwarg : type
-            Description of parameter `map_kwarg`.
-        **kwargs : type
-            Description of parameter `**kwargs`.
+        map_kwarg : dict
+            kwargs for monet.plots.mapgen.draw_map.
+        **kwargs : dict
+            kwargs for xarray plotting.
 
         Returns
         -------
-        type
-            Description of returned object.
+        matplotlib.axes
+            return of the axes handle for matplotlib.
 
         """
         from .plots.mapgen import draw_map
@@ -709,10 +849,10 @@ class MONETAccessor(object):
         import cartopy.crs as ccrs
         import seaborn as sns
         sns.set_context('notebook', font_scale=1.2)
+        da = _dataset_to_monet(self._obj)
         if 'crs' not in map_kwarg:
             if ~center:
-                central_longitude = float(
-                    _rename_to_monet_latlon(self._obj).longitude.mean().values)
+                central_longitude = float(da.longitude.mean().values)
                 map_kwarg['crs'] = ccrs.PlateCarree(
                     central_longitude=central_longitude)
             else:
@@ -721,16 +861,15 @@ class MONETAccessor(object):
             map_kwarg['figsize'] = kwargs['figsize']
             kwargs.pop('figsize', None)
         else:
-            figsize = _dynamic_fig_size(self._obj)
+            figsize = _dynamic_fig_size(da)
             map_kwarg['figsize'] = figsize
         f, ax = draw_map(return_fig=True, **map_kwarg)
-        ax = _rename_to_monet_latlon(self._obj).plot(
-            x='longitude',
-            y='latitude',
-            ax=ax,
-            transform=ccrs.PlateCarree(),
-            infer_intervals=True,
-            **kwargs)
+        ax = _rename_to_monet_latlon(da).plot(x='longitude',
+                                              y='latitude',
+                                              ax=ax,
+                                              transform=ccrs.PlateCarree(),
+                                              infer_intervals=True,
+                                              **kwargs)
         try:
             ax.axes.outline_patch.set_alpha(0)
         except:
