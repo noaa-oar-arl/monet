@@ -40,13 +40,10 @@ Features include:
     - Nearest neighbor finder
     - Constant latitude interpolation
     - Constant longitude interpolation
-    - remap DataArray to current grid
-    - remap entire dataset to current grid
-  * fixes to observational datasets including Airnow, AQS, Aeronet, and ISH
-  * Added GEOS-R Level NESDIS netCDF data reader
+    - remap DataArray to current grid using pyresample nearest neighbor or xesmf
+    - remap entire dataset to current grid using pyresample nearest neighbor or xesmf
   * Simplified combine tool to combine point source data with multidimensional xarray objects
-  * icartt reader using Barron Hendersons PseudoNetCDF
-  * OpenAQ reader to read directly from the OpenAQ Amazon S3 server
+  * Pandas accessor for simple functions.
 
 Reference
 ^^^^^^^^^
