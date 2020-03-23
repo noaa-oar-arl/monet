@@ -444,6 +444,19 @@ class MONETAccessor(object):
 
     """
     def __init__(self, xray_obj):
+        """Short summary.
+
+        Parameters
+        ----------
+        xray_obj : type
+            Description of parameter `xray_obj`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         self._obj = xray_obj
 
     def cftime_to_datetime64(self, name=None):
@@ -818,6 +831,19 @@ class MONETAccessor(object):
 
     @staticmethod
     def _check_kwargs_and_set_defaults(**kwargs):
+        """Short summary.
+
+        Parameters
+        ----------
+        **kwargs : type
+            Description of parameter `**kwargs`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         if 'reuse_weights' not in kwargs:
             kwargs['reuse_weights'] = False
         if 'method' not in kwargs:
@@ -878,6 +904,14 @@ class MONETAccessor(object):
         return ax
 
     def _tight_layout(self):
+        """Short summary.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         from matplotlib.pyplot import subplots_adjust
         subplots_adjust(0, 0, 1, 1)
 
@@ -1059,6 +1093,19 @@ class MONETAccessorDataset(object):
         self._obj = xray_obj
 
     def cftime_to_datetime64(self, name=None):
+        """Short summary.
+
+        Parameters
+        ----------
+        name : type
+            Description of parameter `name`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
         from numpy import vectorize
         da = self._obj
         cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
