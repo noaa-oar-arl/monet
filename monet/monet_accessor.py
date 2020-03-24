@@ -175,6 +175,23 @@ def _rename_to_monet_latlon(ds):
 
 
 def _coards_to_netcdf(dset, lat_name='lat', lon_name='lon'):
+    """Short summary.
+
+    Parameters
+    ----------
+    dset : type
+        Description of parameter `dset`.
+    lat_name : type
+        Description of parameter `lat_name`.
+    lon_name : type
+        Description of parameter `lon_name`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
     from numpy import meshgrid, arange
     lon = wrap_longitudes(dset[lon_name])
     lat = dset[lat_name]
@@ -458,6 +475,52 @@ class MONETAccessor(object):
 
         """
         self._obj = xray_obj
+
+    def is_land(self, return_xarray=True):
+        """checks the mask of land and ocean.
+
+        Parameters
+        ----------
+        return_xarray : bool
+            If True, return the data array with the ocean values set to NaN.
+            If False, return a numpy boolean array of the land (True).
+
+        Returns
+        -------
+        xarray.DataArray or numpy.array
+
+
+        """
+        import global_land_mask as glm
+        da = self.structure_for_monet(self._obj)
+        island = glm.island(da.latitude.values, da.longitude.values)
+        if return_xarray:
+            return da.where(island)
+        else:
+            return island
+
+    def is_ocean(self, return_xarray=True):
+        """checks the mask of land and ocean.
+
+        Parameters
+        ----------
+        return_xarray : bool
+            If True, return the data array with the land values set to NaN.
+            If False, return a numpy boolean array of the ocean (True).
+
+        Returns
+        -------
+        xarray.DataArray or numpy.array
+
+
+        """
+        import global_land_mask as glm
+        da = self.structure_for_monet(self._obj)
+        isocean = glm.is_ocean(da.latitude.values, da.longitude.values)
+        if return_xarray:
+            return da.where(isocean)
+        else:
+            return isocean
 
     def cftime_to_datetime64(self, name=None):
         """Short summary.
@@ -1091,6 +1154,52 @@ class MONETAccessorDataset(object):
     """
     def __init__(self, xray_obj):
         self._obj = xray_obj
+
+    def is_land(self, return_xarray=True):
+        """checks the mask of land and ocean.
+
+        Parameters
+        ----------
+        return_xarray : bool
+            If True, return the data array with the ocean values set to NaN.
+            If False, return a numpy boolean array of the land (True).
+
+        Returns
+        -------
+        xarray.DataArray or numpy.array
+
+
+        """
+        import global_land_mask as glm
+        da = self.structure_for_monet(self._obj)
+        island = glm.island(da.latitude.values, da.longitude.values)
+        if return_xarray:
+            return da.where(island)
+        else:
+            return island
+
+    def is_ocean(self, return_xarray=True):
+        """checks the mask of land and ocean.
+
+        Parameters
+        ----------
+        return_xarray : bool
+            If True, return the data array with the land values set to NaN.
+            If False, return a numpy boolean array of the ocean (True).
+
+        Returns
+        -------
+        xarray.DataArray or numpy.array
+
+
+        """
+        import global_land_mask as glm
+        da = self.structure_for_monet(self._obj)
+        isocean = glm.is_ocean(da.latitude.values, da.longitude.values)
+        if return_xarray:
+            return da.where(isocean)
+        else:
+            return isocean
 
     def cftime_to_datetime64(self, name=None):
         """Short summary.
