@@ -35,6 +35,7 @@ requirements:
     - python-stratify
     - xesmf # [not win]
     - pydecorate
+    - global_land_mask
 
 about:
   home: https://monet-arl.readthedocs.io

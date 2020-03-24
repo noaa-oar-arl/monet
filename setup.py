@@ -26,7 +26,7 @@ setup(name='monet',
       description='The Model and Observation Evaluation Toolkit (MONET)',
       install_requires=[
           'pandas', 'netcdf4', 'xarray', 'dask', 'pyresample', 'matplotlib',
-          'seaborn', 'cartopy', 'pydecorate'
+          'seaborn', 'cartopy', 'pydecorate', 'global_land_mask'
       ],
       extra_requires={'xesmf;platform_system!="Windows"'})
 
