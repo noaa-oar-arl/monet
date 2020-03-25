@@ -216,7 +216,7 @@ class Pardump():
                             sorti)]
                         # sort index in list sorti
                     par_frame['date'] = pdate
-                    #par_frame.sort('ht', inplace=True)  # sort by height
+                    # par_frame.sort('ht', inplace=True)  # sort by height
                     par_frame = pd.concat(
                         [par_frame], keys=[
                             self.fname])  # add a filename key
