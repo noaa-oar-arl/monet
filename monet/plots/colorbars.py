@@ -1,5 +1,6 @@
 """ colorbar helper functions"""
 from builtins import range
+
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 from numpy import arange, linspace, vstack

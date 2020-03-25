@@ -6,7 +6,7 @@ MONET can add georeferecing tools to xarray‘s data structures. These tools can
 accessed via a special .monet attribute, available for both xarray.DataArray and
 xarray.Dataset objects after a simple import monet in your code.
 
-Initiallizing the Accessor
+Initializing the Accessor
 --------------------------
 
 All you have to do is import monet after you import xarray.
@@ -15,7 +15,7 @@ All you have to do is import monet after you import xarray.
 .. code-block:: python
 
     import xarray as xr
-    import monet
+    import monet as m
 
     cmaqfile = monet.__path__ + '/../data/aqm.t12z.aconc.ncf'
 

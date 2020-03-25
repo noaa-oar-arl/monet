@@ -26,6 +26,13 @@ psicr = 0.0658
 R_d = 287.04
 # acceleration of gravity (m s-2)
 g = 9.8
+# ==============================================================================
+# List of constants used in MO similarity
+# ==============================================================================
+# von Karman's constant
+k = 0.4
+# acceleration of gravity (m s-2)
+gravity = 9.8
 
 
 def calc_c_p(p, ea):
@@ -247,9 +254,9 @@ def calc_sun_angles(lat, lon, stdlon, doy, ftime):
 
     # Calculate declination
     declination = 0.409 * np.sin((2.0 * np.pi * doy / 365.0) - 1.39)
-    EOT = (
-        0.258 * np.cos(declination) - 7.416 * np.sin(declination) -
-        3.648 * np.cos(2.0 * declination) - 9.228 * np.sin(2.0 * declination))
+    EOT = (0.258 * np.cos(declination) - 7.416 * np.sin(declination) -
+           3.648 * np.cos(2.0 * declination) -
+           9.228 * np.sin(2.0 * declination))
     LC = (stdlon - lon) / 15.
     time_corr = (-EOT / 60.) + LC
     solar_time = ftime - time_corr
@@ -269,8 +276,8 @@ def calc_sun_angles(lat, lon, stdlon, doy, ftime):
 
     # Get solar azimuth angle
     cos_phi = np.asarray(
-        (np.sin(declination) * np.cos(np.radians(lat)) - np.cos(np.radians(w))
-         * np.cos(declination) * np.sin(np.radians(lat))) / np.cos(sun_elev))
+        (np.sin(declination) * np.cos(np.radians(lat)) -
+         np.cos(np.radians(w)) * np.cos(declination) * np.sin(np.radians(lat))) / np.cos(sun_elev))
     saa = np.zeros(sza.shape)
     saa[w <= 0.0] = np.degrees(np.arccos(cos_phi[w <= 0.0]))
     saa[w > 0.0] = 360. - np.degrees(np.arccos(cos_phi[w > 0.0]))
@@ -312,8 +319,8 @@ def calc_delta_vapor_pressure(T_K):
     """
 
     T_C = T_K - 273.15
-    s = 4098.0 * (0.6108 * np.exp(17.27 * T_C / (T_C + 237.3))) / (
-        (T_C + 237.3)**2)
+    s = 4098.0 * (0.6108 * np.exp(17.27 * T_C /
+                                  (T_C + 237.3))) / ((T_C + 237.3)**2)
     return np.asarray(s)
 
 
@@ -395,15 +402,6 @@ def flux_2_evaporation(flux, T_K=20 + 273.15, time_domain=1):
     ET = ET * time_domain * 3600.
 
     return ET
-
-
-# ==============================================================================
-# List of constants used in MO similarity
-# ==============================================================================
-# von Karman's constant
-k = 0.4
-# acceleration of gravity (m s-2)
-gravity = 9.8
 
 
 def calc_L(ustar, T_A_K, rho, c_p, H, LE):
@@ -574,8 +572,9 @@ def calc_richardson(u, z_u, d_0, T_R0, T_R1, T_A0, T_A1):
     '''
 
     # See eq (2) from Louis 1979
-    Ri = (-(gravity * (z_u - d_0) / T_A1) * ((
-        (T_R1 - T_R0) - (T_A1 - T_A0)) / u**2))  # equation (12) [Norman2000]
+    Ri = (-(gravity * (z_u - d_0) / T_A1) * (((T_R1 - T_R0) -
+                                              (T_A1 - T_A0)) / u**2)
+          )  # equation (12) [Norman2000]
     return np.asarray(Ri)
 
 

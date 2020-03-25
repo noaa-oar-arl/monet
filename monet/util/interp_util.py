@@ -1,6 +1,25 @@
 """ Interpolation functions """
 
 
+def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
+    """Create pyresample SwathDefinition from xarray object.
+
+    Parameters
+    ----------
+    longitude : 2d xarray.DataArray
+        Longitude -> must be from -180 -> 180 and monotonically increasing
+    latitude : 2d xarray.DataArray
+        Latitude -> must be from -90 -> 90 and monotonically increasing
+
+    Returns
+    -------
+    pyresample.CoordinateDefinition
+
+    """
+    from pyresample import geometry
+    return geometry.CoordinateDefinition(lats=latitude, lons=longitude)
+
+
 def lonlat_to_xesmf(longitude=None, latitude=None):
     """Creates an empty xarray.Dataset with the coordinate (longitude, latitude).
 
@@ -164,83 +183,3 @@ def constant_lon_swathdefition(longitude=None, latitude=None):
     if isinstance(lats, DataArray):
         lons.name = 'lons'
     return geometry.SwathDefinition(lons=lons, lats=lats)
-
-
-def get_smops_area_def(nx=1440, ny=720):
-    """Short summary.
-
-    Parameters
-    ----------
-    nx : type
-        Description of parameter `nx` (the default is 1440).
-    ny : type
-        Description of parameter `ny` (the default is 720).
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    from pyproj import Proj
-    from pyresample import utils
-    p = Proj(
-        proj='eqc',
-        lat_ts=0.,
-        lat_0=0.,
-        lon_0=0.,
-        x_0=0.,
-        y_0=0.,
-        a=6378137,
-        b=6378137,
-        units='m')
-    proj4_args = p.srs
-    area_name = 'Global .25 degree SMOPS Grid'
-    area_id = 'smops'
-    proj_id = area_id
-    aa = p([-180, 180], [-90, 90])
-    area_extent = (aa[0][0], aa[1][0], aa[0][1], aa[1][1])
-    area_def = utils.get_area_def(area_id, area_name, proj_id, proj4_args, nx,
-                                  ny, area_extent)
-    return area_def
-
-
-def get_gfs_area_def(nx=1440, ny=721):
-    """Short summary.
-
-    Parameters
-    ----------
-    nx : type
-        Description of parameter `nx` (the default is 1440).
-    ny : type
-        Description of parameter `ny` (the default is 721).
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    from pyresample import utils
-    from pyproj import Proj
-    # proj4_args = '+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0
-    # +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m'
-    p = Proj(
-        proj='eqc',
-        lat_ts=0.,
-        lat_0=0.,
-        lon_0=0.,
-        x_0=0.,
-        y_0=0.,
-        a=6378137,
-        b=6378137,
-        units='m')
-    proj4_args = p.srs
-    area_name = 'Global .25 degree SMOPS Grid'
-    area_id = 'smops'
-    proj_id = area_id
-    aa = p([0, 360 - .25], [-90, 90.])
-    area_extent = (aa[0][0], aa[1][0], aa[0][1], aa[1][1])
-    area_def = utils.get_area_def(area_id, area_name, proj_id, proj4_args, nx,
-                                  ny, area_extent)
-    return area_def
