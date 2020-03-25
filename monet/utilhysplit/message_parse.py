@@ -2,14 +2,15 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 #from math import *
 from optparse import OptionParser
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
+
+
 #import datetime
 #import pandas as pd
 #from pylab import matrix
 #import io
-
-
 """class for Hysplit MESSAGE file.
 optionparser input which will plot time steps"""
 
@@ -17,7 +18,6 @@ optionparser input which will plot time steps"""
 class HysplitMessageFile(object):
     """Class to read the Hysplit Message File.
     Currently looks at how time step evolves over the run"""
-
     def __init__(self, fname):
         self.fname = fname
         self.read()
@@ -35,8 +35,10 @@ class HysplitMessageFile(object):
 
         self.emrise = []  # list of tuple of hour number, mixd, rise
 
-        thash = {}  # key is hour number, value is number of times the hour is printed out
-        phash = {}  # key is hour number, value is large number of particles in that hour
+        thash = {
+        }  # key is hour number, value is number of times the hour is printed out
+        phash = {
+        }  # key is hour number, value is large number of particles in that hour
 
         iii = 0
         # Message files usually have one line with some binary code.
@@ -72,7 +74,8 @@ class HysplitMessageFile(object):
                         phour = hour
                 elif ('NOTICE' in temp) and ('emrise' in temp):
                     temp2 = temp.split()
-                    self.emrise.append((hour, float(temp2[4]), float(temp2[5])))
+                    self.emrise.append(
+                        (hour, float(temp2[4]), float(temp2[5])))
                     print(temp2)
 
         self.timestep = []
@@ -113,7 +116,10 @@ class HysplitMessageFile(object):
 
 parser = OptionParser()
 
-parser.add_option("-f", type='string', dest='fname', default='MESSAGE',
+parser.add_option("-f",
+                  type='string',
+                  dest='fname',
+                  default='MESSAGE',
                   help="Name of HYSPLIT output MESSAGE file. (MESSAGE)")
 
 (options, args) = parser.parse_args()

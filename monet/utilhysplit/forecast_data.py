@@ -8,8 +8,8 @@ import os
 
 def findcycles_forecast(dstart, metdata):
     """dstart : datetime object. start date
-       metdata : str 
-       GFS, GFS0p5, GFS0p25, NAM 12 km, NAMAK, NAMHI 
+       metdata : str
+       GFS, GFS0p5, GFS0p25, NAM 12 km, NAMAK, NAMHI
     """
     FCTDIR = '/pub/forecast/'
     cycles = ["t00z", "t06z", "t12z", "t18z"]
@@ -47,6 +47,7 @@ def findcycles_forecast(dstart, metdata):
         metfilelist.append(metnamefinal + fs)
         metdirlist.append(metdir1)
     return metdirlist, metfilelist
+
 
 # Find met files for HYSPLIT archive runs
 
@@ -99,8 +100,8 @@ def findcycles_archive(dstart, dend, metdata, direction):
                     y = 0
                     while y < len(nweeks):
                         metdirlist.append(metdir1)
-                        metfilelist.append(
-                            met + '.' + smonyr + '.w' + str(nweeks[y]))
+                        metfilelist.append(met + '.' + smonyr + '.w' +
+                                           str(nweeks[y]))
                         y += 1
         if smonyr != emonyr:
             sweek = (dstart.day - 1) // 7 + 1
@@ -122,6 +123,6 @@ def findcycles_archive(dstart, dend, metdata, direction):
                     tmpweek = (tmpdate.day - 1) // 7 + 1
                     tmpmonyr = tmpdate.strftime('%b%y').lower()
                     metdirlist.append(metdir1)
-                    metfilelist.append(
-                        met + '.' + tmpmonyr + '.w' + str(tmpweek))
+                    metfilelist.append(met + '.' + tmpmonyr + '.w' +
+                                       str(tmpweek))
     return metdirlist, metfilelist

@@ -1,5 +1,6 @@
-import monet.utilhysplit.metfiles as mf
 import datetime
+
+import monet.utilhysplit.metfiles as mf
 
 d1 = datetime.datetime(2017, 12, 5, 2)
 runtime = 50

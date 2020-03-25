@@ -1,7 +1,9 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 import datetime
-import numpy as np
 from operator import itemgetter
+
+import numpy as np
+
 
 """
 Classes to read and write input file for HYSPLIT.
@@ -58,7 +60,6 @@ class EmiTimes(object):
                          rectangular area.
 
     """
-
     def __init__(self, filename="EMITIMES.txt", nanvalue=None, species=[1]):
         self.filename = filename
         self.cycle_list = []  # list of EmitCycle objects.
@@ -208,7 +209,7 @@ class EmiTimes(object):
                 ec = EmitCycle(splist=self.splist)
                 # the third line (0,1,2) is the cycle header line.
                 nrecs = ec.parse_header(lines[iii])
-                check = ec.read_cycle(lines[iii + 1: iii + nrecs + 1])
+                check = ec.read_cycle(lines[iii + 1:iii + nrecs + 1])
                 if not check:
                     break
                 else:
@@ -245,18 +246,17 @@ class EmiTimes(object):
         for ec in self.cycle_list:
             ec.filter_records(llcrnr, urcrnr)
 
-    def add_record(
-            self,
-            date,
-            duration,
-            lat,
-            lon,
-            height,
-            rate,
-            area,
-            heat,
-            spnum=1,
-            nanvalue=0):
+    def add_record(self,
+                   date,
+                   duration,
+                   lat,
+                   lon,
+                   height,
+                   rate,
+                   area,
+                   heat,
+                   spnum=1,
+                   nanvalue=0):
         """
         adds a record to a cycle based on the date of the record.
         Returns:
@@ -272,8 +272,9 @@ class EmiTimes(object):
         if cycle_number == -1:
             rvalue = False
         else:
-            self.cycle_list[cycle_number].add_record(
-                date, duration, lat, lon, height, rate, area, heat, spnum, nanvalue)
+            self.cycle_list[cycle_number].add_record(date, duration, lat, lon,
+                                                     height, rate, area, heat,
+                                                     spnum, nanvalue)
             rvalue = True
         return rvalue
 
@@ -309,12 +310,7 @@ class EmitCycle(object):
         # this sort order will allow line sources to be specified properly.
         #
         self.recordra.sort(
-            key=lambda x: (
-                x.date,
-                x.spnum,
-                x.lat,
-                x.lon,
-                x.height))
+            key=lambda x: (x.date, x.spnum, x.lat, x.lon, x.height))
         return -1
 
     def fill_species(self):
@@ -356,16 +352,7 @@ class EmitCycle(object):
                 ht = alist[jjj][0][3]
                 spnum = alist[jjj][1]
                 new_records.append(
-                    EmitLine(
-                        date,
-                        "0100",
-                        lat,
-                        lon,
-                        0,
-                        0,
-                        0,
-                        0,
-                        spnum))
+                    EmitLine(date, "0100", lat, lon, 0, 0, 0, 0, spnum))
                 jjj += 1
             jjj += 1
 
@@ -376,16 +363,7 @@ class EmitCycle(object):
             ht = alist[iii][0][3]
             spnum = alist[iii][1]
             new_records.append(
-                EmitLine(
-                    date,
-                    "0100",
-                    lat,
-                    lon,
-                    0,
-                    0,
-                    0,
-                    0,
-                    spnum))
+                EmitLine(date, "0100", lat, lon, 0, 0, 0, 0, spnum))
 
         for rec in new_records:
             self.add_emitline(rec)
@@ -480,18 +458,17 @@ class EmitCycle(object):
             self.splist.sort()
         self.nrecs += 1
 
-    def add_record(
-            self,
-            sdate,
-            duration,
-            lat,
-            lon,
-            ht,
-            rate,
-            area,
-            heat,
-            spnum=1,
-            nanvalue=0):
+    def add_record(self,
+                   sdate,
+                   duration,
+                   lat,
+                   lon,
+                   ht,
+                   rate,
+                   area,
+                   heat,
+                   spnum=1,
+                   nanvalue=0):
         """Inputs
         sdate
         duration
@@ -518,9 +495,8 @@ class EmitCycle(object):
                 spnum,
             )
             sys.exit()
-        eline = EmitLine(
-            sdate, duration, lat, lon, ht, rate, area, heat, spnum, nanvalue
-        )
+        eline = EmitLine(sdate, duration, lat, lon, ht, rate, area, heat,
+                         spnum, nanvalue)
         self.recordra.append(eline)
         if spnum not in self.splist:
             self.splist.append(spnum)
@@ -590,20 +566,19 @@ class EmitLine(object):
     __str__
 
     """
-
     def __init__(
-        self,
-        date,
-        duration,
-        lat,
-        lon,
-        height,
-        rate,
-        area=0,
-        heat=0,
-        spnum=1,
-        nanvalue=0,
-        verbose=False,
+            self,
+            date,
+            duration,
+            lat,
+            lon,
+            height,
+            rate,
+            area=0,
+            heat=0,
+            spnum=1,
+            nanvalue=0,
+            verbose=False,
     ):
         self.date = date
         self.duration = duration
@@ -617,12 +592,8 @@ class EmitLine(object):
         self.spnum = spnum
         nanpresent = self.checknan(nanvalue)
         if nanpresent and verbose:
-            print(
-                "WARNING: EmitFile NaNs present. \
-          Being changed to "
-                + str(nanvalue)
-                + self.message
-            )
+            print("WARNING: EmitFile NaNs present. \
+          Being changed to " + str(nanvalue) + self.message)
 
     def checknan(self, nanvalue):
         """

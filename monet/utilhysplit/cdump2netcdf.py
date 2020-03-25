@@ -1,11 +1,13 @@
 import datetime
 import os
 import sys
-import xarray as xr
+
 import numpy as np
+import xarray as xr
 from monetio.models import hysplit
 #import monet.utilhysplit.hysp_func as hf
 from netCDF4 import Dataset
+
 #import matplotlib.pyplot as plt
 
 # 01/28/2020 AMC cdump2awips created to make a netcdf file appropriate for input into AWIPS
@@ -114,7 +116,14 @@ def handle_levels(levlist):
 
 
 # def cdump2awips(flist, outname, format='NETCDF4', d1=None, d2=None):
-def cdump2awips(xrash1, dt, outname, mscale=1, munit='unit', format='NETCDF4', d1=None, d2=None):
+def cdump2awips(xrash1,
+                dt,
+                outname,
+                mscale=1,
+                munit='unit',
+                format='NETCDF4',
+                d1=None,
+                d2=None):
 
     #hxr = hysplit.open_dataset(fname, drange=[d1,d2])
     #xrash1, dt = combine_cdump(flist, d1=d1, d2=d2)
@@ -214,7 +223,8 @@ def cdump2awips(xrash1, dt, outname, mscale=1, munit='unit', format='NETCDF4', d
         massid.long_name = 'Mass Loading from surface to ' + top
 
         # Standard Contour levels for concentration in mg/m3
-        clevelid = fid.createVariable('Contour_levels', 'f4', ('contour_levels'))
+        clevelid = fid.createVariable('Contour_levels', 'f4',
+                                      ('contour_levels'))
         clevelid[:] = clevs
 
         # Dimension with different ensemble members.
@@ -254,7 +264,8 @@ def cdump2awips(xrash1, dt, outname, mscale=1, munit='unit', format='NETCDF4', d
         # change seconds to days
         t1 = t1 / (24.0 * 60 * 60)
 
-        t2 = ((xrash.time[0].values + sample_time) - epoch) / np.timedelta64(1, 's')
+        t2 = ((xrash.time[0].values + sample_time) - epoch) / np.timedelta64(
+            1, 's')
         t2 = t2 / (24.0 * 60 * 60)
 
         temp = xrash.loc[dict(time=date1)]
@@ -292,7 +303,7 @@ def makeconc(xrash, date1, level, mult=1, tr=True, verbose=False):
     xrash : xarray data-array
     date1 : datetime.datetime object
     level : list of level names
-    RETURNS 
+    RETURNS
     c1 : data array with concentration from multiple levels combined.
     """
     if not level:

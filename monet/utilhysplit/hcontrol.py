@@ -2,6 +2,7 @@
 import datetime
 from os import path
 
+
 # from pylab import matrix
 """
 PGRMMR: Alice Crawford ORG: ARL/CICS
@@ -30,11 +31,11 @@ def writeover(name, overwrite, query, verbose=False):
     Inputs
     name : str
            filename
-    overwrite: boolean  
+    overwrite: boolean
            if True then will overwrite file if it exists.
     query : boolean
            if True then will ask for user input before overwriting a file
-    verbose : boolean  
+    verbose : boolean
            if True will write messages
     Outputs
     rval : int
@@ -62,8 +63,11 @@ def writeover(name, overwrite, query, verbose=False):
     return rval
 
 
-def writelanduse(landusedir, working_directory="./", overwrite=True,
-                 query=False, silent=False):
+def writelanduse(landusedir,
+                 working_directory="./",
+                 overwrite=True,
+                 query=False,
+                 silent=False):
     """writes an ASCDATA.CFG file in the outdir. The landusedir must
        be the name of the directory where the landuse files are located.
     Parameters
@@ -75,7 +79,9 @@ def writelanduse(landusedir, working_directory="./", overwrite=True,
     ----------
     None
     """
-    rval = writeover(working_directory + 'ASCDATA.CFG', overwrite, query,
+    rval = writeover(working_directory + 'ASCDATA.CFG',
+                     overwrite,
+                     query,
                      verbose=silent)
     with open(path.join(working_directory, "ASCDATA.CFG"), "w") as fid:
         fid.write("-90.0  -180.0 \n")
@@ -85,7 +91,9 @@ def writelanduse(landusedir, working_directory="./", overwrite=True,
         fid.write("0.2 \n")
         fid.write(landusedir + " \n")
         if not path.isdir(landusedir) and not silent:
-            print('writelanduse function WARNING: landuse directory does not exist', landusedir)
+            print(
+                'writelanduse function WARNING: landuse directory does not exist',
+                landusedir)
 
 
 class ConcGrid:
@@ -118,24 +126,23 @@ class ConcGrid:
     interval
     annotate : boolean
     """
-
     def __init__(
-        self,
-        name,
-        levels=None,
-        centerlat=0.0,
-        centerlon=0.0,
-        latdiff=-1.0,
-        londiff=-1.0,
-        latspan=90.0,
-        lonspan=360.0,
-        outdir="./",
-        outfile="cdump",
-        nlev=-1,
-        sample_start="00 00 00 00 00",
-        sample_stop="00 00 00 00 00",
-        sampletype=0,
-        interval=(-1, -1),
+            self,
+            name,
+            levels=None,
+            centerlat=0.0,
+            centerlon=0.0,
+            latdiff=-1.0,
+            londiff=-1.0,
+            latspan=90.0,
+            lonspan=360.0,
+            outdir="./",
+            outfile="cdump",
+            nlev=-1,
+            sample_start="00 00 00 00 00",
+            sample_stop="00 00 00 00 00",
+            sampletype=0,
+            interval=(-1, -1),
     ):
 
         # self.name, self.levels, self.centerlat, self.centerlon,
@@ -224,13 +231,8 @@ class ConcGrid:
         returnstr += str(self.latdiff) + " " + str(self.londiff) + note + "\n"
         if pnotes:
             note = "  #Concentration grid span (degrees latitude longitude)"
-        returnstr += (
-            "{:.2f}".format(self.latspan)
-            + " "
-            + "{:.2f}".format(self.lonspan)
-            + note
-            + "\n"
-        )
+        returnstr += ("{:.2f}".format(self.latspan) + " " +
+                      "{:.2f}".format(self.lonspan) + note + "\n")
         if pnotes:
             note = "  #Directory to write concentration output file"
         returnstr += self.outdir + note + "\n"
@@ -262,22 +264,12 @@ class ConcGrid:
     def describe(self):
         """describe prints out a description of what the lines in the
         control file mean"""
-        returnstr = (
-            "Center of Lat and Lon: "
-            + str(self.centerlat)
-            + " "
-            + str(self.centerlon)
-            + "\n"
-        )
-        returnstr += (
-            "Spacing (deg) Lat, Lon: "
-            + str(self.latdiff)
-            + " "
-            + str(self.londiff)
-            + "\n"
-        )
-        returnstr += ("Span (deg Lat, Lon: " +
-                      str(self.latspan) + " " + str(self.lonspan) + "\n")
+        returnstr = ("Center of Lat and Lon: " + str(self.centerlat) + " " +
+                     str(self.centerlon) + "\n")
+        returnstr += ("Spacing (deg) Lat, Lon: " + str(self.latdiff) + " " +
+                      str(self.londiff) + "\n")
+        returnstr += ("Span (deg Lat, Lon: " + str(self.latspan) + " " +
+                      str(self.lonspan) + "\n")
         returnstr += "Output grid directory: " + self.outdir + "\n"
         returnstr += "Output grid file name: " + self.outfile + "\n"
         returnstr += "Num of vertical levels: " + str(self.nlev) + "\n"
@@ -290,13 +282,8 @@ class ConcGrid:
         returnstr += "Sampling stop (yy mm dd hh min) : " + \
             self.sample_stop + "\n"
         # returnstr +=  self.typstr() + ' ' + str(self.sampletype) + ' '
-        returnstr += (
-            "Interval (hh min) "
-            + str(self.interval[0])
-            + " "
-            + str(self.interval[1])
-            + "\n"
-        )
+        returnstr += ("Interval (hh min) " + str(self.interval[0]) + " " +
+                      str(self.interval[1]) + "\n")
         return returnstr
 
     def typestr(self):
@@ -311,12 +298,8 @@ class ConcGrid:
         elif self.sampletype == 2:
             returnstr = "Maximum every " + tmstr
         elif self.sampletype < 0:
-            returnstr = (
-                "Average over "
-                + str(abs(self.sampletype))
-                + " hours with output every "
-                + tmstr
-            )
+            returnstr = ("Average over " + str(abs(self.sampletype)) +
+                         " hours with output every " + tmstr)
         return returnstr
 
     def definition(self, lines):
@@ -425,18 +408,18 @@ class Species:
         return Species.total
 
     def __init__(
-        self,
-        name,
-        psize=0,
-        rate="1",
-        duration=-1,
-        density=2.5,
-        shape=1,
-        date="00 00 00 00 00",
-        wetdepstr="0.0 0.0 0.0",
-        vel="0.0 0.0 0.0 0.0 0.0",
-        decay="0.0",
-        resuspension="0.0",
+            self,
+            name,
+            psize=0,
+            rate="1",
+            duration=-1,
+            density=2.5,
+            shape=1,
+            date="00 00 00 00 00",
+            wetdepstr="0.0 0.0 0.0",
+            vel="0.0 0.0 0.0 0.0 0.0",
+            decay="0.0",
+            resuspension="0.0",
     ):
 
         self.name = name
@@ -494,9 +477,8 @@ class Species:
             self.datestr = self.date
         else:
             try:
-                self.date = datetime.datetime.strptime(
-                    lines[2].strip(), "%y %m %d %H %M"
-                )
+                self.date = datetime.datetime.strptime(lines[2].strip(),
+                                                       "%y %m %d %H %M")
                 self.datestr = self.date.strftime("%y %M %D %H")
             except BaseException:
                 print("warning: date not valid", lines[2])
@@ -578,15 +560,8 @@ class Species:
             shapstr = ""
             note = spc + \
                 "#Particle diameter(um)   Density (g/cc),  Shape " + shapstr
-        returnval = (
-            "%05.1f" % self.psize
-            + " "
-            + "%02.1f" % self.density
-            + " "
-            + "%04.1f" % self.shape
-            + note
-            + "\n"
-        )
+        returnval = ("%05.1f" % self.psize + " " + "%02.1f" % self.density +
+                     " " + "%04.1f" % self.shape + note + "\n")
         if annotate:
             note = spc + "#Dry Deposition for gas or using resistance method "
         returnval += self.vel + note + "\n"
@@ -615,7 +590,6 @@ class NameList:
     """class which represents HYSPLIT SETUP.CFG file,
        This class can also be used to write GENPARM.CFG file for hycs_gem.
        In write method set gem=True"""
-
     def __init__(self, fname="SETUP.CFG", working_directory="./"):
         self.fname = fname
         self.nlist = {}  # dictionary of lines in the file.
@@ -658,36 +632,25 @@ class NameList:
     def _load_descrip(self):
         """creates dictionary with description of namelist parameters
         """
-        self.descrip["ichem"] = (
-            "Chemistry conversion modules.\n" +
-            "0:none, 1:matrix , 2:convert, 3:dust"
-        )
+        self.descrip["ichem"] = ("Chemistry conversion modules.\n" +
+                                 "0:none, 1:matrix , 2:convert, 3:dust")
         self.descrip["qcycle"] = "Cycling of emission hours"
-        self.descrip["delt"] = (
-            "integration time step\n" +
-            " (0=autoset, >0= constant ,<0=minimum)"
-        )
-        self.descrip["kmixd"] = (
-            "Mixed layer obtained from \n" +
-            " 0:input, 1:temperature, 2: TKE",
-        )
+        self.descrip["delt"] = ("integration time step\n" +
+                                " (0=autoset, >0= constant ,<0=minimum)")
+        self.descrip["kmixd"] = ("Mixed layer obtained from \n" +
+                                 " 0:input, 1:temperature, 2: TKE", )
         self.descrip["kmix0"] = "mixing depth. 250 minimum"
-        self.descrip["kzmis"] = (
-            "Vertical mixing profile." +
-            " 0:No adjustments." +
-            " 1: vertical diffusivity in PBL single" +
-            " average value"
-        )
-        self.descrip["kbls"] = (
-            "Stability computed by" "(1) Heat and momentum fluxes," +
-            " 2: Wind and temperature profiles"
-        )
+        self.descrip["kzmis"] = ("Vertical mixing profile." +
+                                 " 0:No adjustments." +
+                                 " 1: vertical diffusivity in PBL single" +
+                                 " average value")
+        self.descrip["kbls"] = ("Stability computed by"
+                                "(1) Heat and momentum fluxes," +
+                                " 2: Wind and temperature profiles")
         self.descrip["kblt"] = (
             "Flag to set vertical turbulence computational" +
-            "method. 1:Beljaars/Holtslag" +
-            "(2):Kanthar/Clayson " +
-            " 3:TKE field 4:Velocity Variances"
-        )
+            "method. 1:Beljaars/Holtslag" + "(2):Kanthar/Clayson " +
+            " 3:TKE field 4:Velocity Variances")
         self.descrip["initd"] = "defines particle or puff mode"
 
     def summary(self):
@@ -703,9 +666,13 @@ class NameList:
             elif test == 2:
                 print("Top-Hat horizontal and vertical puff")
             elif test == 3:
-                print("Gaussian horizontal puff and vertical particle distribution")
+                print(
+                    "Gaussian horizontal puff and vertical particle distribution"
+                )
             elif test == 4:
-                print("Top-Hat horizontal puff and vertical particle distribution")
+                print(
+                    "Top-Hat horizontal puff and vertical particle distribution"
+                )
             else:
                 print("3D particle horizontal and vertical")
 
@@ -730,11 +697,17 @@ class NameList:
                     key = key.lower()
                 self.nlist[key] = temp[1].strip(",")
 
-    def write(self, order=None, gem=False, verbose=False, overwrite=True,
+    def write(self,
+              order=None,
+              gem=False,
+              verbose=False,
+              overwrite=True,
               query=False):
         """ if gem=True then will write &GENPARM at beginning of file rather than &SETUP"""
 
-        rval = writeover(self.wdir + self.fname, overwrite, query,
+        rval = writeover(self.wdir + self.fname,
+                         overwrite,
+                         query,
                          verbose=verbose)
         if rval == -1:
             return rval
@@ -755,8 +728,8 @@ class NameList:
                 try:
                     fid.write(key.lower() + "=" + self.nlist[key] + ",\n")
                 except BaseException:
-                    print("WARNING: " + str(key) + " " +
-                          str(self.nlist[key]) + " not str")
+                    print("WARNING: " + str(key) + " " + str(self.nlist[key]) +
+                          " not str")
                     kstr = False
                 if not kstr:
                     fid.write(str(key) + "=" + str(self.nlist[key]) + ",\n")
@@ -773,8 +746,12 @@ class ControlLoc(object):
         """number of ControlLoc objects"""
         return ControlLoc.total
 
-    def __init__(self, line=False, latlon=(-1, -1),
-                 alt=10.0, rate=False, area=False):
+    def __init__(self,
+                 line=False,
+                 latlon=(-1, -1),
+                 alt=10.0,
+                 rate=False,
+                 area=False):
         """ Can either input a string (line from HYSPLIT CONTROL file) or can enter
             latlon = tuple (default(-1,-1))
             altitude= real (default (10.0))
@@ -791,8 +768,7 @@ class ControlLoc(object):
         ControlLoc.total += 1
 
     def copy(self):
-        return ControlLoc(False, self.latlon, self.alt,
-                          self.rate, self.area)
+        return ControlLoc(False, self.latlon, self.alt, self.rate, self.area)
 
     def definition(self, line):
         """
@@ -847,12 +823,10 @@ class HycsControl(object):
        class which represents the HYSPLIT
        control file and all the information in it
     """
-
-    def __init__(
-            self,
-            fname="CONTROL",
-            working_directory="./",
-            rtype="dispersion"):
+    def __init__(self,
+                 fname="CONTROL",
+                 working_directory="./",
+                 rtype="dispersion"):
         self.fname = fname
         if working_directory[-1] != "/":
             working_directory += "/"
@@ -913,15 +887,12 @@ class HycsControl(object):
         self.locs.append(newloc)
         self.nlocs += 1
 
-    def add_location(
-            self,
-            line=False,
-            latlon=(
-                0,
-                0),
-            alt=10.0,
-            rate=False,
-            area=False):
+    def add_location(self,
+                     line=False,
+                     latlon=(0, 0),
+                     alt=10.0,
+                     rate=False,
+                     area=False):
         """add new emission location
            line: boolean
            latlon : tuple of floats
@@ -931,8 +902,8 @@ class HycsControl(object):
         """
         self.nlocs += 1
         self.locs.append(
-            ControlLoc(line=line, latlon=latlon, alt=alt, rate=rate, area=area)
-        )
+            ControlLoc(line=line, latlon=latlon, alt=alt, rate=rate,
+                       area=area))
 
     def remove_locations(self, num=-99):
         """
@@ -988,7 +959,12 @@ class HycsControl(object):
         """will replace the duration if already exists"""
         self.run_duration = duration
 
-    def write(self, annotate=False, metgrid=False, verbose=False, overwrite=True, query=False):
+    def write(self,
+              annotate=False,
+              metgrid=False,
+              verbose=False,
+              overwrite=True,
+              query=False):
         """writes CONTROL file to text file
            self.wdir + self.fname
            metgrid option will write a 1 before the number of met files.
@@ -998,7 +974,9 @@ class HycsControl(object):
         note = ""
         sp28 = " " * 28
 
-        rval = writeover(self.wdir + self.fname, overwrite, query,
+        rval = writeover(self.wdir + self.fname,
+                         overwrite,
+                         query,
                          verbose=verbose)
         if rval == -1:
             return rval
@@ -1132,13 +1110,11 @@ class HycsControl(object):
             for ln in contentA:
                 content.append(ln.split("#")[0])
             try:
-                self.date = datetime.datetime.strptime(
-                    content[0].strip(), "%y %m %d %H"
-                )
+                self.date = datetime.datetime.strptime(content[0].strip(),
+                                                       "%y %m %d %H")
             except BaseException:
-                self.date = datetime.datetime.strptime(
-                    content[0].strip(), "%y %m %d %H %M"
-                )
+                self.date = datetime.datetime.strptime(content[0].strip(),
+                                                       "%y %m %d %H %M")
             self.nlocs = int(content[1].strip())
             zz = 2
             for ii in range(zz, zz + self.nlocs):
@@ -1269,11 +1245,8 @@ def getmetfiles(
         temp = edate.strftime(mfmt)
         if not path.isfile(mdir + temp):
             with open(warn_file, "a") as fid:
-                fid.write(
-                    "WARNING " +
-                    mdir +
-                    temp +
-                    " meteorological file does not exist\n")
+                fid.write("WARNING " + mdir + temp +
+                          " meteorological file does not exist\n")
         else:
             mfiles.append(temp)
         edate = edate + dt

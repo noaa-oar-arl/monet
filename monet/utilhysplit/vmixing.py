@@ -1,15 +1,17 @@
 #!/n-home/alicec/anaconda/bin/python
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-import numpy as np
-import string
 import datetime
+import string
 import subprocess
 from os import path
+
+import numpy as np
 import pandas as pd
 from monet.utilhysplit.hcontrol import HycsControl
 
+
 """
-PRGMMR: Alice Crawford  ORG: ARL  
+PRGMMR: Alice Crawford  ORG: ARL
 PYTHON 2.7
 This code written at the NOAA  Air Resources Laboratory
 UID: r102
@@ -23,9 +25,16 @@ CLASSES
 
 
 class VmixingRun:
-
-    def __init__(self, fname, cname='CONTROL', cdir='./', pid=None,
-                 kbls=1, kblt=2, cameo=2, tkemin=None, verbose=True):
+    def __init__(self,
+                 fname,
+                 cname='CONTROL',
+                 cdir='./',
+                 pid=None,
+                 kbls=1,
+                 kblt=2,
+                 cameo=2,
+                 tkemin=None,
+                 verbose=True):
         self.control = HycsControl(fname=cname, rtype='vmixing')
         self.pid = self.control.replace('CONTROL.', '')
         self.kbls = kbls  # 1 fluxes  #2 wind/temp profile
@@ -67,12 +76,11 @@ class VmixingRun:
 
 
 class VmixingData:
-    """ 
+    """
         add_data
         make_dummies (NOT FUNCTIONAL)
-        readfile  
+        readfile
     """
-
     def __init__(self, century=2000, verbose=True):
         """fname : name of file output by xtrct_stn
            valra : list of values that are in fname
@@ -81,7 +89,8 @@ class VmixingData:
         self.units = None
         self.df = pd.DataFrame()
 
-    def add_data(self, fname, vdir='./', century=2000, verbose=False, sid=None):
+    def add_data(self, fname, vdir='./', century=2000, verbose=False,
+                 sid=None):
         df = self.readfile(fname, vdir, century, verbose)
         if sid:
             df['sid'] = sid

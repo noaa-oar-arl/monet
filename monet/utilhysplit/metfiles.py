@@ -1,15 +1,17 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-import numpy as np
 import datetime
-import time
 import os
-from os import path, chdir
+import time
+from os import chdir, path
 from subprocess import call
+
+import numpy as np
 import pandas as pd
+
 
 """
 NAME: svhy.py
-PRGMMR: Alice Crawford  ORG: ARL  
+PRGMMR: Alice Crawford  ORG: ARL
 This code written at the NOAA  Air Resources Laboratory
 ABSTRACT: choosing met files for HYSPLIT control file
 
@@ -23,7 +25,6 @@ def getmetfiles(strfmt, sdate, runtime):
 
 
 class MetFiles:
-
     def __init__(self, strfmt, hours=None, verbose=False):
         self.verbose = verbose
         self.strfmt = strfmt
