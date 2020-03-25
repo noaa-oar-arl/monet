@@ -13,7 +13,7 @@ source:
 
 build:
   number: 0
-  noarch: python
+  #noarch: python
   script: "{{ PYTHON }} -m pip install . -vv"
 
 requirements:
@@ -21,6 +21,7 @@ requirements:
     - {{ compiler('c') }}
   host:
     - python
+    - pip
   run:
     - git
     - python
@@ -38,11 +39,12 @@ requirements:
     - global_land_mask
 
 about:
-  home: https://monet-arl.readthedocs.io
+  home: https://github.com/noaa-oar-arl/monet
   license: MIT License
   license_family: MIT
   license_file: LICENSE
   summary: The Model and ObservatioN Evaluation Tool - for meteorology and AQ
+  doc_url: https://monet-arl.readthedocs.io
 
 extra:
   recipe-maintainers:
