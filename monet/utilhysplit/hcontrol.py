@@ -126,6 +126,7 @@ class ConcGrid:
     interval
     annotate : boolean
     """
+
     def __init__(
             self,
             name,
@@ -590,6 +591,7 @@ class NameList:
     """class which represents HYSPLIT SETUP.CFG file,
        This class can also be used to write GENPARM.CFG file for hycs_gem.
        In write method set gem=True"""
+
     def __init__(self, fname="SETUP.CFG", working_directory="./"):
         self.fname = fname
         self.nlist = {}  # dictionary of lines in the file.

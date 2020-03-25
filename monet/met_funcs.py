@@ -277,8 +277,7 @@ def calc_sun_angles(lat, lon, stdlon, doy, ftime):
     # Get solar azimuth angle
     cos_phi = np.asarray(
         (np.sin(declination) * np.cos(np.radians(lat)) -
-         np.cos(np.radians(w)) * np.cos(declination) * np.sin(np.radians(lat)))
-        / np.cos(sun_elev))
+         np.cos(np.radians(w)) * np.cos(declination) * np.sin(np.radians(lat))) / np.cos(sun_elev))
     saa = np.zeros(sza.shape)
     saa[w <= 0.0] = np.degrees(np.arccos(cos_phi[w <= 0.0]))
     saa[w > 0.0] = 360. - np.degrees(np.arccos(cos_phi[w > 0.0]))

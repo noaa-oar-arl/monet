@@ -519,6 +519,7 @@ class MONETAccessor(object):
         Description of attribute `obj`.
 
     """
+
     def __init__(self, xray_obj):
         """Short summary.
 

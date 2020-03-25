@@ -60,6 +60,7 @@ class EmiTimes(object):
                          rectangular area.
 
     """
+
     def __init__(self, filename="EMITIMES.txt", nanvalue=None, species=[1]):
         self.filename = filename
         self.cycle_list = []  # list of EmitCycle objects.
