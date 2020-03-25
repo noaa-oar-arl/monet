@@ -823,6 +823,7 @@ class HycsControl(object):
        class which represents the HYSPLIT
        control file and all the information in it
     """
+
     def __init__(self,
                  fname="CONTROL",
                  working_directory="./",

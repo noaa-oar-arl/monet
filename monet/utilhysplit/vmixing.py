@@ -81,6 +81,7 @@ class VmixingData:
         make_dummies (NOT FUNCTIONAL)
         readfile
     """
+
     def __init__(self, century=2000, verbose=True):
         """fname : name of file output by xtrct_stn
            valra : list of values that are in fname

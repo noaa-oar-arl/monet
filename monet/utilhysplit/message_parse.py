@@ -13,6 +13,7 @@ optionparser input which will plot time steps"""
 class HysplitMessageFile(object):
     """Class to read the Hysplit Message File.
     Currently looks at how time step evolves over the run"""
+
     def __init__(self, fname):
         self.fname = fname
         self.read()

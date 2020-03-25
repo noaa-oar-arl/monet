@@ -566,6 +566,7 @@ class EmitLine(object):
     __str__
 
     """
+
     def __init__(
             self,
             date,
