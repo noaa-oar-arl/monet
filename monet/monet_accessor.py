@@ -80,7 +80,8 @@ def _dataset_to_monet(dset,
         Description of returned object.
 
     """
-    if 'grid_xt' in dset.dims:  # GFS v16 file
+    if 'grid_xt' in dset.dims:
+        # GFS v16 file
         try:
             if isinstance(dset, xr.DataArray):
                 dset = _dataarray_coards_to_netcdf(dset,
@@ -1276,9 +1277,11 @@ class MONETAccessorDataset(object):
         from numpy import vectorize
         da = self._obj
         cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
-        if name is None:  # assume 'time' is the column name to transform
+        if name is None:
+            # assume 'time' is the column name to transform
             name = 'time'
-        if isinstance(da[name].to_index(), xr.CFTimeIndex):  # assume cftime
+        if isinstance(da[name].to_index(), xr.CFTimeIndex):
+            # assume cftime
             da[name] = xr.apply_ufunc(vectorize(cf_to_dt64), da[name])
         return da
 
