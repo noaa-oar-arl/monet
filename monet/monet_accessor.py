@@ -1290,16 +1290,9 @@ class MONETAccessorDataset(object):
         """
         from numpy import vectorize
         da = self._obj
-
-
-<< << << < HEAD
-        cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
+        def cf_to_dt64(x): return pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
         if name is None:
             # assume 'time' is the column name to transform
-== == == =
-        def cf_to_dt64(x): return pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
-        if name is None:  # assume 'time' is the column name to transform
->>>>>> > bbac1ea899661ed1ae94a8286d5500c9c486b2a2
             name = 'time'
         if isinstance(da[name].to_index(), xr.CFTimeIndex):
             # assume cftime
