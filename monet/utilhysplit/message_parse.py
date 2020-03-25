@@ -1,16 +1,11 @@
-#!/opt/Tools/anaconda3/bin/python
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-#from math import *
+# from math import *
 from optparse import OptionParser
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-#import datetime
-#import pandas as pd
-#from pylab import matrix
-#import io
 """class for Hysplit MESSAGE file.
 optionparser input which will plot time steps"""
 
