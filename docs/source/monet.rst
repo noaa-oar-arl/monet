@@ -6,10 +6,7 @@ Subpackages
 
 .. toctree::
 
-    monet.models
-    monet.obs
     monet.plots
-    monet.sat
     monet.util
 
 Submodules

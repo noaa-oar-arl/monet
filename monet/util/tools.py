@@ -88,9 +88,9 @@ def get_relhum(temp, press, vap):
 
 def long_to_wide(df):
     from pandas import Series, merge
-    w = df.pivot_table(
-        values='obs', index=['time', 'siteid'],
-        columns='variable').reset_index()
+    w = df.pivot_table(values='obs',
+                       index=['time', 'siteid'],
+                       columns='variable').reset_index()
     cols = Series(df.columns)
     g = df.groupby('variable')
     for name, group in g:
@@ -158,13 +158,14 @@ def get_giorgi_region_bounds(index=None, acronym=None):
         -28, -45, -20, -56, 10, 30, 30, 25, 60, 50, 30, 48, -12, -12, -35, 18,
         -11, 20, 5, 30, 30, 50
     ]
-    df = pd.DataFrame({
-        'latmin': latmin,
-        'lonmin': lonmin,
-        'latmax': latmax,
-        'lonmax': lonmax,
-        'acronym': acro
-    },
+    df = pd.DataFrame(
+        {
+            'latmin': latmin,
+            'lonmin': lonmin,
+            'latmax': latmax,
+            'lonmax': lonmax,
+            'acronym': acro
+        },
         index=i)
     try:
         if index is None and acronym is None:
@@ -196,31 +197,35 @@ def get_giorgi_region_df(df):
 
 def get_epa_region_bounds(index=None, acronym=None):
     import pandas as pd
-    i = [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    i = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     acro = [
-        'R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10', 'AK', 'PR', 'VI']
+        'R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10', 'AK',
+        'PR', 'VI'
+    ]
     lonmax = [
-        -66.8628, -73.8885, -74.8526, -75.4129, -80.5188, -88.7421, -89.1005, -
-        96.438, -109.0475, -111.0471, -129.99, -65.177765, -64.26384
+        -66.8628, -73.8885, -74.8526, -75.4129, -80.5188, -88.7421, -89.1005,
+        -96.438, -109.0475, -111.0471, -129.99, -65.177765, -64.26384
     ]
     lonmin = [
-        -73.7272, -79.7624, -83.6753, -91.6589, -97.2304, -109.0489, -104.0543, -
-        116.0458, -124.6509, -124.7305, -169.9146, -67.289886, -64.861221
+        -73.7272, -79.7624, -83.6753, -91.6589, -97.2304, -109.0489, -104.0543,
+        -116.0458, -124.6509, -124.7305, -169.9146, -67.289886, -64.861221
     ]
     latmax = [
-        47.455, 45.0153, 42.5167, 39.1439, 49.3877, 37.0015, 43.5008, 48.9991, 42.0126, 49.0027, 71.5232, 18.520551, 18.751244
+        47.455, 45.0153, 42.5167, 39.1439, 49.3877, 37.0015, 43.5008, 48.9991,
+        42.0126, 49.0027, 71.5232, 18.520551, 18.751244
     ]
     latmin = [
-        40.9509, 38.8472, 36.5427, 24.3959, 36.9894, 25.8419, 35.9958, 36.9949, 31.3325, 41.9871, 52.5964, 17.904834, 18.302014
+        40.9509, 38.8472, 36.5427, 24.3959, 36.9894, 25.8419, 35.9958, 36.9949,
+        31.3325, 41.9871, 52.5964, 17.904834, 18.302014
     ]
-    df = pd.DataFrame({
-        'latmin': latmin,
-        'lonmin': lonmin,
-        'latmax': latmax,
-        'lonmax': lonmax,
-        'acronym': acro
-    },
+    df = pd.DataFrame(
+        {
+            'latmin': latmin,
+            'lonmin': lonmin,
+            'latmax': latmax,
+            'lonmax': lonmax,
+            'acronym': acro
+        },
         index=i)
     try:
         if index is None and acronym is None:

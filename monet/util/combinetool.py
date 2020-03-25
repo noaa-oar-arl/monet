@@ -1,10 +1,12 @@
+import xarray as xr
+from numpy import ones
 from pandas import Series, merge_asof
 
 # from ..util import interp_util as interpo
 # from ..obs import epa_util
 
 
-def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
+def combine_da_to_df(da, df, col=None, merge=True, **kwargs):
     """This function will combine an xarray data array with spatial information
     point observations in `df`.
 
@@ -24,21 +26,17 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     pandas.DataFrame
     """
     from ..util.interp_util import lonlat_to_swathdefinition
-    from ..util.resample import resample_dataset
-    try:
-        if col is None:
-            raise RuntimeError
-    except RuntimeError:
-        print('Must enter column name')
-    dfn = df.dropna(subset=[col])
-    dfnn = dfn.drop_duplicates(subset=['latitude', 'longitude'])
-    # unit = dfnn[col + '_unit'].unique()[0]
-    target_grid = lonlat_to_swathdefinition(longitude=dfnn.longitude.values,
-                                            latitude=dfnn.latitude.values)
-    da_interped = resample_dataset(da.compute(),
-                                   target_grid,
-                                   radius_of_influence=radius_of_influence)
-    # add model if da.name is the same as column
+    from numpy import ones
+    # try:
+    #     if col is None:
+    #         raise RuntimeError
+    # except RuntimeError:
+    #     print('Must enter column name')
+    # dfn = df.dropna(subset=[col])
+    dfnn = df.drop_duplicates(subset=['latitude', 'longitude']).dropna(
+        subset=['latitude', 'longitude'])
+    dfda = dfnn.monet._df_to_da()
+    da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
@@ -46,10 +44,13 @@ def combine_da_to_df(da, df, col=None, radius_of_influence=12e3, merge=True):
     if da.name in df.columns:
         df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
         # print(df_interped.keys())
-    final_df = df.merge(df_interped,
-                        on=['latitude', 'longitude', 'time'],
-                        how='left')
-    return final_df
+    if merge:
+        final_df = df.merge(df_interped,
+                            on=['latitude', 'longitude', 'time'],
+                            how='left')
+        return final_df
+    else:
+        return df_interped
 
 
 def _rename_latlon(ds):
@@ -96,10 +97,14 @@ def combine_da_to_df_xesmf(da, df, col=None, suffix=None, **kwargs):
     if suffix is None:
         suffix = '_new'
     rename_dict = {}
-    for i in da_interped.data_vars.keys():
-        if i in dfnn.keys():
-            rename_dict[i] = i + suffix
-    da_interped = da_interped.rename(rename_dict)
+    if isinstance(da_interped, xr.DataArray):
+        if da_interped.name in dfnn.keys():
+            da_interped.name = df_interped.name + suffix
+    else:
+        for i in da_interped.data_vars.keys():
+            if i in dfnn.keys():
+                rename_dict[i] = i + suffix
+        da_interped = da_interped.rename(rename_dict)
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]

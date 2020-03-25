@@ -1,65 +1,30 @@
-MONET on WCOSS
---------------
+Installing on WCOSS
+===================
 
-MONET can be used currently on WCOSS Phase 1, and WCOSS Phase 2. MONET
-will not be installed on WCOSS Cray but there are plans to move to WCOSS
-Phase 3 in the near future. To use the python environment that MONET is
-installed on users much do a few things.
-
-Create .condarc
-~~~~~~~~~~~~~~~
-
-First, a ``.condarc`` file needs to be created and placed in the
-``HOME`` directory. To create this please copy the following and place
-in the file named ``.condarc`` :
-
+If you have access to the NOAA WCOSS machines you can create your own python environments very
+easily using intel-python.  First, it is suggested to create a .condarc file that lives in your `$HOME` folder to point to
+a location that will house your conda environments.  Below is a sample .condarc file.
 ::
 
-    channels:
-      - conda-forge
-      - defaults
-    envs_dirs:
-      - /naqfc/noscrub/Barry.Baker/python/envs
-    pkgs_dirs:
-      - /naqfc/noscrub/Barry.Baker/python/pkgs
+  channels:
+    - intel
+    - conda-forge
+    - defaults
+  envs_dirs:
+    - /gpfs/dell2/emc/verification/noscrub/User.Name/conda/envs
+  pkgs_dirs:
+    - /gpfs/dell2/emc/verification/noscrub/User.Name/conda/pkgs
 
-Activate MONET Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Next you should start a new environment by cloning the default environment to a new name. This can be done in a
+single command.
+::
+  conda create -n myenv --clone="/usrx/local/prod/intel/2019UP05/intelpython3"
 
-The MONET python environment can then be loaded and sourced. It is
-recommended that in the current shell that other modules be purged so
-that conflicts between packages do not raise.
+A prompt should come up and tell you to activate the environment you just created, myenv.
 
 ::
+  source activate myenv
 
-
-    module purge
-
-Next, use and load the modules:
-
+From here you can install any package the same way you could on regular anaconda installations.
 ::
-
-
-    module use -a /gpfs/hps3/emc/naqfc/save/Barry.Baker/modulefiles
-    module load anaconda/latest
-
-and then activate the MONET environment:
-
-::
-
-    source activate monet
-
-You can put this all in a bash script that you can source when wanting
-to use MONET:
-
-.. code:: bash
-
-
-    #!/bin/bash
-
-    module purge
-
-    module use -a /gpfs/hps3/emc/naqfc/save/Barry.Baker/modulefiles
-    module load anaconda/latest
-
-    source activate monet
+  conda install -c bbakernoaa monet 

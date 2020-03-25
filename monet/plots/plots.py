@@ -52,6 +52,7 @@ def make_spatial_plot(modelvar,
     m.drawcountries()
     return f, ax, c, cmap, vmin, vmax
 
+
 def spatial(modelvar, **kwargs):
     if kwargs['ax'] is None:
         f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
@@ -297,6 +298,7 @@ def timeseries(df,
     plt.title(title)
     plt.tight_layout()
     return ax
+
 
 def kdeplot(df, title=None, label=None, ax=None, **kwargs):
     """Short summary.
