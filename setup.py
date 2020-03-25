@@ -29,18 +29,3 @@ setup(name='monet',
           'seaborn', 'cartopy', 'pydecorate', 'global_land_mask'
       ],
       extra_requires={'xesmf;platform_system!="Windows"'})
-
-# - python
-# - setuptools
-# - numpy
-# - pandas
-# - xarray
-# - dask
-# - cartopy
-# - matplotlib
-# - seaborn
-# - pseudonetcdf
-# - pyresample
-# - xesmf # [not win]
-# - python-stratify
-# - pytables
