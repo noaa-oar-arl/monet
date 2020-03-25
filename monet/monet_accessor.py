@@ -279,6 +279,64 @@ class MONETAccessorPandas:
         lon = self._obj.longitude
         return (float(lon.mean()), float(lat.mean()))
 
+    def to_ascii2nc_df(self,
+                       grib_code=126,
+                       height_msl=0.,
+                       column='aod_550nm',
+                       message_type='ADPUPA',
+                       pressure=1000.,
+                       qc=None,
+                       height_agl=None):
+        df = self._obj
+        df['ascii2nc_time'] = df.time.dt.strftime('%Y%m%d_%H%M%S')
+        df['ascii2nc_gribcode'] = int(grib_code)
+        if isinstance(height_msl, str):
+            df['ascii2nc_elevation'] = df[height_msl]
+        else:
+            df['ascii2nc_elevation'] = height_msl
+        df['ascii2nc_message'] = message_type
+        if isinstance(pressure, str):
+            df['ascii2nc_pressure'] = df[pressure]
+        else:
+            df['ascii2nc_pressure'] = pressure
+        df['ascii2nc_value'] = df[column]
+        if qc is None:
+            df['ascii2nc_qc'] = '0'
+            df.loc[df['ascii2nc_value'].isnull(), 'ascii2nc_qc'] = '1'
+        else:
+            df['ascii2nc_qc'] = '0'
+        if height_agl is None:
+            df['ascii2nc_height_agl'] = df['ascii2nc_elevation']
+        elif isinstance(height_agl, str):
+            df['ascii2nc_height_agl'] = df[height_agl]
+        else:
+            df['ascii2nc_height_agl'] = height_agl
+        out = df[[
+            'ascii2nc_message', 'siteid', 'ascii2nc_time', 'latitude',
+            'longitude', 'ascii2nc_elevation', 'ascii2nc_gribcode',
+            'ascii2nc_pressure', 'ascii2nc_height_agl', 'ascii2nc_qc',
+            'ascii2nc_value'
+        ]]
+        out = out.rename(dict(ascii2nc_message='typ',
+                              siteid='sid',
+                              ascii2nc_time='vld',
+                              latitude='lat',
+                              longitude='lon',
+                              ascii2nc_elevation='elv',
+                              ascii2nc_gribcode='var',
+                              ascii2nc_pressure='lvl',
+                              ascii2nc_height_agl='lvl',
+                              ascii2nc_qc='qc',
+                              ascii2nc_value='obs'),
+                         axis=1)
+        out = out.astype(dict(typ=str, sid=str, vld=str, var=str, qc=str))
+        return out
+
+    def to_ascii2nc_list(self, **kwargs):
+        df = self._obj
+        out = self.to_ascii2nc_df(**kwargs)
+        return out.values.tolist()
+
     def rename_for_monet(self, df=None):
         """Rename latitude and longitude columns in the DataFrame.
 
@@ -476,7 +534,7 @@ class MONETAccessor(object):
         """
         self._obj = xray_obj
 
-    def is_land(self, return_xarray=True):
+    def is_land(self, return_xarray=False):
         """checks the mask of land and ocean.
 
         Parameters
@@ -492,14 +550,14 @@ class MONETAccessor(object):
 
         """
         import global_land_mask as glm
-        da = self.structure_for_monet(self._obj)
-        island = glm.island(da.latitude.values, da.longitude.values)
+        da = _dataset_to_monet(self._obj)
+        island = glm.is_land(da.latitude.values, da.longitude.values)
         if return_xarray:
             return da.where(island)
         else:
             return island
 
-    def is_ocean(self, return_xarray=True):
+    def is_ocean(self, return_xarray=False):
         """checks the mask of land and ocean.
 
         Parameters
@@ -515,7 +573,7 @@ class MONETAccessor(object):
 
         """
         import global_land_mask as glm
-        da = self.structure_for_monet(self._obj)
+        da = _dataset_to_monet(self._obj)
         isocean = glm.is_ocean(da.latitude.values, da.longitude.values)
         if return_xarray:
             return da.where(isocean)
@@ -1155,7 +1213,7 @@ class MONETAccessorDataset(object):
     def __init__(self, xray_obj):
         self._obj = xray_obj
 
-    def is_land(self, return_xarray=True):
+    def is_land(self, return_xarray=False):
         """checks the mask of land and ocean.
 
         Parameters
@@ -1171,14 +1229,14 @@ class MONETAccessorDataset(object):
 
         """
         import global_land_mask as glm
-        da = self.structure_for_monet(self._obj)
-        island = glm.island(da.latitude.values, da.longitude.values)
+        da = _dataset_to_monet(self._obj)
+        island = glm.is_land(da.latitude.values, da.longitude.values)
         if return_xarray:
             return da.where(island)
         else:
             return island
 
-    def is_ocean(self, return_xarray=True):
+    def is_ocean(self, return_xarray=False):
         """checks the mask of land and ocean.
 
         Parameters
@@ -1194,7 +1252,7 @@ class MONETAccessorDataset(object):
 
         """
         import global_land_mask as glm
-        da = self.structure_for_monet(self._obj)
+        da = _dataset_to_monet(self._obj)
         isocean = glm.is_ocean(da.latitude.values, da.longitude.values)
         if return_xarray:
             return da.where(isocean)
