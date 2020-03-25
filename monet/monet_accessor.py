@@ -551,7 +551,10 @@ class MONETAccessor(object):
 
 
         """
-        import global_land_mask as glm
+        try:
+            import global_land_mask as glm
+        except ImportError:
+            print('Please install global_land_mask from pypi')
         da = _dataset_to_monet(self._obj)
         island = glm.is_land(da.latitude.values, da.longitude.values)
         if return_xarray:
@@ -574,7 +577,10 @@ class MONETAccessor(object):
 
 
         """
-        import global_land_mask as glm
+        try:
+            import global_land_mask as glm
+        except ImportError:
+            print('Please install global_land_mask from pypi')
         da = _dataset_to_monet(self._obj)
         isocean = glm.is_ocean(da.latitude.values, da.longitude.values)
         if return_xarray:
@@ -1231,7 +1237,10 @@ class MONETAccessorDataset(object):
 
 
         """
-        import global_land_mask as glm
+        try:
+            import global_land_mask as glm
+        except ImportError:
+            print('Please install global_land_mask from pypi')
         da = _dataset_to_monet(self._obj)
         island = glm.is_land(da.latitude.values, da.longitude.values)
         if return_xarray:
@@ -1254,7 +1263,10 @@ class MONETAccessorDataset(object):
 
 
         """
-        import global_land_mask as glm
+        try:
+            import global_land_mask as glm
+        except ImportError:
+            print('Please install global_land_mask from pypi')
         da = _dataset_to_monet(self._obj)
         isocean = glm.is_ocean(da.latitude.values, da.longitude.values)
         if return_xarray:
