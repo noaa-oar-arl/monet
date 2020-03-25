@@ -122,7 +122,7 @@ def _dataset_to_monet(dset,
 
     dset = _rename_to_monet_latlon(dset)
     latlon2d = True
-    #print(len(dset[lat_name].shape))
+    # print(len(dset[lat_name].shape))
     # print(dset)
     if len(dset[lat_name].shape) < 2:
         # print(dset[lat_name].shape)
@@ -427,8 +427,8 @@ class MONETAccessorPandas:
         """
         d1 = self.rename_for_monet(df)
         d2 = self.rename_for_monet(self._obj)
+        # make fake index
         if has_pyresample:
-            #make fake index
             d1 = self._make_fake_index_var(d1)
             ds1 = self._df_to_da(d1)
             ds2 = self._df_to_da(d2)
@@ -437,7 +437,7 @@ class MONETAccessorPandas:
             res = pr.kd_tree.XArrayResamplerNN(
                 source, target, radius_of_influence=radius_of_influence)
             res.get_neighbour_info()
-            #interpolate just the make_fake_index variable
+            # interpolate just the make_fake_index variable
             # print(ds1)
             r = res.get_sample_from_neighbour_info(ds1.monet_fake_index)
             r.name = 'monet_fake_index'
@@ -474,7 +474,7 @@ class MONETAccessorPandas:
 
         """
         df = self._obj
-        cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
+        def cf_to_dt64(x): return pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
         if col is None:  # assume 'time' is the column name to transform
             col = 'time'
         df[col] = df[col].apply(cf_to_dt64)
@@ -597,7 +597,7 @@ class MONETAccessor(object):
         """
         from numpy import vectorize
         da = self._obj
-        cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
+        def cf_to_dt64(x): return pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
         if name is None:  # assume 'time' is the column name to transform
             name = 'time'
         if isinstance(da[name].to_index(), xr.CFTimeIndex):
@@ -1184,7 +1184,7 @@ class MONETAccessor(object):
                     raise RuntimeError
                 if has_pyresample and pyresample:
                     return combine_da_to_df(da, data, **kwargs)
-                else:  #xesmf resample
+                else:  # xesmf resample
                     return combine_da_to_df_xesmf(da,
                                                   data,
                                                   col=col,
@@ -1211,6 +1211,7 @@ class MONETAccessorDataset(object):
         Description of attribute `obj`.
 
     """
+
     def __init__(self, xray_obj):
         self._obj = xray_obj
 
@@ -1276,9 +1277,14 @@ class MONETAccessorDataset(object):
         """
         from numpy import vectorize
         da = self._obj
+<<<<<<< HEAD
         cf_to_dt64 = lambda x: pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
         if name is None:
             # assume 'time' is the column name to transform
+=======
+        def cf_to_dt64(x): return pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
+        if name is None:  # assume 'time' is the column name to transform
+>>>>>>> bbac1ea899661ed1ae94a8286d5500c9c486b2a2
             name = 'time'
         if isinstance(da[name].to_index(), xr.CFTimeIndex):
             # assume cftime

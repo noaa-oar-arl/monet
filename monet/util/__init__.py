@@ -1,7 +1,7 @@
 import numpy as np
 
 #__name__ = 'util'
-#For backward compatability
+# For backward compatability
 from . import combinetool, interp_util, resample
 from . import stats as mystats
 from . import tools
