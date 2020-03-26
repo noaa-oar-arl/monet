@@ -24,7 +24,7 @@ class Mock(MagicMock):
 
 
 #sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../../'))
 # -- Project information -----------------------------------------------------
 
 project = u'MONET'
@@ -56,7 +56,7 @@ extlinks = {
     'pull': ('https://github.com/noaa-oar-arl/MONET/pull/%s', 'PR'),
 }
 
-autosummary_generate = False  # True
+autosummary_generate = True
 numpydoc_class_members_toctree = True
 napoleon_google_docstring = False
 napoleon_use_param = False

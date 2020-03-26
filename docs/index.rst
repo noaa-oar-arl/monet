@@ -62,8 +62,8 @@ Transport Models.” Atmosphere 8, no. 11: 210
    why-monet
    installing
    monet-accessor
-   observations
-   models
+..   observations
+..   models
    tutorial
    monet_wcoss
 
@@ -73,32 +73,6 @@ Get in touch
 - Ask questions, suggest features or view source code `on GitHub`_.
 
 .. _on GitHub: https://github.com/noaa-oar-arl/MONET
-
-
-Supported datasets
-------------------
-
-**Supported Models**
-
-* `HYSPLIT <https://www.ready.noaa.gov/HYSPLIT.php/>`_
-* `CMAQ <https://www.epa.gov/cmaq/>`_
-* `CAMx <http://www.camx.com/about/default.aspx/>`_
-* FV3-CHEM (comming soon)
-* WRF-CHEM (comming soon)
-
-**Supported Observations**
-
-* `AirNow <https://www.airnow.gov/>`_
-* `AQS <https://www.epa.gov/aqs/>`_
-* `AERONET <https://aeronet.gsfc.nasa.gov/>`_
-* `CRN <https://www.ncdc.noaa.gov/crn/>`_
-* `TOLNet <https://www-air.larc.nasa.gov/missions/TOLNet/>`_
-* `CEMS <https://www.epa.gov/emc/emc-continuous-emission-monitoring-systems/>`_
-* `IMPROVE <http://vista.cira.colostate.edu/Improve/>`_
-* `ISH <https://www.ncdc.noaa.gov/isd/>`_
-
-
-
 
 
 **Help & Reference**
