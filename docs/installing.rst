@@ -43,9 +43,9 @@ The simplest way to install MONET is to install it from the conda-forge feedstoc
 This will install all of the dependencies needed by MONET and MONET itself.
 
 xesmf is an optional dependency and can be installed easily from conda-forge,
-Note xesmf is not available on windows due to the dependency on esmpy and esmf.
+Note xesmf is not available on windows due to the dependency on esmpy and esmf.::
 
-    $ conda install -c conda-forge esmpy
+    $ conda install -c conda-forge monet
 
 To install MONET from source code you must install with pip.  This can be done directly
 from the github page::

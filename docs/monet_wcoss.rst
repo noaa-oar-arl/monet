@@ -27,4 +27,4 @@ A prompt should come up and tell you to activate the environment you just create
 
 From here you can install any package the same way you could on regular anaconda installations.
 ::
-  conda install -c bbakernoaa monet 
+  conda install -c conda-forge monet

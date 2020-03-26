@@ -26,15 +26,19 @@ Please site our work.
 What's New
 ^^^^^^^^^^
 
-MONET v2.0 has been released.  MONET has re-engineered the way it deals with
+MONET v2.2.0 has been released.  MONET has re-engineered the way it deals with
 multidimensional observations or model output by using an Xarray Accessor giving
 MONET a flexible and intuitive way of expanding Xarray for multidimensional
 geospatial information commonly used in meteorology, climate and air quality all while
 making it easier on the user to use MONET and add to it.
 
+MONET also underwent a major restructure with v2.2.0. All I/O functions have been
+moved to a sister repository https://github.com/noaa-oar-arl/monetio.  
+
 Features include:
 
   * Xarray Accessor for both xarray.DataArray and xarray.Dataset using the .monet attribute
+  * Pandas Accessor for pandas.DataFrame using the .monet attribute
   * vertical interpolation using python-stratify (https://github.com/SciTools-incubator/python-stratify) using the .monet.stratify function
   * spatial interpolation using .monet.remap including:
     - Nearest neighbor finder
@@ -42,8 +46,9 @@ Features include:
     - Constant longitude interpolation
     - remap DataArray to current grid using pyresample nearest neighbor or xesmf
     - remap entire dataset to current grid using pyresample nearest neighbor or xesmf
+    - find nearest i,j or lat lon
+    - interpolate to constant latitude or longitude
   * Simplified combine tool to combine point source data with multidimensional xarray objects
-  * Pandas accessor for simple functions.
 
 Reference
 ^^^^^^^^^
