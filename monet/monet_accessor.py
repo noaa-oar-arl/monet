@@ -1006,7 +1006,7 @@ class MONETAccessor(object):
 
         sns.set_context('notebook', font_scale=1.2)
         da = _dataset_to_monet(self._obj)
-        da['longitude'] = wrap_longitudes(da.longitude.values)
+        da['longitude'].data = wrap_longitudes(da.longitude.values)
         if 'crs' not in map_kwarg:
             if ~center:
                 central_longitude = float(da.longitude.mean().values)
