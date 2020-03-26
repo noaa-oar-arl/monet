@@ -701,7 +701,7 @@ class MONETAccessor(object):
             has_pyresample = False
         try:
             if rectilinear:
-                dset = self.structure_for_monet()
+                dset = _dataset_to_monet(self._obj)
                 lat = dset.latitude.isel(x=0).values
                 lon = dset.longitude.isel(y=0).values
                 dset['x'] = lon
@@ -721,7 +721,7 @@ class MONETAccessor(object):
                         'y': 'lat'
                     }))
             elif has_pyresample:
-                dset = self.structure_for_monet()
+                dset = _dataset_to_monet(self._obj)
                 lons, lats = utils.check_and_wrap(self._obj.longitude.values,
                                                   self._obj.latitude.values)
                 swath = llsd(longitude=lons, latitude=lats)
@@ -936,7 +936,7 @@ class MONETAccessor(object):
         except RuntimeError:
             print('Must provide latitude and longitude')
 
-        d = self.structure_for_monet(self._obj, return_obj=True)
+        d = _dataset_to_monet(self._obj)
         if has_pyresample:
             lons, lats = utils.check_and_wrap(d.longitude.values,
                                               d.latitude.values)
