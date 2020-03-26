@@ -1003,8 +1003,10 @@ class MONETAccessor(object):
         from .plots import _dynamic_fig_size
         import cartopy.crs as ccrs
         import seaborn as sns
+
         sns.set_context('notebook', font_scale=1.2)
         da = _dataset_to_monet(self._obj)
+        da['longitude'] = wrap_longitudes(da.longitude.values)
         if 'crs' not in map_kwarg:
             if ~center:
                 central_longitude = float(da.longitude.mean().values)
