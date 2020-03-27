@@ -945,7 +945,7 @@ class MONETAccessor(object):
             row, col = utils.generate_nearest_neighbour_linesample_arrays(
                 swath, pswath, **kwargs)
             y, x = row[0][0], col[0][0]
-            return dset.isel(x=x, y=y)
+            return d.isel(x=x, y=y)
         elif has_xesmf:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
             self._obj = rename_latlon(self._obj)
@@ -1003,10 +1003,8 @@ class MONETAccessor(object):
         from .plots import _dynamic_fig_size
         import cartopy.crs as ccrs
         import seaborn as sns
-
         sns.set_context('notebook', font_scale=1.2)
         da = _dataset_to_monet(self._obj)
-        da['longitude'].data = wrap_longitudes(da.longitude.values)
         if 'crs' not in map_kwarg:
             if ~center:
                 central_longitude = float(da.longitude.mean().values)
@@ -1160,7 +1158,6 @@ class MONETAccessor(object):
 
     def combine_point(self,
                       data,
-                      col=None,
                       suffix=None,
                       pyresample=True,
                       **kwargs):
@@ -1188,19 +1185,13 @@ class MONETAccessor(object):
         # point source data
         da = _dataset_to_monet(self._obj)
         if isinstance(data, pd.DataFrame):
-            try:
-                if col is None:
-                    raise RuntimeError
-                if has_pyresample and pyresample:
-                    return combine_da_to_df(da, data, **kwargs)
-                else:  # xesmf resample
-                    return combine_da_to_df_xesmf(da,
-                                                  data,
-                                                  col=col,
-                                                  suffix=suffix,
-                                                  **kwargs)
-            except RuntimeError:
-                print('Must enter col...')
+            if has_pyresample and pyresample:
+                return combine_da_to_df(da, data, **kwargs)
+            else:  # xesmf resample
+                return combine_da_to_df_xesmf(da,
+                                              data,
+                                              suffix=suffix,
+                                              **kwargs)
         else:
             print('d must be either a pd.DataFrame')
 
@@ -1239,10 +1230,7 @@ class MONETAccessorDataset(object):
 
 
         """
-        try:
-            import global_land_mask as glm
-        except ImportError:
-            print('Please install global_land_mask from pypi')
+        import global_land_mask as glm
         da = _dataset_to_monet(self._obj)
         island = glm.is_land(da.latitude.values, da.longitude.values)
         if return_xarray:
@@ -1265,10 +1253,7 @@ class MONETAccessorDataset(object):
 
 
         """
-        try:
-            import global_land_mask as glm
-        except ImportError:
-            print('Please install global_land_mask from pypi')
+        import global_land_mask as glm
         da = _dataset_to_monet(self._obj)
         isocean = glm.is_ocean(da.latitude.values, da.longitude.values)
         if return_xarray:
@@ -1277,59 +1262,28 @@ class MONETAccessorDataset(object):
             return isocean
 
     def cftime_to_datetime64(self, name=None):
-        """Short summary.
+        """Convert cftime o numpy datetime64 objects.
 
         Parameters
         ----------
-        name : type
-            Description of parameter `name`.
+        name : str
+            time variable name.
 
         Returns
         -------
-        type
+        xarray.DataArray
             Description of returned object.
 
         """
         from numpy import vectorize
         da = self._obj
         def cf_to_dt64(x): return pd.to_datetime(x.strftime('%Y-%m-%d %H:%M:%S'))
-        if name is None:
-            # assume 'time' is the column name to transform
+        if name is None:  # assume 'time' is the column name to transform
             name = 'time'
         if isinstance(da[name].to_index(), xr.CFTimeIndex):
             # assume cftime
             da[name] = xr.apply_ufunc(vectorize(cf_to_dt64), da[name])
         return da
-
-    def structure_for_monet(self,
-                            lat_name='lat',
-                            lon_name='lon',
-                            return_obj=True):
-        """This will attempt to restucture a given DataArray for use within MONET.
-
-        Parameters
-        ----------
-        lat_name : type
-            Description of parameter `lat_name`.
-        lon_name : type
-            Description of parameter `lon_name`.
-        return : type
-            Description of parameter `return`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
-        if return_obj:
-            return _dataset_to_monet(self._obj,
-                                     lat_name=lat_name,
-                                     lon_name=lon_name)
-        else:
-            self._obj = _dataset_to_monet(self._obj,
-                                          lat_name=lat_name,
-                                          lon_name=lon_name)
 
     def remap_xesmf(self, data, **kwargs):
         """Short summary.
@@ -1445,7 +1399,6 @@ class MONETAccessorDataset(object):
         -------
         xarray.Dataset or xarray.DataArray
             The interpolated xarray object
-
         """
         from pyresample import utils
         from pyresample import kd_tree
@@ -1570,7 +1523,7 @@ class MONETAccessorDataset(object):
         except RuntimeError:
             print('Must provide latitude and longitude')
 
-        # d = self.structure_for_monet(self._obj, return_obj=True)
+        # d = _dataset_to_monet(self._obj)
         if has_pyresample:
             dset = _dataset_to_monet(self._obj)
             # print(dset)
@@ -1805,15 +1758,19 @@ class MONETAccessorDataset(object):
         except ImportError:
             print('Window functionality is unavailable without pyresample')
 
-    def combine_point(self, data, col=None, suffix=None, **kwargs):
+    def combine_point(self,
+                      data,
+                      suffix=None,
+                      pyresample=True,
+                      **kwargs):
         """Short summary.
 
         Parameters
         ----------
         data : type
             Description of parameter `data`.
-        mapping_table : type
-            Description of parameter `mapping_table`.
+        col : type
+            Description of parameter `col`.
         radius : type
             Description of parameter `radius`.
 
@@ -1823,5 +1780,19 @@ class MONETAccessorDataset(object):
             Description of returned object.
 
         """
-        from .util.combinetool import combine_da_to_df_xesmf
-        return combine_da_to_df_xesmf(self._obj, data, suffix=suffix, **kwargs)
+        if has_pyresample:
+            from .util.combinetool import combine_da_to_df
+        if has_xesmf:
+            from .util.combinetool import combine_da_to_df_xesmf
+        # point source data
+        da = _dataset_to_monet(self._obj)
+        if isinstance(data, pd.DataFrame):
+            if has_pyresample and pyresample:
+                return combine_da_to_df(da, data, **kwargs)
+            else:  # xesmf resample
+                return combine_da_to_df_xesmf(da,
+                                              data,
+                                              suffix=suffix,
+                                              **kwargs)
+        else:
+            print('d must be either a pd.DataFrame')
