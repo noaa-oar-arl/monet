@@ -536,6 +536,33 @@ class MONETAccessor(object):
         """
         self._obj = xray_obj
 
+    def wrap_longitudes(self, lon_name='longitude'):
+        """Ensures longitudes are from -180 -> 180
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        dset = self._obj
+        dset[lon_name] = (dset[lon_name] + 180) % 360 - 180
+        return dset
+
+    def tidy(self, lon_name='longitude'):
+        """Tidy's DataArray–wraps longitudes and sorts lats and lons
+
+        Returns
+        -------
+        xr.DataArray
+            The tidy object
+
+        """
+        d = self._obj
+        wd = d.monet.wrap_longitudes(lon_name=lon_name)
+        wdl = wd.sortby(wd[lon_name])
+        return wdl
+
     def is_land(self, return_xarray=False):
         """checks the mask of land and ocean.
 
@@ -706,7 +733,7 @@ class MONETAccessor(object):
                 lon = dset.longitude.isel(y=0).values
                 dset['x'] = lon
                 dset['y'] = lat
-                dset = dset.drop(['latitude', 'longitude'])
+                # dset = dset.drop(['latitude', 'longitude'])
                 # check if latitude is in the correct order
                 if dset.latitude.isel(x=0).values[0] > dset.latitude.isel(
                         x=0).values[-1]:
@@ -715,46 +742,44 @@ class MONETAccessor(object):
                     lat_max = lat_min_copy
                 d = dset.sel(x=slice(lon_min, lon_max),
                              y=slice(lat_min, lat_max))
-                return monet.coards_to_netcdf(
-                    d.rename({
-                        'x': 'lon',
-                        'y': 'lat'
-                    }))
+                return d
             elif has_pyresample:
                 dset = _dataset_to_monet(self._obj)
-                lons, lats = utils.check_and_wrap(self._obj.longitude.values,
-                                                  self._obj.latitude.values)
+                lons, lats = utils.check_and_wrap(dset.longitude.values,
+                                                  dset.latitude.values)
                 swath = llsd(longitude=lons, latitude=lats)
-                pswath_ll = npsd(longitude=float(lon_min),
-                                 latitude=float(lat_min))
-                pswath_ur = npsd(longitude=float(lon_max),
-                                 latitude=float(lat_max))
-                row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                    swath, pswath_ll, 1e6)
-                y_ll, x_ll = row[0][0], col[0][0]
-                row, col = utils.generate_nearest_neighbour_linesample_arrays(
-                    swath, pswath_ur, 1e6)
-                y_ur, x_ur = row[0][0], col[0][0]
+                x_ll, y_ll = dset.monet.nearest_ij(lat=float(lat_min), lon=float(lon_min))
+                x_ur, y_ur = dset.monet.nearest_ij(lat=float(lat_max), lon=float(lon_max))
+                # pswath_ll = npsd(longitude=float(lon_min),
+                #                  latitude=float(lat_min))
+                # pswath_ur = npsd(longitude=float(lon_max),
+                #                  latitude=float(lat_max))
+                # row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                #     swath, pswath_ll, 1e6)
+                # y_ll, x_ll = row[0][0], col[0][0]
+                # row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                #     swath, pswath_ur, 1e6)
+                # y_ur, x_ur = row[0][0], col[0][0]
                 if x_ur < x_ll:
-                    x1 = self._obj.x.where(self._obj.x >= x_ll,
-                                           drop=True).values
-                    x2 = self._obj.x.where(self._obj.x <= x_ur,
-                                           drop=True).values
+                    x1 = dset.x.where(dset.x >= x_ll,
+                                      drop=True).values
+                    x2 = dset.x.where(dset.x <= x_ur,
+                                      drop=True).values
                     xrange = concatenate([x1, x2]).astype(int)
-                    self._obj['longitude'][:] = utils.wrap_longitudes(
-                        self._obj.longitude.values)
+                    dset['longitude'][:] = utils.wrap_longitudes(
+                        dset.longitude.values)
                     # xrange = arange(float(x_ur), float(x_ll), dtype=int)
                 else:
                     xrange = slice(x_ll, x_ur)
                 if y_ur < y_ll:
-                    y1 = self._obj.y.where(self._obj.y >= y_ll,
-                                           drop=True).values
-                    y2 = self._obj.y.where(self._obj.y <= y_ur,
-                                           drop=True).values
+                    y1 = dset.y.where(dset.y >= y_ll,
+                                      drop=True).values
+                    y2 = dset.y.where(dset.y <= y_ur,
+                                      drop=True).values
                     yrange = concatenate([y1, y2]).astype(int)
                 else:
                     yrange = slice(y_ll, y_ur)
-                return self._obj.isel(x=xrange, y=yrange)
+                return dset.isel(x=xrange, y=yrange)
             else:
                 raise ImportError
         except ImportError:
@@ -809,7 +834,7 @@ class MONETAccessor(object):
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
-            return rename_latlon(out)
+            return _rename_latlon(out)
 
     def interp_constant_lon(self, lon=None, **kwargs):
         """Interpolates the data array to constant longitude.
@@ -850,7 +875,7 @@ class MONETAccessor(object):
                 output = constant_1d_xesmf(latitude=latitude,
                                            longitude=longitude)
                 out = resample_xesmf(self._obj, output, **kwargs)
-                return rename_latlon(out)
+                return _rename_latlon(out)
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Uses pyresample to intepolate to find the i, j index of grid with respect to the given lat lon.
@@ -948,7 +973,7 @@ class MONETAccessor(object):
             return d.isel(x=x, y=y)
         elif has_xesmf:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
-            self._obj = rename_latlon(self._obj)
+            self._obj = _rename_latlon(self._obj)
             target = lonlat_to_xesmf(longitude=lon, latitude=lat)
             output = resample_xesmf(self._obj, target, **kwargs)
             if cleanup:
@@ -956,7 +981,7 @@ class MONETAccessor(object):
                                         target,
                                         cleanup=True,
                                         **kwargs)
-            return rename_latlon(output.squeeze())
+            return _rename_latlon(output.squeeze())
 
     @staticmethod
     def _check_kwargs_and_set_defaults(**kwargs):
@@ -983,12 +1008,62 @@ class MONETAccessor(object):
             kwargs['filename'] = 'monet_xesmf_regrid_file.nc'
         return kwargs
 
-    def quick_map(self, map_kwarg={}, center=True, **kwargs):
+    def quick_imshow(self, map_kws={}, center=True, **kwargs):
         """Creates a quick map view of a given data array.
 
         Parameters
         ----------
-        map_kwarg : dict
+        map_kws : dict
+            kwargs for monet.plots.mapgen.draw_map.
+        **kwargs : dict
+            kwargs for xarray plotting.
+
+        Returns
+        -------
+        matplotlib.axes
+            return of the axes handle for matplotlib.
+
+        """
+        from .plots.mapgen import draw_map
+        from .plots import _dynamic_fig_size
+        import cartopy.crs as ccrs
+        import seaborn as sns
+        sns.set_context('notebook', font_scale=1.2)
+        # da = _dataset_to_monet(self._obj)
+        da = _rename_to_monet_latlon(self._obj)
+        if 'crs' not in map_kws:
+            if ~center:
+                central_longitude = float(da.longitude.mean().values)
+                map_kws['crs'] = ccrs.PlateCarree(
+                    central_longitude=central_longitude)
+            else:
+                map_kws['crs'] = ccrs.PlateCarree()
+        if 'figsize' in kwargs:
+            map_kws['figsize'] = kwargs['figsize']
+            kwargs.pop('figsize', None)
+        else:
+            figsize = _dynamic_fig_size(da)
+            map_kws['figsize'] = figsize
+        if 'extent' in kwargs:
+            kwargs.pop('extent')
+            map_kws['extent'] = [da.longitude.min(), da.longitude.max(), da.latitude.min(), da.latitude.max()]
+        f, ax = draw_map(return_fig=True, **map_kws)
+        ax = da.plot.imshow(x='longitude', y='latitude', ax=ax,
+                     transform=ccrs.PlateCarree(),
+                     **kwargs)
+        try:
+            ax.axes.outline_patch.set_alpha(0)
+        except:
+            ax.outline_patch.set_alpha(0)
+        self._tight_layout()
+        return ax
+
+    def quick_map(self, map_kws={}, center=True, **kwargs):
+        """Creates a quick map view of a given data array.
+
+        Parameters
+        ----------
+        map_kws : dict
             kwargs for monet.plots.mapgen.draw_map.
         **kwargs : dict
             kwargs for xarray plotting.
@@ -1005,20 +1080,23 @@ class MONETAccessor(object):
         import seaborn as sns
         sns.set_context('notebook', font_scale=1.2)
         da = _dataset_to_monet(self._obj)
-        if 'crs' not in map_kwarg:
+        if 'crs' not in map_kws:
             if ~center:
                 central_longitude = float(da.longitude.mean().values)
-                map_kwarg['crs'] = ccrs.PlateCarree(
+                map_kws['crs'] = ccrs.PlateCarree(
                     central_longitude=central_longitude)
             else:
-                map_kwarg['crs'] = ccrs.PlateCarree()
+                map_kws['crs'] = ccrs.PlateCarree()
         if 'figsize' in kwargs:
-            map_kwarg['figsize'] = kwargs['figsize']
+            map_kws['figsize'] = kwargs['figsize']
             kwargs.pop('figsize', None)
         else:
             figsize = _dynamic_fig_size(da)
-            map_kwarg['figsize'] = figsize
-        f, ax = draw_map(return_fig=True, **map_kwarg)
+            map_kws['figsize'] = figsize
+        if 'extent' in kwargs:
+            kwargs.pop('extent')
+            map_kws['extent'] = [da.longitude.min(), da.longitude.max(), da.latitude.min(), da.latitude.max()]
+        f, ax = draw_map(return_fig=True, **map_kws)
         ax = _rename_to_monet_latlon(da).plot(x='longitude',
                                               y='latitude',
                                               ax=ax,
@@ -1148,8 +1226,8 @@ class MONETAccessor(object):
         if has_xesmf:
             from .util import resample
             # check to see if grid is supplied
-            target = rename_latlon(self._obj)
-            source = rename_latlon(dataarray)
+            target = _rename_latlon(self._obj)
+            source = _rename_latlon(dataarray)
             out = resample.resample_xesmf(source,
                                           target,
                                           method=method,
@@ -1198,7 +1276,7 @@ class MONETAccessor(object):
 
 @xr.register_dataset_accessor('monet')
 class MONETAccessorDataset(object):
-    """Short summary.
+    """Monet accessor to the xarray.Dataset.
 
     Parameters
     ----------
@@ -1216,7 +1294,7 @@ class MONETAccessorDataset(object):
         self._obj = xray_obj
 
     def is_land(self, return_xarray=False):
-        """checks the mask of land and ocean.
+        """checks the mask of land and ocean if the global_land_mask libra.
 
         Parameters
         ----------
@@ -1286,7 +1364,7 @@ class MONETAccessorDataset(object):
         return da
 
     def remap_xesmf(self, data, **kwargs):
-        """Short summary.
+        """Resample the xesmf
 
         Parameters
         ----------
@@ -1304,10 +1382,10 @@ class MONETAccessorDataset(object):
         if has_xesmf:
             try:
                 if isinstance(data, xr.DataArray):
-                    data = rename_latlon(data)
+                    data = _rename_latlon(data)
                     self._remap_xesmf_dataarray(data, **kwargs)
                 elif isinstance(data, xr.Dataset):
-                    data = rename_latlon(data)
+                    data = _rename_latlon(data)
                     self._remap_xesmf_dataset(data, **kwargs)
                 else:
                     raise TypeError
@@ -1537,7 +1615,7 @@ class MONETAccessorDataset(object):
             return dset.isel(x=x).isel(y=y)
         elif has_xesmf:
             kwargs = self._check_kwargs_and_set_defaults(**kwargs)
-            self._obj = rename_latlon(self._obj)
+            self._obj = _rename_latlon(self._obj)
             target = lonlat_to_xesmf(longitude=lon, latitude=lat)
             output = resample_xesmf(self._obj, target, **kwargs)
             if cleanup:
@@ -1545,7 +1623,7 @@ class MONETAccessorDataset(object):
                                         target,
                                         cleanup=True,
                                         **kwargs)
-            return rename_latlon(output.squeeze())
+            return _rename_latlon(output.squeeze())
 
     @staticmethod
     def _check_kwargs_and_set_defaults(**kwargs):
@@ -1618,7 +1696,7 @@ class MONETAccessorDataset(object):
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
-            return rename_latlon(out)
+            return _rename_latlon(out)
 
     def interp_constant_lon(self, lon=None, **kwargs):
         """Interpolates the data array to constant longitude.
@@ -1659,7 +1737,7 @@ class MONETAccessorDataset(object):
                 output = constant_1d_xesmf(latitude=latitude,
                                            longitude=longitude)
                 out = resample_xesmf(self._obj, output, **kwargs)
-                return rename_latlon(out)
+                return _rename_latlon(out)
 
     def stratify(self, levels, vertical, axis=1):
         """Short summary.
@@ -1796,3 +1874,30 @@ class MONETAccessorDataset(object):
                                               **kwargs)
         else:
             print('d must be either a pd.DataFrame')
+
+    def wrap_longitudes(self, lon_name='longitude'):
+        """Ensures longitudes are from -180 -> 180
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        dset = self._obj
+        dset[lon_name] = (dset[lon_name] + 180) % 360 - 180
+        return dset
+
+    def tidy(self, lon_name='longitude'):
+        """Tidy's DataArray–wraps longitudes and sorts lats and lons
+
+        Returns
+        -------
+        xr.DataArray
+            The tidy object
+
+        """
+        d = self._obj
+        wd = d.monet.wrap_longitudes(lon_name=lon_name)
+        wdl = wd.sortby(wd[lon_name])
+        return wdl
