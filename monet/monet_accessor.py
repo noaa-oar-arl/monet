@@ -1049,8 +1049,8 @@ class MONETAccessor(object):
             map_kws['extent'] = [da.longitude.min(), da.longitude.max(), da.latitude.min(), da.latitude.max()]
         f, ax = draw_map(return_fig=True, **map_kws)
         ax = da.plot.imshow(x='longitude', y='latitude', ax=ax,
-                     transform=ccrs.PlateCarree(),
-                     **kwargs)
+                            transform=ccrs.PlateCarree(),
+                            **kwargs)
         try:
             ax.axes.outline_patch.set_alpha(0)
         except:
