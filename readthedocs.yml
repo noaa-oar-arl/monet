@@ -3,10 +3,6 @@
 conda:
   file: docs/environment.yml
 python:
-<<<<<<< HEAD
   version: 3.7
   pip_install: true
-=======
-  version: 3.6
-  setup_py_install: true
->>>>>>> 824cd6c151305140397c55b84e890c4e0d702c99
+
