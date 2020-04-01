@@ -1,8 +1,7 @@
-seaborn
-dask
-scipy
+sphinx>=1.4
+sphinx_rtd_theme
 numpy
-pandas
 matplotlib
-xesmf
-pip
+seaborn
+pyresample
+xarray
