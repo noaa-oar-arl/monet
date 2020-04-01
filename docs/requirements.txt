@@ -3,6 +3,7 @@ numpy
 pandas
 xarray
 dask
+pyproj
 cartopy
 matplotlib-base
 seaborn
