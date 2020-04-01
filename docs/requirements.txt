@@ -1,0 +1,8 @@
+seaborn
+dask
+scipy
+numpy
+pandas
+matplotlib
+xesmf
+pip
