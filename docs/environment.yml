@@ -1,0 +1,49 @@
+channels:
+  - conda-forge
+dependencies:
+  - sphinx_rtd_theme==0.1.9
+  - pip
+  - ipython
+  - matplotlib-base
+  - cartopy
+  - dask
+  - xarray
+  - seaborn
+  - python-stratify
+  - pydecorate
+  - xesmf
+  - autodoc
+  - sphinx
+  - nbsphinx
+
+  # - pip:
+  #   - ipython==7.2.0
+  #   - matplotlib==3.0.2
+  #   - seaborn==0.9.0
+  #   - cloud_sptheme
+  #   - sphinx==1.8.2
+  #   - numpydoc==0.8.0
+  #   - sphinx-gallery==0.2.0
+  #   - ipykernel
+  #   - pillow==5.4.1
+  #   - sphinxcontrib-bibtex
+  #   - sphinxcontrib-programoutput
+  #   - nbsphinx
+
+
+# numpy
+# pandas
+# xarray
+# dask
+# pyproj
+# cartopy
+# matplotlib-base
+# seaborn
+# python-stratify
+# pydecorate
+# xesmf
+# autodocdoc
+# ipython
+# nbsphinx
+# sphinx
+# sphinxcontrib-fulltoc
