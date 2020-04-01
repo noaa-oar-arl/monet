@@ -1,3 +1,4 @@
+name: monet
 channels:
   - conda-forge
 dependencies:
@@ -13,4 +14,4 @@ dependencies:
     - xesmf
     - pyresample
     - sphinxcontrib
-    - sphinx 
+    - sphinx
