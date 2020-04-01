@@ -1,8 +1,7 @@
 # .readthedocs.yml
 
 conda:
-  file: docs/environment.yml
+  file: meta.yml
 python:
   version: 3.7
   pip_install: true
-
