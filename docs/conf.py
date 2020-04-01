@@ -23,7 +23,7 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-#sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+# sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
@@ -49,13 +49,15 @@ extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.napoleon',
     'sphinx.ext.extlinks'
 ]
-#exclude_patterns = ['_build', '**.ipynb_checkpoints']
+# exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 extlinks = {
     'issue': ('https://github.com/noaa-oar-arl/MONET/issues/%s', 'GH'),
     'pull': ('https://github.com/noaa-oar-arl/MONET/pull/%s', 'PR'),
 }
-
+nbsphinx_timeout = 600
+nbsphinx_execute = "always"
+nbsphinx_prolog = """
 autosummary_generate = True
 numpydoc_class_members_toctree = True
 napoleon_google_docstring = False
