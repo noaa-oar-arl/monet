@@ -55,17 +55,20 @@ def _force_forder(x):
         return (x, False)
 
 
-def kolmogorov_zurbenko_filter(df, window, iterations):
-    import pandas as pd
+def kolmogorov_zurbenko_filter(df, col, window, iterations):
     """KZ filter implementation
         series is a pandas series
         window is the filter window m in the units of the data (m = 2q+1)
         iterations is the number of times the moving average is evaluated
         """
+    df.index = df.time_local
     z = df.copy()
     for i in range(iterations):
-        z = pd.rolling_mean(z, window=window, min_periods=1, center=True)
-    return z
+         z.index = z.time_local
+         z = z.groupby('siteid')[col].rolling(
+         window, center=True, min_periods=1).mean().reset_index().dropna()
+    df = df.reset_index(drop=True)
+    return df.merge(z, on=['siteid', 'time_local'])
 
 
 def wsdir2uv(ws, wdir):
