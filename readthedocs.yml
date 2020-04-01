@@ -1,7 +1,8 @@
-# .readthedocs.yml
+build:
+    image: latest
 
-conda:
-  file: meta.yml
 python:
-  version: 3.7
-  pip_install: true
+    version: 3.6
+    setup_py_install: true
+
+requirements_file: docs/requirements.txt

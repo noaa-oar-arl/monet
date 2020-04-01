@@ -1,0 +1,17 @@
+python==3.7
+sphinx_rtd_theme==0.1.9
+numpy
+pandas
+xarray
+dask
+cartopy
+matplotlib-base
+seaborn
+python-stratify
+pydecorate
+xesmf
+autodocdoc
+ipython
+nbsphinx
+sphinx
+sphinxcontrib-fulltoc
