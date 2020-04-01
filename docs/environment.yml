@@ -1,18 +1,16 @@
-name: monet
+name: monet-docs
 channels:
   - conda-forge
 dependencies:
   - python==3.7
-  - pip
-  - pip:
-    - numpy
-    - cartopy
-    - dask
-    - xarray
-    - seaborn
-    - python-stratify
-    - pydecorate
-    - xesmf
-    - pyresample
-    - sphinxcontrib
-    - sphinx
+  - cartopy
+  - dask
+  - ipykernel
+  - ipython
+  - nbsphinx
+  - numpy
+  - numpydoc
+  - pandas>=1.0
+  - seaborn
+  - sphinx>=2.3
+  - sphinx_rtd_theme>=0.4

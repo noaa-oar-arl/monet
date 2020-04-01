@@ -1,7 +1,9 @@
-conda:
-    file: docs/environment.yml
+version: 2
 
-python:
-    version: 3.7
-    install:
-      - requirements: docs/requirements.txt
+build:
+    image: latest
+
+conda:
+    environment: docs/environment.yml
+
+formats: []
