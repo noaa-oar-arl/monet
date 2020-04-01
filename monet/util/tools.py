@@ -64,9 +64,9 @@ def kolmogorov_zurbenko_filter(df, col, window, iterations):
     df.index = df.time_local
     z = df.copy()
     for i in range(iterations):
-         z.index = z.time_local
-         z = z.groupby('siteid')[col].rolling(
-         window, center=True, min_periods=1).mean().reset_index().dropna()
+        z.index = z.time_local
+        z = z.groupby('siteid')[col].rolling(
+            window, center=True, min_periods=1).mean().reset_index().dropna()
     df = df.reset_index(drop=True)
     return df.merge(z, on=['siteid', 'time_local'])
 
