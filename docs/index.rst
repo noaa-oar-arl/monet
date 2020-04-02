@@ -69,8 +69,6 @@ Transport Models.” Atmosphere 8, no. 11: 210
    monet-accessor
    monet_wcoss
    tutorial
-..   observations
-..   models
 
 
 
@@ -79,7 +77,7 @@ Get in touch
 
 - Ask questions, suggest features or view source code `on GitHub`_.
 
-.. _on GitHub: https://github.com/noaa-oar-arl/MONET
+.. _on GitHub: https://github.com/noaa-oar-arl/monet
 
 
 **Help & Reference**
