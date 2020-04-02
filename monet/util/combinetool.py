@@ -2,17 +2,14 @@ import xarray as xr
 from numpy import ones
 from pandas import Series, merge_asof
 
-# from ..util import interp_util as interpo
-# from ..obs import epa_util
 
-
-def combine_da_to_df(da, df, col=None, merge=True, **kwargs):
+def combine_da_to_df(da, df, merge=True, **kwargs):
     """This function will combine an xarray data array with spatial information
     point observations in `df`.
 
     Parameters
     ----------
-    da : xr.DataArray
+    da : xr.DataArray or xr.Dataset
         Description of parameter `da`.
     df : pd.DataFrame
         Description of parameter `df`.
@@ -33,20 +30,28 @@ def combine_da_to_df(da, df, col=None, merge=True, **kwargs):
     # except RuntimeError:
     #     print('Must enter column name')
     # dfn = df.dropna(subset=[col])
-    dfnn = df.drop_duplicates(subset=['latitude', 'longitude']).dropna(
-        subset=['latitude', 'longitude'])
+    dfnn = df.drop_duplicates(subset=['siteid']).dropna(
+        subset=['latitude', 'longitude', 'siteid'])
     dfda = dfnn.monet._df_to_da()
     da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
+    da_interped['siteid'] = (('x'), dfnn.siteid)
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
-    drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
+    drop_cols = cols.loc[cols.isin(['x', 'y', 'z', 'latitude', 'longitude'])]
     df_interped.drop(drop_cols, axis=1, inplace=True)
-    if da.name in df.columns:
-        df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
-        # print(df_interped.keys())
+    if isinstance(da, xr.DataArray):
+        if da.name in df.columns:
+            df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
+    else:
+        dup_name = isinname = [name for name in da.data_vars.keys() if name in df.columns]
+        if len(dup_name) > 0:
+            for name in dup_name:
+                df_interped.rename(columns={name: name + '_new'}, inplace=True)
     if merge:
+        df.reset_index(drop=True)
+        df_interped.reset_index(drop=True)
         final_df = df.merge(df_interped,
-                            on=['latitude', 'longitude', 'time'],
+                            on=['time', 'siteid'],
                             how='left')
         return final_df
     else:
@@ -62,7 +67,7 @@ def _rename_latlon(ds):
         return ds
 
 
-def combine_da_to_df_xesmf(da, df, col=None, suffix=None, **kwargs):
+def combine_da_to_df_xesmf(da, df, suffix=None, **kwargs):
     """This function will combine an xarray data array with spatial information
     point observations in `df`.
 

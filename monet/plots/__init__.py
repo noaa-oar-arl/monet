@@ -27,7 +27,7 @@ def _dynamic_fig_size(obj):
     if 'x' in obj.dims:
         nx, ny = len(obj.x), len(obj.y)
         scale = float(ny) / float(nx)
-    elif 'latitude' in obj.dim:
+    elif 'latitude' in obj.dims:
         nx, ny = len(obj.longitude), len(obj.latitude)
         scale = float(ny) / float(nx)
     figsize = (10, 10 * scale)

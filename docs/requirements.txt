@@ -1,0 +1,7 @@
+sphinx>=1.4
+sphinx_rtd_theme
+numpy
+matplotlib
+seaborn
+pyresample
+xarray

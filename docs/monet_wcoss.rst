@@ -2,7 +2,10 @@ Installing on WCOSS
 ===================
 
 If you have access to the NOAA WCOSS machines you can create your own python environments very
-easily using intel-python.  First, it is suggested to create a .condarc file that lives in your `$HOME` folder to point to
+easily using intel-python.::
+  module load ips/19.0.5.281
+
+Then it is suggested to create a .condarc file that lives in your `$HOME` folder to point to
 a location that will house your conda environments.  Below is a sample .condarc file.
 ::
 
@@ -27,4 +30,4 @@ A prompt should come up and tell you to activate the environment you just create
 
 From here you can install any package the same way you could on regular anaconda installations.
 ::
-  conda install -c bbakernoaa monet 
+  conda install -c conda-forge monet

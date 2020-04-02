@@ -6,30 +6,33 @@ Subpackages
 
 .. toctree::
 
-    monet.models
-    monet.obs
+..    monet.models
+..    monet.obs
     monet.plots
     monet.util
-    monet.verification
+    
+..    monet.verification
 
 Submodules
 ----------
 
-monet\.aeronet module
----------------------
+..
+   monet\.aeronet module
+   ---------------------
 
-.. automodule:: monet.aeronet
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   .. automodule:: monet.aeronet
+       :members:
+       :undoc-members:
+       :show-inheritance:
 
-monet\.monet module
--------------------
+..
+   monet\.monet module
+   -------------------
 
-.. automodule:: monet.monet
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   .. automodule:: monet.monet
+       :members:
+       :undoc-members:
+       :show-inheritance:
 
 
 Module contents

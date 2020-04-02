@@ -6,25 +6,33 @@ Subpackages
 
 .. toctree::
 
-    monet.plots
-    monet.util
+   monet.plots
+   monet.util
 
 Submodules
 ----------
 
-monet.monet module
-------------------
+monet.met\_funcs module
+-----------------------
 
-.. automodule:: monet.monet
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. automodule:: monet.met_funcs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+monet.monet\_accessor module
+----------------------------
+
+.. automodule:: monet.monet_accessor
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 
 Module contents
 ---------------
 
 .. automodule:: monet
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
