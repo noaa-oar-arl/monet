@@ -33,7 +33,7 @@ geospatial information commonly used in meteorology, climate and air quality all
 making it easier on the user to use MONET and add to it.
 
 MONET also underwent a major restructure with v2.2.0. All I/O functions have been
-moved to a sister repository https://github.com/noaa-oar-arl/monetio.  
+moved to a sister repository https://github.com/noaa-oar-arl/monetio.
 
 Features include:
 
@@ -67,10 +67,12 @@ Transport Models.” Atmosphere 8, no. 11: 210
    why-monet
    installing
    monet-accessor
+   monet_wcoss
+   tutorial
 ..   observations
 ..   models
-   tutorial
-   monet_wcoss
+
+
 
 Get in touch
 ------------
