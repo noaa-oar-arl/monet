@@ -57,6 +57,20 @@ def _rename_latlon(ds):
         return ds
 
 
+def _monet_to_latlon(da):
+    if isinstance(da, xr.DataArray):
+        dset = da.to_dataset()
+    dset['x'] = da.longitude[0, :].values
+    dset['y'] = da.latitude[:, 0].values
+    dset = dset.drop(['latitude', 'longitude'])
+    dset = dset.set_coords(['x', 'y'])
+    dset = dset.rename({'x': 'lon', 'y': 'lat'})
+    if isinstance(da, xr.DataArray):
+        return dset[da.name]
+    else:
+        return dset
+
+
 def _dataset_to_monet(dset,
                       lat_name='latitude',
                       lon_name='longitude',
@@ -1026,39 +1040,40 @@ class MONETAccessor(object):
         """
         from .plots.mapgen import draw_map
         from .plots import _dynamic_fig_size
+        import matplotlib.pyplot as plt
         import cartopy.crs as ccrs
         import seaborn as sns
         sns.set_context('notebook', font_scale=1.2)
-        # da = _dataset_to_monet(self._obj)
-        da = _rename_to_monet_latlon(self._obj)
+        da = _dataset_to_monet(self._obj)
+        da = _monet_to_latlon(da)
+        crs_p = ccrs.PlateCarree()
         if 'crs' not in map_kws:
-            if ~center:
-                central_longitude = float(da.longitude.mean().values)
-                map_kws['crs'] = ccrs.PlateCarree(
-                    central_longitude=central_longitude)
-            else:
-                map_kws['crs'] = ccrs.PlateCarree()
+            map_kws['crs'] = crs_p
         if 'figsize' in kwargs:
             map_kws['figsize'] = kwargs['figsize']
             kwargs.pop('figsize', None)
         else:
             figsize = _dynamic_fig_size(da)
             map_kws['figsize'] = figsize
-        if 'extent' in kwargs:
-            kwargs.pop('extent')
-            map_kws['extent'] = [da.longitude.min(), da.longitude.max(), da.latitude.min(), da.latitude.max()]
-        f, ax = draw_map(return_fig=True, **map_kws)
-        ax = da.plot.imshow(x='longitude', y='latitude', ax=ax,
-                            transform=ccrs.PlateCarree(),
-                            **kwargs)
+            print(figsize[0], figsize[1])
+        if 'transform' not in kwargs:
+            transform = crs_p
+        else:
+            transform = kwargs['transform']
+            kwargs.pop('transform', None)
+        ax = draw_map(**map_kws)
         try:
             ax.axes.outline_patch.set_alpha(0)
         except:
             ax.outline_patch.set_alpha(0)
-        self._tight_layout()
+        ax = da.plot.imshow(ax=ax,
+                            transform=ccrs.PlateCarree(),
+                            infer_intervals=True,
+                            **kwargs)
+        plt.tight_layout()
         return ax
 
-    def quick_map(self, map_kws={}, center=True, **kwargs):
+    def quick_map(self, map_kws={}, roll_dateline=False ** kwargs):
         """Creates a quick map view of a given data array.
 
         Parameters
@@ -1076,27 +1091,31 @@ class MONETAccessor(object):
         """
         from .plots.mapgen import draw_map
         from .plots import _dynamic_fig_size
+        import matplotlib.pyplot as plt
         import cartopy.crs as ccrs
         import seaborn as sns
-        sns.set_context('notebook', font_scale=1.2)
+        sns.set_context('notebook')
         da = _dataset_to_monet(self._obj)
+        crs_p = ccrs.PlateCarree()
         if 'crs' not in map_kws:
-            if ~center:
-                central_longitude = float(da.longitude.mean().values)
-                map_kws['crs'] = ccrs.PlateCarree(
-                    central_longitude=central_longitude)
-            else:
-                map_kws['crs'] = ccrs.PlateCarree()
+            map_kws['crs'] = crs_p
         if 'figsize' in kwargs:
             map_kws['figsize'] = kwargs['figsize']
             kwargs.pop('figsize', None)
         else:
             figsize = _dynamic_fig_size(da)
             map_kws['figsize'] = figsize
-        if 'extent' in kwargs:
-            kwargs.pop('extent')
-            map_kws['extent'] = [da.longitude.min(), da.longitude.max(), da.latitude.min(), da.latitude.max()]
-        f, ax = draw_map(return_fig=True, **map_kws)
+            print(figsize[0], figsize[1])
+        if 'transform' not in kwargs:
+            transform = crs_p
+        else:
+            transform = kwargs['transform']
+            kwargs.pop('transform', None)
+        ax = draw_map(**map_kws)
+        try:
+            ax.axes.outline_patch.set_alpha(0)
+        except:
+            ax.outline_patch.set_alpha(0)
         ax = _rename_to_monet_latlon(da).plot(x='longitude',
                                               y='latitude',
                                               ax=ax,
@@ -1107,7 +1126,42 @@ class MONETAccessor(object):
             ax.axes.outline_patch.set_alpha(0)
         except:
             ax.outline_patch.set_alpha(0)
-        self._tight_layout()
+        plt.tight_layout()
+        return ax
+
+    def _quick_contourf(self, map_kws={}, roll_dateline=False, **kwargs):
+        from monet.plots.mapgen import draw_map
+        from monet.plots import _dynamic_fig_size
+        import cartopy.crs as ccrs
+        import seaborn as sns
+        sns.set_context('notebook')
+        da = _dataset_to_monet(self._obj)
+        crs_p = ccrs.PlateCarree()
+        if 'crs' not in map_kws:
+            map_kws['crs'] = crs_p
+        if 'figsize' in kwargs:
+            map_kws['figsize'] = kwargs['figsize']
+            kwargs.pop('figsize', None)
+        else:
+            figsize = _dynamic_fig_size(da)
+            map_kws['figsize'] = figsize
+            print(figsize[0], figsize[1])
+        if 'transform' not in kwargs:
+            transform = crs_p
+        else:
+            transform = kwargs['transform']
+            kwargs.pop('transform', None)
+        ax = draw_map(**map_kws)
+        try:
+            ax.axes.outline_patch.set_alpha(0)
+        except:
+            ax.outline_patch.set_alpha(0)
+        if roll_dateline:
+            ax = da.roll(x=int(len(da.x) / 2)).plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
+        else:
+            ax = da.plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
+
+        plt.tight_layout()
         return ax
 
     def _tight_layout(self):
@@ -1743,7 +1797,7 @@ class MONETAccessorDataset(object):
         """Short summary.
 
         Parameters
-        ---------- 
+        ----------
         levels : type
             Description of parameter `levels`.
         vertical : type
