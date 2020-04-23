@@ -1022,7 +1022,7 @@ class MONETAccessor(object):
             kwargs['filename'] = 'monet_xesmf_regrid_file.nc'
         return kwargs
 
-    def quick_imshow(self, map_kws={}, roll_datline=False, **kwargs):
+    def quick_imshow(self, map_kws={}, roll_dateline=False, **kwargs):
         """Creates a quick map view of a given data array.
 
         Parameters
