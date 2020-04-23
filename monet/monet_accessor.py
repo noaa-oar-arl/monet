@@ -1073,7 +1073,7 @@ class MONETAccessor(object):
         plt.tight_layout()
         return ax
 
-    def quick_map(self, map_kws={}, roll_dateline=False ** kwargs):
+    def quick_map(self, map_kws={}, roll_dateline=False, **kwargs):
         """Creates a quick map view of a given data array.
 
         Parameters
