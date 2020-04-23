@@ -1022,7 +1022,7 @@ class MONETAccessor(object):
             kwargs['filename'] = 'monet_xesmf_regrid_file.nc'
         return kwargs
 
-    def quick_imshow(self, map_kws={}, center=True, **kwargs):
+    def quick_imshow(self, map_kws={}, roll_datline=False, **kwargs):
         """Creates a quick map view of a given data array.
 
         Parameters
@@ -1066,10 +1066,10 @@ class MONETAccessor(object):
             ax.axes.outline_patch.set_alpha(0)
         except:
             ax.outline_patch.set_alpha(0)
-        ax = da.plot.imshow(ax=ax,
-                            transform=ccrs.PlateCarree(),
-                            infer_intervals=True,
-                            **kwargs)
+        if roll_dateline:
+            ax = da.roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
+        else:
+            ax = da.plot.imshow(ax=ax, transform=transform, **kwargs)
         plt.tight_layout()
         return ax
 
@@ -1116,12 +1116,10 @@ class MONETAccessor(object):
             ax.axes.outline_patch.set_alpha(0)
         except:
             ax.outline_patch.set_alpha(0)
-        ax = _rename_to_monet_latlon(da).plot(x='longitude',
-                                              y='latitude',
-                                              ax=ax,
-                                              transform=ccrs.PlateCarree(),
-                                              infer_intervals=True,
-                                              **kwargs)
+        if roll_dateline:
+            ax = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(x='longitude', y='latitude', ax=ax, transform=crs_p, **kwargs)
+        else:
+            ax = da.plot(x='longitude', y='latitude', ax=ax, transform=crs_p, **kwargs)
         try:
             ax.axes.outline_patch.set_alpha(0)
         except:
@@ -1129,9 +1127,10 @@ class MONETAccessor(object):
         plt.tight_layout()
         return ax
 
-    def _quick_contourf(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_contourf(self, map_kws={}, roll_dateline=False, **kwargs):
         from monet.plots.mapgen import draw_map
         from monet.plots import _dynamic_fig_size
+        import matplotlib.pyplot as plt
         import cartopy.crs as ccrs
         import seaborn as sns
         sns.set_context('notebook')
@@ -1157,7 +1156,7 @@ class MONETAccessor(object):
         except:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax = da.roll(x=int(len(da.x) / 2)).plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
+            ax = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
         else:
             ax = da.plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
 
