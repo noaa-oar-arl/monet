@@ -1126,7 +1126,8 @@ class MONETAccessor(object):
         except:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(x='longitude', y='latitude', ax=ax, transform=crs_p, **kwargs)
+            ax = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(x='longitude',
+                                                                      y='latitude', ax=ax, transform=crs_p, **kwargs)
         else:
             ax = da.plot(x='longitude', y='latitude', ax=ax, transform=crs_p, **kwargs)
         try:
@@ -1184,7 +1185,8 @@ class MONETAccessor(object):
         except:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax1 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
+            ax1 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(x='longitude',
+                                                                                y='latitude', ax=ax, transform=transform, **kwargs)
         else:
             ax1 = da.plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
 
