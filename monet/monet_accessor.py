@@ -1069,7 +1069,7 @@ class MONETAccessor(object):
         ax = draw_map(**map_kws)
         try:
             ax.axes.outline_patch.set_alpha(0)
-        except:
+        except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
             ax = da.roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
@@ -1123,16 +1123,12 @@ class MONETAccessor(object):
         ax = draw_map(**map_kws)
         try:
             ax.axes.outline_patch.set_alpha(0)
-        except:
+        except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
             ax = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(x='longitude', y='latitude', ax=ax, transform=crs_p, **kwargs)
         else:
             ax = da.plot(x='longitude', y='latitude', ax=ax, transform=crs_p, **kwargs)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except:
-            ax.outline_patch.set_alpha(0)
         plt.tight_layout()
         return ax
 
@@ -1181,7 +1177,7 @@ class MONETAccessor(object):
         ax = draw_map(**map_kws)
         try:
             ax.axes.outline_patch.set_alpha(0)
-        except:
+        except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
             ax1 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
