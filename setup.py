@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='monet',
-      version='2.2.0',
+      version='2.2.1',
       url='https://github.com/noaa-oar-arl/MONET',
       license='MIT',
       include_package_data=True,
