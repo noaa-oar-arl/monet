@@ -57,6 +57,20 @@ def _rename_latlon(ds):
         return ds
 
 
+def _monet_to_latlon(da):
+    if isinstance(da, xr.DataArray):
+        dset = da.to_dataset()
+    dset['x'] = da.longitude[0, :].values
+    dset['y'] = da.latitude[:, 0].values
+    dset = dset.drop(['latitude', 'longitude'])
+    dset = dset.set_coords(['x', 'y'])
+    dset = dset.rename({'x': 'lon', 'y': 'lat'})
+    if isinstance(da, xr.DataArray):
+        return dset[da.name]
+    else:
+        return dset
+
+
 def _dataset_to_monet(dset,
                       lat_name='latitude',
                       lon_name='longitude',
@@ -826,11 +840,11 @@ class MONETAccessor(object):
         latitude = ones(longitude.shape) * asarray(lat)
         if has_pyresample:
             d2 = xr.DataArray(ones((len(longitude), len(longitude))),
-                              dims=['lat', 'lon'],
+                              dims=['lon', 'lat'],
                               coords=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
-            return result.isel(x=0)
+            return result.isel(y=0)
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
@@ -870,7 +884,7 @@ class MONETAccessor(object):
                                   coords=[longitude, latitude])
                 d2 = _dataset_to_monet(d2)
                 result = d2.monet.remap_nearest(d1)
-                return result.isel(y=0)
+                return result.isel(x=0)
             elif has_xesmf:
                 output = constant_1d_xesmf(latitude=latitude,
                                            longitude=longitude)
@@ -1008,106 +1022,179 @@ class MONETAccessor(object):
             kwargs['filename'] = 'monet_xesmf_regrid_file.nc'
         return kwargs
 
-    def quick_imshow(self, map_kws={}, center=True, **kwargs):
-        """Creates a quick map view of a given data array.
+    def quick_imshow(self, map_kws={}, roll_dateline=False, **kwargs):
+        """This function takes an xarray DataArray and quickly cerates a figure
+        using cartopy and the matplotlib imshow.  Note that this should only be used for
+        regular grids.
 
         Parameters
         ----------
-        map_kws : dict
-            kwargs for monet.plots.mapgen.draw_map.
-        **kwargs : dict
-            kwargs for xarray plotting.
+        map_kws : dictionary
+            kwargs for monet.plots.mapgen.draw_map
+        roll_dateline : bool
+            roll_dateline is meant to help with global datasets that the longitudes
+            range from 0 to 360 instead of -180 to 180.  Otherwise a white line appears
+            at 0 degrees.
+        **kwargs :
+            kwargs for the xarray.DataArray.plot.imshow function
 
         Returns
         -------
         matplotlib.axes
-            return of the axes handle for matplotlib.
+            axes
 
         """
         from .plots.mapgen import draw_map
         from .plots import _dynamic_fig_size
-        import cartopy.crs as ccrs
-        import seaborn as sns
-        sns.set_context('notebook', font_scale=1.2)
-        # da = _dataset_to_monet(self._obj)
-        da = _rename_to_monet_latlon(self._obj)
-        if 'crs' not in map_kws:
-            if ~center:
-                central_longitude = float(da.longitude.mean().values)
-                map_kws['crs'] = ccrs.PlateCarree(
-                    central_longitude=central_longitude)
-            else:
-                map_kws['crs'] = ccrs.PlateCarree()
-        if 'figsize' in kwargs:
-            map_kws['figsize'] = kwargs['figsize']
-            kwargs.pop('figsize', None)
-        else:
-            figsize = _dynamic_fig_size(da)
-            map_kws['figsize'] = figsize
-        if 'extent' in kwargs:
-            kwargs.pop('extent')
-            map_kws['extent'] = [da.longitude.min(), da.longitude.max(), da.latitude.min(), da.latitude.max()]
-        f, ax = draw_map(return_fig=True, **map_kws)
-        ax = da.plot.imshow(x='longitude', y='latitude', ax=ax,
-                            transform=ccrs.PlateCarree(),
-                            **kwargs)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except:
-            ax.outline_patch.set_alpha(0)
-        self._tight_layout()
-        return ax
-
-    def quick_map(self, map_kws={}, center=True, **kwargs):
-        """Creates a quick map view of a given data array.
-
-        Parameters
-        ----------
-        map_kws : dict
-            kwargs for monet.plots.mapgen.draw_map.
-        **kwargs : dict
-            kwargs for xarray plotting.
-
-        Returns
-        -------
-        matplotlib.axes
-            return of the axes handle for matplotlib.
-
-        """
-        from .plots.mapgen import draw_map
-        from .plots import _dynamic_fig_size
+        import matplotlib.pyplot as plt
         import cartopy.crs as ccrs
         import seaborn as sns
         sns.set_context('notebook', font_scale=1.2)
         da = _dataset_to_monet(self._obj)
+        da = _monet_to_latlon(da)
+        crs_p = ccrs.PlateCarree()
         if 'crs' not in map_kws:
-            if ~center:
-                central_longitude = float(da.longitude.mean().values)
-                map_kws['crs'] = ccrs.PlateCarree(
-                    central_longitude=central_longitude)
-            else:
-                map_kws['crs'] = ccrs.PlateCarree()
+            map_kws['crs'] = crs_p
         if 'figsize' in kwargs:
             map_kws['figsize'] = kwargs['figsize']
             kwargs.pop('figsize', None)
         else:
             figsize = _dynamic_fig_size(da)
             map_kws['figsize'] = figsize
-        if 'extent' in kwargs:
-            kwargs.pop('extent')
-            map_kws['extent'] = [da.longitude.min(), da.longitude.max(), da.latitude.min(), da.latitude.max()]
-        f, ax = draw_map(return_fig=True, **map_kws)
-        ax = _rename_to_monet_latlon(da).plot(x='longitude',
-                                              y='latitude',
-                                              ax=ax,
-                                              transform=ccrs.PlateCarree(),
-                                              infer_intervals=True,
-                                              **kwargs)
+        if 'transform' not in kwargs:
+            transform = crs_p
+        else:
+            transform = kwargs['transform']
+            kwargs.pop('transform', None)
+        ax = draw_map(**map_kws)
         try:
             ax.axes.outline_patch.set_alpha(0)
-        except:
+        except AttributeError:
             ax.outline_patch.set_alpha(0)
-        self._tight_layout()
+        if roll_dateline:
+            ax = da.roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax,
+                                                                                 transform=transform,
+                                                                                 **kwargs)
+        else:
+            ax = da.plot.imshow(ax=ax, transform=transform, **kwargs)
+        plt.tight_layout()
+        return ax
+
+    def quick_map(self, map_kws={}, roll_dateline=False, **kwargs):
+        """This function takes an xarray DataArray and quickly cerates a figure
+        using cartopy and the matplotlib pcolormesh
+
+        Parameters
+        ----------
+        map_kws : dictionary
+            kwargs for monet.plots.mapgen.draw_map
+        roll_dateline : bool
+            roll_dateline is meant to help with global datasets that the longitudes
+            range from 0 to 360 instead of -180 to 180.  Otherwise a white line appears
+            at 0 degrees.
+        **kwargs :
+            kwargs for the xarray.DataArray.plot.pcolormesh function
+
+        Returns
+        -------
+        matplotlib.axes
+            axes
+
+        """
+        from .plots.mapgen import draw_map
+        from .plots import _dynamic_fig_size
+        import matplotlib.pyplot as plt
+        import cartopy.crs as ccrs
+        import seaborn as sns
+        sns.set_context('notebook')
+        da = _dataset_to_monet(self._obj)
+        crs_p = ccrs.PlateCarree()
+        if 'crs' not in map_kws:
+            map_kws['crs'] = crs_p
+        if 'figsize' in kwargs:
+            map_kws['figsize'] = kwargs['figsize']
+            kwargs.pop('figsize', None)
+        else:
+            figsize = _dynamic_fig_size(da)
+            map_kws['figsize'] = figsize
+        if 'transform' not in kwargs:
+            transform = crs_p
+        else:
+            transform = kwargs['transform']
+            kwargs.pop('transform', None)
+        ax = draw_map(**map_kws)
+        try:
+            ax.axes.outline_patch.set_alpha(0)
+        except AttributeError:
+            ax.outline_patch.set_alpha(0)
+        if roll_dateline:
+            ax = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(x='longitude',
+                                                                      y='latitude',
+                                                                      ax=ax,
+                                                                      transform=crs_p,
+                                                                      **kwargs)
+        else:
+            ax = da.plot(x='longitude', y='latitude', ax=ax, transform=crs_p, **kwargs)
+        plt.tight_layout()
+        return ax
+
+    def quick_contourf(self, map_kws={}, roll_dateline=False, **kwargs):
+        """This function takes an xarray DataArray and quickly cerates a figure
+        using cartopy and the matplotlib contourf
+
+        Parameters
+        ----------
+        map_kws : dictionary
+            kwargs for monet.plots.mapgen.draw_map
+        roll_dateline : bool
+            roll_dateline is meant to help with global datasets that the longitudes
+            range from 0 to 360 instead of -180 to 180.  Otherwise a white line appears
+            at 0 degrees.
+        **kwargs :
+            kwargs for the xarray.DataArray.plot.contourf function
+
+        Returns
+        -------
+        type
+            axes
+
+        """
+        from monet.plots.mapgen import draw_map
+        from monet.plots import _dynamic_fig_size
+        import matplotlib.pyplot as plt
+        import cartopy.crs as ccrs
+        import seaborn as sns
+        sns.set_context('notebook')
+        da = _dataset_to_monet(self._obj)
+        crs_p = ccrs.PlateCarree()
+        if 'crs' not in map_kws:
+            map_kws['crs'] = crs_p
+        if 'figsize' in kwargs:
+            map_kws['figsize'] = kwargs['figsize']
+            kwargs.pop('figsize', None)
+        else:
+            figsize = _dynamic_fig_size(da)
+            map_kws['figsize'] = figsize
+        if 'transform' not in kwargs:
+            transform = crs_p
+        else:
+            transform = kwargs['transform']
+            kwargs.pop('transform', None)
+        ax = draw_map(**map_kws)
+        try:
+            ax.axes.outline_patch.set_alpha(0)
+        except AttributeError:
+            ax.outline_patch.set_alpha(0)
+        if roll_dateline:
+            ax1 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(x='longitude',
+                                                                                y='latitude',
+                                                                                ax=ax,
+                                                                                transform=transform,
+                                                                                **kwargs)
+        else:
+            ax1 = da.plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
+
+        plt.tight_layout()
         return ax
 
     def _tight_layout(self):
@@ -1688,11 +1775,11 @@ class MONETAccessorDataset(object):
         latitude = ones(longitude.shape) * asarray(lat)
         if has_pyresample:
             d2 = xr.DataArray(ones((len(longitude), len(longitude))),
-                              dims=['lat', 'lon'],
+                              dims=['lon', 'lat'],
                               coords=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
-            return result.isel(x=0)
+            return result.isel(y=0)
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
@@ -1732,7 +1819,7 @@ class MONETAccessorDataset(object):
                                   coords=[longitude, latitude])
                 d2 = _dataset_to_monet(d2)
                 result = d2.monet.remap_nearest(d1)
-                return result.isel(y=0)
+                return result.isel(x=0)
             elif has_xesmf:
                 output = constant_1d_xesmf(latitude=latitude,
                                            longitude=longitude)
