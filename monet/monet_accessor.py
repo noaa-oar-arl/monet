@@ -826,11 +826,11 @@ class MONETAccessor(object):
         latitude = ones(longitude.shape) * asarray(lat)
         if has_pyresample:
             d2 = xr.DataArray(ones((len(longitude), len(longitude))),
-                              dims=['lat', 'lon'],
+                              dims=['lon', 'lat'],
                               coords=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
-            return result.isel(x=0)
+            return result.isel(y=0)
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
@@ -870,7 +870,7 @@ class MONETAccessor(object):
                                   coords=[longitude, latitude])
                 d2 = _dataset_to_monet(d2)
                 result = d2.monet.remap_nearest(d1)
-                return result.isel(y=0)
+                return result.isel(x=0)
             elif has_xesmf:
                 output = constant_1d_xesmf(latitude=latitude,
                                            longitude=longitude)
@@ -1688,11 +1688,11 @@ class MONETAccessorDataset(object):
         latitude = ones(longitude.shape) * asarray(lat)
         if has_pyresample:
             d2 = xr.DataArray(ones((len(longitude), len(longitude))),
-                              dims=['lat', 'lon'],
+                              dims=['lon', 'lat'],
                               coords=[longitude, latitude])
             d2 = _dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
-            return result.isel(x=0)
+            return result.isel(y=0)
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
@@ -1732,7 +1732,7 @@ class MONETAccessorDataset(object):
                                   coords=[longitude, latitude])
                 d2 = _dataset_to_monet(d2)
                 result = d2.monet.remap_nearest(d1)
-                return result.isel(y=0)
+                return result.isel(x=0)
             elif has_xesmf:
                 output = constant_1d_xesmf(latitude=latitude,
                                            longitude=longitude)
@@ -1743,7 +1743,7 @@ class MONETAccessorDataset(object):
         """Short summary.
 
         Parameters
-        ----------
+        ---------- 
         levels : type
             Description of parameter `levels`.
         vertical : type
