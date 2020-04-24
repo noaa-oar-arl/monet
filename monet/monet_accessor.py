@@ -1072,7 +1072,9 @@ class MONETAccessor(object):
         except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax = da.roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
+            ax = da.roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax,
+                                                                                 transform=transform,
+                                                                                 **kwargs)
         else:
             ax = da.plot.imshow(ax=ax, transform=transform, **kwargs)
         plt.tight_layout()
@@ -1127,7 +1129,10 @@ class MONETAccessor(object):
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
             ax = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(x='longitude',
-                                                                      y='latitude', ax=ax, transform=crs_p, **kwargs)
+                                                                      y='latitude',
+                                                                      ax=ax,
+                                                                      transform=crs_p,
+                                                                      **kwargs)
         else:
             ax = da.plot(x='longitude', y='latitude', ax=ax, transform=crs_p, **kwargs)
         plt.tight_layout()
@@ -1182,7 +1187,10 @@ class MONETAccessor(object):
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
             ax1 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(x='longitude',
-                                                                                y='latitude', ax=ax, transform=transform, **kwargs)
+                                                                                y='latitude',
+                                                                                ax=ax,
+                                                                                transform=transform,
+                                                                                **kwargs)
         else:
             ax1 = da.plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
 
