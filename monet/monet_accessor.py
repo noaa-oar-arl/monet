@@ -1023,19 +1023,25 @@ class MONETAccessor(object):
         return kwargs
 
     def quick_imshow(self, map_kws={}, roll_dateline=False, **kwargs):
-        """Creates a quick map view of a given data array.
+        """This function takes an xarray DataArray and quickly cerates a figure
+        using cartopy and the matplotlib imshow.  Note that this should only be used for
+        regular grids.
 
         Parameters
         ----------
-        map_kws : dict
-            kwargs for monet.plots.mapgen.draw_map.
-        **kwargs : dict
-            kwargs for xarray plotting.
+        map_kws : dictionary
+            kwargs for monet.plots.mapgen.draw_map
+        roll_dateline : bool
+            roll_dateline is meant to help with global datasets that the longitudes
+            range from 0 to 360 instead of -180 to 180.  Otherwise a white line appears
+            at 0 degrees.
+        **kwargs :
+            kwargs for the xarray.DataArray.plot.imshow function
 
         Returns
         -------
         matplotlib.axes
-            return of the axes handle for matplotlib.
+            axes
 
         """
         from .plots.mapgen import draw_map
@@ -1055,7 +1061,6 @@ class MONETAccessor(object):
         else:
             figsize = _dynamic_fig_size(da)
             map_kws['figsize'] = figsize
-            print(figsize[0], figsize[1])
         if 'transform' not in kwargs:
             transform = crs_p
         else:
@@ -1074,19 +1079,24 @@ class MONETAccessor(object):
         return ax
 
     def quick_map(self, map_kws={}, roll_dateline=False, **kwargs):
-        """Creates a quick map view of a given data array.
+        """This function takes an xarray DataArray and quickly cerates a figure
+        using cartopy and the matplotlib pcolormesh
 
         Parameters
         ----------
-        map_kws : dict
-            kwargs for monet.plots.mapgen.draw_map.
-        **kwargs : dict
-            kwargs for xarray plotting.
+        map_kws : dictionary
+            kwargs for monet.plots.mapgen.draw_map
+        roll_dateline : bool
+            roll_dateline is meant to help with global datasets that the longitudes
+            range from 0 to 360 instead of -180 to 180.  Otherwise a white line appears
+            at 0 degrees.
+        **kwargs :
+            kwargs for the xarray.DataArray.plot.pcolormesh function
 
         Returns
         -------
         matplotlib.axes
-            return of the axes handle for matplotlib.
+            axes
 
         """
         from .plots.mapgen import draw_map
@@ -1105,7 +1115,6 @@ class MONETAccessor(object):
         else:
             figsize = _dynamic_fig_size(da)
             map_kws['figsize'] = figsize
-            print(figsize[0], figsize[1])
         if 'transform' not in kwargs:
             transform = crs_p
         else:
@@ -1128,6 +1137,26 @@ class MONETAccessor(object):
         return ax
 
     def quick_contourf(self, map_kws={}, roll_dateline=False, **kwargs):
+        """This function takes an xarray DataArray and quickly cerates a figure
+        using cartopy and the matplotlib contourf
+
+        Parameters
+        ----------
+        map_kws : dictionary
+            kwargs for monet.plots.mapgen.draw_map
+        roll_dateline : bool
+            roll_dateline is meant to help with global datasets that the longitudes
+            range from 0 to 360 instead of -180 to 180.  Otherwise a white line appears
+            at 0 degrees.
+        **kwargs :
+            kwargs for the xarray.DataArray.plot.contourf function
+
+        Returns
+        -------
+        type
+            axes
+
+        """
         from monet.plots.mapgen import draw_map
         from monet.plots import _dynamic_fig_size
         import matplotlib.pyplot as plt
@@ -1144,7 +1173,6 @@ class MONETAccessor(object):
         else:
             figsize = _dynamic_fig_size(da)
             map_kws['figsize'] = figsize
-            print(figsize[0], figsize[1])
         if 'transform' not in kwargs:
             transform = crs_p
         else:
@@ -1156,9 +1184,9 @@ class MONETAccessor(object):
         except:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
+            ax1 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
         else:
-            ax = da.plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
+            ax1 = da.plot.contourf(x='longitude', y='latitude', ax=ax, transform=transform, **kwargs)
 
         plt.tight_layout()
         return ax
