@@ -6,32 +6,25 @@ import matplotlib.pyplot as plt
 from numpy import arange, linspace, vstack
 
 
-def colorbar_index(ncolors,
-                   cmap,
-                   minval=None,
-                   maxval=None,
-                   dtype='int',
-                   basemap=None):
+def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype="int", basemap=None):
     import matplotlib.cm as cm
     import numpy as np
+
     cmap = cmap_discretize(cmap, ncolors)
     mappable = cm.ScalarMappable(cmap=cmap)
     mappable.set_array([])
     mappable.set_clim(-0.5, ncolors + 0.5)
     if basemap is not None:
-        colorbar = basemap.colorbar(mappable, format='%1.2g')
+        colorbar = basemap.colorbar(mappable, format="%1.2g")
     else:
-        colorbar = plt.colorbar(mappable, format='%1.2g', fontsize=12)
+        colorbar = plt.colorbar(mappable, format="%1.2g", fontsize=12)
     colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
     if (minval is None) & (maxval is not None):
-        colorbar.set_ticklabels(
-            np.around(np.linspace(0, maxval, ncolors).astype(dtype), 2))
+        colorbar.set_ticklabels(np.around(np.linspace(0, maxval, ncolors).astype(dtype), 2))
     elif (minval is None) & (maxval is None):
-        colorbar.set_ticklabels(
-            np.around(np.linspace(0, ncolors, ncolors).astype(dtype), 2))
+        colorbar.set_ticklabels(np.around(np.linspace(0, ncolors, ncolors).astype(dtype), 2))
     else:
-        colorbar.set_ticklabels(
-            np.around(np.linspace(minval, maxval, ncolors).astype(dtype), 2))
+        colorbar.set_ticklabels(np.around(np.linspace(minval, maxval, ncolors).astype(dtype), 2))
 
     return colorbar, cmap
 
@@ -53,15 +46,15 @@ def cmap_discretize(cmap, N):
 
     if type(cmap) == str:
         cmap = plt.get_cmap(cmap)
-    colors_i = np.concatenate((np.linspace(0, 1., N), (0., 0., 0., 0.)))
+    colors_i = np.concatenate((np.linspace(0, 1.0, N), (0.0, 0.0, 0.0, 0.0)))
     colors_rgba = cmap(colors_i)
-    indices = np.linspace(0, 1., N + 1)
+    indices = np.linspace(0, 1.0, N + 1)
     cdict = {}
-    for ki, key in enumerate(('red', 'green', 'blue')):
-        cdict[key] = [(indices[i], colors_rgba[i - 1, ki], colors_rgba[i, ki])
-                      for i in range(N + 1)]
+    for ki, key in enumerate(("red", "green", "blue")):
+        cdict[key] = [(indices[i], colors_rgba[i - 1, ki], colors_rgba[i, ki]) for i in range(N + 1)]
     # Return colormap object.
     return mcolors.LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)
+
 
 # def o3cmap():
 #     import matplotlib.cm as cm

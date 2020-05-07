@@ -12,7 +12,7 @@ import seaborn as sns
 __version__ = "Time-stamp: <2012-02-17 20:59:35 ycopin>"
 __author__ = "Yannick Copin <yannick.copin@laposte.net>"
 
-colors = ['#DA70D6', '#228B22', '#FA8072', '#FF1493']
+colors = ["#DA70D6", "#228B22", "#FA8072", "#FF1493"]
 sns.set_palette(sns.color_palette(colors))
 
 
@@ -22,7 +22,7 @@ class TaylorDiagram(object):
     r=stddev and theta=arccos(correlation).
     """
 
-    def __init__(self, refstd, scale=1.5, fig=None, rect=111, label='_'):
+    def __init__(self, refstd, scale=1.5, fig=None, rect=111, label="_"):
         """Set up Taylor diagram axes, i.e. single quadrant polar
         plot, using mpl_toolkits.axisartist.floating_axes. refstd is
         the reference standard deviation to be compared to.
@@ -37,7 +37,7 @@ class TaylorDiagram(object):
         tr = PolarAxes.PolarTransform()
 
         # Correlation labels
-        rlocs = NP.concatenate((NP.arange(10) / 10., [0.95, 0.99]))
+        rlocs = NP.concatenate((NP.arange(10) / 10.0, [0.95, 0.99]))
         tlocs = NP.arccos(rlocs)  # Conversion to polar angles
         gl1 = GF.FixedLocator(tlocs)  # Positions
         tf1 = GF.DictFormatter(dict(list(zip(tlocs, list(map(str, rlocs))))))
@@ -45,16 +45,7 @@ class TaylorDiagram(object):
         # Standard deviation axis extent
         self.smin = 0
         self.smax = scale * self.refstd
-        ghelper = FA.GridHelperCurveLinear(
-            tr,
-            extremes=(
-                0,
-                NP.pi / 2,  # 1st quadrant
-                self.smin,
-                self.smax),
-            grid_locator1=gl1,
-            tick_formatter1=tf1,
-        )
+        ghelper = FA.GridHelperCurveLinear(tr, extremes=(0, NP.pi / 2, self.smin, self.smax), grid_locator1=gl1, tick_formatter1=tf1,)  # 1st quadrant
 
         if fig is None:
             fig = PLT.figure()
@@ -86,16 +77,10 @@ class TaylorDiagram(object):
 
         # Add reference point and stddev contour
         print("Reference std:", self.refstd)
-        l, = self.ax.plot([0],
-                          self.refstd,
-                          'r*',
-                          ls='',
-                          ms=14,
-                          label=label,
-                          zorder=10)
+        (l,) = self.ax.plot([0], self.refstd, "r*", ls="", ms=14, label=label, zorder=10)
         t = NP.linspace(0, NP.pi / 2)
         r = NP.zeros_like(t) + self.refstd
-        self.ax.plot(t, r, 'k--', label='_')
+        self.ax.plot(t, r, "k--", label="_")
 
         # Collect sample points for latter use (e.g. legend)
         self.samplePoints = [l]
@@ -104,8 +89,7 @@ class TaylorDiagram(object):
         """Add sample (stddev,corrcoeff) to the Taylor diagram. args
         and kwargs are directly propagated to the Figure.plot
         command."""
-        l, = self.ax.plot(NP.arccos(corrcoef), stddev, *args,
-                          **kwargs)  # (theta,radius)
+        (l,) = self.ax.plot(NP.arccos(corrcoef), stddev, *args, **kwargs)  # (theta,radius)
         self.samplePoints.append(l)
 
         return l
@@ -113,11 +97,9 @@ class TaylorDiagram(object):
     def add_contours(self, levels=5, **kwargs):
         """Add constant centered RMS difference contours."""
 
-        rs, ts = NP.meshgrid(
-            NP.linspace(self.smin, self.smax), NP.linspace(0, NP.pi / 2))
+        rs, ts = NP.meshgrid(NP.linspace(self.smin, self.smax), NP.linspace(0, NP.pi / 2))
         # Compute centered RMS difference
-        rms = NP.sqrt(self.refstd**2 + rs**2 -
-                      2 * self.refstd * rs * NP.cos(ts))
+        rms = NP.sqrt(self.refstd ** 2 + rs ** 2 - 2 * self.refstd * rs * NP.cos(ts))
 
         contours = self.ax.contour(ts, rs, rms, levels, **kwargs)
 

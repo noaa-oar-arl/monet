@@ -1,12 +1,14 @@
 try:
     from pyresample.kd_tree import XArrayResamplerNN
     from pyresample.geometry import SwathDefinition, AreaDefinition
+
     has_pyresample = True
 except ImportError:
-    print('PyResample not installed.  Some functionality will be lost')
+    print("PyResample not installed.  Some functionality will be lost")
     has_pyresample = False
 try:
     import xesmf
+
     has_xesmf = True
 except ImportError:
     has_xesmf = False
@@ -27,11 +29,12 @@ def _ensure_swathdef_compatability(defin):
 
     """
     import xarray as xr
+
     if isinstance(defin.lons, xr.DataArray):
         return defin  # do nothing
     else:
-        defin.lons = xr.DataArray(defin.lons, dims=['y', 'x']).chunk()
-        defin.lats = xr.DataArray(defin.lons, dims=['y', 'x']).chunk()
+        defin.lons = xr.DataArray(defin.lons, dims=["y", "x"]).chunk()
+        defin.lats = xr.DataArray(defin.lons, dims=["y", "x"]).chunk()
         return defin
 
 
@@ -58,8 +61,7 @@ def _check_swath_or_area(defin):
         else:
             raise RuntimeError
     except RuntimeError:
-        print('grid definition must be a pyresample SwathDefinition or '
-              'AreaDefinition')
+        print("grid definition must be a pyresample SwathDefinition or " "AreaDefinition")
         return
     return newswath
 
@@ -84,28 +86,26 @@ def _reformat_resampled_data(orig, new, target_grid):
     """
     target_lon, target_lat = target_grid.get_lonlats_dask()
     new.name = orig.name
-    new['latitude'] = (('y', 'x'), target_lat)
-    new['longitude'] = (('y', 'x'), target_lon)
-    new.attrs['area'] = target_grid
+    new["latitude"] = (("y", "x"), target_lat)
+    new["longitude"] = (("y", "x"), target_lon)
+    new.attrs["area"] = target_grid
     return new
 
 
 def resample_stratify(da, levels, vertical, axis=1):
     import stratify
     import xarray as xr
-    result = stratify.interpolate(levels,
-                                  vertical.chunk(),
-                                  da.chunk(),
-                                  axis=axis)
+
+    result = stratify.interpolate(levels, vertical.chunk(), da.chunk(), axis=axis)
     dims = da.dims
     out = xr.DataArray(result, dims=dims)
     for i in dims:
-        if i != 'z':
+        if i != "z":
             out[i] = da[i]
     out.attrs = da.attrs.copy()
     if len(da.coords) > 0:
         for i in da.coords:
-            if i != 'z':
+            if i != "z":
                 out.coords[i] = da.coords[i]
     return out
 
@@ -114,6 +114,7 @@ def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
     if has_xesmf:
         import xesmf as xe
         import xarray as xr
+
         regridder = xe.Regridder(source_da, target_da, **kwargs)
         if cleanup:
             regridder.clean_weight_file()
