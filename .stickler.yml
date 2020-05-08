@@ -1,8 +1,7 @@
 linters:
-  linters:
-    black:
-        config: ./pyproject.toml
-        fixer: true
+  black:
+    config: ./pyproject.toml
+    fixer: true
   # pep8:
   #   python: 3
   #   max-line-length: 120
