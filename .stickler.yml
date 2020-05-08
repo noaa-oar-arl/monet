@@ -1,15 +1,18 @@
 linters:
-  pep8:
-    python: 3
-    max-line-length: 120
+  black:
+    config: ./pyproject.toml
     fixer: true
-    ignore:
-      - 'W28'
-      - 'W504'
-      - 'E128'
-      - 'E501'
-      - 'E122'
-      - 'W503'
+  # pep8:
+  #   python: 3
+  #   max-line-length: 120
+  #   fixer: true
+  #   ignore:
+  #     - 'W28'
+  #     - 'W504'
+  #     - 'E128'
+  #     - 'E501'
+  #     - 'E122'
+  #     - 'W503'
 fixers:
   enable: true
 review:

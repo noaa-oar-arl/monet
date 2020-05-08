@@ -5,7 +5,7 @@ from .colorbars import *
 from .mapgen import *
 from .plots import *
 
-__all__ = ['colorbars', 'plots', 'taylordiagram', 'mapgen']
+__all__ = ["colorbars", "plots", "taylordiagram", "mapgen"]
 
 # This is the driver for all verify objects
 
@@ -24,13 +24,13 @@ def _dynamic_fig_size(obj):
         Description of returned object.
 
     """
-    if 'x' in obj.dims:
+    if "x" in obj.dims:
         nx, ny = len(obj.x), len(obj.y)
         scale = float(ny) / float(nx)
-    elif 'latitude' in obj.dims:
+    elif "latitude" in obj.dims:
         nx, ny = len(obj.longitude), len(obj.latitude)
         scale = float(ny) / float(nx)
-    elif 'lat' in obj.dims:
+    elif "lat" in obj.dims:
         nx, ny = len(obj.lon), len(obj.lat)
         scale = float(ny) / float(nx)
     figsize = (10, 10 * scale)
@@ -62,8 +62,10 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
     import sys
     from PIL import Image
     import matplotlib.pyplot as plt
+
     try:
         from pydecorate import DecoratorAGG
+
         pydecorate = True
     except ImportError:
         pydecorate = False
@@ -80,54 +82,39 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
             dc.align_right()
         # sys.argv[0])[-5] + 'data/MONET_logo.png'
         # print(os.path.basename(__file__))
-        logo = os.path.abspath(__file__)[:-17] + 'data/MONET-logo.png'
+        logo = os.path.abspath(__file__)[:-17] + "data/MONET-logo.png"
         # print(logo)
         dc.add_logo(logo)
-        if fname.split('.')[-1] == 'png':
+        if fname.split(".")[-1] == "png":
             img.save(fname, "PNG")
-        elif fname.split('.')[-1] == 'jpg':
+        elif fname.split(".")[-1] == "jpg":
             img.save(fname, "JPEG")
 
 
-def sp_scatter_bias(df,
-                    col1=None,
-                    col2=None,
-                    ax=None,
-                    outline=False,
-                    tight=True,
-                    global_map=True,
-                    map_kwargs={},
-                    cbar_kwargs={},
-                    val_max=None,
-                    val_min=None,
-                    **kwargs):
+def sp_scatter_bias(
+    df, col1=None, col2=None, ax=None, outline=False, tight=True, global_map=True, map_kwargs={}, cbar_kwargs={}, val_max=None, val_min=None, **kwargs
+):
     from scipy.stats import scoreatpercentile as score
     from numpy import around
+
     if ax is None:
         ax = draw_map(**map_kwargs)
     try:
         if col1 is None or col2 is None:
-            print('User must specify col1 and col2 in the dataframe')
+            print("User must specify col1 and col2 in the dataframe")
             raise ValueError
         else:
-            dfnew = df[['latitude', 'longitude', col1,
-                        col2]].dropna().copy(deep=True)
-            dfnew['sp_diff'] = (dfnew[col2] - dfnew[col1])
-            top = score(dfnew['sp_diff'].abs(), per=95)
+            dfnew = df[["latitude", "longitude", col1, col2]].dropna().copy(deep=True)
+            dfnew["sp_diff"] = dfnew[col2] - dfnew[col1]
+            top = score(dfnew["sp_diff"].abs(), per=95)
             if val_max is not None:
                 top = val_max
             x, y = df.longitude.values, df.latitude.values
-            dfnew['sp_diff_size'] = dfnew['sp_diff'].abs() / top * 100.
-            dfnew.loc[dfnew['sp_diff_size'] > 300, 'sp_diff_size'] = 300.
-            dfnew.plot.scatter(x='longitude',
-                               y='latitude',
-                               c=dfnew['sp_diff'],
-                               s=dfnew['sp_diff_size'],
-                               vmin=-1 * top,
-                               vmax=top,
-                               ax=ax,
-                               colorbar=True,
-                               **kwargs)
+            dfnew["sp_diff_size"] = dfnew["sp_diff"].abs() / top * 100.0
+            dfnew.loc[dfnew["sp_diff_size"] > 300, "sp_diff_size"] = 300.0
+            dfnew.plot.scatter(
+                x="longitude", y="latitude", c=dfnew["sp_diff"], s=dfnew["sp_diff_size"], vmin=-1 * top, vmax=top, ax=ax, colorbar=True, **kwargs
+            )
             if ~outline:
                 ax.outline_patch.set_alpha(0)
             if global_map:

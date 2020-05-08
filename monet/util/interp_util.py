@@ -17,6 +17,7 @@ def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
 
     """
     from pyresample import geometry
+
     return geometry.CoordinateDefinition(lats=latitude, lons=longitude)
 
 
@@ -38,13 +39,10 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
     """
     import xarray as xr
     from numpy import asarray
+
     lat = asarray(latitude)
     lon = asarray(longitude)
-    dset = xr.Dataset(
-        coords={
-            'lon': (['x', 'y'], lon.reshape(1, 1)),
-            'lat': (['x', 'y'], lat.reshape(1, 1))
-        })
+    dset = xr.Dataset(coords={"lon": (["x", "y"], lon.reshape(1, 1)), "lat": (["x", "y"], lat.reshape(1, 1))})
     return dset
 
 
@@ -66,6 +64,7 @@ def lonlat_to_swathdefinition(longitude=None, latitude=None):
     """
     from pyresample.geometry import SwathDefinition
     from numpy import vstack
+
     if len(longitude.shape) < 2:
         lons = vstack(longitude)
         lats = vstack(latitude)
@@ -93,6 +92,7 @@ def nearest_point_swathdefinition(longitude=None, latitude=None):
     """
     from pyresample.geometry import SwathDefinition
     from numpy import vstack
+
     lons = vstack([longitude])
     lats = vstack([latitude])
     return SwathDefinition(lons=lons, lats=lats)
@@ -116,14 +116,11 @@ def constant_1d_xesmf(longitude=None, latitude=None):
     """
     import xarray as xr
     from numpy import asarray
+
     lat = asarray(latitude)
     lon = asarray(longitude)
     s = lat.shape[0]
-    dset = xr.Dataset(
-        coords={
-            'lon': (['x', 'y'], lon.reshape(s, 1)),
-            'lat': (['x', 'y'], lat.reshape(s, 1))
-        })
+    dset = xr.Dataset(coords={"lon": (["x", "y"], lon.reshape(s, 1)), "lat": (["x", "y"], lat.reshape(s, 1))})
     return dset
 
 
@@ -146,13 +143,14 @@ def constant_lat_swathdefition(longitude=None, latitude=None):
     from pyresample import geometry
     from xarray import DataArray
     from numpy import vstack
+
     if len(longitude.shape) < 2:
         lons = vstack(longitude)
     else:
         lons = longitude
-    lats = lons * 0. + latitude
+    lats = lons * 0.0 + latitude
     if isinstance(lats, DataArray):
-        lats.name = 'lats'
+        lats.name = "lats"
     return geometry.SwathDefinition(lons=lons, lats=lats)
 
 
@@ -175,11 +173,12 @@ def constant_lon_swathdefition(longitude=None, latitude=None):
     from pyresample import geometry
     from xarray import DataArray
     from numpy import vstack
+
     if len(latitude.shape) < 2:
         lats = vstack(latitude)
     else:
         lats = latitude
-    lons = lats * 0. + longitude
+    lons = lats * 0.0 + longitude
     if isinstance(lats, DataArray):
-        lons.name = 'lons'
+        lons.name = "lons"
     return geometry.SwathDefinition(lons=lons, lats=lats)
