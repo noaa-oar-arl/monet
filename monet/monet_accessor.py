@@ -122,8 +122,8 @@ def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=
                     dset["XLAT_M"] = dset.XLAT_M.squeeze()
                     dset["XLONG_M"] = dset.XLONG_M.squeeze()
                 elif "XLAT" in dset.coords:
-                    dset["XLAT_M"] = dset.XLAT_M.squeeze()
-                    dset["XLONG_M"] = dset.XLONG_M.squeeze()
+                    dset["XLAT"] = dset.XLAT.squeeze()
+                    dset["XLONG"] = dset.XLONG.squeeze()
             else:
                 raise ValueError
         except ValueError:
