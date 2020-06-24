@@ -63,16 +63,15 @@ def draw_map(
         states_provinces = cfeature.NaturalEarthFeature(
             category="cultural", name="admin_1_states_provinces_lines", scale=resolution, facecolor="none"
         )
-        ax.add_feature(states_provinces, edgecolor="black")
 
     if coastlines:
-        ax.coastlines(resolution)
+        ax.coastlines(resolution, linewidth=0.25)
 
     if countries:
-        ax.add_feature(cfeature.BORDERS)
+        ax.add_feature(cfeature.BORDERS, linewidth=0.25)
 
     if states:
-        ax.add_feature(states_provinces)
+        ax.add_feature(states_provinces, linewidth=0.25)
 
     if extent is not None:
         ax.set_extent(extent)
