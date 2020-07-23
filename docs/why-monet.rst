@@ -5,15 +5,16 @@ Features
 --------
 
 Retrieving, loading, and combining data and putting into a common format
-is the core of MONET.  MONET uses the pandas_ and xarray_ data formats for data
+is the core of MONET.  MONET uses the Pandas_ and xarray_ data formats for data
 analysis.
 
-- Open point observations in a common format.  pandas_ excels at working with tabular data or point measurements. It is used for time series analysis and statistical measures.
+- Open point observations in a common format.  Pandas_ excels at working with tabular data or point measurements. 
+  It is used for time series analysis and statistical measures.
 - Open model and satellite data in a common format.  xarray_ is used when N-dimensional arrays are needed.
 - Retrieving observational datasets for given time and space.
 - Efficiently combine/interpolate model and observational datasets.
 - Provide easy plotting using proven tools in python
-- Perform statics between model runs or observations or models and observations.
+- Perform statistics between model runs or observations or models and observations.
 
 Gallery
 -------
@@ -45,4 +46,5 @@ Plots|
 
 .. _ndarray: http://docs.scipy.org/doc/numpy/reference/arrays.ndarray.html
 .. _netCDF: http://www.unidata.ucar.edu/software/netcdf
-.. _pandas: http://pandas.pydata.org
+.. _Pandas: http://pandas.pydata.org
+.. _xarray: http://xarray.pydata.org/en/stable/
