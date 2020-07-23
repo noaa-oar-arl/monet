@@ -14,5 +14,9 @@
 }
 
 .wy-nav-top {
-  background-color: #ffffff;
+  background-color: #eee;
+}
+
+nav.wy-nav-top > a, i.fa-bars {
+  color: #404040;  /* this is the body text color */
 }
