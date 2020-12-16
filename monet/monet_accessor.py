@@ -1031,15 +1031,16 @@ class MONETAccessor(object):
         else:
             transform = kwargs["transform"]
             kwargs.pop("transform", None)
-        ax = draw_map(**map_kws)
+        if 'ax' not in kwargs:
+            ax = draw_map(**map_kws)            
         try:
             ax.axes.outline_patch.set_alpha(0)
         except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax = da.roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
+            ax1 = da.roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
         else:
-            ax = da.plot.imshow(ax=ax, transform=transform, **kwargs)
+            ax1 = da.plot.imshow(ax=ax, transform=transform, **kwargs)
         plt.tight_layout()
         return ax
 
@@ -1086,15 +1087,16 @@ class MONETAccessor(object):
         else:
             transform = kwargs["transform"]
             kwargs.pop("transform", None)
-        ax = draw_map(**map_kws)
+        if 'ax' not in kwargs:
+            ax = draw_map(**map_kws)
         try:
             ax.axes.outline_patch.set_alpha(0)
         except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(x="longitude", y="latitude", ax=ax, transform=crs_p, **kwargs)
+            ax2 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(x="longitude", y="latitude", ax=ax, transform=crs_p, **kwargs)
         else:
-            ax = da.plot(x="longitude", y="latitude", ax=ax, transform=crs_p, **kwargs)
+            ax2 = da.plot(x="longitude", y="latitude", ax=ax, transform=crs_p, **kwargs)
         plt.tight_layout()
         return ax
 
@@ -1141,7 +1143,8 @@ class MONETAccessor(object):
         else:
             transform = kwargs["transform"]
             kwargs.pop("transform", None)
-        ax = draw_map(**map_kws)
+        if 'ax' not in kwargs:
+            ax = draw_map(**map_kws)
         try:
             ax.axes.outline_patch.set_alpha(0)
         except AttributeError:
