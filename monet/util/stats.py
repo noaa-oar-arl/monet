@@ -1697,6 +1697,31 @@ def ETS(obs, mod, minval, maxval):
     print("ETS for range " + str(minval) + " --> " + str(maxval) + ": " + ets)
     return ets
 
+def CSI(obs, mod, minval, maxval):
+    """Critical Success Index (1 is perfect - Range 0 -> 1)
+
+    Parameters
+    ----------
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    minval : type
+        Description of parameter `minval`.
+    maxval : type
+        Description of parameter `maxval`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    a, b, c, d = scores(obs, mod, minval, maxval=maxval)
+    csi = a / a + b + c 
+    print("CSI for range " + str(minval) + " --> " + str(maxval) + ": " + csi)
+    return csi
+
 
 def scores(obs, mod, minval, maxval=1.0e5):
     """Short summary.
