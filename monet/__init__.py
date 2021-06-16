@@ -1,4 +1,4 @@
-from . import monet_accessor, plots, util
+from . import monet_accessor, plots, util, met_funcs
 from .plots import savefig
 
 __all__ = ["plots", "sat", "util", "monet_accessor"]

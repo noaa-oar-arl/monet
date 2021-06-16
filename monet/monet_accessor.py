@@ -1032,15 +1032,15 @@ class MONETAccessor(object):
             transform = kwargs["transform"]
             kwargs.pop("transform", None)
         if 'ax' not in kwargs:
-            ax = draw_map(**map_kws)            
+            ax = draw_map(**map_kws)
         try:
             ax.axes.outline_patch.set_alpha(0)
         except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax1 = da.roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
+            ax1 = da..squeeze().roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
         else:
-            ax1 = da.plot.imshow(ax=ax, transform=transform, **kwargs)
+            ax1 = da.squeeze().plot.imshow(ax=ax, transform=transform, **kwargs)
         plt.tight_layout()
         return ax
 
