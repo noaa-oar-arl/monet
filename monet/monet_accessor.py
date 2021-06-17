@@ -784,17 +784,17 @@ class MONETAccessor(object):
     def interp_constant_lat(self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs):
         """Interpolates the data array to constant longitude.
 
-            Parameters
-            ----------
-            lon : float
-                Latitude on which to interpolate to
+        Parameters
+        ----------
+        lon : float
+            Latitude on which to interpolate to
 
-            Returns
-            -------
-            DataArray
-                DataArray of at constant longitude
+        Returns
+        -------
+        DataArray
+            DataArray of at constant longitude
 
-            """
+        """
         from numpy import linspace, ones, asarray
 
         try:
@@ -828,17 +828,17 @@ class MONETAccessor(object):
     def interp_constant_lon(self, lon=None, **kwargs):
         """Interpolates the data array to constant longitude.
 
-            Parameters
-            ----------
-            lon : float
-                Latitude on which to interpolate to
+        Parameters
+        ----------
+        lon : float
+            Latitude on which to interpolate to
 
-            Returns
-            -------
-            DataArray
-                DataArray of at constant longitude
+        Returns
+        -------
+        DataArray
+            DataArray of at constant longitude
 
-            """
+        """
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf
@@ -1038,7 +1038,7 @@ class MONETAccessor(object):
         except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax1 = da..squeeze().roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
+            ax1 = da.squeeze().roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
         else:
             ax1 = da.squeeze().plot.imshow(ax=ax, transform=transform, **kwargs)
         plt.tight_layout()
@@ -1673,17 +1673,17 @@ class MONETAccessorDataset(object):
     def interp_constant_lat(self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs):
         """Interpolates the data array to constant longitude.
 
-            Parameters
-            ----------
-            lon : float
-                Latitude on which to interpolate to
+        Parameters
+        ----------
+        lon : float
+            Latitude on which to interpolate to
 
-            Returns
-            -------
-            DataArray
-                DataArray of at constant longitude
+        Returns
+        -------
+        DataArray
+            DataArray of at constant longitude
 
-            """
+        """
         from numpy import linspace, ones, asarray
 
         try:
@@ -1717,17 +1717,17 @@ class MONETAccessorDataset(object):
     def interp_constant_lon(self, lon=None, **kwargs):
         """Interpolates the data array to constant longitude.
 
-            Parameters
-            ----------
-            lon : float
-                Latitude on which to interpolate to
+        Parameters
+        ----------
+        lon : float
+            Latitude on which to interpolate to
 
-            Returns
-            -------
-            xr.Dataset or xr.DataArray
-                DataArray of at constant longitude
+        Returns
+        -------
+        xr.Dataset or xr.DataArray
+            DataArray of at constant longitude
 
-            """
+        """
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf
