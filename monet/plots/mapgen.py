@@ -13,6 +13,7 @@ def draw_map(
     resolution="10m",
     extent=None,
     figsize=(10, 5),
+    linewidth=0.25,
     return_fig=False,
     **kwargs
 ):
@@ -61,17 +62,17 @@ def draw_map(
 
     if states:
         states_provinces = cfeature.NaturalEarthFeature(
-            category="cultural", name="admin_1_states_provinces_lines", scale=resolution, facecolor="none", edgecolor='k',linewidth=0.25
+            category="cultural", name="admin_1_states_provinces_lines", scale=resolution, facecolor="none", edgecolor='k',linewidth=linewidth
         )
 
     if coastlines:
         ax.coastlines(resolution, linewidth=0.25)
 
     if countries:
-        ax.add_feature(cfeature.BORDERS, linewidth=0.25)
+        ax.add_feature(cfeature.BORDERS, linewidth=linewidth)
 
     if states:
-        ax.add_feature(states_provinces, linewidth=0.25)
+        ax.add_feature(states_provinces, linewidth=linewidth)
 
     if extent is not None:
         ax.set_extent(extent)
