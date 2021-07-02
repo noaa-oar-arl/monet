@@ -66,7 +66,7 @@ def draw_map(
         )
 
     if coastlines:
-        ax.coastlines(resolution, linewidth=0.25)
+        ax.coastlines(resolution, linewidth=linewidth)
 
     if countries:
         ax.add_feature(cfeature.BORDERS, linewidth=linewidth)
