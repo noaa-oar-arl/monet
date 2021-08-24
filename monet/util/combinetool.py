@@ -24,14 +24,14 @@ def combine_da_to_df(da, df, merge=True, **kwargs):
     """
     from ..util.interp_util import lonlat_to_swathdefinition
     from numpy import ones
+
     # try:
     #     if col is None:
     #         raise RuntimeError
     # except RuntimeError:
     #     print('Must enter column name')
     # dfn = df.dropna(subset=[col])
-    dfnn = df.drop_duplicates(subset=['siteid']).dropna(
-        subset=['latitude', 'longitude', 'siteid'])
+    dfnn = df.drop_duplicates(subset=['siteid']).dropna(subset=['latitude', 'longitude', 'siteid'])
     dfda = dfnn.monet._df_to_da()
     da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
     da_interped['siteid'] = (('x'), dfnn.siteid)
@@ -50,12 +50,45 @@ def combine_da_to_df(da, df, merge=True, **kwargs):
     if merge:
         df.reset_index(drop=True)
         df_interped.reset_index(drop=True)
-        final_df = df.merge(df_interped,
-                            on=['time', 'siteid'],
-                            how='left')
+        final_df = df.merge(df_interped, on=['time', 'siteid'], how='left')
         return final_df
     else:
         return df_interped
+
+
+def combine_da_to_da(source, target, merge=True, interp_time=False, **kwargs):
+    """This function will combine an xarray data array with spatial information
+    point observations in `df`.
+
+    Parameters
+    ----------
+    da : xr.DataArray or xr.Dataset
+        Description of parameter `da`.
+    df : pd.DataFrame
+        Description of parameter `df`.
+    merge : bool
+        If merge=True then the output is merged with the target
+    interp_time : bool
+        If true it will linearly interplate in time to the target.time
+    kwargs : dict
+        kwargs following monet.monet_accessor.remap_nearest
+
+    Returns
+    -------
+    xarray.DataSet
+    """
+    from ..util.interp_util import lonlat_to_swathdefinition
+    from numpy import ones
+    from ..monet_accessor import _dataset_to_monet
+
+    target_fixed = _dataset_to_monet(target)
+    source_fixed = _dataset_to_monet(source)
+    output = target_fixed.monet.remap_nearest(source_fixed, **kwargs)
+    if interp_time:
+        output = output.interp(time=target.time)
+    if merge:
+        output = xr.merge([target_fixed, output])
+    return output
 
 
 def _rename_latlon(ds):
@@ -88,13 +121,13 @@ def combine_da_to_df_xesmf(da, df, suffix=None, **kwargs):
     """
     from ..util.interp_util import constant_1d_xesmf
     from ..util.resample import resample_xesmf
+
     # dfn = df.dropna(subset=[col])
     dfnn = df.drop_duplicates(subset=['latitude', 'longitude'])
     # unit = dfnn[col + '_unit'].unique()[0]
     # target_grid = lonlat_to_swathdefinition(
     #     longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
-    target = constant_1d_xesmf(longitude=dfnn.longitude.values,
-                               latitude=dfnn.latitude.values)
+    target = constant_1d_xesmf(longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
 
     da = _rename_latlon(da)  # check to rename latitude and longitude
     da_interped = resample_xesmf(da, target, **kwargs)
@@ -118,10 +151,7 @@ def combine_da_to_df_xesmf(da, df, suffix=None, **kwargs):
     # if da.name in df.columns:
     #     df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
     # print(df_interped.keys())
-    final_df = df.merge(df_interped,
-                        on=['latitude', 'longitude', 'time'],
-                        how='left',
-                        suffixes=('', suffix))
+    final_df = df.merge(df_interped, on=['latitude', 'longitude', 'time'], how='left', suffixes=('', suffix))
     return final_df
 
 
@@ -157,8 +187,7 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
         print('da shape= ', da.shape, 'daz shape= ', daz.shape)
         return -1
 
-    target = constant_1d_xesmf(longitude=df.longitude.values,
-                               latitude=df.latitude.values)
+    target = constant_1d_xesmf(longitude=df.longitude.values, latitude=df.latitude.values)
 
     # check to rename 'latitude' and 'longitude' for xe.Regridder
     da = _rename_latlon(da)
@@ -171,35 +200,23 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
 
     # sort aircraft target altitudes and call stratfiy from resample to do vertical interpolation
     # resample_stratify from monet accessor
-    daz_interped_xyz = daz_interped.monet.stratify(sorted(df['altitude']),
-                                                   daz_interped,
-                                                   axis=1)
-    da_interped_xyz = da_interped.monet.stratify(sorted(df['altitude']),
-                                                 daz_interped,
-                                                 axis=1)
+    daz_interped_xyz = daz_interped.monet.stratify(sorted(df['altitude']), daz_interped, axis=1)
+    da_interped_xyz = da_interped.monet.stratify(sorted(df['altitude']), daz_interped, axis=1)
     da_interped_xyz.name = da.name
     daz_interped_xyz.name = 'altitude'
     df_interped_xyz = da_interped_xyz.to_dataframe().reset_index()
     dfz_interped_xyz = daz_interped_xyz.to_dataframe().reset_index()
 
-    df_interped_xyz.insert(0,
-                           'altitude',
-                           dfz_interped_xyz['altitude'],
-                           allow_duplicates=True)
+    df_interped_xyz.insert(0, 'altitude', dfz_interped_xyz['altitude'], allow_duplicates=True)
 
     cols = Series(df_interped_xyz.columns)
     drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
     df_interped_xyz.drop(drop_cols, axis=1, inplace=True)
     if da.name in df.columns:
-        df_interped_xyz.rename(columns={da.name: da.name + '_new'},
-                               inplace=True)
+        df_interped_xyz.rename(columns={da.name: da.name + '_new'}, inplace=True)
         print(df_interped_xyz.keys())
 
-    final_df = merge_asof(df,
-                          df_interped_xyz,
-                          by=['latitude', 'longitude', 'altitude'],
-                          on='time',
-                          direction='nearest')
+    final_df = merge_asof(df, df_interped_xyz, by=['latitude', 'longitude', 'altitude'], on='time', direction='nearest')
     return final_df
 
 
@@ -224,8 +241,7 @@ def combine_da_to_height_profile(da, dset, radius_of_influence=12e3):
     # from ..util.interp_util import nearest_point_swathdefinition
     lon, lat = dset.longitude, dset.latitude
     # target_grid = nearest_point_swathdefinition(longitude=lon, latitude=lat)
-    da_interped = da.monet.nearest_latlon(
-        lon=lon, lat=lat, radius_of_influence=radius_of_influence)
+    da_interped = da.monet.nearest_latlon(lon=lon, lat=lat, radius_of_influence=radius_of_influence)
 
     # FIXME: interp to height here
 
