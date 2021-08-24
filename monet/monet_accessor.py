@@ -1313,6 +1313,44 @@ class MONETAccessor(object):
         else:
             print("d must be either a pd.DataFrame")
 
+    def combine_da(self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs):
+        """Short summary.
+
+        Parameters
+        ----------
+        data : type
+            Description of parameter `data`.
+        col : type
+            Description of parameter `col`.
+        radius : type
+            Description of parameter `radius`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        if has_pyresample:
+            from .util.combinetool import combine_da_to_df
+        if has_xesmf:
+            from .util.combinetool import combine_da_to_df_xesmf
+        # point source data
+        da = _dataset_to_monet(self._obj)
+        if isinstance(data, xr.DataArray):
+            d = xr.Dataset(data)
+            if has_pyresample and pyresample:
+                return combine_da_to_d(da, d, **kwargs)
+            else:  # xesmf resample
+                return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
+        elif isinstance(data, xr.Dataset):
+            if has_pyresample and pyresample:
+                return combine_da_to_d(da, d, **kwargs)
+            else:  # xesmf resample
+                return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
+        else:
+            print("d must be either a pd.DataFrame")
+
 
 @xr.register_dataset_accessor("monet")
 class MONETAccessorDataset(object):
@@ -1868,6 +1906,44 @@ class MONETAccessorDataset(object):
                 return combine_da_to_df(da, data, **kwargs)
             else:  # xesmf resample
                 return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
+        else:
+            print("d must be either a pd.DataFrame")
+
+    def combine_da(self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs):
+        """Short summary.
+
+        Parameters
+        ----------
+        data : type
+            Description of parameter `data`.
+        col : type
+            Description of parameter `col`.
+        radius : type
+            Description of parameter `radius`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        if has_pyresample:
+            from .util.combinetool import combine_da_to_df
+        if has_xesmf:
+            from .util.combinetool import combine_da_to_df_xesmf
+        # point source data
+        da = _dataset_to_monet(self._obj)
+        if isinstance(data, xr.DataArray):
+            d = xr.Dataset(data)
+            if has_pyresample and pyresample:
+                return combine_da_to_d(da, d, **kwargs)
+            else:  # xesmf resample
+                return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
+        elif isinstance(data, xr.Dataset):
+            if has_pyresample and pyresample:
+                return combine_da_to_d(da, d, **kwargs)
+            else:  # xesmf resample
+                return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
         else:
             print("d must be either a pd.DataFrame")
 

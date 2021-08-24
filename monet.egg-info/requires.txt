@@ -1,0 +1,10 @@
+pandas
+netcdf4
+xarray
+dask
+pyresample
+matplotlib
+seaborn
+cartopy
+pydecorate
+global_land_mask
