@@ -74,6 +74,11 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
     from PIL import Image
     from pydecorate import DecoratorAGG
 
+    parts = fname.split(".")
+    if not len(parts) > 1:
+        raise ValueError("`fname` must include a file extension, e.g. '.png'")
+    ext = fname.split(".")[-1]
+
     # Save current figure
     plt.savefig(fname, **kwargs)
 
@@ -84,6 +89,8 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
         add_logo_kwargs = {}
         if logo_height is not None:
             add_logo_kwargs["height"] = logo_height
+        if ext.lower() not in {"png", "jpg", "jpeg"}:
+            raise ValueError(f"only PNG and JPEG supported, but detected extension is {ext!r}")
 
         img = Image.open(fname)
         dc = DecoratorAGG(img)  # cursor starts top-left
@@ -100,13 +107,8 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
             raise ValueError(f"invalid `loc` {loc!r}")
         dc.add_logo(logo, **add_logo_kwargs)
 
-        ext = fname.split(".")[-1]
-        if ext.lower() == "png":
-            img.save(fname, "PNG")
-        elif ext.lower() in {"jpg", "jpeg"}:
-            img.save(fname, "JPEG")
-        else:
-            raise ValueError(f"only PNG and JPEG supported, but detected extension is {ext!r}")
+        # PIL will determine format from the filename extension
+        img.save(fname)
 
         img.close()
 
