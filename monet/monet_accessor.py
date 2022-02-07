@@ -1318,12 +1318,13 @@ class MONETAccessor(object):
 
         Parameters
         ----------
-        data : type
-            Description of parameter `data`.
-        col : type
-            Description of parameter `col`.
-        radius : type
-            Description of parameter `radius`.
+        data
+            To be combined.
+        suffix : str, optional
+            Added to the ``name`` of the new variable, defaults to ``'_new'``.
+            Ignored if pyresample used.
+        col
+        radius
 
         Returns
         -------
@@ -1914,10 +1915,11 @@ class MONETAccessorDataset(object):
 
         Parameters
         ----------
-        data : type
-            Description of parameter `data`.
+        data
+            To be combined.
         suffix : str, optional
             Added to the ``name`` of the new variable, defaults to ``'_new'``.
+            Ignored if pyresample used.
         col
         radius
 
