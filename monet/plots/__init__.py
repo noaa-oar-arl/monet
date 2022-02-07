@@ -1,5 +1,4 @@
 from __future__ import absolute_import, print_function
-from multiprocessing.sharedctypes import Value
 
 from . import colorbars, plots, taylordiagram
 from .colorbars import *
@@ -75,21 +74,19 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
     from PIL import Image
     from pydecorate import DecoratorAGG
 
-    data = Path(__file__).parent / "../data"
-
     # Save current figure
     plt.savefig(fname, **kwargs)
 
     # Add logo
     if decorate:
         if logo is None:
-            logo = data / "MONET-logo.png"
-        img = Image.open(fname)
-        dc = DecoratorAGG(img)  # cursor starts top-left
+            logo = Path(__file__).parent / "../data/MONET-logo.png"
         add_logo_kwargs = {}
         if logo_height is not None:
             add_logo_kwargs["height"] = logo_height
 
+        img = Image.open(fname)
+        dc = DecoratorAGG(img)  # cursor starts top-left
         if loc == 1:
             dc.align_bottom()
         elif loc == 2:
