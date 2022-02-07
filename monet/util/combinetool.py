@@ -62,16 +62,16 @@ def combine_da_to_da(source, target, merge=True, interp_time=False, **kwargs):
 
     Parameters
     ----------
-    da : xr.DataArray or xr.Dataset
-        Description of parameter `da`.
-    df : pd.DataFrame
-        Description of parameter `df`.
+    source : xr.DataArray or xr.Dataset
+        Gridded data.
+    target : xr.DataArray
+        Point observations.
     merge : bool
         If merge=True then the output is merged with the target
     interp_time : bool
-        If true it will linearly interplate in time to the target.time
+        Linearly interplate to ``target.time``.
     kwargs : dict
-        kwargs following monet.monet_accessor.remap_nearest
+        kwargs to :meth:`~monet.monet_accessor.MONETAccessor.remap_nearest`
 
     Returns
     -------

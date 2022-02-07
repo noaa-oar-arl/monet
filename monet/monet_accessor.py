@@ -1340,16 +1340,16 @@ class MONETAccessor(object):
         if isinstance(data, xr.DataArray):
             d = xr.Dataset(data)
             if has_pyresample and pyresample:
-                return combine_da_to_d(da, d, **kwargs)
+                return combine_da_to_df(da, d, **kwargs)
             else:  # xesmf resample
                 return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
         elif isinstance(data, xr.Dataset):
             if has_pyresample and pyresample:
-                return combine_da_to_d(da, d, **kwargs)
+                return combine_da_to_df(da, data, **kwargs)
             else:  # xesmf resample
-                return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
+                return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
         else:
-            print("d must be either a pd.DataFrame")
+            raise ValueError("`data` must be an xarray Dataset or DataArray")
 
 
 @xr.register_dataset_accessor("monet")
@@ -1916,16 +1916,14 @@ class MONETAccessorDataset(object):
         ----------
         data : type
             Description of parameter `data`.
-        col : type
-            Description of parameter `col`.
-        radius : type
-            Description of parameter `radius`.
+        suffix : str, optional
+            Added to the ``name`` of the new variable, defaults to ``'_new'``.
+        col
+        radius
 
         Returns
         -------
-        type
-            Description of returned object.
-
+        pandas.DataFrame
         """
         if has_pyresample:
             from .util.combinetool import combine_da_to_df
@@ -1936,16 +1934,16 @@ class MONETAccessorDataset(object):
         if isinstance(data, xr.DataArray):
             d = xr.Dataset(data)
             if has_pyresample and pyresample:
-                return combine_da_to_d(da, d, **kwargs)
+                return combine_da_to_df(da, d, **kwargs)
             else:  # xesmf resample
                 return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
         elif isinstance(data, xr.Dataset):
             if has_pyresample and pyresample:
-                return combine_da_to_d(da, d, **kwargs)
+                return combine_da_to_df(da, data, **kwargs)
             else:  # xesmf resample
-                return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
+                return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
         else:
-            print("d must be either a pd.DataFrame")
+            raise ValueError("`data` must be an xarray Dataset or DataArray")
 
     def wrap_longitudes(self, lon_name="longitude"):
         """Ensures longitudes are from -180 -> 180
