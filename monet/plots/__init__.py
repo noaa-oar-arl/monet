@@ -49,9 +49,10 @@ def savefig(fname, *, loc=1, decorate=True, **kwargs):
     loc : int
         The location for the MONET logo.
 
-        * 1 -- bottom
+        * 1 -- bottom left
         * 2 -- bottom right
-        * 3 -- right
+        * 3 -- top right
+        * 4 -- top left
     decorate : bool
         Whether to add the logo.
     **kwargs : dict
@@ -75,7 +76,7 @@ def savefig(fname, *, loc=1, decorate=True, **kwargs):
     # Add logo
     if decorate:
         img = Image.open(fname)
-        dc = DecoratorAGG(img)
+        dc = DecoratorAGG(img)  # cursor starts top-left
         if loc == 1:
             dc.align_bottom()
         elif loc == 2:
@@ -83,8 +84,10 @@ def savefig(fname, *, loc=1, decorate=True, **kwargs):
             dc.align_right()
         elif loc == 3:
             dc.align_right()
+        elif loc == 4:
+            dc.align_left()
         else:
-            raise ValueError("invalid `loc`")
+            raise ValueError(f"invalid `loc` {loc!r}")
         logo = data / "MONET-logo.png"
         dc.add_logo(logo)
 
