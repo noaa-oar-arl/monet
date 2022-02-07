@@ -38,7 +38,7 @@ def _dynamic_fig_size(obj):
     return figsize
 
 
-def savefig(fname, *, loc=1, decorate=True, **kwargs):
+def savefig(fname, *, loc=1, decorate=True, logo_height=None, **kwargs):
     """Save figure and add the MONET logo.
 
     Parameters
@@ -49,12 +49,16 @@ def savefig(fname, *, loc=1, decorate=True, **kwargs):
     loc : int
         The location for the MONET logo.
 
-        * 1 -- bottom left
+        * 1 -- bottom left (default)
         * 2 -- bottom right
         * 3 -- top right
         * 4 -- top left
     decorate : bool
         Whether to add the logo.
+    logo_height : float or int, optional
+        Desired logo height in pixels.
+        If not provided, the original logo image dimensions are used.
+        Modify to scale the logo.
     **kwargs : dict
         Passed to the ``plt.savefig`` function.
 
@@ -77,6 +81,9 @@ def savefig(fname, *, loc=1, decorate=True, **kwargs):
     if decorate:
         img = Image.open(fname)
         dc = DecoratorAGG(img)  # cursor starts top-left
+        dc_add_logo_kwargs = {}
+        if logo_height is not None:
+            dc_add_logo_kwargs["height"] = logo_height
         if loc == 1:
             dc.align_bottom()
         elif loc == 2:
@@ -89,7 +96,7 @@ def savefig(fname, *, loc=1, decorate=True, **kwargs):
         else:
             raise ValueError(f"invalid `loc` {loc!r}")
         logo = data / "MONET-logo.png"
-        dc.add_logo(logo)
+        dc.add_logo(logo, **dc_add_logo_kwargs)
 
         ext = fname.split(".")[-1]
         if ext.lower() == "png":
