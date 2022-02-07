@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function
+from multiprocessing.sharedctypes import Value
 
 from . import colorbars, plots, taylordiagram
 from .colorbars import *
@@ -37,40 +38,42 @@ def _dynamic_fig_size(obj):
     return figsize
 
 
-def savefig(fname, loc=1, decorate=True, **kwargs):
-    """save figure and add the MONET logo .
+def savefig(fname, *, loc=1, decorate=True, **kwargs):
+    """Save figure and add the MONET logo.
 
     Parameters
     ----------
     fname : str
-        output file name.
+        Output file name or path. Passed to ``plt.savefig``.
+        Must include desired file extension (``.jpg`` or ``.png``).
     loc : int
-        the location for the monet logo.
+        The location for the MONET logo.
+
+        * 1 -- bottom
+        * 2 -- bottom right
+        * 3 -- right
     decorate : bool
-        Description of parameter `decorate`.
+        Whether to add the logo.
     **kwargs : dict
-        kwargs for the matplotlib.pyplot.savefig function.
+        Passed to the ``plt.savefig`` function.
 
     Returns
     -------
-    type
-        Description of returned object.
-
+    None
     """
-    import io
-    import os
-    import sys
-    from PIL import Image
+    from pathlib import Path
+
     import matplotlib.pyplot as plt
+    from PIL import Image
+    from pydecorate import DecoratorAGG
 
-    try:
-        from pydecorate import DecoratorAGG
+    data = Path(__file__).parent / "../data"
 
-        pydecorate = True
-    except ImportError:
-        pydecorate = False
+    # Save current figure
     plt.savefig(fname, **kwargs)
-    if pydecorate and decorate:
+
+    # Add logo
+    if decorate:
         img = Image.open(fname)
         dc = DecoratorAGG(img)
         if loc == 1:
@@ -80,15 +83,20 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
             dc.align_right()
         elif loc == 3:
             dc.align_right()
-        # sys.argv[0])[-5] + 'data/MONET_logo.png'
-        # print(os.path.basename(__file__))
-        logo = os.path.abspath(__file__)[:-17] + "data/MONET-logo.png"
-        # print(logo)
+        else:
+            raise ValueError("invalid `loc`")
+        logo = data / "MONET-logo.png"
         dc.add_logo(logo)
-        if fname.split(".")[-1] == "png":
+
+        ext = fname.split(".")[-1]
+        if ext.lower() == "png":
             img.save(fname, "PNG")
-        elif fname.split(".")[-1] == "jpg":
+        elif ext.lower() in {"jpg", "jpeg"}:
             img.save(fname, "JPEG")
+        else:
+            raise ValueError(f"only PNG and JPEG supported, but detected extension is {ext!r}")
+
+        img.close()
 
 
 def sp_scatter_bias(
