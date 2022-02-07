@@ -46,7 +46,7 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
         Output file name or path. Passed to ``plt.savefig``.
         Must include desired file extension (``.jpg`` or ``.png``).
     loc : int
-        The location for the MONET logo.
+        The location for the logo.
 
         * 1 -- bottom left (default)
         * 2 -- bottom right
@@ -102,7 +102,7 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
         elif loc == 3:
             dc.align_right()
         elif loc == 4:
-            dc.align_left()
+            pass
         else:
             raise ValueError(f"invalid `loc` {loc!r}")
         dc.add_logo(logo, **add_logo_kwargs)
