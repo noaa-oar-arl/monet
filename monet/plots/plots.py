@@ -379,15 +379,14 @@ def taylordiagram(
         plt.clabel(contours, inline=1, fontsize=10)
         plt.grid(alpha=0.5)
         plt.legend(fontsize="small", loc="best")
-    #        plt.tight_layout()
 
     elif not addon and dia is not None:
-        print("Do you want to add this on? if so please turn " "the addon keyword to True")
+        print("Do you want to add this on? if so please turn the addon keyword to True")
     elif addon and dia is None:
-        print("Please pass the previous Taylor Diagram Instance with dia " "keyword...")
+        print("Please pass the previous Taylor Diagram Instance with dia keyword...")
     else:
         cc = corrcoef(df.Obs.values, df.CMAQ.values)[0, 1]
-        dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label)
+        dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label1)
         plt.legend(fontsize="small", loc="best")
         plt.tight_layout()
     return dia

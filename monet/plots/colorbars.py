@@ -1,8 +1,5 @@
-""" colorbar helper functions"""
-
-import matplotlib.colors as mcolors
+"""Colorbar helper functions"""
 import matplotlib.pyplot as plt
-from numpy import arange, linspace, vstack
 
 
 def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype="int", basemap=None):

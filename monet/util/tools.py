@@ -92,14 +92,12 @@ def get_relhum(temp, press, vap):
 
 
 def long_to_wide(df):
-    from pandas import Series, merge
+    from pandas import merge
 
     w = df.pivot_table(values="obs", index=["time", "siteid"], columns="variable").reset_index()
-    cols = Series(df.columns)
     g = df.groupby("variable")
     for name, group in g:
         w[name + "_unit"] = group.units.unique()[0]
-    # mergeon = hstack((index.values, df.variable.unique()))
     return merge(w, df, on=["siteid", "time"])
 
 

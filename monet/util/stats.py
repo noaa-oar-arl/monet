@@ -175,7 +175,7 @@ def NO(obs, mod, axis=None):
 
     """
 
-    return (np.ma.getmaskarray(obs) == False).sum(axis=axis)
+    return (~np.ma.getmaskarray(obs)).sum(axis=axis)  # True where masked
 
 
 def NOP(obs, mod, axis=None):
@@ -198,7 +198,7 @@ def NOP(obs, mod, axis=None):
     """
 
     obsc, modc = matchmasks(obs, mod)
-    return (np.ma.getmaskarray(obsc) == False).sum(axis=axis)
+    return (~np.ma.getmaskarray(obsc)).sum(axis=axis)
 
 
 def NP(obs, mod, axis=None):
@@ -219,7 +219,7 @@ def NP(obs, mod, axis=None):
         Description of returned object.
 
     """
-    return (np.ma.getmaskarray(mod) == False).sum(axis=axis)
+    return (~np.ma.getmaskarray(mod)).sum(axis=axis)
 
 
 def MO(obs, mod, axis=None):
@@ -1843,7 +1843,7 @@ def stats(df, minval, maxval):
         a, b, c, d = scores(df.Obs.values, df.CMAQ.values, 70, 1000)
         dd["POD"] = a / (a + b)
         dd["FAR"] = c / (a + c)
-    except:
+    except Exception:
         dd["POD"] = 1.0
         dd["FAR"] = 0.0
     return dd

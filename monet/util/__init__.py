@@ -6,7 +6,7 @@ from . import combinetool, interp_util, resample
 from . import stats as mystats
 from . import tools
 
-__all__ = ["stats", "tools", "interp_util", "resample", "combinetool"]
+__all__ = ["stats", "mystats", "tools", "interp_util", "resample", "combinetool"]
 
 
 def nearest(items, pivot):
@@ -84,10 +84,9 @@ def wsdir2uv(ws, wdir):
 
 
 def long_to_wide(df):
-    from pandas import Series, merge
+    from pandas import merge
 
     w = df.pivot_table(values="obs", index=["time", "siteid"], columns="variable").reset_index()
-    cols = Series(df.columns)
     g = df.groupby("variable")
     for name, group in g:
         w[name + "_unit"] = group.units.unique()[0]

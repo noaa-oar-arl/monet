@@ -1,13 +1,13 @@
 try:
     from pyresample.geometry import AreaDefinition, SwathDefinition
-    from pyresample.kd_tree import XArrayResamplerNN
+    from pyresample.kd_tree import XArrayResamplerNN  # noqa: F401
 
     has_pyresample = True
 except ImportError:
     print("PyResample not installed.  Some functionality will be lost")
     has_pyresample = False
 try:
-    import xesmf
+    import xesmf  # noqa: F401
 
     has_xesmf = True
 except ImportError:

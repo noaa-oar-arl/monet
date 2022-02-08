@@ -4,7 +4,7 @@ import pandas as pd
 import xarray as xr
 
 try:
-    import xesmf
+    import xesmf  # noqa: F401
 
     has_xesmf = True
 except ImportError:
@@ -17,22 +17,21 @@ try:
 except ImportError:
     has_pyresample = False
 
+    def wrap_longitudes(lons):
+        """Short summary.
 
-def wrap_longitudes(lons):
-    """Short summary.
+        Parameters
+        ----------
+        lons : type
+            Description of parameter `lons`.
 
-    Parameters
-    ----------
-    lons : type
-        Description of parameter `lons`.
+        Returns
+        -------
+        type
+            Description of returned object.
 
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    return (lons + 180) % 360 - 180
+        """
+        return (lons + 180) % 360 - 180
 
 
 def _rename_latlon(ds):
@@ -356,7 +355,7 @@ class MONETAccessorPandas:
         return out
 
     def to_ascii2nc_list(self, **kwargs):
-        df = self._obj
+        # df = self._obj
         out = self.to_ascii2nc_df(**kwargs)
         return out.values.tolist()
 
@@ -397,7 +396,8 @@ class MONETAccessorPandas:
         df = self.rename_for_monet(self._obj)
         if has_pyresample:
             from .util.interp_util import nearest_point_swathdefinition as npsd
-        return nspd(latitude=df.latitude.values, longitude=df.longitude.values)
+
+            return npsd(latitude=df.latitude.values, longitude=df.longitude.values)
 
     def _df_to_da(self, d=None):
         """Short summary.
@@ -413,8 +413,6 @@ class MONETAccessorPandas:
             Description of returned object.
 
         """
-        import xarray as xr
-
         index_name = "index"
         if d is None:
             d = self._obj
@@ -516,7 +514,7 @@ class MONETAccessorPandas:
         """
         from numpy import arange
 
-        column = df.columns[0]
+        # column = df.columns[0]
         fake_index = arange(len(df))
         column_name = "monet_fake_index"
         r = pd.Series(fake_index.astype(float), index=df.index)
@@ -736,8 +734,8 @@ class MONETAccessor:
             from numpy import concatenate
             from pyresample import utils
 
-            from .util.interp_util import lonlat_to_swathdefinition as llsd
-            from .util.interp_util import nearest_point_swathdefinition as npsd
+            # from .util.interp_util import lonlat_to_swathdefinition as llsd
+            # from .util.interp_util import nearest_point_swathdefinition as npsd
 
             has_pyresample = True
         except ImportError:
@@ -760,7 +758,7 @@ class MONETAccessor:
             elif has_pyresample:
                 dset = _dataset_to_monet(self._obj)
                 lons, lats = utils.check_and_wrap(dset.longitude.values, dset.latitude.values)
-                swath = llsd(longitude=lons, latitude=lats)
+                # swath = llsd(longitude=lons, latitude=lats)
                 x_ll, y_ll = dset.monet.nearest_ij(lat=float(lat_min), lon=float(lon_min))
                 x_ur, y_ur = dset.monet.nearest_ij(lat=float(lat_max), lon=float(lon_max))
                 # pswath_ll = npsd(longitude=float(lon_min),
@@ -813,12 +811,6 @@ class MONETAccessor:
         """
         from numpy import asarray, linspace, ones
 
-        try:
-            import pyresample as pr
-
-            has_pyresample = True
-        except ImportError:
-            has_pyresample = False
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf
@@ -907,7 +899,7 @@ class MONETAccessor:
 
         """
         try:
-            from pyresample import geometry, utils
+            from pyresample import utils
 
             from .util.interp_util import lonlat_to_swathdefinition as llsd
             from .util.interp_util import nearest_point_swathdefinition as npsd
@@ -952,9 +944,9 @@ class MONETAccessor:
 
         """
         try:
-            from pyresample import geometry, utils
+            from pyresample import utils
 
-            from .util.interp_util import lonlat_to_swathdefinition as llsd
+            # from .util.interp_util import lonlat_to_swathdefinition as llsd
             from .util.interp_util import nearest_point_swathdefinition as npsd
 
             has_pyresample = True
@@ -1065,13 +1057,13 @@ class MONETAccessor:
         except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax1 = (
+            _ = (
                 da.squeeze()
                 .roll(lon=int(len(da.lon) / 2), roll_coords=True)
                 .plot.imshow(ax=ax, transform=transform, **kwargs)
             )
         else:
-            ax1 = da.squeeze().plot.imshow(ax=ax, transform=transform, **kwargs)
+            _ = da.squeeze().plot.imshow(ax=ax, transform=transform, **kwargs)
         plt.tight_layout()
         return ax
 
@@ -1114,11 +1106,7 @@ class MONETAccessor:
         else:
             figsize = _dynamic_fig_size(da)
             map_kws["figsize"] = figsize
-        if "transform" not in kwargs:
-            transform = crs_p
-        else:
-            transform = kwargs["transform"]
-            kwargs.pop("transform", None)
+        transform = kwargs.pop("transform", crs_p)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
         try:
@@ -1126,11 +1114,11 @@ class MONETAccessor:
         except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax2 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(
-                x="longitude", y="latitude", ax=ax, transform=crs_p, **kwargs
+            _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(
+                x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
             )
         else:
-            ax2 = da.plot(x="longitude", y="latitude", ax=ax, transform=crs_p, **kwargs)
+            _ = da.plot(x="longitude", y="latitude", ax=ax, transform=transform, **kwargs)
         plt.tight_layout()
         return ax
 
@@ -1185,13 +1173,11 @@ class MONETAccessor:
         except AttributeError:
             ax.outline_patch.set_alpha(0)
         if roll_dateline:
-            ax1 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(
+            _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(
                 x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
             )
         else:
-            ax1 = da.plot.contourf(
-                x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
-            )
+            _ = da.plot.contourf(x="longitude", y="latitude", ax=ax, transform=transform, **kwargs)
 
         plt.tight_layout()
         return ax
@@ -1264,9 +1250,7 @@ class MONETAccessor:
             resampled object on current grid.
 
         """
-        from pyresample import kd_tree, utils
-
-        from .util import resample
+        from pyresample import kd_tree
 
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
@@ -1550,9 +1534,7 @@ class MONETAccessorDataset:
         xarray.Dataset or xarray.DataArray
             The interpolated xarray object
         """
-        from pyresample import kd_tree, utils
-
-        from .util import resample
+        from pyresample import kd_tree
 
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
@@ -1608,7 +1590,7 @@ class MONETAccessorDataset:
 
         """
         try:
-            from pyresample import geometry, utils
+            from pyresample import utils
 
             has_pyresample = True
         except ImportError:
@@ -1652,7 +1634,7 @@ class MONETAccessorDataset:
 
         """
         try:
-            from pyresample import geometry, utils
+            from pyresample import utils
 
             from .util.interp_util import lonlat_to_swathdefinition as llsd
             from .util.interp_util import nearest_point_swathdefinition as npsd
@@ -1730,12 +1712,6 @@ class MONETAccessorDataset:
         """
         from numpy import asarray, linspace, ones
 
-        try:
-            import pyresample as pr
-
-            has_pyresample = True
-        except ImportError:
-            has_pyresample = False
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf

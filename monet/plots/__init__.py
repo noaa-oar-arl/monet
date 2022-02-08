@@ -1,9 +1,42 @@
-from . import colorbars, plots, taylordiagram
-from .colorbars import *
-from .mapgen import *
-from .plots import *
+from .colorbars import cmap_discretize, colorbar_index
+from .mapgen import draw_map
+from .plots import (
+    kdeplot,
+    make_spatial_contours,
+    make_spatial_plot,
+    normval,
+    scatter,
+    spatial,
+    spatial_bias_scatter,
+    taylordiagram,
+    timeseries,
+    wind_barbs,
+    wind_quiver,
+)
 
-__all__ = ["colorbars", "plots", "taylordiagram", "mapgen"]
+__all__ = (
+    #
+    "savefig",
+    "sp_scatter_bias",
+    #
+    "cmap_discretize",
+    "colorbar_index",
+    #
+    "mapgen",
+    #
+    "kdeplot",
+    "make_spatial_contours",
+    "make_spatial_plot",
+    "normval",
+    "scatter",
+    "spatial",
+    "spatial_bias_scatter",
+    "taylordiagram",
+    "timeseries",
+    "wind_barbs",
+    "wind_quiver",
+)
+
 
 # This is the driver for all verify objects
 
@@ -55,9 +88,7 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
         Description of returned object.
 
     """
-    import io
     import os
-    import sys
 
     import matplotlib.pyplot as plt
     from PIL import Image
@@ -104,7 +135,7 @@ def sp_scatter_bias(
     val_min=None,
     **kwargs
 ):
-    from numpy import around
+    import matplotlib.pyplot as plt
     from scipy.stats import scoreatpercentile as score
 
     if ax is None:
@@ -119,7 +150,7 @@ def sp_scatter_bias(
             top = score(dfnew["sp_diff"].abs(), per=95)
             if val_max is not None:
                 top = val_max
-            x, y = df.longitude.values, df.latitude.values
+            # x, y = df.longitude.values, df.latitude.values
             dfnew["sp_diff_size"] = dfnew["sp_diff"].abs() / top * 100.0
             dfnew.loc[dfnew["sp_diff_size"] > 300, "sp_diff_size"] = 300.0
             dfnew.plot.scatter(

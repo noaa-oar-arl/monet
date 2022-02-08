@@ -1,5 +1,4 @@
 import xarray as xr
-from numpy import ones
 from pandas import Series, merge_asof
 
 
@@ -22,10 +21,6 @@ def combine_da_to_df(da, df, merge=True, **kwargs):
     -------
     pandas.DataFrame
     """
-    from numpy import ones
-
-    from ..util.interp_util import lonlat_to_swathdefinition
-
     # try:
     #     if col is None:
     #         raise RuntimeError
@@ -44,9 +39,9 @@ def combine_da_to_df(da, df, merge=True, **kwargs):
         if da.name in df.columns:
             df_interped.rename(columns={da.name: da.name + "_new"}, inplace=True)
     else:
-        dup_name = isinname = [name for name in da.data_vars.keys() if name in df.columns]
-        if len(dup_name) > 0:
-            for name in dup_name:
+        dup_names = [name for name in da.data_vars.keys() if name in df.columns]
+        if len(dup_names) > 0:
+            for name in dup_names:
                 df_interped.rename(columns={name: name + "_new"}, inplace=True)
     if merge:
         df.reset_index(drop=True)
@@ -103,7 +98,7 @@ def combine_da_to_df_xesmf(da, df, suffix=None, **kwargs):
     rename_dict = {}
     if isinstance(da_interped, xr.DataArray):
         if da_interped.name in dfnn.keys():
-            da_interped.name = df_interped.name + suffix
+            da_interped.name = da_interped.name + suffix
     else:
         for i in da_interped.data_vars.keys():
             if i in dfnn.keys():
