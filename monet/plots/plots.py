@@ -20,7 +20,9 @@ def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
         plotargs["cmap"] = "viridis"
     if discrete and "vmin" in plotargs and "vmax" in plotargs:
 
-        c, cmap = colorbar_index(ncolors, plotargs["cmap"], minval=plotargs["vmin"], maxval=plotargs["vmax"], basemap=m)
+        c, cmap = colorbar_index(
+            ncolors, plotargs["cmap"], minval=plotargs["vmin"], maxval=plotargs["vmax"], basemap=m
+        )
         plotargs["cmap"] = cmap
         m.imshow(modelvar, **plotargs)
         vmin, vmax = plotargs["vmin"], plotargs["vmax"]
@@ -50,7 +52,18 @@ def spatial(modelvar, **kwargs):
     return ax
 
 
-def make_spatial_contours(modelvar, gridobj, date, m, dpi=None, savename="", discrete=True, ncolors=None, dtype="int", **kwargs):
+def make_spatial_contours(
+    modelvar,
+    gridobj,
+    date,
+    m,
+    dpi=None,
+    savename="",
+    discrete=True,
+    ncolors=None,
+    dtype="int",
+    **kwargs
+):
     plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
     lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
@@ -64,7 +77,9 @@ def make_spatial_contours(modelvar, gridobj, date, m, dpi=None, savename="", dis
     cmap = kwargs["cmap"]
     levels = kwargs["levels"]
     if discrete:
-        c, cmap = colorbar_index(ncolors, cmap, minval=levels[0], maxval=levels[-1], basemap=m, dtype=dtype)
+        c, cmap = colorbar_index(
+            ncolors, cmap, minval=levels[0], maxval=levels[-1], basemap=m, dtype=dtype
+        )
     else:
         c = m.colorbar()
     titstring = date.strftime("%B %d %Y %H")
@@ -101,8 +116,8 @@ def wind_barbs(ws, wdir, gridobj, m, **kwargs):
 
 
 def normval(vmin, vmax, cmap):
-    from numpy import arange
     from matplotlib.colors import BoundaryNorm
+    from numpy import arange
 
     bounds = arange(vmin, vmax + 5.0, 5.0)
     norm = BoundaryNorm(boundaries=bounds, ncolors=cmap.N)
@@ -140,10 +155,12 @@ def normval(vmin, vmax, cmap):
 #     ss = (new.Obs - new.CMAQ).abs() * fact
 
 
-def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename="", ncolors=15, fact=1.5, cmap="RdBu_r"):
+def spatial_bias_scatter(
+    df, m, date, vmin=None, vmax=None, savename="", ncolors=15, fact=1.5, cmap="RdBu_r"
+):
 
-    from scipy.stats import scoreatpercentile as score
     from numpy import around
+    from scipy.stats import scoreatpercentile as score
 
     #    plt.figure(figsize=(11, 6), frameon=False)
     f, ax = plt.subplots(figsize=(11, 6), frameon=False)
@@ -159,7 +176,18 @@ def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename="", ncolors
     colors = new.CMAQ - new.Obs
     ss = (new.CMAQ - new.Obs).abs() / top * 100.0
     ss[ss > 300] = 300.0
-    plt.scatter(x, y, c=colors, s=ss, vmin=-1.0 * top, vmax=top, cmap=cmap, edgecolors="k", linewidths=0.25, alpha=0.7)
+    plt.scatter(
+        x,
+        y,
+        c=colors,
+        s=ss,
+        vmin=-1.0 * top,
+        vmax=top,
+        cmap=cmap,
+        edgecolors="k",
+        linewidths=0.25,
+        alpha=0.7,
+    )
 
     if savename != "":
         plt.savefig(savename + date + ".jpg", dpi=75.0)
@@ -186,7 +214,17 @@ def spatial_bias_scatter(df, m, date, vmin=None, vmax=None, savename="", ncolors
 #         plt.close()
 
 
-def timeseries(df, x="time", y="obs", ax=None, plotargs={}, fillargs={"alpha": 0.2}, title="", ylabel=None, label=None):
+def timeseries(
+    df,
+    x="time",
+    y="obs",
+    ax=None,
+    plotargs={},
+    fillargs={"alpha": 0.2},
+    title="",
+    ylabel=None,
+    label=None,
+):
     """Short summary.
 
     Parameters
@@ -313,7 +351,17 @@ def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
     return ax
 
 
-def taylordiagram(df, marker="o", col1="obs", col2="model", label1="OBS", label2="MODEL", scale=1.5, addon=False, dia=None):
+def taylordiagram(
+    df,
+    marker="o",
+    col1="obs",
+    col2="model",
+    label1="OBS",
+    label2="MODEL",
+    scale=1.5,
+    addon=False,
+    dia=None,
+):
     from numpy import corrcoef
 
     df = df.drop_duplicates().dropna(subset=[col1, col2])

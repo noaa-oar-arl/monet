@@ -76,7 +76,7 @@ def kolmogorov_zurbenko_filter(df, window, iterations):
 
 
 def wsdir2uv(ws, wdir):
-    from numpy import pi, sin, cos
+    from numpy import cos, pi, sin
 
     u = -ws * sin(wdir * pi / 180.0)
     v = -ws * cos(wdir * pi / 180.0)
@@ -97,8 +97,16 @@ def long_to_wide(df):
 
 def calc_8hr_rolling_max(df, col=None, window=None):
     df.index = df.time_local
-    df_rolling = df.groupby("siteid")[col].rolling(window, center=True, win_type="boxcar").mean().reset_index().dropna()
-    df_rolling_max = df_rolling.groupby("siteid").resample("D", on="time_local").max().reset_index(drop=True)
+    df_rolling = (
+        df.groupby("siteid")[col]
+        .rolling(window, center=True, win_type="boxcar")
+        .mean()
+        .reset_index()
+        .dropna()
+    )
+    df_rolling_max = (
+        df_rolling.groupby("siteid").resample("D", on="time_local").max().reset_index(drop=True)
+    )
     df = df.reset_index(drop=True)
     return df.merge(df_rolling_max, on=["siteid", "time_local"])
 
@@ -152,11 +160,106 @@ def get_giorgi_region_bounds(index=None, acronym=None):
         "TIB",
         "NAS",
     ]
-    lonmax = [155, 155, -34, -40, -83, -103, -85, -60, -103, -10, 40, 40, 22, 52, 52, 65, 155, 145, 100, 75, 100, 180]
-    lonmin = [110, 110, -82, -76, -116, -130, -103, -85, -170, -103, -10, -10, -20, 22, -10, -20, 95, 100, 65, 40, 75, 40]
-    latmax = [-11, -28, 12, -20, 30, 60, 50, 50, 72, 85, 48, 75, 18, 18, -12, 30, 20, 50, 30, 50, 50, 70]
-    latmin = [-28, -45, -20, -56, 10, 30, 30, 25, 60, 50, 30, 48, -12, -12, -35, 18, -11, 20, 5, 30, 30, 50]
-    df = pd.DataFrame({"latmin": latmin, "lonmin": lonmin, "latmax": latmax, "lonmax": lonmax, "acronym": acro}, index=i)
+    lonmax = [
+        155,
+        155,
+        -34,
+        -40,
+        -83,
+        -103,
+        -85,
+        -60,
+        -103,
+        -10,
+        40,
+        40,
+        22,
+        52,
+        52,
+        65,
+        155,
+        145,
+        100,
+        75,
+        100,
+        180,
+    ]
+    lonmin = [
+        110,
+        110,
+        -82,
+        -76,
+        -116,
+        -130,
+        -103,
+        -85,
+        -170,
+        -103,
+        -10,
+        -10,
+        -20,
+        22,
+        -10,
+        -20,
+        95,
+        100,
+        65,
+        40,
+        75,
+        40,
+    ]
+    latmax = [
+        -11,
+        -28,
+        12,
+        -20,
+        30,
+        60,
+        50,
+        50,
+        72,
+        85,
+        48,
+        75,
+        18,
+        18,
+        -12,
+        30,
+        20,
+        50,
+        30,
+        50,
+        50,
+        70,
+    ]
+    latmin = [
+        -28,
+        -45,
+        -20,
+        -56,
+        10,
+        30,
+        30,
+        25,
+        60,
+        50,
+        30,
+        48,
+        -12,
+        -12,
+        -35,
+        18,
+        -11,
+        20,
+        5,
+        30,
+        30,
+        50,
+    ]
+    df = pd.DataFrame(
+        {"latmin": latmin, "lonmin": lonmin, "latmax": latmax, "lonmax": lonmax, "acronym": acro},
+        index=i,
+    )
     try:
         if index is None and acronym is None:
             print("either index or acronym needs to be supplied")
@@ -175,7 +278,12 @@ def get_giorgi_region_df(df):
     df.loc[:, "GIORGI_ACRO"] = None
     for i in range(22):
         latmin, lonmin, latmax, lonmax, acro = get_giorgi_region_bounds(index=int(i + 1))
-        con = (df.longitude <= lonmax) & (df.longitude >= lonmin) & (df.latitude <= latmax) & (df.latitude >= latmin)
+        con = (
+            (df.longitude <= lonmax)
+            & (df.longitude >= lonmin)
+            & (df.latitude <= latmax)
+            & (df.latitude >= latmin)
+        )
         df.loc[con, "GIORGI_INDEX"] = i + 1
         df.loc[con, "GIORGI_ACRO"] = acro
     return df
@@ -213,20 +321,34 @@ def calc_13_category_usda_soil_type(clay, sand, silt):
         Description of returned object.
 
     """
-    from numpy import zeros, where
+    from numpy import where, zeros
 
     stype = zeros(clay.shape)
     stype[where((silt + clay * 1.5 < 15.0) & (clay != 255))] = 1.0  # SAND
-    stype[where((silt + 1.5 * clay >= 15.0) & (silt + 1.5 * clay < 30) & (clay != 255))] = 2.0  # Loamy Sand
-    stype[where((clay >= 7.0) & (clay < 20) & (sand > 52) & (silt + 2 * clay >= 30) & (clay != 255))] = 3.0  # Sandy Loam (cond 1)
-    stype[where((clay < 7) & (silt < 50) & (silt + 2 * clay >= 30) & (clay != 255))] = 3  # sandy loam (cond 2)
-    stype[where((silt >= 50) & (clay >= 12) & (clay < 27) & (clay != 255))] = 4  # silt loam (cond 1)
+    stype[
+        where((silt + 1.5 * clay >= 15.0) & (silt + 1.5 * clay < 30) & (clay != 255))
+    ] = 2.0  # Loamy Sand
+    stype[
+        where((clay >= 7.0) & (clay < 20) & (sand > 52) & (silt + 2 * clay >= 30) & (clay != 255))
+    ] = 3.0  # Sandy Loam (cond 1)
+    stype[
+        where((clay < 7) & (silt < 50) & (silt + 2 * clay >= 30) & (clay != 255))
+    ] = 3  # sandy loam (cond 2)
+    stype[
+        where((silt >= 50) & (clay >= 12) & (clay < 27) & (clay != 255))
+    ] = 4  # silt loam (cond 1)
     stype[where((silt >= 50) & (silt < 80) & (clay < 12) & (clay != 255))] = 4  # silt loam (cond 2)
     stype[where((silt >= 80) & (clay < 12) & (clay != 255))] = 5  # silt
-    stype[where((clay >= 7) & (clay < 27) & (silt >= 28) & (silt < 50) & (sand <= 52) & (clay != 255))] = 6  # loam
-    stype[where((clay >= 20) & (clay < 35) & (silt < 28) & (sand > 45) & (clay != 255))] = 7  # sandy clay loam
+    stype[
+        where((clay >= 7) & (clay < 27) & (silt >= 28) & (silt < 50) & (sand <= 52) & (clay != 255))
+    ] = 6  # loam
+    stype[
+        where((clay >= 20) & (clay < 35) & (silt < 28) & (sand > 45) & (clay != 255))
+    ] = 7  # sandy clay loam
     stype[where((clay >= 27) & (clay < 40.0) & (sand > 40) & (clay != 255))] = 8  # silt clay loam
-    stype[where((clay >= 27) & (clay < 40.0) & (sand > 20) & (sand <= 45) & (clay != 255))] = 9  # clay loam
+    stype[
+        where((clay >= 27) & (clay < 40.0) & (sand > 20) & (sand <= 45) & (clay != 255))
+    ] = 9  # clay loam
     stype[where((clay >= 35) & (sand > 45) & (clay != 255))] = 10  # sandy clay
     stype[where((clay >= 40) & (silt >= 40) & (clay != 255))] = 11  # silty clay
     stype[where((clay >= 40) & (sand <= 45) & (silt < 40) & (clay != 255))] = 12  # clay

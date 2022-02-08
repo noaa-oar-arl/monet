@@ -1,6 +1,6 @@
 try:
+    from pyresample.geometry import AreaDefinition, SwathDefinition
     from pyresample.kd_tree import XArrayResamplerNN
-    from pyresample.geometry import SwathDefinition, AreaDefinition
 
     has_pyresample = True
 except ImportError:
@@ -112,8 +112,8 @@ def resample_stratify(da, levels, vertical, axis=1):
 
 def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
     if has_xesmf:
-        import xesmf as xe
         import xarray as xr
+        import xesmf as xe
 
         regridder = xe.Regridder(source_da, target_da, **kwargs)
         if cleanup:

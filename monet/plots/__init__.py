@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function
-
 from . import colorbars, plots, taylordiagram
 from .colorbars import *
 from .mapgen import *
@@ -60,8 +58,9 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
     import io
     import os
     import sys
-    from PIL import Image
+
     import matplotlib.pyplot as plt
+    from PIL import Image
 
     try:
         from pydecorate import DecoratorAGG
@@ -92,10 +91,21 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
 
 
 def sp_scatter_bias(
-    df, col1=None, col2=None, ax=None, outline=False, tight=True, global_map=True, map_kwargs={}, cbar_kwargs={}, val_max=None, val_min=None, **kwargs
+    df,
+    col1=None,
+    col2=None,
+    ax=None,
+    outline=False,
+    tight=True,
+    global_map=True,
+    map_kwargs={},
+    cbar_kwargs={},
+    val_max=None,
+    val_min=None,
+    **kwargs
 ):
-    from scipy.stats import scoreatpercentile as score
     from numpy import around
+    from scipy.stats import scoreatpercentile as score
 
     if ax is None:
         ax = draw_map(**map_kwargs)
@@ -113,7 +123,15 @@ def sp_scatter_bias(
             dfnew["sp_diff_size"] = dfnew["sp_diff"].abs() / top * 100.0
             dfnew.loc[dfnew["sp_diff_size"] > 300, "sp_diff_size"] = 300.0
             dfnew.plot.scatter(
-                x="longitude", y="latitude", c=dfnew["sp_diff"], s=dfnew["sp_diff_size"], vmin=-1 * top, vmax=top, ax=ax, colorbar=True, **kwargs
+                x="longitude",
+                y="latitude",
+                c=dfnew["sp_diff"],
+                s=dfnew["sp_diff_size"],
+                vmin=-1 * top,
+                vmax=top,
+                ax=ax,
+                colorbar=True,
+                **kwargs
             )
             if ~outline:
                 ax.outline_patch.set_alpha(0)
