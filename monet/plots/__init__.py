@@ -38,7 +38,7 @@ def _dynamic_fig_size(obj):
 
 
 def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwargs):
-    """Save figure and add the MONET logo.
+    """Save figure and add logo.
 
     Parameters
     ----------
@@ -52,7 +52,7 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
         * 2 -- bottom right
         * 3 -- top right
         * 4 -- top left
-    decorate : bool
+    decorate : bool, default: True
         Whether to add the logo.
     logo : str, optional
         Path to the logo to be used.
@@ -107,7 +107,7 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
             raise ValueError(f"invalid `loc` {loc!r}")
         dc.add_logo(logo, **add_logo_kwargs)
 
-        # PIL will determine format from the filename extension
+        # PIL.Image will determine format from the filename extension
         img.save(fname)
 
         img.close()
