@@ -1,0 +1,7 @@
+[tool.black]
+line-length = 100
+
+[tool.isort]
+known_first_party = "monetio"
+profile = "black"
+line_length = 100

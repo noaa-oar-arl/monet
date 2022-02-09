@@ -3,7 +3,6 @@ Taylor diagram (Taylor, 2001) test implementation.
 http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm
 """
 
-from builtins import map, object, zip
 
 import matplotlib.pyplot as PLT
 import numpy as NP
@@ -16,7 +15,7 @@ colors = ["#DA70D6", "#228B22", "#FA8072", "#FF1493"]
 sns.set_palette(sns.color_palette(colors))
 
 
-class TaylorDiagram(object):
+class TaylorDiagram:
     """Taylor diagram: plot model standard deviation and correlation
     to reference (data) sample in a single-quadrant polar plot, with
     r=stddev and theta=arccos(correlation).
@@ -28,9 +27,9 @@ class TaylorDiagram(object):
         the reference standard deviation to be compared to.
         """
 
-        from matplotlib.projections import PolarAxes
         import mpl_toolkits.axisartist.floating_axes as FA
         import mpl_toolkits.axisartist.grid_finder as GF
+        from matplotlib.projections import PolarAxes
 
         self.refstd = refstd  # Reference standard deviation
 
@@ -45,7 +44,12 @@ class TaylorDiagram(object):
         # Standard deviation axis extent
         self.smin = 0
         self.smax = scale * self.refstd
-        ghelper = FA.GridHelperCurveLinear(tr, extremes=(0, NP.pi / 2, self.smin, self.smax), grid_locator1=gl1, tick_formatter1=tf1,)  # 1st quadrant
+        ghelper = FA.GridHelperCurveLinear(
+            tr,
+            extremes=(0, NP.pi / 2, self.smin, self.smax),
+            grid_locator1=gl1,
+            tick_formatter1=tf1,
+        )  # 1st quadrant
 
         if fig is None:
             fig = PLT.figure()

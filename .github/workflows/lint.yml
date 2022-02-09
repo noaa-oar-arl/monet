@@ -1,0 +1,20 @@
+name: Lint
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: pre-commit
+    runs-on: ubuntu-latest
+    if: github.repository == 'noaa-oar-arl/monet'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - uses: pre-commit/action@v2.0.3

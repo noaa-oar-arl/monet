@@ -1,11 +1,42 @@
-from __future__ import absolute_import, print_function
+from .colorbars import cmap_discretize, colorbar_index
+from .mapgen import draw_map
+from .plots import (
+    kdeplot,
+    make_spatial_contours,
+    make_spatial_plot,
+    normval,
+    scatter,
+    spatial,
+    spatial_bias_scatter,
+    taylordiagram,
+    timeseries,
+    wind_barbs,
+    wind_quiver,
+)
 
-from . import colorbars, plots, taylordiagram
-from .colorbars import *
-from .mapgen import *
-from .plots import *
+__all__ = (
+    #
+    "savefig",
+    "sp_scatter_bias",
+    #
+    "cmap_discretize",
+    "colorbar_index",
+    #
+    "mapgen",
+    #
+    "kdeplot",
+    "make_spatial_contours",
+    "make_spatial_plot",
+    "normval",
+    "scatter",
+    "spatial",
+    "spatial_bias_scatter",
+    "taylordiagram",
+    "timeseries",
+    "wind_barbs",
+    "wind_quiver",
+)
 
-__all__ = ["colorbars", "plots", "taylordiagram", "mapgen"]
 
 # This is the driver for all verify objects
 
@@ -57,11 +88,10 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
         Description of returned object.
 
     """
-    import io
     import os
-    import sys
-    from PIL import Image
+
     import matplotlib.pyplot as plt
+    from PIL import Image
 
     try:
         from pydecorate import DecoratorAGG
@@ -92,10 +122,21 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
 
 
 def sp_scatter_bias(
-    df, col1=None, col2=None, ax=None, outline=False, tight=True, global_map=True, map_kwargs={}, cbar_kwargs={}, val_max=None, val_min=None, **kwargs
+    df,
+    col1=None,
+    col2=None,
+    ax=None,
+    outline=False,
+    tight=True,
+    global_map=True,
+    map_kwargs={},
+    cbar_kwargs={},
+    val_max=None,
+    val_min=None,
+    **kwargs
 ):
+    import matplotlib.pyplot as plt
     from scipy.stats import scoreatpercentile as score
-    from numpy import around
 
     if ax is None:
         ax = draw_map(**map_kwargs)
@@ -109,11 +150,19 @@ def sp_scatter_bias(
             top = score(dfnew["sp_diff"].abs(), per=95)
             if val_max is not None:
                 top = val_max
-            x, y = df.longitude.values, df.latitude.values
+            # x, y = df.longitude.values, df.latitude.values
             dfnew["sp_diff_size"] = dfnew["sp_diff"].abs() / top * 100.0
             dfnew.loc[dfnew["sp_diff_size"] > 300, "sp_diff_size"] = 300.0
             dfnew.plot.scatter(
-                x="longitude", y="latitude", c=dfnew["sp_diff"], s=dfnew["sp_diff_size"], vmin=-1 * top, vmax=top, ax=ax, colorbar=True, **kwargs
+                x="longitude",
+                y="latitude",
+                c=dfnew["sp_diff"],
+                s=dfnew["sp_diff_size"],
+                vmin=-1 * top,
+                vmax=top,
+                ax=ax,
+                colorbar=True,
+                **kwargs
             )
             if ~outline:
                 ax.outline_patch.set_alpha(0)

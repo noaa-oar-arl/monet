@@ -8,7 +8,7 @@ Retrieving, loading, and combining data and putting into a common format
 is the core of MONET.  MONET uses the Pandas_ and xarray_ data formats for data
 analysis.
 
-- Open point observations in a common format.  Pandas_ excels at working with tabular data or point measurements. 
+- Open point observations in a common format.  Pandas_ excels at working with tabular data or point measurements.
   It is used for time series analysis and statistical measures.
 - Open model and satellite data in a common format.  xarray_ is used when N-dimensional arrays are needed.
 - Retrieving observational datasets for given time and space.

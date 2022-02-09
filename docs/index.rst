@@ -27,7 +27,7 @@ What's New
 ^^^^^^^^^^
 
 MONET v2.2.0 has been released.  MONET has re-engineered the way it deals with
-multidimensional observations or model output by using an 
+multidimensional observations or model output by using an
 `xarray accessor <http://xarray.pydata.org/en/stable/internals.html#extending-xarray>`_
 giving MONET a flexible and intuitive way of expanding `xarray`_ for multidimensional
 geospatial information commonly used in meteorology, climate and air quality all while

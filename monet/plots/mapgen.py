@@ -62,7 +62,12 @@ def draw_map(
 
     if states:
         states_provinces = cfeature.NaturalEarthFeature(
-            category="cultural", name="admin_1_states_provinces_lines", scale=resolution, facecolor="none", edgecolor='k',linewidth=linewidth
+            category="cultural",
+            name="admin_1_states_provinces_lines",
+            scale=resolution,
+            facecolor="none",
+            edgecolor="k",
+            linewidth=linewidth,
         )
 
     if coastlines:
