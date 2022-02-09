@@ -3,7 +3,7 @@ from pandas import DataFrame, crosstab
 
 
 def STDO(obs, mod, axis=None):
-    """ Standard deviation of Observations
+    """Standard deviation of Observations
 
     Parameters
     ----------
@@ -25,7 +25,7 @@ def STDO(obs, mod, axis=None):
 
 
 def STDP(obs, mod, axis=None):
-    """ Standard deviation of Predictions
+    """Standard deviation of Predictions
 
     Parameters
     ----------
@@ -47,7 +47,7 @@ def STDP(obs, mod, axis=None):
 
 
 def MNB(obs, mod, axis=None):
-    """ Mean Normalized Bias (%)
+    """Mean Normalized Bias (%)
 
     Parameters
     ----------
@@ -69,7 +69,7 @@ def MNB(obs, mod, axis=None):
 
 
 def MNE(obs, mod, axis=None):
-    """ Mean Normalized Gross Error (%)
+    """Mean Normalized Gross Error (%)
 
     Parameters
     ----------
@@ -91,7 +91,7 @@ def MNE(obs, mod, axis=None):
 
 
 def MdnNB(obs, mod, axis=None):
-    """ Median Normalized Bias (%)
+    """Median Normalized Bias (%)
 
     Parameters
     ----------
@@ -109,11 +109,11 @@ def MdnNB(obs, mod, axis=None):
 
     """
 
-    return np.ma.median(np.ma.masked_invalid(((mod - obs) / obs)), axis=axis) * 100.0
+    return np.ma.median(np.ma.masked_invalid((mod - obs) / obs), axis=axis) * 100.0
 
 
 def MdnNE(obs, mod, axis=None):
-    """ Median Normalized Gross Error (%)
+    """Median Normalized Gross Error (%)
 
     Parameters
     ----------
@@ -131,11 +131,11 @@ def MdnNE(obs, mod, axis=None):
 
     """
 
-    return np.ma.median(np.ma.masked_invalid((np.ma.abs(mod - obs) / obs)), axis=axis) * 100.0
+    return np.ma.median(np.ma.masked_invalid(np.ma.abs(mod - obs) / obs), axis=axis) * 100.0
 
 
 def NMdnGE(obs, mod, axis=None):
-    """ Normalized Median Gross Error (%)
+    """Normalized Median Gross Error (%)
 
     Parameters
     ----------
@@ -153,11 +153,11 @@ def NMdnGE(obs, mod, axis=None):
 
     """
 
-    return np.ma.masked_invalid((np.ma.abs(mod - obs).mean(axis=axis) / obs.mean(axis=axis))) * 100.0
+    return np.ma.masked_invalid(np.ma.abs(mod - obs).mean(axis=axis) / obs.mean(axis=axis)) * 100.0
 
 
 def NO(obs, mod, axis=None):
-    """ N Observations (#)
+    """N Observations (#)
 
     Parameters
     ----------
@@ -175,11 +175,11 @@ def NO(obs, mod, axis=None):
 
     """
 
-    return (np.ma.getmaskarray(obs) == False).sum(axis=axis)
+    return (~np.ma.getmaskarray(obs)).sum(axis=axis)  # True where masked
 
 
 def NOP(obs, mod, axis=None):
-    """ N Observations/Prediction Pairs (#)
+    """N Observations/Prediction Pairs (#)
 
     Parameters
     ----------
@@ -198,11 +198,11 @@ def NOP(obs, mod, axis=None):
     """
 
     obsc, modc = matchmasks(obs, mod)
-    return (np.ma.getmaskarray(obsc) == False).sum(axis=axis)
+    return (~np.ma.getmaskarray(obsc)).sum(axis=axis)
 
 
 def NP(obs, mod, axis=None):
-    """ N Predictions (#)
+    """N Predictions (#)
 
     Parameters
     ----------
@@ -219,11 +219,11 @@ def NP(obs, mod, axis=None):
         Description of returned object.
 
     """
-    return (np.ma.getmaskarray(mod) == False).sum(axis=axis)
+    return (~np.ma.getmaskarray(mod)).sum(axis=axis)
 
 
 def MO(obs, mod, axis=None):
-    """ Mean Observations (obs unit)
+    """Mean Observations (obs unit)
 
     Parameters
     ----------
@@ -244,7 +244,7 @@ def MO(obs, mod, axis=None):
 
 
 def MP(obs, mod, axis=None):
-    """ Mean Predictions (model unit)
+    """Mean Predictions (model unit)
 
     Parameters
     ----------
@@ -265,7 +265,7 @@ def MP(obs, mod, axis=None):
 
 
 def MdnO(obs, mod, axis=None):
-    """ Median Observations (obs unit)
+    """Median Observations (obs unit)
 
     Parameters
     ----------
@@ -286,7 +286,7 @@ def MdnO(obs, mod, axis=None):
 
 
 def MdnP(obs, mod, axis=None):
-    """ Median Predictions (model unit)
+    """Median Predictions (model unit)
 
     Parameters
     ----------
@@ -308,7 +308,7 @@ def MdnP(obs, mod, axis=None):
 
 
 def RM(obs, mod, axis=None):
-    """ Mean Ratio Observations/Predictions (none)
+    """Mean Ratio Observations/Predictions (none)
 
     Parameters
     ----------
@@ -326,11 +326,11 @@ def RM(obs, mod, axis=None):
 
     """
 
-    return np.ma.masked_invalid((obs / mod)).mean(axis=axis)
+    return np.ma.masked_invalid(obs / mod).mean(axis=axis)
 
 
 def RMdn(obs, mod, axis=None):
-    """ Median Ratio Observations/Predictions (none)
+    """Median Ratio Observations/Predictions (none)
 
     Parameters
     ----------
@@ -348,11 +348,11 @@ def RMdn(obs, mod, axis=None):
 
     """
 
-    return np.ma.median(np.ma.masked_invalid((obs / mod)), axis=axis)
+    return np.ma.median(np.ma.masked_invalid(obs / mod), axis=axis)
 
 
 def MB(obs, mod, axis=None):
-    """ Mean Bias
+    """Mean Bias
 
     Parameters
     ----------
@@ -374,7 +374,7 @@ def MB(obs, mod, axis=None):
 
 
 def MdnB(obs, mod, axis=None):
-    """ Median Bias
+    """Median Bias
 
     Parameters
     ----------
@@ -396,7 +396,7 @@ def MdnB(obs, mod, axis=None):
 
 
 def WDMB_m(obs, mod, axis=None):
-    """ Wind Direction Mean Bias (avoid single block error in np.ma)
+    """Wind Direction Mean Bias (avoid single block error in np.ma)
 
     Parameters
     ----------
@@ -418,7 +418,7 @@ def WDMB_m(obs, mod, axis=None):
 
 
 def WDMB(obs, mod, axis=None):
-    """ Wind Direction Mean Bias
+    """Wind Direction Mean Bias
 
     Parameters
     ----------
@@ -440,7 +440,7 @@ def WDMB(obs, mod, axis=None):
 
 
 def WDMdnB(obs, mod, axis=None):
-    """ Wind Direction Median Bias
+    """Wind Direction Median Bias
 
     Parameters
     ----------
@@ -462,7 +462,7 @@ def WDMdnB(obs, mod, axis=None):
 
 
 def NMB(obs, mod, axis=None):
-    """ Normalized Mean Bias (%)
+    """Normalized Mean Bias (%)
 
     Parameters
     ----------
@@ -484,7 +484,7 @@ def NMB(obs, mod, axis=None):
 
 
 def WDNMB_m(obs, mod, axis=None):
-    """ Wind Direction Normalized Mean Bias (%) (avoid single block error in np.ma)
+    """Wind Direction Normalized Mean Bias (%) (avoid single block error in np.ma)
 
     Parameters
     ----------
@@ -506,7 +506,7 @@ def WDNMB_m(obs, mod, axis=None):
 
 
 def NMB_ABS(obs, mod, axis=None):
-    """ Normalized Mean Bias - Absolute of the denominator (%)
+    """Normalized Mean Bias - Absolute of the denominator (%)
 
     Parameters
     ----------
@@ -528,7 +528,7 @@ def NMB_ABS(obs, mod, axis=None):
 
 
 def NMdnB(obs, mod, axis=None):
-    """ Normalized Median Bias (%)
+    """Normalized Median Bias (%)
 
     Parameters
     ----------
@@ -550,7 +550,7 @@ def NMdnB(obs, mod, axis=None):
 
 
 def FB(obs, mod, axis=None):
-    """ Fractional Bias (%)
+    """Fractional Bias (%)
 
     Parameters
     ----------
@@ -568,11 +568,11 @@ def FB(obs, mod, axis=None):
 
     """
 
-    return ((np.ma.masked_invalid(((mod - obs) / (mod + obs)))).mean(axis=axis) * 2.0) * 100.0
+    return ((np.ma.masked_invalid((mod - obs) / (mod + obs))).mean(axis=axis) * 2.0) * 100.0
 
 
 def ME(obs, mod, axis=None):
-    """ Mean Gross Error (model and obs unit)
+    """Mean Gross Error (model and obs unit)
 
     Parameters
     ----------
@@ -594,7 +594,7 @@ def ME(obs, mod, axis=None):
 
 
 def MdnE(obs, mod, axis=None):
-    """ Median Gross Error (model and obs unit)
+    """Median Gross Error (model and obs unit)
 
     Parameters
     ----------
@@ -616,7 +616,7 @@ def MdnE(obs, mod, axis=None):
 
 
 def WDME_m(obs, mod, axis=None):
-    """ Wind Direction Mean Gross Error (model and obs unit)
+    """Wind Direction Mean Gross Error (model and obs unit)
     (avoid single block error in np.ma)
 
     Parameters
@@ -682,7 +682,7 @@ def WDMdnE(obs, mod, axis=None):
 
 
 def NME_m(obs, mod, axis=None):
-    """ Normalized Mean Error (%) (avoid single block error in np.ma)
+    """Normalized Mean Error (%) (avoid single block error in np.ma)
 
     Parameters
     ----------
@@ -700,12 +700,12 @@ def NME_m(obs, mod, axis=None):
 
     """
 
-    out = ((np.abs(mod - obs).sum(axis=axis) / obs.sum(axis=axis))) * 100
+    out = (np.abs(mod - obs).sum(axis=axis) / obs.sum(axis=axis)) * 100
     return out
 
 
 def NME_m_ABS(obs, mod, axis=None):
-    """ Normalized Mean Error (%) - Absolute of the denominator
+    """Normalized Mean Error (%) - Absolute of the denominator
     (avoid single block error in np.ma)
 
     Parameters
@@ -724,12 +724,12 @@ def NME_m_ABS(obs, mod, axis=None):
 
     """
 
-    out = ((np.abs(mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)))) * 100
+    out = (np.abs(mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis))) * 100
     return out
 
 
 def NME(obs, mod, axis=None):
-    """ Normalized Mean Error (%)
+    """Normalized Mean Error (%)
 
     Parameters
     ----------
@@ -747,12 +747,12 @@ def NME(obs, mod, axis=None):
 
     """
 
-    out = ((np.ma.abs(mod - obs).sum(axis=axis) / obs.sum(axis=axis))) * 100
+    out = (np.ma.abs(mod - obs).sum(axis=axis) / obs.sum(axis=axis)) * 100
     return out
 
 
 def NMdnE(obs, mod, axis=None):
-    """ Normalized Median Error (%)
+    """Normalized Median Error (%)
 
     Parameters
     ----------
@@ -775,7 +775,7 @@ def NMdnE(obs, mod, axis=None):
 
 
 def FE(obs, mod, axis=None):
-    """ Fractional Error (%)
+    """Fractional Error (%)
 
     Parameters
     ----------
@@ -793,11 +793,11 @@ def FE(obs, mod, axis=None):
 
     """
 
-    return ((np.ma.abs(mod - obs) / (mod + obs))).mean(axis=axis) * 2.0 * 100.0
+    return (np.ma.abs(mod - obs) / (mod + obs)).mean(axis=axis) * 2.0 * 100.0
 
 
 def USUTPB(obs, mod, axis=None):
-    """ Unpaired Space/Unpaired Time Peak Bias (%)
+    """Unpaired Space/Unpaired Time Peak Bias (%)
 
     Parameters
     ----------
@@ -815,11 +815,11 @@ def USUTPB(obs, mod, axis=None):
 
     """
 
-    return (((mod.max(axis=axis) - obs.max(axis=axis)) / obs.max(axis=axis))) * 100.0
+    return ((mod.max(axis=axis) - obs.max(axis=axis)) / obs.max(axis=axis)) * 100.0
 
 
 def USUTPE(obs, mod, axis=None):
-    """ Unpaired Space/Unpaired Time Peak Error (%)
+    """Unpaired Space/Unpaired Time Peak Error (%)
 
     Parameters
     ----------
@@ -837,11 +837,11 @@ def USUTPE(obs, mod, axis=None):
 
     """
 
-    return ((np.ma.abs(mod.max(axis=axis) - obs.max(axis=axis)) / obs.max(axis=axis))) * 100.0
+    return (np.ma.abs(mod.max(axis=axis) - obs.max(axis=axis)) / obs.max(axis=axis)) * 100.0
 
 
 def MNPB(obs, mod, paxis, axis=None):
-    """ Mean Normalized Peak Bias (%)
+    """Mean Normalized Peak Bias (%)
 
     Parameters
     ----------
@@ -861,11 +861,13 @@ def MNPB(obs, mod, paxis, axis=None):
 
     """
 
-    return (((mod.max(axis=paxis) - obs.max(axis=paxis)) / obs.max(axis=paxis))).mean(axis=axis) * 100.0
+    return ((mod.max(axis=paxis) - obs.max(axis=paxis)) / obs.max(axis=paxis)).mean(
+        axis=axis
+    ) * 100.0
 
 
 def MdnNPB(obs, mod, paxis, axis=None):
-    """ Median Normalized Peak Bias (%)
+    """Median Normalized Peak Bias (%)
 
     Parameters
     ----------
@@ -885,11 +887,14 @@ def MdnNPB(obs, mod, paxis, axis=None):
 
     """
 
-    return np.ma.median(((mod.max(axis=paxis) - obs.max(axis=paxis)) / obs.max(axis=paxis)), axis=axis) * 100.0
+    return (
+        np.ma.median(((mod.max(axis=paxis) - obs.max(axis=paxis)) / obs.max(axis=paxis)), axis=axis)
+        * 100.0
+    )
 
 
 def MNPE(obs, mod, paxis, axis=None):
-    """ Mean Normalized Peak Error (%)
+    """Mean Normalized Peak Error (%)
 
     Parameters
     ----------
@@ -909,11 +914,13 @@ def MNPE(obs, mod, paxis, axis=None):
 
     """
 
-    return (((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))) / obs.max(axis=paxis))).mean(axis=axis) * 100.0
+    return ((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))) / obs.max(axis=paxis)).mean(
+        axis=axis
+    ) * 100.0
 
 
 def MdnNPE(obs, mod, paxis, axis=None):
-    """ Median Normalized Peak Bias (%)
+    """Median Normalized Peak Bias (%)
 
     Parameters
     ----------
@@ -933,11 +940,17 @@ def MdnNPE(obs, mod, paxis, axis=None):
 
     """
 
-    return np.ma.median(((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))) / obs.max(axis=paxis)), axis=axis) * 100.0
+    return (
+        np.ma.median(
+            ((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))) / obs.max(axis=paxis)),
+            axis=axis,
+        )
+        * 100.0
+    )
 
 
 def NMPB(obs, mod, paxis, axis=None):
-    """ Normalized Mean Peak Bias (%)
+    """Normalized Mean Peak Bias (%)
 
     Parameters
     ----------
@@ -957,11 +970,15 @@ def NMPB(obs, mod, paxis, axis=None):
 
     """
 
-    return (mod.max(axis=paxis) - obs.max(axis=paxis)).mean(axis=axis) / obs.max(axis=paxis).mean(axis=axis) * 100.0
+    return (
+        (mod.max(axis=paxis) - obs.max(axis=paxis)).mean(axis=axis)
+        / obs.max(axis=paxis).mean(axis=axis)
+        * 100.0
+    )
 
 
 def NMdnPB(obs, mod, paxis, axis=None):
-    """ Normalized Median Peak Bias (%)
+    """Normalized Median Peak Bias (%)
 
     Parameters
     ----------
@@ -981,11 +998,15 @@ def NMdnPB(obs, mod, paxis, axis=None):
 
     """
 
-    return np.ma.median((mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis) / np.ma.median(obs.max(axis=paxis), axis=axis) * 100.0
+    return (
+        np.ma.median((mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis)
+        / np.ma.median(obs.max(axis=paxis), axis=axis)
+        * 100.0
+    )
 
 
 def NMPE(obs, mod, paxis, axis=None):
-    """ Normalized Mean Peak Error (%)
+    """Normalized Mean Peak Error (%)
 
     Parameters
     ----------
@@ -1005,11 +1026,15 @@ def NMPE(obs, mod, paxis, axis=None):
 
     """
 
-    return (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))).mean(axis=axis) / obs.max(axis=paxis).mean(axis=axis) * 100.0
+    return (
+        (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))).mean(axis=axis)
+        / obs.max(axis=paxis).mean(axis=axis)
+        * 100.0
+    )
 
 
 def NMdnPE(obs, mod, paxis, axis=None):
-    """ Normalized Median Peak Bias (%)
+    """Normalized Median Peak Bias (%)
 
     Parameters
     ----------
@@ -1029,11 +1054,15 @@ def NMdnPE(obs, mod, paxis, axis=None):
 
     """
 
-    return np.ma.median(np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis) / np.ma.median(obs.max(axis=paxis), axis=axis) * 100.0
+    return (
+        np.ma.median(np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis)
+        / np.ma.median(obs.max(axis=paxis), axis=axis)
+        * 100.0
+    )
 
 
 def PSUTMNPB(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Mean Normalized Peak Bias (%)
+    """Paired Space/Unpaired Time Mean Normalized Peak Bias (%)
 
     Parameters
     ----------
@@ -1055,7 +1084,7 @@ def PSUTMNPB(obs, mod, axis=None):
 
 
 def PSUTMdnNPB(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Median Normalized Peak Bias (%)
+    """Paired Space/Unpaired Time Median Normalized Peak Bias (%)
 
     Parameters
     ----------
@@ -1077,7 +1106,7 @@ def PSUTMdnNPB(obs, mod, axis=None):
 
 
 def PSUTMNPE(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Mean Normalized Peak Error (%)
+    """Paired Space/Unpaired Time Mean Normalized Peak Error (%)
 
     Parameters
     ----------
@@ -1099,7 +1128,7 @@ def PSUTMNPE(obs, mod, axis=None):
 
 
 def PSUTMdnNPE(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Median Normalized Peak Error (%)
+    """Paired Space/Unpaired Time Median Normalized Peak Error (%)
 
     Parameters
     ----------
@@ -1121,7 +1150,7 @@ def PSUTMdnNPE(obs, mod, axis=None):
 
 
 def PSUTNMPB(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Normalized Mean Peak Bias (%)
+    """Paired Space/Unpaired Time Normalized Mean Peak Bias (%)
 
     Parameters
     ----------
@@ -1143,7 +1172,7 @@ def PSUTNMPB(obs, mod, axis=None):
 
 
 def PSUTNMPE(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Normalized Mean Peak Error (%)
+    """Paired Space/Unpaired Time Normalized Mean Peak Error (%)
 
     Parameters
     ----------
@@ -1165,7 +1194,7 @@ def PSUTNMPE(obs, mod, axis=None):
 
 
 def PSUTNMdnPB(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Normalized Median Peak Bias (%)
+    """Paired Space/Unpaired Time Normalized Median Peak Bias (%)
 
     Parameters
     ----------
@@ -1187,7 +1216,7 @@ def PSUTNMdnPB(obs, mod, axis=None):
 
 
 def PSUTNMdnPE(obs, mod, axis=None):
-    """ Paired Space/Unpaired Time Normalized Median Peak Error (%)
+    """Paired Space/Unpaired Time Normalized Median Peak Error (%)
 
     Parameters
     ----------
@@ -1209,7 +1238,7 @@ def PSUTNMdnPE(obs, mod, axis=None):
 
 
 def R2(obs, mod, axis=None):
-    """ Coefficient of Determination (unit squared)
+    """Coefficient of Determination (unit squared)
 
     Parameters
     ----------
@@ -1258,7 +1287,7 @@ def RMSE(obs, mod, axis=None):
 
 
 def WDRMSE_m(obs, mod, axis=None):
-    """ Wind Direction Root Mean Square Error (model unit) (avoid single block error in np.ma)
+    """Wind Direction Root Mean Square Error (model unit) (avoid single block error in np.ma)
 
     Parameters
     ----------
@@ -1404,7 +1433,7 @@ def RMSEu(obs, mod, axis=None):
 
 
 def d1(obs, mod, axis=None):
-    """ Modified Index of Agreement, d1
+    """Modified Index of Agreement, d1
 
     Parameters
     ----------
@@ -1422,7 +1451,10 @@ def d1(obs, mod, axis=None):
 
     """
     return 1.0 - (
-        (np.ma.abs(obs - mod)).sum(axis=axis) / (np.ma.abs(mod - obs.mean(axis=axis)) + np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis)
+        (np.ma.abs(obs - mod)).sum(axis=axis)
+        / (np.ma.abs(mod - obs.mean(axis=axis)) + np.ma.abs(obs - obs.mean(axis=axis))).sum(
+            axis=axis
+        )
     )
 
 
@@ -1444,7 +1476,10 @@ def E1(obs, mod, axis=None):
         Description of returned object.
 
     """
-    return 1.0 - ((np.ma.abs(obs - mod)).sum(axis=axis) / (np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis))
+    return 1.0 - (
+        (np.ma.abs(obs - mod)).sum(axis=axis)
+        / (np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis)
+    )
 
 
 def IOA_m(obs, mod, axis=None):
@@ -1468,7 +1503,10 @@ def IOA_m(obs, mod, axis=None):
     obsmean = obs.mean(axis=axis)
     if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
-    return 1.0 - ((np.abs(obs - mod) ** 2).sum(axis=axis) / ((np.abs(mod - obsmean) + np.abs(obs - obsmean)) ** 2).sum(axis=axis))
+    return 1.0 - (
+        (np.abs(obs - mod) ** 2).sum(axis=axis)
+        / ((np.abs(mod - obsmean) + np.abs(obs - obsmean)) ** 2).sum(axis=axis)
+    )
 
 
 def IOA(obs, mod, axis=None):
@@ -1492,7 +1530,10 @@ def IOA(obs, mod, axis=None):
     obsmean = obs.mean(axis=axis)
     if axis is not None:
         obsmean = np.expand_dims(obsmean, axis=axis)
-    return 1.0 - ((np.ma.abs(obs - mod) ** 2).sum(axis=axis) / ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis))
+    return 1.0 - (
+        (np.ma.abs(obs - mod) ** 2).sum(axis=axis)
+        / ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis)
+    )
 
 
 def circlebias_m(b):
@@ -1560,7 +1601,9 @@ def WDIOA_m(obs, mod, axis=None):
 
     ohat = circlebias_m(obs - obsmean)
 
-    return 1.0 - ((np.abs(b) ** 2).sum(axis=axis) / ((np.abs(bhat) + np.abs(ohat)) ** 2).sum(axis=axis))
+    return 1.0 - (
+        (np.abs(b) ** 2).sum(axis=axis) / ((np.abs(bhat) + np.abs(ohat)) ** 2).sum(axis=axis)
+    )
 
 
 def WDIOA(obs, mod, axis=None):
@@ -1590,7 +1633,10 @@ def WDIOA(obs, mod, axis=None):
 
     ohat = circlebias(obs - obsmean)
 
-    return 1.0 - ((np.ma.abs(b) ** 2).sum(axis=axis) / ((np.ma.abs(bhat) + np.ma.abs(ohat)) ** 2).sum(axis=axis))
+    return 1.0 - (
+        (np.ma.abs(b) ** 2).sum(axis=axis)
+        / ((np.ma.abs(bhat) + np.ma.abs(ohat)) ** 2).sum(axis=axis)
+    )
 
 
 def AC(obs, mod, axis=None):
@@ -1641,7 +1687,10 @@ def WDAC(obs, mod, axis=None):
     if axis is not None:
         obs_bar = np.expand_dims(obs_bar, axis=axis)
     p1 = (circlebias(mod - obs_bar) * circlebias(obs - obs_bar)).sum(axis=axis)
-    p2 = ((circlebias(mod - obs_bar) ** 2).sum(axis=axis) * (circlebias(obs - obs_bar) ** 2).sum(axis=axis)) ** 0.5
+    p2 = (
+        (circlebias(mod - obs_bar) ** 2).sum(axis=axis)
+        * (circlebias(obs - obs_bar) ** 2).sum(axis=axis)
+    ) ** 0.5
     return p1 / p2
 
 
@@ -1697,6 +1746,7 @@ def ETS(obs, mod, minval, maxval):
     print("ETS for range " + str(minval) + " --> " + str(maxval) + ": " + ets)
     return ets
 
+
 def CSI(obs, mod, minval, maxval):
     """Critical Success Index (1 is perfect - Range 0 -> 1)
 
@@ -1718,7 +1768,7 @@ def CSI(obs, mod, minval, maxval):
 
     """
     a, b, c, d = scores(obs, mod, minval, maxval=maxval)
-    csi = a / a + b + c 
+    csi = a / a + b + c
     print("CSI for range " + str(minval) + " --> " + str(maxval) + ": " + csi)
     return csi
 
@@ -1747,7 +1797,11 @@ def scores(obs, mod, minval, maxval=1.0e5):
     d["obs"] = obs
     d["mod"] = mod
     df = DataFrame(d)
-    ct = crosstab((df["mod"] > minval) & (df["mod"] < maxval), (df["obs"] > minval) & (df["obs"] < maxval), margins=True)
+    ct = crosstab(
+        (df["mod"] > minval) & (df["mod"] < maxval),
+        (df["obs"] > minval) & (df["obs"] < maxval),
+        margins=True,
+    )
     #    print ct
     a = ct[1][1].astype("float")
     b = ct[1][0].astype("float")
@@ -1789,7 +1843,7 @@ def stats(df, minval, maxval):
         a, b, c, d = scores(df.Obs.values, df.CMAQ.values, 70, 1000)
         dd["POD"] = a / (a + b)
         dd["FAR"] = c / (a + c)
-    except:
+    except Exception:
         dd["POD"] = 1.0
         dd["FAR"] = 0.0
     return dd
