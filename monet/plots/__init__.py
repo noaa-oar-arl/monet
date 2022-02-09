@@ -156,7 +156,7 @@ def sp_scatter_bias(
     cbar_kwargs={},
     val_max=None,
     val_min=None,
-    **kwargs
+    **kwargs,
 ):
     import matplotlib.pyplot as plt
     from scipy.stats import scoreatpercentile as score
@@ -185,7 +185,7 @@ def sp_scatter_bias(
                 vmax=top,
                 ax=ax,
                 colorbar=True,
-                **kwargs
+                **kwargs,
             )
             if ~outline:
                 ax.outline_patch.set_alpha(0)
