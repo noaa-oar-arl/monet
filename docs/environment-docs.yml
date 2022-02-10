@@ -1,0 +1,30 @@
+name: monet-docs
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.8
+  - ipykernel
+  - ipython
+  #
+  # core
+  - cartopy
+  - dask
+  - matplotlib
+  - netcdf4
+  - numpy
+  - pandas>=1.0
+  - pydecorate
+  - pyresample
+  - seaborn
+  - xarray
+  #
+  # docs
+  - nbsphinx
+  - sphinx=4.*
+  - sphinx-autobuild
+  - sphinx_rtd_theme>=0.4
+  #
+  - pip>=21.1
+  - pip:
+      - "-e ../"
