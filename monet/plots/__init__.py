@@ -68,41 +68,63 @@ def _dynamic_fig_size(obj):
     return figsize
 
 
-def savefig(fname, loc=1, decorate=True, **kwargs):
-    """save figure and add the MONET logo .
+def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwargs):
+    """Save figure and add logo.
 
     Parameters
     ----------
     fname : str
-        output file name.
+        Output file name or path. Passed to ``plt.savefig``.
+        Must include desired file extension (``.jpg`` or ``.png``).
     loc : int
-        the location for the monet logo.
-    decorate : bool
-        Description of parameter `decorate`.
+        The location for the logo.
+
+        * 1 -- bottom left (default)
+        * 2 -- bottom right
+        * 3 -- top right
+        * 4 -- top left
+    decorate : bool, default: True
+        Whether to add the logo.
+    logo : str, optional
+        Path to the logo to be used.
+        If not provided, the MONET logo is used.
+    logo_height : float or int, optional
+        Desired logo height in pixels.
+        If not provided, the original logo image dimensions are used.
+        Modify to scale the logo.
     **kwargs : dict
-        kwargs for the matplotlib.pyplot.savefig function.
+        Passed to the ``plt.savefig`` function.
 
     Returns
     -------
-    type
-        Description of returned object.
-
+    None
     """
-    import os
+    from pathlib import Path
 
     import matplotlib.pyplot as plt
     from PIL import Image
+    from pydecorate import DecoratorAGG
 
-    try:
-        from pydecorate import DecoratorAGG
+    parts = fname.split(".")
+    if not len(parts) > 1:
+        raise ValueError("`fname` must include a file extension, e.g. '.png'")
+    ext = fname.split(".")[-1]
 
-        pydecorate = True
-    except ImportError:
-        pydecorate = False
+    # Save current figure
     plt.savefig(fname, **kwargs)
-    if pydecorate and decorate:
+
+    # Add logo
+    if decorate:
+        if logo is None:
+            logo = Path(__file__).parent / "../data/MONET-logo.png"
+        add_logo_kwargs = {}
+        if logo_height is not None:
+            add_logo_kwargs["height"] = logo_height
+        if ext.lower() not in {"png", "jpg", "jpeg"}:
+            raise ValueError(f"only PNG and JPEG supported, but detected extension is {ext!r}")
+
         img = Image.open(fname)
-        dc = DecoratorAGG(img)
+        dc = DecoratorAGG(img)  # cursor starts top-left
         if loc == 1:
             dc.align_bottom()
         elif loc == 2:
@@ -110,15 +132,16 @@ def savefig(fname, loc=1, decorate=True, **kwargs):
             dc.align_right()
         elif loc == 3:
             dc.align_right()
-        # sys.argv[0])[-5] + 'data/MONET_logo.png'
-        # print(os.path.basename(__file__))
-        logo = os.path.abspath(__file__)[:-17] + "data/MONET-logo.png"
-        # print(logo)
-        dc.add_logo(logo)
-        if fname.split(".")[-1] == "png":
-            img.save(fname, "PNG")
-        elif fname.split(".")[-1] == "jpg":
-            img.save(fname, "JPEG")
+        elif loc == 4:
+            pass
+        else:
+            raise ValueError(f"invalid `loc` {loc!r}")
+        dc.add_logo(logo, **add_logo_kwargs)
+
+        # PIL.Image will determine format from the filename extension
+        img.save(fname)
+
+        img.close()
 
 
 def sp_scatter_bias(
@@ -133,7 +156,7 @@ def sp_scatter_bias(
     cbar_kwargs={},
     val_max=None,
     val_min=None,
-    **kwargs
+    **kwargs,
 ):
     import matplotlib.pyplot as plt
     from scipy.stats import scoreatpercentile as score
@@ -162,7 +185,7 @@ def sp_scatter_bias(
                 vmax=top,
                 ax=ax,
                 colorbar=True,
-                **kwargs
+                **kwargs,
             )
             if ~outline:
                 ax.outline_patch.set_alpha(0)

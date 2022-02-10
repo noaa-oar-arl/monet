@@ -160,7 +160,7 @@ def calc_stephan_boltzmann(T_K):
     M : float
         Emitted radiance (W m-2)"""
 
-    M = sb * T_K ** 4
+    M = sb * T_K**4
     return np.asarray(M)
 
 
@@ -377,8 +377,8 @@ def calc_lapse_rate_moist(T_A_K, ea, p):
     lambda_v = calc_lambda(T_A_K)
     Gamma_w = (
         g
-        * (R_d * T_A_K ** 2 + lambda_v * r * T_A_K)
-        / (c_p * R_d * T_A_K ** 2 + lambda_v ** 2 * r * epsilon)
+        * (R_d * T_A_K**2 + lambda_v * r * T_A_K)
+        / (c_p * R_d * T_A_K**2 + lambda_v**2 * r * epsilon)
     )
     return Gamma_w
 
@@ -492,7 +492,7 @@ def calc_Psi_H(zoL):
     c = 0.33
     d = 0.057
     n = 0.78
-    Psi_H[i] = ((1.0 - d) / n) * np.log((c + y ** n) / c)
+    Psi_H[i] = ((1.0 - d) / n) * np.log((c + y**n) / c)
     return np.asarray(Psi_H)
 
 
@@ -531,13 +531,13 @@ def calc_Psi_M(zoL):
     a = 0.33
     b = 0.41
     x = np.asarray((y / a) ** 0.333333)
-    Psi_0 = -np.log(a) + 3 ** 0.5 * b * a ** 0.333333 * np.pi / 6.0
-    y = np.minimum(y, b ** -3)
+    Psi_0 = -np.log(a) + 3**0.5 * b * a**0.333333 * np.pi / 6.0
+    y = np.minimum(y, b**-3)
     Psi_M[i] = (
         np.log(a + y)
-        - 3.0 * b * y ** 0.333333
-        + (b * a ** 0.333333) / 2.0 * np.log((1.0 + x) ** 2 / (1.0 - x + x ** 2))
-        + 3.0 ** 0.5 * b * a ** 0.333333 * np.arctan((2.0 * x - 1.0) / 3 ** 0.5)
+        - 3.0 * b * y**0.333333
+        + (b * a**0.333333) / 2.0 * np.log((1.0 + x) ** 2 / (1.0 - x + x**2))
+        + 3.0**0.5 * b * a**0.333333 * np.arctan((2.0 * x - 1.0) / 3**0.5)
         + Psi_0
     )
     return np.asarray(Psi_M)
@@ -581,7 +581,7 @@ def calc_richardson(u, z_u, d_0, T_R0, T_R1, T_A0, T_A1):
 
     # See eq (2) from Louis 1979
     Ri = -(gravity * (z_u - d_0) / T_A1) * (
-        ((T_R1 - T_R0) - (T_A1 - T_A0)) / u ** 2
+        ((T_R1 - T_R0) - (T_A1 - T_A0)) / u**2
     )  # equation (12) [Norman2000]
     return np.asarray(Ri)
 

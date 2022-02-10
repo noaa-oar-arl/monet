@@ -103,7 +103,7 @@ class TaylorDiagram:
 
         rs, ts = NP.meshgrid(NP.linspace(self.smin, self.smax), NP.linspace(0, NP.pi / 2))
         # Compute centered RMS difference
-        rms = NP.sqrt(self.refstd ** 2 + rs ** 2 - 2 * self.refstd * rs * NP.cos(ts))
+        rms = NP.sqrt(self.refstd**2 + rs**2 - 2 * self.refstd * rs * NP.cos(ts))
 
         contours = self.ax.contour(ts, rs, rms, levels, **kwargs)
 
