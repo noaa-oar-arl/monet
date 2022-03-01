@@ -1,8 +1,8 @@
 "MONET Accessor"
 
+import numpy as np
 import pandas as pd
 import xarray as xr
-import numpy as np
 
 try:
     import xesmf  # noqa: F401
@@ -131,11 +131,11 @@ def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=
 
     # Unstructured Grid
     # lat & lon are not coordinate variables in unstructured grid
-    if "ncol" in dset.dims:
+    if dset.monet.unstructured_grid:
         # only call rename and wrap_longitudes
         dset = _rename_to_monet_latlon(dset)
         dset["longitude"] = wrap_longitudes(dset["longitude"])
-        
+
     else:
         dset = _rename_to_monet_latlon(dset)
         latlon2d = True
@@ -157,7 +157,7 @@ def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=
         else:
             dset = _rename_to_monet_latlon(dset)
         dset["longitude"] = wrap_longitudes(dset["longitude"])
-        
+
     return dset
 
 
@@ -175,14 +175,13 @@ def _rename_to_monet_latlon(ds):
         Description of returned object.
 
     """
-    
+
     # To consider unstructured grid
-    if "ncol" in ds.dims:
+    if ds.monet.unstructured_grid:
         check_list = ds.data_vars
     else:
         check_list = ds.coords
-        
-        
+
     if "lat" in check_list:
         return ds.rename({"lat": "latitude", "lon": "longitude"})
     elif "Latitude" in check_list:
@@ -1373,6 +1372,7 @@ class MONETAccessorDataset:
 
     def __init__(self, xray_obj):
         self._obj = xray_obj
+        self.unstructured_grid = False
 
     def is_land(self, return_xarray=False):
         """checks the mask of land and ocean if the global_land_mask libra.
@@ -1615,50 +1615,61 @@ class MONETAccessorDataset:
         except TypeError:
             print("data must be either an Xarray.DataArray or Xarray.Dataset")
 
-
         d1 = data
         d2 = self._obj
 
         site_indices = []
-        site_latitudes = d2["latitude"].values[0,:] 
-        site_longitudes = d2["longitude"].values[0,:] 
-        model_latitudes = d1["latitude"].values 
-        model_longitudes = d1["longitude"].values 
+        site_latitudes = d2["latitude"].values[0, :]
+        site_longitudes = d2["longitude"].values[0, :]
+        model_latitudes = d1["latitude"].values
+        model_longitudes = d1["longitude"].values
 
-
-        for siteii in np.arange( len(d2["siteid"][0]) ):        
-            ##### Needed to be updated in the future #####        
+        for siteii in np.arange(len(d2["siteid"][0])):
+            # ==== Needed to be updated in the future =====
             # currently based on center lon & lat
-            #lon_tmp = d2['longitude'].values[0,siteii]
-            #if lon_tmp < -0.:
+            # lon_tmp = d2['longitude'].values[0,siteii]
+            # if lon_tmp < -0.:
             #    lon_tmp += 360.
             #
-            #site_indices.append( get_site_index( lon_tmp, 
-            #                                     d2['latitude'].values[0,siteii], 
+            # site_indices.append( get_site_index( lon_tmp,
+            #                                     d2['latitude'].values[0,siteii],
             #                                     scrip_file=d1.monet.scrip, check_N=20 ) )
-            site_indices.append( np.argmin( np.abs( site_latitudes[siteii] - model_latitudes ) + \
-                                            np.abs( site_longitudes[siteii] - model_longitudes ) ) )
+            site_indices.append(
+                np.argmin(
+                    np.abs(site_latitudes[siteii] - model_latitudes)
+                    + np.abs(site_longitudes[siteii] - model_longitudes)
+                )
+            )
 
-        dict_data = { }           
+        dict_data = {}
         for dvar in d1.data_vars:
-            if dvar in ["latitude","longitude"]:
+            if dvar in ["latitude", "longitude"]:
                 continue
             else:
-                dict_data[dvar] = ( ["time","z","y","x"], 
-                                    d1[dvar][:,0,np.array(site_indices)].values.reshape( len(d1["time"]), 1, 1, len(site_indices) ) )
+                dict_data[dvar] = (
+                    ["time", "z", "y", "x"],
+                    d1[dvar][:, 0, np.array(site_indices)].values.reshape(
+                        len(d1["time"]), 1, 1, len(site_indices)
+                    ),
+                )
 
+        dict_coords = {
+            "time": (["time"], d1["time"].values),
+            "x": (["x"], np.arange(len(site_indices))),
+            "longitude": (
+                ["y", "x"],
+                model_longitudes[np.array(site_indices)].reshape(1, len(site_indices)),
+            ),
+            "latitude": (
+                ["y", "x"],
+                model_latitudes[np.array(site_indices)].reshape(1, len(site_indices)),
+            ),
+        }
 
-        dict_coords = { "time":(["time"], d1["time"].values ),
-                        "x":(["x"], np.arange(len(site_indices))), 
-                        "longitude":( ["y","x"], model_longitudes[np.array(site_indices)].reshape(1,len(site_indices)) ),
-                        "latitude":( ["y","x"], model_latitudes[np.array(site_indices)].reshape(1,len(site_indices)))  }
-
-        result = xr.Dataset( data_vars=dict_data,
-                              coords=dict_coords )
+        result = xr.Dataset(data_vars=dict_data, coords=dict_coords)
 
         return result
-    
-    
+
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Uses pyresample to intepolate to find the i, j index of grid with respect to the given lat lon.
 
