@@ -1,0 +1,25 @@
+cff-version: '1.2.0'
+title: monetio
+type: software
+message: If you use this software, please cite it using the metadata from this file.
+authors:
+  - family-names: Baker
+    given-names: Barry D.
+    orcid: https://orcid.org/0000-0002-6431-2391
+url: https://github.com/noaa-oar-arl/monetio/
+preferred-citation:
+  type: article
+  title: >-
+    Overview of the Model and Observation Evaluation Toolkit (MONET)
+    Version 1.0 for Evaluating Atmospheric Transport Models
+  authors:
+    - family-names: Baker
+      given-names: Barry
+      orcid: https://orcid.org/0000-0002-6431-2391
+    - family-names: Pan
+      given-names: Li
+  year: 2017
+  journal: Atmosphere
+  volume: 8
+  issue: 11
+  doi: 10.3390/atmos8110210
