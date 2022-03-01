@@ -10,7 +10,7 @@ Subpackages
 ..    monet.obs
     monet.plots
     monet.util
-    
+
 ..    monet.verification
 
 Submodules
