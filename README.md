@@ -9,9 +9,14 @@ MONET is a verification package. It handles CMAQ 4.7.1+, EPA AQS surface data, E
 
 Please refer to <https://monet-arl.readthedocs.io> for the documentation.
 
+Check [the `develop` branch](https://github.com/noaa-oar-arl/monet/tree/develop) for the most recent updates.
+In most cases, pull requests should target this branch.
+
 ### Note for data I/O
 
-Note that as of version 2.1.5 MONET has been split into two repositories, MONET and [MONETIO](https://github.com/noaa-oar-arl/monetio).
+Note that as of version 2.1.5 MONET has been split into two repositories,
+[MONET](https://github.com/noaa-oar-arl/monet) and
+[MONETIO](https://github.com/noaa-oar-arl/monetio).
 This was done to simplify the build process for each repository and allow each to develop independently.
 
 ### Reference
