@@ -131,7 +131,7 @@ def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=
 
     # Unstructured Grid
     # lat & lon are not coordinate variables in unstructured grid
-    if dset.monet.unstructured_grid:
+    if dset.attrs.get("mio_has_unstructured_grid", False):
         # only call rename and wrap_longitudes
         dset = _rename_to_monet_latlon(dset)
         dset["longitude"] = wrap_longitudes(dset["longitude"])
@@ -177,7 +177,7 @@ def _rename_to_monet_latlon(ds):
     """
 
     # To consider unstructured grid
-    if ds.monet.unstructured_grid:
+    if ds.attrs.get("mio_has_unstructured_grid", False):
         check_list = ds.data_vars
     else:
         check_list = ds.coords
@@ -1372,7 +1372,6 @@ class MONETAccessorDataset:
 
     def __init__(self, xray_obj):
         self._obj = xray_obj
-        self.unstructured_grid = False
 
     def is_land(self, return_xarray=False):
         """checks the mask of land and ocean if the global_land_mask libra.

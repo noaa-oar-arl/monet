@@ -31,7 +31,7 @@ def combine_da_to_df(da, df, merge=True, **kwargs):
     dfda = dfnn.monet._df_to_da()
 
     # Add if statement for unstructured grid output
-    if da.monet.unstructured_grid:
+    if da.attrs.get("mio_has_unstructured_grid", False):
         da_interped = dfda.monet.remap_nearest_unstructured(da).compute()
     else:
         da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
