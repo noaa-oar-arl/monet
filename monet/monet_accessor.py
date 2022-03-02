@@ -1,5 +1,6 @@
 "MONET Accessor"
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -128,26 +129,35 @@ def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=
         except ValueError:
             print("dset must be an Xarray.DataArray or Xarray.Dataset")
 
-    dset = _rename_to_monet_latlon(dset)
-    latlon2d = True
-    # print(len(dset[lat_name].shape))
-    # print(dset)
-    if len(dset[lat_name].shape) < 2:
-        # print(dset[lat_name].shape)
-        latlon2d = False
-    if latlon2d is False:
-        try:
-            if isinstance(dset, xr.DataArray):
-                dset = _dataarray_coards_to_netcdf(dset, lat_name=lat_name, lon_name=lon_name)
-            elif isinstance(dset, xr.Dataset):
-                dset = _coards_to_netcdf(dset, lat_name=lat_name, lon_name=lon_name)
-            else:
-                raise ValueError
-        except ValueError:
-            print("dset must be an Xarray.DataArray or Xarray.Dataset")
+    # Unstructured Grid
+    # lat & lon are not coordinate variables in unstructured grid
+    if dset.attrs.get("mio_has_unstructured_grid", False):
+        # only call rename and wrap_longitudes
+        dset = _rename_to_monet_latlon(dset)
+        dset["longitude"] = wrap_longitudes(dset["longitude"])
+
     else:
         dset = _rename_to_monet_latlon(dset)
-    dset["longitude"] = wrap_longitudes(dset["longitude"])
+        latlon2d = True
+        # print(len(dset[lat_name].shape))
+        # print(dset)
+        if len(dset[lat_name].shape) < 2:
+            # print(dset[lat_name].shape)
+            latlon2d = False
+        if latlon2d is False:
+            try:
+                if isinstance(dset, xr.DataArray):
+                    dset = _dataarray_coards_to_netcdf(dset, lat_name=lat_name, lon_name=lon_name)
+                elif isinstance(dset, xr.Dataset):
+                    dset = _coards_to_netcdf(dset, lat_name=lat_name, lon_name=lon_name)
+                else:
+                    raise ValueError
+            except ValueError:
+                print("dset must be an Xarray.DataArray or Xarray.Dataset")
+        else:
+            dset = _rename_to_monet_latlon(dset)
+        dset["longitude"] = wrap_longitudes(dset["longitude"])
+
     return dset
 
 
@@ -165,15 +175,22 @@ def _rename_to_monet_latlon(ds):
         Description of returned object.
 
     """
-    if "lat" in ds.coords:
+
+    # To consider unstructured grid
+    if ds.attrs.get("mio_has_unstructured_grid", False):
+        check_list = ds.data_vars
+    else:
+        check_list = ds.coords
+
+    if "lat" in check_list:
         return ds.rename({"lat": "latitude", "lon": "longitude"})
-    elif "Latitude" in ds.coords:
+    elif "Latitude" in check_list:
         return ds.rename({"Latitude": "latitude", "Longitude": "longitude"})
-    elif "Lat" in ds.coords:
+    elif "Lat" in check_list:
         return ds.rename({"Lat": "latitude", "Lon": "longitude"})
-    elif "XLAT_M" in ds.coords:
+    elif "XLAT_M" in check_list:
         return ds.rename({"XLAT_M": "latitude", "XLONG_M": "longitude"})
-    elif "XLAT" in ds.coords:
+    elif "XLAT" in check_list:
         return ds.rename({"XLAT": "latitude", "XLONG": "longitude"})
     else:
         return ds
@@ -189,7 +206,7 @@ def _coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
     lat_name : type
         Description of parameter `lat_name`.
     lon_name : type
-        Description of parameter `lon_name`.
+        Description of parameter `lon_name `.
 
     Returns
     -------
@@ -1568,6 +1585,87 @@ class MONETAccessorDataset:
                 result.attrs = d1.attrs
             result.coords["latitude"] = d2.latitude
             result.coords["longitude"] = d2.longitude
+
+        return result
+
+    # Add nearest function for unstructured grid
+    def remap_nearest_unstructured(self, data):
+        """Will find the closest model data to the observation for unstructured grid
+
+        Parameters
+        ----------
+        data : xarray.DataArray or xarray.Dataset
+            geospatial dataset that includes the latitude and longtide coordinates
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            The interpolated xarray object
+        """
+
+        try:
+            check_error = False
+            if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
+                check_error = False
+            else:
+                check_error = True
+            if check_error:
+                raise TypeError
+        except TypeError:
+            print("data must be either an Xarray.DataArray or Xarray.Dataset")
+
+        d1 = data
+        d2 = self._obj
+
+        site_indices = []
+        site_latitudes = d2["latitude"].values[0, :]
+        site_longitudes = d2["longitude"].values[0, :]
+        model_latitudes = d1["latitude"].values
+        model_longitudes = d1["longitude"].values
+
+        for siteii in np.arange(len(d2["siteid"][0])):
+            # ==== Needed to be updated in the future =====
+            # currently based on center lon & lat
+            # lon_tmp = d2['longitude'].values[0,siteii]
+            # if lon_tmp < -0.:
+            #    lon_tmp += 360.
+            #
+            # site_indices.append( get_site_index( lon_tmp,
+            #                                     d2['latitude'].values[0,siteii],
+            #                                     scrip_file=d1.monet.scrip, check_N=20 ) )
+            site_indices.append(
+                np.argmin(
+                    np.abs(site_latitudes[siteii] - model_latitudes)
+                    + np.abs(site_longitudes[siteii] - model_longitudes)
+                )
+            )
+
+        dict_data = {}
+        for dvar in d1.data_vars:
+            if dvar in ["latitude", "longitude"]:
+                continue
+            else:
+                dict_data[dvar] = (
+                    ["time", "z", "y", "x"],
+                    d1[dvar][:, 0, np.array(site_indices)].values.reshape(
+                        len(d1["time"]), 1, 1, len(site_indices)
+                    ),
+                )
+
+        dict_coords = {
+            "time": (["time"], d1["time"].values),
+            "x": (["x"], np.arange(len(site_indices))),
+            "longitude": (
+                ["y", "x"],
+                model_longitudes[np.array(site_indices)].reshape(1, len(site_indices)),
+            ),
+            "latitude": (
+                ["y", "x"],
+                model_latitudes[np.array(site_indices)].reshape(1, len(site_indices)),
+            ),
+        }
+
+        result = xr.Dataset(data_vars=dict_data, coords=dict_coords)
 
         return result
 
