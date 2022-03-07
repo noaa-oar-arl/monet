@@ -29,10 +29,17 @@ def combine_da_to_df(da, df, merge=True, **kwargs):
     # dfn = df.dropna(subset=[col])
     dfnn = df.drop_duplicates(subset=["siteid"]).dropna(subset=["latitude", "longitude", "siteid"])
     dfda = dfnn.monet._df_to_da()
-    da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
+
+    # Add if statement for unstructured grid output
+    if da.attrs.get("mio_has_unstructured_grid", False):
+        da_interped = dfda.monet.remap_nearest_unstructured(da).compute()
+    else:
+        da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
+
     da_interped["siteid"] = (("x"), dfnn.siteid)
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
+
     drop_cols = cols.loc[cols.isin(["x", "y", "z", "latitude", "longitude"])]
     df_interped.drop(drop_cols, axis=1, inplace=True)
     if isinstance(da, xr.DataArray):
