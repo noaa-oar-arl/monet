@@ -1,7 +1,11 @@
+[build-system]
+requires = ["setuptools>=39.2.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [tool.black]
 line-length = 100
 
 [tool.isort]
-known_first_party = "monetio"
+known_first_party = "monet"
 profile = "black"
 line_length = 100
