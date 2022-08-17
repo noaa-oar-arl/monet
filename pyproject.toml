@@ -9,3 +9,8 @@ line-length = 100
 known_first_party = "monet"
 profile = "black"
 line_length = 100
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:distutils Version classes:DeprecationWarning::",
+]
