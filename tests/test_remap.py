@@ -12,7 +12,7 @@ def test_remap_ds_ds():
 
     def make_ds(*, nx=10, ny=10):
         data = np.arange(nx * ny).reshape((ny, nx))
-        assert data.flags["C_CONTIGUOUS"]
+        assert data.flags["C_CONTIGUOUS"], "xESMF wants this"
 
         return xr.Dataset(
             data_vars={"data": (("y", "x"), data)},
@@ -24,6 +24,9 @@ def test_remap_ds_ds():
 
     target = make_ds()
     source = make_ds(nx=5)
+    # When we call `target.monet.remap_xesmf()`,
+    # data on the source grid is regridded to the target grid
+    # and added as a new variable.
 
     # Check for cf accessor
     assert hasattr(target, "cf")
@@ -31,12 +34,13 @@ def test_remap_ds_ds():
         target.cf.get_bounds("latitude")
     assert hasattr(target.monet._obj, "cf")
 
-    # On the DataArray directly works fine
+    # On the data DataArray directly
     target.monet.remap_xesmf(source["data"])
     ds1 = target.copy(deep=True)
 
-    # On the Dataset complains
+    # On the Dataset
     # Note conservative methods don't work here because need cell bounds
+    target = target.drop_vars("data_y")
     target.monet.remap_xesmf(source, method="nearest_d2s")
     ds2 = target.copy(deep=True)
 
