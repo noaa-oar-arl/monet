@@ -26,7 +26,5 @@ def test_remap_ds_ds():
     _ = ds1.monet.remap_xesmf(ds1["data"])
 
     # On the Dataset complains
-    with pytest.raises(
-        ValueError, match="Unsupported key-type <class 'xarray.core.variable.Variable'>"
-    ):
+    with pytest.raises(AttributeError, match="'DataArray.cf' object has no attribute 'get_bounds'"):
         _ = ds1.monet.remap_xesmf(ds1)
