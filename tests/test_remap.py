@@ -9,27 +9,36 @@ def test_remap_ds_ds():
     # Barry noted a problem with this
 
     lonmin, latmin, lonmax, latmax = [0, 0, 10, 10]
-    nx = ny = 20
 
-    data = np.ones((ny, nx), dtype=float)
-    assert data.flags["C_CONTIGUOUS"]
+    def make_ds(*, nx=10, ny=10):
+        data = np.arange(nx * ny).reshape((ny, nx))
+        assert data.flags["C_CONTIGUOUS"]
 
-    ds1 = xr.Dataset(
-        data_vars={"data": (("x", "y"), data)},
-        coords={
-            "latitude": ("y", np.linspace(latmin, latmax, ny)),
-            "longitude": ("x", np.linspace(lonmin, lonmax, nx)),
-        },
-    )
+        return xr.Dataset(
+            data_vars={"data": (("y", "x"), data)},
+            coords={
+                "latitude": ("y", np.linspace(latmin, latmax, ny)),
+                "longitude": ("x", np.linspace(lonmin, lonmax, nx)),
+            },
+        )
+
+    target = make_ds()
+    source = make_ds(nx=5)
 
     # Check for cf accessor
-    assert hasattr(ds1, "cf")
+    assert hasattr(target, "cf")
     with pytest.raises(KeyError, match="No results found for 'latitude'."):
-        ds1.cf.get_bounds("latitude")
-    assert hasattr(ds1.monet._obj, "cf")
+        target.cf.get_bounds("latitude")
+    assert hasattr(target.monet._obj, "cf")
 
     # On the DataArray directly works fine
-    _ = ds1.monet.remap_xesmf(ds1["data"])
+    target.monet.remap_xesmf(source["data"])
+    ds1 = target.copy(deep=True)
 
     # On the Dataset complains
-    _ = ds1.monet.remap_xesmf(ds1)
+    # Note conservative methods don't work here because need cell bounds
+    target.monet.remap_xesmf(source, method="nearest_d2s")
+    ds2 = target.copy(deep=True)
+
+    assert np.all(ds1.data == ds2.data), "original data should be same"
+    assert not np.all(ds1.data_y == ds2.data_y), "remapped data should be different"
