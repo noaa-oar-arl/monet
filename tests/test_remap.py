@@ -22,9 +22,14 @@ def test_remap_ds_ds():
         },
     )
 
+    # Check for cf accessor
+    assert hasattr(ds1, "cf")
+    with pytest.raises(KeyError, match="No results found for 'latitude'."):
+        ds1.cf.get_bounds("latitude")
+    assert hasattr(ds1.monet._obj, "cf")
+
     # On the DataArray directly works fine
     _ = ds1.monet.remap_xesmf(ds1["data"])
 
     # On the Dataset complains
-    with pytest.raises(AttributeError, match="'DataArray.cf' object has no attribute 'get_bounds'"):
-        _ = ds1.monet.remap_xesmf(ds1)
+    _ = ds1.monet.remap_xesmf(ds1)

@@ -1483,7 +1483,7 @@ class MONETAccessorDataset:
         vars = pd.Series(list(dset.variables))
         loop_vars = vars.loc[~vars.isin(skip_keys)]
         dataarray = dset[loop_vars[0]]
-        da = self._remap_xesmf_dataarray(dataarray, self._obj, filename=filename, **kwargs)
+        da = self._remap_xesmf_dataarray(dataarray, filename=filename, **kwargs)
         self._obj[da.name] = da
         das = {}
         das[da.name] = da
