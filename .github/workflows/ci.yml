@@ -33,4 +33,4 @@ jobs:
             python=${{ matrix.python-version }}
 
       - name: Test with pytest
-        run: pytest -n auto -v
+        run: pytest -v
