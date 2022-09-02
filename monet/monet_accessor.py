@@ -1477,13 +1477,14 @@ class MONETAccessorDataset:
                     raise TypeError
             except TypeError:
                 print("data must be an xarray.DataArray or xarray.Dataset")
+                # TODO: raise
 
     def _remap_xesmf_dataset(self, dset, filename="monet_xesmf_regrid_file.nc", **kwargs):
-        skip_keys = ["latitude", "longitude", "time", "TFLAG"]
-        vars = pd.Series(dset.variables)
+        skip_keys = ["lat", "lon", "time", "TFLAG"]
+        vars = pd.Series(list(dset.variables))
         loop_vars = vars.loc[~vars.isin(skip_keys)]
         dataarray = dset[loop_vars[0]]
-        da = self._remap_xesmf_dataarray(dataarray, self._obj, filename=filename, **kwargs)
+        da = self._remap_xesmf_dataarray(dataarray, filename=filename, **kwargs)
         self._obj[da.name] = da
         das = {}
         das[da.name] = da

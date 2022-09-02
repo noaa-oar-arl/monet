@@ -126,4 +126,7 @@ def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
             ds.attrs = source_da.attrs
             return ds
         else:
-            return regridder(source_da)
+            da = regridder(source_da)
+            if da.name is None:
+                da.name = source_da.name
+            return da
