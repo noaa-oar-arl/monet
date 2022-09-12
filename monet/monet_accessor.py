@@ -1023,7 +1023,7 @@ class MONETAccessor:
             kwargs["filename"] = "monet_xesmf_regrid_file.nc"
         return kwargs
 
-    def quick_imshow(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_imshow(self, map_kws=None, roll_dateline=False, **kwargs):
         """This function takes an xarray DataArray and quickly cerates a figure
         using cartopy and the matplotlib imshow.  Note that this should only be used for
         regular grids.
@@ -1051,6 +1051,9 @@ class MONETAccessor:
 
         from .plots import _dynamic_fig_size
         from .plots.mapgen import draw_map
+
+        if map_kws is None:
+            map_kws = {}
 
         sns.set_context("notebook", font_scale=1.2)
         da = _dataset_to_monet(self._obj)
@@ -1083,7 +1086,7 @@ class MONETAccessor:
         plt.tight_layout()
         return ax
 
-    def quick_map(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_map(self, map_kws=None, roll_dateline=False, **kwargs):
         """This function takes an xarray DataArray and quickly cerates a figure
         using cartopy and the matplotlib pcolormesh
 
@@ -1111,6 +1114,9 @@ class MONETAccessor:
         from .plots import _dynamic_fig_size
         from .plots.mapgen import draw_map
 
+        if map_kws is None:
+            map_kws = {}
+
         sns.set_context("notebook")
         da = _dataset_to_monet(self._obj)
         crs_p = ccrs.PlateCarree()
@@ -1135,7 +1141,7 @@ class MONETAccessor:
         plt.tight_layout()
         return ax
 
-    def quick_contourf(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_contourf(self, map_kws=None, roll_dateline=False, **kwargs):
         """This function takes an xarray DataArray and quickly cerates a figure
         using cartopy and the matplotlib contourf
 
@@ -1162,6 +1168,9 @@ class MONETAccessor:
 
         from monet.plots import _dynamic_fig_size
         from monet.plots.mapgen import draw_map
+
+        if map_kws is None:
+            map_kws = {}
 
         sns.set_context("notebook")
         da = _dataset_to_monet(self._obj)
