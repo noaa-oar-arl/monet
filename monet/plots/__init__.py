@@ -197,3 +197,13 @@ def sp_scatter_bias(
             return ax
     except ValueError:
         exit
+
+
+def _set_outline_patch_alpha(ax, alpha=0):
+    try:
+        ax.axes.outline_patch.set_alpha(alpha)
+    except AttributeError:
+        try:
+            ax.outline_patch.set_alpha(alpha)
+        except AttributeError:
+            ax.spines["geo"].set_alpha(alpha)

@@ -1,5 +1,4 @@
 import cartopy
-import pytest
 import xarray as xr
 from packaging.version import Version
 
@@ -10,8 +9,13 @@ cartopy_version = Version(cartopy.__version__)
 da = xr.tutorial.load_dataset("air_temperature").air
 
 
-@pytest.mark.xfail(
-    cartopy_version >= Version("0.21.0"), reason="removed `GeoAxes.outline_patch` attr"
-)
 def test_quick_map():
-    da.monet.quick_map()
+    da.isel(time=1).monet.quick_map()
+
+
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+
+    test_quick_map()
+
+    plt.show()

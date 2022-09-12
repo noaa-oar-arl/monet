@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from .plots import _set_outline_patch_alpha
+
 try:
     import xesmf  # noqa: F401
 
@@ -1126,10 +1128,7 @@ class MONETAccessor:
         transform = kwargs.pop("transform", crs_p)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except AttributeError:
-            ax.outline_patch.set_alpha(0)
+        _set_outline_patch_alpha(ax)
         if roll_dateline:
             _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(
                 x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
