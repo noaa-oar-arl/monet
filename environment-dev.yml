@@ -22,4 +22,6 @@ dependencies:
   # test/dev
   - ipykernel
   - ipython
+  - packaging
+  - pooch
   - pytest
