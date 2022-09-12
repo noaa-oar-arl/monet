@@ -1,3 +1,5 @@
+import warnings
+
 from .colorbars import cmap_discretize, colorbar_index
 from .mapgen import draw_map
 from .plots import (
@@ -212,4 +214,4 @@ def _set_outline_patch_alpha(ax, alpha=0):
         else:
             break
     else:
-        raise RuntimeError("unable to set outline_patch alpha")
+        warnings.warn("unable to set outline_patch alpha", stacklevel=2)
