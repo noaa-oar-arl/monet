@@ -200,10 +200,16 @@ def sp_scatter_bias(
 
 
 def _set_outline_patch_alpha(ax, alpha=0):
-    try:
-        ax.axes.outline_patch.set_alpha(alpha)
-    except AttributeError:
+    for f in [
+        lambda alpha: ax.axes.outline_patch.set_alpha(alpha),
+        lambda alpha: ax.outline_patch.set_alpha(alpha),
+        lambda alpha: ax.spines["geo"].set_alpha(alpha),
+    ]:
         try:
-            ax.outline_patch.set_alpha(alpha)
+            f(alpha)
         except AttributeError:
-            ax.spines["geo"].set_alpha(alpha)
+            continue
+        else:
+            break
+    else:
+        raise RuntimeError("unable to set outline_patch alpha")
