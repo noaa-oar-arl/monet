@@ -1071,10 +1071,7 @@ class MONETAccessor:
             kwargs.pop("transform", None)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except AttributeError:
-            ax.outline_patch.set_alpha(0)
+        _set_outline_patch_alpha(ax)
         if roll_dateline:
             _ = (
                 da.squeeze()
@@ -1184,10 +1181,7 @@ class MONETAccessor:
             kwargs.pop("transform", None)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except AttributeError:
-            ax.outline_patch.set_alpha(0)
+        _set_outline_patch_alpha(ax)
         if roll_dateline:
             _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(
                 x="longitude", y="latitude", ax=ax, transform=transform, **kwargs

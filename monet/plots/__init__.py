@@ -187,8 +187,8 @@ def sp_scatter_bias(
                 colorbar=True,
                 **kwargs,
             )
-            if ~outline:
-                ax.outline_patch.set_alpha(0)
+            if not outline:
+                _set_outline_patch_alpha(ax)
             if global_map:
                 plt.xlim([-180, 180])
                 plt.ylim([-90, 90])
