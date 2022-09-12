@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from .plots import _set_outline_patch_alpha
+
 try:
     import xesmf  # noqa: F401
 
@@ -1021,7 +1023,7 @@ class MONETAccessor:
             kwargs["filename"] = "monet_xesmf_regrid_file.nc"
         return kwargs
 
-    def quick_imshow(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_imshow(self, map_kws=None, roll_dateline=False, **kwargs):
         """This function takes an xarray DataArray and quickly cerates a figure
         using cartopy and the matplotlib imshow.  Note that this should only be used for
         regular grids.
@@ -1050,6 +1052,9 @@ class MONETAccessor:
         from .plots import _dynamic_fig_size
         from .plots.mapgen import draw_map
 
+        if map_kws is None:
+            map_kws = {}
+
         sns.set_context("notebook", font_scale=1.2)
         da = _dataset_to_monet(self._obj)
         da = _monet_to_latlon(da)
@@ -1069,10 +1074,7 @@ class MONETAccessor:
             kwargs.pop("transform", None)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except AttributeError:
-            ax.outline_patch.set_alpha(0)
+        _set_outline_patch_alpha(ax)
         if roll_dateline:
             _ = (
                 da.squeeze()
@@ -1084,7 +1086,7 @@ class MONETAccessor:
         plt.tight_layout()
         return ax
 
-    def quick_map(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_map(self, map_kws=None, roll_dateline=False, **kwargs):
         """This function takes an xarray DataArray and quickly cerates a figure
         using cartopy and the matplotlib pcolormesh
 
@@ -1112,6 +1114,9 @@ class MONETAccessor:
         from .plots import _dynamic_fig_size
         from .plots.mapgen import draw_map
 
+        if map_kws is None:
+            map_kws = {}
+
         sns.set_context("notebook")
         da = _dataset_to_monet(self._obj)
         crs_p = ccrs.PlateCarree()
@@ -1126,10 +1131,7 @@ class MONETAccessor:
         transform = kwargs.pop("transform", crs_p)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except AttributeError:
-            ax.outline_patch.set_alpha(0)
+        _set_outline_patch_alpha(ax)
         if roll_dateline:
             _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(
                 x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
@@ -1139,7 +1141,7 @@ class MONETAccessor:
         plt.tight_layout()
         return ax
 
-    def quick_contourf(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_contourf(self, map_kws=None, roll_dateline=False, **kwargs):
         """This function takes an xarray DataArray and quickly cerates a figure
         using cartopy and the matplotlib contourf
 
@@ -1167,6 +1169,9 @@ class MONETAccessor:
         from monet.plots import _dynamic_fig_size
         from monet.plots.mapgen import draw_map
 
+        if map_kws is None:
+            map_kws = {}
+
         sns.set_context("notebook")
         da = _dataset_to_monet(self._obj)
         crs_p = ccrs.PlateCarree()
@@ -1185,10 +1190,7 @@ class MONETAccessor:
             kwargs.pop("transform", None)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except AttributeError:
-            ax.outline_patch.set_alpha(0)
+        _set_outline_patch_alpha(ax)
         if roll_dateline:
             _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(
                 x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
