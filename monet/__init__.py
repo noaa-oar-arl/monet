@@ -1,7 +1,7 @@
 from . import met_funcs, monet_accessor, plots, util
 from .plots import savefig
 
-__version__ = "2.2.5"
+__version__ = "2.2.6"
 
 __all__ = [
     "__version__",
