@@ -66,7 +66,7 @@ def _monet_to_latlon(da):
         dset = da.to_dataset()
     dset["x"] = da.longitude[0, :].values
     dset["y"] = da.latitude[:, 0].values
-    dset = dset.drop(["latitude", "longitude"])
+    dset = dset.drop_vars(["latitude", "longitude"])
     dset = dset.set_coords(["x", "y"])
     dset = dset.rename({"x": "lon", "y": "lat"})
     if isinstance(da, xr.DataArray):
