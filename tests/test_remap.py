@@ -5,6 +5,10 @@ import xarray as xr
 import monet  # noqa: F401
 
 
+def test_import_xesmf():
+    import xesmf  # noqa: F401
+
+
 def test_remap_ds_ds():
     # Barry noted a problem with this
 
