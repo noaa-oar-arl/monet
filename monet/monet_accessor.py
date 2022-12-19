@@ -1303,7 +1303,7 @@ class MONETAccessor:
 
         Parameters
         ----------
-        daaarray : ndarray or xarray DataArray
+        dataarray : ndarray or xarray DataArray
             Description of parameter `dset`.
         radius_of_influence : float or integer
             radius of influcence for pyresample in meters.
@@ -1322,6 +1322,9 @@ class MONETAccessor:
             source = _rename_latlon(dataarray)
             out = resample.resample_xesmf(source, target, method=method, **kwargs)
             return _rename_to_monet_latlon(out)
+
+        else:
+            print("xesmf unavailable. " "Try `import xesmf` and check the failure message.")
 
     def combine_point(self, data, suffix=None, pyresample=True, **kwargs):
         """Short summary.
@@ -1452,20 +1455,15 @@ class MONETAccessorDataset:
         return da
 
     def remap_xesmf(self, data, **kwargs):
-        """Resample the xesmf
+        """Resample using xESMF.
 
         Parameters
         ----------
-        data : type
-            Description of parameter `data`.
-        **kwargs : type
-            Description of parameter `**kwargs`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
+        data : xarray.DataArray or xarray.Dataset
+            Data to be remapped.
+        **kwargs
+            Passed on to :func:`~monet.util.resample.resample_xesmf`
+            and then to ``xesmf.Regridder``.
         """
         if has_xesmf:
             try:
@@ -1480,6 +1478,9 @@ class MONETAccessorDataset:
             except TypeError:
                 print("data must be an xarray.DataArray or xarray.Dataset")
                 # TODO: raise
+
+        else:
+            print("xesmf unavailable. " "Try `import xesmf` and check the failure message.")
 
     def _remap_xesmf_dataset(self, dset, filename="monet_xesmf_regrid_file.nc", **kwargs):
         skip_keys = ["lat", "lon", "time", "TFLAG"]
