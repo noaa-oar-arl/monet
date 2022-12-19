@@ -26,3 +26,4 @@ dependencies:
   - pooch
   - pytest
   - shapely<2
+  - esmf<8.4
