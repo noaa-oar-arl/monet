@@ -1,0 +1,27 @@
+name: monet-dev
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python>=3.6
+  #
+  # core
+  - cartopy
+  - dask
+  - matplotlib
+  - netcdf4
+  - pydecorate
+  - pandas
+  - seaborn
+  - xarray
+  #
+  # optional
+  - pyresample
+  - xesmf # non-Windows only!
+  #
+  # test/dev
+  - ipykernel
+  - ipython
+  - packaging
+  - pooch
+  - pytest

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=39.2.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+known_first_party = "monet"
+profile = "black"
+line_length = 100
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:distutils Version classes:DeprecationWarning::",
+    """ignore:elementwise comparison failed; returning scalar instead:\
+       FutureWarning:xarray.core.dataarray:""",
+    # ^ looks to be coming from xESMF
+]

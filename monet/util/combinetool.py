@@ -1,5 +1,4 @@
 import xarray as xr
-from numpy import ones
 from pandas import Series, merge_asof
 
 
@@ -22,35 +21,39 @@ def combine_da_to_df(da, df, merge=True, **kwargs):
     -------
     pandas.DataFrame
     """
-    from ..util.interp_util import lonlat_to_swathdefinition
-    from numpy import ones
-
     # try:
     #     if col is None:
     #         raise RuntimeError
     # except RuntimeError:
     #     print('Must enter column name')
     # dfn = df.dropna(subset=[col])
-    dfnn = df.drop_duplicates(subset=['siteid']).dropna(subset=['latitude', 'longitude', 'siteid'])
+    dfnn = df.drop_duplicates(subset=["siteid"]).dropna(subset=["latitude", "longitude", "siteid"])
     dfda = dfnn.monet._df_to_da()
-    da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
-    da_interped['siteid'] = (('x'), dfnn.siteid)
+
+    # Add if statement for unstructured grid output
+    if da.attrs.get("mio_has_unstructured_grid", False):
+        da_interped = dfda.monet.remap_nearest_unstructured(da).compute()
+    else:
+        da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
+
+    da_interped["siteid"] = (("x"), dfnn.siteid)
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
-    drop_cols = cols.loc[cols.isin(['x', 'y', 'z', 'latitude', 'longitude'])]
+
+    drop_cols = cols.loc[cols.isin(["x", "y", "z", "latitude", "longitude"])]
     df_interped.drop(drop_cols, axis=1, inplace=True)
     if isinstance(da, xr.DataArray):
         if da.name in df.columns:
-            df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
+            df_interped.rename(columns={da.name: da.name + "_new"}, inplace=True)
     else:
-        dup_name = isinname = [name for name in da.data_vars.keys() if name in df.columns]
-        if len(dup_name) > 0:
-            for name in dup_name:
-                df_interped.rename(columns={name: name + '_new'}, inplace=True)
+        dup_names = [name for name in da.data_vars.keys() if name in df.columns]
+        if len(dup_names) > 0:
+            for name in dup_names:
+                df_interped.rename(columns={name: name + "_new"}, inplace=True)
     if merge:
         df.reset_index(drop=True)
         df_interped.reset_index(drop=True)
-        final_df = df.merge(df_interped, on=['time', 'siteid'], how='left')
+        final_df = df.merge(df_interped, on=["time", "siteid"], how="left")
         return final_df
     else:
         return df_interped
@@ -77,8 +80,6 @@ def combine_da_to_da(source, target, merge=True, interp_time=False, **kwargs):
     -------
     xarray.DataSet
     """
-    from ..util.interp_util import lonlat_to_swathdefinition
-    from numpy import ones
     from ..monet_accessor import _dataset_to_monet
 
     target_fixed = _dataset_to_monet(target)
@@ -92,10 +93,10 @@ def combine_da_to_da(source, target, merge=True, interp_time=False, **kwargs):
 
 
 def _rename_latlon(ds):
-    if 'latitude' in ds.coords:
-        return ds.rename({'latitude': 'lat', 'longitude': 'lon'})
-    elif 'lat' in ds.coords:
-        return ds.rename({'lat': 'latitude', 'lon': 'longitude'})
+    if "latitude" in ds.coords:
+        return ds.rename({"latitude": "lat", "longitude": "lon"})
+    elif "lat" in ds.coords:
+        return ds.rename({"lat": "latitude", "lon": "longitude"})
     else:
         return ds
 
@@ -123,7 +124,7 @@ def combine_da_to_df_xesmf(da, df, suffix=None, **kwargs):
     from ..util.resample import resample_xesmf
 
     # dfn = df.dropna(subset=[col])
-    dfnn = df.drop_duplicates(subset=['latitude', 'longitude'])
+    dfnn = df.drop_duplicates(subset=["latitude", "longitude"])
     # unit = dfnn[col + '_unit'].unique()[0]
     # target_grid = lonlat_to_swathdefinition(
     #     longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
@@ -133,11 +134,11 @@ def combine_da_to_df_xesmf(da, df, suffix=None, **kwargs):
     da_interped = resample_xesmf(da, target, **kwargs)
     da_interped = _rename_latlon(da_interped)  # check to change back
     if suffix is None:
-        suffix = '_new'
+        suffix = "_new"
     rename_dict = {}
     if isinstance(da_interped, xr.DataArray):
         if da_interped.name in dfnn.keys():
-            da_interped.name = df_interped.name + suffix
+            da_interped.name = da_interped.name + suffix
     else:
         for i in da_interped.data_vars.keys():
             if i in dfnn.keys():
@@ -145,13 +146,15 @@ def combine_da_to_df_xesmf(da, df, suffix=None, **kwargs):
         da_interped = da_interped.rename(rename_dict)
     df_interped = da_interped.to_dataframe().reset_index()
     cols = Series(df_interped.columns)
-    drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
+    drop_cols = cols.loc[cols.isin(["x", "y", "z"])]
     df_interped.drop(drop_cols, axis=1, inplace=True)
 
     # if da.name in df.columns:
     #     df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
     # print(df_interped.keys())
-    final_df = df.merge(df_interped, on=['latitude', 'longitude', 'time'], how='left', suffixes=('', suffix))
+    final_df = df.merge(
+        df_interped, on=["latitude", "longitude", "time"], how="left", suffixes=("", suffix)
+    )
     return final_df
 
 
@@ -183,8 +186,8 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
         if da.shape != daz.shape:
             raise RuntimeError
     except RuntimeError:
-        print('da and daz must be of the same shape')
-        print('da shape= ', da.shape, 'daz shape= ', daz.shape)
+        print("da and daz must be of the same shape")
+        print("da shape= ", da.shape, "daz shape= ", daz.shape)
         return -1
 
     target = constant_1d_xesmf(longitude=df.longitude.values, latitude=df.latitude.values)
@@ -200,23 +203,29 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
 
     # sort aircraft target altitudes and call stratfiy from resample to do vertical interpolation
     # resample_stratify from monet accessor
-    daz_interped_xyz = daz_interped.monet.stratify(sorted(df['altitude']), daz_interped, axis=1)
-    da_interped_xyz = da_interped.monet.stratify(sorted(df['altitude']), daz_interped, axis=1)
+    daz_interped_xyz = daz_interped.monet.stratify(sorted(df["altitude"]), daz_interped, axis=1)
+    da_interped_xyz = da_interped.monet.stratify(sorted(df["altitude"]), daz_interped, axis=1)
     da_interped_xyz.name = da.name
-    daz_interped_xyz.name = 'altitude'
+    daz_interped_xyz.name = "altitude"
     df_interped_xyz = da_interped_xyz.to_dataframe().reset_index()
     dfz_interped_xyz = daz_interped_xyz.to_dataframe().reset_index()
 
-    df_interped_xyz.insert(0, 'altitude', dfz_interped_xyz['altitude'], allow_duplicates=True)
+    df_interped_xyz.insert(0, "altitude", dfz_interped_xyz["altitude"], allow_duplicates=True)
 
     cols = Series(df_interped_xyz.columns)
-    drop_cols = cols.loc[cols.isin(['x', 'y', 'z'])]
+    drop_cols = cols.loc[cols.isin(["x", "y", "z"])]
     df_interped_xyz.drop(drop_cols, axis=1, inplace=True)
     if da.name in df.columns:
-        df_interped_xyz.rename(columns={da.name: da.name + '_new'}, inplace=True)
+        df_interped_xyz.rename(columns={da.name: da.name + "_new"}, inplace=True)
         print(df_interped_xyz.keys())
 
-    final_df = merge_asof(df, df_interped_xyz, by=['latitude', 'longitude', 'altitude'], on='time', direction='nearest')
+    final_df = merge_asof(
+        df,
+        df_interped_xyz,
+        by=["latitude", "longitude", "altitude"],
+        on="time",
+        direction="nearest",
+    )
     return final_df
 
 

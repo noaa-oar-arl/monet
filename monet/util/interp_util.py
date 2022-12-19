@@ -42,7 +42,9 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
 
     lat = asarray(latitude)
     lon = asarray(longitude)
-    dset = xr.Dataset(coords={"lon": (["x", "y"], lon.reshape(1, 1)), "lat": (["x", "y"], lat.reshape(1, 1))})
+    dset = xr.Dataset(
+        coords={"lon": (["x", "y"], lon.reshape(1, 1)), "lat": (["x", "y"], lat.reshape(1, 1))}
+    )
     return dset
 
 
@@ -62,8 +64,8 @@ def lonlat_to_swathdefinition(longitude=None, latitude=None):
         Description of returned object.
 
     """
-    from pyresample.geometry import SwathDefinition
     from numpy import vstack
+    from pyresample.geometry import SwathDefinition
 
     if len(longitude.shape) < 2:
         lons = vstack(longitude)
@@ -90,8 +92,8 @@ def nearest_point_swathdefinition(longitude=None, latitude=None):
 
 
     """
-    from pyresample.geometry import SwathDefinition
     from numpy import vstack
+    from pyresample.geometry import SwathDefinition
 
     lons = vstack([longitude])
     lats = vstack([latitude])
@@ -120,7 +122,9 @@ def constant_1d_xesmf(longitude=None, latitude=None):
     lat = asarray(latitude)
     lon = asarray(longitude)
     s = lat.shape[0]
-    dset = xr.Dataset(coords={"lon": (["x", "y"], lon.reshape(s, 1)), "lat": (["x", "y"], lat.reshape(s, 1))})
+    dset = xr.Dataset(
+        coords={"lon": (["x", "y"], lon.reshape(s, 1)), "lat": (["x", "y"], lat.reshape(s, 1))}
+    )
     return dset
 
 
@@ -140,9 +144,9 @@ def constant_lat_swathdefition(longitude=None, latitude=None):
     pyreample.geometry.SwathDefinition
 
     """
+    from numpy import vstack
     from pyresample import geometry
     from xarray import DataArray
-    from numpy import vstack
 
     if len(longitude.shape) < 2:
         lons = vstack(longitude)
@@ -170,9 +174,9 @@ def constant_lon_swathdefition(longitude=None, latitude=None):
     pyreample.geometry.SwathDefinition
 
     """
+    from numpy import vstack
     from pyresample import geometry
     from xarray import DataArray
-    from numpy import vstack
 
     if len(latitude.shape) < 2:
         lats = vstack(latitude)

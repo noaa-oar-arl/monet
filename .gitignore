@@ -4,9 +4,10 @@
 *~
 .DS_Store
 docs/_build/
+monet_xesmf_regrid_file.nc
 
 
-# GitHub default Python .gitignore below:
+# Default GitHub .gitignore for Python below:
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

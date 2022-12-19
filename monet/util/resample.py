@@ -1,13 +1,13 @@
 try:
-    from pyresample.kd_tree import XArrayResamplerNN
-    from pyresample.geometry import SwathDefinition, AreaDefinition
+    from pyresample.geometry import AreaDefinition, SwathDefinition
+    from pyresample.kd_tree import XArrayResamplerNN  # noqa: F401
 
     has_pyresample = True
 except ImportError:
     print("PyResample not installed.  Some functionality will be lost")
     has_pyresample = False
 try:
-    import xesmf
+    import xesmf  # noqa: F401
 
     has_xesmf = True
 except ImportError:
@@ -112,8 +112,8 @@ def resample_stratify(da, levels, vertical, axis=1):
 
 def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
     if has_xesmf:
-        import xesmf as xe
         import xarray as xr
+        import xesmf as xe
 
         regridder = xe.Regridder(source_da, target_da, **kwargs)
         if cleanup:
@@ -126,4 +126,7 @@ def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
             ds.attrs = source_da.attrs
             return ds
         else:
-            return regridder(source_da)
+            da = regridder(source_da)
+            if da.name is None:
+                da.name = source_da.name
+            return da

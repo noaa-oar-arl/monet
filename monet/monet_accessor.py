@@ -1,10 +1,13 @@
 "MONET Accessor"
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
+from .plots import _set_outline_patch_alpha
+
 try:
-    import xesmf
+    import xesmf  # noqa: F401
 
     has_xesmf = True
 except ImportError:
@@ -17,22 +20,21 @@ try:
 except ImportError:
     has_pyresample = False
 
+    def wrap_longitudes(lons):
+        """Short summary.
 
-def wrap_longitudes(lons):
-    """Short summary.
+        Parameters
+        ----------
+        lons : type
+            Description of parameter `lons`.
 
-    Parameters
-    ----------
-    lons : type
-        Description of parameter `lons`.
+        Returns
+        -------
+        type
+            Description of returned object.
 
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    return (lons + 180) % 360 - 180
+        """
+        return (lons + 180) % 360 - 180
 
 
 def _rename_latlon(ds):
@@ -129,26 +131,35 @@ def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=
         except ValueError:
             print("dset must be an Xarray.DataArray or Xarray.Dataset")
 
-    dset = _rename_to_monet_latlon(dset)
-    latlon2d = True
-    # print(len(dset[lat_name].shape))
-    # print(dset)
-    if len(dset[lat_name].shape) < 2:
-        # print(dset[lat_name].shape)
-        latlon2d = False
-    if latlon2d is False:
-        try:
-            if isinstance(dset, xr.DataArray):
-                dset = _dataarray_coards_to_netcdf(dset, lat_name=lat_name, lon_name=lon_name)
-            elif isinstance(dset, xr.Dataset):
-                dset = _coards_to_netcdf(dset, lat_name=lat_name, lon_name=lon_name)
-            else:
-                raise ValueError
-        except ValueError:
-            print("dset must be an Xarray.DataArray or Xarray.Dataset")
+    # Unstructured Grid
+    # lat & lon are not coordinate variables in unstructured grid
+    if dset.attrs.get("mio_has_unstructured_grid", False):
+        # only call rename and wrap_longitudes
+        dset = _rename_to_monet_latlon(dset)
+        dset["longitude"] = wrap_longitudes(dset["longitude"])
+
     else:
         dset = _rename_to_monet_latlon(dset)
-    dset["longitude"] = wrap_longitudes(dset["longitude"])
+        latlon2d = True
+        # print(len(dset[lat_name].shape))
+        # print(dset)
+        if len(dset[lat_name].shape) < 2:
+            # print(dset[lat_name].shape)
+            latlon2d = False
+        if latlon2d is False:
+            try:
+                if isinstance(dset, xr.DataArray):
+                    dset = _dataarray_coards_to_netcdf(dset, lat_name=lat_name, lon_name=lon_name)
+                elif isinstance(dset, xr.Dataset):
+                    dset = _coards_to_netcdf(dset, lat_name=lat_name, lon_name=lon_name)
+                else:
+                    raise ValueError
+            except ValueError:
+                print("dset must be an Xarray.DataArray or Xarray.Dataset")
+        else:
+            dset = _rename_to_monet_latlon(dset)
+        dset["longitude"] = wrap_longitudes(dset["longitude"])
+
     return dset
 
 
@@ -166,15 +177,22 @@ def _rename_to_monet_latlon(ds):
         Description of returned object.
 
     """
-    if "lat" in ds.coords:
+
+    # To consider unstructured grid
+    if ds.attrs.get("mio_has_unstructured_grid", False):
+        check_list = ds.data_vars
+    else:
+        check_list = ds.coords
+
+    if "lat" in check_list:
         return ds.rename({"lat": "latitude", "lon": "longitude"})
-    elif "Latitude" in ds.coords:
+    elif "Latitude" in check_list:
         return ds.rename({"Latitude": "latitude", "Longitude": "longitude"})
-    elif "Lat" in ds.coords:
+    elif "Lat" in check_list:
         return ds.rename({"Lat": "latitude", "Lon": "longitude"})
-    elif "XLAT_M" in ds.coords:
+    elif "XLAT_M" in check_list:
         return ds.rename({"XLAT_M": "latitude", "XLONG_M": "longitude"})
-    elif "XLAT" in ds.coords:
+    elif "XLAT" in check_list:
         return ds.rename({"XLAT": "latitude", "XLONG": "longitude"})
     else:
         return ds
@@ -190,7 +208,7 @@ def _coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
     lat_name : type
         Description of parameter `lat_name`.
     lon_name : type
-        Description of parameter `lon_name`.
+        Description of parameter `lon_name `.
 
     Returns
     -------
@@ -198,7 +216,7 @@ def _coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
         Description of returned object.
 
     """
-    from numpy import meshgrid, arange
+    from numpy import arange, meshgrid
 
     lon = wrap_longitudes(dset[lon_name])
     lat = dset[lat_name]
@@ -232,7 +250,7 @@ def _dataarray_coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
         Description of returned object.
 
     """
-    from numpy import meshgrid, arange
+    from numpy import arange, meshgrid
 
     lon = wrap_longitudes(dset[lon_name])
     lat = dset[lat_name]
@@ -287,7 +305,16 @@ class MONETAccessorPandas:
         lon = self._obj.longitude
         return (float(lon.mean()), float(lat.mean()))
 
-    def to_ascii2nc_df(self, grib_code=126, height_msl=0.0, column="aod_550nm", message_type="ADPUPA", pressure=1000.0, qc=None, height_agl=None):
+    def to_ascii2nc_df(
+        self,
+        grib_code=126,
+        height_msl=0.0,
+        column="aod_550nm",
+        message_type="ADPUPA",
+        pressure=1000.0,
+        qc=None,
+        height_agl=None,
+    ):
         df = self._obj
         df["ascii2nc_time"] = df.time.dt.strftime("%Y%m%d_%H%M%S")
         df["ascii2nc_gribcode"] = int(grib_code)
@@ -347,7 +374,7 @@ class MONETAccessorPandas:
         return out
 
     def to_ascii2nc_list(self, **kwargs):
-        df = self._obj
+        # df = self._obj
         out = self.to_ascii2nc_df(**kwargs)
         return out.values.tolist()
 
@@ -388,7 +415,8 @@ class MONETAccessorPandas:
         df = self.rename_for_monet(self._obj)
         if has_pyresample:
             from .util.interp_util import nearest_point_swathdefinition as npsd
-        return nspd(latitude=df.latitude.values, longitude=df.longitude.values)
+
+            return npsd(latitude=df.latitude.values, longitude=df.longitude.values)
 
     def _df_to_da(self, d=None):
         """Short summary.
@@ -404,8 +432,6 @@ class MONETAccessorPandas:
             Description of returned object.
 
         """
-        import xarray as xr
-
         index_name = "index"
         if d is None:
             d = self._obj
@@ -418,7 +444,9 @@ class MONETAccessorPandas:
             ds = ds.set_coords(["latitude", "longitude"])
         return ds
 
-    def remap_nearest(self, df, radius_of_influence=1e5, combine=False, lat_name=None, lon_name=None):
+    def remap_nearest(
+        self, df, radius_of_influence=1e5, combine=False, lat_name=None, lon_name=None
+    ):
         """Remap df to find nearest sites
 
         Parameters
@@ -443,7 +471,9 @@ class MONETAccessorPandas:
             ds2 = self._df_to_da(d2)
             source = ds1.monet._get_CoordinateDefinition(ds1)
             target = ds2.monet._get_CoordinateDefinition(ds2)
-            res = pr.kd_tree.XArrayResamplerNN(source, target, radius_of_influence=radius_of_influence)
+            res = pr.kd_tree.XArrayResamplerNN(
+                source, target, radius_of_influence=radius_of_influence
+            )
             res.get_neighbour_info()
             # interpolate just the make_fake_index variable
             # print(ds1)
@@ -457,7 +487,9 @@ class MONETAccessorPandas:
             result = v.merge(d1, how="left", on="monet_fake_index").drop("monet_fake_index", axis=1)
             if combine:
                 columns_to_use = result.columns.difference(d2.columns)
-                return pd.merge(d2, result[columns_to_use], left_index=True, right_index=True, how="outer")
+                return pd.merge(
+                    d2, result[columns_to_use], left_index=True, right_index=True, how="outer"
+                )
             else:
                 return result
 
@@ -501,7 +533,7 @@ class MONETAccessorPandas:
         """
         from numpy import arange
 
-        column = df.columns[0]
+        # column = df.columns[0]
         fake_index = arange(len(df))
         column_name = "monet_fake_index"
         r = pd.Series(fake_index.astype(float), index=df.index)
@@ -511,7 +543,7 @@ class MONETAccessorPandas:
 
 
 @xr.register_dataarray_accessor("monet")
-class MONETAccessor(object):
+class MONETAccessor:
     """Short summary.
 
     Parameters
@@ -718,10 +750,11 @@ class MONETAccessor(object):
 
         """
         try:
-            from pyresample import utils
-            from .util.interp_util import nearest_point_swathdefinition as npsd
-            from .util.interp_util import lonlat_to_swathdefinition as llsd
             from numpy import concatenate
+            from pyresample import utils
+
+            # from .util.interp_util import lonlat_to_swathdefinition as llsd
+            # from .util.interp_util import nearest_point_swathdefinition as npsd
 
             has_pyresample = True
         except ImportError:
@@ -744,7 +777,7 @@ class MONETAccessor(object):
             elif has_pyresample:
                 dset = _dataset_to_monet(self._obj)
                 lons, lats = utils.check_and_wrap(dset.longitude.values, dset.latitude.values)
-                swath = llsd(longitude=lons, latitude=lats)
+                # swath = llsd(longitude=lons, latitude=lats)
                 x_ll, y_ll = dset.monet.nearest_ij(lat=float(lat_min), lon=float(lon_min))
                 x_ur, y_ur = dset.monet.nearest_ij(lat=float(lat_max), lon=float(lon_max))
                 # pswath_ll = npsd(longitude=float(lon_min),
@@ -795,14 +828,8 @@ class MONETAccessor(object):
             DataArray of at constant longitude
 
         """
-        from numpy import linspace, ones, asarray
+        from numpy import asarray, linspace, ones
 
-        try:
-            import pyresample as pr
-
-            has_pyresample = True
-        except ImportError:
-            has_pyresample = False
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf
@@ -816,7 +843,11 @@ class MONETAccessor(object):
         longitude = linspace(d1.longitude.min(), d1.longitude.max(), len(d1.x))
         latitude = ones(longitude.shape) * asarray(lat)
         if has_pyresample:
-            d2 = xr.DataArray(ones((len(longitude), len(longitude))), dims=["lon", "lat"], coords=[longitude, latitude])
+            d2 = xr.DataArray(
+                ones((len(longitude), len(longitude))),
+                dims=["lon", "lat"],
+                coords=[longitude, latitude],
+            )
             d2 = _dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
             return result.isel(y=0)
@@ -842,7 +873,7 @@ class MONETAccessor(object):
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf
-        from numpy import linspace, ones, asarray
+        from numpy import asarray, linspace, ones
 
         try:
             if lon is None:
@@ -855,7 +886,11 @@ class MONETAccessor(object):
         if has_pyresample:
 
             if has_pyresample:
-                d2 = xr.DataArray(ones((len(longitude), len(longitude))), dims=["lon", "lat"], coords=[longitude, latitude])
+                d2 = xr.DataArray(
+                    ones((len(longitude), len(longitude))),
+                    dims=["lon", "lat"],
+                    coords=[longitude, latitude],
+                )
                 d2 = _dataset_to_monet(d2)
                 result = d2.monet.remap_nearest(d1)
                 return result.isel(x=0)
@@ -883,9 +918,10 @@ class MONETAccessor(object):
 
         """
         try:
-            from pyresample import geometry, utils
-            from .util.interp_util import nearest_point_swathdefinition as npsd
+            from pyresample import utils
+
             from .util.interp_util import lonlat_to_swathdefinition as llsd
+            from .util.interp_util import nearest_point_swathdefinition as npsd
 
             has_pyresample = True
         except ImportError:
@@ -927,9 +963,10 @@ class MONETAccessor(object):
 
         """
         try:
-            from pyresample import geometry, utils
+            from pyresample import utils
+
+            # from .util.interp_util import lonlat_to_swathdefinition as llsd
             from .util.interp_util import nearest_point_swathdefinition as npsd
-            from .util.interp_util import lonlat_to_swathdefinition as llsd
 
             has_pyresample = True
         except ImportError:
@@ -986,7 +1023,7 @@ class MONETAccessor(object):
             kwargs["filename"] = "monet_xesmf_regrid_file.nc"
         return kwargs
 
-    def quick_imshow(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_imshow(self, map_kws=None, roll_dateline=False, **kwargs):
         """This function takes an xarray DataArray and quickly cerates a figure
         using cartopy and the matplotlib imshow.  Note that this should only be used for
         regular grids.
@@ -1008,11 +1045,15 @@ class MONETAccessor(object):
             axes
 
         """
-        from .plots.mapgen import draw_map
-        from .plots import _dynamic_fig_size
-        import matplotlib.pyplot as plt
         import cartopy.crs as ccrs
+        import matplotlib.pyplot as plt
         import seaborn as sns
+
+        from .plots import _dynamic_fig_size
+        from .plots.mapgen import draw_map
+
+        if map_kws is None:
+            map_kws = {}
 
         sns.set_context("notebook", font_scale=1.2)
         da = _dataset_to_monet(self._obj)
@@ -1031,20 +1072,21 @@ class MONETAccessor(object):
         else:
             transform = kwargs["transform"]
             kwargs.pop("transform", None)
-        if 'ax' not in kwargs:
+        if "ax" not in kwargs:
             ax = draw_map(**map_kws)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except AttributeError:
-            ax.outline_patch.set_alpha(0)
+        _set_outline_patch_alpha(ax)
         if roll_dateline:
-            ax1 = da.squeeze().roll(lon=int(len(da.lon) / 2), roll_coords=True).plot.imshow(ax=ax, transform=transform, **kwargs)
+            _ = (
+                da.squeeze()
+                .roll(lon=int(len(da.lon) / 2), roll_coords=True)
+                .plot.imshow(ax=ax, transform=transform, **kwargs)
+            )
         else:
-            ax1 = da.squeeze().plot.imshow(ax=ax, transform=transform, **kwargs)
+            _ = da.squeeze().plot.imshow(ax=ax, transform=transform, **kwargs)
         plt.tight_layout()
         return ax
 
-    def quick_map(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_map(self, map_kws=None, roll_dateline=False, **kwargs):
         """This function takes an xarray DataArray and quickly cerates a figure
         using cartopy and the matplotlib pcolormesh
 
@@ -1065,11 +1107,15 @@ class MONETAccessor(object):
             axes
 
         """
-        from .plots.mapgen import draw_map
-        from .plots import _dynamic_fig_size
-        import matplotlib.pyplot as plt
         import cartopy.crs as ccrs
+        import matplotlib.pyplot as plt
         import seaborn as sns
+
+        from .plots import _dynamic_fig_size
+        from .plots.mapgen import draw_map
+
+        if map_kws is None:
+            map_kws = {}
 
         sns.set_context("notebook")
         da = _dataset_to_monet(self._obj)
@@ -1082,25 +1128,20 @@ class MONETAccessor(object):
         else:
             figsize = _dynamic_fig_size(da)
             map_kws["figsize"] = figsize
-        if "transform" not in kwargs:
-            transform = crs_p
-        else:
-            transform = kwargs["transform"]
-            kwargs.pop("transform", None)
-        if 'ax' not in kwargs:
+        transform = kwargs.pop("transform", crs_p)
+        if "ax" not in kwargs:
             ax = draw_map(**map_kws)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except AttributeError:
-            ax.outline_patch.set_alpha(0)
+        _set_outline_patch_alpha(ax)
         if roll_dateline:
-            ax2 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(x="longitude", y="latitude", ax=ax, transform=crs_p, **kwargs)
+            _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(
+                x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
+            )
         else:
-            ax2 = da.plot(x="longitude", y="latitude", ax=ax, transform=crs_p, **kwargs)
+            _ = da.plot(x="longitude", y="latitude", ax=ax, transform=transform, **kwargs)
         plt.tight_layout()
         return ax
 
-    def quick_contourf(self, map_kws={}, roll_dateline=False, **kwargs):
+    def quick_contourf(self, map_kws=None, roll_dateline=False, **kwargs):
         """This function takes an xarray DataArray and quickly cerates a figure
         using cartopy and the matplotlib contourf
 
@@ -1121,11 +1162,15 @@ class MONETAccessor(object):
             axes
 
         """
-        from monet.plots.mapgen import draw_map
-        from monet.plots import _dynamic_fig_size
-        import matplotlib.pyplot as plt
         import cartopy.crs as ccrs
+        import matplotlib.pyplot as plt
         import seaborn as sns
+
+        from monet.plots import _dynamic_fig_size
+        from monet.plots.mapgen import draw_map
+
+        if map_kws is None:
+            map_kws = {}
 
         sns.set_context("notebook")
         da = _dataset_to_monet(self._obj)
@@ -1143,16 +1188,15 @@ class MONETAccessor(object):
         else:
             transform = kwargs["transform"]
             kwargs.pop("transform", None)
-        if 'ax' not in kwargs:
+        if "ax" not in kwargs:
             ax = draw_map(**map_kws)
-        try:
-            ax.axes.outline_patch.set_alpha(0)
-        except AttributeError:
-            ax.outline_patch.set_alpha(0)
+        _set_outline_patch_alpha(ax)
         if roll_dateline:
-            ax1 = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(x="longitude", y="latitude", ax=ax, transform=transform, **kwargs)
+            _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(
+                x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
+            )
         else:
-            ax1 = da.plot.contourf(x="longitude", y="latitude", ax=ax, transform=transform, **kwargs)
+            _ = da.plot.contourf(x="longitude", y="latitude", ax=ax, transform=transform, **kwargs)
 
         plt.tight_layout()
         return ax
@@ -1225,9 +1269,7 @@ class MONETAccessor(object):
             resampled object on current grid.
 
         """
-        from pyresample import utils
         from pyresample import kd_tree
-        from .util import resample
 
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
@@ -1313,7 +1355,9 @@ class MONETAccessor(object):
         else:
             print("d must be either a pd.DataFrame")
 
-    def combine_da(self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs):
+    def combine_da(
+        self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs
+    ):
         """Short summary.
 
         Parameters
@@ -1354,7 +1398,7 @@ class MONETAccessor(object):
 
 
 @xr.register_dataset_accessor("monet")
-class MONETAccessorDataset(object):
+class MONETAccessorDataset:
     """Monet accessor to the xarray.Dataset.
 
     Parameters
@@ -1476,23 +1520,28 @@ class MONETAccessorDataset(object):
                     raise TypeError
             except TypeError:
                 print("data must be an xarray.DataArray or xarray.Dataset")
+                # TODO: raise
 
     def _remap_xesmf_dataset(self, dset, filename="monet_xesmf_regrid_file.nc", **kwargs):
-        skip_keys = ["latitude", "longitude", "time", "TFLAG"]
-        vars = pd.Series(dset.variables)
+        skip_keys = ["lat", "lon", "time", "TFLAG"]
+        vars = pd.Series(list(dset.variables))
         loop_vars = vars.loc[~vars.isin(skip_keys)]
         dataarray = dset[loop_vars[0]]
-        da = self._remap_xesmf_dataarray(dataarray, self._obj, filename=filename, **kwargs)
+        da = self._remap_xesmf_dataarray(dataarray, filename=filename, **kwargs)
         self._obj[da.name] = da
         das = {}
         das[da.name] = da
         for i in loop_vars[1:]:
             dataarray = dset[i]
-            tmp = self._remap_xesmf_dataarray(dataarray, filename=filename, reuse_weights=True, **kwargs)
+            tmp = self._remap_xesmf_dataarray(
+                dataarray, filename=filename, reuse_weights=True, **kwargs
+            )
             das[tmp.name] = tmp.copy()
         return xr.Dataset(das)
 
-    def _remap_xesmf_dataarray(self, dataarray, method="bilinear", filename="monet_xesmf_regrid_file.nc", **kwargs):
+    def _remap_xesmf_dataarray(
+        self, dataarray, method="bilinear", filename="monet_xesmf_regrid_file.nc", **kwargs
+    ):
         """Resample the DataArray to the dataset object.
 
         Parameters
@@ -1546,9 +1595,7 @@ class MONETAccessorDataset(object):
         xarray.Dataset or xarray.DataArray
             The interpolated xarray object
         """
-        from pyresample import utils
         from pyresample import kd_tree
-        from .util import resample
 
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
@@ -1585,6 +1632,87 @@ class MONETAccessorDataset(object):
 
         return result
 
+    # Add nearest function for unstructured grid
+    def remap_nearest_unstructured(self, data):
+        """Will find the closest model data to the observation for unstructured grid
+
+        Parameters
+        ----------
+        data : xarray.DataArray or xarray.Dataset
+            geospatial dataset that includes the latitude and longtide coordinates
+
+        Returns
+        -------
+        xarray.Dataset or xarray.DataArray
+            The interpolated xarray object
+        """
+
+        try:
+            check_error = False
+            if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
+                check_error = False
+            else:
+                check_error = True
+            if check_error:
+                raise TypeError
+        except TypeError:
+            print("data must be either an Xarray.DataArray or Xarray.Dataset")
+
+        d1 = data
+        d2 = self._obj
+
+        site_indices = []
+        site_latitudes = d2["latitude"].values[0, :]
+        site_longitudes = d2["longitude"].values[0, :]
+        model_latitudes = d1["latitude"].values
+        model_longitudes = d1["longitude"].values
+
+        for siteii in np.arange(len(d2["siteid"][0])):
+            # ==== Needed to be updated in the future =====
+            # currently based on center lon & lat
+            # lon_tmp = d2['longitude'].values[0,siteii]
+            # if lon_tmp < -0.:
+            #    lon_tmp += 360.
+            #
+            # site_indices.append( get_site_index( lon_tmp,
+            #                                     d2['latitude'].values[0,siteii],
+            #                                     scrip_file=d1.monet.scrip, check_N=20 ) )
+            site_indices.append(
+                np.argmin(
+                    np.abs(site_latitudes[siteii] - model_latitudes)
+                    + np.abs(site_longitudes[siteii] - model_longitudes)
+                )
+            )
+
+        dict_data = {}
+        for dvar in d1.data_vars:
+            if dvar in ["latitude", "longitude"]:
+                continue
+            else:
+                dict_data[dvar] = (
+                    ["time", "z", "y", "x"],
+                    d1[dvar][:, 0, np.array(site_indices)].values.reshape(
+                        len(d1["time"]), 1, 1, len(site_indices)
+                    ),
+                )
+
+        dict_coords = {
+            "time": (["time"], d1["time"].values),
+            "x": (["x"], np.arange(len(site_indices))),
+            "longitude": (
+                ["y", "x"],
+                model_longitudes[np.array(site_indices)].reshape(1, len(site_indices)),
+            ),
+            "latitude": (
+                ["y", "x"],
+                model_latitudes[np.array(site_indices)].reshape(1, len(site_indices)),
+            ),
+        }
+
+        result = xr.Dataset(data_vars=dict_data, coords=dict_coords)
+
+        return result
+
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Uses pyresample to intepolate to find the i, j index of grid with respect to the given lat lon.
 
@@ -1604,14 +1732,14 @@ class MONETAccessorDataset(object):
 
         """
         try:
-            from pyresample import geometry, utils
+            from pyresample import utils
 
             has_pyresample = True
         except ImportError:
             has_pyresample = False
             print("requires pyresample to be installed")
-        from .util.interp_util import nearest_point_swathdefinition as npsd
         from .util.interp_util import lonlat_to_swathdefinition as llsd
+        from .util.interp_util import nearest_point_swathdefinition as npsd
 
         try:
             if lat is None or lon is None:
@@ -1648,9 +1776,10 @@ class MONETAccessorDataset(object):
 
         """
         try:
-            from pyresample import geometry, utils
-            from .util.interp_util import nearest_point_swathdefinition as npsd
+            from pyresample import utils
+
             from .util.interp_util import lonlat_to_swathdefinition as llsd
+            from .util.interp_util import nearest_point_swathdefinition as npsd
 
             has_pyresample = True
         except ImportError:
@@ -1723,14 +1852,8 @@ class MONETAccessorDataset(object):
             DataArray of at constant longitude
 
         """
-        from numpy import linspace, ones, asarray
+        from numpy import asarray, linspace, ones
 
-        try:
-            import pyresample as pr
-
-            has_pyresample = True
-        except ImportError:
-            has_pyresample = False
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf
@@ -1744,7 +1867,11 @@ class MONETAccessorDataset(object):
         longitude = linspace(d1.longitude.min(), d1.longitude.max(), len(d1.x))
         latitude = ones(longitude.shape) * asarray(lat)
         if has_pyresample:
-            d2 = xr.DataArray(ones((len(longitude), len(longitude))), dims=["lon", "lat"], coords=[longitude, latitude])
+            d2 = xr.DataArray(
+                ones((len(longitude), len(longitude))),
+                dims=["lon", "lat"],
+                coords=[longitude, latitude],
+            )
             d2 = _dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
             return result.isel(y=0)
@@ -1770,7 +1897,7 @@ class MONETAccessorDataset(object):
         if has_xesmf:
             from .util.interp_util import constant_1d_xesmf
             from .util.resample import resample_xesmf
-        from numpy import linspace, ones, asarray
+        from numpy import asarray, linspace, ones
 
         try:
             if lon is None:
@@ -1783,7 +1910,11 @@ class MONETAccessorDataset(object):
         if has_pyresample:
 
             if has_pyresample:
-                d2 = xr.DataArray(ones((len(longitude), len(longitude))), dims=["lon", "lat"], coords=[longitude, latitude])
+                d2 = xr.DataArray(
+                    ones((len(longitude), len(longitude))),
+                    dims=["lon", "lat"],
+                    coords=[longitude, latitude],
+                )
                 d2 = _dataset_to_monet(d2)
                 result = d2.monet.remap_nearest(d1)
                 return result.isel(x=0)
@@ -1840,23 +1971,30 @@ class MONETAccessorDataset(object):
 
         """
         try:
-            from pyresample import utils
-            from .util.interp_util import nearest_point_swathdefinition as npsd
-            from .util.interp_util import lonlat_to_swathdefinition as llsd
             from numpy import concatenate
+            from pyresample import utils
+
+            from .util.interp_util import lonlat_to_swathdefinition as llsd
+            from .util.interp_util import nearest_point_swathdefinition as npsd
 
             has_pyresample = True
         except ImportError:
             has_pyresample = False
         try:
             if has_pyresample:
-                lons, lats = utils.check_and_wrap(self._obj.longitude.values, self._obj.latitude.values)
+                lons, lats = utils.check_and_wrap(
+                    self._obj.longitude.values, self._obj.latitude.values
+                )
                 swath = llsd(longitude=lons, latitude=lats)
                 pswath_ll = npsd(longitude=float(lon_min), latitude=float(lat_min))
                 pswath_ur = npsd(longitude=float(lon_max), latitude=float(lat_max))
-                row, col = utils.generate_nearest_neighbour_linesample_arrays(swath, pswath_ll, float(1e6))
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ll, float(1e6)
+                )
                 y_ll, x_ll = row[0][0], col[0][0]
-                row, col = utils.generate_nearest_neighbour_linesample_arrays(swath, pswath_ur, float(1e6))
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ur, float(1e6)
+                )
                 y_ur, x_ur = row[0][0], col[0][0]
                 if x_ur < x_ll:
                     x1 = self._obj.x.where(self._obj.x >= x_ll, drop=True).values
@@ -1910,7 +2048,9 @@ class MONETAccessorDataset(object):
         else:
             print("d must be either a pd.DataFrame")
 
-    def combine_da(self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs):
+    def combine_da(
+        self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs
+    ):
         """Short summary.
 
         Parameters
