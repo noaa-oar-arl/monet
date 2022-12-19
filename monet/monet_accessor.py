@@ -26,13 +26,9 @@ except ImportError:
         Parameters
         ----------
         lons : type
-            Description of parameter `lons`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         return (lons + 180) % 360 - 180
 
@@ -43,13 +39,9 @@ def _rename_latlon(ds):
     Parameters
     ----------
     ds : type
-        Description of parameter `ds`.
-
     Returns
     -------
     type
-        Description of returned object.
-
     """
     if "latitude" in ds.coords:
         return ds.rename({"latitude": "lat", "longitude": "lon"})
@@ -92,8 +84,6 @@ def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=
     Returns
     -------
     type
-        Description of returned object.
-
     """
     if "grid_xt" in dset.dims:
         # GFS v16 file
@@ -105,7 +95,7 @@ def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=
             else:
                 raise ValueError
         except ValueError:
-            print("dset must be an Xarray.DataArray or Xarray.Dataset")
+            print("dset must be an xarray.DataArray or xarray.Dataset")
 
     if "south_north" in dset.dims:  # WRF WPS file
         dset = dset.rename(dict(south_north="y", west_east="x"))
@@ -169,13 +159,9 @@ def _rename_to_monet_latlon(ds):
     Parameters
     ----------
     ds : type
-        Description of parameter `ds`.
-
     Returns
     -------
     type
-        Description of returned object.
-
     """
 
     # To consider unstructured grid
@@ -204,17 +190,11 @@ def _coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
     Parameters
     ----------
     dset : type
-        Description of parameter `dset`.
-    lat_name : type
-        Description of parameter `lat_name`.
-    lon_name : type
-        Description of parameter `lon_name `.
-
+    lat_name : typ
+    lon_name : typ
     Returns
     -------
     type
-        Description of returned object.
-
     """
     from numpy import arange, meshgrid
 
@@ -238,17 +218,11 @@ def _dataarray_coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
     Parameters
     ----------
     dset : type
-        Description of parameter `dset`.
-    lat_name : type
-        Description of parameter `lat_name`.
-    lon_name : type
-        Description of parameter `lon_name`.
-
+    lat_name : typ
+    lon_name : typ
     Returns
     -------
     type
-        Description of returned object.
-
     """
     from numpy import arange, meshgrid
 
@@ -278,13 +252,9 @@ class MONETAccessorPandas:
         Parameters
         ----------
         obj : type
-            Description of parameter `obj`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         # verify there is a column latitude and a column longitude
         if "latitude" not in obj.columns or "longitude" not in obj.columns:
@@ -297,8 +267,6 @@ class MONETAccessorPandas:
         Returns
         -------
         type
-            Description of returned object.
-
         """
         # return the geographic center point of this DataFrame
         lat = self._obj.latitude
@@ -383,14 +351,12 @@ class MONETAccessorPandas:
 
         Parameters
         ----------
-        df : type
-            Description of parameter `df`.
+        df : pandas.DataFrame, optional
+            To use instead of self.
 
         Returns
         -------
-        type
-            Description of returned object.
-
+        pandas.DataFrame
         """
         if df is None:
             df = self._obj
@@ -418,19 +384,17 @@ class MONETAccessorPandas:
 
             return npsd(latitude=df.latitude.values, longitude=df.longitude.values)
 
-    def _df_to_da(self, d=None):
-        """Short summary.
+    def _df_to_da(self, d=None):  # TODO: should be `to_ds` or `to_xarray`
+        """Convert to xarray.
 
         Parameters
         ----------
-        d : type
-            Description of parameter `d`.
+        d : pandas.DataFrame, optional
+            To use instead of self.
 
         Returns
         -------
-        type
-            Description of returned object.
-
+        xarray.Dataset
         """
         index_name = "index"
         if d is None:
@@ -445,53 +409,67 @@ class MONETAccessorPandas:
         return ds
 
     def remap_nearest(
-        self, df, radius_of_influence=1e5, combine=False, lat_name=None, lon_name=None
+        self,
+        df,
+        radius_of_influence=1e5,
+        combine=False,
+        # lat_name=None, lon_name=None
     ):
-        """Remap df to find nearest sites
+        """Remap data in `df` to nearest points in self.
 
         Parameters
         ----------
         df : pandas.DataFrame
-            dataframe to be interpolated
+            Data to be interpolated to nearest points in self.
         radius_of_influence : float
-            kwarg for pyresample.kd_tree
+            Radius of influence (meters), used by ``pyresample.kd_tree``.
+        combine : bool
+            Merge with original self data.
 
         Returns
         -------
-        pandas.dataframe
-            Returns the interpolated dataframe
-
+        pandas.DataFrame
+            Interpolated dataframe.
         """
-        d1 = self.rename_for_monet(df)
-        d2 = self.rename_for_monet(self._obj)
+        source_data = self.rename_for_monet(df)
+        target_data = self.rename_for_monet(self._obj)
         # make fake index
         if has_pyresample:
-            d1 = self._make_fake_index_var(d1)
-            ds1 = self._df_to_da(d1)
-            ds2 = self._df_to_da(d2)
-            source = ds1.monet._get_CoordinateDefinition(ds1)
-            target = ds2.monet._get_CoordinateDefinition(ds2)
+            source_data = self._make_fake_index_var(source_data)
+            source_data_da = self._df_to_da(source_data)
+            target_data_da = self._df_to_da(target_data)
+            source = source_data_da.monet._get_CoordinateDefinition(source_data_da)
+            target = target_data_da.monet._get_CoordinateDefinition(target_data_da)
             res = pr.kd_tree.XArrayResamplerNN(
                 source, target, radius_of_influence=radius_of_influence
             )
             res.get_neighbour_info()
             # interpolate just the make_fake_index variable
             # print(ds1)
-            r = res.get_sample_from_neighbour_info(ds1.monet_fake_index)
+            r = res.get_sample_from_neighbour_info(source_data_da.monet_fake_index)
             r.name = "monet_fake_index"
             # r = ds2.monet.remap_nearest(
             #     ds1, radius_of_influence=radius_of_influence)
             # now merge back from original DataFrame
             q = r.compute()
             v = q.squeeze().to_dataframe()
-            result = v.merge(d1, how="left", on="monet_fake_index").drop("monet_fake_index", axis=1)
+            result = v.merge(source_data, how="left", on="monet_fake_index").drop(
+                "monet_fake_index", axis=1
+            )
             if combine:
-                columns_to_use = result.columns.difference(d2.columns)
+                columns_to_use = result.columns.difference(target_data.columns)
                 return pd.merge(
-                    d2, result[columns_to_use], left_index=True, right_index=True, how="outer"
+                    target_data,
+                    result[columns_to_use],
+                    left_index=True,
+                    right_index=True,
+                    how="outer",
                 )
             else:
                 return result
+
+        else:
+            print("pyresample unavailable. Try `import pyresample` and check the failure message.")
 
     def cftime_to_datetime64(self, col=None):
         """Short summary.
@@ -499,13 +477,9 @@ class MONETAccessorPandas:
         Parameters
         ----------
         col : type
-            Description of parameter `col`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         df = self._obj
 
@@ -523,13 +497,9 @@ class MONETAccessorPandas:
         Parameters
         ----------
         df : type
-            Description of parameter `df`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         from numpy import arange
 
@@ -549,13 +519,9 @@ class MONETAccessor:
     Parameters
     ----------
     xray_obj : type
-        Description of parameter `xray_obj`.
-
     Attributes
     ----------
     obj : type
-        Description of attribute `obj`.
-
     """
 
     def __init__(self, xray_obj):
@@ -564,13 +530,9 @@ class MONETAccessor:
         Parameters
         ----------
         xray_obj : type
-            Description of parameter `xray_obj`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         self._obj = xray_obj
 
@@ -580,8 +542,6 @@ class MONETAccessor:
         Returns
         -------
         type
-            Description of returned object.
-
         """
         dset = self._obj
         dset[lon_name] = (dset[lon_name] + 180) % 360 - 180
@@ -659,13 +619,9 @@ class MONETAccessor:
         Parameters
         ----------
         name : type
-            Description of parameter `name`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         from numpy import vectorize
 
@@ -686,17 +642,11 @@ class MONETAccessor:
         Parameters
         ----------
         lat_name : type
-            Description of parameter `lat_name`.
-        lon_name : type
-            Description of parameter `lon_name`.
-        return : type
-            Description of parameter `return`.
-
+        lon_name : typ
+        return : typ
         Returns
         -------
         type
-            Description of returned object.
-
         """
         if return_obj:
             return _dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
@@ -709,17 +659,11 @@ class MONETAccessor:
         Parameters
         ----------
         levels : type
-            Description of parameter `levels`.
-        vertical : type
-            Description of parameter `vertical`.
-        axis : type
-            Description of parameter `axis`.
-
+        vertical : typ
+        axis : typ
         Returns
         -------
         type
-            Description of returned object.
-
         """
         from .util.resample import resample_stratify
 
@@ -950,17 +894,11 @@ class MONETAccessor:
         Parameters
         ----------
         lat : type
-            Description of parameter `lat`.
-        lon : type
-            Description of parameter `lon`.
-        **kwargs : type
-            Description of parameter `**kwargs`.
-
+        lon : typ
+        **kwargs : typ
         Returns
         -------
         type
-            Description of returned object.
-
         """
         try:
             from pyresample import utils
@@ -1005,13 +943,9 @@ class MONETAccessor:
         Parameters
         ----------
         **kwargs : type
-            Description of parameter `**kwargs`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         if "reuse_weights" not in kwargs:
             kwargs["reuse_weights"] = False
@@ -1207,8 +1141,6 @@ class MONETAccessor:
         Returns
         -------
         type
-            Description of returned object.
-
         """
         from matplotlib.pyplot import subplots_adjust
 
@@ -1220,13 +1152,9 @@ class MONETAccessor:
         Parameters
         ----------
         defin : type
-            Description of parameter `defin`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         from pyresample.geometry import SwathDefinition
 
@@ -1252,49 +1180,47 @@ class MONETAccessor:
         return g
 
     def remap_nearest(self, data, **kwargs):
-        """Interpolates from another grid (data) to the current grid of self using pyresample.
-            it assumes that the dimensions are ordered in y,x,z per
-        pyresample docs
+        """Remap `data` from another grid to the current self grid using pyresample
+        nearest-neighbor interpolation.
+
+        This assumes that the dimensions are ordered in y,x,z per pyresample docs.
 
         Parameters
         ----------
-        da : xarray DataArray or xarray DataSet
-            Object to be interpolated
-        radius_of_influence : float or integer
-            radius of influcence for pyresample in meters.
+        data : xarray.DataArray or xarray.Dataset
+            Data to be interpolated to nearest points in self.
+        radius_of_influence : float
+            Radius of influence (meters), used by ``pyresample.kd_tree``.
 
         Returns
         -------
-        xarray.DataArray
-            resampled object on current grid.
-
+        xarray.DataArray or xarray.Dataset
+            Data on current (self) grid.
         """
         from pyresample import kd_tree
 
         # from .grids import get_generic_projection_from_proj4
         # check to see if grid is supplied
-        d1 = _dataset_to_monet(data)
-        # print(d1)
-        d2 = _dataset_to_monet(self._obj)
-        # print(d2)
-        source = self._get_CoordinateDefinition(data=d1)
-        target = self._get_CoordinateDefinition(data=d2)
+        source_data = _dataset_to_monet(data)
+        target_data = _dataset_to_monet(self._obj)
+        source = self._get_CoordinateDefinition(data=source_data)
+        target = self._get_CoordinateDefinition(data=target_data)
         r = kd_tree.XArrayResamplerNN(source, target, **kwargs)
         r.get_neighbour_info()
-        if isinstance(d1, xr.DataArray):
-            result = r.get_sample_from_neighbour_info(d1)
-            result.name = d1.name
-            result["latitude"] = d2.latitude
+        if isinstance(source_data, xr.DataArray):
+            result = r.get_sample_from_neighbour_info(source_data)
+            result.name = source_data.name
+            result["latitude"] = target_data.latitude
 
-        elif isinstance(d1, xr.Dataset):
+        elif isinstance(source_data, xr.Dataset):
             results = {}
-            for i in d1.data_vars.keys():
-                results[i] = r.get_sample_from_neighbour_info(d1[i])
+            for i in source_data.data_vars.keys():
+                results[i] = r.get_sample_from_neighbour_info(source_data[i])
             result = xr.Dataset(results)
-            if bool(d1.attrs):
-                result.attrs = d1.attrs
-            result.coords["latitude"] = d2.latitude
-            result.coords["longitude"] = d2.longitude
+            if bool(source_data.attrs):
+                result.attrs = source_data.attrs
+            result.coords["latitude"] = target_data.latitude
+            result.coords["longitude"] = target_data.longitude
 
         return result
 
@@ -1304,8 +1230,7 @@ class MONETAccessor:
         Parameters
         ----------
         daaarray : ndarray or xarray DataArray
-            Description of parameter `dset`.
-        radius_of_influence : float or integer
+        radius_of_inflence : float or integer
             radius of influcence for pyresample in meters.
 
         Returns
@@ -1328,18 +1253,15 @@ class MONETAccessor:
 
         Parameters
         ----------
-        data : type
-            Description of parameter `data`.
-        col : type
-            Description of parameter `col`.
-        radius : type
-            Description of parameter `radius`.
+        data : pandas.DataFrame
+        suffix : str, optional
+            Used to rename new data array(s) if using xemsf.
+        pyresample : bool
+            Use pyresample (:func:`~monet.util.combinetool.combine_da_to_df`).
 
         Returns
         -------
-        type
-            Description of returned object.
-
+        pandas.DataFrame
         """
         if has_pyresample:
             from .util.combinetool import combine_da_to_df
@@ -1353,7 +1275,7 @@ class MONETAccessor:
             else:  # xesmf resample
                 return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
         else:
-            print("d must be either a pd.DataFrame")
+            print("d must be a pandas.DataFrame")
 
     def combine_da(
         self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs
@@ -1373,8 +1295,6 @@ class MONETAccessor:
         Returns
         -------
         type
-            Description of returned object.
-
         """
         if has_pyresample:
             from .util.combinetool import combine_da_to_df
@@ -1404,13 +1324,9 @@ class MONETAccessorDataset:
     Parameters
     ----------
     xray_obj : type
-        Description of parameter `xray_obj`.
-
     Attributes
     ----------
     obj : type
-        Description of attribute `obj`.
-
     """
 
     def __init__(self, xray_obj):
@@ -1475,8 +1391,6 @@ class MONETAccessorDataset:
         Returns
         -------
         xarray.DataArray
-            Description of returned object.
-
         """
         from numpy import vectorize
 
@@ -1498,15 +1412,10 @@ class MONETAccessorDataset:
         Parameters
         ----------
         data : type
-            Description of parameter `data`.
-        **kwargs : type
-            Description of parameter `**kwargs`.
-
+        **kwargs : typ
         Returns
         -------
         type
-            Description of returned object.
-
         """
         if has_xesmf:
             try:
@@ -1547,13 +1456,9 @@ class MONETAccessorDataset:
         Parameters
         ----------
         dataarray : type
-            Description of parameter `dataarray`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         from .util import resample
 
@@ -1581,19 +1486,21 @@ class MONETAccessorDataset:
         return g
 
     def remap_nearest(self, data, radius_of_influence=1e6):
-        """Will remap data to the current dataset using the pyresample.kd_tree nearest neighbor interpolation.
+        """Remap `data` from another grid to the current self grid using pyresample
+        nearest-neighbor interpolation.
 
         Parameters
         ----------
         data : xarray.DataArray or xarray.Dataset
-            geospatial dataset that includes the latitude and longtide coordinates
+            Data to be interpolated to nearest points in self.
+            Must include lat/lon coordinates.
         radius_of_influence : float
-            radius_of_influence kwarg for pyresample.kd_tree. Default (1e6)
+            Radius of influence (meters), used by ``pyresample.kd_tree``.
 
         Returns
         -------
         xarray.Dataset or xarray.DataArray
-            The interpolated xarray object
+            Data on current (self) grid.
         """
         from pyresample import kd_tree
 
@@ -1609,42 +1516,45 @@ class MONETAccessorDataset:
                 raise TypeError
         except TypeError:
             print("data must be either an Xarray.DataArray or Xarray.Dataset")
-        d1 = _dataset_to_monet(data)
-        d2 = _dataset_to_monet(self._obj)
-        source = self._get_CoordinateDefinition(d1)
-        target = self._get_CoordinateDefinition(d2)
+        source_data = _dataset_to_monet(data)
+        target_data = _dataset_to_monet(self._obj)
+        source = self._get_CoordinateDefinition(source_data)
+        target = self._get_CoordinateDefinition(target_data)
         r = kd_tree.XArrayResamplerNN(source, target, radius_of_influence=radius_of_influence)
         r.get_neighbour_info()
-        if isinstance(d1, xr.DataArray):
-            result = r.get_sample_from_neighbour_info(d1)
-            result.name = d1.name
-            result["latitude"] = d2.latitude
+        if isinstance(source_data, xr.DataArray):
+            result = r.get_sample_from_neighbour_info(source_data)
+            result.name = source_data.name
+            result["latitude"] = target_data.latitude
 
-        elif isinstance(d1, xr.Dataset):
+        elif isinstance(source_data, xr.Dataset):
             results = {}
-            for i in d1.data_vars.keys():
-                results[i] = r.get_sample_from_neighbour_info(d1[i])
+            for i in source_data.data_vars.keys():
+                results[i] = r.get_sample_from_neighbour_info(source_data[i])
             result = xr.Dataset(results)
-            if bool(d1.attrs):
-                result.attrs = d1.attrs
-            result.coords["latitude"] = d2.latitude
-            result.coords["longitude"] = d2.longitude
+            if bool(source_data.attrs):
+                result.attrs = source_data.attrs
+            result.coords["latitude"] = target_data.latitude
+            result.coords["longitude"] = target_data.longitude
 
         return result
 
     # Add nearest function for unstructured grid
     def remap_nearest_unstructured(self, data):
-        """Will find the closest model data to the observation for unstructured grid
+        """Find the closest model data (`data`) to the observation (self)
+        for unstructured grid model data.
+
+        Based on model grid cell center locations.
 
         Parameters
         ----------
-        data : xarray.DataArray or xarray.Dataset
-            geospatial dataset that includes the latitude and longtide coordinates
+        data : xarray.Dataset
+            Data to be interpolated, including lat/lon coordinates.
 
         Returns
         -------
-        xarray.Dataset or xarray.DataArray
-            The interpolated xarray object
+        xarray.Dataset
+            Data on self grid.
         """
 
         try:
@@ -1656,18 +1566,18 @@ class MONETAccessorDataset:
             if check_error:
                 raise TypeError
         except TypeError:
-            print("data must be either an Xarray.DataArray or Xarray.Dataset")
+            print("data must be either an xarray.DataArray or xarray.Dataset")
 
-        d1 = data
-        d2 = self._obj
+        model_data = data
+        obs_data = self._obj
 
         site_indices = []
-        site_latitudes = d2["latitude"].values[0, :]
-        site_longitudes = d2["longitude"].values[0, :]
-        model_latitudes = d1["latitude"].values
-        model_longitudes = d1["longitude"].values
+        site_latitudes = obs_data["latitude"].values[0, :]
+        site_longitudes = obs_data["longitude"].values[0, :]
+        model_latitudes = model_data["latitude"].values
+        model_longitudes = model_data["longitude"].values
 
-        for siteii in np.arange(len(d2["siteid"][0])):
+        for siteii in np.arange(len(obs_data["siteid"][0])):
             # ==== Needed to be updated in the future =====
             # currently based on center lon & lat
             # lon_tmp = d2['longitude'].values[0,siteii]
@@ -1685,19 +1595,19 @@ class MONETAccessorDataset:
             )
 
         dict_data = {}
-        for dvar in d1.data_vars:
+        for dvar in model_data.data_vars:
             if dvar in ["latitude", "longitude"]:
                 continue
             else:
                 dict_data[dvar] = (
                     ["time", "z", "y", "x"],
-                    d1[dvar][:, 0, np.array(site_indices)].values.reshape(
-                        len(d1["time"]), 1, 1, len(site_indices)
+                    model_data[dvar][:, 0, np.array(site_indices)].values.reshape(
+                        len(model_data["time"]), 1, 1, len(site_indices)
                     ),
                 )
 
         dict_coords = {
-            "time": (["time"], d1["time"].values),
+            "time": (["time"], model_data["time"].values),
             "x": (["x"], np.arange(len(site_indices))),
             "longitude": (
                 ["y", "x"],
@@ -1763,17 +1673,11 @@ class MONETAccessorDataset:
         Parameters
         ----------
         lat : type
-            Description of parameter `lat`.
-        lon : type
-            Description of parameter `lon`.
-        **kwargs : type
-            Description of parameter `**kwargs`.
-
+        lon : typ
+        **kwargs : typ
         Returns
         -------
         type
-            Description of returned object.
-
         """
         try:
             from pyresample import utils
@@ -1820,13 +1724,9 @@ class MONETAccessorDataset:
         Parameters
         ----------
         **kwargs : type
-            Description of parameter `**kwargs`.
-
         Returns
         -------
         type
-            Description of returned object.
-
         """
         if "reuse_weights" not in kwargs:
             kwargs["reuse_weights"] = False
@@ -1929,17 +1829,11 @@ class MONETAccessorDataset:
         Parameters
         ----------
         levels : type
-            Description of parameter `levels`.
-        vertical : type
-            Description of parameter `vertical`.
-        axis : type
-            Description of parameter `axis`.
-
+        vertical : typ
+        axis : typ
         Returns
         -------
         type
-            Description of returned object.
-
         """
         loop_vars = [i for i in self._obj.variables if "z" in self._obj[i].dims]
         orig = self._obj[loop_vars[0]].stratify(levels, vertical, axis=axis)
@@ -2022,17 +1916,11 @@ class MONETAccessorDataset:
         Parameters
         ----------
         data : type
-            Description of parameter `data`.
-        col : type
-            Description of parameter `col`.
-        radius : type
-            Description of parameter `radius`.
-
+        col : typ
+        radius : typ
         Returns
         -------
         type
-            Description of returned object.
-
         """
         if has_pyresample:
             from .util.combinetool import combine_da_to_df
@@ -2093,8 +1981,6 @@ class MONETAccessorDataset:
         Returns
         -------
         type
-            Description of returned object.
-
         """
         dset = self._obj
         dset[lon_name] = (dset[lon_name] + 180) % 360 - 180

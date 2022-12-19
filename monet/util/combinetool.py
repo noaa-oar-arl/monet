@@ -3,65 +3,63 @@ from pandas import Series, merge_asof
 
 
 def combine_da_to_df(da, df, merge=True, **kwargs):
-    """This function will combine an xarray data array with spatial information
-    point observations in `df`.
+    """Combine xarray data array `da` with spatial information
+    point observations in dataframe `df`, returning a new dataframe.
 
     Parameters
     ----------
-    da : xr.DataArray or xr.Dataset
-        Description of parameter `da`.
-    df : pd.DataFrame
-        Description of parameter `df`.
-    lay : iterable, default = [0]
-        Description of parameter `lay`.
-    radius : integer or float, default = 12e3
-        Description of parameter `radius`.
+    da : xarray.DataArray or xarray.Dataset
+        Data to be interpolated to target grid points.
+    df : pandas.DataFrame
+        Data on target grid points.
+    merge : bool
+        Merge interpolated `df` data with `da` data.
+        Otherwise, return interpolated `da` data only.
+    kwargs : dict
+        Passed to :meth:`~monet.monet_accessor.MONETAccessor.remap_nearest`
+        (if `da` is not unstructured-grid data).
 
     Returns
     -------
     pandas.DataFrame
     """
-    # try:
-    #     if col is None:
-    #         raise RuntimeError
-    # except RuntimeError:
-    #     print('Must enter column name')
-    # dfn = df.dropna(subset=[col])
-    dfnn = df.drop_duplicates(subset=["siteid"]).dropna(subset=["latitude", "longitude", "siteid"])
-    dfda = dfnn.monet._df_to_da()
+    target_da = df.drop_duplicates(subset=["siteid"]).dropna(
+        subset=["latitude", "longitude", "siteid"]
+    )
+    target_data_da = target_da.monet._df_to_da()
 
     # Add if statement for unstructured grid output
     if da.attrs.get("mio_has_unstructured_grid", False):
-        da_interped = dfda.monet.remap_nearest_unstructured(da).compute()
+        da_interped = target_data_da.monet.remap_nearest_unstructured(da).compute()
     else:
-        da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
+        da_interped = target_data_da.monet.remap_nearest(da, **kwargs).compute()
 
-    da_interped["siteid"] = (("x"), dfnn.siteid)
-    df_interped = da_interped.to_dataframe().reset_index()
-    cols = Series(df_interped.columns)
+    da_interped["siteid"] = (("x"), target_da.siteid)
+    da_interped_df = da_interped.to_dataframe().reset_index()
+    cols = Series(da_interped_df.columns)
 
     drop_cols = cols.loc[cols.isin(["x", "y", "z", "latitude", "longitude"])]
-    df_interped.drop(drop_cols, axis=1, inplace=True)
+    da_interped_df.drop(drop_cols, axis=1, inplace=True)
     if isinstance(da, xr.DataArray):
         if da.name in df.columns:
-            df_interped.rename(columns={da.name: da.name + "_new"}, inplace=True)
+            da_interped_df.rename(columns={da.name: da.name + "_new"}, inplace=True)
     else:
         dup_names = [name for name in da.data_vars.keys() if name in df.columns]
         if len(dup_names) > 0:
             for name in dup_names:
-                df_interped.rename(columns={name: name + "_new"}, inplace=True)
+                da_interped_df.rename(columns={name: name + "_new"}, inplace=True)
     if merge:
         df.reset_index(drop=True)
-        df_interped.reset_index(drop=True)
-        final_df = df.merge(df_interped, on=["time", "siteid"], how="left")
+        da_interped_df.reset_index(drop=True)
+        final_df = df.merge(da_interped_df, on=["time", "siteid"], how="left")
         return final_df
     else:
-        return df_interped
+        return da_interped_df
 
 
 def combine_da_to_da(source, target, merge=True, interp_time=False, **kwargs):
-    """This function will combine an xarray data array with spatial information
-    point observations in `df`.
+    """Combine xarray data array with with point observations
+    in second data array `target`.
 
     Parameters
     ----------
@@ -74,7 +72,7 @@ def combine_da_to_da(source, target, merge=True, interp_time=False, **kwargs):
     interp_time : bool
         Linearly interplate to ``target.time``.
     kwargs : dict
-        kwargs to :meth:`~monet.monet_accessor.MONETAccessor.remap_nearest`
+        Passed to :meth:`~monet.monet_accessor.MONETAccessor.remap_nearest`.
 
     Returns
     -------
