@@ -25,3 +25,4 @@ dependencies:
   - packaging
   - pooch
   - pytest
+  - shapely<2
