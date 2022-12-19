@@ -1324,7 +1324,7 @@ class MONETAccessor:
             return _rename_to_monet_latlon(out)
 
         else:
-            print("xesmf unavailable. " "Try `import xesmf` and check the failure message.")
+            print("xesmf unavailable. Try `import xesmf` and check the failure message.")
 
     def combine_point(self, data, suffix=None, pyresample=True, **kwargs):
         """Short summary.
@@ -1480,7 +1480,7 @@ class MONETAccessorDataset:
                 # TODO: raise
 
         else:
-            print("xesmf unavailable. " "Try `import xesmf` and check the failure message.")
+            print("xesmf unavailable. Try `import xesmf` and check the failure message.")
 
     def _remap_xesmf_dataset(self, dset, filename="monet_xesmf_regrid_file.nc", **kwargs):
         skip_keys = ["lat", "lon", "time", "TFLAG"]
