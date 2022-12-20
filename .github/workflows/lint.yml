@@ -18,3 +18,13 @@ jobs:
         with:
           python-version: "3.8"
       - uses: pre-commit/action@v3.0.0
+
+  spell:
+    name: codespell
+    runs-on: ubuntu-latest
+    if: github.repository == 'noaa-oar-arl/monet'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: codespell-project/actions-codespell@v1
+        with:
+          exclude_file: .codespell-exclude.txt
