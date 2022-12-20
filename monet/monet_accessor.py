@@ -56,7 +56,7 @@ def _monet_to_latlon(da):
         dset = da.to_dataset()
     dset["x"] = da.longitude[0, :].values
     dset["y"] = da.latitude[:, 0].values
-    dset = dset.drop(["latitude", "longitude"])
+    dset = dset.drop_vars(["latitude", "longitude"])
     dset = dset.set_coords(["x", "y"])
     dset = dset.rename({"x": "lon", "y": "lat"})
     if isinstance(da, xr.DataArray):
@@ -1215,29 +1215,34 @@ class MONETAccessor:
 
         return result
 
-    def remap_xesmf(self, dataarray, method="bilinear", **kwargs):
-        """remaps from another grid to the current grid of self using xesmf
+    def remap_xesmf(self, data, **kwargs):
+        """Remap `data` from another grid to the current grid of self using xESMF.
 
         Parameters
         ----------
-        daaarray : ndarray or xarray DataArray
-        radius_of_inflence : float or integer
-            radius of influcence for pyresample in meters.
+        data : numpy.ndarray or xarray.DataArray
+        kwargs : dict
+            Passed on to :func:`~monet.util.resample.resample_xesmf`
+            and then to ``xesmf.Regridder``.
+            ``method`` defaults to ``'bilinear'``.
 
         Returns
         -------
         xarray.DataArray
-            resampled object on current grid.
-
+            Resampled object on current grid.
         """
+        kwargs["method"] = kwargs.get("method", "bilinear")
         if has_xesmf:
             from .util import resample
 
             # check to see if grid is supplied
             target = _rename_latlon(self._obj)
-            source = _rename_latlon(dataarray)
-            out = resample.resample_xesmf(source, target, method=method, **kwargs)
+            source = _rename_latlon(data)
+            out = resample.resample_xesmf(source, target, **kwargs)
             return _rename_to_monet_latlon(out)
+
+        else:
+            print("xesmf unavailable. Try `import xesmf` and check the failure message.")
 
     def combine_point(self, data, suffix=None, pyresample=True, **kwargs):
         """Combine self data with point data in dataframe `data`.
@@ -1397,18 +1402,15 @@ class MONETAccessorDataset:
         return ds
 
     def remap_xesmf(self, data, **kwargs):
-        """Resample using xESMF.
+        """Remap `data` from another grid to the current grid of self using xESMF.
 
         Parameters
         ----------
         data : xarray.DataArray or xarray.Dataset
-            To be remapped to the self grid.
+            Data to be remapped.
         kwargs : dict
-            Passed on to the xesmf resample routine.
-
-        Returns
-        -------
-        type
+            Passed on to :func:`~monet.util.resample.resample_xesmf`
+            and then to ``xesmf.Regridder``.
         """
         if has_xesmf:
             try:
@@ -1423,6 +1425,9 @@ class MONETAccessorDataset:
             except TypeError:
                 print("data must be an xarray.DataArray or xarray.Dataset")
                 # TODO: raise
+
+        else:
+            print("xesmf unavailable. Try `import xesmf` and check the failure message.")
 
     def _remap_xesmf_dataset(self, dset, filename="monet_xesmf_regrid_file.nc", **kwargs):
         skip_keys = ["lat", "lon", "time", "TFLAG"]
