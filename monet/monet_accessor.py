@@ -1273,44 +1273,44 @@ class MONETAccessor:
         else:
             print("`data` must be a pandas.DataFrame")
 
-    def combine_da(
-        self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs
-    ):
-        """Short summary.
+    # def combine_da(
+    #     self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs
+    # ):
+    #     """Short summary.
 
-        Parameters
-        ----------
-        data
-            To be combined.
-        suffix : str, optional
-            Added to the ``name`` of the new variable, defaults to ``'_new'``.
-            Ignored if pyresample used.
-        col
-        radius
+    #     Parameters
+    #     ----------
+    #     data
+    #         To be combined.
+    #     suffix : str, optional
+    #         Added to the ``name`` of the new variable, defaults to ``'_new'``.
+    #         Ignored if pyresample used.
+    #     col
+    #     radius
 
-        Returns
-        -------
-        type
-        """
-        if has_pyresample:
-            from .util.combinetool import combine_da_to_df
-        if has_xesmf:
-            from .util.combinetool import combine_da_to_df_xesmf
-        # point source data
-        da = _dataset_to_monet(self._obj)
-        if isinstance(data, xr.DataArray):
-            d = xr.Dataset(data)
-            if has_pyresample and pyresample:
-                return combine_da_to_df(da, d, **kwargs)
-            else:  # xesmf resample
-                return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
-        elif isinstance(data, xr.Dataset):
-            if has_pyresample and pyresample:
-                return combine_da_to_df(da, data, **kwargs)
-            else:  # xesmf resample
-                return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
-        else:
-            raise ValueError("`data` must be an xarray Dataset or DataArray")
+    #     Returns
+    #     -------
+    #     type
+    #     """
+    #     if has_pyresample:
+    #         from .util.combinetool import combine_da_to_df
+    #     if has_xesmf:
+    #         from .util.combinetool import combine_da_to_df_xesmf
+    #     # point source data
+    #     da = _dataset_to_monet(self._obj)
+    #     if isinstance(data, xr.DataArray):
+    #         d = xr.Dataset(data)
+    #         if has_pyresample and pyresample:
+    #             return combine_da_to_df(da, d, **kwargs)
+    #         else:  # xesmf resample
+    #             return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
+    #     elif isinstance(data, xr.Dataset):
+    #         if has_pyresample and pyresample:
+    #             return combine_da_to_df(da, data, **kwargs)
+    #         else:  # xesmf resample
+    #             return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
+    #     else:
+    #         raise ValueError("`data` must be an xarray Dataset or DataArray")
 
 
 @xr.register_dataset_accessor("monet")
@@ -1944,44 +1944,44 @@ class MONETAccessorDataset:
         else:
             print("`data` must be a pandas.DataFrame")
 
-    def combine_da(
-        self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs
-    ):
-        """Short summary.
+    # def combine_da(
+    #     self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs
+    # ):
+    #     """Short summary.
 
-        Parameters
-        ----------
-        data
-            To be combined.
-        suffix : str, optional
-            Added to the ``name`` of the new variable, defaults to ``'_new'``.
-            Ignored if pyresample used.
-        col
-        radius
+    #     Parameters
+    #     ----------
+    #     data
+    #         To be combined.
+    #     suffix : str, optional
+    #         Added to the ``name`` of the new variable, defaults to ``'_new'``.
+    #         Ignored if pyresample used.
+    #     col
+    #     radius
 
-        Returns
-        -------
-        pandas.DataFrame
-        """
-        if has_pyresample:
-            from .util.combinetool import combine_da_to_df
-        if has_xesmf:
-            from .util.combinetool import combine_da_to_df_xesmf
-        # point source data
-        da = _dataset_to_monet(self._obj)
-        if isinstance(data, xr.DataArray):
-            d = xr.Dataset(data)
-            if has_pyresample and pyresample:
-                return combine_da_to_df(da, d, **kwargs)
-            else:  # xesmf resample
-                return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
-        elif isinstance(data, xr.Dataset):
-            if has_pyresample and pyresample:
-                return combine_da_to_df(da, data, **kwargs)
-            else:  # xesmf resample
-                return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
-        else:
-            raise ValueError("`data` must be an xarray Dataset or DataArray")
+    #     Returns
+    #     -------
+    #     pandas.DataFrame
+    #     """
+    #     if has_pyresample:
+    #         from .util.combinetool import combine_da_to_df
+    #     if has_xesmf:
+    #         from .util.combinetool import combine_da_to_df_xesmf
+    #     # point source data
+    #     da = _dataset_to_monet(self._obj)
+    #     if isinstance(data, xr.DataArray):
+    #         d = xr.Dataset(data)
+    #         if has_pyresample and pyresample:
+    #             return combine_da_to_df(da, d, **kwargs)
+    #         else:  # xesmf resample
+    #             return combine_da_to_df_xesmf(da, d, suffix=suffix, **kwargs)
+    #     elif isinstance(data, xr.Dataset):
+    #         if has_pyresample and pyresample:
+    #             return combine_da_to_df(da, data, **kwargs)
+    #         else:  # xesmf resample
+    #             return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
+    #     else:
+    #         raise ValueError("`data` must be an xarray Dataset or DataArray")
 
     def wrap_longitudes(self, lon_name="longitude"):
         """Ensures longitudes are from -180 -> 180
