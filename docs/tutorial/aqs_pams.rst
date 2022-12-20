@@ -28,7 +28,7 @@ Now we have all the imports we could need lets load some data. Most of
 the PAMS data is on daily data so lets add the kwarg daily=True to the
 call. We will also create this for the year 2015 and 2016. Some
 variables that may be valuable are the VOCS, ozone, NO2, NOX,
-temperature. For all of the measurments available please see
+temperature. For all of the measurements available please see
 https://aqs.epa.gov/aqsweb/airdata/download_files.html
 
 .. code-block:: python
