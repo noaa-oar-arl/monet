@@ -25,6 +25,3 @@ dependencies:
   - packaging
   - pooch
   - pytest
-  #
-  - esmf<8.4
-  - shapely<2
