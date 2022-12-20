@@ -40,7 +40,7 @@ def _ensure_swathdef_compatability(defin):
 
 def _check_swath_or_area(defin):
     """Checks for a SwathDefinition or AreaDefinition. If AreaDefinition do
-    nothing else ensure compatability with XArrayResamplerNN
+    nothing else ensure compatibility with XArrayResamplerNN
 
     Parameters
     ----------

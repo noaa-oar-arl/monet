@@ -86,8 +86,8 @@ def MNE(obs, mod, axis=None):
         Description of returned object.
 
     """
-    ans = np.ma.masked_invalid(np.ma.abs(mod - obs) / obs).mean(axis=axis) * 100.0
-    return ans
+
+    return np.ma.masked_invalid(np.ma.abs(mod - obs) / obs).mean(axis=axis) * 100.0
 
 
 def MdnNB(obs, mod, axis=None):

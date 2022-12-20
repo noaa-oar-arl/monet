@@ -1586,7 +1586,7 @@ def combine_da_to_height_profile(da, dset, *, radius_of_influence=12e3):
 #         Description of returned object.
 #
 #     """
-#     # wont do to much.  just interpolate the model to observations in the x y space
+#     # won't do too much.  just interpolate the model to observations in the x y space
 #     lat = obs.dset.Latitude
 #     lon = obs.dset.Longitude
 #     dset = find_nearest_latlon_xarray(model.dset[param], lat=lat, lon=lon, radius=model.dset.XCELL)
