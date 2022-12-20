@@ -34,14 +34,12 @@ except ImportError:
 
 
 def _rename_latlon(ds):
-    """Short summary.
+    """Rename latitude/longitude variants to ``lat``/``lon``,
+    returning a new xarray object.
 
     Parameters
     ----------
-    ds : type
-    Returns
-    -------
-    type
+    ds : xarray.DataArray or xarray.Dataset
     """
     if "latitude" in ds.coords:
         return ds.rename({"latitude": "lat", "longitude": "lon"})
@@ -68,22 +66,19 @@ def _monet_to_latlon(da):
 
 
 def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=False):
-    """Renames XArray DataArray or Dataset for use with monet functions
+    """Rename xarray DataArray or Dataset coordinate variables for use with monet functions,
+    returning a new xarray object.
 
     Parameters
     ----------
-    dset : xr.DataArray or xr.Dataset
-        a given data obj to be renamed for monet.
+    dset : xarray.DataArray or xarray.Dataset
+        A given data obj to be renamed for monet.
     lat_name : str
-        name of the latitude array.
+        Name of the latitude array.
     lon_name : str
-        name of the longitude array.
+        Name of the longitude array.
     latlon2d : bool
-        flag for if the latitude and longitude data is two dimensional.
-
-    Returns
-    -------
-    type
+        Whether the latitude and longitude data is two-dimensional.
     """
     if "grid_xt" in dset.dims:
         # GFS v16 file
@@ -154,14 +149,12 @@ def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=
 
 
 def _rename_to_monet_latlon(ds):
-    """Short summary.
+    """Rename latitude/longitude variants to ``lat``/``lon``,
+    returning a new xarray object.
 
     Parameters
     ----------
-    ds : type
-    Returns
-    -------
-    type
+    ds : xarray.DataArray or xarray.Dataset
     """
 
     # To consider unstructured grid
@@ -185,16 +178,17 @@ def _rename_to_monet_latlon(ds):
 
 
 def _coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
-    """Short summary.
+    """Convert 1-D lat/lon coords to x/y convention, with
+    lat/lon as 2-D variables with (y, x) dimensions,
+    returning a new xarray object.
 
     Parameters
     ----------
-    dset : type
-    lat_name : typ
-    lon_name : typ
-    Returns
-    -------
-    type
+    dset : xarray.Dataset
+    lat_name : str
+        Name of the latitude array.
+    lon_name : str
+        Name of the longitude array.
     """
     from numpy import arange, meshgrid
 
@@ -213,16 +207,17 @@ def _coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
 
 
 def _dataarray_coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
-    """Short summary.
+    """Convert 1-D lat/lon coords to x/y convention, with
+    lat/lon as 2-D variables with (y, x) dimensions,
+    returning a new xarray object.
 
     Parameters
     ----------
-    dset : type
-    lat_name : typ
-    lon_name : typ
-    Returns
-    -------
-    type
+    dset : xarray.DataArray
+    lat_name : str
+        Name of the latitude array.
+    lon_name : str
+        Name of the longitude array.
     """
     from numpy import arange, meshgrid
 
@@ -247,31 +242,23 @@ class MONETAccessorPandas:
 
     @staticmethod
     def _validate(obj):
-        """Short summary.
-
-        Parameters
-        ----------
-        obj : type
-        Returns
-        -------
-        type
-        """
-        # verify there is a column latitude and a column longitude
+        """Verify there is a column ``'latitude'`` and a column ``'longitude'``."""
         if "latitude" not in obj.columns or "longitude" not in obj.columns:
             raise AttributeError("Must have 'latitude' and 'longitude'.")
 
     @property
     def center(self):
-        """Short summary.
+        """Return the geographic center point of this DataFrame.
 
         Returns
         -------
-        type
+        tuple
+            (lon, lat)
         """
-        # return the geographic center point of this DataFrame
         lat = self._obj.latitude
         lon = self._obj.longitude
         return (float(lon.mean()), float(lat.mean()))
+        # TODO: won't necessarily represent geographic center
 
     def to_ascii2nc_df(
         self,
@@ -376,7 +363,6 @@ class MONETAccessorPandas:
         Returns
         -------
         pyreample.geometry.SwathDefinition
-
         """
         df = self.rename_for_monet(self._obj)
         if has_pyresample:
@@ -472,14 +458,18 @@ class MONETAccessorPandas:
             print("pyresample unavailable. Try `import pyresample` and check the failure message.")
 
     def cftime_to_datetime64(self, col=None):
-        """Short summary.
+        """Convert to datetime64.
 
         Parameters
         ----------
-        col : type
+        col : str, optional
+            Column to apply the transformation to (in place).
+            ``'time'`` assumed by default.
+
         Returns
         -------
-        type
+        pandas.DataFrame
+            self
         """
         df = self._obj
 
@@ -492,14 +482,17 @@ class MONETAccessorPandas:
         return df
 
     def _make_fake_index_var(self, df):
-        """Short summary.
+        """Add a fake float range index column to `df`.
 
         Parameters
         ----------
-        df : type
+        df : pandas.DataFrame
+
         Returns
         -------
-        type
+        pandas.DataFrame
+            Input dataframe with fake index column added
+            (column name ``'monet_fake_index'``).
         """
         from numpy import arange
 
@@ -514,47 +507,40 @@ class MONETAccessorPandas:
 
 @xr.register_dataarray_accessor("monet")
 class MONETAccessor:
-    """Short summary.
-
-    Parameters
-    ----------
-    xray_obj : type
-    Attributes
-    ----------
-    obj : type
-    """
+    """MONET."""
 
     def __init__(self, xray_obj):
-        """Short summary.
-
+        """
         Parameters
         ----------
-        xray_obj : type
-        Returns
-        -------
-        type
+        xray_obj : xarray.DataArray
         """
         self._obj = xray_obj
 
     def wrap_longitudes(self, lon_name="longitude"):
         """Ensures longitudes are from -180 -> 180
 
+        Parameters
+        ----------
+        lon_name : str
+
         Returns
         -------
-        type
+        xarray.DataArray
+            self
         """
         dset = self._obj
         dset[lon_name] = (dset[lon_name] + 180) % 360 - 180
         return dset
 
     def tidy(self, lon_name="longitude"):
-        """Tidy's DataArray–wraps longitudes and sorts lats and lons
+        """Tidy's DataArray–wraps longitudes and sorts lats and lons.
+
+        lon wrapping applied in-place but not sorting.
 
         Returns
         -------
-        xr.DataArray
-            The tidy object
-
+        xarray.DataArray
         """
         d = self._obj
         wd = d.monet.wrap_longitudes(lon_name=lon_name)
@@ -562,7 +548,8 @@ class MONETAccessor:
         return wdl
 
     def is_land(self, return_xarray=False):
-        """checks the mask of land and ocean.
+        """Check the mask of land and ocean,
+        returning corresponding boolean mask.
 
         Parameters
         ----------
@@ -573,8 +560,6 @@ class MONETAccessor:
         Returns
         -------
         xarray.DataArray or numpy.array
-
-
         """
         try:
             import global_land_mask as glm
@@ -588,7 +573,8 @@ class MONETAccessor:
             return island
 
     def is_ocean(self, return_xarray=False):
-        """checks the mask of land and ocean.
+        """Check the mask of land and ocean,
+        returning corresponding boolean mask.
 
         Parameters
         ----------
@@ -614,14 +600,18 @@ class MONETAccessor:
             return isocean
 
     def cftime_to_datetime64(self, name=None):
-        """Short summary.
+        """Convert to datetime64.
 
         Parameters
         ----------
-        name : type
+        name : str, optional
+            Variable to apply the transformation to (in place).
+            ``'time'`` assumed by default.
+
         Returns
         -------
-        type
+        xarray.DataArray
+            self
         """
         from numpy import vectorize
 
@@ -641,12 +631,10 @@ class MONETAccessor:
 
         Parameters
         ----------
-        lat_name : type
-        lon_name : typ
-        return : typ
-        Returns
-        -------
-        type
+        lat_name : str
+        lon_name : str
+        return_obj : bool
+            If true, return modified object, else modify in place.
         """
         if return_obj:
             return _dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
@@ -654,20 +642,23 @@ class MONETAccessor:
             self._obj = _dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
 
     def stratify(self, levels, vertical, axis=1):
-        """Short summary.
+        """Resample in the vertical with stratify.
 
         Parameters
         ----------
-        levels : type
-        vertical : typ
-        axis : typ
+        levels
+            Values to interpolate to.
+        vertical
+            Vertical dimension coordinate variable.
+        axis : int
+
         Returns
         -------
-        type
+        xarray.DataArray
         """
         from .util.resample import resample_stratify
 
-        out = resample_stratify(self._obj, levels, vertical, axis=1)
+        out = resample_stratify(self._obj, levels, vertical, axis=axis)
         return out
 
     def window(self, lat_min=None, lon_min=None, lat_max=None, lon_max=None, rectilinear=False):
@@ -893,12 +884,14 @@ class MONETAccessor:
 
         Parameters
         ----------
-        lat : type
-        lon : typ
-        **kwargs : typ
+        lat : float
+        lon : float
+        kwargs : dict
+            Passed on to resampling routines.
+
         Returns
         -------
-        type
+        xarray.Dataset
         """
         try:
             from pyresample import utils
@@ -938,14 +931,17 @@ class MONETAccessor:
 
     @staticmethod
     def _check_kwargs_and_set_defaults(**kwargs):
-        """Short summary.
-
+        """
         Parameters
         ----------
-        **kwargs : type
+        kwargs : dict
+            Regrid/remap kwargs dict.
+
         Returns
         -------
-        type
+        dict
+            With defaults added if not already set.
+            Note modified in place.
         """
         if "reuse_weights" not in kwargs:
             kwargs["reuse_weights"] = False
@@ -975,9 +971,7 @@ class MONETAccessor:
 
         Returns
         -------
-        matplotlib.axes
-            axes
-
+        matplotlib.axes.Axes
         """
         import cartopy.crs as ccrs
         import matplotlib.pyplot as plt
@@ -1037,9 +1031,7 @@ class MONETAccessor:
 
         Returns
         -------
-        matplotlib.axes
-            axes
-
+        matplotlib.axes.Axes
         """
         import cartopy.crs as ccrs
         import matplotlib.pyplot as plt
@@ -1092,9 +1084,7 @@ class MONETAccessor:
 
         Returns
         -------
-        type
-            axes
-
+        matplotlib.axes.Axes
         """
         import cartopy.crs as ccrs
         import matplotlib.pyplot as plt
@@ -1152,6 +1142,7 @@ class MONETAccessor:
         Parameters
         ----------
         defin : type
+
         Returns
         -------
         type
@@ -1249,7 +1240,7 @@ class MONETAccessor:
             return _rename_to_monet_latlon(out)
 
     def combine_point(self, data, suffix=None, pyresample=True, **kwargs):
-        """Short summary.
+        """Combine self data with point data in dataframe `data`.
 
         Parameters
         ----------
@@ -1258,6 +1249,11 @@ class MONETAccessor:
             Used to rename new data array(s) if using xemsf.
         pyresample : bool
             Use pyresample (:func:`~monet.util.combinetool.combine_da_to_df`).
+        kwargs : dict
+            Passed on to
+            :func:`~monet.util.combinetool.combine_da_to_df`
+            or
+            :func:`~monet.util.combinetool.combine_da_to_df_xesmf`
 
         Returns
         -------
@@ -1275,7 +1271,7 @@ class MONETAccessor:
             else:  # xesmf resample
                 return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
         else:
-            print("d must be a pandas.DataFrame")
+            print("`data` must be a pandas.DataFrame")
 
     def combine_da(
         self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs
@@ -1319,15 +1315,7 @@ class MONETAccessor:
 
 @xr.register_dataset_accessor("monet")
 class MONETAccessorDataset:
-    """Monet accessor to the xarray.Dataset.
-
-    Parameters
-    ----------
-    xray_obj : type
-    Attributes
-    ----------
-    obj : type
-    """
+    """MONET."""
 
     def __init__(self, xray_obj):
         self._obj = xray_obj
@@ -1381,38 +1369,43 @@ class MONETAccessorDataset:
             return isocean
 
     def cftime_to_datetime64(self, name=None):
-        """Convert cftime o numpy datetime64 objects.
+        """Convert to datetime64.
 
         Parameters
         ----------
-        name : str
-            time variable name.
+        name : str, optional
+            Variable to apply the transformation to (in place).
+            ``'time'`` assumed by default.
 
         Returns
         -------
-        xarray.DataArray
+        xarray.Dataset
+            self
         """
         from numpy import vectorize
 
-        da = self._obj
+        ds = self._obj
 
         def cf_to_dt64(x):
             return pd.to_datetime(x.strftime("%Y-%m-%d %H:%M:%S"))
 
         if name is None:  # assume 'time' is the column name to transform
             name = "time"
-        if isinstance(da[name].to_index(), xr.CFTimeIndex):
+        if isinstance(ds[name].to_index(), xr.CFTimeIndex):
             # assume cftime
-            da[name] = xr.apply_ufunc(vectorize(cf_to_dt64), da[name])
-        return da
+            ds[name] = xr.apply_ufunc(vectorize(cf_to_dt64), ds[name])
+        return ds
 
     def remap_xesmf(self, data, **kwargs):
-        """Resample the xesmf
+        """Resample using xESMF.
 
         Parameters
         ----------
-        data : type
-        **kwargs : typ
+        data : xarray.DataArray or xarray.Dataset
+            To be remapped to the self grid.
+        kwargs : dict
+            Passed on to the xesmf resample routine.
+
         Returns
         -------
         type
@@ -1455,10 +1448,11 @@ class MONETAccessorDataset:
 
         Parameters
         ----------
-        dataarray : type
+        dataarray : xarray.DataArray
+
         Returns
         -------
-        type
+        xarray.DataArray
         """
         from .util import resample
 
@@ -1475,7 +1469,6 @@ class MONETAccessorDataset:
         Returns
         -------
         pyreseample.geometry.CoordinateDefinition
-
         """
         from pyresample import geometry as geo
 
@@ -1639,7 +1632,6 @@ class MONETAccessorDataset:
         -------
         i,j
             Returns the i (x index) and j (y index) of the given latitude longitude value
-
         """
         try:
             from pyresample import utils
@@ -1672,12 +1664,14 @@ class MONETAccessorDataset:
 
         Parameters
         ----------
-        lat : type
-        lon : typ
-        **kwargs : typ
+        lat : float
+        lon : float
+        kwargs : dict
+            Passed on to resampling routine.
+
         Returns
         -------
-        type
+        xarray.Dataset
         """
         try:
             from pyresample import utils
@@ -1719,14 +1713,17 @@ class MONETAccessorDataset:
 
     @staticmethod
     def _check_kwargs_and_set_defaults(**kwargs):
-        """Short summary.
-
+        """
         Parameters
         ----------
-        **kwargs : type
+        kwargs : dict
+            Regrid/remap kwargs dict.
+
         Returns
         -------
-        type
+        dict
+            With defaults added if not already set.
+            Note modified in place.
         """
         if "reuse_weights" not in kwargs:
             kwargs["reuse_weights"] = False
@@ -1824,16 +1821,19 @@ class MONETAccessorDataset:
                 return _rename_latlon(out)
 
     def stratify(self, levels, vertical, axis=1):
-        """Short summary.
+        """Resample in the vertical with stratify.
 
         Parameters
         ----------
-        levels : type
-        vertical : typ
-        axis : typ
+        levels
+            Values to interpolate to.
+        vertical
+            Vertical dimension coordinate variable.
+        axis : int
+
         Returns
         -------
-        type
+        xarray.Dataset
         """
         loop_vars = [i for i in self._obj.variables if "z" in self._obj[i].dims]
         orig = self._obj[loop_vars[0]].stratify(levels, vertical, axis=axis)
@@ -1911,16 +1911,24 @@ class MONETAccessorDataset:
             print("Window functionality is unavailable without pyresample")
 
     def combine_point(self, data, suffix=None, pyresample=True, **kwargs):
-        """Short summary.
+        """Combine self data with point data in dataframe `data`.
 
         Parameters
         ----------
-        data : type
-        col : typ
-        radius : typ
+        data : pandas.DataFrame
+        suffix : str, optional
+            Used to rename new data array(s) if using xemsf.
+        pyresample : bool
+            Use pyresample (:func:`~monet.util.combinetool.combine_da_to_df`).
+        kwargs : dict
+            Passed on to
+            :func:`~monet.util.combinetool.combine_da_to_df`
+            or
+            :func:`~monet.util.combinetool.combine_da_to_df_xesmf`
+
         Returns
         -------
-        type
+        pandas.DataFrame
         """
         if has_pyresample:
             from .util.combinetool import combine_da_to_df
@@ -1934,7 +1942,7 @@ class MONETAccessorDataset:
             else:  # xesmf resample
                 return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
         else:
-            print("d must be either a pd.DataFrame")
+            print("`data` must be a pandas.DataFrame")
 
     def combine_da(
         self, data, suffix=None, pyresample=True, merge=True, interp_time=False, **kwargs
@@ -1977,23 +1985,20 @@ class MONETAccessorDataset:
 
     def wrap_longitudes(self, lon_name="longitude"):
         """Ensures longitudes are from -180 -> 180
-
-        Returns
-        -------
-        type
+        Modifies self in place.
         """
         dset = self._obj
         dset[lon_name] = (dset[lon_name] + 180) % 360 - 180
         return dset
 
     def tidy(self, lon_name="longitude"):
-        """Tidy's DataArray–wraps longitudes and sorts lats and lons
+        """Tidy's Dataset–wraps longitudes and sorts lats and lons.
+
+        lon wrapping applied in-place but not sorting.
 
         Returns
         -------
-        xr.DataArray
-            The tidy object
-
+        xarray.Dataset
         """
         d = self._obj
         wd = d.monet.wrap_longitudes(lon_name=lon_name)
