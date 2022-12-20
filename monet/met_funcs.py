@@ -467,7 +467,7 @@ def calc_Psi_H(zoL):
     Returns
     -------
     Psi_H : float
-        adiabatic corrector factor fof heat transport (unitless).
+        adiabatic corrector factor for heat transport (unitless).
 
     References
     ----------
@@ -479,7 +479,7 @@ def calc_Psi_H(zoL):
     zoL = np.asarray(zoL)
     Psi_H = np.zeros(zoL.shape)
 
-    # for stable and netural (zoL = 0 -> Psi_H = 0) conditions
+    # for stable and neutral (zoL = 0 -> Psi_H = 0) conditions
     i = zoL >= 0.0
     a = 6.1
     b = 2.5
@@ -507,7 +507,7 @@ def calc_Psi_M(zoL):
     Returns
     -------
     Psi_M : float
-        adiabatic corrector factor fof momentum transport (unitless).
+        adiabatic corrector factor for momentum transport (unitless).
 
     References
     ----------
@@ -519,7 +519,7 @@ def calc_Psi_M(zoL):
     zoL = np.asarray(zoL)
 
     Psi_M = np.zeros(zoL.shape)
-    # for stable and netural (zoL = 0 -> Psi_M = 0) conditions
+    # for stable and neutral (zoL = 0 -> Psi_M = 0) conditions
     i = zoL >= 0.0
     a = 6.1
     b = 2.5
@@ -608,7 +608,7 @@ def calc_u_star(u, z_u, L, d_0, z_0M):
         Cambridge: Cambridge University Press.
     """
 
-    # Covert input scalars to numpy arrays
+    # Convert input scalars to numpy arrays
     u, z_u, L, d_0, z_0M = map(np.asarray, (u, z_u, L, d_0, z_0M))
 
     # calculate correction factors in other conditions

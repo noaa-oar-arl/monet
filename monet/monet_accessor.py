@@ -835,7 +835,7 @@ class MONETAccessor:
                 return _rename_latlon(out)
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
-        """Uses pyresample to intepolate to find the i, j index of grid with respect to the given lat lon.
+        """Uses pyresample to interpolate to find the i, j index of grid with respect to the given lat lon.
 
         Parameters
         ----------
@@ -879,7 +879,7 @@ class MONETAccessor:
             return x, y
 
     def nearest_latlon(self, lat=None, lon=None, cleanup=True, esmf=False, **kwargs):
-        """Uses xesmf to intepolate to a given latitude and longitude.  Note
+        """Uses xesmf to interpolate to a given latitude and longitude.  Note
         that the conservative method is not available.
 
         Parameters
@@ -1136,20 +1136,20 @@ class MONETAccessor:
 
         subplots_adjust(0, 0, 1, 1)
 
-    def _check_swath_def(self, defin):
+    def _check_swath_def(self, defn):
         """checks if it is a pyresample SwathDefinition or AreaDefinition.
 
         Parameters
         ----------
-        defin : type
+        defn : pyresample.geometry.SwathDefinition or pyresample.geometry.AreaDefinition
 
         Returns
         -------
-        type
+        bool
         """
         from pyresample.geometry import SwathDefinition
 
-        if isinstance(defin, SwathDefinition):
+        if isinstance(defn, SwathDefinition):
             return True
         else:
             return False
@@ -1159,8 +1159,7 @@ class MONETAccessor:
 
         Returns
         -------
-        pyreseample.geometry.CoordinateDefinition
-
+        pyresample.geometry.CoordinateDefinition
         """
         from pyresample import geometry as geo
 
@@ -1473,7 +1472,7 @@ class MONETAccessorDataset:
 
         Returns
         -------
-        pyreseample.geometry.CoordinateDefinition
+        pyresample.geometry.CoordinateDefinition
         """
         from pyresample import geometry as geo
 
@@ -1622,7 +1621,7 @@ class MONETAccessorDataset:
         return result
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
-        """Uses pyresample to intepolate to find the i, j index of grid with respect to the given lat lon.
+        """Uses pyresample to interpolate to find the i, j index of grid with respect to the given lat lon.
 
         Parameters
         ----------
@@ -1664,7 +1663,7 @@ class MONETAccessorDataset:
             return x, y
 
     def nearest_latlon(self, lat=None, lon=None, cleanup=True, esmf=False, **kwargs):
-        """Uses xesmf to intepolate to a given latitude and longitude.  Note
+        """Uses xesmf to interpolate to a given latitude and longitude.  Note
         that the conservative method is not available.
 
         Parameters

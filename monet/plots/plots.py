@@ -67,7 +67,7 @@ def make_spatial_contours(
     plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
     lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
-    # define map and draw boundries
+    # define map and draw boundaries
     m.drawstates()
     m.drawcoastlines(linewidth=0.3)
     m.drawcountries()
@@ -97,7 +97,7 @@ def wind_quiver(ws, wdir, gridobj, m, **kwargs):
 
     lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
     lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
-    # define map and draw boundries
+    # define map and draw boundaries
     x, y = m(lon, lat)
     u, v = tools.wsdir2uv(ws, wdir)
     quiv = m.quiver(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
@@ -109,7 +109,7 @@ def wind_barbs(ws, wdir, gridobj, m, **kwargs):
 
     lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
     lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
-    # define map and draw boundries
+    # define map and draw boundaries
     x, y = m(lon, lat)
     u, v = tools.wsdir2uv(ws, wdir)
     m.barbs(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
