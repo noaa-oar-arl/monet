@@ -1,0 +1,2 @@
+        "CNA",
+            #                                     scrip_file=d1.monet.scrip, check_N=20 ) )

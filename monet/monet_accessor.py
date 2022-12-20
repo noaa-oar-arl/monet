@@ -1136,20 +1136,20 @@ class MONETAccessor:
 
         subplots_adjust(0, 0, 1, 1)
 
-    def _check_swath_def(self, defin):
+    def _check_swath_def(self, defn):
         """checks if it is a pyresample SwathDefinition or AreaDefinition.
 
         Parameters
         ----------
-        defin : type
+        defn : pyresample.geometry.SwathDefinition or pyresample.geometry.AreaDefinition
 
         Returns
         -------
-        type
+        bool
         """
         from pyresample.geometry import SwathDefinition
 
-        if isinstance(defin, SwathDefinition):
+        if isinstance(defn, SwathDefinition):
             return True
         else:
             return False
@@ -1159,8 +1159,7 @@ class MONETAccessor:
 
         Returns
         -------
-        pyreseample.geometry.CoordinateDefinition
-
+        pyresample.geometry.CoordinateDefinition
         """
         from pyresample import geometry as geo
 
@@ -1473,7 +1472,7 @@ class MONETAccessorDataset:
 
         Returns
         -------
-        pyreseample.geometry.CoordinateDefinition
+        pyresample.geometry.CoordinateDefinition
         """
         from pyresample import geometry as geo
 

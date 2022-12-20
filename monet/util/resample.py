@@ -14,54 +14,50 @@ except ImportError:
     has_xesmf = False
 
 
-def _ensure_swathdef_compatability(defin):
-    """ensures the SwathDefinition is compatible with XArrayResamplerNN.
+def _ensure_swathdef_compatability(defn):
+    """Ensures the SwathDefinition is compatible with XArrayResamplerNN.
 
     Parameters
     ----------
-    defin : pyresample SwathDefinition
-        a pyresample.geometry.SwathDefinition instance
+    defn : pyresample.geometry.SwathDefinition
+        A :class:`pyresample.geometry.SwathDefinition` instance.
 
     Returns
     -------
-    type
-        Description of returned object.
-
+    pyresample.geometry.SwathDefinition
     """
     import xarray as xr
 
-    if isinstance(defin.lons, xr.DataArray):
-        return defin  # do nothing
+    if isinstance(defn.lons, xr.DataArray):
+        return defn  # do nothing
     else:
-        defin.lons = xr.DataArray(defin.lons, dims=["y", "x"]).chunk()
-        defin.lats = xr.DataArray(defin.lons, dims=["y", "x"]).chunk()
-        return defin
+        defn.lons = xr.DataArray(defn.lons, dims=["y", "x"]).chunk()
+        defn.lats = xr.DataArray(defn.lons, dims=["y", "x"]).chunk()
+        return defn
 
 
-def _check_swath_or_area(defin):
+def _check_swath_or_area(defn):
     """Checks for a SwathDefinition or AreaDefinition. If AreaDefinition do
     nothing else ensure compatibility with XArrayResamplerNN
 
     Parameters
     ----------
-    defin : pyresample SwathDefinition or AreaDefinition
-        Description of parameter `defin`.
+    defn : pyresample.geometry.SwathDefinition or pyresample.geometry.AreaDefinition
 
     Returns
     -------
-    pyresample.geometry
+    new_defn
         SwathDefinition or AreaDefinition
-
     """
     try:
-        if isinstance(defin, SwathDefinition):
-            newswath = _ensure_swathdef_compatability(defin)
-        elif isinstance(defin, AreaDefinition):
-            newswath = defin
+        if isinstance(defn, SwathDefinition):
+            newswath = _ensure_swathdef_compatability(defn)
+        elif isinstance(defn, AreaDefinition):
+            newswath = defn
         else:
             raise RuntimeError
     except RuntimeError:
-        print("grid definition must be a pyresample SwathDefinition or " "AreaDefinition")
+        print("grid definition must be a pyresample SwathDefinition or AreaDefinition")
         return
     return newswath
 
