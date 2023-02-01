@@ -819,7 +819,6 @@ class MONETAccessor:
         latitude = linspace(d1.latitude.min(), d1.latitude.max(), len(d1.y))
         longitude = ones(latitude.shape) * asarray(lon)
         if has_pyresample:
-
             if has_pyresample:
                 d2 = xr.DataArray(
                     ones((len(longitude), len(longitude))),
@@ -1809,7 +1808,6 @@ class MONETAccessorDataset:
         latitude = linspace(d1.latitude.min(), d1.latitude.max(), len(d1.y))
         longitude = ones(latitude.shape) * asarray(lon)
         if has_pyresample:
-
             if has_pyresample:
                 d2 = xr.DataArray(
                     ones((len(longitude), len(longitude))),

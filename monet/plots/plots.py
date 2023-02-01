@@ -19,7 +19,6 @@ def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
     if "cmap" not in plotargs:
         plotargs["cmap"] = "viridis"
     if discrete and "vmin" in plotargs and "vmax" in plotargs:
-
         c, cmap = colorbar_index(
             ncolors, plotargs["cmap"], minval=plotargs["vmin"], maxval=plotargs["vmax"], basemap=m
         )
@@ -158,7 +157,6 @@ def normval(vmin, vmax, cmap):
 def spatial_bias_scatter(
     df, m, date, vmin=None, vmax=None, savename="", ncolors=15, fact=1.5, cmap="RdBu_r"
 ):
-
     from numpy import around
     from scipy.stats import scoreatpercentile as score
 
