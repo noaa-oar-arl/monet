@@ -253,7 +253,6 @@ def timeseries(
     if ax is None:
         f, ax = plt.subplots(figsize=(11, 6), frameon=False)
 
-    sns.set_palette(sns.color_palette(colors))
     sns.set_style("ticks")
     df.index = df[x]
     m = df.groupby("time").mean()  # mean values for each sample time period
