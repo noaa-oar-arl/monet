@@ -4,8 +4,8 @@ http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm
 """
 import functools
 
-import matplotlib.pyplot as PLT
-import numpy as NP
+import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 
 __version__ = "Time-stamp: <2012-02-17 20:59:35 ycopin>"
@@ -45,8 +45,8 @@ class TaylorDiagram:
         tr = PolarAxes.PolarTransform()
 
         # Correlation labels
-        rlocs = NP.concatenate((NP.arange(10) / 10.0, [0.95, 0.99]))
-        tlocs = NP.arccos(rlocs)  # Conversion to polar angles
+        rlocs = np.concatenate((np.arange(10) / 10.0, [0.95, 0.99]))
+        tlocs = np.arccos(rlocs)  # Conversion to polar angles
         gl1 = GF.FixedLocator(tlocs)  # Positions
         tf1 = GF.DictFormatter(dict(list(zip(tlocs, list(map(str, rlocs))))))
 
@@ -55,13 +55,13 @@ class TaylorDiagram:
         self.smax = scale * self.refstd
         ghelper = FA.GridHelperCurveLinear(
             tr,
-            extremes=(0, NP.pi / 2, self.smin, self.smax),
+            extremes=(0, np.pi / 2, self.smin, self.smax),
             grid_locator1=gl1,
             tick_formatter1=tf1,
         )  # 1st quadrant
 
         if fig is None:
-            fig = PLT.figure()
+            fig = plt.figure()
 
         ax = FA.FloatingSubplot(fig, rect, grid_helper=ghelper)
         fig.add_subplot(ax)
@@ -91,8 +91,8 @@ class TaylorDiagram:
         # Add reference point and stddev contour
         print("Reference std:", self.refstd)
         (l,) = self.ax.plot([0], self.refstd, "r*", ls="", ms=14, label=label, zorder=10)
-        t = NP.linspace(0, NP.pi / 2)
-        r = NP.zeros_like(t) + self.refstd
+        t = np.linspace(0, np.pi / 2)
+        r = np.zeros_like(t) + self.refstd
         self.ax.plot(t, r, "k--", label="_")
 
         # Collect sample points for latter use (e.g. legend)
@@ -103,7 +103,7 @@ class TaylorDiagram:
         """Add sample (stddev,corrcoeff) to the Taylor diagram. args
         and kwargs are directly propagated to the Figure.plot
         command."""
-        (l,) = self.ax.plot(NP.arccos(corrcoef), stddev, *args, **kwargs)  # (theta,radius)
+        (l,) = self.ax.plot(np.arccos(corrcoef), stddev, *args, **kwargs)  # (theta,radius)
         self.samplePoints.append(l)
 
         return l
@@ -112,9 +112,9 @@ class TaylorDiagram:
     def add_contours(self, levels=5, **kwargs):
         """Add constant centered RMS difference contours."""
 
-        rs, ts = NP.meshgrid(NP.linspace(self.smin, self.smax), NP.linspace(0, NP.pi / 2))
+        rs, ts = np.meshgrid(np.linspace(self.smin, self.smax), np.linspace(0, np.pi / 2))
         # Compute centered RMS difference
-        rms = NP.sqrt(self.refstd**2 + rs**2 - 2 * self.refstd * rs * NP.cos(ts))
+        rms = np.sqrt(self.refstd**2 + rs**2 - 2 * self.refstd * rs * np.cos(ts))
 
         contours = self.ax.contour(ts, rs, rms, levels, **kwargs)
 
@@ -123,23 +123,23 @@ class TaylorDiagram:
 
 if __name__ == "__main__":
     # Reference dataset
-    x = NP.linspace(0, 4 * NP.pi, 100)
-    data = NP.sin(x)
+    x = np.linspace(0, 4 * np.pi, 100)
+    data = np.sin(x)
     refstd = data.std(ddof=1)  # Reference standard deviation
 
     # Models
-    m1 = data + 0.2 * NP.random.randn(len(x))  # Model 1
-    m2 = 0.8 * data + 0.1 * NP.random.randn(len(x))  # Model 2
-    m3 = NP.sin(x - NP.pi / 10)  # Model 3
+    m1 = data + 0.2 * np.random.randn(len(x))  # Model 1
+    m2 = 0.8 * data + 0.1 * np.random.randn(len(x))  # Model 2
+    m3 = np.sin(x - np.pi / 10)  # Model 3
 
     # Compute stddev and correlation coefficient of models
-    samples = NP.array([[m.std(ddof=1), NP.corrcoef(data, m)[0, 1]] for m in (m1, m2, m3)])
+    samples = np.array([[m.std(ddof=1), np.corrcoef(data, m)[0, 1]] for m in (m1, m2, m3)])
 
-    fig = PLT.figure(figsize=(10, 4))
+    fig = plt.figure(figsize=(10, 4))
 
     # Taylor diagram
     dia = TaylorDiagram(refstd, fig=fig, rect=122, label="Reference")
-    # colors_ = PLT.matplotlib.cm.jet(NP.linspace(0, 1, len(samples)))
+    # colors_ = plt.matplotlib.cm.jet(np.linspace(0, 1, len(samples)))
     colors_ = [None] * len(samples)
     with sns.color_palette(colors):
         ax1 = fig.add_subplot(1, 2, 1, xlabel="X", ylabel="Y")
@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
     # Add RMS contours, and label them
     contours = dia.add_contours(colors="0.5")
-    PLT.clabel(contours, inline=1, fontsize=10)
+    plt.clabel(contours, inline=1, fontsize=10)
 
     # Add a figure legend
     fig.legend(
@@ -167,4 +167,4 @@ if __name__ == "__main__":
         loc="upper right",
     )
 
-    PLT.show()
+    plt.show()
