@@ -1,4 +1,6 @@
 """plotting routines"""
+import functools
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -7,12 +9,19 @@ from .colorbars import colorbar_index
 
 # colors = ['#1e90ff','#045C5C','#00A847','#DB4291','#BB7E5D']
 colors = ["#1e90ff", "#DA70D6", "#228B22", "#FA8072", "#FF1493"]
-sns.set_palette(sns.color_palette(colors))
 
-sns.set_context("poster")
+
+def _default_sns_context(f):
+    @functools.wraps(f)
+    def inner(*args, **kwargs):
+        with sns.plotting_context("poster"), sns.color_palette(colors):
+            return f(*args, **kwargs)
+
+    return inner
 
 
 # CMAQ Spatial Plots
+@_default_sns_context
 def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
     f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
     # determine colorbar
@@ -43,14 +52,17 @@ def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
     return f, ax, c, cmap, vmin, vmax
 
 
+@_default_sns_context
 def spatial(modelvar, **kwargs):
-    if kwargs["ax"] is None:
+    if kwargs.get("ax") is None:
         f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
         kwargs["ax"] = ax
     ax = modelvar.plot(**kwargs)
+    plt.tight_layout()
     return ax
 
 
+@_default_sns_context
 def make_spatial_contours(
     modelvar,
     gridobj,
@@ -91,6 +103,7 @@ def make_spatial_contours(
     return c
 
 
+@_default_sns_context
 def wind_quiver(ws, wdir, gridobj, m, **kwargs):
     from . import tools
 
@@ -103,6 +116,7 @@ def wind_quiver(ws, wdir, gridobj, m, **kwargs):
     return quiv
 
 
+@_default_sns_context
 def wind_barbs(ws, wdir, gridobj, m, **kwargs):
     import tools
 
@@ -154,6 +168,7 @@ def normval(vmin, vmax, cmap):
 #     ss = (new.Obs - new.CMAQ).abs() * fact
 
 
+@_default_sns_context
 def spatial_bias_scatter(
     df, m, date, vmin=None, vmax=None, savename="", ncolors=15, fact=1.5, cmap="RdBu_r"
 ):
@@ -212,6 +227,7 @@ def spatial_bias_scatter(
 #         plt.close()
 
 
+@_default_sns_context
 def timeseries(
     df,
     x="time",
@@ -250,42 +266,42 @@ def timeseries(
         Description of returned object.
 
     """
-    if ax is None:
-        f, ax = plt.subplots(figsize=(11, 6), frameon=False)
+    with sns.axes_style("ticks"):
+        if ax is None:
+            f, ax = plt.subplots(figsize=(11, 6), frameon=False)
+        df.index = df[x]
+        m = df.groupby("time").mean()  # mean values for each sample time period
+        e = df.groupby("time").std()  # std values for each sample time period
+        variable = df.variable[0]
+        if df.columns.isin(["units"]).max():
+            unit = df.units[0]
+        else:
+            unit = "None"
+        upper = m[y] + e[y]
+        lower = m[y] - e[y]
+        lower.loc[lower < 0] = 0
+        lower = lower.values
+        if "alpha" not in fillargs:
+            fillargs["alpha"] = 0.2
+        if label is not None:
+            m.rename(columns={y: label}, inplace=True)
+        else:
+            label = y
+        m[label].plot(ax=ax, **plotargs)
+        ax.fill_between(m[label].index, lower, upper, **fillargs)
+        if ylabel is None:
+            ax.set_ylabel(variable + " (" + unit + ")")
+        else:
+            ax.set_ylabel(label)
+        ax.set_xlabel("")
+        plt.legend()
+        plt.title(title)
+        plt.tight_layout()
 
-    sns.set_palette(sns.color_palette(colors))
-    sns.set_style("ticks")
-    df.index = df[x]
-    m = df.groupby("time").mean()  # mean values for each sample time period
-    e = df.groupby("time").std()  # std values for each sample time period
-    variable = df.variable[0]
-    if df.columns.isin(["units"]).max():
-        unit = df.units[0]
-    else:
-        unit = "None"
-    upper = m[y] + e[y]
-    lower = m[y] - e[y]
-    lower.loc[lower < 0] = 0
-    lower = lower.values
-    if "alpha" not in fillargs:
-        fillargs["alpha"] = 0.2
-    if label is not None:
-        m.rename(columns={y: label}, inplace=True)
-    else:
-        label = y
-    m[label].plot(ax=ax, **plotargs)
-    ax.fill_between(m[label].index, lower, upper, **fillargs)
-    if ylabel is None:
-        ax.set_ylabel(variable + " (" + unit + ")")
-    else:
-        ax.set_ylabel(label)
-    ax.set_xlabel("")
-    plt.legend()
-    plt.title(title)
-    plt.tight_layout()
     return ax
 
 
+@_default_sns_context
 def kdeplot(df, title=None, label=None, ax=None, **kwargs):
     """Short summary.
 
@@ -310,16 +326,16 @@ def kdeplot(df, title=None, label=None, ax=None, **kwargs):
         Description of returned object.
 
     """
-    sns.set_style("ticks")
+    with sns.axes_style("ticks"):
+        if ax is None:
+            f, ax = plt.subplots(figsize=(11, 6), frameon=False)
+            sns.despine()
+        ax = sns.kdeplot(df, ax=ax, label=label, **kwargs)
 
-    if ax is None:
-        f, ax = plt.subplots(figsize=(11, 6), frameon=False)
-        sns.despine()
-
-    ax = sns.kdeplot(df, ax=ax, label=label, **kwargs)
     return ax
 
 
+@_default_sns_context
 def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
     """Short summary.
 
@@ -340,15 +356,16 @@ def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
         Description of returned object.
 
     """
-    sns.set_style("ticks")
+    with sns.axes_style("ticks"):
+        if ax is None:
+            f, ax = plt.subplots(figsize=(8, 6), frameon=False)
+        ax = sns.regplot(data=df, x=x, y=y, label=label, **kwargs)
+        plt.title(title)
 
-    if ax is None:
-        f, ax = plt.subplots(figsize=(8, 6), frameon=False)
-    ax = sns.regplot(data=df, x=x, y=y, label=label, **kwargs)
-    plt.title(title)
     return ax
 
 
+@_default_sns_context
 def taylordiagram(
     df,
     marker="o",
@@ -365,18 +382,18 @@ def taylordiagram(
     df = df.drop_duplicates().dropna(subset=[col1, col2])
 
     if not addon and dia is None:
-        f = plt.figure(figsize=(12, 10))
-        sns.set_style("ticks")
-        obsstd = df[col1].std()
+        with sns.axes_style("ticks"):
+            f = plt.figure(figsize=(12, 10))
+            obsstd = df[col1].std()
 
-        dia = td.TaylorDiagram(obsstd, scale=scale, fig=f, rect=111, label=label1)
-        plt.grid(linewidth=1, alpha=0.5)
-        cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
-        dia.add_sample(df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label2)
-        contours = dia.add_contours(colors="0.5")
-        plt.clabel(contours, inline=1, fontsize=10)
-        plt.grid(alpha=0.5)
-        plt.legend(fontsize="small", loc="best")
+            dia = td.TaylorDiagram(obsstd, scale=scale, fig=f, rect=111, label=label1)
+            plt.grid(linewidth=1, alpha=0.5)
+            cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
+            dia.add_sample(df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label2)
+            contours = dia.add_contours(colors="0.5")
+            plt.clabel(contours, inline=1, fontsize=10)
+            plt.grid(alpha=0.5)
+            plt.legend(fontsize="small", loc="best")
 
     elif not addon and dia is not None:
         print("Do you want to add this on? if so please turn the addon keyword to True")
