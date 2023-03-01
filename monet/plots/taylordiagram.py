@@ -167,4 +167,6 @@ if __name__ == "__main__":
         loc="upper right",
     )
 
+    fig.tight_layout()
+
     plt.show()
