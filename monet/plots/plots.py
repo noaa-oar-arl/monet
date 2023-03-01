@@ -15,7 +15,7 @@ def _default_sns_context(f):
     @functools.wraps(f)
     def inner(*args, **kwargs):
         with sns.plotting_context("poster"), sns.color_palette(colors):
-            f(*args, **kwargs)
+            return f(*args, **kwargs)
 
     return inner
 
@@ -266,10 +266,9 @@ def timeseries(
         Description of returned object.
 
     """
-    if ax is None:
-        f, ax = plt.subplots(figsize=(11, 6), frameon=False)
-
     with sns.axes_style("ticks"):
+        if ax is None:
+            f, ax = plt.subplots(figsize=(11, 6), frameon=False)
         df.index = df[x]
         m = df.groupby("time").mean()  # mean values for each sample time period
         e = df.groupby("time").std()  # std values for each sample time period
