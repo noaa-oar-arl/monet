@@ -975,6 +975,7 @@ class MONETAccessor:
         import cartopy.crs as ccrs
         import matplotlib.pyplot as plt
         import seaborn as sns
+        from cartopy.mpl.geoaxes import GeoAxes
 
         from .plots import _dynamic_fig_size
         from .plots.mapgen import draw_map
@@ -1001,6 +1002,10 @@ class MONETAccessor:
             kwargs.pop("transform", None)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
+        else:
+            ax = kwargs.pop("ax", None)
+            if not isinstance(ax, GeoAxes):
+                raise TypeError("`ax` should be a Cartopy GeoAxes instance")
         _set_outline_patch_alpha(ax)
         if roll_dateline:
             _ = (
@@ -1035,6 +1040,7 @@ class MONETAccessor:
         import cartopy.crs as ccrs
         import matplotlib.pyplot as plt
         import seaborn as sns
+        from cartopy.mpl.geoaxes import GeoAxes
 
         from .plots import _dynamic_fig_size
         from .plots.mapgen import draw_map
@@ -1056,6 +1062,10 @@ class MONETAccessor:
         transform = kwargs.pop("transform", crs_p)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
+        else:
+            ax = kwargs.pop("ax", None)
+            if not isinstance(ax, GeoAxes):
+                raise TypeError("`ax` should be a Cartopy GeoAxes instance")
         _set_outline_patch_alpha(ax)
         if roll_dateline:
             _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(
@@ -1088,6 +1098,7 @@ class MONETAccessor:
         import cartopy.crs as ccrs
         import matplotlib.pyplot as plt
         import seaborn as sns
+        from cartopy.mpl.geoaxes import GeoAxes
 
         from monet.plots import _dynamic_fig_size
         from monet.plots.mapgen import draw_map
@@ -1113,6 +1124,10 @@ class MONETAccessor:
             kwargs.pop("transform", None)
         if "ax" not in kwargs:
             ax = draw_map(**map_kws)
+        else:
+            ax = kwargs.pop("ax", None)
+            if not isinstance(ax, GeoAxes):
+                raise TypeError("`ax` should be a Cartopy GeoAxes instance")
         _set_outline_patch_alpha(ax)
         if roll_dateline:
             _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(

@@ -202,6 +202,7 @@ def sp_scatter_bias(
 
 
 def _set_outline_patch_alpha(ax, alpha=0):
+    """For :class:`cartopy.mpl.geoaxes.GeoAxes`"""
     for f in [
         lambda alpha: ax.axes.outline_patch.set_alpha(alpha),
         lambda alpha: ax.outline_patch.set_alpha(alpha),

@@ -21,7 +21,8 @@ def test_quick(which):
 def test_quick_with_ax(which):
     _, ax = plt.subplots()
 
-    getattr(da.monet, f"quick_{which}")(ax=ax)
+    with pytest.raises(TypeError, match="`ax` should be a Cartopy GeoAxes instance"):
+        getattr(da.monet, f"quick_{which}")(ax=ax)
 
 
 @pytest.mark.parametrize("which", ["imshow", "map", "contourf"])
