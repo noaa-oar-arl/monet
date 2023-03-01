@@ -253,35 +253,36 @@ def timeseries(
     if ax is None:
         f, ax = plt.subplots(figsize=(11, 6), frameon=False)
 
-    sns.set_style("ticks")
-    df.index = df[x]
-    m = df.groupby("time").mean()  # mean values for each sample time period
-    e = df.groupby("time").std()  # std values for each sample time period
-    variable = df.variable[0]
-    if df.columns.isin(["units"]).max():
-        unit = df.units[0]
-    else:
-        unit = "None"
-    upper = m[y] + e[y]
-    lower = m[y] - e[y]
-    lower.loc[lower < 0] = 0
-    lower = lower.values
-    if "alpha" not in fillargs:
-        fillargs["alpha"] = 0.2
-    if label is not None:
-        m.rename(columns={y: label}, inplace=True)
-    else:
-        label = y
-    m[label].plot(ax=ax, **plotargs)
-    ax.fill_between(m[label].index, lower, upper, **fillargs)
-    if ylabel is None:
-        ax.set_ylabel(variable + " (" + unit + ")")
-    else:
-        ax.set_ylabel(label)
-    ax.set_xlabel("")
-    plt.legend()
-    plt.title(title)
-    plt.tight_layout()
+    with sns.axes_style("ticks"):
+        df.index = df[x]
+        m = df.groupby("time").mean()  # mean values for each sample time period
+        e = df.groupby("time").std()  # std values for each sample time period
+        variable = df.variable[0]
+        if df.columns.isin(["units"]).max():
+            unit = df.units[0]
+        else:
+            unit = "None"
+        upper = m[y] + e[y]
+        lower = m[y] - e[y]
+        lower.loc[lower < 0] = 0
+        lower = lower.values
+        if "alpha" not in fillargs:
+            fillargs["alpha"] = 0.2
+        if label is not None:
+            m.rename(columns={y: label}, inplace=True)
+        else:
+            label = y
+        m[label].plot(ax=ax, **plotargs)
+        ax.fill_between(m[label].index, lower, upper, **fillargs)
+        if ylabel is None:
+            ax.set_ylabel(variable + " (" + unit + ")")
+        else:
+            ax.set_ylabel(label)
+        ax.set_xlabel("")
+        plt.legend()
+        plt.title(title)
+        plt.tight_layout()
+
     return ax
 
 
@@ -309,13 +310,12 @@ def kdeplot(df, title=None, label=None, ax=None, **kwargs):
         Description of returned object.
 
     """
-    sns.set_style("ticks")
+    with sns.axes_style("ticks"):
+        if ax is None:
+            f, ax = plt.subplots(figsize=(11, 6), frameon=False)
+            sns.despine()
+        ax = sns.kdeplot(df, ax=ax, label=label, **kwargs)
 
-    if ax is None:
-        f, ax = plt.subplots(figsize=(11, 6), frameon=False)
-        sns.despine()
-
-    ax = sns.kdeplot(df, ax=ax, label=label, **kwargs)
     return ax
 
 
@@ -339,12 +339,12 @@ def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
         Description of returned object.
 
     """
-    sns.set_style("ticks")
+    with sns.axes_style("ticks"):
+        if ax is None:
+            f, ax = plt.subplots(figsize=(8, 6), frameon=False)
+        ax = sns.regplot(data=df, x=x, y=y, label=label, **kwargs)
+        plt.title(title)
 
-    if ax is None:
-        f, ax = plt.subplots(figsize=(8, 6), frameon=False)
-    ax = sns.regplot(data=df, x=x, y=y, label=label, **kwargs)
-    plt.title(title)
     return ax
 
 
@@ -364,18 +364,18 @@ def taylordiagram(
     df = df.drop_duplicates().dropna(subset=[col1, col2])
 
     if not addon and dia is None:
-        f = plt.figure(figsize=(12, 10))
-        sns.set_style("ticks")
-        obsstd = df[col1].std()
+        with sns.axes_style("ticks"):
+            f = plt.figure(figsize=(12, 10))
+            obsstd = df[col1].std()
 
-        dia = td.TaylorDiagram(obsstd, scale=scale, fig=f, rect=111, label=label1)
-        plt.grid(linewidth=1, alpha=0.5)
-        cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
-        dia.add_sample(df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label2)
-        contours = dia.add_contours(colors="0.5")
-        plt.clabel(contours, inline=1, fontsize=10)
-        plt.grid(alpha=0.5)
-        plt.legend(fontsize="small", loc="best")
+            dia = td.TaylorDiagram(obsstd, scale=scale, fig=f, rect=111, label=label1)
+            plt.grid(linewidth=1, alpha=0.5)
+            cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
+            dia.add_sample(df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label2)
+            contours = dia.add_contours(colors="0.5")
+            plt.clabel(contours, inline=1, fontsize=10)
+            plt.grid(alpha=0.5)
+            plt.legend(fontsize="small", loc="best")
 
     elif not addon and dia is not None:
         print("Do you want to add this on? if so please turn the addon keyword to True")
