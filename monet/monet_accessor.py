@@ -1097,6 +1097,9 @@ class MONETAccessor:
 
         sns.set_context("notebook")
         da = _dataset_to_monet(self._obj)
+        dlon = da.longitude.diff("x")
+        if not ((dlon >= 0).all() or (dlon <= 0).all()):  # monotonic
+            da["longitude"] = da.longitude % 360  # unwrap longitudes
         crs_p = ccrs.PlateCarree()
         if "crs" not in map_kws:
             map_kws["crs"] = crs_p
