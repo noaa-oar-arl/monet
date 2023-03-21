@@ -69,7 +69,7 @@ distinguish aerosols which these readers do not process well.
 
 fv3grib2nc4.py like nemsio2nc4.py tool is a command line tool created to
 convert the grib2 aerosol data to netcdf files. fv3grib2nc4.py will
-create seperate files for each of the three layer types; '1 hybrid
+create separate files for each of the three layer types; '1 hybrid
 layer', 'entire atmosphere', and 'surface'. These are the three layers
 that currently hold aerosol data. The tool is available at
 https://github.com/bbakernoaa/fv3grib2nc4
@@ -116,7 +116,7 @@ Using MONET
 Using MONET with FV3-Chem is much like using MONET with other model
 outputs. It tries to recognize where the files came from (nemsio, grib2,
 etc....) and then processes the data, renaming coordinates (lat lon to
-latitude and longitude) and processing varaibles like geopotential
+latitude and longitude) and processing variables like geopotential
 height and pressure if available. First lets import ``monet`` and
 ``fv3chem`` from MONET
 
@@ -190,8 +190,8 @@ To open a single file
 
 
 Notice this object f has dimensions of (time,z,y,x) with 2d coordinates
-of latitude and longitude. You can get more infomation on single
-varaibles such as pm25 simply by printing the varaible.
+of latitude and longitude. You can get more information on single
+variables such as pm25 simply by printing the variable.
 
 .. code-block:: python
 
@@ -220,7 +220,7 @@ Quick Map Plotting
 ~~~~~~~~~~~~~~~~~~
 
 Now one of the main things that will need to be done is plotting on a
-map. This can be done quickly using the functionallity in MONET. In this
+map. This can be done quickly using the functionality in MONET. In this
 example we will plot the first layer PM2.5 at time 2018-07-01.
 
 .. code-block:: python
@@ -248,7 +248,7 @@ example we will plot the first layer PM2.5 at time 2018-07-01.
 .. image:: output_8_2.png
 
 
-Adjusting the scale is simple by suppling ``vmin`` and ``vmax``. Lets
+Adjusting the scale is simple by supplying ``vmin`` and ``vmax``. Lets
 set a minimum of 0 AOD and maximum of 0.5.
 
 .. code-block:: python
@@ -277,7 +277,7 @@ set a minimum of 0 AOD and maximum of 0.5.
 
 
 Now we have all the control that xarray has built into their plotting
-routines. For example, lets have a descrete colorbar with 10 levels,
+routines. For example, lets have a discrete colorbar with 10 levels,
 ``levels=10``, and let it determine the levels by throwing out the top
 and bottom 2% of values using the ``robust=True``
 

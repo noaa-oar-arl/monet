@@ -2,54 +2,99 @@ import xarray as xr
 from pandas import Series, merge_asof
 
 
-def combine_da_to_df(da, df, merge=True, **kwargs):
-    """This function will combine an xarray data array with spatial information
-    point observations in `df`.
+def combine_da_to_df(da, df, *, merge=True, **kwargs):
+    """Combine xarray data array `da` with spatial information
+    point observations in dataframe `df`, returning a new dataframe.
+
+    Uses pyresample via ``.monet.remap_nearest``.
 
     Parameters
     ----------
-    da : xr.DataArray or xr.Dataset
-        Description of parameter `da`.
-    df : pd.DataFrame
-        Description of parameter `df`.
-    lay : iterable, default = [0]
-        Description of parameter `lay`.
-    radius : integer or float, default = 12e3
-        Description of parameter `radius`.
+    da : xarray.DataArray or xarray.Dataset
+        Data to be interpolated to target grid points.
+        Can be unstructured-grid data
+        (detected by checking ``'mio_has_unstructured_grid'`` attribute).
+    df : pandas.DataFrame
+        Data on target points.
+    merge : bool
+        Merge interpolated `df` data with `da` data.
+        Otherwise, return interpolated `da` data only.
+    kwargs : dict
+        Passed to :meth:`~monet.monet_accessor.MONETAccessor.remap_nearest`
+        (if `da` is not unstructured-grid data).
 
     Returns
     -------
     pandas.DataFrame
     """
-    # try:
-    #     if col is None:
-    #         raise RuntimeError
-    # except RuntimeError:
-    #     print('Must enter column name')
-    # dfn = df.dropna(subset=[col])
-    dfnn = df.drop_duplicates(subset=["siteid"]).dropna(subset=["latitude", "longitude", "siteid"])
-    dfda = dfnn.monet._df_to_da()
-    da_interped = dfda.monet.remap_nearest(da, **kwargs).compute()
-    da_interped["siteid"] = (("x"), dfnn.siteid)
-    df_interped = da_interped.to_dataframe().reset_index()
-    cols = Series(df_interped.columns)
+    target_da = df.drop_duplicates(subset=["siteid"]).dropna(
+        subset=["latitude", "longitude", "siteid"]
+    )
+    target_data_da = target_da.monet._df_to_da()
+
+    # Add if statement for unstructured grid output
+    if da.attrs.get("mio_has_unstructured_grid", False):
+        da_interped = target_data_da.monet.remap_nearest_unstructured(da).compute()
+    else:
+        da_interped = target_data_da.monet.remap_nearest(da, **kwargs).compute()
+
+    da_interped["siteid"] = (("x"), target_da.siteid)
+    da_interped_df = da_interped.to_dataframe().reset_index()
+    cols = Series(da_interped_df.columns)
+
     drop_cols = cols.loc[cols.isin(["x", "y", "z", "latitude", "longitude"])]
-    df_interped.drop(drop_cols, axis=1, inplace=True)
+    da_interped_df.drop(drop_cols, axis=1, inplace=True)
     if isinstance(da, xr.DataArray):
         if da.name in df.columns:
-            df_interped.rename(columns={da.name: da.name + "_new"}, inplace=True)
+            da_interped_df.rename(columns={da.name: da.name + "_new"}, inplace=True)
     else:
         dup_names = [name for name in da.data_vars.keys() if name in df.columns]
         if len(dup_names) > 0:
             for name in dup_names:
-                df_interped.rename(columns={name: name + "_new"}, inplace=True)
+                da_interped_df.rename(columns={name: name + "_new"}, inplace=True)
     if merge:
         df.reset_index(drop=True)
-        df_interped.reset_index(drop=True)
-        final_df = df.merge(df_interped, on=["time", "siteid"], how="left")
+        da_interped_df.reset_index(drop=True)
+        final_df = df.merge(da_interped_df, on=["time", "siteid"], how="left")
         return final_df
     else:
-        return df_interped
+        return da_interped_df
+
+
+def combine_da_to_da(source, target, *, merge=True, interp_time=False, **kwargs):
+    """Combine xarray data array `source` with with point observations
+    in second data array `target`, returning a new xarray object.
+
+    Uses pyresample nearest-neighbor via ``.monet.remap_nearest``.
+
+    Parameters
+    ----------
+    source : xarray.DataArray or xarray.Dataset
+        Gridded data.
+    target : xarray.DataArray
+        Point observations.
+    merge : bool
+        If false, only return the interpolated source data.
+        If true, merge with the target data.
+    interp_time : bool
+        Linearly interpolate to ``target.time``.
+    kwargs : dict
+        Passed on to :meth:`~monet.monet_accessor.MONETAccessor.remap_nearest`.
+
+    Returns
+    -------
+    xarray.Dataset
+    """
+    from ..monet_accessor import _dataset_to_monet
+
+    target_fixed = _dataset_to_monet(target)
+    source_fixed = _dataset_to_monet(source)
+    output = target_fixed.monet.remap_nearest(source_fixed, **kwargs)
+    if interp_time:
+        output = output.interp(time=target.time)
+    if merge:
+        output = xr.merge([target_fixed, output])
+    return output
 
 
 def _rename_latlon(ds):
@@ -61,20 +106,23 @@ def _rename_latlon(ds):
         return ds
 
 
-def combine_da_to_df_xesmf(da, df, suffix=None, **kwargs):
-    """This function will combine an xarray data array with spatial information
-    point observations in `df`.
+def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
+    """Combine xarray data array `da` with spatial information
+    point observations in dataframe `df`, returning a new dataframe.
+
+    Uses :func:`~monet.util.resample.resample_xesmf`.
 
     Parameters
     ----------
-    da : xr.DataArray
-        Description of parameter `da`.
-    df : pd.DataFrame
-        Description of parameter `df`.
-    lay : iterable, default = [0]
-        Description of parameter `lay`.
-    radius : integer or float, default = 12e3
-        Description of parameter `radius`.
+    da : xarray.DataArray or xarray.Dataset
+        Data to be interpolated to target grid points.
+    df : pandas.DataFrame
+        Data on target points.
+    suffix : str, optional
+        Added to the ``name`` of the new variable, defaults to ``'_new'``.
+    kwargs : dict
+        Passed on to :func:`~monet.util.resample.resample_xesmf`
+        (and then to ``xesmf.Regridder``).
 
     Returns
     -------
@@ -124,16 +172,16 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
 
     Parameters
     ----------
-    da : xr.DataArray
-        Description of parameter `da`.
-    daz : xr.DataArray
-        Description of parameter `daz`.
-    df : pd.DataFrame
-        Description of parameter `df`.
-    lay : iterable, default = [0]
-        Description of parameter `lay`.
-    radius : integer or float, default = 12e3
-        Description of parameter `radius`.
+    da : xarray.DataArray
+        Data to interpolate.
+    daz : xarray.DataArray
+        Vertical coordinate data variable.
+        Must have same shape as `da`.
+    df : pandas.DataFrame
+        Point data.
+    kwargs : dict
+        Passed on to :func:`~monet.util.resample.resample_xesmf`
+        (and then to ``xesmf.Regridder``).
 
     Returns
     -------
@@ -189,23 +237,20 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
     return final_df
 
 
-def combine_da_to_height_profile(da, dset, radius_of_influence=12e3):
+def combine_da_to_height_profile(da, dset, *, radius_of_influence=12e3):
     """This function will combine an xarray.DataArray to a 2d dataset with
     dimensions (time,z)
 
     Parameters
     ----------
     da : xarray.DataArray
-        Description of parameter `da`.
     dset : xarray.Dataset
-        Description of parameter `dset`.
 
     Returns
     -------
     xarray.Dataset
-        returns the xarray.Dataset with the `da` added as an additional
+        Returns the xarray.Dataset with the `da` added as an additional
         variable.
-
     """
     # from ..util.interp_util import nearest_point_swathdefinition
     lon, lat = dset.longitude, dset.latitude
@@ -1541,7 +1586,7 @@ def combine_da_to_height_profile(da, dset, radius_of_influence=12e3):
 #         Description of returned object.
 #
 #     """
-#     # wont do to much.  just interpolate the model to observations in the x y space
+#     # won't do too much.  just interpolate the model to observations in the x y space
 #     lat = obs.dset.Latitude
 #     lon = obs.dset.Longitude
 #     dset = find_nearest_latlon_xarray(model.dset[param], lat=lat, lon=lon, radius=model.dset.XCELL)

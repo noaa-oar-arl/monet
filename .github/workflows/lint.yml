@@ -2,9 +2,9 @@ name: Lint
 
 on:
   push:
-    branches: [master, develop]
+    branches: [stable, develop]
   pull_request:
-    branches: [master, develop]
+    branches: [stable, develop]
   workflow_dispatch:
 
 jobs:
@@ -13,8 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'noaa-oar-arl/monet'
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
-      - uses: pre-commit/action@v2.0.3
+      - uses: pre-commit/action@v3.0.0
+
+  spell:
+    name: codespell
+    runs-on: ubuntu-latest
+    if: github.repository == 'noaa-oar-arl/monet'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: codespell-project/actions-codespell@v1
+        with:
+          exclude_file: .codespell-exclude

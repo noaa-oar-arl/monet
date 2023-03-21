@@ -100,7 +100,7 @@ Notice that the dimensions changed from 1800x3600 to 720x1440.
 Open Multiple Days
 ~~~~~~~~~~~~~~~~~~
 
-If you want to open multiple days in a sinlge call you could use the
+If you want to open multiple days in a single call you could use the
 open\_mfdataset. Lets grab the first nine days of July 2018.
 
 .. code-block:: python

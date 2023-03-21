@@ -23,7 +23,7 @@ AirNow is the near realtime dataset for air composition and meteorology measurem
 
     "The U.S. EPA AirNow program is the national repository of real time air quality data and forecasts for the United States. AirNow is the vehicle for providing timely Air Quality Index (AQI) information to the public, media outlets, other federal agencies and their applications, and to the research community. The system is managed by the U.S. EPA’s Office of Air Quality Planning and Standards Outreach and Information Division, Information Transfer Group in Research Triangle Park (RTP), North Carolina. AirNow is currently hosted and operated at a contractor facility, known as the AirNow Data Management Center (DMC), which currently resides outside of RTP." - https://www.airnow.gov/index.cfm?action=ani.airnowUS
 
-AirNow_ data can be dowloaded from the Amazon S3 server and aggregated using the
+AirNow_ data can be downloaded from the Amazon S3 server and aggregated using the
 monet.obs.airnow class.  For example,lets say that we want to look at data from
 2018-05-01 to 2018-05-05.
 
@@ -46,7 +46,7 @@ This provides a structured :py:class:`~pandas.DataFrame`.
 
     df.head()
 
-Some users may want to keep a local copy of the data and not have to retrive the data
+Some users may want to keep a local copy of the data and not have to retrieve the data
 each time they want to access the data.  There is a simple kwarg that can be used to
 download the data, *download=True*.  By default, *download* is set to False.
 
@@ -93,8 +93,8 @@ MONET is able to use the EPA AQS data that is collected and reported on an hourl
     prepare reports for Congress as mandated by the Clean Air Act." - https://www.epa.gov/aqs
 
 We will begin by loading hourly ozone concentrations from 2018.  The EPA AQS data
-is seperated into yearly files and seperate files for hourly and daily data.  The
-files are also seperated by which variable is measured.  For instance, hourly ozone files
+is separated into yearly files and separate files for hourly and daily data.  The
+files are also separated by which variable is measured.  For instance, hourly ozone files
 for the entire year of 2018 are found in https://aqs.epa.gov/aqsweb/airdata/hourly_44201_2018.zip.
 We will first load a single variable and then add multiple later on.
 
@@ -146,12 +146,12 @@ Let's load variables PM10 and OZONE using hourly data to get an idea of how to g
 
   df = aqs.add_data(dates, param=['OZONE','PM10'])
 
-Loading Specfic Network
-^^^^^^^^^^^^^^^^^^^^^^^
+Loading Specific Network
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sometimes you may want to load a specific network that is available in the AQS data
 files.  For instance, lets load data from the Chemical Speciation Network (CSN; https://www3.epa.gov/ttnamti1/speciepg.html).
-As of writting this tutorial we will load the 2017 data as it is complete.
+As of writing this tutorial we will load the 2017 data as it is complete.
 
 .. code::   python
 
@@ -175,7 +175,7 @@ AERONET
 
     "The AERONET (AErosol RObotic NETwork) project is a federation of ground-based
     remote sensing aerosol networks established by NASA and PHOTONS (PHOtométrie pour le Traitement Opérationnel de Normalisation Satellitaire; Univ. of Lille 1, CNES, and CNRS-INSU)
-    and is greatly expanded by networks (e.g., RIMA, AeroSpan, AEROCAN, and CARSNET) and collaborators from national agencies, institutes, universities, individual scientists, and partners. Fo more than 25 years, the project has provided long-term, continuous and readily accessible public domain database of aerosol optical, microphysical and radiative properties for aerosol research and characterization, validation of satellite retrievals, and synergism with other databases. The network imposes standardization of instruments, calibration, processing and distribution.
+    and is greatly expanded by networks (e.g., RIMA, AeroSpan, AEROCAN, and CARSNET) and collaborators from national agencies, institutes, universities, individual scientists, and partners. For more than 25 years, the project has provided long-term, continuous and readily accessible public domain database of aerosol optical, microphysical and radiative properties for aerosol research and characterization, validation of satellite retrievals, and synergism with other databases. The network imposes standardization of instruments, calibration, processing and distribution.
 
     AERONET collaboration provides globally distributed observations of spectral aerosol optical depth (AOD), inversion products, and precipitable water in diverse aerosol regimes. Version 3 AOD data are computed for three data quality levels: Level 1.0 (unscreened), Level 1.5 (cloud-screened and quality controlled), and Level 2.0 (quality-assured). Inversions, precipitable water, and other AOD-dependent products are derived from these levels and may implement additional quality checks. " -https://aeronet.gsfc.nasa.gov
 
@@ -206,7 +206,7 @@ Available Measurements
    :widths: 20, 20
 
    "SIZ",	"Size distribution"
-   "RIN",	"Refractive indicies (real and imaginary)"
+   "RIN",	"Refractive indices (real and imaginary)"
    "CAD",	"Coincident AOT data with almucantar retrieval"
    "VOL",	"Volume concentration, volume mean radius, effective radius and standard deviation"
    "TAB",	"AOT absorption"
@@ -216,7 +216,7 @@ Available Measurements
    "FRC",	"Radiative Forcing"
    "LID",	"Lidar and Depolarization Ratios"
    "FLX",	"Spectral flux"
-   "ALL",	"All of the above retrievals (SIZ to FLUX) in one file"
+   "ALL",	"All of the above retrievals (SIZ to FLX) in one file"
    "PFN*",	"Phase function (available for only all points data format: AVG=10)"
 
 Loading AOD and SDA

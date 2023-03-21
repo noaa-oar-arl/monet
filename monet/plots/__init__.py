@@ -1,3 +1,5 @@
+import warnings
+
 from .colorbars import cmap_discretize, colorbar_index
 from .mapgen import draw_map
 from .plots import (
@@ -187,8 +189,8 @@ def sp_scatter_bias(
                 colorbar=True,
                 **kwargs,
             )
-            if ~outline:
-                ax.outline_patch.set_alpha(0)
+            if not outline:
+                _set_outline_patch_alpha(ax)
             if global_map:
                 plt.xlim([-180, 180])
                 plt.ylim([-90, 90])
@@ -197,3 +199,20 @@ def sp_scatter_bias(
             return ax
     except ValueError:
         exit
+
+
+def _set_outline_patch_alpha(ax, alpha=0):
+    """For :class:`cartopy.mpl.geoaxes.GeoAxes`"""
+    for f in [
+        lambda alpha: ax.axes.outline_patch.set_alpha(alpha),
+        lambda alpha: ax.outline_patch.set_alpha(alpha),
+        lambda alpha: ax.spines["geo"].set_alpha(alpha),
+    ]:
+        try:
+            f(alpha)
+        except AttributeError:
+            continue
+        else:
+            break
+    else:
+        warnings.warn("unable to set outline_patch alpha", stacklevel=2)

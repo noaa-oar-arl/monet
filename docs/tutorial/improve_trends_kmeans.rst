@@ -36,7 +36,7 @@ data.
       ‘,’ by default)
 
 After downloading we can then read the data. Here we included the
-EPACode and State to add additional meta data stored on the EPA auxilary
+EPACode and State to add additional meta data stored on the EPA auxiliary
 files used in the EPA AQS and AirNow datasets in MONET. Let’s make a few
 imports from monet and some other libraries that will aid us later.
 

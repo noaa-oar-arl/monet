@@ -18,7 +18,7 @@ eruption. First, import MONET and several helper functions for later.
 Now the data can be downloaded from the MONET github page in the
 MONET/data directory. We will assume you already have this downloaded
 and will proceed. Open the simulation. As of right now we still require
-that a seperate grdcro2d (grddot2d) file be loaded for the mass points
+that a separate grdcro2d (grddot2d) file be loaded for the mass points
 (dot points) using the ``grid`` kwarg.
 
 .. code:: python
@@ -138,7 +138,7 @@ aggrigate species in the concentration file.
 
 
 Notice that this looks like the ncdump of the file except that there are
-seperate coordinates including the latitude and longitude and the time
+separate coordinates including the latitude and longitude and the time
 as numpy.datetime64 objects. Also included is the proj4 string, a pyresample area grid
 and default mapping tables to several different observational datasets.
 
@@ -195,7 +195,7 @@ will add a map using the MONETAccessor and use the ``robust=True`` kwarg.
 Better but we can still do much more. There is low concentrations on
 most of this map making it hard to notice the extremely high values and
 the SO2 data is in ppmv and not ppbv as normally viewed as. Also, a
-logscale may be better fo this type of data as it goes from 0-20000 ppbv
+logscale may be better for this type of data as it goes from 0-20000 ppbv
 rather than a linear scale.
 
 .. code:: python
@@ -208,7 +208,7 @@ rather than a linear scale.
 .. image:: CMAQ_hi_volcano_files/CMAQ_hi_volcano_11_3.png
 
 
-Now let’s us view serveral time slices at once. We will average in time
+Now let’s us view several time slices at once. We will average in time
 (every 8 hours) to give us 6 total subplots.
 
 .. code:: python
@@ -246,7 +246,7 @@ It is often useful to be able to pair model data with observational
 data. MONET uses the pyresample library
 (http://pyresample.readthedocs.io/en/latest/) to do a nearest neighbor
 interpolation. First let us get the airnow data for the dates of the
-simulation. We will also rotate it from the raw AirNow long format (stacked variables) to a wide format (each variable is a seperate column)
+simulation. We will also rotate it from the raw AirNow long format (stacked variables) to a wide format (each variable is a separate column)
 
 
 .. code:: python
@@ -290,7 +290,7 @@ new column (model).
 
 
 Let’s look at the distributions to see if the two overlap to get a
-general scence of performance.
+general sense of performance.
 
 .. code:: python
 
