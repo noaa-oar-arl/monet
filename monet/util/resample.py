@@ -77,7 +77,7 @@ def _reformat_resampled_data(orig, new, target_grid):
     Returns
     -------
     xarray.DataArray
-        reformated xarray.DataArray
+        reformatted xarray.DataArray
 
     """
     target_lon, target_lat = target_grid.get_lonlats_dask()
