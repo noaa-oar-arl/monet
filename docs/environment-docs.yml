@@ -15,9 +15,11 @@ dependencies:
   - numpy
   - pandas>=1.0
   - pydecorate
-  - pyresample
   - seaborn
   - xarray
+  #
+  # optional
+  - pyresample
   #
   # docs
   - nbsphinx
