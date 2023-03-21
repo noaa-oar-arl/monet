@@ -17,7 +17,7 @@ dependencies:
   #
   # optional
   - pyresample
-  - xesmf # non-Windows only!
+  - xesmf>=0.7 # non-Windows only!
   #
   # test/dev
   - ipykernel
