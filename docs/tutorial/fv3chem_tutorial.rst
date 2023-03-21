@@ -248,7 +248,7 @@ example we will plot the first layer PM2.5 at time 2018-07-01.
 .. image:: output_8_2.png
 
 
-Adjusting the scale is simple by suppling ``vmin`` and ``vmax``. Lets
+Adjusting the scale is simple by supplying ``vmin`` and ``vmax``. Lets
 set a minimum of 0 AOD and maximum of 0.5.
 
 .. code-block:: python
