@@ -34,7 +34,7 @@ jobs:
 
       - name: Downgrades if on Python 3.6
         if: matrix.python-version == '3.6'
-        run: micromamba install cf_xarray=0.6.3 'attrs<23'
+        run: micromamba install cf_xarray=0.6.3 attrs=22.2.0
 
       - name: Ensure xesmf>=0.7 if not on Python 3.6
         if: matrix.python-version != '3.6'
