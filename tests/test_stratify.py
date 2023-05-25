@@ -49,6 +49,8 @@ def test_resample_stratify(model):
     assert da_interped.z.size == 10
     assert da_interped.coords == da.reset_coords("lev").coords
     assert da_interped.name == da.name
+    assert da_interped.isel(z=0) == da.isel(z=0), "same lb"
+    assert da_interped.isel(z=-1) == da.isel(z=-1), "same ub"
 
 
 def test_accessor_stratify_da(model):
