@@ -6,8 +6,8 @@ import monet  # noqa: F401
 from monet.util.resample import resample_stratify
 
 
-@pytest.fixture
-def model():
+@pytest.fixture(scope="module", params=[False, True], ids=["no-dask", "dask"])
+def model(request):
     # "Model" data, profiles, but with dims (z, y, x)
     xv = yv = np.r_[0]
     zv = np.linspace(0, 1, 5)
@@ -20,7 +20,7 @@ def model():
         data1[i] = i + 0.2 * (1 - y)
         data2[i] = 0.5 * i - 0.2 * (1 - y)
 
-    da = xr.Dataset(
+    ds = xr.Dataset(
         data_vars={
             "data1": (("z", "y", "x"), data1),
             "data2": (("z", "y", "x"), data2),
@@ -33,7 +33,10 @@ def model():
         },
     )
 
-    return da
+    if request.param:
+        ds = ds.chunk({"z": 1})
+
+    return ds
 
 
 def test_resample_stratify(model):
