@@ -95,14 +95,11 @@ def resample_stratify(da, levels, vertical, axis=1):
     result = stratify.interpolate(levels, vertical.chunk().data, da.chunk().data, axis=axis)
     dims = da.dims
     out = xr.DataArray(result, dims=dims)
-    for i in dims:
-        if i != "z":
-            out[i] = da[i]
     out.attrs = da.attrs.copy()
     if len(da.coords) > 0:
-        for i in da.coords:
-            if i != "z":
-                out.coords[i] = da.coords[i]
+        for vn in da.coords:
+            if vn != "z" and "z" not in da[vn].dims:
+                out[vn] = da[vn].copy()
     return out
 
 

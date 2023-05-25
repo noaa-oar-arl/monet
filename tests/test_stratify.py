@@ -20,7 +20,7 @@ def test_resample_stratify():
             "height": (("z", "y", "x"), zv[:, None, None]),
         },
         coords={
-            # "lev": ("z", zv),
+            "lev": ("z", zv),
             "lat": ("y", yv),
             "lon": ("x", xv),
         },
@@ -30,3 +30,7 @@ def test_resample_stratify():
     old_coord = model.height
     new_coord_vals = xr.DataArray(data=np.linspace(0, 1, 10), dims="z")
     da_interped = resample_stratify(da, new_coord_vals, old_coord, axis=0)
+
+    assert da_interped.dims == ("z", "y", "x")
+    assert da_interped.z.size == 10
+    assert da_interped.coords == da.reset_coords("lev").coords
