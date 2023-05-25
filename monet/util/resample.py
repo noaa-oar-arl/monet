@@ -94,7 +94,7 @@ def resample_stratify(da, levels, vertical, axis=1):
 
     result = stratify.interpolate(levels, vertical.chunk().data, da.chunk().data, axis=axis)
     dims = da.dims
-    out = xr.DataArray(result, dims=dims)
+    out = xr.DataArray(result, dims=dims, name=da.name)
     out.attrs = da.attrs.copy()
     if len(da.coords) > 0:
         for vn in da.coords:
