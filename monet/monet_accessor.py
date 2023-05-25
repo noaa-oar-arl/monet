@@ -1866,18 +1866,18 @@ class MONETAccessorDataset:
             vertical = self._obj[vertical]
         vertical_shape = vertical.shape
         loop_vars = [
-            i
-            for i in self._obj.variables
-            if "z" in self._obj[i].dims
-            and i != vertical.name
-            and len(self._obj[i].shape) >= len(vertical_shape)
-            and self._obj[i].shape[-len(vertical_shape) :] == vertical_shape
+            vn
+            for vn in self._obj.variables
+            if "z" in self._obj[vn].dims
+            and vn != vertical.name
+            and len(self._obj[vn].shape) >= len(vertical_shape)
+            and self._obj[vn].shape[-len(vertical_shape) :] == vertical_shape
         ]
         orig = self._obj[loop_vars[0]].monet.stratify(levels, vertical, axis=axis)
         dset = orig.to_dataset(name=loop_vars[0])
         dset.attrs = self._obj.attrs.copy()
-        for i in loop_vars[1:]:
-            dset[i] = self._obj[i].monet.stratify(levels, vertical, axis=axis)
+        for vn in loop_vars[1:]:
+            dset[vn] = self._obj[vn].monet.stratify(levels, vertical, axis=axis)
         return dset
 
     def window(self, lat_min, lon_min, lat_max, lon_max):
