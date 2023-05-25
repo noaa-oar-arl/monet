@@ -17,6 +17,7 @@ dependencies:
   #
   # optional
   - pyresample
+  - python-stratify
   - xesmf # non-Windows only!
   #
   # test/dev
