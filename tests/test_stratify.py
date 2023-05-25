@@ -20,9 +20,9 @@ def test_resample_stratify():
             "height": (("z", "y", "x"), zv[:, None, None]),
         },
         coords={
-            # "level": ("z", zv),
-            "latitude": ("y", yv),
-            "longitude": ("x", xv),
+            # "lev": ("z", zv),
+            "lat": ("y", yv),
+            "lon": ("x", xv),
         },
     )
 
