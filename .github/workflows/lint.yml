@@ -25,6 +25,6 @@ jobs:
     if: github.repository == 'noaa-oar-arl/monet'
     steps:
       - uses: actions/checkout@v3
-      - uses: codespell-project/actions-codespell@v1
+      - uses: codespell-project/actions-codespell@v2
         with:
           exclude_file: .codespell-exclude
