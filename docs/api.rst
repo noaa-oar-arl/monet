@@ -1,5 +1,5 @@
 
-Get in touch
+Get in Touch
 ------------
 
 Ask questions, suggest features or view source code `on GitHub`_.
@@ -9,6 +9,8 @@ If an issue arrises please post on the `GitHub` issues.
 
 API
 ---
+
+.. module:: monet
 
 
 Top-level functions
@@ -91,6 +93,8 @@ Dataset Accessor
    Dataset.monet.remap_xesmf
    Dataset.monet.combine_point
 
+
+.. _pandas-accessors:
 
 DataFrame Accessor
 ~~~~~~~~~~~~~~~~~~
