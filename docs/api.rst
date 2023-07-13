@@ -92,6 +92,24 @@ Dataset Accessor
    Dataset.monet.combine_point
 
 
+DataFrame Accessor
+~~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: pandas
+
+.. autosummary::
+   :toctree: api/
+   :template: autosummary/accessor_method.rst
+
+   DataFrame.monet.center
+   DataFrame.monet.to_ascii2nc_df
+   DataFrame.monet.to_ascii2nc_list
+   DataFrame.monet.rename_for_monet
+   DataFrame.monet.get_sparse_SwathDefinition
+   DataFrame.monet.remap_nearest
+   DataFrame.monet.cftime_to_datetime64
+
+
 Indices
 -------
 * :ref:`genindex`
