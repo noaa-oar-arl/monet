@@ -248,7 +248,12 @@ class MONETAccessorPandas:
 
     @property
     def center(self):
-        """Return the geographic center point of this DataFrame.
+        """The geographic center point of this DataFrame.
+
+        .. note::
+
+           Currently just the lon and lat mean values,
+           not necessarily representative of the geographic center.
 
         Returns
         -------

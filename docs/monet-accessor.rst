@@ -30,7 +30,7 @@ All you have to do is import monet and xarray.
 
     c.O3[0,0,:,:].monet.quick_map()
 
-.. image:: tutorial/CMAQ_hi_volcano_files/o3_example_quickmap.png
+.. image:: ../sample_figures/cmaq_o3_example_quickmap.png
 
 
 Interpolation Methods

@@ -105,7 +105,6 @@ DataFrame Accessor
    :toctree: api/
    :template: autosummary/accessor_method.rst
 
-   DataFrame.monet.center
    DataFrame.monet.to_ascii2nc_df
    DataFrame.monet.to_ascii2nc_list
    DataFrame.monet.rename_for_monet
@@ -113,6 +112,11 @@ DataFrame Accessor
    DataFrame.monet.remap_nearest
    DataFrame.monet.cftime_to_datetime64
 
+.. autosummary::
+   :toctree: api/
+   :template: autosummary/accessor_attribute.rst
+
+   DataFrame.monet.center
 
 Indices
 -------

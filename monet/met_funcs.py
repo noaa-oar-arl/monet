@@ -11,7 +11,7 @@ References
 .. [Norman2000] Norman, J. M., W. P. Kustas, J. H. Prueger, and G. R. Diak (2000),
    Surface flux estimation using radiometric temperature: A dual-temperature-difference
    method to minimize measurement errors, Water Resour. Res., 36(8), 2263-2274,
-   http://dx.doi.org/10.1029/2000WR900033.
+   https://doi.org/10.1029/2000WR900033.
 """
 
 import numpy as np
@@ -352,7 +352,8 @@ def calc_mixing_ratio(ea, p):
 
     References
     ----------
-    http://glossary.ametsoc.org/wiki/Mixing_ratio"""
+    https://glossary.ametsoc.org/wiki/Mixing_ratio
+    """
 
     r = epsilon * ea / (p - ea)
     return r
@@ -377,7 +378,8 @@ def calc_lapse_rate_moist(T_A_K, ea, p):
 
     References
     ----------
-    http://glossary.ametsoc.org/wiki/Saturation-adiabatic_lapse_rate"""
+    https://glossary.ametsoc.org/wiki/Adiabatic_lapse_rate
+    """
 
     r = calc_mixing_ratio(ea, p)
     c_p = calc_c_p(p, ea)

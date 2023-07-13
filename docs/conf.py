@@ -72,6 +72,11 @@ napoleon_google_docstring = False
 napoleon_use_param = False
 napoleon_use_ivar = False  # True
 
+linkcheck_ignore = [
+    "https://glossary.ametsoc.org/wiki/",  # currently a cert issue
+    "https://doi.org/10.1029/2000WR900033",  # 403 at Wiley
+]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
 
