@@ -8,8 +8,9 @@ MONET Xarray Accessor
 MONET can add georeferencing tools to xarray's data structures
 through `their accessor mechanism <https://docs.xarray.dev/en/stable/internals/extending-xarray.html>`__.
 These tools can be
-accessed via a special ``.monet`` attribute, :ref:`available <xarray-accessors>` for both `xarray.DataArray` and
-`xarray.Dataset` objects after a simple :python:`import monet` in your code.
+accessed via a special ``.monet`` attribute, :ref:`available <xarray-accessors>`
+for both :class:`xarray.DataArray` and :class:`xarray.Dataset` objects
+after a simple :python:`import monet` in your code.
 
 Initializing the Accessor
 --------------------------
@@ -37,15 +38,17 @@ Interpolation Methods
 ---------------------
 
 The MONET accessor provides several useful interpolation routines including:
-Getting the nearest point to a given latitude and longitude, interpolating to a
-constant latitude or longitude, interpolating to a vertical levels, and remapping
-entire 2D :py:class:`~xarray.DataArray` or :py:class:`~xarray.DataSet`.
 
-Find Nearest lat/lon Point
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+- getting the nearest point to a given latitude and longitude
+- interpolating to a constant latitude or longitude
+- interpolating to a vertical levels
+- remapping entire 2D :py:class:`~xarray.DataArray` or :py:class:`~xarray.DataSet`.
 
-To find the nearest latitude longitude point you just need to use the
-.monet.nearest_latlon method. In this example we will continue to use the CMAQ
+Find Nearest Point
+^^^^^^^^^^^^^^^^^^
+
+To find the nearest latitude/longitude point you just need to use the
+:py:meth:`~xarray.Dataset.monet.nearest_latlon` method. In this example we will continue to use the CMAQ
 test file above.  We will find the closest grid points to lat=20.5, lon=-157.4.
 
 .. code-block:: python
