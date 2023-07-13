@@ -40,9 +40,11 @@ jobs:
         if: matrix.python-version != '3.6'
         run: |
           update_needed=$(python -c "
+          import sys
           from packaging.version import Version
           import xesmf as xe
           v = Version(getattr(xe, '__version__', '0.0.0'))
+          print(v, file=sys.stderr)
           print('n' if v >= Version('0.7') else 'y')
           ")
           if [[ $update_needed == 'y' ]]; then
