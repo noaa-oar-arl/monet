@@ -1,21 +1,26 @@
 *********************
-MONET XArray Accessor
+MONET xarray accessor
 *********************
 
-MONET can add georeferecing tools to xarray‘s data structures. These tools can be
-accessed via a special .monet attribute, available for both xarray.DataArray and
-xarray.Dataset objects after a simple import monet in your code.
+.. role:: python(code)
+   :language: python
+
+MONET can add georeferencing tools to xarray's data structures
+through `their accessor mechanism <https://docs.xarray.dev/en/stable/internals/extending-xarray.html>`__.
+These tools can be
+accessed via a special ``.monet`` attribute, :ref:`available <xarray-accessors>` for both `xarray.DataArray` and
+`xarray.Dataset` objects after a simple :python:`import monet` in your code.
 
 Initializing the Accessor
 --------------------------
 
-All you have to do is import monet after you import xarray.
+All you have to do is import monet and xarray.
 
 
 .. code-block:: python
 
+    import monet
     import xarray as xr
-    import monet as m
 
     cmaqfile = monet.__path__ + '/../data/aqm.t12z.aconc.ncf'
 
@@ -34,7 +39,7 @@ Interpolation Accessors
 The MONET accessor provides several useful interpolation routines including:
 Getting the nearest point to a given latitude and longitude, interpolating to a
 constant latitude or longitude, interpolating to a vertical levels, and remapping
-entire 2D :py:class::`~xarray.DataArray` or :py::class::`xarray.DataSet`.
+entire 2D :py:class:`~xarray.DataArray` or :py:class:`~xarray.DataSet`.
 
 Find Nearest Lat lon point
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

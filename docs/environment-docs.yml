@@ -25,6 +25,7 @@ dependencies:
   - nbsphinx
   - sphinx=4.*
   - sphinx-autobuild
+  - sphinx-autosummary-accessors
   - sphinx_rtd_theme>=0.4
   #
   - pip>=21.1

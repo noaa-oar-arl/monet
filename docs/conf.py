@@ -15,6 +15,8 @@ import os
 import sys
 from unittest.mock import MagicMock
 
+import sphinx_autosummary_accessors
+
 
 class Mock(MagicMock):
     @classmethod
@@ -50,6 +52,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.extlinks",
+    "sphinx_autosummary_accessors",
 ]
 # exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
@@ -70,7 +73,7 @@ napoleon_use_param = False
 napoleon_use_ivar = False  # True
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
