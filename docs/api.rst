@@ -14,11 +14,28 @@ API
 * :ref:`modindex`
 * :ref:`search`
 
-.. toctree::
-    :maxdepth: 4
+Top-level functions
+~~~~~~~~~~~~~~~~~~~
 
-    source/monet
-    source/modules
+.. autosummary::
+   :toctree: api/
+   :recursive:
+
+   monet.dataset_to_monet
+   monet.rename_to_monet_latlon
+   monet.rename_latlon
+
+
+Modules
+~~~~~~~
+
+.. autosummary::
+   :toctree: api/
+   :recursive:
+
+   monet.met_funcs
+   monet.plots
+   monet.util
 
 
 .. _on GitHub: https://github.com/noaa-oar-arl/MONET

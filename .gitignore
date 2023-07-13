@@ -5,6 +5,7 @@
 .DS_Store
 docs/_build/
 monet_xesmf_regrid_file.nc
+docs/api/
 
 
 # Default GitHub .gitignore for Python below:

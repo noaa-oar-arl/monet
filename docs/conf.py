@@ -58,7 +58,12 @@ extlinks = {
     "pull": ("https://github.com/noaa-oar-arl/MONET/pull/%s", "PR"),
 }
 
-autosummary_generate = True
+autosummary_generate = True  # default in Sphinx v4
+autodoc_default_options = {
+    "members": True,
+    "special-members": "__init__",
+}
+autodoc_member_order = "groupwise"
 numpydoc_class_members_toctree = True
 napoleon_google_docstring = False
 napoleon_use_param = False
