@@ -119,10 +119,5 @@ DataFrame Accessor
 
    DataFrame.monet.center
 
-Indices
--------
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 .. _on GitHub: https://github.com/noaa-oar-arl/monet

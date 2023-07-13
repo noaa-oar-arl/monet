@@ -73,6 +73,18 @@ Transport Models." Atmosphere 8, no. 11: 210.
 doi:`10.3390/atmos8110210 <https://doi.org/10.3390/atmos8110210>`__.
 
 
+Get in Touch
+^^^^^^^^^^^^
+
+Ask questions, suggest features or view source code `on GitHub`_.
+
+
+Indices
+^^^^^^^
+* :ref:`genindex`
+* :ref:`modindex`
+
+
 .. toctree::
    :maxdepth: 4
    :caption: Getting Started
@@ -85,14 +97,6 @@ doi:`10.3390/atmos8110210 <https://doi.org/10.3390/atmos8110210>`__.
    tutorial
 
 
-Get in Touch
-------------
-
-- Ask questions, suggest features or view source code `on GitHub`_.
-
-.. _on GitHub: https://github.com/noaa-oar-arl/monet
-
-
 .. toctree::
    :maxdepth: 10
    :caption: Help & Reference
@@ -100,6 +104,8 @@ Get in Touch
 
    api
 
+
+.. _on GitHub: https://github.com/noaa-oar-arl/monet
 .. _xarray: https://docs.xarray.dev
 .. _pyresample: https://pyresample.readthedocs.io/en/latest/
 .. _xESMF: https://xesmf.readthedocs.io/en/latest/
