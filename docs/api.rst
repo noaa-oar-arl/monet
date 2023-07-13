@@ -4,7 +4,8 @@ Get in Touch
 
 Ask questions, suggest features or view source code `on GitHub`_.
 
-If an issue arrises please post on the `GitHub` issues.
+If an issue arrises please post on the
+`GitHub issues <https://github.com/noaa-oar-arl/monet/issues>`__.
 
 
 API
@@ -124,4 +125,4 @@ Indices
 * :ref:`modindex`
 * :ref:`search`
 
-.. _on GitHub: https://github.com/noaa-oar-arl/MONET
+.. _on GitHub: https://github.com/noaa-oar-arl/monet
