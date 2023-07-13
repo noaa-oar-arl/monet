@@ -1,5 +1,5 @@
 *********************
-MONET xarray accessor
+MONET Xarray Accessor
 *********************
 
 .. role:: python(code)
@@ -33,15 +33,15 @@ All you have to do is import monet and xarray.
 .. image:: tutorial/CMAQ_hi_volcano_files/o3_example_quickmap.png
 
 
-Interpolation Accessors
------------------------
+Interpolation Methods
+---------------------
 
 The MONET accessor provides several useful interpolation routines including:
 Getting the nearest point to a given latitude and longitude, interpolating to a
 constant latitude or longitude, interpolating to a vertical levels, and remapping
 entire 2D :py:class:`~xarray.DataArray` or :py:class:`~xarray.DataSet`.
 
-Find Nearest Lat lon point
+Find Nearest lat/lon Point
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To find the nearest latitude longitude point you just need to use the
