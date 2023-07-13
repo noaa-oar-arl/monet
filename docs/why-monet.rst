@@ -13,7 +13,7 @@ analysis.
 - Open model and satellite data in a common format.  xarray_ is used when N-dimensional arrays are needed.
 - Retrieving observational datasets for given time and space.
 - Efficiently combine/interpolate model and observational datasets.
-- Provide easy plotting using proven tools in python
+- Provide easy plotting using proven tools in Python
 - Perform statistics between model runs or observations or models and observations.
 
 Gallery
