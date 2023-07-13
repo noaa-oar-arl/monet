@@ -1,10 +1,17 @@
 """
-DESCRIPTION
-===========
 This package contains the main routines for estimating variables related to the
- Monin-Obukhov (MO) Similarity Theory, such as  MO length, adiabatic correctors
+Monin-Obukhov (MO) Similarity Theory, such as  MO length, adiabatic correctors
 for heat and momentum transport. It requires the following package.
 
+References
+----------
+.. [Brutsaert2005] Brutsaert, W. (2005). Hydrology: an introduction (Vol. 61, No. 8).
+   Cambridge: Cambridge University Press.
+
+.. [Norman2000] Norman, J. M., W. P. Kustas, J. H. Prueger, and G. R. Diak (2000),
+   Surface flux estimation using radiometric temperature: A dual-temperature-difference
+   method to minimize measurement errors, Water Resour. Res., 36(8), 2263-2274,
+   https://doi.org/10.1029/2000WR900033.
 """
 
 import numpy as np
@@ -345,7 +352,8 @@ def calc_mixing_ratio(ea, p):
 
     References
     ----------
-    http://glossary.ametsoc.org/wiki/Mixing_ratio"""
+    https://glossary.ametsoc.org/wiki/Mixing_ratio
+    """
 
     r = epsilon * ea / (p - ea)
     return r
@@ -370,7 +378,8 @@ def calc_lapse_rate_moist(T_A_K, ea, p):
 
     References
     ----------
-    http://glossary.ametsoc.org/wiki/Saturation-adiabatic_lapse_rate"""
+    https://glossary.ametsoc.org/wiki/Adiabatic_lapse_rate
+    """
 
     r = calc_mixing_ratio(ea, p)
     c_p = calc_c_p(p, ea)
@@ -436,8 +445,8 @@ def calc_L(ustar, T_A_K, rho, c_p, H, LE):
 
     References
     ----------
-    .. [Brutsaert2005] Brutsaert, W. (2005). Hydrology: an introduction (Vol. 61, No. 8).
-        Cambridge: Cambridge University Press."""
+    [Brutsaert2005]_
+    """
 
     # Convert input scalars to numpy arrays
     ustar, T_A_K, rho, c_p, H, LE = map(np.asarray, (ustar, T_A_K, rho, c_p, H, LE))
@@ -471,8 +480,7 @@ def calc_Psi_H(zoL):
 
     References
     ----------
-    .. [Brutsaert2005] Brutsaert, W. (2005). Hydrology: an introduction (Vol. 61, No. 8).
-        Cambridge: Cambridge University Press.
+    [Brutsaert2005]_
     """
 
     # Convert input scalars to numpy array
@@ -511,8 +519,7 @@ def calc_Psi_M(zoL):
 
     References
     ----------
-    .. [Brutsaert2005] Brutsaert, W. (2005). Hydrology: an introduction (Vol. 61, No. 8).
-        Cambridge: Cambridge University Press.
+    [Brutsaert2005]_
     """
 
     # Convert input scalars to numpy array
@@ -573,10 +580,7 @@ def calc_richardson(u, z_u, d_0, T_R0, T_R1, T_A0, T_A1):
 
     References
     ----------
-    .. [Norman2000] Norman, J. M., W. P. Kustas, J. H. Prueger, and G. R. Diak (2000),
-        Surface flux estimation using radiometric temperature: A dual-temperature-difference
-        method to minimize measurement errors, Water Resour. Res., 36(8), 2263-2274,
-        http://dx.doi.org/10.1029/2000WR900033.
+    [Norman2000]_
     """
 
     # See eq (2) from Louis 1979
@@ -604,8 +608,7 @@ def calc_u_star(u, z_u, L, d_0, z_0M):
 
     References
     ----------
-    .. [Brutsaert2005] Brutsaert, W. (2005). Hydrology: an introduction (Vol. 61, No. 8).
-        Cambridge: Cambridge University Press.
+    [Brutsaert2005]_
     """
 
     # Convert input scalars to numpy arrays

@@ -10,8 +10,9 @@ dependencies:
   - dask
   - matplotlib
   - netcdf4
+  - numpy
+  - pandas>=1.0
   - pydecorate
-  - pandas
   - seaborn
   - xarray
   #

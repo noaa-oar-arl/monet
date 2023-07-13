@@ -45,3 +45,26 @@ jobs:
 
       - name: Test with pytest
         run: pytest -v
+
+  docs:
+    name: Check docs build
+    runs-on: ubuntu-latest
+    if: github.repository == 'noaa-oar-arl/monet'
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python (micromamba)
+        uses: mamba-org/provision-with-micromamba@v15
+        with:
+          environment-file: docs/environment-docs.yml
+          cache-env: true
+
+      - name: linkcheck
+        run: sphinx-build -b linkcheck docs docs/_build/linkcheck
+
+      - name: sphinx-build -W
+        run: sphinx-build -b html -W docs docs/_build/html

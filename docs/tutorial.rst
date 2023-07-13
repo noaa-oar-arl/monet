@@ -2,11 +2,5 @@
 Tutorial
 ********
 
-.. toctree::
-    :maxdepth: 3
-
-    tutorial/aqs_pams
-    tutorial/improve_trends_kmeans
-    tutorial/CMAQ_hi_volcano
-    tutorial/NESDIS_VIIRS_AOD
-    tutorial/fv3chem_tutorial
+Examples have been moved to
+`the MONETIO docs <https://monetio.readthedocs.io/en/stable/tutorial.html>`__.
