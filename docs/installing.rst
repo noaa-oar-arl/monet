@@ -25,9 +25,9 @@ For parallel computing
 For plotting
 ~~~~~~~~~~~~
 
-- `matplotlib <http://matplotlib.org/>`__: required for :ref:`plotting`
+- `matplotlib <http://matplotlib.org/>`__: required for plotting
 - `cartopy <http://scitools.org.uk/cartopy/>`__: recommended for
-  :ref:`plot-maps`
+  :ref:`plotting maps <plot-maps>`
 - `seaborn <https://stanford.edu/~mwaskom/software/seaborn/>`__: for better
   color palettes
 
@@ -35,7 +35,7 @@ For plotting
 Instructions
 ------------
 
-MONET itself is a pure Python package, but some of it's dependencies may not be.
+MONET itself is a pure Python package, but some of its dependencies may not be.
 The simplest way to install MONET is to install it from the conda-forge feedstock::
 
     $ conda install -c conda-forge monet
@@ -47,12 +47,12 @@ Note xesmf is not available on windows due to the dependency on esmpy and esmf.:
 
     $ conda install -c conda-forge monet
 
-To install MONET from source code you must install with pip.  This can be done directly
-from the github page::
+To install MONET from source code you must install with ``pip``.  This can be done directly
+from the GitHub page::
 
     $ pip install git+https://github.com/noaa-oar-arl/MONET.git
 
-or you can manually download it from GitHub and install it using the setup.py::
+or you can manually download it from GitHub and install it from source::
 
     $ git clone https://github.com/noaa-oar-arl/MONET.git
     $ cd MONET

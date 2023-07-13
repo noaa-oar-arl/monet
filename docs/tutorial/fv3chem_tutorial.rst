@@ -216,6 +216,8 @@ variables such as pm25 simply by printing the variable.
 Here units are not included because it is not stored in the nemsio
 format.
 
+.. _plot-maps:
+
 Quick Map Plotting
 ~~~~~~~~~~~~~~~~~~
 
