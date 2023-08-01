@@ -42,7 +42,12 @@ jobs:
           update_needed=$(python -c "
           import sys
           from packaging.version import Version
-          import xesmf as xe
+          try:
+            import xesmf as xe
+          except ImportError as e:
+            print(e, file=sys.stderr)
+            print('y')
+            raise SystemExit()
           v = Version(getattr(xe, '__version__', '0.0.0'))
           print(v, file=sys.stderr)
           print('n' if v >= Version('0.7') else 'y')
