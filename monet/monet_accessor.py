@@ -21,14 +21,11 @@ except ImportError:
     has_pyresample = False
 
     def wrap_longitudes(lons):
-        """Short summary.
+        """For longitudes that may be in [0, 360) format, return in [-180, 180) format.
 
         Parameters
         ----------
-        lons : type
-        Returns
-        -------
-        type
+        lons : array-like
         """
         return (lons + 180) % 360 - 180
 
@@ -363,7 +360,7 @@ class MONETAccessorPandas:
         return df
 
     def get_sparse_SwathDefinition(self):
-        """Creates a pyreample.geometry.SwathDefinition for a single point.
+        """Creates a ``pyreample.geometry.SwathDefinition`` for a single point.
 
         Returns
         -------
@@ -523,7 +520,9 @@ class MONETAccessor:
         self._obj = xray_obj
 
     def wrap_longitudes(self, lon_name="longitude"):
-        """Ensures longitudes are from -180 -> 180
+        """Ensures longitudes are from -180 -> 180.
+
+        Modifies longitude variable in place.
 
         Parameters
         ----------
@@ -632,7 +631,7 @@ class MONETAccessor:
         return da
 
     def structure_for_monet(self, lat_name="lat", lon_name="lon", return_obj=True):
-        """This will attempt to restucture a given DataArray for use within MONET.
+        """This will attempt to restructure a given DataArray for use within MONET.
 
         Parameters
         ----------
@@ -961,9 +960,10 @@ class MONETAccessor:
         return kwargs
 
     def quick_imshow(self, map_kws=None, roll_dateline=False, **kwargs):
-        """This function takes an xarray DataArray and quickly cerates a figure
-        using cartopy and the matplotlib imshow.  Note that this should only be used for
-        regular grids.
+        """This function takes an xarray DataArray and quickly creates a figure
+        using cartopy and matplotlib ``imshow``.
+
+        Note that this should only be used for regular grids.
 
         Parameters
         ----------
@@ -1028,8 +1028,8 @@ class MONETAccessor:
         return ax
 
     def quick_map(self, map_kws=None, roll_dateline=False, **kwargs):
-        """This function takes an xarray DataArray and quickly cerates a figure
-        using cartopy and the matplotlib pcolormesh
+        """This function takes an xarray DataArray and quickly creates a figure
+        using cartopy and matplotlib ``pcolormesh``.
 
         Parameters
         ----------
@@ -1087,8 +1087,8 @@ class MONETAccessor:
         return ax
 
     def quick_contourf(self, map_kws=None, roll_dateline=False, **kwargs):
-        """This function takes an xarray DataArray and quickly cerates a figure
-        using cartopy and the matplotlib contourf
+        """This function takes an xarray DataArray and quickly creates a figure
+        using cartopy and matplotlib ``contourf``.
 
         Parameters
         ----------
@@ -1155,12 +1155,7 @@ class MONETAccessor:
         return ax
 
     def _tight_layout(self):
-        """Short summary.
-
-        Returns
-        -------
-        type
-        """
+        """Apply ``subplots_adjust(0, 0, 1, 1)``."""
         from matplotlib.pyplot import subplots_adjust
 
         subplots_adjust(0, 0, 1, 1)
@@ -2026,8 +2021,9 @@ class MONETAccessorDataset:
     #         raise ValueError("`data` must be an xarray Dataset or DataArray")
 
     def wrap_longitudes(self, lon_name="longitude"):
-        """Ensures longitudes are from -180 -> 180
-        Modifies self in place.
+        """Ensures longitudes are from -180 -> 180.
+
+        Modifies longitude variable in place.
         """
         dset = self._obj
         dset[lon_name] = (dset[lon_name] + 180) % 360 - 180
