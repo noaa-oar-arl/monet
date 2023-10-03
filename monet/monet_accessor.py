@@ -632,7 +632,7 @@ class MONETAccessor:
         return da
 
     def structure_for_monet(self, lat_name="lat", lon_name="lon", return_obj=True):
-        """This will attempt to restucture a given DataArray for use within MONET.
+        """This will attempt to restructure a given DataArray for use within MONET.
 
         Parameters
         ----------
@@ -961,7 +961,7 @@ class MONETAccessor:
         return kwargs
 
     def quick_imshow(self, map_kws=None, roll_dateline=False, **kwargs):
-        """This function takes an xarray DataArray and quickly cerates a figure
+        """This function takes an xarray DataArray and quickly creates a figure
         using cartopy and the matplotlib imshow.  Note that this should only be used for
         regular grids.
 
@@ -1028,7 +1028,7 @@ class MONETAccessor:
         return ax
 
     def quick_map(self, map_kws=None, roll_dateline=False, **kwargs):
-        """This function takes an xarray DataArray and quickly cerates a figure
+        """This function takes an xarray DataArray and quickly creates a figure
         using cartopy and the matplotlib pcolormesh
 
         Parameters
@@ -1087,7 +1087,7 @@ class MONETAccessor:
         return ax
 
     def quick_contourf(self, map_kws=None, roll_dateline=False, **kwargs):
-        """This function takes an xarray DataArray and quickly cerates a figure
+        """This function takes an xarray DataArray and quickly creates a figure
         using cartopy and the matplotlib contourf
 
         Parameters
