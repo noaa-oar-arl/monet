@@ -1803,6 +1803,7 @@ def scores(obs, mod, minval, maxval=1.0e5):
         rownames=["mod"],
         colnames=["obs"],
         margins=True,
+        margins_name="All",
     )
 
     # If there is a mix of T and F, the columns are [False, True, 'All']
