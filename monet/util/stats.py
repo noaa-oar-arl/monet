@@ -1,5 +1,4 @@
 import numpy as np
-from pandas import DataFrame, crosstab
 
 
 def STDO(obs, mod, axis=None):
@@ -1791,32 +1790,44 @@ def scores(obs, mod, minval, maxval=1.0e5):
     a, b, c, d : float
         Counts of hits, misses, false alarms, and correct negatives.
     """
+    import pandas as pd
+
     d = {}
     d["obs"] = obs
     d["mod"] = mod
-    df = DataFrame(d)
+    df = pd.DataFrame(d)
 
     # If NaN is involved in a cond, it will be F, we want to skip those
     df = df.dropna(subset=["obs", "mod"], how="any")
 
-    ct = crosstab(
+    ct = pd.crosstab(
         (df["mod"] > minval) & (df["mod"] < maxval),
         (df["obs"] > minval) & (df["obs"] < maxval),
+        rownames=["mod"],
+        colnames=["obs"],
         margins=True,
     )
 
-    # If there is a mix of T and T, the columns are [False, True, 'All']
-    # Otherwise, we need to add to get same results
+    # If there is a mix of T and F, the columns are [False, True, 'All']
+    # Otherwise, we need to add to get the full table
     if (ct.columns == [True, "All"]).all():
         ct.insert(0, False, 0)
-
     if (ct.columns == [False, "All"]).all():
-        ct.insert(1, True, 0)
+        ct.insert(0, True, 0)
 
-    a = ct[1][1].astype("float")
-    b = ct[1][0].astype("float")
-    c = ct[0][1].astype("float")
-    d = ct[0][0].astype("float")
+    # Same for the rows
+    if (ct.index == [True, "All"]).all():
+        df = pd.concat([df, pd.DataFrame(index=[False], data={False: 0, True: 0, "All": 0})])
+    if (ct.index == [False, "All"]).all():
+        df = pd.concat([df, pd.DataFrame(index=[True], data={False: 0, True: 0, "All": 0})])
+
+    # Sort
+    df = df.loc[[True, False, "All"], [True, False, "All"]]
+
+    a = ct.at[True, True].astype("float")  # hit
+    b = ct.at[False, True].astype("float")  # miss
+    c = ct.at[True, False].astype("float")  # false alarm
+    d = ct.at[False, False].astype("float")  # correct negative
 
     return a, b, c, d
 
