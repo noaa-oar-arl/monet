@@ -37,3 +37,13 @@ def test_scores():
     assert a == 0 and b == 1 and c == 1 and d == 0
     a, b, c, d = scores([-1, 1], [1, -1], minval=0)
     assert a == 0 and b == 1 and c == 1 and d == 0
+
+    # No pairs
+    a, b, c, d = scores([np.nan, np.nan], [np.nan, np.nan], minval=0)
+    assert a == 0 and b == 0 and c == 0 and d == 0
+    a, b, c, d = scores([np.nan, 1], [1, np.nan], minval=0)
+    assert a == 0 and b == 0 and c == 0 and d == 0
+
+    # Some pairs after NaN dropping
+    a, b, c, d = scores([np.nan, 1], [1, 1], minval=0)
+    assert a == 1 and b == 0 and c == 0 and d == 0
