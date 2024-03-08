@@ -1798,6 +1798,9 @@ def scores(obs, mod, minval, maxval=1.0e5):
     d["mod"] = mod
     df = DataFrame(d)  # drop either na
 
+    # If NaN is involved in a cond, it will be F, we want to skip those
+    df = df.dropna(subset=["obs", "mod"], how="any")
+
     ct = crosstab(
         (df["mod"] > minval) & (df["mod"] < maxval),
         (df["obs"] > minval) & (df["obs"] < maxval),
