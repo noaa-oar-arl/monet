@@ -1796,17 +1796,27 @@ def scores(obs, mod, minval, maxval=1.0e5):
     d = {}
     d["obs"] = obs
     d["mod"] = mod
-    df = DataFrame(d)
+    df = DataFrame(d)  # drop either na
+
     ct = crosstab(
         (df["mod"] > minval) & (df["mod"] < maxval),
         (df["obs"] > minval) & (df["obs"] < maxval),
         margins=True,
     )
-    #    print ct
+
+    # If there is a mix of T and T, the columns are [False, True, 'All']
+    # Otherwise, we need to add to get same results
+    if (ct.columns == [True, "All"]).all():
+        ct.insert(0, False, 0)
+
+    if (ct.columns == [False, "All"]).all():
+        ct.insert(1, True, 0)
+
     a = ct[1][1].astype("float")
     b = ct[1][0].astype("float")
     c = ct[0][1].astype("float")
     d = ct[0][0].astype("float")
+
     return a, b, c, d
 
 
