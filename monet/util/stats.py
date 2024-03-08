@@ -1792,10 +1792,7 @@ def scores(obs, mod, minval, maxval=1.0e5):
     """
     import pandas as pd
 
-    d = {}
-    d["obs"] = obs
-    d["mod"] = mod
-    df = pd.DataFrame(d)
+    df = pd.DataFrame({"obs": obs, "mod": mod})
 
     # If NaN is involved in a cond, it will be F, we want to skip those
     df = df.dropna(subset=["obs", "mod"], how="any")
