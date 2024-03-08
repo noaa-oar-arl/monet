@@ -1774,29 +1774,27 @@ def CSI(obs, mod, minval, maxval):
 
 
 def scores(obs, mod, minval, maxval=1.0e5):
-    """Short summary.
+    """Calculate scores.
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    minval : type
-        Description of parameter `minval`.
-    maxval : type
-        Description of parameter `maxval`.
+    obs : array-like
+        Observation values ("truth").
+    mod : array-like
+        Model values ("prediction").
+        Should be the same size as `obs`.
+    minval, minval : float
+        Interval to test (exclusive on both sides).
 
     Returns
     -------
-    type
-        Description of returned object.
-
+    a, b, c, d : float
+        Counts of hits, misses, false alarms, and correct negatives.
     """
     d = {}
     d["obs"] = obs
     d["mod"] = mod
-    df = DataFrame(d)  # drop either na
+    df = DataFrame(d)
 
     # If NaN is involved in a cond, it will be F, we want to skip those
     df = df.dropna(subset=["obs", "mod"], how="any")
