@@ -1,5 +1,4 @@
 import numpy as np
-from pandas import DataFrame, crosstab
 
 
 def STDO(obs, mod, axis=None):
@@ -1774,39 +1773,64 @@ def CSI(obs, mod, minval, maxval):
 
 
 def scores(obs, mod, minval, maxval=1.0e5):
-    """Short summary.
+    """Calculate scores.
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    minval : type
-        Description of parameter `minval`.
-    maxval : type
-        Description of parameter `maxval`.
+    obs : array-like
+        Observation values ("truth").
+    mod : array-like
+        Model values ("prediction").
+        Should be the same size as `obs`.
+    minval, minval : float
+        Interval to test (exclusive on both sides).
 
     Returns
     -------
-    type
-        Description of returned object.
-
+    a, b, c, d : float
+        Counts of hits, misses, false alarms, and correct negatives.
     """
-    d = {}
-    d["obs"] = obs
-    d["mod"] = mod
-    df = DataFrame(d)
-    ct = crosstab(
+    import pandas as pd
+
+    df = pd.DataFrame({"obs": obs, "mod": mod})
+
+    # If NaN is involved in a cond, it will be F, we want to skip those
+    df = df.dropna(subset=["obs", "mod"], how="any")
+
+    if df.empty:
+        zero = np.float64(0)
+        return zero, zero, zero, zero
+
+    ct = pd.crosstab(
         (df["mod"] > minval) & (df["mod"] < maxval),
         (df["obs"] > minval) & (df["obs"] < maxval),
+        rownames=["mod"],
+        colnames=["obs"],
         margins=True,
+        margins_name="All",
     )
-    #    print ct
-    a = ct[1][1].astype("float")
-    b = ct[1][0].astype("float")
-    c = ct[0][1].astype("float")
-    d = ct[0][0].astype("float")
+
+    # If there is a mix of T and F, the columns are [False, True, 'All']
+    # Otherwise, we need to add to get the full table
+    if set(ct.columns) == {True, "All"}:
+        ct.insert(0, False, 0)
+    elif set(ct.columns) == {False, "All"}:
+        ct.insert(0, True, 0)
+
+    # Same for the rows
+    if set(ct.index) == {True, "All"}:
+        ct = pd.concat([ct, pd.DataFrame(index=[False], data={False: 0, True: 0, "All": 0})])
+    elif set(ct.index) == {False, "All"}:
+        ct = pd.concat([ct, pd.DataFrame(index=[True], data={False: 0, True: 0, "All": 0})])
+
+    # Sort
+    ct = ct.loc[[True, False, "All"], [True, False, "All"]]
+
+    a = ct.at[True, True].astype("float")  # hit
+    b = ct.at[False, True].astype("float")  # miss
+    c = ct.at[True, False].astype("float")  # false alarm
+    d = ct.at[False, False].astype("float")  # correct negative
+
     return a, b, c, d
 
 
