@@ -1798,7 +1798,8 @@ def scores(obs, mod, minval, maxval=1.0e5):
     df = df.dropna(subset=["obs", "mod"], how="any")
 
     if df.empty:
-        return 0, 0, 0, 0
+        zero = np.float64(0)
+        return zero, zero, zero, zero
 
     ct = pd.crosstab(
         (df["mod"] > minval) & (df["mod"] < maxval),
