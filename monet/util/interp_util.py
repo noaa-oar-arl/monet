@@ -1,5 +1,7 @@
-""" Interpolation utility functions for MONET """
+"""Interpolation utility functions for MONET"""
 
+import xarray as xr
+import numpy as np
 
 def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
     """Create a pyresample CoordinateDefinition from xarray DataArrays.
@@ -36,7 +38,6 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
     xarray.Dataset
         An empty dataset with the given longitude and latitude as coordinates.
     """
-    import xarray as xr
     from numpy import asarray
 
     lat = asarray(latitude)
@@ -62,15 +63,14 @@ def lonlat_to_swathdefinition(longitude=None, latitude=None):
     pyresample.geometry.SwathDefinition
         SwathDefinition object created from the given lon/lat arrays.
     """
-    from numpy import vstack
+    from numpy import vstack, meshgrid
     from pyresample.geometry import SwathDefinition
 
     if len(longitude.shape) < 2:
-        lons = vstack(longitude)
-        lats = vstack(latitude)
+        lons, lats = meshgrid(longitude, latitude)
     else:
-        lons = longitude
-        lats = latitude
+        lons, lats = longitude, latitude
+
     return SwathDefinition(lons=lons, lats=lats)
 
 
@@ -112,7 +112,6 @@ def constant_1d_xesmf(longitude=None, latitude=None):
     xarray.Dataset
         Dataset suitable for xESMF with lon/lat coordinates.
     """
-    import xarray as xr
     from numpy import asarray
 
     lat = asarray(latitude)
@@ -141,17 +140,16 @@ def constant_lat_swathdefition(longitude=None, latitude=None):
     pyresample.geometry.SwathDefinition
         SwathDefinition with constant latitude.
     """
-    from numpy import vstack
+    from numpy import vstack, meshgrid
     from pyresample import geometry
     from xarray import DataArray
 
     if len(longitude.shape) < 2:
-        lons = vstack(longitude)
+        lons, lats = meshgrid(longitude, latitude)
     else:
         lons = longitude
-    lats = lons * 0.0 + latitude
-    if isinstance(lats, DataArray):
-        lats.name = "lats"
+        lats = lons * 0.0 + latitude
+
     return geometry.SwathDefinition(lons=lons, lats=lats)
 
 
@@ -172,15 +170,16 @@ def constant_lon_swathdefition(longitude=None, latitude=None):
     pyresample.geometry.SwathDefinition
         SwathDefinition with constant longitude.
     """
-    from numpy import vstack
+    from numpy import vstack, meshgrid
     from pyresample import geometry
     from xarray import DataArray
 
     if len(latitude.shape) < 2:
-        lats = vstack(latitude)
+        lats, lons = meshgrid(latitude, longitude)
+        lons = lons.T
+        lats = lats.T
     else:
         lats = latitude
-    lons = lats * 0.0 + longitude
-    if isinstance(lats, DataArray):
-        lons.name = "lons"
+        lons = lats * 0.0 + longitude
+
     return geometry.SwathDefinition(lons=lons, lats=lats)

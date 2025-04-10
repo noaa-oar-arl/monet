@@ -1,12 +1,18 @@
-import numpy as np
+"""
+MONET utilities.
 
-# __name__ = 'util'
-# For backward compatibility
-from . import combinetool, interp_util, resample
-from . import stats as mystats
+This module provides various utilities for working with
+geospatial data, interpolation, and statistics.
+"""
+
+from . import combinetool
+from . import coards_tools
+from . import interp_util
+from . import resample
+from . import stats
 from . import tools
 
-__all__ = ["stats", "mystats", "tools", "interp_util", "resample", "combinetool"]
+__all__ = ['combinetool', 'coards_tools', 'interp_util', 'resample', 'stats', 'tools']
 
 
 def nearest(items, pivot):

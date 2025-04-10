@@ -1,9 +1,11 @@
 import xarray as xr
 from pandas import Series, merge_asof
+import pandas as pd
+import numpy as np
 
 
 def combine_da_to_df(da, df, *, merge=True, **kwargs):
-    """Combine xarray data array with point observations in a dataframe.
+    """Combine xarray data with point observations in a dataframe.
 
     Uses pyresample via ``.monet.remap_nearest``.
 
@@ -19,39 +21,61 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
         Whether to merge interpolated `da` data with original `df`.
         If False, return interpolated `da` data only.
     **kwargs : dict
-        Passed to :meth:`~monet.monet_accessor.MONETAccessor.remap_nearest`
-        (if `da` is not unstructured-grid data).
+        Passed to pyresample's neighbor lookup.
 
     Returns
     -------
     pandas.DataFrame
         DataFrame with combined model and observational data.
     """
+    radius_of_influence = kwargs.pop('radius_of_influence', 12e4)
+    suffix = kwargs.pop('suffix', '_new')
+
     target_da = df.drop_duplicates(subset=["siteid"]).dropna(
         subset=["latitude", "longitude", "siteid"]
     )
+
+    # Rename lat/lon columns if needed
+    if "lat" in target_da.columns:
+        target_da = target_da.rename(columns={"lat": "latitude", "lon": "longitude"})
+    elif "Lat" in target_da.columns:
+        target_da = target_da.rename(columns={"Lat": "latitude", "Lon": "longitude"})
+    elif "LAT" in target_da.columns:
+        target_da = target_da.rename(columns={"LAT": "latitude", "LON": "longitude"})
+
+    # Convert to xarray for remapping
+    if not hasattr(target_da, 'monet'):
+        # If someone passes a pandas DataFrame without the monet accessor registered
+        from ..accessors.pandas_accessor import MONETAccessorPandas
+        pd.api.extensions.register_dataframe_accessor("monet")(MONETAccessorPandas)
+
     target_data_da = target_da.monet._df_to_da()
 
     # Add if statement for unstructured grid output
     if da.attrs.get("mio_has_unstructured_grid", False):
         da_interped = target_data_da.monet.remap_nearest_unstructured(da).compute()
     else:
-        da_interped = target_data_da.monet.remap_nearest(da, **kwargs).compute()
+        da_interped = target_data_da.monet.remap_nearest(da,
+                                                        radius_of_influence=radius_of_influence,
+                                                        **kwargs).compute()
 
     da_interped["siteid"] = (("x"), target_da.siteid)
     da_interped_df = da_interped.to_dataframe().reset_index()
-    cols = Series(da_interped_df.columns)
+    cols = pd.Series(da_interped_df.columns)
 
     drop_cols = cols.loc[cols.isin(["x", "y", "z", "latitude", "longitude"])]
     da_interped_df.drop(drop_cols, axis=1, inplace=True)
+
+    # Handle column naming conflicts
     if isinstance(da, xr.DataArray):
         if da.name in df.columns:
-            da_interped_df.rename(columns={da.name: da.name + "_new"}, inplace=True)
-    else:
+            da_interped_df.rename(columns={da.name: da.name + suffix}, inplace=True)
+    else:  # Dataset
         dup_names = [name for name in da.data_vars.keys() if name in df.columns]
         if len(dup_names) > 0:
             for name in dup_names:
-                da_interped_df.rename(columns={name: name + "_new"}, inplace=True)
+                da_interped_df.rename(columns={name: name + suffix}, inplace=True)
+
     if merge:
         df.reset_index(drop=True)
         da_interped_df.reset_index(drop=True)
@@ -119,56 +143,73 @@ def _rename_latlon(ds):
         return ds
 
 
-def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
-    """Combine xarray data with dataframe observations using xESMF regridding.
+def combine_da_to_df_xesmf(da, df, suffix=None, **kwargs):
+    """Combine point data with a DataArray using xESMF.
 
     Parameters
     ----------
-    da : xarray.DataArray or xarray.Dataset
-        Source data to be interpolated.
+    da : xarray.DataArray
+        DataArray containing model data.
     df : pandas.DataFrame
-        Target dataframe with 'latitude', 'longitude', and 'time' columns.
-    suffix : str, optional
-        Suffix to add to variable names in case of name conflicts.
-        Defaults to '_new'.
+        DataFrame containing point observations.
+    suffix : str, default: None
+        Suffix to add to the variable names to prevent column name conflicts.
     **kwargs : dict
-        Passed to :func:`~monet.util.resample.resample_xesmf`
-        (and then to ``xesmf.Regridder``).
+        Additional keyword arguments for xESMF regridding.
 
     Returns
     -------
     pandas.DataFrame
-        Combined dataframe with original and interpolated data.
+        DataFrame with combined model and observation data.
     """
-    from ..util.interp_util import constant_1d_xesmf
+    try:
+        import xesmf
+    except ImportError:
+        raise ImportError("xesmf is required for this functionality")
+
+    from ..util.interp_util import lonlat_to_xesmf
     from ..util.resample import resample_xesmf
 
-    dfnn = df.drop_duplicates(subset=["latitude", "longitude"])
-    target = constant_1d_xesmf(longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
-
-    da = _rename_latlon(da)  # check to rename latitude and longitude
-    da_interped = resample_xesmf(da, target, **kwargs)
-    da_interped = _rename_latlon(da_interped)  # check to change back
+    # Default suffix
     if suffix is None:
-        suffix = "_new"
-    rename_dict = {}
-    if isinstance(da_interped, xr.DataArray):
-        if da_interped.name in dfnn.keys():
-            da_interped.name = da_interped.name + suffix
-    else:
-        for i in da_interped.data_vars.keys():
-            if i in dfnn.keys():
-                rename_dict[i] = i + suffix
-        da_interped = da_interped.rename(rename_dict)
-    df_interped = da_interped.to_dataframe().reset_index()
-    cols = Series(df_interped.columns)
-    drop_cols = cols.loc[cols.isin(["x", "y", "z"])]
-    df_interped.drop(drop_cols, axis=1, inplace=True)
+        suffix = '_xesmf'
 
-    final_df = df.merge(
-        df_interped, on=["latitude", "longitude", "time"], how="left", suffixes=("", suffix)
+    # Make a copy of the DataFrame
+    target = df.copy()
+
+    # Rename lat/lon columns if needed
+    if "lat" in target.columns:
+        target = target.rename(columns={"lat": "latitude", "lon": "longitude"})
+    elif "Lat" in target.columns:
+        target = target.rename(columns={"Lat": "latitude", "Lon": "longitude"})
+    elif "LAT" in target.columns:
+        target = target.rename(columns={"LAT": "latitude", "LON": "longitude"})
+
+    # Create xESMF compatible dataset for the point locations
+    point_ds = lonlat_to_xesmf(
+        longitude=target.longitude.values,
+        latitude=target.latitude.values
     )
-    return final_df
+
+    # Rename coordinates for xESMF
+    da_renamed = da.copy()
+    if 'latitude' in da.coords:
+        da_renamed = da_renamed.rename({'latitude': 'lat', 'longitude': 'lon'})
+
+    # Use xESMF to resample the data
+    result = resample_xesmf(da_renamed, point_ds, **kwargs)
+
+    # Convert to DataFrame
+    if isinstance(result, xr.DataArray):
+        varname = result.name if result.name is not None else "model_data"
+        sdf = pd.DataFrame({varname + suffix: result.values.ravel()}, index=target.index)
+    else:  # Dataset
+        sdf = pd.DataFrame(index=target.index)
+        for varname, datavar in result.data_vars.items():
+            sdf[varname + suffix] = datavar.values.ravel()
+
+    # Merge with original DataFrame
+    return pd.concat([target, sdf], axis=1)
 
 
 def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
