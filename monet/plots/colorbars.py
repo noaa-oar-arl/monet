@@ -1,30 +1,35 @@
-"""Colorbar helper functions for MONET plots."""
+"""Colorbar helper functions"""
 
 import matplotlib.pyplot as plt
 
 
 def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype="int", basemap=None):
-    """Create a colorbar with discrete colors.
+    """Create a colorbar with discrete colors and custom tick labels.
 
     Parameters
     ----------
     ncolors : int
-        Number of discrete colors.
+        Number of discrete colors to use in the colorbar.
     cmap : str or matplotlib.colors.Colormap
-        Colormap to discretize.
+        Colormap to discretize and use for the colorbar.
     minval : float, optional
-        Minimum value for the colorbar. If None, uses 0.
+        Minimum value for the colorbar tick labels. If None and maxval is None,
+        tick labels will range from 0 to ncolors. If None and maxval is provided,
+        tick labels will range from 0 to maxval.
     maxval : float, optional
-        Maximum value for the colorbar. If None, uses ncolors.
-    dtype : str, default: "int"
-        Data type for colorbar labels ('int' or 'float').
-    basemap : basemap.Basemap, optional
-        Basemap instance to add colorbar to. If None, uses plt.colorbar.
+        Maximum value for the colorbar tick labels. If None, tick labels
+        will range from 0 or minval to ncolors.
+    dtype : str or type, default "int"
+        Data type for tick label values (e.g., "int", "float").
+    basemap : matplotlib.mpl_toolkits.basemap.Basemap, optional
+        Basemap instance to attach the colorbar to. If None, uses plt.colorbar.
 
     Returns
     -------
     tuple
-        (colorbar, discretized_colormap)
+        (colorbar, discretized_cmap) where:
+        - colorbar is the matplotlib.colorbar.Colorbar instance
+        - discretized_cmap is the discretized colormap
     """
     import matplotlib.cm as cm
     import numpy as np
@@ -51,25 +56,32 @@ def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype="int", basemap
 def cmap_discretize(cmap, N):
     """Return a discrete colormap from a continuous colormap.
 
+    Creates a new colormap by discretizing an existing continuous colormap
+    into N distinct colors while preserving the color transitions.
+
     Parameters
     ----------
     cmap : str or matplotlib.colors.Colormap
-        Colormap instance or name to discretize.
+        Colormap instance or registered colormap name to discretize.
+        Example: cm.jet, 'viridis', etc.
     N : int
-        Number of colors in the discrete colormap.
+        Number of discrete colors to use in the new colormap.
 
     Returns
     -------
     matplotlib.colors.LinearSegmentedColormap
-        Discretized colormap.
+        A new colormap object with N discrete colors based on the input colormap.
+        The name will be the original colormap name with "_N" appended.
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import matplotlib.pyplot as plt
-    >>> x = np.resize(np.arange(100), (5, 100))
-    >>> djet = cmap_discretize('jet', 5)
-    >>> plt.imshow(x, cmap=djet)
+    >>> from numpy import arange
+    >>> from numpy.ma import resize
+    >>> from matplotlib.pyplot import imshow
+    >>> from matplotlib.cm import jet
+    >>> x = resize(arange(100), (5, 100))
+    >>> djet = cmap_discretize(jet, 5)
+    >>> imshow(x, cmap=djet)
     """
     import matplotlib.colors as mcolors
     import numpy as np

@@ -1,4 +1,4 @@
-"""Plotting routines for MONET visualization."""
+"""plotting routines"""
 
 import functools
 
@@ -8,10 +8,13 @@ import seaborn as sns
 from . import taylordiagram as td
 from .colorbars import colorbar_index
 
+# colors = ['#1e90ff','#045C5C','#00A847','#DB4291','#BB7E5D']
 colors = ["#1e90ff", "#DA70D6", "#228B22", "#FA8072", "#FF1493"]
 
 
 def _default_sns_context(f):
+    """Decorator to apply a default seaborn context and color palette to plotting functions."""
+
     @functools.wraps(f)
     def inner(*args, **kwargs):
         with sns.plotting_context("poster"), sns.color_palette(colors):
@@ -20,31 +23,39 @@ def _default_sns_context(f):
     return inner
 
 
+# Spatial Plots
 @_default_sns_context
 def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
-    """Create a spatial plot of model data.
+    """Create a basic spatial plot using imshow.
 
     Parameters
     ----------
     modelvar : numpy.ndarray
-        Model variable 2D array to plot.
-    m : basemap.Basemap
-        Basemap object for mapping.
+        2D model variable array to plot.
+    m : mpl_toolkits.basemap.Basemap
+        Basemap instance for mapping.
     dpi : int, optional
-        Dots per inch for the figure.
-    plotargs : dict, default: {}
-        Additional keyword arguments passed to the plotting function.
-    ncolors : int, default: 15
-        Number of colors for discrete colormap.
-    discrete : bool, default: False
-        Whether to use a discrete colormap.
+        Dots per inch for the figure. Higher values increase resolution.
+    plotargs : dict, default {}
+        Additional arguments to pass to imshow. Common options include 'cmap',
+        'vmin', 'vmax', and 'alpha'.
+    ncolors : int, default 15
+        Number of discrete colors when using discrete colorbar.
+    discrete : bool, default False
+        If True, use a discrete colorbar instead of a continuous one.
 
     Returns
     -------
     tuple
-        Tuple containing (figure, axis, colorbar, colormap, vmin, vmax).
+        (figure, axes, colorbar, colormap, vmin, vmax)
+        - figure: matplotlib Figure instance
+        - axes: matplotlib Axes instance
+        - colorbar: matplotlib Colorbar instance
+        - colormap: matplotlib Colormap instance
+        - vmin, vmax: minimum and maximum values for the colormap
     """
     f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
+    # determine colorbar
     if "cmap" not in plotargs:
         plotargs["cmap"] = "viridis"
     if discrete and "vmin" in plotargs and "vmax" in plotargs:
@@ -65,6 +76,7 @@ def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
         c = m.colorbar()
         vmin, vmax = temp.get_clim()
         cmap = plotargs["cmap"]
+    # draw borders
     m.drawstates()
     m.drawcoastlines(linewidth=0.3)
     m.drawcountries()
@@ -73,14 +85,17 @@ def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
 
 @_default_sns_context
 def spatial(modelvar, **kwargs):
-    """Create a simple spatial plot using xarray's built-in plotting.
+    """Create a simple spatial plot from an xarray object.
+
+    A convenience wrapper for xarray's plot method with consistent styling.
 
     Parameters
     ----------
     modelvar : xarray.DataArray
-        Model variable to plot.
-    **kwargs : dict
-        Additional keyword arguments passed to the xarray plot function.
+        The data to plot spatially.
+    **kwargs
+        Additional keyword arguments passed to xarray's plot method.
+        If 'ax' is not provided, a new figure and axes will be created.
 
     Returns
     -------
@@ -108,39 +123,40 @@ def make_spatial_contours(
     dtype="int",
     **kwargs
 ):
-    """Create a contour plot of spatial data.
+    """Create a contour plot on a map with optional discrete colorbar.
 
     Parameters
     ----------
     modelvar : numpy.ndarray
-        Model variable 2D array to plot.
-    gridobj : netCDF4.Dataset or similar
-        Grid object containing LAT and LON variables.
+        2D model variable array to contour.
+    gridobj : object
+        Object containing grid information with LAT and LON variables.
     date : datetime.datetime
-        Date/time for the title.
-    m : basemap.Basemap
-        Basemap object for mapping.
+        Date/time for the plot title.
+    m : mpl_toolkits.basemap.Basemap
+        Basemap instance for mapping.
     dpi : int, optional
-        Dots per inch for saving the figure.
-    savename : str, default: ""
-        Base name for saving the figure. If empty, figure is not saved.
-    discrete : bool, default: True
-        Whether to use a discrete colormap.
+        Dots per inch for the figure if saving.
+    savename : str, default ""
+        If provided, save the figure to this path with date appended.
+    discrete : bool, default True
+        If True, use a discrete colorbar instead of a continuous one.
     ncolors : int, optional
-        Number of discrete colors for colorbar.
-    dtype : str, default: "int"
-        Data type for colorbar labels ('int' or 'float').
-    **kwargs : dict
-        Additional keyword arguments passed to contourf.
+        Number of discrete colors when using discrete colorbar.
+    dtype : str, default "int"
+        Data type for colorbar tick labels.
+    **kwargs
+        Additional arguments to pass to contourf. Must include 'cmap' and 'levels'.
 
     Returns
     -------
     matplotlib.colorbar.Colorbar
-        The colorbar object.
+        The colorbar instance.
     """
     plt.figure(figsize=(11, 6), frameon=False)
     lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
     lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
+    # define map and draw boundaries
     m.drawstates()
     m.drawcoastlines(linewidth=0.3)
     m.drawcountries()
@@ -157,6 +173,7 @@ def make_spatial_contours(
         c = m.colorbar()
     titstring = date.strftime("%B %d %Y %H")
     plt.title(titstring)
+
     plt.tight_layout()
     if savename != "":
         plt.savefig(savename + date.strftime("%Y%m%d_%H.jpg"), dpi=dpi)
@@ -166,30 +183,32 @@ def make_spatial_contours(
 
 @_default_sns_context
 def wind_quiver(ws, wdir, gridobj, m, **kwargs):
-    """Create a quiver plot for wind data.
+    """Create a quiver plot of wind vectors on a map.
 
     Parameters
     ----------
     ws : numpy.ndarray
-        Wind speed 2D array.
+        2D array of wind speeds.
     wdir : numpy.ndarray
-        Wind direction 2D array (in degrees).
-    gridobj : netCDF4.Dataset or similar
-        Grid object containing LAT and LON variables.
-    m : basemap.Basemap
-        Basemap object for mapping.
-    **kwargs : dict
-        Additional keyword arguments passed to the quiver function.
+        2D array of wind directions (meteorological convention, degrees).
+    gridobj : object
+        Object containing grid information with LAT and LON variables.
+    m : mpl_toolkits.basemap.Basemap
+        Basemap instance for mapping.
+    **kwargs
+        Additional arguments to pass to quiver. Common options include
+        'scale', 'scale_units', and 'width'.
 
     Returns
     -------
     matplotlib.quiver.Quiver
-        The quiver object.
+        The quiver instance.
     """
     from . import tools
 
     lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
     lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
+    # define map and draw boundaries
     x, y = m(lon, lat)
     u, v = tools.wsdir2uv(ws, wdir)
     quiv = m.quiver(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
@@ -198,20 +217,21 @@ def wind_quiver(ws, wdir, gridobj, m, **kwargs):
 
 @_default_sns_context
 def wind_barbs(ws, wdir, gridobj, m, **kwargs):
-    """Create a barbs plot for wind data.
+    """Create a barbs plot of wind on a map.
 
     Parameters
     ----------
     ws : numpy.ndarray
-        Wind speed 2D array.
+        2D array of wind speeds.
     wdir : numpy.ndarray
-        Wind direction 2D array (in degrees).
-    gridobj : netCDF4.Dataset or similar
-        Grid object containing LAT and LON variables.
-    m : basemap.Basemap
-        Basemap object for mapping.
-    **kwargs : dict
-        Additional keyword arguments passed to the barbs function.
+        2D array of wind directions (meteorological convention, degrees).
+    gridobj : object
+        Object containing grid information with LAT and LON variables.
+    m : mpl_toolkits.basemap.Basemap
+        Basemap instance for mapping.
+    **kwargs
+        Additional arguments to pass to barbs. Common options include
+        'length', 'pivot', and 'barb_increments'.
 
     Returns
     -------
@@ -221,27 +241,28 @@ def wind_barbs(ws, wdir, gridobj, m, **kwargs):
 
     lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
     lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
+    # define map and draw boundaries
     x, y = m(lon, lat)
     u, v = tools.wsdir2uv(ws, wdir)
     m.barbs(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
 
 
 def normval(vmin, vmax, cmap):
-    """Create a BoundaryNorm for a color map.
+    """Create a BoundaryNorm for discrete colormaps with specific bounds.
 
     Parameters
     ----------
     vmin : float
-        Minimum value for the colorbar.
+        Minimum value for the colormap.
     vmax : float
-        Maximum value for the colorbar.
+        Maximum value for the colormap.
     cmap : matplotlib.colors.Colormap
-        Colormap to use.
+        The colormap to create bounds for.
 
     Returns
     -------
     matplotlib.colors.BoundaryNorm
-        Boundary normalization object.
+        A boundary norm with evenly spaced bounds from vmin to vmax in steps of 5.0.
     """
     from matplotlib.colors import BoundaryNorm
     from numpy import arange
@@ -255,37 +276,43 @@ def normval(vmin, vmax, cmap):
 def spatial_bias_scatter(
     df, m, date, vmin=None, vmax=None, savename="", ncolors=15, fact=1.5, cmap="RdBu_r"
 ):
-    """Create a scatter plot showing spatial bias.
+    """Create a scatter plot showing bias between model and observations on a map.
 
     Parameters
     ----------
     df : pandas.DataFrame
-        DataFrame containing the data with CMAQ, Obs, longitude, latitude columns.
-    m : basemap.Basemap
-        Basemap object for mapping.
+        DataFrame containing 'latitude', 'longitude', 'CMAQ', and 'Obs' columns.
+    m : mpl_toolkits.basemap.Basemap
+        Basemap instance for mapping.
     date : str or datetime.datetime
-        Date to filter the DataFrame.
+        Date to filter the DataFrame. Only entries matching this date will be plotted.
     vmin : float, optional
-        Minimum value for colorbar. If None, it's determined from the data.
+        Minimum value for colorscale. If None, automatically determined.
     vmax : float, optional
-        Maximum value for colorbar. If None, it's determined from the data.
-    savename : str, default: ""
-        Base name for saving the figure. If empty, figure is not saved.
-    ncolors : int, default: 15
-        Number of discrete colors for colorbar.
-    fact : float, default: 1.5
-        Factor to scale the point sizes.
-    cmap : str, default: "RdBu_r"
-        Colormap name to use.
+        Maximum value for colorscale. If None, automatically determined.
+    savename : str, default ""
+        If provided, save the figure to this path with date appended.
+    ncolors : int, default 15
+        Number of discrete colors for the colorbar.
+    fact : float, default 1.5
+        Scaling factor for point sizes.
+    cmap : str or matplotlib.colors.Colormap, default "RdBu_r"
+        Colormap to use for bias values.
 
     Returns
     -------
     tuple
-        Tuple containing (figure, axis, colorbar).
+        (figure, axes, colorbar) containing the matplotlib objects.
+
+    Notes
+    -----
+    The scatter points are colored by the difference (CMAQ - Obs) and sized
+    by the absolute magnitude of this difference, making larger biases more visible.
     """
     from numpy import around
     from scipy.stats import scoreatpercentile as score
 
+    #    plt.figure(figsize=(11, 6), frameon=False)
     f, ax = plt.subplots(figsize=(11, 6), frameon=False)
     ax.set_facecolor("white")
     diff = df.CMAQ - df.Obs
@@ -295,6 +322,7 @@ def spatial_bias_scatter(
     c, cmap = colorbar_index(ncolors, cmap, minval=top * -1, maxval=top, basemap=m)
 
     c.ax.tick_params(labelsize=13)
+    #    cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
     ss = (new.CMAQ - new.Obs).abs() / top * 100.0
     ss[ss > 300] = 300.0
@@ -329,40 +357,45 @@ def timeseries(
     ylabel=None,
     label=None,
 ):
-    """Create a time series plot with error shading.
+    """Create a timeseries plot with shaded error bounds.
 
     Parameters
     ----------
     df : pandas.DataFrame
         DataFrame containing the data to plot.
-    x : str, default: "time"
-        Column name to use for the x-axis.
-    y : str, default: "obs"
-        Column name to use for the y-axis.
+    x : str, default "time"
+        Column name to use for the x-axis (time).
+    y : str, default "obs"
+        Column name to use for the y-axis (values to plot).
     ax : matplotlib.axes.Axes, optional
-        Axes to plot on. If None, a new axis will be created.
-    plotargs : dict, default: {}
-        Additional keyword arguments for the line plot.
-    fillargs : dict, default: {"alpha": 0.2}
-        Additional keyword arguments for the fill_between function.
-    title : str, default: ""
+        Axes to plot on. If None, creates a new figure and axes.
+    plotargs : dict, default {}
+        Additional arguments to pass to DataFrame.plot().
+    fillargs : dict, default {"alpha": 0.2}
+        Additional arguments to pass to fill_between for the error shading.
+    title : str, default ""
         Title for the plot.
     ylabel : str, optional
-        Label for the y-axis. If None, uses the variable name and unit.
+        Y-axis label. If None, uses variable name and units from DataFrame.
     label : str, optional
-        Label for the line in the legend. If None, uses the y column name.
+        Label for the plotted line (for legend). If None, uses y.
 
     Returns
     -------
     matplotlib.axes.Axes
         The axes containing the plot.
+
+    Notes
+    -----
+    This function groups the data by time, plots the mean values, and adds
+    shading for ±1 standard deviation around the mean.
     """
     with sns.axes_style("ticks"):
         if ax is None:
             f, ax = plt.subplots(figsize=(11, 6), frameon=False)
         df.index = df[x]
-        m = df.groupby("time").mean()
-        e = df.groupby("time").std()
+        m = df.groupby("time").mean()  # mean values for each sample time period
+        e = df.groupby("time").std()  # std values for each sample time period
         variable = df.variable[0]
         if df.columns.isin(["units"]).max():
             unit = df.units[0]
@@ -394,20 +427,21 @@ def timeseries(
 
 @_default_sns_context
 def kdeplot(df, title=None, label=None, ax=None, **kwargs):
-    """Create a kernel density estimation plot.
+    """Create a kernel density estimate plot.
 
     Parameters
     ----------
-    df : pandas.Series or numpy.ndarray
-        Data to plot.
+    df : pandas.Series or array-like
+        Data to plot the distribution of.
     title : str, optional
         Title for the plot.
     label : str, optional
-        Label for the line in the legend.
+        Label for the plotted line (for legend).
     ax : matplotlib.axes.Axes, optional
-        Axes to plot on. If None, a new axis will be created.
-    **kwargs : dict
-        Additional keyword arguments passed to sns.kdeplot.
+        Axes to plot on. If None, creates a new figure and axes.
+    **kwargs
+        Additional arguments passed to seaborn's kdeplot.
+        Common options include 'shade', 'bw', and 'color'.
 
     Returns
     -------
@@ -432,17 +466,18 @@ def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
     df : pandas.DataFrame
         DataFrame containing the data to plot.
     x : str, optional
-        Column name to use for the x-axis. Default is 'obs'.
+        Column name for x-axis values.
     y : str, optional
-        Column name to use for the y-axis. Default is 'model'.
+        Column name for y-axis values.
     title : str, optional
         Title for the plot.
     label : str, optional
-        Label for the data in the legend.
+        Label for the plot (for legend).
     ax : matplotlib.axes.Axes, optional
-        Axes to plot on. If None, a new axis will be created.
-    **kwargs : dict
-        Additional keyword arguments passed to sns.regplot.
+        Axes to plot on. If None, creates a new figure and axes.
+    **kwargs
+        Additional arguments passed to seaborn's regplot.
+        Common options include 'scatter_kws', 'line_kws', and 'ci'.
 
     Returns
     -------
@@ -459,7 +494,7 @@ def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
 
 
 @_default_sns_context
-def taylordiagram(
+def create_taylor_diagram(
     df,
     marker="o",
     col1="obs",
@@ -470,6 +505,41 @@ def taylordiagram(
     addon=False,
     dia=None,
 ):
+    """
+    :no-index:
+
+    Create a DataFrame-based Taylor diagram using the TaylorDiagram class.
+
+    A convenience wrapper for easily creating Taylor diagrams from DataFrames.
+    For the main Taylor diagram implementation, see :mod:`monet.plots.taylordiagram`.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame containing observation and model data
+    marker : str, default "o"
+        Marker style for plotting model points
+    col1 : str, default "obs"
+        Column name for observations
+    col2 : str, default "model"
+        Column name for model predictions
+    label1 : str, default "OBS"
+        Label for observations in legend
+    label2 : str, default "MODEL"
+        Label for model in legend
+    scale : float, default 1.5
+        Scale factor for diagram
+    addon : bool, default False
+        If True, add to existing diagram; if False, create new
+    dia : TaylorDiagram, optional
+        Existing diagram to add to if addon=True
+
+    Returns
+    -------
+    TaylorDiagram
+        The Taylor diagram instance
+    """
+    # Same implementation as before
     from numpy import corrcoef
 
     df = df.drop_duplicates().dropna(subset=[col1, col2])

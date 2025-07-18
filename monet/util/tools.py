@@ -4,23 +4,22 @@ __author__ = "barry"
 
 
 def search_listinlist(array1, array2):
-    """Find indices of intersection elements between two arrays.
+    """Find matching indices between two arrays.
 
     Parameters
     ----------
     array1 : numpy.ndarray
-        First array to compare.
+        First array to search for matches
     array2 : numpy.ndarray
-        Second array to compare.
+        Second array to search for matches
 
     Returns
     -------
     tuple
-        A tuple of (index1, index2) where index1 contains indices in array1
-        and index2 contains indices in array2 that correspond to intersection elements.
+        (index1, index2) containing:
+        - index1: sorted array of indices in array1 where matches were found
+        - index2: sorted array of indices in array2 where matches were found
     """
-    # find intersections
-
     s1 = set(array1.flatten())
     s2 = set(array2.flatten())
 
@@ -39,25 +38,23 @@ def search_listinlist(array1, array2):
 
 
 def linregress(x, y):
-    """Calculate a linear least-squares regression for two sets of measurements.
+    """Perform a linear regression using statsmodels.
 
     Parameters
     ----------
-    x : array_like
-        Independent variable.
-    y : array_like
-        Dependent variable.
+    x : array-like
+        Independent variable values.
+    y : array-like
+        Dependent variable values.
 
     Returns
     -------
-    slope : float
-        Slope of the regression line.
-    intercept : float
-        Intercept of the regression line.
-    r_squared : float
-        Square of the correlation coefficient.
-    std_err : float
-        Standard error of the estimate.
+    tuple
+        (slope, intercept, r_squared, standard_error) where:
+        - slope is the regression line slope
+        - intercept is the regression line y-intercept
+        - r_squared is the coefficient of determination
+        - standard_error is the standard error of the residuals
     """
     import statsmodels.api as sm
 
@@ -71,21 +68,21 @@ def linregress(x, y):
 
 
 def findclosest(list, value):
-    """Find the index and value in a list that is closest to a given value.
+    """Find the index and value of the closest element to a target value.
 
     Parameters
     ----------
-    list : array_like
-        List or array to search.
+    list : list-like
+        Collection of values to search through.
     value : float or int
-        Value to find closest match for.
+        The target value to find the closest match to.
 
     Returns
     -------
-    index : int
-        Index of the closest value.
-    closest_value : same type as elements in list
-        The value in the list that is closest to the given value.
+    tuple
+        (index, closest_value) where:
+        - index is the position in the list of the closest value
+        - closest_value is the value from the list that is closest to the target
     """
     a = min((abs(x - value), x, i) for i, x in enumerate(list))
     return a[2], a[1]
@@ -95,6 +92,18 @@ def _force_forder(x):
     """
     Converts arrays x to fortran order. Returns
     a tuple in the form (x, is_transposed).
+
+    Parameters
+    ----------
+    x : numpy.ndarray
+        Array to potentially convert to Fortran-order.
+
+    Returns
+    -------
+    tuple
+        (result_array, is_transposed) where:
+        - result_array is the array in Fortran-order
+        - is_transposed is a boolean indicating if transposition was performed
     """
     if x.flags.c_contiguous:
         return (x.T, True)
@@ -103,10 +112,27 @@ def _force_forder(x):
 
 
 def kolmogorov_zurbenko_filter(df, col, window, iterations):
-    """KZ filter implementation
-    series is a pandas series
-    window is the filter window m in the units of the data (m = 2q+1)
-    iterations is the number of times the moving average is evaluated
+    """Apply a Kolmogorov-Zurbenko filter to a specific column in a DataFrame.
+
+    A Kolmogorov-Zurbenko filter is a low-pass filter created by iteratively
+    applying a moving average of specified window length. This implementation
+    applies the filter to a DataFrame grouped by site ID.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame containing the data to filter.
+    col : str
+        Column name to apply the filter to.
+    window : int
+        Size of the moving average window.
+    iterations : int
+        Number of times to apply the moving average filter.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with original data and filtered values merged in.
     """
     df.index = df.time_local
     z = df.copy()
@@ -124,6 +150,22 @@ def kolmogorov_zurbenko_filter(df, col, window, iterations):
 
 
 def wsdir2uv(ws, wdir):
+    """Convert wind speed and direction to U and V components.
+
+    Parameters
+    ----------
+    ws : array-like
+        Wind speed values.
+    wdir : array-like
+        Wind direction values in degrees (meteorological convention: 0=North, 90=East).
+
+    Returns
+    -------
+    tuple
+        (u, v) where:
+        - u is the zonal wind component (positive for eastward wind)
+        - v is the meridional wind component (positive for northward wind)
+    """
     from numpy import cos, pi, sin
 
     u = -ws * sin(wdir * pi / 180.0)
@@ -132,9 +174,22 @@ def wsdir2uv(ws, wdir):
 
 
 def get_relhum(temp, press, vap):
-    # temp:  temperature (K)
-    # press: pressure (Pa)
-    # vap:   water vapor mixing ratio (kg/kg)
+    """Calculate relative humidity from temperature, pressure and vapor pressure.
+
+    Parameters
+    ----------
+    temp : array-like
+        Temperature in Kelvin
+    press : array-like
+        Pressure in hPa/mb
+    vap : array-like
+        Vapor pressure in hPa/mb
+
+    Returns
+    -------
+    array-like
+        Relative humidity as a percentage (0-100)
+    """
     temp_o = 273.16
     es_vap = 611.0 * np.exp(17.67 * ((temp - temp_o) / (temp - 29.65)))
     ws_vap = 0.622 * (es_vap / press)
@@ -143,6 +198,19 @@ def get_relhum(temp, press, vap):
 
 
 def long_to_wide(df):
+    """Convert a DataFrame from long (stacked) to wide format.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame in long format with 'time', 'siteid', 'variable',
+        'obs', and 'units' columns
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame in wide format with variables as columns
+    """
     from pandas import merge
 
     w = df.pivot_table(values="obs", index=["time", "siteid"], columns="variable").reset_index()
@@ -153,6 +221,22 @@ def long_to_wide(df):
 
 
 def calc_8hr_rolling_max(df, col=None, window=None):
+    """Calculate 8-hour rolling maximum values.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input data with 'time_local' and 'siteid' columns
+    col : str
+        Column name to calculate rolling max for
+    window : int
+        Rolling window size in hours
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with added column containing 8-hour maxima
+    """
     df.index = df.time_local
     df_rolling = (
         df.groupby("siteid")[col]
@@ -169,6 +253,20 @@ def calc_8hr_rolling_max(df, col=None, window=None):
 
 
 def calc_24hr_ave(df, col=None):
+    """Calculate 24-hour averages.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input data with 'time_local' and 'siteid' columns
+    col : str
+        Column name to average
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with added column containing daily averages
+    """
     df.index = df.time_local
     df_24hr_ave = df.groupby("siteid")[col].resample("D").mean().reset_index()
     df = df.reset_index(drop=True)
@@ -176,6 +274,20 @@ def calc_24hr_ave(df, col=None):
 
 
 def calc_3hr_ave(df, col=None):
+    """Calculate 3-hour averages.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input data with 'time_local' and 'siteid' columns
+    col : str
+        Column name to average
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with added column containing 3-hour averages
+    """
     df.index = df.time_local
     df_3hr_ave = df.groupby("siteid")[col].resample("3H").mean().reset_index()
     df = df.reset_index(drop=True)
@@ -183,6 +295,20 @@ def calc_3hr_ave(df, col=None):
 
 
 def calc_annual_ave(df, col=None):
+    """Calculate annual averages.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input data with 'time_local' and 'siteid' columns
+    col : str
+        Column name to average
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with added column containing annual averages
+    """
     df.index = df.time_local
     df_annual_ave = df.groupby("siteid")[col].resample("A").mean().reset_index()
     df = df.reset_index(drop=True)
@@ -190,6 +316,28 @@ def calc_annual_ave(df, col=None):
 
 
 def get_giorgi_region_bounds(index=None, acronym=None):
+    """Get lat/lon boundaries for a Giorgi region.
+
+    Giorgi regions are geographical regions defined for climate studies.
+    Returns bounds for a region specified by index number or acronym.
+
+    Parameters
+    ----------
+    index : int, optional
+        Region index number (1-22)
+    acronym : str, optional
+        Region acronym (e.g. 'NAU', 'SAU', etc)
+
+    Returns
+    -------
+    numpy.ndarray
+        Array containing [latmin, lonmin, latmax, lonmax, acronym]
+
+    Notes
+    -----
+    Either index or acronym must be provided. For region definitions see:
+    https://web.northeastern.edu/sds/web/demsos/images_002/subregions.jpg
+    """
     import pandas as pd
 
     i = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
@@ -331,6 +479,20 @@ def get_giorgi_region_bounds(index=None, acronym=None):
 
 
 def get_giorgi_region_df(df):
+    """Add Giorgi region index and acronym to DataFrame based on lat/lon.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame containing 'latitude' and 'longitude' columns
+
+    Returns
+    -------
+    pandas.DataFrame
+        Input DataFrame with added columns:
+        - GIORGI_INDEX: region index number
+        - GIORGI_ACRO: region acronym
+    """
     df.loc[:, "GIORGI_INDEX"] = None
     df.loc[:, "GIORGI_ACRO"] = None
     for i in range(22):
@@ -347,6 +509,20 @@ def get_giorgi_region_df(df):
 
 
 def get_epa_region_bounds(index=None, acronym=None):
+    """Get lat/lon boundaries for an EPA region.
+
+    Parameters
+    ----------
+    index : int, optional
+        EPA region number
+    acronym : str, optional
+        EPA region acronym
+
+    Returns
+    -------
+    list
+        [latmin, lonmin, latmax, lonmax, acronym]
+    """
     import pandas as pd
 
     i = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
@@ -432,6 +608,18 @@ def get_epa_region_bounds(index=None, acronym=None):
 
 
 def get_epa_region_df(df):
+    """Add EPA region information to DataFrame based on lat/lon.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame containing 'latitude' and 'longitude' columns
+
+    Returns
+    -------
+    pandas.DataFrame
+        Input DataFrame with added EPA region columns
+    """
     df.loc[:, "EPA_INDEX"] = None
     df.loc[:, "EPA_ACRO"] = None
     for i in range(13):
