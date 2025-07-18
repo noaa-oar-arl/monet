@@ -2,58 +2,12 @@
 
 import numpy as np
 import pandas as pd
-import xarray as xr
 
 from .base import BaseAccessor, has_pyresample
 
+
 @pd.api.extensions.register_dataframe_accessor("monet")
 class MONETAccessorPandas(BaseAccessor):
-    def plot_points_map(self, lon_col="longitude", lat_col="latitude", projection=None, color="C0", marker="o", size=40, edgecolor="k", alpha=0.8, map_kws=None, figsize=(8, 6), dpi=150, title=None, export_path=None, export_formats=None, **kwargs):
-        """
-        Plot points from this DataFrame on a Cartopy map.
-        """
-        from ..plots.cartopy_utils import plot_points_map
-        return plot_points_map(
-            self._obj,
-            lon_col=lon_col,
-            lat_col=lat_col,
-            projection=projection,
-            color=color,
-            marker=marker,
-            size=size,
-            edgecolor=edgecolor,
-            alpha=alpha,
-            map_kws=map_kws,
-            figsize=figsize,
-            dpi=dpi,
-            title=title,
-            export_path=export_path,
-            export_formats=export_formats,
-            **kwargs
-        )
-
-    def plot_lines_map(self, lon_col="longitude", lat_col="latitude", group_col=None, projection=None, color="C0", linewidth=2, alpha=0.8, map_kws=None, figsize=(8, 6), dpi=150, title=None, export_path=None, export_formats=None, **kwargs):
-        """
-        Plot lines from this DataFrame on a Cartopy map. Optionally group by a column.
-        """
-        from ..plots.cartopy_utils import plot_lines_map
-        return plot_lines_map(
-            self._obj,
-            lon_col=lon_col,
-            lat_col=lat_col,
-            group_col=group_col,
-            projection=projection,
-            color=color,
-            linewidth=linewidth,
-            alpha=alpha,
-            map_kws=map_kws,
-            figsize=figsize,
-            dpi=dpi,
-            title=title,
-            export_path=export_path,
-            export_formats=export_formats,
-            **kwargs
-        )
     """Pandas DataFrame accessor for MONET functionality.
 
     This accessor adds MONET-specific methods to pandas DataFrames.
@@ -266,6 +220,7 @@ class MONETAccessorPandas(BaseAccessor):
 
         df = self.rename_for_monet(self._obj)
         from ..util.interp_util import nearest_point_swathdefinition as npsd
+
         return npsd(latitude=df.latitude.values, longitude=df.longitude.values)
 
     def _df_to_da(self, d=None):  # TODO: should be `to_ds` or `to_xarray`
@@ -316,6 +271,8 @@ class MONETAccessorPandas(BaseAccessor):
         """
         if not has_pyresample:
             raise ImportError("pyresample is required for this functionality")
+        else:
+            import pyresample as pr
 
         source_data = self.rename_for_monet(df)
         target_data = self.rename_for_monet(self._obj)
@@ -325,9 +282,7 @@ class MONETAccessorPandas(BaseAccessor):
         target_data_da = self._df_to_da(target_data)
         source = source_data_da.monet._get_CoordinateDefinition(source_data_da)
         target = target_data_da.monet._get_CoordinateDefinition(target_data_da)
-        res = pr.kd_tree.XArrayResamplerNN(
-            source, target, radius_of_influence=radius_of_influence
-        )
+        res = pr.kd_tree.XArrayResamplerNN(source, target, radius_of_influence=radius_of_influence)
         res.get_neighbour_info()
         # interpolate just the make_fake_index variable
         r = res.get_sample_from_neighbour_info(source_data_da.monet_fake_index)
@@ -400,4 +355,88 @@ class MONETAccessorPandas(BaseAccessor):
         """
         Faceted map plotting is not supported for Pandas DataFrames.
         """
-        raise NotImplementedError("Faceted map plotting is only available for xarray DataArray and Dataset accessors.")
+        raise NotImplementedError(
+            "Faceted map plotting is only available for xarray DataArray and Dataset accessors."
+        )
+
+    def plot_points_map(
+        self,
+        lon_col="longitude",
+        lat_col="latitude",
+        projection=None,
+        color="C0",
+        marker="o",
+        size=40,
+        edgecolor="k",
+        alpha=0.8,
+        map_kws=None,
+        figsize=(8, 6),
+        dpi=150,
+        title=None,
+        export_path=None,
+        export_formats=None,
+        **kwargs,
+    ):
+        """
+        Plot points from this DataFrame on a Cartopy map.
+        """
+        from ..plots.cartopy_utils import plot_points_map
+
+        return plot_points_map(
+            self._obj,
+            lon_col=lon_col,
+            lat_col=lat_col,
+            projection=projection,
+            color=color,
+            marker=marker,
+            size=size,
+            edgecolor=edgecolor,
+            alpha=alpha,
+            map_kws=map_kws,
+            figsize=figsize,
+            dpi=dpi,
+            title=title,
+            export_path=export_path,
+            export_formats=export_formats,
+            **kwargs,
+        )
+
+    def plot_lines_map(
+        self,
+        lon_col="longitude",
+        lat_col="latitude",
+        group_col=None,
+        projection=None,
+        color="C0",
+        linewidth=2,
+        alpha=0.8,
+        map_kws=None,
+        figsize=(8, 6),
+        dpi=150,
+        title=None,
+        export_path=None,
+        export_formats=None,
+        **kwargs,
+    ):
+        """
+        Plot lines from this DataFrame on a Cartopy map. Optionally group by a column.
+        """
+        from ..plots.cartopy_utils import plot_lines_map
+
+        return plot_lines_map(
+            self._obj,
+            lon_col=lon_col,
+            lat_col=lat_col,
+            group_col=group_col,
+            projection=projection,
+            color=color,
+            linewidth=linewidth,
+            alpha=alpha,
+            map_kws=map_kws,
+            figsize=figsize,
+            dpi=dpi,
+            title=title,
+            export_path=export_path,
+            export_formats=export_formats,
+            **kwargs,
+        )

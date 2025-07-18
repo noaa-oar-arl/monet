@@ -1,8 +1,8 @@
-
 """Interpolation utility functions for MONET"""
 
-import xarray as xr
 import numpy as np
+import xarray as xr
+
 
 def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
     """Create pyresample SwathDefinition from xarray object.
@@ -23,6 +23,7 @@ def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
         A coordinate definition object that can be used with pyresample.
     """
     from pyresample import geometry
+
     if longitude is None or latitude is None:
         raise ValueError("Both longitude and latitude must be provided.")
     if not (isinstance(longitude, xr.DataArray) and isinstance(latitude, xr.DataArray)):
@@ -51,6 +52,7 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
         A dataset with lon/lat coordinates suitable for use with xesmf.
     """
     from numpy import asarray
+
     lat = asarray(latitude)
     lon = asarray(longitude)
     if lat.ndim == 0:
@@ -80,6 +82,7 @@ def lonlat_to_swathdefinition(longitude=None, latitude=None):
     """
     from numpy import meshgrid
     from pyresample.geometry import SwathDefinition
+
     if longitude is None or latitude is None:
         raise ValueError("Both longitude and latitude must be provided.")
     longitude = np.asarray(longitude)
@@ -111,6 +114,7 @@ def nearest_point_swathdefinition(longitude=None, latitude=None):
         A SwathDefinition representing a single point.
     """
     from pyresample.geometry import SwathDefinition
+
     if longitude is None or latitude is None:
         raise ValueError("Both longitude and latitude must be provided.")
     lons = np.atleast_1d(longitude)
@@ -135,6 +139,7 @@ def constant_1d_xesmf(longitude=None, latitude=None):
         but latitude is constant.
     """
     from numpy import asarray
+
     lat = asarray(latitude)
     lon = asarray(longitude)
     if lat.ndim == 0:
@@ -165,6 +170,7 @@ def constant_lat_swathdefition(longitude=None, latitude=None):
     """
     from numpy import meshgrid
     from pyresample import geometry
+
     longitude = np.asarray(longitude)
     if longitude.ndim == 1:
         lons, lats = meshgrid(longitude, np.array([latitude]))
@@ -191,6 +197,7 @@ def constant_lon_swathdefition(longitude=None, latitude=None):
     """
     from numpy import meshgrid
     from pyresample import geometry
+
     latitude = np.asarray(latitude)
     if latitude.ndim == 1:
         lats, lons = meshgrid(latitude, np.array([longitude]))
@@ -202,7 +209,7 @@ def constant_lon_swathdefition(longitude=None, latitude=None):
     return geometry.SwathDefinition(lons=lons, lats=lats)
 
 
-def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, area_id=None):
+def create_area_def_from_latlon(lat, lon, projection="platea", resolution=None, area_id=None):
     """Create a pyresample AreaDefinition from latitude and longitude arrays.
 
     Parameters
@@ -232,9 +239,9 @@ def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, 
     -----
     For non-regular grids, SwathDefinition might be more appropriate than AreaDefinition.
     """
-    from pyresample.geometry import AreaDefinition
-    import pyproj
     import numpy as np
+    import pyproj
+    from pyresample.geometry import AreaDefinition
 
     # Convert 1D coordinates to 2D if needed
     if lat.ndim == 1 and lon.ndim == 1:
@@ -247,7 +254,7 @@ def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, 
 
     # Set the area_id
     if area_id is None:
-        area_id = 'generated_area'
+        area_id = "generated_area"
 
     # Determine data boundaries
     lat_min = lat_2d.min()
@@ -256,9 +263,17 @@ def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, 
     lon_max = lon_2d.max()
 
     # Setup projection based on the input data
-    if projection == 'platea':
+    if projection == "platea":
         # Plate Carrée projection (equidistant cylindrical)
-        proj_dict = {'proj': 'eqc', 'lat_ts': 0, 'lat_0': 0, 'lon_0': 0, 'x_0': 0, 'y_0': 0, 'ellps': 'WGS84'}
+        proj_dict = {
+            "proj": "eqc",
+            "lat_ts": 0,
+            "lat_0": 0,
+            "lon_0": 0,
+            "x_0": 0,
+            "y_0": 0,
+            "ellps": "WGS84",
+        }
 
         # Convert lat/lon to projection coordinates
         p = pyproj.Proj(proj_dict)
@@ -266,7 +281,7 @@ def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, 
         x_ur, y_ur = p(lon_max, lat_max)
         area_extent = (x_ll, y_ll, x_ur, y_ur)
 
-    elif projection == 'lcc':
+    elif projection == "lcc":
         # Lambert Conformal Conic projection
         center_lat = (lat_min + lat_max) / 2
         center_lon = (lon_min + lon_max) / 2
@@ -274,12 +289,12 @@ def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, 
         lat_2 = center_lat + (lat_max - center_lat) * 0.33
 
         proj_dict = {
-            'proj': 'lcc',
-            'lat_0': center_lat,
-            'lon_0': center_lon,
-            'lat_1': lat_1,
-            'lat_2': lat_2,
-            'ellps': 'WGS84'
+            "proj": "lcc",
+            "lat_0": center_lat,
+            "lon_0": center_lon,
+            "lat_1": lat_1,
+            "lat_2": lat_2,
+            "ellps": "WGS84",
         }
 
         # Convert lat/lon to projection coordinates
@@ -288,9 +303,9 @@ def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, 
         x_ur, y_ur = p(lon_max, lat_max)
         area_extent = (x_ll, y_ll, x_ur, y_ur)
 
-    elif projection == 'merc':
+    elif projection == "merc":
         # Mercator projection
-        proj_dict = {'proj': 'merc', 'lat_ts': 0, 'ellps': 'WGS84'}
+        proj_dict = {"proj": "merc", "lat_ts": 0, "ellps": "WGS84"}
 
         # Convert lat/lon to projection coordinates
         p = pyproj.Proj(proj_dict)
@@ -298,17 +313,17 @@ def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, 
         x_ur, y_ur = p(lon_max, lat_max)
         area_extent = (x_ll, y_ll, x_ur, y_ur)
 
-    elif projection == 'stere':
+    elif projection == "stere":
         # Stereographic projection
         center_lat = (lat_min + lat_max) / 2
         center_lon = (lon_min + lon_max) / 2
 
         proj_dict = {
-            'proj': 'stere',
-            'lat_0': center_lat,
-            'lon_0': center_lon,
-            'lat_ts': center_lat,
-            'ellps': 'WGS84'
+            "proj": "stere",
+            "lat_0": center_lat,
+            "lon_0": center_lon,
+            "lat_ts": center_lat,
+            "ellps": "WGS84",
         }
 
         # Convert lat/lon to projection coordinates
@@ -317,17 +332,12 @@ def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, 
         x_ur, y_ur = p(lon_max, lat_max)
         area_extent = (x_ll, y_ll, x_ur, y_ur)
 
-    elif projection == 'gnom' or projection == 'gnomonic':
+    elif projection == "gnom" or projection == "gnomonic":
         # Gnomonic projection (used by UFS SRW)
         center_lat = (lat_min + lat_max) / 2
         center_lon = (lon_min + lon_max) / 2
 
-        proj_dict = {
-            'proj': 'gnom',
-            'lat_0': center_lat,
-            'lon_0': center_lon,
-            'ellps': 'WGS84'
-        }
+        proj_dict = {"proj": "gnom", "lat_0": center_lat, "lon_0": center_lon, "ellps": "WGS84"}
 
         # Convert lat/lon to projection coordinates
         p = pyproj.Proj(proj_dict)
@@ -342,11 +352,10 @@ def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, 
     description = f"Generated area definition ({projection})"
     proj_id = projection
 
-    return AreaDefinition(area_id, description, proj_id, proj_dict,
-                         width, height, area_extent)
+    return AreaDefinition(area_id, description, proj_id, proj_dict, width, height, area_extent)
 
 
-def create_area_def_from_dataset(dataset, projection='platea', resolution=None, area_id=None):
+def create_area_def_from_dataset(dataset, projection="platea", resolution=None, area_id=None):
     """Create an AreaDefinition from an xarray Dataset or DataArray.
 
     Parameters
@@ -380,12 +389,13 @@ def create_area_def_from_dataset(dataset, projection='platea', resolution=None, 
         dataset.longitude.values,
         projection=projection,
         resolution=resolution,
-        area_id=area_id
+        area_id=area_id,
     )
 
 
-def get_grid_area_def(lat_min, lat_max, lon_min, lon_max, resolution=0.1,
-                      projection='platea', area_id=None):
+def get_grid_area_def(
+    lat_min, lat_max, lon_min, lon_max, resolution=0.1, projection="platea", area_id=None
+):
     """Create an AreaDefinition for a regular grid based on bounds and resolution.
 
     Parameters
@@ -426,7 +436,7 @@ def get_grid_area_def(lat_min, lat_max, lon_min, lon_max, resolution=0.1,
     return create_area_def_from_latlon(lat_2d, lon_2d, projection=projection, area_id=area_id)
 
 
-def create_area_def_from_esmf_mesh(mesh, projection='platea', resolution=None, area_id=None):
+def create_area_def_from_esmf_mesh(mesh, projection="platea", resolution=None, area_id=None):
     """Create a pyresample AreaDefinition from an ESMF Mesh.
 
     Parameters
@@ -474,12 +484,12 @@ def create_area_def_from_esmf_mesh(mesh, projection='platea', resolution=None, a
 
     # Create AreaDefinition from extracted coordinates
     if area_id is None:
-        area_id = 'esmf_mesh_area'
+        area_id = "esmf_mesh_area"
 
     return create_area_def_from_latlon(lats, lons, projection, resolution, area_id)
 
 
-def create_area_def_from_ugrid(ugrid_dataset, projection='platea', resolution=None, area_id=None):
+def create_area_def_from_ugrid(ugrid_dataset, projection="platea", resolution=None, area_id=None):
     """Create a pyresample AreaDefinition from a UGRID-compliant dataset.
 
     Parameters
@@ -509,13 +519,11 @@ def create_area_def_from_ugrid(ugrid_dataset, projection='platea', resolution=No
     For accurate operations on unstructured grids, consider using
     pyresample's SwathDefinition or xESMF's ESMF-based regridding.
     """
-    import xarray as xr
-    import numpy as np
 
     # First, identify the mesh topology variable
     mesh_topology_var = None
     for var in ugrid_dataset.variables:
-        if hasattr(ugrid_dataset[var], 'cf_role') and ugrid_dataset[var].cf_role == 'mesh_topology':
+        if hasattr(ugrid_dataset[var], "cf_role") and ugrid_dataset[var].cf_role == "mesh_topology":
             mesh_topology_var = var
             break
 
@@ -524,7 +532,7 @@ def create_area_def_from_ugrid(ugrid_dataset, projection='platea', resolution=No
 
     # Find node coordinates
     topology = ugrid_dataset[mesh_topology_var]
-    if hasattr(topology, 'node_coordinates'):
+    if hasattr(topology, "node_coordinates"):
         node_coords = topology.node_coordinates.split()
         if len(node_coords) >= 2:
             lon_var, lat_var = node_coords[0], node_coords[1]
@@ -537,10 +545,10 @@ def create_area_def_from_ugrid(ugrid_dataset, projection='platea', resolution=No
         lon_var = None
         lat_var = None
         for var in ugrid_dataset.variables:
-            if hasattr(ugrid_dataset[var], 'standard_name'):
-                if ugrid_dataset[var].standard_name == 'longitude':
+            if hasattr(ugrid_dataset[var], "standard_name"):
+                if ugrid_dataset[var].standard_name == "longitude":
                     lon_var = var
-                elif ugrid_dataset[var].standard_name == 'latitude':
+                elif ugrid_dataset[var].standard_name == "latitude":
                     lat_var = var
 
         if lon_var is None or lat_var is None:
@@ -551,7 +559,7 @@ def create_area_def_from_ugrid(ugrid_dataset, projection='platea', resolution=No
 
     # Create AreaDefinition from extracted coordinates
     if area_id is None:
-        area_id = 'ugrid_area'
+        area_id = "ugrid_area"
 
     return create_area_def_from_latlon(lats, lons, projection, resolution, area_id)
 
@@ -575,8 +583,9 @@ def mesh_to_swath_definition(mesh):
     """
     try:
         import ESMF
+
+        # import numpy as np  # unused
         from pyresample.geometry import SwathDefinition
-        import numpy as np
     except ImportError:
         raise ImportError("ESMF and pyresample are required for this functionality")
 
@@ -612,14 +621,14 @@ def ugrid_to_swath_definition(ugrid_dataset):
     -----
     This is more appropriate than AreaDefinition for unstructured grids.
     """
+    # import numpy as np  # unused
+    # import xarray as xr  # unused
     from pyresample.geometry import SwathDefinition
-    import xarray as xr
-    import numpy as np
 
     # First, identify the mesh topology variable
     mesh_topology_var = None
     for var in ugrid_dataset.variables:
-        if hasattr(ugrid_dataset[var], 'cf_role') and ugrid_dataset[var].cf_role == 'mesh_topology':
+        if hasattr(ugrid_dataset[var], "cf_role") and ugrid_dataset[var].cf_role == "mesh_topology":
             mesh_topology_var = var
             break
 
@@ -628,7 +637,7 @@ def ugrid_to_swath_definition(ugrid_dataset):
 
     # Find node coordinates
     topology = ugrid_dataset[mesh_topology_var]
-    if hasattr(topology, 'node_coordinates'):
+    if hasattr(topology, "node_coordinates"):
         node_coords = topology.node_coordinates.split()
         if len(node_coords) >= 2:
             lon_var, lat_var = node_coords[0], node_coords[1]
@@ -641,10 +650,10 @@ def ugrid_to_swath_definition(ugrid_dataset):
         lon_var = None
         lat_var = None
         for var in ugrid_dataset.variables:
-            if hasattr(ugrid_dataset[var], 'standard_name'):
-                if ugrid_dataset[var].standard_name == 'longitude':
+            if hasattr(ugrid_dataset[var], "standard_name"):
+                if ugrid_dataset[var].standard_name == "longitude":
                     lon_var = var
-                elif ugrid_dataset[var].standard_name == 'latitude':
+                elif ugrid_dataset[var].standard_name == "latitude":
                     lat_var = var
 
         if lon_var is None or lat_var is None:
@@ -657,7 +666,9 @@ def ugrid_to_swath_definition(ugrid_dataset):
     return SwathDefinition(lons=lons, lats=lats)
 
 
-def guess_area_def_from_dataset(dataset, resolution=None, max_grid_points=1000000, projection='auto', area_id=None):
+def guess_area_def_from_dataset(
+    dataset, resolution=None, max_grid_points=1000000, projection="auto", area_id=None
+):
     """Create an AreaDefinition from any dataset by inferring grid characteristics.
 
     Parameters
@@ -685,56 +696,57 @@ def guess_area_def_from_dataset(dataset, resolution=None, max_grid_points=100000
     - For unstructured grids, this creates a regular-grid approximation
     - If the dataset contains projection information, it will be used
     """
-    import xarray as xr
-    import numpy as np
+    # import numpy as np  # unused
+    # import xarray as xr  # unused
 
     # Set default area_id if not provided
     if area_id is None:
-        area_id = 'inferred_grid'
+        area_id = "inferred_grid"
 
     # First, check if dataset has UGRID attributes
     is_ugrid = False
     for var in dataset.variables:
-        if hasattr(dataset[var], 'cf_role') and dataset[var].cf_role == 'mesh_topology':
+        if hasattr(dataset[var], "cf_role") and dataset[var].cf_role == "mesh_topology":
             is_ugrid = True
             break
 
     if is_ugrid:
         # For UGRID datasets, use the UGRID converter
-        return create_area_def_from_ugrid(dataset,
-                                         projection='platea' if projection == 'auto' else projection,
-                                         area_id=area_id)
+        return create_area_def_from_ugrid(
+            dataset, projection="platea" if projection == "auto" else projection, area_id=area_id
+        )
 
     # Determine if we're dealing with a regular, rectilinear, or curvilinear grid
     # Check attributes for projection information
-    if projection == 'auto':
+    if projection == "auto":
         # Try to find projection information in global attributes
-        if hasattr(dataset, 'grid_mapping'):
+        if hasattr(dataset, "grid_mapping"):
             grid_mapping = dataset.grid_mapping
             if hasattr(dataset, grid_mapping):
                 grid_map_var = dataset[grid_mapping]
-                if hasattr(grid_map_var, 'grid_mapping_name'):
+                if hasattr(grid_map_var, "grid_mapping_name"):
                     mapping_name = grid_map_var.grid_mapping_name
-                    if mapping_name == 'lambert_conformal_conic':
-                        projection = 'lcc'
-                    elif mapping_name == 'mercator':
-                        projection = 'merc'
-                    elif mapping_name == 'polar_stereographic':
-                        projection = 'stere'
-                    elif mapping_name == 'gnomonic':
-                        projection = 'gnom'
+                    if mapping_name == "lambert_conformal_conic":
+                        projection = "lcc"
+                    elif mapping_name == "mercator":
+                        projection = "merc"
+                    elif mapping_name == "polar_stereographic":
+                        projection = "stere"
+                    elif mapping_name == "gnomonic":
+                        projection = "gnom"
                     else:
                         # Default to platea
-                        projection = 'platea'
+                        projection = "platea"
                 else:
-                    projection = 'platea'
+                    projection = "platea"
             else:
-                projection = 'platea'
+                projection = "platea"
         else:
-            projection = 'platea'
+            projection = "platea"
 
     # Try to get coordinate information
     from ..accessors.base import BaseAccessor
+
     lat_name, lon_name = BaseAccessor._detect_latlon_names(dataset)
 
     if lat_name is None or lon_name is None:
@@ -768,13 +780,21 @@ def guess_area_def_from_dataset(dataset, resolution=None, max_grid_points=100000
         if resolution is None:
             # Target resolution based on point density
             point_count = len(lats)
-            area = (lat_max - lat_min) * (lon_max - lon_min)
-            density = np.sqrt(point_count / area)
+            # area = (lat_max - lat_min) * (lon_max - lon_min)  # unused
+            # density = np.sqrt(point_count / area)  # unused
 
             # Limit resolution to prevent excessively large grids
             target_points = min(point_count * 1.5, max_grid_points)
-            x_res = max((lon_max - lon_min) / np.sqrt(target_points / ((lat_max - lat_min)/(lon_max - lon_min))), 0.01)
-            y_res = max((lat_max - lat_min) / np.sqrt(target_points / ((lon_max - lon_min)/(lat_max - lat_min))), 0.01)
+            x_res = max(
+                (lon_max - lon_min)
+                / np.sqrt(target_points / ((lat_max - lat_min) / (lon_max - lon_min))),
+                0.01,
+            )
+            y_res = max(
+                (lat_max - lat_min)
+                / np.sqrt(target_points / ((lon_max - lon_min) / (lat_max - lat_min))),
+                0.01,
+            )
             resolution = (x_res, y_res)
 
         # If resolution is a single value, make it a tuple

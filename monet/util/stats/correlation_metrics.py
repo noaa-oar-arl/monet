@@ -1,8 +1,11 @@
 """
 Correlation and Agreement Metrics for Model Evaluation
 """
+
 import numpy as np
-from .utils_stats import matchedcompressed, circlebias, circlebias_m
+
+from .utils_stats import circlebias, circlebias_m, matchedcompressed
+
 
 def R2(obs, mod, axis=None):
     """
@@ -41,6 +44,7 @@ def R2(obs, mod, axis=None):
     except ImportError:
         xr = None
     from scipy.stats import pearsonr
+
     if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         if axis is None:
@@ -49,6 +53,7 @@ def R2(obs, mod, axis=None):
             dim = obs.dims[axis]
         else:
             dim = axis
+
         def _pearsonr2(a, b):
             r_val = pearsonr(a, b)
             # Always extract first element if tuple
@@ -60,11 +65,13 @@ def R2(obs, mod, axis=None):
                 raise TypeError(f"pearsonr returned a tuple unexpectedly: {r}")
             # If r is a numpy scalar, convert to float
             import numpy as np
+
             if isinstance(r, np.generic):
                 r = r.item()
             if not isinstance(r, (float, int)):
                 raise TypeError(f"pearsonr returned non-numeric type: {type(r)}")
             return float(r) ** 2
+
         r2 = xr.apply_ufunc(
             _pearsonr2,
             obs,
@@ -72,7 +79,7 @@ def R2(obs, mod, axis=None):
             input_core_dims=[[dim], [dim]],
             output_core_dims=[[]],
             vectorize=True,
-            dask='parallelized',
+            dask="parallelized",
             output_dtypes=[float],
         )
         return r2
@@ -86,6 +93,7 @@ def R2(obs, mod, axis=None):
         if isinstance(r, tuple):
             raise TypeError(f"pearsonr returned a tuple unexpectedly: {r}")
         import numpy as np
+
         if isinstance(r, np.generic):
             r = r.item()
         if not isinstance(r, (float, int)):
@@ -256,8 +264,13 @@ def WDRMSE(obs, mod, axis=None):
                     raise TypeError("All elements of dim must be str for xarray.DataArray.mean")
             else:
                 raise TypeError("dim must be a string or list of strings for xarray.DataArray.mean")
-            if not (isinstance(dim, str) or (isinstance(dim, list) and all(isinstance(d, str) for d in dim))):
-                raise TypeError("dim must be a string or list of strings for xarray.DataArray.mean (final check)")
+            if not (
+                isinstance(dim, str)
+                or (isinstance(dim, list) and all(isinstance(d, str) for d in dim))
+            ):
+                raise TypeError(
+                    "dim must be a string or list of strings for xarray.DataArray.mean (final check)"
+                )
             return arr.mean(dim=dim) ** 0.5  # type: ignore
         else:
             return arr.mean(axis=axis) ** 0.5
@@ -341,10 +354,12 @@ def matchmasks(a1, a2):
     >>> a1 = np.ma.array([1, 2, 3], mask=[0, 1, 0])
     >>> a2 = np.ma.array([4, 5, 6], mask=[0, 0, 1])
     >>> stats.matchmasks(a1, a2)
-    (masked_array(data=[1, --, 3], mask=[False,  True, False]), masked_array(data=[4, --, --], mask=[False, False,  True]))
+    (masked_array(data=[1, --, 3], mask=[False,  True, False]),
+     masked_array(data=[4, --, --], mask=[False, False,  True]))
     """
     mask = np.ma.getmaskarray(a1) | np.ma.getmaskarray(a2)
     return np.ma.masked_where(mask, a1), np.ma.masked_where(mask, a2)
+
 
 def RMSEu(obs, mod, axis=None):
     """
@@ -629,10 +644,11 @@ def WDIOA_m(obs, mod, axis=None):
     float or None
         WDIOA_m value or None if computation fails.
     """
-    obsmean = obs.mean(axis=axis)
+    # obsmean = obs.mean(axis=axis)  # unused
     if axis is None:
         try:
             from scipy.stats import linregress
+
             obsc, modc = matchedcompressed(obs, mod)
             m, b, rval, pval, stderr = linregress(modc, obsc)
             mod_hat = b + m * mod
@@ -641,6 +657,7 @@ def WDIOA_m(obs, mod, axis=None):
             return None
     else:
         raise ValueError("RMSEu only supports axis=None (scalar output)")
+
 
 def WDIOA(obs, mod, axis=None):
     """
@@ -661,6 +678,7 @@ def WDIOA(obs, mod, axis=None):
         WDIOA value(s)
     """
     import numpy as np
+
     try:
         import xarray as xr
     except ImportError:
@@ -776,7 +794,10 @@ def WDAC(obs, mod, axis=None):
         obs_anom = obs_rad - obs_rad.mean(dim=obs.dims[axis])
         mod_anom = mod_rad - mod_rad.mean(dim=mod.dims[axis])
         numerator = (np.sin(obs_anom) * np.sin(mod_anom)).mean(dim=obs.dims[axis])
-        denominator = np.sqrt((np.sin(obs_anom)**2).mean(dim=obs.dims[axis]) * (np.sin(mod_anom)**2).mean(dim=mod.dims[axis]))
+        denominator = np.sqrt(
+            (np.sin(obs_anom) ** 2).mean(dim=obs.dims[axis])
+            * (np.sin(mod_anom) ** 2).mean(dim=mod.dims[axis])
+        )
         return numerator / denominator
     else:
         obs = np.asarray(obs)
@@ -786,8 +807,11 @@ def WDAC(obs, mod, axis=None):
         obs_anom = obs_rad - np.mean(obs_rad, axis=axis)
         mod_anom = mod_rad - np.mean(mod_rad, axis=axis)
         numerator = np.mean(np.sin(obs_anom) * np.sin(mod_anom), axis=axis)
-        denominator = np.sqrt(np.mean(np.sin(obs_anom)**2, axis=axis) * np.mean(np.sin(mod_anom)**2, axis=axis))
+        denominator = np.sqrt(
+            np.mean(np.sin(obs_anom) ** 2, axis=axis) * np.mean(np.sin(mod_anom) ** 2, axis=axis)
+        )
         return numerator / denominator
+
 
 def taylor_skill(obs, mod, axis=None):
     """
@@ -837,17 +861,19 @@ def taylor_skill(obs, mod, axis=None):
         std_mod = float(mod.std(dim=axis))
         corr = float(xr.corr(obs, mod, dim=axis))
         num = 4.0 * corr * std_mod * std_obs
-        denom = ((std_mod ** 2 + std_obs ** 2) * (1.0 + corr) ** 2)
+        denom = (std_mod**2 + std_obs**2) * (1.0 + corr) ** 2
         return num / denom
     else:
         std_obs = float(np.ma.std(obs, axis=axis))
         std_mod = float(np.ma.std(mod, axis=axis))
         from scipy.stats import pearsonr
+
         if np.ma.is_masked(obs):
             corr = float(pearsonr(obs.compressed(), mod.compressed())[0])  # type: ignore
         else:
             corr = float(pearsonr(obs, mod)[0])  # type: ignore
-        return (4.0 * corr * std_mod * std_obs) / ((std_mod ** 2 + std_obs ** 2) * (1.0 + corr) ** 2)
+        return (4.0 * corr * std_mod * std_obs) / ((std_mod**2 + std_obs**2) * (1.0 + corr) ** 2)
+
 
 def KGE(obs, mod, axis=None):
     """
@@ -900,6 +926,7 @@ def KGE(obs, mod, axis=None):
         return 1.0 - ((r - 1.0) ** 2 + (alpha - 1.0) ** 2 + (beta - 1.0) ** 2) ** 0.5
     else:
         from scipy.stats import pearsonr
+
         if np.ma.is_masked(obs):
             r = float(pearsonr(obs.compressed(), mod.compressed())[0])  # type: ignore
         else:
@@ -907,6 +934,7 @@ def KGE(obs, mod, axis=None):
         alpha = float(np.ma.std(mod, axis=axis) / np.ma.std(obs, axis=axis))
         beta = float(np.ma.mean(mod, axis=axis) / np.ma.mean(obs, axis=axis))
         return 1.0 - ((r - 1.0) ** 2 + (alpha - 1.0) ** 2 + (beta - 1.0) ** 2) ** 0.5
+
 
 def spearmanr(obs, mod, axis=None):
     """
@@ -939,6 +967,7 @@ def spearmanr(obs, mod, axis=None):
     except ImportError:
         xr = None
     from scipy.stats import spearmanr as _spearmanr
+
     if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         if axis is None:
@@ -947,8 +976,10 @@ def spearmanr(obs, mod, axis=None):
             dim = obs.dims[axis]
         else:
             dim = axis
+
         def _spearmanr_onlyrho(a, b):
             return _spearmanr(a, b)[0]
+
         rho = xr.apply_ufunc(
             _spearmanr_onlyrho,
             obs,
@@ -956,7 +987,7 @@ def spearmanr(obs, mod, axis=None):
             input_core_dims=[[dim], [dim]],
             output_core_dims=[[]],
             vectorize=True,
-            dask='parallelized',
+            dask="parallelized",
             output_dtypes=[float],
         )
         return rho
@@ -965,6 +996,7 @@ def spearmanr(obs, mod, axis=None):
     else:
         # Not implemented for axis, fallback to nan
         return np.nan
+
 
 def kendalltau(obs, mod, axis=None):
     """
@@ -1006,6 +1038,7 @@ def kendalltau(obs, mod, axis=None):
     except ImportError:
         xr = None
     from scipy.stats import kendalltau as _kendalltau
+
     if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         # Default to last dimension if axis is None
@@ -1016,8 +1049,10 @@ def kendalltau(obs, mod, axis=None):
             dim = obs.dims[axis]
         else:
             dim = axis
+
         def _kendalltau_onlytau(a, b):
             return _kendalltau(a, b)[0]
+
         tau = xr.apply_ufunc(
             _kendalltau_onlytau,
             obs,
@@ -1025,7 +1060,7 @@ def kendalltau(obs, mod, axis=None):
             input_core_dims=[[dim], [dim]],
             output_core_dims=[[]],
             vectorize=True,
-            dask='parallelized',
+            dask="parallelized",
             output_dtypes=[float],
         )
         return tau

@@ -1,17 +1,19 @@
+import gc
 
-import numpy as np
-import pytest
-from monet.util import stats
 import dask.array as da
 import dask.config
-import gc
+import numpy as np
+
+from monet.util import stats
 
 # Set Dask scheduler to single-threaded for all tests
 dask.config.set(scheduler="single-threaded")
 
+
 # Helper to convert numpy arrays to dask arrays
 def to_dask(arr):
     return da.from_array(arr, chunks=arr.shape)
+
 
 def test_MB():
     obs = np.array([1, 2, 3, 4, 5])
@@ -28,6 +30,7 @@ def test_MB():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_NMB():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -41,6 +44,7 @@ def test_NMB():
     assert np.isclose(result_d, 13.333333333333334)
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_RMSE():
     obs = np.array([1, 2, 3, 4, 5])
@@ -56,6 +60,7 @@ def test_RMSE():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_IOA():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -69,6 +74,7 @@ def test_IOA():
     assert 0 <= result_d <= 1
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_FE():
     obs = np.array([1, 2, 3, 4, 5])
@@ -84,6 +90,7 @@ def test_FE():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_NME():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -97,6 +104,7 @@ def test_NME():
     assert result_d >= 0
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_R2():
     obs = np.array([1, 2, 3, 4, 5])
@@ -112,6 +120,7 @@ def test_R2():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_STDO():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -126,6 +135,7 @@ def test_STDO():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_STDP():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -139,6 +149,7 @@ def test_STDP():
     assert np.isclose(result_d, np.std(mod))
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_MNB():
     obs = np.array([1, 2, 3, 4, 5])
@@ -155,6 +166,7 @@ def test_MNB():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_MNE():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -169,6 +181,7 @@ def test_MNE():
     assert np.isclose(result_d, expected)
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_MdnNB():
     obs = np.array([1, 2, 3, 4, 5])
@@ -185,6 +198,7 @@ def test_MdnNB():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_MdnNE():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -200,6 +214,7 @@ def test_MdnNE():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_NO():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -213,6 +228,7 @@ def test_NO():
     assert result_d == 5
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_NP():
     obs = np.array([1, 2, 3, 4, 5])
@@ -228,6 +244,7 @@ def test_NP():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_MO():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -241,6 +258,7 @@ def test_MO():
     assert np.isclose(result_d, np.mean(obs))
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_MP():
     obs = np.array([1, 2, 3, 4, 5])
@@ -256,6 +274,7 @@ def test_MP():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_MdnO():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -270,6 +289,7 @@ def test_MdnO():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_MdnP():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -283,6 +303,7 @@ def test_MdnP():
     assert np.isclose(result_d, np.median(mod))
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_RM():
     obs = np.array([1, 2, 3, 4, 5])
@@ -299,6 +320,7 @@ def test_RM():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_RMdn():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -313,6 +335,7 @@ def test_RMdn():
     assert np.isclose(result_d, expected)
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 # Additional tests for uncovered stats functions
 def test_NMdnGE():
@@ -329,6 +352,7 @@ def test_NMdnGE():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_NOP():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -342,6 +366,7 @@ def test_NOP():
     assert result_d == 5
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_MdnB():
     obs = np.array([1, 2, 3, 4, 5])
@@ -357,6 +382,7 @@ def test_MdnB():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_FB():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -370,6 +396,7 @@ def test_FB():
     assert np.isfinite(result_d)
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_ME():
     obs = np.array([1, 2, 3, 4, 5])
@@ -385,6 +412,7 @@ def test_ME():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_MdnE():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -398,6 +426,7 @@ def test_MdnE():
     assert np.isclose(result_d, np.median(np.abs(mod - obs)))
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_NME_m():
     obs = np.array([1, 2, 3, 4, 5])
@@ -413,6 +442,7 @@ def test_NME_m():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_NME_m_ABS():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -426,6 +456,7 @@ def test_NME_m_ABS():
     assert np.isfinite(result_d)
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_NMdnE():
     obs = np.array([1, 2, 3, 4, 5])
@@ -441,6 +472,7 @@ def test_NMdnE():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_USUTPB():
     obs = np.array([1, 2, 3, 4, 5])
     mod = np.array([2, 2, 3, 4, 6])
@@ -454,6 +486,7 @@ def test_USUTPB():
     assert np.isfinite(result_d)
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_USUTPE():
     obs = np.array([1, 2, 3, 4, 5])
@@ -469,6 +502,7 @@ def test_USUTPE():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_MNPB():
     obs = np.array([[1, 2], [3, 4]])
     mod = np.array([[2, 2], [3, 5]])
@@ -482,6 +516,7 @@ def test_MNPB():
     assert np.isfinite(result_d)
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_MdnNPB():
     obs = np.array([[1, 2], [3, 4]])
@@ -497,6 +532,7 @@ def test_MdnNPB():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_MNPE():
     obs = np.array([[1, 2], [3, 4]])
     mod = np.array([[2, 2], [3, 5]])
@@ -511,6 +547,7 @@ def test_MNPE():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_MdnNPE():
     obs = np.array([[1, 2], [3, 4]])
     mod = np.array([[2, 2], [3, 5]])
@@ -524,6 +561,7 @@ def test_MdnNPE():
     assert np.isfinite(result_d)
     del obs_d, mod_d, result_d
     gc.collect()
+
 
 def test_scores():
     obs = np.array([0, 1, 1, 0, 1])
@@ -541,6 +579,7 @@ def test_scores():
     del obs_d, mod_d, a_d, b_d, c_d, d_d
     gc.collect()
 
+
 def test_CSI():
     obs = np.array([0, 1, 1, 0, 1])
     mod = np.array([0, 1, 0, 0, 1])
@@ -557,6 +596,7 @@ def test_CSI():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_HSS():
     obs = np.array([0, 1, 1, 0, 1])
     mod = np.array([0, 1, 0, 0, 1])
@@ -572,17 +612,18 @@ def test_HSS():
     del obs_d, mod_d, result_d
     gc.collect()
 
+
 def test_ETS():
     obs = np.array([0, 1, 1, 0, 1])
     mod = np.array([0, 1, 0, 0, 1])
     result = stats.ETS(obs, mod, minval=0.5, maxval=1.5)
     # ETS should be between -1/3 and 1
-    assert -1/3 <= result <= 1
+    assert -1 / 3 <= result <= 1
 
     obs_d = to_dask(obs)
     mod_d = to_dask(mod)
     result_d = stats.ETS(obs_d, mod_d, minval=0.5, maxval=1.5)
     result_d = da.compute(result_d)[0]
-    assert -1/3 <= result_d <= 1
+    assert -1 / 3 <= result_d <= 1
     del obs_d, mod_d, result_d
     gc.collect()

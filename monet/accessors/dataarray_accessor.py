@@ -1,10 +1,10 @@
 """DataArray accessor for MONET functionality."""
 
-import numpy as np
 import pandas as pd
 import xarray as xr
 
 from .base import BaseAccessor, has_pyresample, has_xesmf
+
 
 @xr.register_dataarray_accessor("monet")
 class MONETAccessor(BaseAccessor):
@@ -217,7 +217,7 @@ class MONETAccessor(BaseAccessor):
             )
             d2 = self._dataset_to_monet(d2)
             result = d2.monet.remap_nearest(d1)
-            return result.isel(y=0)
+            return result
         elif has_xesmf:
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
@@ -288,6 +288,7 @@ class MONETAccessor(BaseAccessor):
 
         try:
             from pyresample import utils
+
             from ..util.interp_util import lonlat_to_swathdefinition as llsd
             from ..util.interp_util import nearest_point_swathdefinition as npsd
         except ImportError:
@@ -302,7 +303,10 @@ class MONETAccessor(BaseAccessor):
         dset = self._dataset_to_monet(self._obj)
         lons, lats = utils.check_and_wrap(dset.longitude.values, dset.latitude.values)
         swath = llsd(longitude=lons, latitude=lats)
-        pswath = npsd(longitude=float(lon), latitude=float(lat))
+        if lon is not None and lat is not None:
+            pswath = npsd(longitude=float(lon), latitude=float(lat))
+        else:
+            raise ValueError("Longitude and latitude must not be None.")
         row, col = utils.generate_nearest_neighbour_linesample_arrays(swath, pswath, float(1e6))
         y, x = row[0][0], col[0][0]
         return x, y
@@ -338,7 +342,7 @@ class MONETAccessor(BaseAccessor):
         if has_pyresample:
             try:
                 from pyresample import utils
-                from ..util.interp_util import lonlat_to_swathdefinition as llsd
+
                 from ..util.interp_util import nearest_point_swathdefinition as npsd
             except ImportError:
                 raise ImportError("requires pyresample to be installed")
@@ -354,29 +358,63 @@ class MONETAccessor(BaseAccessor):
             self._obj = self._rename_latlon(self._obj)
             from ..util.interp_util import lonlat_to_xesmf
             from ..util.resample import resample_xesmf
+
             target = lonlat_to_xesmf(longitude=lon, latitude=lat)
             output = resample_xesmf(self._obj, target, **kwargs)
             if cleanup:
                 output = resample_xesmf(self._obj, target, cleanup=True, **kwargs)
             return self._rename_latlon(output.squeeze())
 
-    def quick_imshow(self, map_kws=None, roll_dateline=False, projection=None, colorbar=True, figsize=None, **kwargs):
+    def quick_imshow(
+        self,
+        map_kws=None,
+        roll_dateline=False,
+        projection=None,
+        colorbar=True,
+        figsize=None,
+        **kwargs,
+    ):
         """Create a quick imshow plot of the data with flexible options."""
         from ..plots.cartopy_utils import plot_quick_imshow
-        da = self._dataset_to_monet(self._obj)
-        return plot_quick_imshow(da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs)
 
-    def quick_map(self, map_kws=None, roll_dateline=False, projection=None, colorbar=True, figsize=None, **kwargs):
+        da = self._dataset_to_monet(self._obj)
+        return plot_quick_imshow(
+            da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs
+        )
+
+    def quick_map(
+        self,
+        map_kws=None,
+        roll_dateline=False,
+        projection=None,
+        colorbar=True,
+        figsize=None,
+        **kwargs,
+    ):
         """Create a quick map plot of the data with flexible options."""
         from ..plots.cartopy_utils import plot_quick_map
-        da = self._dataset_to_monet(self._obj)
-        return plot_quick_map(da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs)
 
-    def quick_contourf(self, map_kws=None, roll_dateline=False, projection=None, colorbar=True, figsize=None, **kwargs):
+        da = self._dataset_to_monet(self._obj)
+        return plot_quick_map(
+            da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs
+        )
+
+    def quick_contourf(
+        self,
+        map_kws=None,
+        roll_dateline=False,
+        projection=None,
+        colorbar=True,
+        figsize=None,
+        **kwargs,
+    ):
         """Create a quick filled contour plot of the data with flexible options."""
         from ..plots.cartopy_utils import plot_quick_contourf
+
         da = self._dataset_to_monet(self._obj)
-        return plot_quick_contourf(da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs)
+        return plot_quick_contourf(
+            da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs
+        )
 
     def _tight_layout(self):
         """Apply tight layout to the current figure.
@@ -406,6 +444,7 @@ class MONETAccessor(BaseAccessor):
             return False
 
         from pyresample.geometry import SwathDefinition
+
         return isinstance(defn, SwathDefinition)
 
     def remap(self, data, method="nearest", radius_of_influence=1e6, **kwargs):
@@ -430,15 +469,12 @@ class MONETAccessor(BaseAccessor):
         if not has_pyresample:
             raise ImportError("pyresample is required for this functionality")
         from ..util import resample
+
         source_data = self._dataset_to_monet(data)
         target_data = self._dataset_to_monet(self._obj)
-        source = self._get_CoordinateDefinition(source_data)
         target = self._get_CoordinateDefinition(target_data)
         result = resample.resample(
-            source_data, target,
-            method=method,
-            radius_of_influence=radius_of_influence,
-            **kwargs
+            source_data, target, method=method, radius_of_influence=radius_of_influence, **kwargs
         )
         # Ensure coordinates are properly set
         if isinstance(result, xr.DataArray):
@@ -516,43 +552,6 @@ class MONETAccessor(BaseAccessor):
         else:
             print("`data` must be a pandas.DataFrame")
 
-    def remap_xesmf(self, data, parallel=True, n_workers=None, **kwargs):
-        """Remap data using xESMF regridding with optional parallelization.
-
-        Parameters
-        ----------
-        data : xarray.DataArray or xarray.Dataset
-            Data to remap.
-        parallel : bool, default: True
-            Whether to use parallel processing via dask.
-        n_workers : int, optional
-            Number of dask workers to use. If None, uses all available cores.
-        **kwargs : dict
-            Keyword arguments for xESMF regridding.
-
-        Returns
-        -------
-        xarray.DataArray
-            Remapped data array.
-        """
-        kwargs['method'] = kwargs.get('method', 'bilinear')
-        if has_xesmf:
-            from ..util import resample
-
-            target = self._rename_latlon(self._obj)
-            source = self._rename_latlon(data)
-
-            out = resample.resample_xesmf(
-                source, target,
-                parallel=parallel,
-                n_workers=n_workers,
-                **kwargs
-            )
-
-            return self._rename_to_monet_latlon(out)
-        else:
-            print("xesmf unavailable. Try `import xesmf` and check the failure message.")
-
     def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
         """Remap data using nearest neighbor interpolation with parallel processing.
 
@@ -579,25 +578,18 @@ class MONETAccessor(BaseAccessor):
 
         source_data = self._dataset_to_monet(data)
         target_data = self._dataset_to_monet(self._obj)
-        source = self._get_CoordinateDefinition(source_data)
         target = self._get_CoordinateDefinition(target_data)
 
         result = resample.resample_pyresample_parallel(
-            source_data, target,
+            source_data,
+            target,
             radius_of_influence=radius_of_influence,
             n_processes=n_processes,
-            **kwargs
+            **kwargs,
         )
-
-        # Ensure coordinates are properly set
-        if isinstance(result, xr.DataArray):
-            result["latitude"] = target_data.latitude
-            result["longitude"] = target_data.longitude
-            result.name = source_data.name
-
         return result
 
-    def combine_point_esmf(self, point_df, method='bilinear', **kwargs):
+    def combine_point_esmf(self, point_df, method="bilinear", **kwargs):
         """Combine this DataArray with point data using ESMF LocStream.
 
         Parameters
@@ -618,13 +610,9 @@ class MONETAccessor(BaseAccessor):
 
         grid_data = self._dataset_to_monet(self._obj)
 
-        return combine_grid_to_point_esmf(
-            grid_data, point_df,
-            method=method,
-            **kwargs
-        )
+        return combine_grid_to_point_esmf(grid_data, point_df, method=method, **kwargs)
 
-    def to_area_def(self, projection='platea', resolution=None, area_id=None):
+    def to_area_def(self, projection="platea", resolution=None, area_id=None):
         """Convert the dataarray's coordinates to a pyresample AreaDefinition.
 
         Parameters
@@ -653,10 +641,7 @@ class MONETAccessor(BaseAccessor):
         from ..util.interp_util import guess_area_def_from_dataset
 
         return guess_area_def_from_dataset(
-            self._obj,
-            projection=projection,
-            resolution=resolution,
-            area_id=area_id
+            self._obj, projection=projection, resolution=resolution, area_id=area_id
         )
 
     def to_swath_def(self):
@@ -674,28 +659,40 @@ class MONETAccessor(BaseAccessor):
 
         # Process as UGRID if it has mesh topology
         for var in self._obj.coords:
-            if hasattr(self._obj[var], 'cf_role') and self._obj[var].cf_role == 'mesh_topology':
+            if hasattr(self._obj[var], "cf_role") and self._obj[var].cf_role == "mesh_topology":
                 from ..util.interp_util import ugrid_to_swath_definition
+
                 return ugrid_to_swath_definition(self._obj)
 
         # Otherwise use standard methods
         da = self._dataset_to_monet(self._obj)
         return self._get_CoordinateDefinition(da)
 
-    def compare(self, other, stat="diff", plot=True, plot_method="quick_map", stat_kwargs=None, plot_kwargs=None):
+    def compare(
+        self,
+        other,
+        stat="diff",
+        plot=True,
+        plot_method="quick_map",
+        stat_kwargs=None,
+        plot_kwargs=None,
+    ):
         """
-        Compute and optionally plot a statistic between this DataArray and another, leveraging MONET's util.stats metrics.
+        Compute and optionally plot a statistic between this DataArray and another,
+        leveraging MONET's util.stats metrics.
 
         Parameters
         ----------
         other : xarray.DataArray
             The other DataArray to compare with.
         stat : str or callable, default: "diff"
-            Statistic to compute. Can be any metric name from monet.util.stats (e.g., "RMSE", "MB", "NMB", "IOA", etc.), "diff", or a callable.
+            Statistic to compute. Can be any metric name from monet.util.stats
+            (e.g., "RMSE", "MB", "NMB", "IOA", etc.), "diff", or a callable.
         plot : bool, default: True
             Whether to plot the result using a MONET quick plot method.
         plot_method : str, default: "quick_map"
-            Which plotting method to use (e.g., "quick_map", "quick_imshow", "quick_contourf").
+            Which plotting method to use
+            (e.g., "quick_map", "quick_imshow", "quick_contourf").
         stat_kwargs : dict, optional
             Additional kwargs for the statistic function.
         plot_kwargs : dict, optional
@@ -706,8 +703,10 @@ class MONETAccessor(BaseAccessor):
         xarray.DataArray or (fig, ax)
             The statistic DataArray, or (fig, ax) if plot=True.
         """
-        import numpy as np
         import importlib
+
+        import numpy as np
+
         stat_kwargs = stat_kwargs or {}
         plot_kwargs = plot_kwargs or {}
         da1 = self._obj
@@ -746,7 +745,30 @@ class MONETAccessor(BaseAccessor):
         else:
             return stat_da
 
-    def quick_facet_time_map(self, map_kws=None, projection=None, colorbar=True, figsize=None, cmap=None, vmin=None, vmax=None, norm=None, dpi=150, xlabel=None, ylabel=None, suptitle=None, cbar_label=None, xticks=None, yticks=None, annotations=None, export_path=None, export_formats=None, time_dim="time", ncols=3, **kwargs):
+    def quick_facet_time_map(
+        self,
+        map_kws=None,
+        projection=None,
+        colorbar=True,
+        figsize=None,
+        cmap=None,
+        vmin=None,
+        vmax=None,
+        norm=None,
+        dpi=150,
+        xlabel=None,
+        ylabel=None,
+        suptitle=None,
+        cbar_label=None,
+        xticks=None,
+        yticks=None,
+        annotations=None,
+        export_path=None,
+        export_formats=None,
+        time_dim="time",
+        ncols=3,
+        **kwargs,
+    ):
         """
         Create a facet grid of map plots for each time slice in a DataArray using Cartopy.
 
@@ -795,6 +817,7 @@ class MONETAccessor(BaseAccessor):
             The matplotlib axes objects.
         """
         from ..plots.cartopy_utils import facet_time_map
+
         da = self._dataset_to_monet(self._obj)
         return facet_time_map(
             da,
@@ -818,5 +841,5 @@ class MONETAccessor(BaseAccessor):
             annotations=annotations,
             export_path=export_path,
             export_formats=export_formats,
-            **kwargs
+            **kwargs,
         )

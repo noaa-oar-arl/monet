@@ -241,4 +241,3 @@ Plotting Functions (monet.plots)
 .. _pandas: https://pandas.pydata.org
 .. _dask: https://docs.dask.org/en/stable/
 .. _monet-reference: https://monet.readthedocs.io/en/latest/
-

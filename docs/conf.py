@@ -221,7 +221,7 @@ texinfo_documents = [
 # -- Extension configuration -------------------------------------------------
 
 # Override the autosummary template
-import os
+
 
 if not os.path.exists("_templates/autosummary"):
     os.makedirs("_templates/autosummary")

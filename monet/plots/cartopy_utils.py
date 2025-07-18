@@ -1,9 +1,7 @@
 """Cartopy-based plotting utilities for MONET."""
 
-
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 try:
     import cartopy.crs as ccrs
@@ -11,6 +9,7 @@ try:
 except ImportError:
     ccrs = None
     GeoAxes = None
+
 
 def plot_quick_imshow(
     da,
@@ -33,7 +32,7 @@ def plot_quick_imshow(
     annotations=None,
     export_path=None,
     export_formats=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Create a imshow plot of the data on a map using Cartopy.
@@ -88,35 +87,45 @@ def plot_quick_imshow(
         projection = ccrs.PlateCarree()
     if map_kws is None:
         map_kws = {}
-    fig, ax = plt.subplots(subplot_kw={'projection': projection}, figsize=figsize, dpi=dpi)
+    fig, ax = plt.subplots(subplot_kw={"projection": projection}, figsize=figsize, dpi=dpi)
     plot_args = dict(cmap=cmap, vmin=vmin, vmax=vmax, norm=norm)
     # Remove 'ax' and 'transform' from kwargs to avoid multiple values error
-    plot_args.update({k: v for k, v in kwargs.items() if k not in ['ax', 'transform']})
+    plot_args.update({k: v for k, v in kwargs.items() if k not in ["ax", "transform"]})
     mesh = da.plot.imshow(ax=ax, transform=ccrs.PlateCarree(), **plot_args)
     # Map features
     if GeoAxes is not None and isinstance(ax, GeoAxes):
-        coast_kws = map_kws.get('coastlines', {})
+        coast_kws = map_kws.get("coastlines", {})
         ax.coastlines(**coast_kws)
-        grid_kws = map_kws.get('gridlines', {'draw_labels': True, 'linewidth': 0.5, 'color': 'gray', 'alpha': 0.5, 'linestyle': '--'})
+        grid_kws = map_kws.get(
+            "gridlines",
+            {
+                "draw_labels": True,
+                "linewidth": 0.5,
+                "color": "gray",
+                "alpha": 0.5,
+                "linestyle": "--",
+            },
+        )
         gl = ax.gridlines(**grid_kws)
-        if hasattr(gl, 'top_labels'):
+        if hasattr(gl, "top_labels"):
             gl.top_labels = False
-        if hasattr(gl, 'right_labels'):
+        if hasattr(gl, "right_labels"):
             gl.right_labels = False
         # Extra features
-        for feature_name in ['land', 'ocean', 'borders', 'lakes', 'rivers', 'states']:
+        for feature_name in ["land", "ocean", "borders", "lakes", "rivers", "states"]:
             if feature_name in map_kws:
                 import cartopy.feature as cfeature
+
                 feat = getattr(cfeature, feature_name.upper(), None)
                 if feat is not None:
                     ax.add_feature(feat(), **map_kws[feature_name])
     # Axis labels and title
     if xlabel:
-        ax.set_xlabel(xlabel, fontsize=12, fontweight='bold')
+        ax.set_xlabel(xlabel, fontsize=12, fontweight="bold")
     if ylabel:
-        ax.set_ylabel(ylabel, fontsize=12, fontweight='bold')
+        ax.set_ylabel(ylabel, fontsize=12, fontweight="bold")
     if title:
-        ax.set_title(title, fontsize=14, fontweight='bold')
+        ax.set_title(title, fontsize=14, fontweight="bold")
     # Custom ticks
     if xticks is not None:
         ax.set_xticks(xticks)
@@ -130,10 +139,19 @@ def plot_quick_imshow(
     if colorbar:
         if cbar_inset:
             from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-            cax = inset_axes(ax, width="5%", height="80%", loc='lower left', bbox_to_anchor=(1.05, 0.1, 1, 1), bbox_transform=ax.transAxes, borderpad=0)
-            cbar = plt.colorbar(mesh, cax=cax, orientation='vertical')
+
+            cax = inset_axes(
+                ax,
+                width="5%",
+                height="80%",
+                loc="lower left",
+                bbox_to_anchor=(1.05, 0.1, 1, 1),
+                bbox_transform=ax.transAxes,
+                borderpad=0,
+            )
+            cbar = plt.colorbar(mesh, cax=cax, orientation="vertical")
         else:
-            cbar = plt.colorbar(mesh, ax=ax, orientation='vertical', pad=0.02, aspect=30)
+            cbar = plt.colorbar(mesh, ax=ax, orientation="vertical", pad=0.02, aspect=30)
         cbar.ax.tick_params(labelsize=10)
         if cbar_label:
             cbar.set_label(cbar_label, fontsize=12)
@@ -143,7 +161,7 @@ def plot_quick_imshow(
         if export_formats is None:
             export_formats = ["png"]
         for fmt in export_formats:
-            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches='tight')
+            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches="tight")
     return fig, ax
     if ccrs is None:
         raise ImportError("Cartopy is required for mapping utilities.")
@@ -151,22 +169,32 @@ def plot_quick_imshow(
         projection = ccrs.PlateCarree()
     if map_kws is None:
         map_kws = {}
-    fig, ax = plt.subplots(subplot_kw={'projection': projection}, figsize=figsize)
+    fig, ax = plt.subplots(subplot_kw={"projection": projection}, figsize=figsize)
     mesh = da.plot.imshow(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
     if GeoAxes is not None and isinstance(ax, GeoAxes):
-        coast_kws = map_kws.get('coastlines', {})
+        coast_kws = map_kws.get("coastlines", {})
         ax.coastlines(**coast_kws)
-        grid_kws = map_kws.get('gridlines', {'draw_labels': True, 'linewidth': 0.5, 'color': 'gray', 'alpha': 0.5, 'linestyle': '--'})
+        grid_kws = map_kws.get(
+            "gridlines",
+            {
+                "draw_labels": True,
+                "linewidth": 0.5,
+                "color": "gray",
+                "alpha": 0.5,
+                "linestyle": "--",
+            },
+        )
         gl = ax.gridlines(**grid_kws)
-        if hasattr(gl, 'top_labels'):
+        if hasattr(gl, "top_labels"):
             gl.top_labels = False
-        if hasattr(gl, 'right_labels'):
+        if hasattr(gl, "right_labels"):
             gl.right_labels = False
     if colorbar:
-        cbar = plt.colorbar(mesh, ax=ax, orientation='vertical', pad=0.02, aspect=30)
+        cbar = plt.colorbar(mesh, ax=ax, orientation="vertical", pad=0.02, aspect=30)
         cbar.ax.tick_params(labelsize=10)
     fig.tight_layout()
     return fig, ax
+
 
 def plot_quick_map(
     da,
@@ -189,7 +217,7 @@ def plot_quick_map(
     annotations=None,
     export_path=None,
     export_formats=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Create a publication-quality map plot of the data using Cartopy and xarray's default plot method.
@@ -244,34 +272,44 @@ def plot_quick_map(
         projection = ccrs.PlateCarree()
     if map_kws is None:
         map_kws = {}
-    fig, ax = plt.subplots(subplot_kw={'projection': projection}, figsize=figsize, dpi=dpi)
+    fig, ax = plt.subplots(subplot_kw={"projection": projection}, figsize=figsize, dpi=dpi)
     plot_args = dict(cmap=cmap, vmin=vmin, vmax=vmax, norm=norm)
-    plot_args.update({k: v for k, v in kwargs.items() if k not in ['ax', 'transform']})
+    plot_args.update({k: v for k, v in kwargs.items() if k not in ["ax", "transform"]})
     mesh = da.plot(ax=ax, transform=ccrs.PlateCarree(), **plot_args)
     # Map features
     if GeoAxes is not None and isinstance(ax, GeoAxes):
-        coast_kws = map_kws.get('coastlines', {})
+        coast_kws = map_kws.get("coastlines", {})
         ax.coastlines(**coast_kws)
-        grid_kws = map_kws.get('gridlines', {'draw_labels': True, 'linewidth': 0.5, 'color': 'gray', 'alpha': 0.5, 'linestyle': '--'})
+        grid_kws = map_kws.get(
+            "gridlines",
+            {
+                "draw_labels": True,
+                "linewidth": 0.5,
+                "color": "gray",
+                "alpha": 0.5,
+                "linestyle": "--",
+            },
+        )
         gl = ax.gridlines(**grid_kws)
-        if hasattr(gl, 'top_labels'):
+        if hasattr(gl, "top_labels"):
             gl.top_labels = False
-        if hasattr(gl, 'right_labels'):
+        if hasattr(gl, "right_labels"):
             gl.right_labels = False
         # Extra features
-        for feature_name in ['land', 'ocean', 'borders', 'lakes', 'rivers', 'states']:
+        for feature_name in ["land", "ocean", "borders", "lakes", "rivers", "states"]:
             if feature_name in map_kws:
                 import cartopy.feature as cfeature
+
                 feat = getattr(cfeature, feature_name.upper(), None)
                 if feat is not None:
                     ax.add_feature(feat(), **map_kws[feature_name])
     # Axis labels and title
     if xlabel:
-        ax.set_xlabel(xlabel, fontsize=12, fontweight='bold')
+        ax.set_xlabel(xlabel, fontsize=12, fontweight="bold")
     if ylabel:
-        ax.set_ylabel(ylabel, fontsize=12, fontweight='bold')
+        ax.set_ylabel(ylabel, fontsize=12, fontweight="bold")
     if title:
-        ax.set_title(title, fontsize=14, fontweight='bold')
+        ax.set_title(title, fontsize=14, fontweight="bold")
     # Custom ticks
     if xticks is not None:
         ax.set_xticks(xticks)
@@ -285,10 +323,19 @@ def plot_quick_map(
     if colorbar:
         if cbar_inset:
             from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-            cax = inset_axes(ax, width="5%", height="80%", loc='lower left', bbox_to_anchor=(1.05, 0.1, 1, 1), bbox_transform=ax.transAxes, borderpad=0)
-            cbar = plt.colorbar(mesh, cax=cax, orientation='vertical')
+
+            cax = inset_axes(
+                ax,
+                width="5%",
+                height="80%",
+                loc="lower left",
+                bbox_to_anchor=(1.05, 0.1, 1, 1),
+                bbox_transform=ax.transAxes,
+                borderpad=0,
+            )
+            cbar = plt.colorbar(mesh, cax=cax, orientation="vertical")
         else:
-            cbar = plt.colorbar(mesh, ax=ax, orientation='vertical', pad=0.02, aspect=30)
+            cbar = plt.colorbar(mesh, ax=ax, orientation="vertical", pad=0.02, aspect=30)
         cbar.ax.tick_params(labelsize=10)
         if cbar_label:
             cbar.set_label(cbar_label, fontsize=12)
@@ -298,8 +345,9 @@ def plot_quick_map(
         if export_formats is None:
             export_formats = ["png"]
         for fmt in export_formats:
-            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches='tight')
+            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches="tight")
     return fig, ax
+
 
 def plot_quick_contourf(
     da,
@@ -322,7 +370,7 @@ def plot_quick_contourf(
     annotations=None,
     export_path=None,
     export_formats=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Create a publication-quality filled contour plot of the data on a map using Cartopy.
@@ -377,34 +425,44 @@ def plot_quick_contourf(
         projection = ccrs.PlateCarree()
     if map_kws is None:
         map_kws = {}
-    fig, ax = plt.subplots(subplot_kw={'projection': projection}, figsize=figsize, dpi=dpi)
+    fig, ax = plt.subplots(subplot_kw={"projection": projection}, figsize=figsize, dpi=dpi)
     plot_args = dict(cmap=cmap, vmin=vmin, vmax=vmax, norm=norm)
-    plot_args.update({k: v for k, v in kwargs.items() if k not in ['ax', 'transform']})
+    plot_args.update({k: v for k, v in kwargs.items() if k not in ["ax", "transform"]})
     mesh = da.plot.contourf(ax=ax, transform=ccrs.PlateCarree(), **plot_args)
     # Map features
     if GeoAxes is not None and isinstance(ax, GeoAxes):
-        coast_kws = map_kws.get('coastlines', {})
+        coast_kws = map_kws.get("coastlines", {})
         ax.coastlines(**coast_kws)
-        grid_kws = map_kws.get('gridlines', {'draw_labels': True, 'linewidth': 0.5, 'color': 'gray', 'alpha': 0.5, 'linestyle': '--'})
+        grid_kws = map_kws.get(
+            "gridlines",
+            {
+                "draw_labels": True,
+                "linewidth": 0.5,
+                "color": "gray",
+                "alpha": 0.5,
+                "linestyle": "--",
+            },
+        )
         gl = ax.gridlines(**grid_kws)
-        if hasattr(gl, 'top_labels'):
+        if hasattr(gl, "top_labels"):
             gl.top_labels = False
-        if hasattr(gl, 'right_labels'):
+        if hasattr(gl, "right_labels"):
             gl.right_labels = False
         # Extra features
-        for feature_name in ['land', 'ocean', 'borders', 'lakes', 'rivers', 'states']:
+        for feature_name in ["land", "ocean", "borders", "lakes", "rivers", "states"]:
             if feature_name in map_kws:
                 import cartopy.feature as cfeature
+
                 feat = getattr(cfeature, feature_name.upper(), None)
                 if feat is not None:
                     ax.add_feature(feat(), **map_kws[feature_name])
     # Axis labels and title
     if xlabel:
-        ax.set_xlabel(xlabel, fontsize=12, fontweight='bold')
+        ax.set_xlabel(xlabel, fontsize=12, fontweight="bold")
     if ylabel:
-        ax.set_ylabel(ylabel, fontsize=12, fontweight='bold')
+        ax.set_ylabel(ylabel, fontsize=12, fontweight="bold")
     if title:
-        ax.set_title(title, fontsize=14, fontweight='bold')
+        ax.set_title(title, fontsize=14, fontweight="bold")
     # Custom ticks
     if xticks is not None:
         ax.set_xticks(xticks)
@@ -418,10 +476,19 @@ def plot_quick_contourf(
     if colorbar:
         if cbar_inset:
             from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-            cax = inset_axes(ax, width="5%", height="80%", loc='lower left', bbox_to_anchor=(1.05, 0.1, 1, 1), bbox_transform=ax.transAxes, borderpad=0)
-            cbar = plt.colorbar(mesh, cax=cax, orientation='vertical')
+
+            cax = inset_axes(
+                ax,
+                width="5%",
+                height="80%",
+                loc="lower left",
+                bbox_to_anchor=(1.05, 0.1, 1, 1),
+                bbox_transform=ax.transAxes,
+                borderpad=0,
+            )
+            cbar = plt.colorbar(mesh, cax=cax, orientation="vertical")
         else:
-            cbar = plt.colorbar(mesh, ax=ax, orientation='vertical', pad=0.02, aspect=30)
+            cbar = plt.colorbar(mesh, ax=ax, orientation="vertical", pad=0.02, aspect=30)
         cbar.ax.tick_params(labelsize=10)
         if cbar_label:
             cbar.set_label(cbar_label, fontsize=12)
@@ -431,8 +498,9 @@ def plot_quick_contourf(
         if export_formats is None:
             export_formats = ["png"]
         for fmt in export_formats:
-            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches='tight')
+            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches="tight")
     return fig, ax
+
 
 def facet_time_map(
     da,
@@ -456,7 +524,7 @@ def facet_time_map(
     annotations=None,
     export_path=None,
     export_formats=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Create a facet grid of map plots for each time slice in a DataArray using Cartopy.
@@ -519,7 +587,9 @@ def facet_time_map(
     nrows = int(np.ceil(nt / ncols))
     if figsize is None:
         figsize = (4 * ncols, 3.5 * nrows)
-    fig, axes = plt.subplots(nrows, ncols, subplot_kw={'projection': projection}, figsize=figsize, dpi=dpi)
+    fig, axes = plt.subplots(
+        nrows, ncols, subplot_kw={"projection": projection}, figsize=figsize, dpi=dpi
+    )
     axes = np.atleast_1d(axes).flatten()
     plot_args = dict(cmap=cmap, vmin=vmin, vmax=vmax, norm=norm)
     plot_args.update(kwargs)
@@ -530,9 +600,18 @@ def facet_time_map(
         mesh = dat.plot(ax=ax, transform=ccrs.PlateCarree(), add_colorbar=False, **plot_args)
         # Map features
         if GeoAxes is not None and isinstance(ax, GeoAxes):
-            coast_kws = map_kws.get('coastlines', {})
+            coast_kws = map_kws.get("coastlines", {})
             ax.coastlines(**coast_kws)
-            grid_kws = map_kws.get('gridlines', {'draw_labels': False, 'linewidth': 0.5, 'color': 'gray', 'alpha': 0.5, 'linestyle': '--'})
+            grid_kws = map_kws.get(
+                "gridlines",
+                {
+                    "draw_labels": False,
+                    "linewidth": 0.5,
+                    "color": "gray",
+                    "alpha": 0.5,
+                    "linestyle": "--",
+                },
+            )
             ax.gridlines(**grid_kws)
         # Axis labels and title
         if xlabel:
@@ -554,18 +633,28 @@ def facet_time_map(
     # Shared colorbar
     if colorbar and mesh is not None:
         from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-        cax = inset_axes(axes[-1], width="5%", height="80%", loc='lower left', bbox_to_anchor=(1.05, 0.1, 1, 1), bbox_transform=axes[-1].transAxes, borderpad=0)
-        fig.colorbar(mesh, cax=cax, orientation='vertical', label=cbar_label)
+
+        cax = inset_axes(
+            axes[-1],
+            width="5%",
+            height="80%",
+            loc="lower left",
+            bbox_to_anchor=(1.05, 0.1, 1, 1),
+            bbox_transform=axes[-1].transAxes,
+            borderpad=0,
+        )
+        fig.colorbar(mesh, cax=cax, orientation="vertical", label=cbar_label)
     if suptitle:
-        fig.suptitle(suptitle, fontsize=14, fontweight='bold')
+        fig.suptitle(suptitle, fontsize=14, fontweight="bold")
     fig.tight_layout(rect=(0, 0, 0.97, 1))
     # Export
     if export_path:
         if export_formats is None:
             export_formats = ["png"]
         for fmt in export_formats:
-            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches='tight')
+            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches="tight")
     return fig, axes
+
 
 # Pandas DataFrame mapping utilities
 def plot_points_map(
@@ -584,7 +673,7 @@ def plot_points_map(
     title=None,
     export_path=None,
     export_formats=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Plot points from a DataFrame on a Cartopy map.
@@ -635,22 +724,32 @@ def plot_points_map(
     fig, ax = plt.subplots(subplot_kw={"projection": projection}, figsize=figsize, dpi=dpi)
     # Map features
     if GeoAxes is not None and isinstance(ax, GeoAxes):
-        coast_kws = map_kws.get('coastlines', {})
+        coast_kws = map_kws.get("coastlines", {})
         ax.coastlines(**coast_kws)
-        grid_kws = map_kws.get('gridlines', {'draw_labels': True, 'linewidth': 0.5, 'color': 'gray', 'alpha': 0.5, 'linestyle': '--'})
+        grid_kws = map_kws.get(
+            "gridlines",
+            {
+                "draw_labels": True,
+                "linewidth": 0.5,
+                "color": "gray",
+                "alpha": 0.5,
+                "linestyle": "--",
+            },
+        )
         gl = ax.gridlines(**grid_kws)
-        if hasattr(gl, 'top_labels'):
+        if hasattr(gl, "top_labels"):
             gl.top_labels = False
-        if hasattr(gl, 'right_labels'):
+        if hasattr(gl, "right_labels"):
             gl.right_labels = False
-        for feature_name in ['land', 'ocean', 'borders', 'lakes', 'rivers', 'states']:
+        for feature_name in ["land", "ocean", "borders", "lakes", "rivers", "states"]:
             if feature_name in map_kws:
                 import cartopy.feature as cfeature
+
                 feat = getattr(cfeature, feature_name.upper(), None)
                 if feat is not None:
                     ax.add_feature(feat(), **map_kws[feature_name])
     # Plot points
-    sc = ax.scatter(
+    ax.scatter(
         df[lon_col],
         df[lat_col],
         color=color,
@@ -659,18 +758,19 @@ def plot_points_map(
         edgecolor=edgecolor,
         alpha=alpha,
         transform=ccrs.PlateCarree(),
-        **kwargs
+        **kwargs,
     )
     if title:
-        ax.set_title(title, fontsize=14, fontweight='bold')
+        ax.set_title(title, fontsize=14, fontweight="bold")
     fig.tight_layout()
     # Export
     if export_path:
         if export_formats is None:
             export_formats = ["png"]
         for fmt in export_formats:
-            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches='tight')
+            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches="tight")
     return fig, ax
+
 
 def plot_lines_map(
     df,
@@ -687,7 +787,7 @@ def plot_lines_map(
     title=None,
     export_path=None,
     export_formats=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Plot lines from a DataFrame on a Cartopy map. Optionally group by a column.
@@ -736,17 +836,27 @@ def plot_lines_map(
     fig, ax = plt.subplots(subplot_kw={"projection": projection}, figsize=figsize, dpi=dpi)
     # Map features
     if GeoAxes is not None and isinstance(ax, GeoAxes):
-        coast_kws = map_kws.get('coastlines', {})
+        coast_kws = map_kws.get("coastlines", {})
         ax.coastlines(**coast_kws)
-        grid_kws = map_kws.get('gridlines', {'draw_labels': True, 'linewidth': 0.5, 'color': 'gray', 'alpha': 0.5, 'linestyle': '--'})
+        grid_kws = map_kws.get(
+            "gridlines",
+            {
+                "draw_labels": True,
+                "linewidth": 0.5,
+                "color": "gray",
+                "alpha": 0.5,
+                "linestyle": "--",
+            },
+        )
         gl = ax.gridlines(**grid_kws)
-        if hasattr(gl, 'top_labels'):
+        if hasattr(gl, "top_labels"):
             gl.top_labels = False
-        if hasattr(gl, 'right_labels'):
+        if hasattr(gl, "right_labels"):
             gl.right_labels = False
-        for feature_name in ['land', 'ocean', 'borders', 'lakes', 'rivers', 'states']:
+        for feature_name in ["land", "ocean", "borders", "lakes", "rivers", "states"]:
             if feature_name in map_kws:
                 import cartopy.feature as cfeature
+
                 feat = getattr(cfeature, feature_name.upper(), None)
                 if feat is not None:
                     ax.add_feature(feat(), **map_kws[feature_name])
@@ -760,7 +870,7 @@ def plot_lines_map(
                 linewidth=linewidth,
                 alpha=alpha,
                 transform=ccrs.PlateCarree(),
-                **kwargs
+                **kwargs,
             )
     else:
         ax.plot(
@@ -770,15 +880,15 @@ def plot_lines_map(
             linewidth=linewidth,
             alpha=alpha,
             transform=ccrs.PlateCarree(),
-            **kwargs
+            **kwargs,
         )
     if title:
-        ax.set_title(title, fontsize=14, fontweight='bold')
+        ax.set_title(title, fontsize=14, fontweight="bold")
     fig.tight_layout()
     # Export
     if export_path:
         if export_formats is None:
             export_formats = ["png"]
         for fmt in export_formats:
-            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches='tight')
+            fig.savefig(f"{export_path}.{fmt}", dpi=dpi, bbox_inches="tight")
     return fig, ax

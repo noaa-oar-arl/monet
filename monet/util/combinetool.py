@@ -1,7 +1,6 @@
+import pandas as pd
 import xarray as xr
 from pandas import Series, merge_asof
-import pandas as pd
-import numpy as np
 
 
 def combine_da_to_df(da, df, *, merge=True, **kwargs):
@@ -30,8 +29,8 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
         DataFrame with interpolated model values at observation locations,
         either merged with original data (if merge=True) or standalone.
     """
-    radius_of_influence = kwargs.pop('radius_of_influence', 12e4)
-    suffix = kwargs.pop('suffix', '_new')
+    radius_of_influence = kwargs.pop("radius_of_influence", 12e4)
+    suffix = kwargs.pop("suffix", "_new")
 
     target_da = df.drop_duplicates(subset=["siteid"]).dropna(
         subset=["latitude", "longitude", "siteid"]
@@ -46,9 +45,10 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
         target_da = target_da.rename(columns={"LAT": "latitude", "LON": "longitude"})
 
     # Convert to xarray for remapping
-    if not hasattr(target_da, 'monet'):
+    if not hasattr(target_da, "monet"):
         # If someone passes a pandas DataFrame without the monet accessor registered
         from ..accessors.pandas_accessor import MONETAccessorPandas
+
         pd.api.extensions.register_dataframe_accessor("monet")(MONETAccessorPandas)
 
     target_data_da = target_da.monet._df_to_da()
@@ -57,9 +57,9 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
     if da.attrs.get("mio_has_unstructured_grid", False):
         da_interped = target_data_da.monet.remap_nearest_unstructured(da).compute()
     else:
-        da_interped = target_data_da.monet.remap_nearest(da,
-                                                        radius_of_influence=radius_of_influence,
-                                                        **kwargs).compute()
+        da_interped = target_data_da.monet.remap_nearest(
+            da, radius_of_influence=radius_of_influence, **kwargs
+        ).compute()
 
     da_interped["siteid"] = (("x"), target_da.siteid)
     da_interped_df = da_interped.to_dataframe().reset_index()
@@ -172,7 +172,7 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
         DataFrame with combined model and observation data.
     """
     try:
-        import xesmf
+        import xesmf  # noqa: F401
     except ImportError:
         raise ImportError("xesmf is required for this functionality")
 
@@ -181,7 +181,7 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
 
     # Default suffix
     if suffix is None:
-        suffix = '_xesmf'
+        suffix = "_xesmf"
 
     # Make a copy of the DataFrame
     target = df.copy()
@@ -195,15 +195,12 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
         target = target.rename(columns={"LAT": "latitude", "LON": "longitude"})
 
     # Create xESMF compatible dataset for the point locations
-    point_ds = lonlat_to_xesmf(
-        longitude=target.longitude.values,
-        latitude=target.latitude.values
-    )
+    point_ds = lonlat_to_xesmf(longitude=target.longitude.values, latitude=target.latitude.values)
 
     # Rename coordinates for xESMF
     da_renamed = da.copy()
-    if 'latitude' in da.coords:
-        da_renamed = da_renamed.rename({'latitude': 'lat', 'longitude': 'lon'})
+    if "latitude" in da.coords:
+        da_renamed = da_renamed.rename({"latitude": "lat", "longitude": "lon"})
 
     # Use xESMF to resample the data
     result = resample_xesmf(da_renamed, point_ds, **kwargs)
@@ -320,7 +317,9 @@ def combine_da_to_height_profile(da, dset, *, radius_of_influence=12e3):
     return dset
 
 
-def combine_grid_to_point_esmf(grid_data, point_df, method='bilinear', locstream_kwargs=None, regrid_kwargs=None):
+def combine_grid_to_point_esmf(
+    grid_data, point_df, method="bilinear", locstream_kwargs=None, regrid_kwargs=None
+):
     """Combine gridded data with point observations using ESMF LocStream.
 
     Parameters
@@ -346,9 +345,8 @@ def combine_grid_to_point_esmf(grid_data, point_df, method='bilinear', locstream
     Requires xESMF and ESMF to be installed.
     """
     try:
-        import xesmf as xe
         import xarray as xr
-        import numpy as np
+        import xesmf as xe
     except ImportError:
         raise ImportError("xesmf and ESMF are required for this functionality")
 
@@ -359,47 +357,47 @@ def combine_grid_to_point_esmf(grid_data, point_df, method='bilinear', locstream
         regrid_kwargs = {}
 
     # Ensure we have required columns
-    required_cols = ['latitude', 'longitude', 'siteid']
+    required_cols = ["latitude", "longitude", "siteid"]
     for col in required_cols:
         if col not in point_df.columns:
             raise ValueError(f"point_df must contain a '{col}' column")
 
     # Extract unique lat/lon points to avoid duplicates
-    unique_points = point_df.drop_duplicates(subset=['latitude', 'longitude'])
+    unique_points = point_df.drop_duplicates(subset=["latitude", "longitude"])
 
     # Create an xarray dataset for the point locations
     points_ds = xr.Dataset(
         coords={
-            'lon': ('location', unique_points['longitude'].values),
-            'lat': ('location', unique_points['latitude'].values),
+            "lon": ("location", unique_points["longitude"].values),
+            "lat": ("location", unique_points["latitude"].values),
         }
     )
 
     # Add site ID for later matching
-    points_ds['siteid'] = ('location', unique_points['siteid'].values)
+    points_ds["siteid"] = ("location", unique_points["siteid"].values)
 
     # Ensure grid_data is properly formatted
     if isinstance(grid_data, xr.DataArray):
         grid_data = grid_data.to_dataset()
 
     # Ensure grid_data has proper coordinate names for xESMF
-    if 'latitude' in grid_data.coords and 'longitude' in grid_data.coords:
-        grid_data = grid_data.rename({'latitude': 'lat', 'longitude': 'lon'})
+    if "latitude" in grid_data.coords and "longitude" in grid_data.coords:
+        grid_data = grid_data.rename({"latitude": "lat", "longitude": "lon"})
 
     # Create ESMF regridder with LocStream
     try:
-        regridder = xe.Regridder(grid_data, points_ds, method,
-                               locstream_out=True, **regrid_kwargs)
+        regridder = xe.Regridder(grid_data, points_ds, method, locstream_out=True, **regrid_kwargs)
     except Exception as e:
         # Attempt alternative approach for curvilinear grids
         grid_dims = list(grid_data.dims)
-        if len(grid_dims) >= 2 and grid_data['lat'].dims == grid_data['lon'].dims:
+        if len(grid_dims) >= 2 and grid_data["lat"].dims == grid_data["lon"].dims:
             # Handle curvilinear grid
             grid_data_new = grid_data.copy()
-            y_dim, x_dim = grid_data['lat'].dims
-            grid_data_new = grid_data_new.rename({y_dim: 'y', x_dim: 'x'})
-            regridder = xe.Regridder(grid_data_new, points_ds, method,
-                                   locstream_out=True, **regrid_kwargs)
+            y_dim, x_dim = grid_data["lat"].dims
+            grid_data_new = grid_data_new.rename({y_dim: "y", x_dim: "x"})
+            regridder = xe.Regridder(
+                grid_data_new, points_ds, method, locstream_out=True, **regrid_kwargs
+            )
         else:
             raise ValueError(f"Failed to create regridder: {e}")
 
@@ -418,14 +416,14 @@ def combine_grid_to_point_esmf(grid_data, point_df, method='bilinear', locstream
     result_df = result_ds.to_dataframe().reset_index()
 
     # Merge with the original point data
-    if 'location' in result_df.columns:
+    if "location" in result_df.columns:
         # Map location index to siteid
-        siteid_map = dict(zip(range(len(unique_points)), unique_points['siteid']))
-        result_df['siteid'] = result_df['location'].map(siteid_map)
-        result_df = result_df.drop(columns=['location'])
+        siteid_map = dict(zip(range(len(unique_points)), unique_points["siteid"]))
+        result_df["siteid"] = result_df["location"].map(siteid_map)
+        result_df = result_df.drop(columns=["location"])
 
     # Merge results with original data
-    merged_df = pd.merge(point_df, result_df, on='siteid', how='left')
+    merged_df = pd.merge(point_df, result_df, on="siteid", how="left")
 
     # Clean up the regridder
     regridder.clean_weight_file()

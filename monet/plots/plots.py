@@ -121,7 +121,7 @@ def make_spatial_contours(
     discrete=True,
     ncolors=None,
     dtype="int",
-    **kwargs
+    **kwargs,
 ):
     """Create a contour plot on a map with optional discrete colorbar.
 

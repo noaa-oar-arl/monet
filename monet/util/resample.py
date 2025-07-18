@@ -1,8 +1,7 @@
 try:
+    from pyresample.future.resamplers import BilinearXarrayResampler, KDTreeNearestXarrayResampler
     from pyresample.geometry import AreaDefinition, SwathDefinition
     from pyresample.kd_tree import XArrayResamplerNN  # noqa: F401
-    from pyresample.future.resamplers import KDTreeNearestXarrayResampler
-    from pyresample.future.resamplers import BilinearXarrayResampler
 
     has_pyresample = True
 except ImportError:
@@ -134,7 +133,9 @@ def resample_stratify(da, levels, vertical, axis=1):
     return out
 
 
-def resample_xesmf(source_da, target_da, method='bilinear', cleanup=False, parallel=False, n_workers=None, **kwargs):
+def resample_xesmf(
+    source_da, target_da, method="bilinear", cleanup=False, parallel=False, n_workers=None, **kwargs
+):
     """Resample data from one grid to another using xESMF.
 
     Uses xESMF to perform regridding between different coordinate systems and grids.
@@ -177,17 +178,18 @@ def resample_xesmf(source_da, target_da, method='bilinear', cleanup=False, paral
         if parallel:
             try:
                 # We need to import these conditionally
-                import dask
+                # import dask  # unused
                 from dask.distributed import Client, LocalCluster
 
                 # Create a local cluster and client
                 if n_workers is None:
                     import multiprocessing as mp
+
                     n_workers = mp.cpu_count()
 
                 cluster = LocalCluster(n_workers=n_workers)
                 client = Client(cluster)
-                kwargs['dask_client'] = client
+                kwargs["dask_client"] = client
 
                 # Ensure data is chunked
                 if isinstance(source_da, xr.Dataset):
@@ -236,7 +238,9 @@ def resample_xesmf(source_da, target_da, method='bilinear', cleanup=False, paral
             client.close()
 
 
-def resample_pyresample_parallel(source_data, target_grid, radius_of_influence=1e6, n_processes=None, **kwargs):
+def resample_pyresample_parallel(
+    source_data, target_grid, radius_of_influence=1e6, n_processes=None, **kwargs
+):
     """Resample data using pyresample with parallel processing.
 
     Parameters
@@ -261,9 +265,10 @@ def resample_pyresample_parallel(source_data, target_grid, radius_of_influence=1
     if not has_pyresample:
         raise ImportError("pyresample is required for this functionality")
 
-    from pyresample import kd_tree
     import multiprocessing as mp
+
     import xarray as xr
+    from pyresample import kd_tree
 
     if n_processes is None:
         n_processes = mp.cpu_count()
@@ -274,16 +279,21 @@ def resample_pyresample_parallel(source_data, target_grid, radius_of_influence=1
 
     if isinstance(source_data, xr.DataArray):
         # For DataArrays, use built-in parallelization in pyresample
-        kwargs['nprocs'] = n_processes
-        result = kd_tree.resample_nearest(source, source_data.values, target,
-                                         radius_of_influence=radius_of_influence,
-                                         fill_value=None, **kwargs)
+        kwargs["nprocs"] = n_processes
+        result = kd_tree.resample_nearest(
+            source,
+            source_data.values,
+            target,
+            radius_of_influence=radius_of_influence,
+            fill_value=None,
+            **kwargs,
+        )
 
         # Reconstruct DataArray with proper coordinates
         target_lon, target_lat = target.get_lonlats()
-        da = xr.DataArray(result, dims=('y', 'x'), name=source_data.name)
-        da['latitude'] = (('y', 'x'), target_lat)
-        da['longitude'] = (('y', 'x'), target_lon)
+        da = xr.DataArray(result, dims=("y", "x"), name=source_data.name)
+        da["latitude"] = (("y", "x"), target_lat)
+        da["longitude"] = (("y", "x"), target_lon)
         da.attrs = source_data.attrs.copy()
 
         return da
@@ -296,9 +306,14 @@ def resample_pyresample_parallel(source_data, target_grid, radius_of_influence=1
             # Define worker function for parallel processing
             def process_var(var_name):
                 var_data = source_data[var_name]
-                result = kd_tree.resample_nearest(source, var_data.values, target,
-                                                radius_of_influence=radius_of_influence,
-                                                fill_value=None, **kwargs)
+                result = kd_tree.resample_nearest(
+                    source,
+                    var_data.values,
+                    target,
+                    radius_of_influence=radius_of_influence,
+                    fill_value=None,
+                    **kwargs,
+                )
                 return var_name, result
 
             # Process all variables in parallel
@@ -307,13 +322,17 @@ def resample_pyresample_parallel(source_data, target_grid, radius_of_influence=1
 
             # Reconstruct Dataset
             for var_name, result in results_list:
-                results[var_name] = (('y', 'x'), result)
+                results[var_name] = (("y", "x"), result)
 
             # Create the Dataset with results
             target_lon, target_lat = target.get_lonlats()
-            ds = xr.Dataset(results,
-                           coords={'latitude': (('y', 'x'), target_lat),
-                                  'longitude': (('y', 'x'), target_lon)})
+            ds = xr.Dataset(
+                results,
+                coords={
+                    "latitude": (("y", "x"), target_lat),
+                    "longitude": (("y", "x"), target_lon),
+                },
+            )
             ds.attrs = source_data.attrs.copy()
 
             return ds
@@ -348,12 +367,13 @@ def resample_pyresample_xarray(source_data, target_grid, radius_of_influence=1e6
     import xarray as xr
 
     # Ensure source and target are properly defined
-    source_grid = _check_swath_or_area(source_data.attrs.get('area', None))
+    source_grid = _check_swath_or_area(source_data.attrs.get("area", None))
     target_grid = _check_swath_or_area(target_grid)
 
     # Create the resampler
-    resampler = KDTreeNearestXarrayResampler(source_grid, target_grid,
-                                           radius_of_influence=radius_of_influence)
+    resampler = KDTreeNearestXarrayResampler(
+        source_grid, target_grid, radius_of_influence=radius_of_influence
+    )
 
     # Load the data
     if isinstance(source_data, xr.DataArray):
@@ -366,11 +386,10 @@ def resample_pyresample_xarray(source_data, target_grid, radius_of_influence=1e6
         result = resampler.get_dataset_data()
         # Add coordinates if not present
         target_lon, target_lat = target_grid.get_lonlats_dask()
-        if 'latitude' not in result.coords:
-            result = result.assign_coords({
-                'latitude': (('y', 'x'), target_lat),
-                'longitude': (('y', 'x'), target_lon)
-            })
+        if "latitude" not in result.coords:
+            result = result.assign_coords(
+                {"latitude": (("y", "x"), target_lat), "longitude": (("y", "x"), target_lon)}
+            )
         result.attrs.update(source_data.attrs)
     else:
         raise TypeError("source_data must be an xarray.DataArray or xarray.Dataset")
@@ -378,7 +397,7 @@ def resample_pyresample_xarray(source_data, target_grid, radius_of_influence=1e6
     return result
 
 
-def resample(source_data, target_grid, method='nearest', radius_of_influence=1e6, **kwargs):
+def resample(source_data, target_grid, method="nearest", radius_of_influence=1e6, **kwargs):
     """Resample data using various methods with dask parallelization.
 
     This function provides a high-level API for resampling similar to ndpyramid.
@@ -422,13 +441,15 @@ def resample(source_data, target_grid, method='nearest', radius_of_influence=1e6
             source_data = source_data.chunk()
 
     # Select resampling method
-    if method.lower() == 'nearest':
+    if method.lower() == "nearest":
         return _resample_nearest(source_data, target_grid, radius_of_influence, **kwargs)
-    elif method.lower() == 'bilinear':
+    elif method.lower() == "bilinear":
         return _resample_bilinear(source_data, target_grid, radius_of_influence, **kwargs)
     else:
-        raise ValueError(f"Unsupported resampling method: {method}. "
-                        f"Supported methods are 'nearest' and 'bilinear'.")
+        raise ValueError(
+            f"Unsupported resampling method: {method}. "
+            f"Supported methods are 'nearest' and 'bilinear'."
+        )
 
 
 def _resample_nearest(source_data, target_grid, radius_of_influence=1e6, **kwargs):
@@ -453,19 +474,19 @@ def _resample_nearest(source_data, target_grid, radius_of_influence=1e6, **kwarg
     import xarray as xr
 
     # Handle area attribute from source_data or from kwargs
-    if 'source_grid' in kwargs:
-        source_grid = kwargs.pop('source_grid')
+    if "source_grid" in kwargs:
+        source_grid = kwargs.pop("source_grid")
     else:
-        source_grid = source_data.attrs.get('area', None)
+        source_grid = source_data.attrs.get("area", None)
 
     # Ensure source and target are properly defined
     source_grid = _check_swath_or_area(source_grid)
     target_grid = _check_swath_or_area(target_grid)
 
     # Create the resampler
-    resampler = KDTreeNearestXarrayResampler(source_grid, target_grid,
-                                           radius_of_influence=radius_of_influence,
-                                           **kwargs)
+    resampler = KDTreeNearestXarrayResampler(
+        source_grid, target_grid, radius_of_influence=radius_of_influence, **kwargs
+    )
 
     # Process data based on type
     if isinstance(source_data, xr.DataArray):
@@ -478,11 +499,10 @@ def _resample_nearest(source_data, target_grid, radius_of_influence=1e6, **kwarg
         result = resampler.get_dataset_data()
         # Add coordinates if not present
         target_lon, target_lat = target_grid.get_lonlats_dask()
-        if 'latitude' not in result.coords:
-            result = result.assign_coords({
-                'latitude': (('y', 'x'), target_lat),
-                'longitude': (('y', 'x'), target_lon)
-            })
+        if "latitude" not in result.coords:
+            result = result.assign_coords(
+                {"latitude": (("y", "x"), target_lat), "longitude": (("y", "x"), target_lon)}
+            )
         result.attrs.update(source_data.attrs)
     else:
         raise TypeError("source_data must be an xarray.DataArray or xarray.Dataset")
@@ -512,19 +532,19 @@ def _resample_bilinear(source_data, target_grid, radius_of_influence=1e6, **kwar
     import xarray as xr
 
     # Handle area attribute from source_data or from kwargs
-    if 'source_grid' in kwargs:
-        source_grid = kwargs.pop('source_grid')
+    if "source_grid" in kwargs:
+        source_grid = kwargs.pop("source_grid")
     else:
-        source_grid = source_data.attrs.get('area', None)
+        source_grid = source_data.attrs.get("area", None)
 
     # Ensure source and target are properly defined
     source_grid = _check_swath_or_area(source_grid)
     target_grid = _check_swath_or_area(target_grid)
 
     # Create the resampler
-    resampler = BilinearXarrayResampler(source_grid, target_grid,
-                                      radius_of_influence=radius_of_influence,
-                                      **kwargs)
+    resampler = BilinearXarrayResampler(
+        source_grid, target_grid, radius_of_influence=radius_of_influence, **kwargs
+    )
 
     # Process data based on type
     if isinstance(source_data, xr.DataArray):
@@ -537,11 +557,10 @@ def _resample_bilinear(source_data, target_grid, radius_of_influence=1e6, **kwar
         result = resampler.get_dataset_data()
         # Add coordinates if not present
         target_lon, target_lat = target_grid.get_lonlats_dask()
-        if 'latitude' not in result.coords:
-            result = result.assign_coords({
-                'latitude': (('y', 'x'), target_lat),
-                'longitude': (('y', 'x'), target_lon)
-            })
+        if "latitude" not in result.coords:
+            result = result.assign_coords(
+                {"latitude": (("y", "x"), target_lat), "longitude": (("y", "x"), target_lon)}
+            )
         result.attrs.update(source_data.attrs)
     else:
         raise TypeError("source_data must be an xarray.DataArray or xarray.Dataset")

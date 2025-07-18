@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def HSS(obs, mod, minval, maxval=None):
     """
     Heidke Skill Score (HSS)
@@ -40,7 +41,7 @@ def HSS(obs, mod, minval, maxval=None):
     # Output: HSS value between -∞ and 1
     """
     a, b, c, d = _contingency_table(obs, mod, minval, maxval)
-    denom = ((a + c) * (c + d) + (a + b) * (b + d))
+    denom = (a + c) * (c + d) + (a + b) * (b + d)
     if denom > 0:
         return 2 * (a * d - b * c) / denom
     else:
@@ -90,11 +91,12 @@ def ETS(obs, mod, minval, maxval=None):
     a, b, c, d = _contingency_table(obs, mod, minval, maxval)
     total = a + b + c + d
     random_hits = ((a + b) * (a + c)) / total if total > 0 else 0
-    denom = (a + b + c - random_hits)
+    denom = a + b + c - random_hits
     if denom > 0:
         return (a - random_hits) / denom
     else:
         return np.nan
+
 
 def CSI(obs, mod, minval, maxval=None):
     """
@@ -164,13 +166,15 @@ def scores(obs, mod, minval, maxval=None):
     """
     return _contingency_table(obs, mod, minval, maxval)
 
+
 def POD(obs, mod, minval, maxval=None):
     """
     Probability of Detection (POD) for a given event threshold.
 
     Typical Use Cases
     -----------------
-    - Evaluating how well a model detects events above a critical threshold (e.g., pollution exceedances, precipitation events).
+    - Evaluating how well a model detects events above a critical threshold
+      (e.g., pollution exceedances, precipitation events).
     - Used in contingency table analysis for categorical forecast verification.
 
     Parameters
@@ -197,6 +201,7 @@ def POD(obs, mod, minval, maxval=None):
     """
     a, b, c, d = _contingency_table(obs, mod, minval, maxval)
     return a / (a + b) if (a + b) > 0 else np.nan
+
 
 def FAR(obs, mod, minval, maxval=None):
     """
@@ -228,6 +233,7 @@ def FAR(obs, mod, minval, maxval=None):
     a, b, c, d = _contingency_table(obs, mod, minval, maxval)
     return c / (a + c) if (a + c) > 0 else np.nan
 
+
 def FBI(obs, mod, minval, maxval=None):
     """
     Frequency Bias Index (FBI) for a given event threshold.
@@ -256,6 +262,7 @@ def FBI(obs, mod, minval, maxval=None):
     """
     a, b, c, d = _contingency_table(obs, mod, minval, maxval)
     return (a + c) / (a + b) if (a + b) > 0 else np.nan
+
 
 def TSS(obs, mod, minval, maxval=None):
     """
@@ -288,6 +295,7 @@ def TSS(obs, mod, minval, maxval=None):
     pofd = c / (c + d) if (c + d) > 0 else np.nan
     return pod - pofd
 
+
 def _contingency_table(obs, mod, minval, maxval=None):
     """
     Compute the 2x2 contingency table for event-based metrics.
@@ -313,6 +321,7 @@ def _contingency_table(obs, mod, minval, maxval=None):
         Correct negatives (obs < threshold and mod < threshold)
     """
     import numpy as np
+
     try:
         import xarray as xr
     except ImportError:

@@ -1,9 +1,12 @@
 """
 Relative/Percentage Metrics for Model Evaluation
 """
+
 import numpy as np
 import xarray as xr
+
 from .utils_stats import circlebias, circlebias_m
+
 
 def NMB(obs, mod, axis=None):
     """
@@ -38,7 +41,6 @@ def NMB(obs, mod, axis=None):
         return (mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.0
     else:
         return np.sum(mod - obs, axis=axis) / np.sum(obs, axis=axis) * 100.0
-
 
 
 def WDNMB_m(obs, mod, axis=None):
@@ -116,7 +118,6 @@ def NMB_ABS(obs, mod, axis=None):
         return (mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)) * 100.0
     else:
         return np.sum(mod - obs, axis=axis) / np.abs(np.sum(obs, axis=axis)) * 100.0
-
 
 
 def NMdnB(obs, mod, axis=None):
@@ -442,7 +443,8 @@ def NME_m_ABS(obs, mod, axis=None):
 
     Typical Use Cases
     -----------------
-    - Quantifying normalized mean error when the denominator (sum of observations) may be negative or zero, robust to masked arrays.
+    - Quantifying normalized mean error when the denominator (sum of observations)
+      may be negative or zero, robust to masked arrays.
     - Used for model evaluation with possible sign changes or missing values in observed data.
 
     Parameters
@@ -631,7 +633,9 @@ def USUTPB(obs, mod, axis=None):
     elif isinstance(mod, np.ndarray) and isinstance(obs, np.ndarray):
         return ((mod.max(axis=axis) - obs.max(axis=axis)) / obs.max(axis=axis)) * 100.0
     else:
-        return ((np.ma.max(mod, axis=axis) - np.ma.max(obs, axis=axis)) / np.ma.max(obs, axis=axis)) * 100.0
+        return (
+            (np.ma.max(mod, axis=axis) - np.ma.max(obs, axis=axis)) / np.ma.max(obs, axis=axis)
+        ) * 100.0
 
 
 def USUTPE(obs, mod, axis=None):
@@ -673,7 +677,10 @@ def USUTPE(obs, mod, axis=None):
     elif isinstance(mod, np.ndarray) and isinstance(obs, np.ndarray):
         return (np.abs(mod.max(axis=axis) - obs.max(axis=axis)) / obs.max(axis=axis)) * 100.0
     else:
-        return (np.ma.abs(np.ma.max(mod, axis=axis) - np.ma.max(obs, axis=axis)) / np.ma.max(obs, axis=axis)) * 100.0
+        return (
+            np.ma.abs(np.ma.max(mod, axis=axis) - np.ma.max(obs, axis=axis))
+            / np.ma.max(obs, axis=axis)
+        ) * 100.0
 
 
 def MNPB(obs, mod, paxis, axis=None):
@@ -698,9 +705,13 @@ def MNPB(obs, mod, paxis, axis=None):
     """
     if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
-        return (((mod.max(dim=paxis) - obs.max(dim=paxis)) / obs.max(dim=paxis)).mean(dim=axis)) * 100.0
+        return (
+            ((mod.max(dim=paxis) - obs.max(dim=paxis)) / obs.max(dim=paxis)).mean(dim=axis)
+        ) * 100.0
     else:
-        return ((np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)) / np.ma.max(obs, axis=paxis)).mean(axis=axis) * 100.0
+        return (
+            (np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)) / np.ma.max(obs, axis=paxis)
+        ).mean(axis=axis) * 100.0
 
 
 def MdnNPB(obs, mod, paxis, axis=None):
@@ -725,9 +736,20 @@ def MdnNPB(obs, mod, paxis, axis=None):
     """
     if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
-        return ((mod.max(dim=paxis) - obs.max(dim=paxis)) / obs.max(dim=paxis)).median(dim=axis) * 100.0
+        return ((mod.max(dim=paxis) - obs.max(dim=paxis)) / obs.max(dim=paxis)).median(
+            dim=axis
+        ) * 100.0
     else:
-        return np.ma.median(((np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)) / np.ma.max(obs, axis=paxis)), axis=axis) * 100.0
+        return (
+            np.ma.median(
+                (
+                    (np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis))
+                    / np.ma.max(obs, axis=paxis)
+                ),
+                axis=axis,
+            )
+            * 100.0
+        )
 
 
 def MNPE(obs, mod, paxis, axis=None):
@@ -767,9 +789,14 @@ def MNPE(obs, mod, paxis, axis=None):
 
     if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
-        return (abs(mod.max(dim=paxis) - obs.max(dim=paxis)) / obs.max(dim=paxis)).mean(dim=axis) * 100.0
+        return (abs(mod.max(dim=paxis) - obs.max(dim=paxis)) / obs.max(dim=paxis)).mean(
+            dim=axis
+        ) * 100.0
     else:
-        return (np.ma.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)) / np.ma.max(obs, axis=paxis)).mean(axis=axis) * 100.0
+        return (
+            np.ma.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis))
+            / np.ma.max(obs, axis=paxis)
+        ).mean(axis=axis) * 100.0
 
 
 def MdnNPE(obs, mod, paxis, axis=None):
@@ -778,8 +805,10 @@ def MdnNPE(obs, mod, paxis, axis=None):
 
     Typical Use Cases
     -----------------
-    - Evaluating the typical error in peak values between model and observations, normalized by observed peaks, robust to outliers.
-    - Used in robust model evaluation for extreme events, such as air quality exceedances or meteorological extremes.
+    - Evaluating the typical error in peak values between model and observations,
+      normalized by observed peaks, robust to outliers.
+    - Used in robust model evaluation for extreme events, such as air quality exceedances
+      or meteorological extremes.
 
     Parameters
     ----------
@@ -808,9 +837,20 @@ def MdnNPE(obs, mod, paxis, axis=None):
     """
     if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
-        return (abs(mod.max(dim=paxis) - obs.max(dim=paxis)) / obs.max(dim=paxis)).median(dim=axis) * 100.0
+        return (abs(mod.max(dim=paxis) - obs.max(dim=paxis)) / obs.max(dim=paxis)).median(
+            dim=axis
+        ) * 100.0
     else:
-        return np.ma.median((np.ma.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)) / np.ma.max(obs, axis=paxis)), axis=axis) * 100.0
+        return (
+            np.ma.median(
+                (
+                    np.ma.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis))
+                    / np.ma.max(obs, axis=paxis)
+                ),
+                axis=axis,
+            )
+            * 100.0
+        )
 
 
 def NMPB(obs, mod, paxis, axis=None):
@@ -849,9 +889,15 @@ def NMPB(obs, mod, paxis, axis=None):
     """
     if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
-        return ((mod.max(dim=paxis) - obs.max(dim=paxis)).mean(dim=axis) / obs.max(dim=paxis).mean(dim=axis)) * 100.0
+        return (
+            (mod.max(dim=paxis) - obs.max(dim=paxis)).mean(dim=axis)
+            / obs.max(dim=paxis).mean(dim=axis)
+        ) * 100.0
     else:
-        return ((np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)).mean(axis=axis) / np.ma.max(obs, axis=paxis).mean(axis=axis)) * 100.0
+        return (
+            (np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)).mean(axis=axis)
+            / np.ma.max(obs, axis=paxis).mean(axis=axis)
+        ) * 100.0
 
 
 def NMdnPB(obs, mod, paxis, axis=None):
@@ -890,9 +936,16 @@ def NMdnPB(obs, mod, paxis, axis=None):
     """
     if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
-        return (mod.max(dim=paxis) - obs.max(dim=paxis)).median(dim=axis) / obs.max(dim=paxis).median(dim=axis) * 100.0
+        return (
+            (mod.max(dim=paxis) - obs.max(dim=paxis)).median(dim=axis)
+            / obs.max(dim=paxis).median(dim=axis)
+            * 100.0
+        )
     else:
-        return (np.ma.median(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis), axis=axis) / np.ma.median(np.ma.max(obs, axis=paxis), axis=axis)) * 100.0
+        return (
+            np.ma.median(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis), axis=axis)
+            / np.ma.median(np.ma.max(obs, axis=paxis), axis=axis)
+        ) * 100.0
 
 
 def NMPE(obs, mod, paxis, axis=None):
@@ -931,9 +984,15 @@ def NMPE(obs, mod, paxis, axis=None):
     """
     if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
-        return (abs(mod.max(dim=paxis) - obs.max(dim=paxis)).mean(dim=axis) / obs.max(dim=paxis).mean(dim=axis)) * 100.0
+        return (
+            abs(mod.max(dim=paxis) - obs.max(dim=paxis)).mean(dim=axis)
+            / obs.max(dim=paxis).mean(dim=axis)
+        ) * 100.0
     else:
-        return (np.ma.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)).mean(axis=axis) / np.ma.max(obs, axis=paxis).mean(axis=axis)) * 100.0
+        return (
+            np.ma.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)).mean(axis=axis)
+            / np.ma.max(obs, axis=paxis).mean(axis=axis)
+        ) * 100.0
 
 
 def NMdnPE(obs, mod, paxis, axis=None):
@@ -972,9 +1031,18 @@ def NMdnPE(obs, mod, paxis, axis=None):
     """
     if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
-        return (abs(mod.max(dim=paxis) - obs.max(dim=paxis))).median(dim=axis) / obs.max(dim=paxis).median(dim=axis) * 100.0
+        return (
+            (abs(mod.max(dim=paxis) - obs.max(dim=paxis))).median(dim=axis)
+            / obs.max(dim=paxis).median(dim=axis)
+            * 100.0
+        )
     else:
-        return (np.ma.median(np.ma.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)), axis=axis) / np.ma.median(np.ma.max(obs, axis=paxis), axis=axis)) * 100.0
+        return (
+            np.ma.median(
+                np.ma.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)), axis=axis
+            )
+            / np.ma.median(np.ma.max(obs, axis=paxis), axis=axis)
+        ) * 100.0
 
 
 def PSUTMNPB(obs, mod, axis=None):
@@ -1076,7 +1144,8 @@ def PSUTNMdnPE(obs, mod, axis=None):
 
     Typical Use Cases
     -----------------
-    - Evaluating the normalized median peak error for spatially paired, temporally unpaired datasets, robust to outliers.
+    - Evaluating the normalized median peak error for spatially paired, temporally unpaired
+      datasets, robust to outliers.
     - Used in robust model evaluation for spatial ensemble or multi-time analysis.
 
     Parameters

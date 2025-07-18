@@ -1,12 +1,16 @@
 """
 Error Metrics for Model Evaluation
 """
+
 import numpy as np
 import xarray as xr
-from .utils_stats import matchmasks, circlebias, circlebias_m
+
+from .utils_stats import circlebias, circlebias_m, matchmasks
+
 ############################################################
 # 1. Basic Error Metrics
 ############################################################
+
 
 def STDO(obs, mod, axis=None):
     """
@@ -29,6 +33,7 @@ def STDO(obs, mod, axis=None):
     else:
         return np.std(obs, axis=axis)
 
+
 def STDP(obs, mod, axis=None):
     """
     Standard deviation of Predictions
@@ -50,6 +55,7 @@ def STDP(obs, mod, axis=None):
     else:
         return np.std(mod, axis=axis)
 
+
 def MNB(obs, mod, axis=None):
     """
     Mean Normalized Bias (%)
@@ -70,9 +76,10 @@ def MNB(obs, mod, axis=None):
     """
     if hasattr(obs, "dims") and hasattr(mod, "dims"):
         obs, mod = obs.align(mod, join="inner")
-        return (((mod - obs) / obs).mean(dim=obs.dims[axis] if axis is not None else None) * 100.0)
+        return ((mod - obs) / obs).mean(dim=obs.dims[axis] if axis is not None else None) * 100.0
     else:
         return np.ma.masked_invalid((mod - obs) / obs).mean(axis=axis) * 100.0
+
 
 def MNE(obs, mod, axis=None):
     """
@@ -94,9 +101,10 @@ def MNE(obs, mod, axis=None):
     """
     if hasattr(obs, "dims") and hasattr(mod, "dims"):
         obs, mod = obs.align(mod, join="inner")
-        return ((abs(mod - obs) / obs).mean(dim=obs.dims[axis] if axis is not None else None) * 100.0)
+        return (abs(mod - obs) / obs).mean(dim=obs.dims[axis] if axis is not None else None) * 100.0
     else:
         return np.ma.masked_invalid(np.ma.abs(mod - obs) / obs).mean(axis=axis) * 100.0
+
 
 def MdnNB(obs, mod, axis=None):
     """
@@ -122,16 +130,12 @@ def MdnNB(obs, mod, axis=None):
         Description of returned object.
 
     """
-    xr = None
-    try:
-        import xarray as xr
-    except ImportError:
-        pass
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if "xr" in globals() and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return ((mod - obs) / obs).median(dim=axis) * 100.0
     else:
         return np.ma.median(np.ma.masked_invalid((mod - obs) / obs), axis=axis) * 100.0
+
 
 def MdnNE(obs, mod, axis=None):
     """
@@ -157,16 +161,12 @@ def MdnNE(obs, mod, axis=None):
         Description of returned object.
 
     """
-    xr = None
-    try:
-        import xarray as xr
-    except ImportError:
-        pass
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if "xr" in globals() and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return (abs(mod - obs) / obs).median(dim=axis) * 100.0
     else:
         return np.ma.median(np.ma.masked_invalid(np.ma.abs(mod - obs) / obs), axis=axis) * 100.0
+
 
 def NMdnGE(obs, mod, axis=None):
     """
@@ -201,7 +201,10 @@ def NMdnGE(obs, mod, axis=None):
         obs, mod = xr.align(obs, mod, join="inner")
         return (abs(mod - obs).mean(dim=axis) / obs.mean(dim=axis)) * 100.0
     else:
-        return np.ma.masked_invalid(np.ma.abs(mod - obs).mean(axis=axis) / obs.mean(axis=axis)) * 100.0
+        return (
+            np.ma.masked_invalid(np.ma.abs(mod - obs).mean(axis=axis) / obs.mean(axis=axis)) * 100.0
+        )
+
 
 def NO(obs, mod, axis=None):
     """
@@ -236,6 +239,7 @@ def NO(obs, mod, axis=None):
         return obs.count(dim=axis)
     else:
         return (~np.ma.getmaskarray(obs)).sum(axis=axis)
+
 
 def NOP(obs, mod, axis=None):
     """
@@ -273,6 +277,7 @@ def NOP(obs, mod, axis=None):
         obsc, modc = matchmasks(obs, mod)
         return (~np.ma.getmaskarray(obsc)).sum(axis=axis)
 
+
 def NP(obs, mod, axis=None):
     """
     N Predictions (#)
@@ -306,6 +311,7 @@ def NP(obs, mod, axis=None):
         return mod.count(dim=axis)
     else:
         return (~np.ma.getmaskarray(mod)).sum(axis=axis)
+
 
 def MO(obs, mod, axis=None):
     """
@@ -343,6 +349,7 @@ def MO(obs, mod, axis=None):
     else:
         return np.mean(obs, axis=axis)
 
+
 def MP(obs, mod, axis=None):
     """
     Mean Predictions (model unit)
@@ -379,6 +386,7 @@ def MP(obs, mod, axis=None):
     else:
         return np.mean(mod, axis=axis)
 
+
 def MdnO(obs, mod, axis=None):
     """
     Median Observations (obs unit)
@@ -404,6 +412,7 @@ def MdnO(obs, mod, axis=None):
 
     """
     import dask.array as da
+
     xr = None
     try:
         import xarray as xr
@@ -419,6 +428,7 @@ def MdnO(obs, mod, axis=None):
         return obs.median(axis=axis)
     else:
         return np.median(obs, axis=axis)
+
 
 def MdnP(obs, mod, axis=None):
     """
@@ -558,7 +568,6 @@ def MdnB(obs, mod, axis=None):
         return np.ma.median(mod - obs, axis=axis)
 
 
-
 def WDMB_m(obs, mod, axis=None):
     """
     Wind Direction Mean Bias (WDMB, robust version for masked arrays)
@@ -591,7 +600,6 @@ def WDMB_m(obs, mod, axis=None):
         return circlebias_m(mod - obs).mean(axis=axis)
     else:
         return np.ma.mean(circlebias_m(mod - obs), axis=axis)
-
 
 
 def WDMB(obs, mod, axis=None):
@@ -658,6 +666,7 @@ def WDMdnB(obs, mod, axis=None):
     else:
         return np.ma.median(circlebias(mod - obs), axis=axis)
 
+
 def MAE(obs, mod, axis=None):
     """
     Mean Absolute Error (MAE).
@@ -699,6 +708,7 @@ def MAE(obs, mod, axis=None):
         return abs(mod - obs).mean(dim=axis)
     else:
         return np.ma.abs(mod - obs).mean(axis=axis)
+
 
 def MedAE(obs, mod, axis=None):
     """
@@ -742,6 +752,7 @@ def MedAE(obs, mod, axis=None):
     else:
         return np.ma.median(np.ma.abs(mod - obs), axis=axis)
 
+
 def sMAPE(obs, mod, axis=None):
     """
     Symmetric Mean Absolute Percentage Error (sMAPE).
@@ -783,6 +794,7 @@ def sMAPE(obs, mod, axis=None):
         return (200 * abs(mod - obs) / (abs(mod) + abs(obs))).mean(dim=axis)
     else:
         return (200 * np.ma.abs(mod - obs) / (np.ma.abs(mod) + np.ma.abs(obs))).mean(axis=axis)
+
 
 def CRMSE(obs, mod, axis=None):
     """

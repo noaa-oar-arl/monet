@@ -1,18 +1,18 @@
 """Base accessor implementation for MONET"""
 
-import numpy as np
-import pandas as pd
 import xarray as xr
 
 try:
-    import xesmf
+    import xesmf  # noqa: F401
+
     has_xesmf = True
 except ImportError:
     has_xesmf = False
 
 try:
-    import pyresample as pr
+    import pyresample  # noqa: F401
     from pyresample.utils import wrap_longitudes
+
     has_pyresample = True
 except ImportError:
     has_pyresample = False
@@ -24,10 +24,12 @@ except ImportError:
 
 class BaseAccessor:
     """Base class for MONET accessors with common utility methods."""
+
     @staticmethod
     def safe_import(module_name, error_msg=None):
         """Import a module with a clear error message if not found."""
         import importlib
+
         try:
             return importlib.import_module(module_name)
         except ImportError:
@@ -128,10 +130,39 @@ class BaseAccessor:
             (lat_name, lon_name) if found, otherwise (None, None)
         """
         # Common latitude/longitude naming patterns, including non-rectilinear grid names
-        lat_names = ['latitude', 'lat', 'Latitude', 'LATITUDE', 'LAT', 'y', 'Lat',
-                     'XLAT', 'XLAT_M', 'grid_yt', 'nav_lat', 'NY', 'lat_b', 'lat_centers']
-        lon_names = ['longitude', 'lon', 'Longitude', 'LONGITUDE', 'LON', 'x', 'Long', 'Lon',
-                     'XLONG', 'XLONG_M', 'grid_xt', 'nav_lon', 'NX', 'lon_b', 'lon_centers']
+        lat_names = [
+            "latitude",
+            "lat",
+            "Latitude",
+            "LATITUDE",
+            "LAT",
+            "y",
+            "Lat",
+            "XLAT",
+            "XLAT_M",
+            "grid_yt",
+            "nav_lat",
+            "NY",
+            "lat_b",
+            "lat_centers",
+        ]
+        lon_names = [
+            "longitude",
+            "lon",
+            "Longitude",
+            "LONGITUDE",
+            "LON",
+            "x",
+            "Long",
+            "Lon",
+            "XLONG",
+            "XLONG_M",
+            "grid_xt",
+            "nav_lon",
+            "NX",
+            "lon_b",
+            "lon_centers",
+        ]
 
         # First check in coordinates
         for lat, lon in zip(lat_names, lon_names):
@@ -150,10 +181,10 @@ class BaseAccessor:
 
         if isinstance(ds, xr.Dataset):
             for var in ds.variables:
-                if 'standard_name' in ds[var].attrs:
-                    if ds[var].attrs['standard_name'] in ['latitude', 'grid_latitude']:
+                if "standard_name" in ds[var].attrs:
+                    if ds[var].attrs["standard_name"] in ["latitude", "grid_latitude"]:
                         lat_name = var
-                    elif ds[var].attrs['standard_name'] in ['longitude', 'grid_longitude']:
+                    elif ds[var].attrs["standard_name"] in ["longitude", "grid_longitude"]:
                         lon_name = var
 
             if lat_name is not None and lon_name is not None:
@@ -162,7 +193,14 @@ class BaseAccessor:
         return None, None
 
     @staticmethod
-    def _dataset_to_monet(dset, lat_name="latitude", lon_name="longitude", latlon2d=None, lon180=None, coards_compliant=False):
+    def _dataset_to_monet(
+        dset,
+        lat_name="latitude",
+        lon_name="longitude",
+        latlon2d=None,
+        lon180=None,
+        coards_compliant=False,
+    ):
         """Rename xarray DataArray or Dataset coordinate variables for use with monet functions.
 
         Parameters
@@ -205,7 +243,9 @@ class BaseAccessor:
         # Handle grid_xt dimension in UFS files
         if "grid_xt" in dset.dims:  # UFS
             if isinstance(dset, xr.DataArray):
-                dset = BaseAccessor._dataarray_coards_to_netcdf(dset, lat_name="grid_yt", lon_name="grid_xt")
+                dset = BaseAccessor._dataarray_coards_to_netcdf(
+                    dset, lat_name="grid_yt", lon_name="grid_xt"
+                )
             elif isinstance(dset, xr.Dataset):
                 dset = BaseAccessor._coards_to_netcdf(dset, lat_name="grid_yt", lon_name="grid_xt")
 
@@ -232,17 +272,17 @@ class BaseAccessor:
         # Check for Climate and Forecast (CF) convention attributes
         if isinstance(dset, xr.Dataset):
             for var in dset.variables:
-                if 'standard_name' in dset[var].attrs:
-                    if dset[var].attrs['standard_name'] in ['latitude', 'grid_latitude']:
+                if "standard_name" in dset[var].attrs:
+                    if dset[var].attrs["standard_name"] in ["latitude", "grid_latitude"]:
                         lat_name = var
-                    elif dset[var].attrs['standard_name'] in ['longitude', 'grid_longitude']:
+                    elif dset[var].attrs["standard_name"] in ["longitude", "grid_longitude"]:
                         lon_name = var
 
         # Rename lat/lon coordinates to 'latitude'/'longitude'
         dset = BaseAccessor._rename_to_monet_latlon(dset)  # common cases
-        if (isinstance(dset, xr.Dataset) and not {"latitude", "longitude"} <= set(dset.variables)) or (
-            isinstance(dset, xr.DataArray) and not {"latitude", "longitude"} <= set(dset.coords)
-        ):
+        if (
+            isinstance(dset, xr.Dataset) and not {"latitude", "longitude"} <= set(dset.variables)
+        ) or (isinstance(dset, xr.DataArray) and not {"latitude", "longitude"} <= set(dset.coords)):
             dset = dset.rename({lat_name: "latitude", lon_name: "longitude"})
 
         # Maybe wrap longitudes
@@ -271,9 +311,13 @@ class BaseAccessor:
         if not latlon2d:
             try:
                 if isinstance(dset, xr.DataArray):
-                    dset = BaseAccessor._dataarray_coards_to_netcdf(dset, lat_name="latitude", lon_name="longitude")
+                    dset = BaseAccessor._dataarray_coards_to_netcdf(
+                        dset, lat_name="latitude", lon_name="longitude"
+                    )
                 elif isinstance(dset, xr.Dataset):
-                    dset = BaseAccessor._coards_to_netcdf(dset, lat_name="latitude", lon_name="longitude")
+                    dset = BaseAccessor._coards_to_netcdf(
+                        dset, lat_name="latitude", lon_name="longitude"
+                    )
             except Exception as e:
                 # If conversion fails, log error and return original dataset
                 print(f"Error converting COARDS format: {e}")
@@ -281,7 +325,8 @@ class BaseAccessor:
 
         # Make COARDS compliant if requested
         if coards_compliant:
-            from ..util.coards_tools import monet_to_coards, add_cf_standard_names
+            from ..util.coards_tools import add_cf_standard_names, monet_to_coards
+
             dset = monet_to_coards(dset)
             dset = add_cf_standard_names(dset)
 
@@ -472,9 +517,12 @@ class BaseAccessor:
             raise ImportError("pyresample is required for this functionality")
 
         from pyresample import geometry as geo
+
         return geo.CoordinateDefinition(lats=data.latitude, lons=data.longitude)
 
-    def structure_for_monet(self, lat_name="lat", lon_name="lon", return_obj=True, coards_compliant=False):
+    def structure_for_monet(
+        self, lat_name="lat", lon_name="lon", return_obj=True, coards_compliant=False
+    ):
         """Structure the DataArray for use with MONET functions.
 
         Parameters
@@ -494,8 +542,10 @@ class BaseAccessor:
             Restructured DataArray if return_obj is True, otherwise None.
         """
         if return_obj:
-            return self._dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name,
-                                         coards_compliant=coards_compliant)
+            return self._dataset_to_monet(
+                self._obj, lat_name=lat_name, lon_name=lon_name, coards_compliant=coards_compliant
+            )
         else:
-            self._obj = self._dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name,
-                                              coards_compliant=coards_compliant)
+            self._obj = self._dataset_to_monet(
+                self._obj, lat_name=lat_name, lon_name=lon_name, coards_compliant=coards_compliant
+            )

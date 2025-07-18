@@ -1,7 +1,9 @@
 """
 Utility Functions for Statistics
 """
+
 import numpy as np
+
 
 def matchedcompressed(a1, a2):
     """
@@ -36,6 +38,7 @@ def matchedcompressed(a1, a2):
     a1, a2 = matchmasks(a1, a2)
     return a1.compressed(), a2.compressed()
 
+
 def matchmasks(a1, a2):
     """
     Match and combine masks from two masked arrays.
@@ -63,7 +66,8 @@ def matchmasks(a1, a2):
     >>> a1 = np.ma.array([1, 2, 3], mask=[0, 1, 0])
     >>> a2 = np.ma.array([4, 5, 6], mask=[0, 0, 1])
     >>> matchmasks(a1, a2)
-    (masked_array(data=[1, --, 3], mask=[False,  True, False]), masked_array(data=[4, --, --], mask=[False, False,  True]))
+    (masked_array(data=[1, --, 3], mask=[False,  True, False]),
+     masked_array(data=[4, --, --], mask=[False, False,  True]))
     """
     try:
         import xarray as xr
@@ -85,7 +89,8 @@ def circlebias_m(b):
 
     Typical Use Cases
     -----------------
-    - Calculating the signed difference between two wind directions, accounting for circularity, robust to masked arrays.
+    - Calculating the signed difference between two wind directions, accounting for circularity,
+      robust to masked arrays.
     - Used in wind direction bias and error metrics for masked or missing data.
 
     Parameters
@@ -140,4 +145,3 @@ def circlebias(b):
     """
     b = np.asarray(b)
     return (b + 180) % 360 - 180
-

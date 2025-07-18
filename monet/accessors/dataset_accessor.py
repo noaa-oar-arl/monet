@@ -6,6 +6,7 @@ import xarray as xr
 
 from .base import BaseAccessor, has_pyresample, has_xesmf
 
+
 @xr.register_dataset_accessor("monet")
 class MONETAccessorDataset(BaseAccessor):
     def __init__(self, xray_obj):
@@ -119,15 +120,12 @@ class MONETAccessorDataset(BaseAccessor):
         try:
             from ..util import resample
 
-            kwargs['method'] = kwargs.get('method', 'bilinear')
+            kwargs["method"] = kwargs.get("method", "bilinear")
             target = self._rename_latlon(self._obj)
             source = self._rename_latlon(data)
 
             out = resample.resample_xesmf(
-                source, target,
-                parallel=parallel,
-                n_workers=n_workers,
-                **kwargs
+                source, target, parallel=parallel, n_workers=n_workers, **kwargs
             )
 
             return self._rename_to_monet_latlon(out)
@@ -160,14 +158,14 @@ class MONETAccessorDataset(BaseAccessor):
 
         source_data = self._dataset_to_monet(data)
         target_data = self._dataset_to_monet(self._obj)
-        source = self._get_CoordinateDefinition(source_data)
         target = self._get_CoordinateDefinition(target_data)
 
         result = resample.resample_pyresample_parallel(
-            source_data, target,
+            source_data,
+            target,
             radius_of_influence=radius_of_influence,
             n_processes=n_processes,
-            **kwargs
+            **kwargs,
         )
 
         # Ensure coordinates are properly set
@@ -177,7 +175,7 @@ class MONETAccessorDataset(BaseAccessor):
 
         return result
 
-    def combine_point_esmf(self, point_df, method='bilinear', **kwargs):
+    def combine_point_esmf(self, point_df, method="bilinear", **kwargs):
         """Combine this dataset with point data using ESMF LocStream.
 
         Parameters
@@ -198,11 +196,7 @@ class MONETAccessorDataset(BaseAccessor):
 
         grid_data = self._dataset_to_monet(self._obj)
 
-        return combine_grid_to_point_esmf(
-            grid_data, point_df,
-            method=method,
-            **kwargs
-        )
+        return combine_grid_to_point_esmf(grid_data, point_df, method=method, **kwargs)
 
     def _remap_xesmf_dataset(self, dset, filename="monet_xesmf_regrid_file.nc", **kwargs):
         """Remap dataset using xESMF.
@@ -289,15 +283,12 @@ class MONETAccessorDataset(BaseAccessor):
         if not has_pyresample:
             raise ImportError("pyresample is required for this functionality")
         from ..util import resample
+
         source_data = self._dataset_to_monet(data)
         target_data = self._dataset_to_monet(self._obj)
-        source = self._get_CoordinateDefinition(source_data)
         target = self._get_CoordinateDefinition(target_data)
         result = resample.resample(
-            source_data, target,
-            method=method,
-            radius_of_influence=radius_of_influence,
-            **kwargs
+            source_data, target, method=method, radius_of_influence=radius_of_influence, **kwargs
         )
         # Ensure coordinates are properly set
         if isinstance(result, xr.DataArray):
@@ -449,6 +440,7 @@ class MONETAccessorDataset(BaseAccessor):
 
         try:
             from pyresample import utils
+
             from ..util.interp_util import lonlat_to_swathdefinition as llsd
             from ..util.interp_util import nearest_point_swathdefinition as npsd
         except ImportError:
@@ -498,6 +490,7 @@ class MONETAccessorDataset(BaseAccessor):
         if has_pyresample:
             try:
                 from pyresample import utils
+
                 from ..util.interp_util import lonlat_to_swathdefinition as llsd
                 from ..util.interp_util import nearest_point_swathdefinition as npsd
             except ImportError:
@@ -515,6 +508,7 @@ class MONETAccessorDataset(BaseAccessor):
             self._obj = self._rename_latlon(self._obj)
             from ..util.interp_util import lonlat_to_xesmf
             from ..util.resample import resample_xesmf
+
             target = lonlat_to_xesmf(longitude=lon, latitude=lat)
             output = resample_xesmf(self._obj, target, **kwargs)
             if cleanup:
@@ -566,6 +560,7 @@ class MONETAccessorDataset(BaseAccessor):
         elif has_xesmf:
             from ..util.interp_util import constant_1d_xesmf
             from ..util.resample import resample_xesmf
+
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
             return self._rename_latlon(out)
@@ -611,6 +606,7 @@ class MONETAccessorDataset(BaseAccessor):
         elif has_xesmf:
             from ..util.interp_util import constant_1d_xesmf
             from ..util.resample import resample_xesmf
+
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
             return self._rename_latlon(out)
@@ -637,19 +633,23 @@ class MONETAccessorDataset(BaseAccessor):
         if isinstance(vertical, str):
             vertical = self._obj[vertical]
         vertical_shape = vertical.shape
+        vlen = -len(vertical_shape)
         loop_vars = [
             vn
             for vn in self._obj.variables
             if "z" in self._obj[vn].dims
             and vn != vertical.name
             and len(self._obj[vn].shape) >= len(vertical_shape)
-            and self._obj[vn].shape[-len(vertical_shape):] == vertical_shape
+            and self._obj[vn].shape[vlen:] == vertical_shape
         ]
 
         if not loop_vars:
-            raise ValueError("No variables found with vertical dimension matching the provided coordinate")
+            raise ValueError(
+                "No variables found with vertical dimension matching the provided coordinate"
+            )
 
         from ..util.resample import resample_stratify
+
         orig = resample_stratify(self._obj[loop_vars[0]], levels, vertical, axis=axis)
         dset = orig.to_dataset(name=loop_vars[0])
         dset.attrs = self._obj.attrs.copy()
@@ -682,6 +682,7 @@ class MONETAccessorDataset(BaseAccessor):
             try:
                 from numpy import concatenate
                 from pyresample import utils
+
                 from ..util.interp_util import lonlat_to_swathdefinition as llsd
                 from ..util.interp_util import nearest_point_swathdefinition as npsd
 
@@ -691,10 +692,14 @@ class MONETAccessorDataset(BaseAccessor):
                 pswath_ll = npsd(longitude=float(lon_min), latitude=float(lat_min))
                 pswath_ur = npsd(longitude=float(lon_max), latitude=float(lat_max))
 
-                row, col = utils.generate_nearest_neighbour_linesample_arrays(swath, pswath_ll, float(1e6))
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ll, float(1e6)
+                )
                 y_ll, x_ll = row[0][0], col[0][0]
 
-                row, col = utils.generate_nearest_neighbour_linesample_arrays(swath, pswath_ur, float(1e6))
+                row, col = utils.generate_nearest_neighbour_linesample_arrays(
+                    swath, pswath_ur, float(1e6)
+                )
                 y_ur, x_ur = row[0][0], col[0][0]
 
                 if x_ur < x_ll:
@@ -742,10 +747,12 @@ class MONETAccessorDataset(BaseAccessor):
 
         if has_pyresample and pyresample:
             from ..util.combinetool import combine_da_to_df
+
             da = self._dataset_to_monet(self._obj)
             return combine_da_to_df(da, data, **kwargs)
         elif has_xesmf:
             from ..util.combinetool import combine_da_to_df_xesmf
+
             da = self._dataset_to_monet(self._obj)
             return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
         else:
@@ -786,7 +793,7 @@ class MONETAccessorDataset(BaseAccessor):
         wdl = wd.sortby(wd[lon_name])
         return wdl
 
-    def to_area_def(self, projection='platea', resolution=None, area_id=None):
+    def to_area_def(self, projection="platea", resolution=None, area_id=None):
         """Convert the dataset's coordinates to a pyresample AreaDefinition.
 
         Parameters
@@ -815,10 +822,7 @@ class MONETAccessorDataset(BaseAccessor):
         from ..util.interp_util import guess_area_def_from_dataset
 
         return guess_area_def_from_dataset(
-            self._obj,
-            projection=projection,
-            resolution=resolution,
-            area_id=area_id
+            self._obj, projection=projection, resolution=resolution, area_id=area_id
         )
 
     def to_swath_def(self):
@@ -836,15 +840,40 @@ class MONETAccessorDataset(BaseAccessor):
 
         # Process as UGRID if it has mesh topology
         for var in self._obj.variables:
-            if hasattr(self._obj[var], 'cf_role') and self._obj[var].cf_role == 'mesh_topology':
+            if hasattr(self._obj[var], "cf_role") and self._obj[var].cf_role == "mesh_topology":
                 from ..util.interp_util import ugrid_to_swath_definition
+
                 return ugrid_to_swath_definition(self._obj)
 
         # Otherwise use standard methods
         ds = self._dataset_to_monet(self._obj)
         return self._get_CoordinateDefinition(ds)
 
-    def quick_facet_time_map(self, var, map_kws=None, projection=None, colorbar=True, figsize=None, cmap=None, vmin=None, vmax=None, norm=None, dpi=150, xlabel=None, ylabel=None, suptitle=None, cbar_label=None, xticks=None, yticks=None, annotations=None, export_path=None, export_formats=None, time_dim="time", ncols=3, **kwargs):
+    def quick_facet_time_map(
+        self,
+        var,
+        map_kws=None,
+        projection=None,
+        colorbar=True,
+        figsize=None,
+        cmap=None,
+        vmin=None,
+        vmax=None,
+        norm=None,
+        dpi=150,
+        xlabel=None,
+        ylabel=None,
+        suptitle=None,
+        cbar_label=None,
+        xticks=None,
+        yticks=None,
+        annotations=None,
+        export_path=None,
+        export_formats=None,
+        time_dim="time",
+        ncols=3,
+        **kwargs,
+    ):
         """
         Create a facet grid of map plots for each time slice in a Dataset variable using Cartopy.
 
@@ -895,6 +924,7 @@ class MONETAccessorDataset(BaseAccessor):
             The matplotlib axes objects.
         """
         from ..plots.cartopy_utils import facet_time_map
+
         da = self._dataset_to_monet(self._obj[var])
         return facet_time_map(
             da,
@@ -918,6 +948,5 @@ class MONETAccessorDataset(BaseAccessor):
             annotations=annotations,
             export_path=export_path,
             export_formats=export_formats,
-            **kwargs
+            **kwargs,
         )
-

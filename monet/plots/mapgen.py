@@ -18,7 +18,7 @@ def draw_map(
     figsize=(10, 5),
     linewidth=0.25,
     return_fig=False,
-    **kwargs
+    **kwargs,
 ):
     """Draw a map with Cartopy.
 
