@@ -68,6 +68,11 @@ DataArray Accessor
    DataArray.monet.remap_nearest
    DataArray.monet.remap_xesmf
    DataArray.monet.combine_point
+   DataArray.monet.compare
+   DataArray.monet.quick_facet_time_map
+   DataArray.monet.remap_nearest_parallel
+   DataArray.monet.to_area_def
+   DataArray.monet.to_swath_def
 
 
 Dataset Accessor
@@ -94,6 +99,10 @@ Dataset Accessor
    Dataset.monet.remap_nearest_unstructured
    Dataset.monet.remap_xesmf
    Dataset.monet.combine_point
+   Dataset.monet.remap_nearest_parallel
+   Dataset.monet.quick_facet_time_map
+   Dataset.monet.to_area_def
+   Dataset.monet.to_swath_def
 
 
 .. _pandas-accessors:
@@ -113,6 +122,18 @@ DataFrame Accessor
    DataFrame.monet.get_sparse_SwathDefinition
    DataFrame.monet.remap_nearest
    DataFrame.monet.cftime_to_datetime64
+   DataFrame.monet.plot_points_map
+   DataFrame.monet.plot_lines_map
+
+.. autosummary::
+   :toctree: api/
+   :template: autosummary/class.rst
+
+   monet.accessors.dataarray_accessor.MONETAccessor
+   monet.accessors.dataset_accessor.MONETAccessorDataset
+   monet.accessors.pandas_accessor.MONETAccessorPandas
+   monet.accessors.base.BaseAccessor
+   monet.plots.taylordiagram.TaylorDiagram
 
 .. autosummary::
    :toctree: api/
@@ -121,4 +142,75 @@ DataFrame Accessor
    DataFrame.monet.center
 
 
+
+
+
+.. _util:
+
+Utility Functions (monet.util)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: monet.util
+
+.. autosummary::
+   :toctree: api/
+   :template: autosummary/function.rst
+
+   nearest
+   search_listinlist
+   linregress
+   findclosest
+   kolmogorov_zurbenko_filter
+   wsdir2uv
+   long_to_wide
+   calc_8hr_rolling_max
+   calc_24hr_ave
+   calc_3hr_ave
+   calc_annual_ave
+   get_giorgi_region_bounds
+   get_giorgi_region_df
+   calc_13_category_usda_soil_type
+
+.. _plots:
+
+Plotting Functions (monet.plots)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: monet.plots
+
+.. autosummary::
+   :toctree: api/
+   :template: autosummary/function.rst
+
+   plots.make_spatial_plot
+   plots.spatial
+   plots.make_spatial_contours
+   plots.wind_quiver
+   plots.wind_barbs
+   plots.normval
+   plots.spatial_bias_scatter
+   plots.timeseries
+   plots.kdeplot
+   plots.scatter
+   plots.taylordiagram
+   mapgen.draw_map
+   colorbars.colorbar_index
+   colorbars.cmap_discretize
+   cartopy_utils.plot_quick_imshow
+   cartopy_utils.plot_quick_map
+   cartopy_utils.plot_quick_contourf
+   cartopy_utils.facet_time_map
+   cartopy_utils.plot_points_map
+   cartopy_utils.plot_lines_map
+
 .. _on GitHub: https://github.com/noaa-oar-arl/monet
+.. _xESMF: https://xesmf.readthedocs.io
+.. _pyresample: https://pyresample.readthedocs.io/en/latest/
+.. _global-land-mask: https://global-land-mask.readthedocs.io/en/latest/
+.. _cartopy: https://scitools.org.uk/cartopy/docs/latest/
+.. _matplotlib: https://matplotlib.org
+.. _xarray: https://docs.xarray.dev/en/stable/
+.. _pandas: https://pandas.pydata.org
+.. _dask: https://docs.dask.org/en/stable/
+.. _monet-reference: https://monet.readthedocs.io/en/latest/
+
