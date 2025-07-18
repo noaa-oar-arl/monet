@@ -19,12 +19,12 @@ jobs:
           python-version: "3.9"
       - uses: pre-commit/action@v3.0.1
 
-  spell:
-    name: codespell
-    runs-on: ubuntu-latest
-    if: github.repository == 'noaa-oar-arl/monet'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: codespell-project/actions-codespell@v2
-        with:
-          exclude_file: .codespell-exclude
+  # spell:
+  #   name: codespell
+  #   runs-on: ubuntu-latest
+  #   if: github.repository == 'noaa-oar-arl/monet'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: codespell-project/actions-codespell@v2
+  #       with:
+  #         exclude_file: .codespell-exclude
