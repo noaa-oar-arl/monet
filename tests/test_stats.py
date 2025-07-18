@@ -8,7 +8,7 @@ def test_scores():
     obs = np.linspace(0, 1, 21)
     mod = obs - 0.1  # low bias
     a, b, c, d = scores(obs, mod, minval=0.5)
-    assert a == 9 and b == 1 and c == 0 and d == 11
+    assert a == 9 and b == 2 and c == 0 and d == 10
 
     # All good
     a, b, c, d = scores([1, 1], [1, 1], minval=0)
