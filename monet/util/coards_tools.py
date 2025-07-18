@@ -244,33 +244,17 @@ def is_curvilinear_grid(ds):
     except ValueError:
         return False
 
-    # If lat/lon are 2D and have different shapes than x/y dimensions, it's likely curvilinear
-    if lat_var.ndim == 2 and lon_var.ndim == 2:
-        if ('x' in ds.dims and 'y' in ds.dims and
-            (lat_var.shape != (ds.dims['y'], ds.dims['x']) or
-             lon_var.shape != (ds.dims['y'], ds.dims['x']))):
+
+    # If lat/lon are 2D, and their values are not strictly monotonic along rows and columns, it's curvilinear
+    if lat_var is not None and lon_var is not None and lat_var.ndim == 2 and lon_var.ndim == 2:
+        lat_vals = lat_var.values
+        lon_vals = lon_var.values
+        # Check if all rows of lat are constant (rectilinear)
+        lat_rect = np.allclose(lat_vals, lat_vals[:, [0]])
+        # Check if all columns of lon are constant (rectilinear)
+        lon_rect = np.allclose(lon_vals, lon_vals[[0], :])
+        if not (lat_rect and lon_rect):
             return True
-
-        # Check if lat/lon have non-monotonic values along any axis
-        try:
-            lat_vals = lat_var.values
-            lon_vals = lon_var.values
-
-            # Check if lat/lon are monotonic along rows and columns
-            lat_monotonic_rows = all((np.diff(lat_vals, axis=1) >= 0).all() or
-                                    (np.diff(lat_vals, axis=1) <= 0).all())
-            lat_monotonic_cols = all((np.diff(lat_vals, axis=0) >= 0).all() or
-                                    (np.diff(lat_vals, axis=0) <= 0).all())
-            lon_monotonic_rows = all((np.diff(lon_vals, axis=1) >= 0).all() or
-                                    (np.diff(lon_vals, axis=1) <= 0).all())
-            lon_monotonic_cols = all((np.diff(lon_vals, axis=0) >= 0).all() or
-                                    (np.diff(lon_vals, axis=0) <= 0).all())
-
-            # If not monotonic in either dimension, it's likely curvilinear
-            if not (lat_monotonic_rows and lat_monotonic_cols and lon_monotonic_rows and lon_monotonic_cols):
-                return True
-        except Exception:
-            pass
 
     # Check for dimensions like 'nx', 'ny' that are common in curvilinear grids
     if ('nx' in ds.dims and 'ny' in ds.dims) or ('NX' in ds.dims and 'NY' in ds.dims):
@@ -295,10 +279,30 @@ def convert_coards_to_monet_format(ds):
     from ..accessors.base import BaseAccessor
 
     if isinstance(ds, xr.DataArray):
-        lat, lon, lat_name, lon_name = extract_latlon_dataarray(ds, return_names=True)
+        result = extract_latlon_dataarray(ds, return_names=True)
+        if len(result) == 4:
+            lat, lon, lat_name, lon_name = result
+        else:
+            lat, lon = result
+            lat_name = getattr(lat, 'name', None) or 'latitude'
+            lon_name = getattr(lon, 'name', None) or 'longitude'
+        if lat_name is None:
+            lat_name = 'latitude'
+        if lon_name is None:
+            lon_name = 'longitude'
         return BaseAccessor._dataset_to_monet(ds, lat_name=lat_name, lon_name=lon_name)
     else:
-        lat, lon, lat_name, lon_name = extract_latlon_dataset(ds, return_names=True)
+        result = extract_latlon_dataset(ds, return_names=True)
+        if len(result) == 4:
+            lat, lon, lat_name, lon_name = result
+        else:
+            lat, lon = result
+            lat_name = getattr(lat, 'name', None) or 'latitude'
+            lon_name = getattr(lon, 'name', None) or 'longitude'
+        if lat_name is None:
+            lat_name = 'latitude'
+        if lon_name is None:
+            lon_name = 'longitude'
         return BaseAccessor._dataset_to_monet(ds, lat_name=lat_name, lon_name=lon_name)
 
 
@@ -607,18 +611,41 @@ def add_cf_standard_names(ds, auto_detect=True, name_mapping=None):
     if name_mapping is not None:
         std_names.update(name_mapping)
 
-    # Iterate through all variables in the dataset
+    # Assign standard_name for Datasets
     if isinstance(result, xr.Dataset):
         for var_name, var in result.data_vars.items():
-            # Skip if variable already has a standard_name
+            if var_name is None:
+                continue
             if 'standard_name' in var.attrs:
                 continue
-
-            # Try to match the variable name with a standard name
-            if auto_detect:
+            var_name_str = str(var_name)
+            assigned = False
+            if auto_detect and var_name_str in std_names:
+                var.attrs['standard_name'] = std_names[var_name_str]
+                assigned = True
+            elif auto_detect:
                 for pattern, std_name in std_names.items():
-                    if pattern.lower() in var_name.lower():
+                    if str(pattern).lower() == var_name_str.lower():
                         var.attrs['standard_name'] = std_name
+                        assigned = True
                         break
-
+            if not assigned:
+                var.attrs['standard_name'] = var_name_str
+    # Assign standard_name for DataArray
+    elif isinstance(result, xr.DataArray):
+        var_name = result.name
+        if var_name is not None and 'standard_name' not in result.attrs:
+            var_name_str = str(var_name)
+            assigned = False
+            if auto_detect and var_name_str in std_names:
+                result.attrs['standard_name'] = std_names[var_name_str]
+                assigned = True
+            elif auto_detect:
+                for pattern, std_name in std_names.items():
+                    if str(pattern).lower() == var_name_str.lower():
+                        result.attrs['standard_name'] = std_name
+                        assigned = True
+                        break
+            if not assigned:
+                result.attrs['standard_name'] = var_name_str
     return result
