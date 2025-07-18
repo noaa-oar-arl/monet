@@ -4,13 +4,13 @@ MONET utilities.
 This module provides various utilities for working with
 geospatial data, interpolation, and statistics.
 """
-
 from . import combinetool
 from . import coards_tools
 from . import interp_util
 from . import resample
 from . import stats
 from . import tools
+import numpy as np
 
 __all__ = ['combinetool', 'coards_tools', 'interp_util', 'resample', 'stats', 'tools']
 

@@ -1,3 +1,4 @@
+
 """Interpolation utility functions for MONET"""
 
 import xarray as xr
@@ -19,7 +20,12 @@ def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
         CoordinateDefinition object created from the given lat/lon arrays.
     """
     from pyresample import geometry
-
+    if longitude is None or latitude is None:
+        raise ValueError("Both longitude and latitude must be provided.")
+    if not (isinstance(longitude, xr.DataArray) and isinstance(latitude, xr.DataArray)):
+        raise TypeError("longitude and latitude must be xarray.DataArray objects.")
+    if longitude.shape != latitude.shape:
+        raise ValueError("longitude and latitude must have the same shape.")
     return geometry.CoordinateDefinition(lats=latitude, lons=longitude)
 
 
@@ -39,11 +45,14 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
         An empty dataset with the given longitude and latitude as coordinates.
     """
     from numpy import asarray
-
     lat = asarray(latitude)
     lon = asarray(longitude)
+    if lat.ndim == 0:
+        lat = lat[None]
+    if lon.ndim == 0:
+        lon = lon[None]
     dset = xr.Dataset(
-        coords={"lon": (["x", "y"], lon.reshape(1, 1)), "lat": (["x", "y"], lat.reshape(1, 1))}
+        coords={"lon": (["x", "y"], lon.reshape(-1, 1)), "lat": (["x", "y"], lat.reshape(-1, 1))}
     )
     return dset
 
@@ -63,14 +72,18 @@ def lonlat_to_swathdefinition(longitude=None, latitude=None):
     pyresample.geometry.SwathDefinition
         SwathDefinition object created from the given lon/lat arrays.
     """
-    from numpy import vstack, meshgrid
+    from numpy import meshgrid
     from pyresample.geometry import SwathDefinition
-
-    if len(longitude.shape) < 2:
+    if longitude is None or latitude is None:
+        raise ValueError("Both longitude and latitude must be provided.")
+    longitude = np.asarray(longitude)
+    latitude = np.asarray(latitude)
+    if longitude.ndim == 1 and latitude.ndim == 1:
         lons, lats = meshgrid(longitude, latitude)
-    else:
+    elif longitude.shape == latitude.shape:
         lons, lats = longitude, latitude
-
+    else:
+        raise ValueError("longitude and latitude must be both 1D or both 2D with the same shape.")
     return SwathDefinition(lons=lons, lats=lats)
 
 
@@ -89,11 +102,11 @@ def nearest_point_swathdefinition(longitude=None, latitude=None):
     pyresample.geometry.SwathDefinition
         SwathDefinition object representing a single point.
     """
-    from numpy import vstack
     from pyresample.geometry import SwathDefinition
-
-    lons = vstack([longitude])
-    lats = vstack([latitude])
+    if longitude is None or latitude is None:
+        raise ValueError("Both longitude and latitude must be provided.")
+    lons = np.atleast_1d(longitude)
+    lats = np.atleast_1d(latitude)
     return SwathDefinition(lons=lons, lats=lats)
 
 
@@ -113,9 +126,12 @@ def constant_1d_xesmf(longitude=None, latitude=None):
         Dataset suitable for xESMF with lon/lat coordinates.
     """
     from numpy import asarray
-
     lat = asarray(latitude)
     lon = asarray(longitude)
+    if lat.ndim == 0:
+        lat = lat[None]
+    if lon.ndim == 0:
+        lon = lon[None]
     s = lat.shape[0]
     dset = xr.Dataset(
         coords={"lon": (["x", "y"], lon.reshape(s, 1)), "lat": (["x", "y"], lat.reshape(s, 1))}
@@ -140,16 +156,14 @@ def constant_lat_swathdefition(longitude=None, latitude=None):
     pyresample.geometry.SwathDefinition
         SwathDefinition with constant latitude.
     """
-    from numpy import vstack, meshgrid
+    from numpy import meshgrid
     from pyresample import geometry
-    from xarray import DataArray
-
-    if len(longitude.shape) < 2:
-        lons, lats = meshgrid(longitude, latitude)
+    longitude = np.asarray(longitude)
+    if longitude.ndim == 1:
+        lons, lats = meshgrid(longitude, np.array([latitude]))
     else:
         lons = longitude
-        lats = lons * 0.0 + latitude
-
+        lats = np.full_like(lons, latitude)
     return geometry.SwathDefinition(lons=lons, lats=lats)
 
 
@@ -170,16 +184,604 @@ def constant_lon_swathdefition(longitude=None, latitude=None):
     pyresample.geometry.SwathDefinition
         SwathDefinition with constant longitude.
     """
-    from numpy import vstack, meshgrid
+    from numpy import meshgrid
     from pyresample import geometry
-    from xarray import DataArray
-
-    if len(latitude.shape) < 2:
-        lats, lons = meshgrid(latitude, longitude)
+    latitude = np.asarray(latitude)
+    if latitude.ndim == 1:
+        lats, lons = meshgrid(latitude, np.array([longitude]))
         lons = lons.T
         lats = lats.T
     else:
         lats = latitude
-        lons = lats * 0.0 + longitude
-
+        lons = np.full_like(lats, longitude)
     return geometry.SwathDefinition(lons=lons, lats=lats)
+
+
+def create_area_def_from_latlon(lat, lon, projection='platea', resolution=None, area_id=None):
+    """Create a pyresample AreaDefinition from latitude and longitude arrays.
+
+    Parameters
+    ----------
+    lat : numpy.ndarray
+        2D latitude array or 1D latitude coordinate
+    lon : numpy.ndarray
+        2D longitude array or 1D longitude coordinate
+    projection : str, default: 'platea'
+        Projection name. Options include:
+        - 'platea': Plate Carrée (equidistant cylindrical)
+        - 'lcc': Lambert Conformal Conic
+        - 'merc': Mercator
+        - 'stere': Stereographic
+        - 'gnom': Gnomonic (used by UFS SRW)
+    resolution : float, optional
+        Resolution in meters. If None, calculate from data.
+    area_id : str, optional
+        Identifier for the area. Default is 'generated_area'.
+
+    Returns
+    -------
+    pyresample.geometry.AreaDefinition
+        An AreaDefinition object representing the data's grid.
+
+    Notes
+    -----
+    For non-regular grids, SwathDefinition might be more appropriate than AreaDefinition.
+    """
+    from pyresample.geometry import AreaDefinition
+    import pyproj
+    import numpy as np
+
+    # Convert 1D coordinates to 2D if needed
+    if lat.ndim == 1 and lon.ndim == 1:
+        lon_2d, lat_2d = np.meshgrid(lon, lat)
+    else:
+        lat_2d, lon_2d = lat, lon
+
+    # Get dimensions of the grid
+    height, width = lat_2d.shape
+
+    # Set the area_id
+    if area_id is None:
+        area_id = 'generated_area'
+
+    # Determine data boundaries
+    lat_min = lat_2d.min()
+    lat_max = lat_2d.max()
+    lon_min = lon_2d.min()
+    lon_max = lon_2d.max()
+
+    # Setup projection based on the input data
+    if projection == 'platea':
+        # Plate Carrée projection (equidistant cylindrical)
+        proj_dict = {'proj': 'eqc', 'lat_ts': 0, 'lat_0': 0, 'lon_0': 0, 'x_0': 0, 'y_0': 0, 'ellps': 'WGS84'}
+
+        # Convert lat/lon to projection coordinates
+        p = pyproj.Proj(proj_dict)
+        x_ll, y_ll = p(lon_min, lat_min)
+        x_ur, y_ur = p(lon_max, lat_max)
+        area_extent = (x_ll, y_ll, x_ur, y_ur)
+
+    elif projection == 'lcc':
+        # Lambert Conformal Conic projection
+        center_lat = (lat_min + lat_max) / 2
+        center_lon = (lon_min + lon_max) / 2
+        lat_1 = center_lat - (center_lat - lat_min) * 0.33
+        lat_2 = center_lat + (lat_max - center_lat) * 0.33
+
+        proj_dict = {
+            'proj': 'lcc',
+            'lat_0': center_lat,
+            'lon_0': center_lon,
+            'lat_1': lat_1,
+            'lat_2': lat_2,
+            'ellps': 'WGS84'
+        }
+
+        # Convert lat/lon to projection coordinates
+        p = pyproj.Proj(proj_dict)
+        x_ll, y_ll = p(lon_min, lat_min)
+        x_ur, y_ur = p(lon_max, lat_max)
+        area_extent = (x_ll, y_ll, x_ur, y_ur)
+
+    elif projection == 'merc':
+        # Mercator projection
+        proj_dict = {'proj': 'merc', 'lat_ts': 0, 'ellps': 'WGS84'}
+
+        # Convert lat/lon to projection coordinates
+        p = pyproj.Proj(proj_dict)
+        x_ll, y_ll = p(lon_min, lat_min)
+        x_ur, y_ur = p(lon_max, lat_max)
+        area_extent = (x_ll, y_ll, x_ur, y_ur)
+
+    elif projection == 'stere':
+        # Stereographic projection
+        center_lat = (lat_min + lat_max) / 2
+        center_lon = (lon_min + lon_max) / 2
+
+        proj_dict = {
+            'proj': 'stere',
+            'lat_0': center_lat,
+            'lon_0': center_lon,
+            'lat_ts': center_lat,
+            'ellps': 'WGS84'
+        }
+
+        # Convert lat/lon to projection coordinates
+        p = pyproj.Proj(proj_dict)
+        x_ll, y_ll = p(lon_min, lat_min)
+        x_ur, y_ur = p(lon_max, lat_max)
+        area_extent = (x_ll, y_ll, x_ur, y_ur)
+
+    elif projection == 'gnom' or projection == 'gnomonic':
+        # Gnomonic projection (used by UFS SRW)
+        center_lat = (lat_min + lat_max) / 2
+        center_lon = (lon_min + lon_max) / 2
+
+        proj_dict = {
+            'proj': 'gnom',
+            'lat_0': center_lat,
+            'lon_0': center_lon,
+            'ellps': 'WGS84'
+        }
+
+        # Convert lat/lon to projection coordinates
+        p = pyproj.Proj(proj_dict)
+        x_ll, y_ll = p(lon_min, lat_min)
+        x_ur, y_ur = p(lon_max, lat_max)
+        area_extent = (x_ll, y_ll, x_ur, y_ur)
+
+    else:
+        raise ValueError(f"Unsupported projection: {projection}")
+
+    # Create the AreaDefinition
+    description = f"Generated area definition ({projection})"
+    proj_id = projection
+
+    return AreaDefinition(area_id, description, proj_id, proj_dict,
+                         width, height, area_extent)
+
+
+def create_area_def_from_dataset(dataset, projection='platea', resolution=None, area_id=None):
+    """Create an AreaDefinition from an xarray Dataset or DataArray.
+
+    Parameters
+    ----------
+    dataset : xarray.Dataset or xarray.DataArray
+        Dataset or DataArray containing latitude and longitude coordinates
+    projection : str, default: 'platea'
+        Projection name. Options include:
+        - 'platea': Plate Carrée (equidistant cylindrical)
+        - 'lcc': Lambert Conformal Conic
+        - 'merc': Mercator
+        - 'stere': Stereographic
+        - 'gnom': Gnomonic (used by UFS SRW)
+    resolution : float, optional
+        Resolution in meters. If None, calculate from data.
+    area_id : str, optional
+        Identifier for the area. Default is 'generated_area'.
+
+    Returns
+    -------
+    pyresample.geometry.AreaDefinition
+        An AreaDefinition object representing the dataset's grid.
+    """
+    from ..accessors.base import BaseAccessor
+
+    # Get lat/lon coordinates
+    dataset = BaseAccessor._dataset_to_monet(dataset)
+
+    return create_area_def_from_latlon(
+        dataset.latitude.values,
+        dataset.longitude.values,
+        projection=projection,
+        resolution=resolution,
+        area_id=area_id
+    )
+
+
+def get_grid_area_def(lat_min, lat_max, lon_min, lon_max, resolution=0.1,
+                      projection='platea', area_id=None):
+    """Create an AreaDefinition for a regular grid based on bounds and resolution.
+
+    Parameters
+    ----------
+    lat_min : float
+        Minimum latitude
+    lat_max : float
+        Maximum latitude
+    lon_min : float
+        Minimum longitude
+    lon_max : float
+        Maximum longitude
+    resolution : float, default: 0.1
+        Resolution in degrees
+    projection : str, default: 'platea'
+        Projection name. Options include:
+        - 'platea': Plate Carrée (equidistant cylindrical)
+        - 'lcc': Lambert Conformal Conic
+        - 'merc': Mercator
+        - 'stere': Stereographic
+        - 'gnom': Gnomonic (used by UFS SRW)
+    area_id : str, optional
+        Identifier for the area. Default is 'regular_grid'.
+
+    Returns
+    -------
+    pyresample.geometry.AreaDefinition
+        An AreaDefinition object representing the regular grid.
+    """
+    import numpy as np
+
+    # Create regular grid
+    lat = np.arange(lat_min, lat_max + resolution, resolution)
+    lon = np.arange(lon_min, lon_max + resolution, resolution)
+
+    lon_2d, lat_2d = np.meshgrid(lon, lat)
+
+    return create_area_def_from_latlon(lat_2d, lon_2d, projection=projection, area_id=area_id)
+
+
+def create_area_def_from_esmf_mesh(mesh, projection='platea', resolution=None, area_id=None):
+    """Create a pyresample AreaDefinition from an ESMF Mesh.
+
+    Parameters
+    ----------
+    mesh : ESMF.Mesh
+        ESMF Mesh object containing unstructured grid information
+    projection : str, default: 'platea'
+        Projection name. Options include:
+        - 'platea': Plate Carrée (equidistant cylindrical)
+        - 'lcc': Lambert Conformal Conic
+        - 'merc': Mercator
+        - 'stere': Stereographic
+        - 'gnom': Gnomonic (used by UFS SRW)
+    resolution : float, optional
+        Resolution in meters. If None, calculate from data.
+    area_id : str, optional
+        Identifier for the area. Default is 'esmf_mesh_area'.
+
+    Returns
+    -------
+    pyresample.geometry.AreaDefinition
+        An AreaDefinition object representing the mesh's grid bounds.
+
+    Notes
+    -----
+    This creates a regular-grid approximation of the unstructured mesh.
+    For accurate operations on unstructured grids, consider using
+    pyresample's SwathDefinition or ESMF's native capabilities.
+    """
+    try:
+        import ESMF
+    except ImportError:
+        raise ImportError("ESMF is required for this functionality")
+
+    # Extract node coordinates from the mesh
+    node_coords = mesh.get_coords()
+
+    if mesh.coord_sys == ESMF.CoordSys.SPH_DEG:
+        # Coordinates are in degrees (longitude/latitude)
+        lons = node_coords[0]
+        lats = node_coords[1]
+    else:
+        # For other coordinate systems, try to convert or raise an error
+        raise ValueError("Only spherical degree coordinate system is supported")
+
+    # Create AreaDefinition from extracted coordinates
+    if area_id is None:
+        area_id = 'esmf_mesh_area'
+
+    return create_area_def_from_latlon(lats, lons, projection, resolution, area_id)
+
+
+def create_area_def_from_ugrid(ugrid_dataset, projection='platea', resolution=None, area_id=None):
+    """Create a pyresample AreaDefinition from a UGRID-compliant dataset.
+
+    Parameters
+    ----------
+    ugrid_dataset : xarray.Dataset
+        Dataset following the UGRID conventions with mesh topology
+    projection : str, default: 'platea'
+        Projection name. Options include:
+        - 'platea': Plate Carrée (equidistant cylindrical)
+        - 'lcc': Lambert Conformal Conic
+        - 'merc': Mercator
+        - 'stere': Stereographic
+        - 'gnom': Gnomonic (used by UFS SRW)
+    resolution : float, optional
+        Resolution in meters. If None, calculate from data.
+    area_id : str, optional
+        Identifier for the area. Default is 'ugrid_area'.
+
+    Returns
+    -------
+    pyresample.geometry.AreaDefinition
+        An AreaDefinition object representing the UGRID mesh bounds.
+
+    Notes
+    -----
+    This creates a regular-grid approximation of the unstructured mesh.
+    For accurate operations on unstructured grids, consider using
+    pyresample's SwathDefinition or xESMF's ESMF-based regridding.
+    """
+    import xarray as xr
+    import numpy as np
+
+    # First, identify the mesh topology variable
+    mesh_topology_var = None
+    for var in ugrid_dataset.variables:
+        if hasattr(ugrid_dataset[var], 'cf_role') and ugrid_dataset[var].cf_role == 'mesh_topology':
+            mesh_topology_var = var
+            break
+
+    if mesh_topology_var is None:
+        raise ValueError("No mesh_topology variable found in the dataset")
+
+    # Find node coordinates
+    topology = ugrid_dataset[mesh_topology_var]
+    if hasattr(topology, 'node_coordinates'):
+        node_coords = topology.node_coordinates.split()
+        if len(node_coords) >= 2:
+            lon_var, lat_var = node_coords[0], node_coords[1]
+            lons = ugrid_dataset[lon_var].values
+            lats = ugrid_dataset[lat_var].values
+        else:
+            raise ValueError("Not enough node coordinates specified")
+    else:
+        # Try to find by standard names
+        lon_var = None
+        lat_var = None
+        for var in ugrid_dataset.variables:
+            if hasattr(ugrid_dataset[var], 'standard_name'):
+                if ugrid_dataset[var].standard_name == 'longitude':
+                    lon_var = var
+                elif ugrid_dataset[var].standard_name == 'latitude':
+                    lat_var = var
+
+        if lon_var is None or lat_var is None:
+            raise ValueError("Could not identify latitude and longitude variables")
+
+        lons = ugrid_dataset[lon_var].values
+        lats = ugrid_dataset[lat_var].values
+
+    # Create AreaDefinition from extracted coordinates
+    if area_id is None:
+        area_id = 'ugrid_area'
+
+    return create_area_def_from_latlon(lats, lons, projection, resolution, area_id)
+
+
+def mesh_to_swath_definition(mesh):
+    """Convert an ESMF Mesh to a pyresample SwathDefinition.
+
+    Parameters
+    ----------
+    mesh : ESMF.Mesh
+        ESMF Mesh object containing unstructured grid information
+
+    Returns
+    -------
+    pyresample.geometry.SwathDefinition
+        A SwathDefinition object representing the mesh nodes
+
+    Notes
+    -----
+    This is more appropriate than AreaDefinition for unstructured grids.
+    """
+    try:
+        import ESMF
+        from pyresample.geometry import SwathDefinition
+        import numpy as np
+    except ImportError:
+        raise ImportError("ESMF and pyresample are required for this functionality")
+
+    # Extract node coordinates from the mesh
+    node_coords = mesh.get_coords()
+
+    if mesh.coord_sys == ESMF.CoordSys.SPH_DEG:
+        # Coordinates are in degrees (longitude/latitude)
+        lons = node_coords[0]
+        lats = node_coords[1]
+    else:
+        # For other coordinate systems, try to convert or raise an error
+        raise ValueError("Only spherical degree coordinate system is supported")
+
+    # Create SwathDefinition
+    return SwathDefinition(lons=lons, lats=lats)
+
+
+def ugrid_to_swath_definition(ugrid_dataset):
+    """Convert a UGRID-compliant dataset to a pyresample SwathDefinition.
+
+    Parameters
+    ----------
+    ugrid_dataset : xarray.Dataset
+        Dataset following the UGRID conventions with mesh topology
+
+    Returns
+    -------
+    pyresample.geometry.SwathDefinition
+        A SwathDefinition object representing the mesh nodes
+
+    Notes
+    -----
+    This is more appropriate than AreaDefinition for unstructured grids.
+    """
+    from pyresample.geometry import SwathDefinition
+    import xarray as xr
+    import numpy as np
+
+    # First, identify the mesh topology variable
+    mesh_topology_var = None
+    for var in ugrid_dataset.variables:
+        if hasattr(ugrid_dataset[var], 'cf_role') and ugrid_dataset[var].cf_role == 'mesh_topology':
+            mesh_topology_var = var
+            break
+
+    if mesh_topology_var is None:
+        raise ValueError("No mesh_topology variable found in the dataset")
+
+    # Find node coordinates
+    topology = ugrid_dataset[mesh_topology_var]
+    if hasattr(topology, 'node_coordinates'):
+        node_coords = topology.node_coordinates.split()
+        if len(node_coords) >= 2:
+            lon_var, lat_var = node_coords[0], node_coords[1]
+            lons = ugrid_dataset[lon_var].values
+            lats = ugrid_dataset[lat_var].values
+        else:
+            raise ValueError("Not enough node coordinates specified")
+    else:
+        # Try to find by standard names
+        lon_var = None
+        lat_var = None
+        for var in ugrid_dataset.variables:
+            if hasattr(ugrid_dataset[var], 'standard_name'):
+                if ugrid_dataset[var].standard_name == 'longitude':
+                    lon_var = var
+                elif ugrid_dataset[var].standard_name == 'latitude':
+                    lat_var = var
+
+        if lon_var is None or lat_var is None:
+            raise ValueError("Could not identify latitude and longitude variables")
+
+        lons = ugrid_dataset[lon_var].values
+        lats = ugrid_dataset[lat_var].values
+
+    # Create SwathDefinition
+    return SwathDefinition(lons=lons, lats=lats)
+
+
+def guess_area_def_from_dataset(dataset, resolution=None, max_grid_points=1000000, projection='auto', area_id=None):
+    """Create an AreaDefinition from any dataset by inferring grid characteristics.
+
+    Parameters
+    ----------
+    dataset : xarray.Dataset or xarray.DataArray
+        Dataset to create AreaDefinition from, can be regular, curvilinear, or unstructured
+    resolution : float or tuple, optional
+        Target resolution in degrees or (x_res, y_res). If None, inferred from data.
+    max_grid_points : int, default: 1000000
+        Maximum number of grid points in the resulting AreaDefinition to prevent
+        creating excessively large grids
+    projection : str, default: 'auto'
+        Projection to use. If 'auto', tries to determine from dataset attributes.
+        Options include: 'platea', 'lcc', 'merc', 'stere', 'gnom'
+    area_id : str, optional
+        Identifier for the area. Default is 'inferred_grid'.
+
+    Returns
+    -------
+    pyresample.geometry.AreaDefinition
+        An AreaDefinition object representing the dataset's grid
+
+    Notes
+    -----
+    - For unstructured grids, this creates a regular-grid approximation
+    - If the dataset contains projection information, it will be used
+    """
+    import xarray as xr
+    import numpy as np
+
+    # Set default area_id if not provided
+    if area_id is None:
+        area_id = 'inferred_grid'
+
+    # First, check if dataset has UGRID attributes
+    is_ugrid = False
+    for var in dataset.variables:
+        if hasattr(dataset[var], 'cf_role') and dataset[var].cf_role == 'mesh_topology':
+            is_ugrid = True
+            break
+
+    if is_ugrid:
+        # For UGRID datasets, use the UGRID converter
+        return create_area_def_from_ugrid(dataset,
+                                         projection='platea' if projection == 'auto' else projection,
+                                         area_id=area_id)
+
+    # Determine if we're dealing with a regular, rectilinear, or curvilinear grid
+    # Check attributes for projection information
+    if projection == 'auto':
+        # Try to find projection information in global attributes
+        if hasattr(dataset, 'grid_mapping'):
+            grid_mapping = dataset.grid_mapping
+            if hasattr(dataset, grid_mapping):
+                grid_map_var = dataset[grid_mapping]
+                if hasattr(grid_map_var, 'grid_mapping_name'):
+                    mapping_name = grid_map_var.grid_mapping_name
+                    if mapping_name == 'lambert_conformal_conic':
+                        projection = 'lcc'
+                    elif mapping_name == 'mercator':
+                        projection = 'merc'
+                    elif mapping_name == 'polar_stereographic':
+                        projection = 'stere'
+                    elif mapping_name == 'gnomonic':
+                        projection = 'gnom'
+                    else:
+                        # Default to platea
+                        projection = 'platea'
+                else:
+                    projection = 'platea'
+            else:
+                projection = 'platea'
+        else:
+            projection = 'platea'
+
+    # Try to get coordinate information
+    from ..accessors.base import BaseAccessor
+    lat_name, lon_name = BaseAccessor._detect_latlon_names(dataset)
+
+    if lat_name is None or lon_name is None:
+        raise ValueError("Could not detect latitude and longitude coordinates")
+
+    # Get the latitude and longitude arrays
+    lats = dataset[lat_name].values
+    lons = dataset[lon_name].values
+
+    # Determine grid type
+    is_1d = lats.ndim == 1 and lons.ndim == 1
+    is_2d = lats.ndim == 2 and lons.ndim == 2
+
+    if is_1d:
+        # Regular rectilinear grid
+        # Create 2D mesh for area definition
+        lon_2d, lat_2d = np.meshgrid(lons, lats)
+        return create_area_def_from_latlon(lat_2d, lon_2d, projection, resolution, area_id)
+
+    elif is_2d:
+        # Curvilinear grid
+        return create_area_def_from_latlon(lats, lons, projection, resolution, area_id)
+
+    else:
+        # Assume unstructured data points
+        # Create a regular grid that encompasses all points
+        lat_min, lat_max = np.nanmin(lats), np.nanmax(lats)
+        lon_min, lon_max = np.nanmin(lons), np.nanmax(lons)
+
+        # Calculate default resolution if not provided
+        if resolution is None:
+            # Target resolution based on point density
+            point_count = len(lats)
+            area = (lat_max - lat_min) * (lon_max - lon_min)
+            density = np.sqrt(point_count / area)
+
+            # Limit resolution to prevent excessively large grids
+            target_points = min(point_count * 1.5, max_grid_points)
+            x_res = max((lon_max - lon_min) / np.sqrt(target_points / ((lat_max - lat_min)/(lon_max - lon_min))), 0.01)
+            y_res = max((lat_max - lat_min) / np.sqrt(target_points / ((lon_max - lon_min)/(lat_max - lat_min))), 0.01)
+            resolution = (x_res, y_res)
+
+        # If resolution is a single value, make it a tuple
+        if isinstance(resolution, (int, float)):
+            resolution = (resolution, resolution)
+
+        # Create regular grid
+        x_res, y_res = resolution
+        lats_reg = np.arange(lat_min, lat_max + y_res, y_res)
+        lons_reg = np.arange(lon_min, lon_max + x_res, x_res)
+
+        # Create 2D mesh
+        lon_2d, lat_2d = np.meshgrid(lons_reg, lats_reg)
+
+        return create_area_def_from_latlon(lat_2d, lon_2d, projection, None, area_id)
