@@ -1,4 +1,5 @@
 from . import met_funcs, plots, util
+from .accessors import *  # Ensure accessors are registered on import
 from .accessors import base
 from .plots import savefig
 from .util.coards_tools import (
@@ -14,7 +15,6 @@ __version__ = "2.2.12"
 __all__ = [
     "__version__",
     "plots",
-    "sat",
     "util",
     "accessors",
     "met_funcs",

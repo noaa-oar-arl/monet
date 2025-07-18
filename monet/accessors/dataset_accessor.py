@@ -8,8 +8,6 @@ from .base import BaseAccessor, has_pyresample, has_xesmf
 
 @xr.register_dataset_accessor("monet")
 class MONETAccessorDataset(BaseAccessor):
-    """Dataset accessor for MONET functionality."""
-
     def __init__(self, xray_obj):
         """Initialize the accessor.
 
@@ -96,13 +94,17 @@ class MONETAccessorDataset(BaseAccessor):
             ds[name] = xr.apply_ufunc(vectorize(cf_to_dt64), ds[name])
         return ds
 
-    def remap_xesmf(self, data, **kwargs):
-        """Remap data using xESMF regridding.
+    def remap_xesmf(self, data, parallel=True, n_workers=None, **kwargs):
+        """Remap data using xESMF regridding with optional parallelization.
 
         Parameters
         ----------
         data : xarray.DataArray or xarray.Dataset
             Data to remap.
+        parallel : bool, default: True
+            Whether to use parallel processing via dask.
+        n_workers : int, optional
+            Number of dask workers to use. If None, uses all available cores.
         **kwargs : dict
             Keyword arguments for xESMF regridding.
 
@@ -115,16 +117,92 @@ class MONETAccessorDataset(BaseAccessor):
             raise ImportError("xesmf is required for this functionality")
 
         try:
-            if isinstance(data, xr.DataArray):
-                data = self._rename_latlon(data)
-                return self._remap_xesmf_dataarray(data, **kwargs)
-            elif isinstance(data, xr.Dataset):
-                data = self._rename_latlon(data)
-                return self._remap_xesmf_dataset(data, **kwargs)
-            else:
-                raise TypeError("data must be an xarray.DataArray or xarray.Dataset")
+            from ..util import resample
+
+            kwargs['method'] = kwargs.get('method', 'bilinear')
+            target = self._rename_latlon(self._obj)
+            source = self._rename_latlon(data)
+
+            out = resample.resample_xesmf(
+                source, target,
+                parallel=parallel,
+                n_workers=n_workers,
+                **kwargs
+            )
+
+            return self._rename_to_monet_latlon(out)
         except Exception as e:
             print(f"Error remapping with xESMF: {e}")
+
+    def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
+        """Remap data using nearest neighbor interpolation with parallel processing.
+
+        Parameters
+        ----------
+        data : xarray.DataArray or xarray.Dataset
+            Data to remap.
+        radius_of_influence : float, default: 1e6
+            Search radius in meters.
+        n_processes : int, optional
+            Number of processes to use. If None, uses all available cores.
+        **kwargs : dict
+            Additional keyword arguments for regridding.
+
+        Returns
+        -------
+        xarray.Dataset
+            Remapped dataset.
+        """
+        if not has_pyresample:
+            raise ImportError("pyresample is required for this functionality")
+
+        from ..util import resample
+
+        source_data = self._dataset_to_monet(data)
+        target_data = self._dataset_to_monet(self._obj)
+        source = self._get_CoordinateDefinition(source_data)
+        target = self._get_CoordinateDefinition(target_data)
+
+        result = resample.resample_pyresample_parallel(
+            source_data, target,
+            radius_of_influence=radius_of_influence,
+            n_processes=n_processes,
+            **kwargs
+        )
+
+        # Ensure coordinates are properly set
+        if isinstance(result, xr.Dataset):
+            result.coords["latitude"] = target_data.latitude
+            result.coords["longitude"] = target_data.longitude
+
+        return result
+
+    def combine_point_esmf(self, point_df, method='bilinear', **kwargs):
+        """Combine this dataset with point data using ESMF LocStream.
+
+        Parameters
+        ----------
+        point_df : pandas.DataFrame
+            DataFrame containing point observations with latitude, longitude, and siteid columns.
+        method : str, default: 'bilinear'
+            Regridding method to use.
+        **kwargs : dict
+            Additional keyword arguments for ESMF regridding.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Combined dataframe with grid data interpolated to point locations.
+        """
+        from ..util.combinetool import combine_grid_to_point_esmf
+
+        grid_data = self._dataset_to_monet(self._obj)
+
+        return combine_grid_to_point_esmf(
+            grid_data, point_df,
+            method=method,
+            **kwargs
+        )
 
     def _remap_xesmf_dataset(self, dset, filename="monet_xesmf_regrid_file.nc", **kwargs):
         """Remap dataset using xESMF.
@@ -188,6 +266,48 @@ class MONETAccessorDataset(BaseAccessor):
             out.name = out.name + "_y"
         self._obj[out.name] = out
         return out
+
+    def remap(self, data, method="nearest", radius_of_influence=1e6, **kwargs):
+        """Remap data using pyresample (nearest or bilinear).
+
+        Parameters
+        ----------
+        data : xarray.DataArray or xarray.Dataset
+            Data to remap.
+        method : str, default: 'nearest'
+            Resampling method: 'nearest' or 'bilinear'.
+        radius_of_influence : float, default: 1e6
+            Search radius in meters (for both methods).
+        **kwargs : dict
+            Additional keyword arguments for the resampler.
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+            Remapped data.
+        """
+        if not has_pyresample:
+            raise ImportError("pyresample is required for this functionality")
+        from ..util import resample
+        source_data = self._dataset_to_monet(data)
+        target_data = self._dataset_to_monet(self._obj)
+        source = self._get_CoordinateDefinition(source_data)
+        target = self._get_CoordinateDefinition(target_data)
+        result = resample.resample(
+            source_data, target,
+            method=method,
+            radius_of_influence=radius_of_influence,
+            **kwargs
+        )
+        # Ensure coordinates are properly set
+        if isinstance(result, xr.DataArray):
+            result["latitude"] = target_data.latitude
+            result["longitude"] = target_data.longitude
+            result.name = source_data.name
+        elif isinstance(result, xr.Dataset):
+            result.coords["latitude"] = target_data.latitude
+            result.coords["longitude"] = target_data.longitude
+        return result
 
     def remap_nearest(self, data, radius_of_influence=1e6, **kwargs):
         """Remap data using nearest neighbor interpolation.
@@ -665,3 +785,139 @@ class MONETAccessorDataset(BaseAccessor):
         wd = d.monet.wrap_longitudes(lon_name=lon_name)
         wdl = wd.sortby(wd[lon_name])
         return wdl
+
+    def to_area_def(self, projection='platea', resolution=None, area_id=None):
+        """Convert the dataset's coordinates to a pyresample AreaDefinition.
+
+        Parameters
+        ----------
+        projection : str, default: 'platea'
+            Projection name. Options include:
+            - 'platea': Plate Carrée (equidistant cylindrical)
+            - 'lcc': Lambert Conformal Conic
+            - 'merc': Mercator
+            - 'stere': Stereographic
+            - 'gnom': Gnomonic (used by UFS SRW)
+            - 'auto': Try to determine from data attributes
+        resolution : float, optional
+            Resolution in meters. If None, calculated from data.
+        area_id : str, optional
+            Identifier for the area.
+
+        Returns
+        -------
+        pyresample.geometry.AreaDefinition
+            An AreaDefinition object representing this dataset's grid.
+        """
+        if not has_pyresample:
+            raise ImportError("pyresample is required for this functionality")
+
+        from ..util.interp_util import guess_area_def_from_dataset
+
+        return guess_area_def_from_dataset(
+            self._obj,
+            projection=projection,
+            resolution=resolution,
+            area_id=area_id
+        )
+
+    def to_swath_def(self):
+        """Convert the dataset's coordinates to a pyresample SwathDefinition.
+
+        This is particularly useful for unstructured or irregular grids.
+
+        Returns
+        -------
+        pyresample.geometry.SwathDefinition
+            A SwathDefinition object representing this dataset's grid.
+        """
+        if not has_pyresample:
+            raise ImportError("pyresample is required for this functionality")
+
+        # Process as UGRID if it has mesh topology
+        for var in self._obj.variables:
+            if hasattr(self._obj[var], 'cf_role') and self._obj[var].cf_role == 'mesh_topology':
+                from ..util.interp_util import ugrid_to_swath_definition
+                return ugrid_to_swath_definition(self._obj)
+
+        # Otherwise use standard methods
+        ds = self._dataset_to_monet(self._obj)
+        return self._get_CoordinateDefinition(ds)
+
+    def quick_facet_time_map(self, var, map_kws=None, projection=None, colorbar=True, figsize=None, cmap=None, vmin=None, vmax=None, norm=None, dpi=150, xlabel=None, ylabel=None, suptitle=None, cbar_label=None, xticks=None, yticks=None, annotations=None, export_path=None, export_formats=None, time_dim="time", ncols=3, **kwargs):
+        """
+        Create a facet grid of map plots for each time slice in a Dataset variable using Cartopy.
+
+        Parameters
+        ----------
+        var : str
+            Name of the variable in the dataset to plot.
+        map_kws : dict, optional
+            Dictionary of keyword arguments for map features.
+        projection : cartopy.crs.Projection, optional
+            Cartopy projection to use. Defaults to PlateCarree.
+        colorbar : bool, default: True
+            Whether to add a colorbar (shared).
+        figsize : tuple, optional
+            Figure size.
+        cmap : str or Colormap, optional
+            Colormap to use.
+        vmin, vmax : float, optional
+            Color limits.
+        norm : Normalize, optional
+            Matplotlib normalization.
+        dpi : int, optional
+            Dots per inch for export.
+        xlabel, ylabel, suptitle : str, optional
+            Axis labels and super title.
+        cbar_label : str, optional
+            Label for the colorbar.
+        xticks, yticks : list, optional
+            Custom tick locations.
+        annotations : list of dict, optional
+            List of annotation dicts for each subplot.
+        export_path : str, optional
+            Path to export the figure (without extension).
+        export_formats : list, optional
+            List of formats to export (e.g., ["png", "pdf"]).
+        time_dim : str, default: "time"
+            Name of the time dimension.
+        ncols : int, default: 3
+            Number of columns in the facet grid.
+        **kwargs : dict
+            Additional keyword arguments for plotting.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib figure object.
+        axes : ndarray of matplotlib.axes.Axes
+            The matplotlib axes objects.
+        """
+        from ..plots.cartopy_utils import facet_time_map
+        da = self._dataset_to_monet(self._obj[var])
+        return facet_time_map(
+            da,
+            time_dim=time_dim,
+            ncols=ncols,
+            map_kws=map_kws,
+            projection=projection,
+            colorbar=colorbar,
+            figsize=figsize,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            norm=norm,
+            dpi=dpi,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            suptitle=suptitle,
+            cbar_label=cbar_label,
+            xticks=xticks,
+            yticks=yticks,
+            annotations=annotations,
+            export_path=export_path,
+            export_formats=export_formats,
+            **kwargs
+        )
+

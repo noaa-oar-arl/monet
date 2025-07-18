@@ -176,72 +176,6 @@ class MONETAccessor(BaseAccessor):
         out = resample_stratify(self._obj, levels, vertical, axis=axis)
         return out
 
-    def window(self, lat_min=None, lon_min=None, lat_max=None, lon_max=None, rectilinear=False):
-        """Extract a spatial window from the data.
-
-        Parameters
-        ----------
-        lat_min : float, optional
-            Minimum latitude.
-        lon_min : float, optional
-            Minimum longitude.
-        lat_max : float, optional
-            Maximum latitude.
-        lon_max : float, optional
-            Maximum longitude.
-        rectilinear : bool, default: False
-            Whether the grid is rectilinear.
-
-        Returns
-        -------
-        xarray.DataArray
-            Windowed DataArray.
-        """
-        try:
-            if rectilinear:
-                dset = self._dataset_to_monet(self._obj)
-                lat = dset.latitude.isel(x=0).values
-                lon = dset.longitude.isel(y=0).values
-                dset["x"] = lon
-                dset["y"] = lat
-                # check if latitude is in the correct order
-                if dset.latitude.isel(x=0).values[0] > dset.latitude.isel(x=0).values[-1]:
-                    lat_min_copy = lat_min
-                    lat_min = lat_max
-                    lat_max = lat_min_copy
-                d = dset.sel(x=slice(lon_min, lon_max), y=slice(lat_min, lat_max))
-                return d
-            elif has_pyresample:
-                from numpy import concatenate
-                from pyresample import utils
-
-                dset = self._dataset_to_monet(self._obj)
-                lons, lats = utils.check_and_wrap(dset.longitude.values, dset.latitude.values)
-                x_ll, y_ll = dset.monet.nearest_ij(lat=float(lat_min), lon=float(lon_min))
-                x_ur, y_ur = dset.monet.nearest_ij(lat=float(lat_max), lon=float(lon_max))
-                if x_ur < x_ll:
-                    x1 = dset.x.where(dset.x >= x_ll, drop=True).values
-                    x2 = dset.x.where(dset.x <= x_ur, drop=True).values
-                    xrange = concatenate([x1, x2]).astype(int)
-                    dset["longitude"][:] = utils.wrap_longitudes(dset.longitude.values)
-                else:
-                    xrange = slice(x_ll, x_ur)
-                if y_ur < y_ll:
-                    y1 = dset.y.where(dset.y >= y_ll, drop=True).values
-                    y2 = dset.y.where(dset.y <= y_ur, drop=True).values
-                    yrange = concatenate([y1, y2]).astype(int)
-                else:
-                    yrange = slice(y_ll, y_ur)
-                return dset.isel(x=xrange, y=yrange)
-            else:
-                raise ImportError
-        except ImportError:
-            print(
-                """If this is a rectilinear grid and you don't have pyresample
-                  please add the rectilinear=True to the call.  Otherwise the window
-                  functionality is unavailable without pyresample"""
-            )
-
     def interp_constant_lat(self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs):
         """Interpolate data to a constant latitude.
 
@@ -426,192 +360,23 @@ class MONETAccessor(BaseAccessor):
                 output = resample_xesmf(self._obj, target, cleanup=True, **kwargs)
             return self._rename_latlon(output.squeeze())
 
-    def quick_imshow(self, map_kws=None, roll_dateline=False, **kwargs):
-        """Create a quick imshow plot of the data.
-
-        Parameters
-        ----------
-        map_kws : dict, optional
-            Keyword arguments for map creation.
-        roll_dateline : bool, default: False
-            Whether to roll the dateline for proper global visualization.
-        **kwargs : dict
-            Additional keyword arguments for imshow.
-
-        Returns
-        -------
-        matplotlib.axes.Axes
-            The plot axes.
-        """
-        import cartopy.crs as ccrs
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-        from cartopy.mpl.geoaxes import GeoAxes
-
-        from ..plots import _dynamic_fig_size, _set_outline_patch_alpha
-        from ..plots.mapgen import draw_map
-
-        if map_kws is None:
-            map_kws = {}
-
+    def quick_imshow(self, map_kws=None, roll_dateline=False, projection=None, colorbar=True, figsize=None, **kwargs):
+        """Create a quick imshow plot of the data with flexible options."""
+        from ..plots.cartopy_utils import plot_quick_imshow
         da = self._dataset_to_monet(self._obj)
-        da = self._monet_to_latlon(da)
-        crs_p = ccrs.PlateCarree()
-        if "crs" not in map_kws:
-            map_kws["crs"] = crs_p
-        if "figsize" in kwargs:
-            map_kws["figsize"] = kwargs["figsize"]
-            kwargs.pop("figsize", None)
-        else:
-            figsize = _dynamic_fig_size(da)
-            map_kws["figsize"] = figsize
-        if "transform" not in kwargs:
-            transform = crs_p
-        else:
-            transform = kwargs["transform"]
-            kwargs.pop("transform", None)
-        with sns.plotting_context("notebook", font_scale=1.2):
-            if "ax" not in kwargs:
-                ax = draw_map(**map_kws)
-            else:
-                ax = kwargs.pop("ax", None)
-                if not isinstance(ax, GeoAxes):
-                    raise TypeError("`ax` should be a Cartopy GeoAxes instance")
-            _set_outline_patch_alpha(ax)
-            if roll_dateline:
-                _ = (
-                    da.squeeze()
-                    .roll(lon=int(len(da.lon) / 2), roll_coords=True)
-                    .plot.imshow(ax=ax, transform=transform, **kwargs)
-                )
-            else:
-                _ = da.squeeze().plot.imshow(ax=ax, transform=transform, **kwargs)
-            plt.tight_layout()
+        return plot_quick_imshow(da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs)
 
-        return ax
-
-    def quick_map(self, map_kws=None, roll_dateline=False, **kwargs):
-        """Create a quick map plot of the data.
-
-        Parameters
-        ----------
-        map_kws : dict, optional
-            Keyword arguments for map creation.
-        roll_dateline : bool, default: False
-            Whether to roll the dateline for proper global visualization.
-        **kwargs : dict
-            Additional keyword arguments for plotting.
-
-        Returns
-        -------
-        matplotlib.axes.Axes
-            The plot axes.
-        """
-        import cartopy.crs as ccrs
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-        from cartopy.mpl.geoaxes import GeoAxes
-
-        from ..plots import _dynamic_fig_size, _set_outline_patch_alpha
-        from ..plots.mapgen import draw_map
-
-        if map_kws is None:
-            map_kws = {}
-
+    def quick_map(self, map_kws=None, roll_dateline=False, projection=None, colorbar=True, figsize=None, **kwargs):
+        """Create a quick map plot of the data with flexible options."""
+        from ..plots.cartopy_utils import plot_quick_map
         da = self._dataset_to_monet(self._obj)
-        crs_p = ccrs.PlateCarree()
-        if "crs" not in map_kws:
-            map_kws["crs"] = crs_p
-        if "figsize" in kwargs:
-            map_kws["figsize"] = kwargs["figsize"]
-            kwargs.pop("figsize", None)
-        else:
-            figsize = _dynamic_fig_size(da)
-            map_kws["figsize"] = figsize
-        transform = kwargs.pop("transform", crs_p)
-        with sns.plotting_context("notebook"):
-            if "ax" not in kwargs:
-                ax = draw_map(**map_kws)
-            else:
-                ax = kwargs.pop("ax", None)
-                if not isinstance(ax, GeoAxes):
-                    raise TypeError("`ax` should be a Cartopy GeoAxes instance")
-            _set_outline_patch_alpha(ax)
-            if roll_dateline:
-                _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot(
-                    x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
-                )
-            else:
-                _ = da.plot(x="longitude", y="latitude", ax=ax, transform=transform, **kwargs)
-            plt.tight_layout()
+        return plot_quick_map(da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs)
 
-        return ax
-
-    def quick_contourf(self, map_kws=None, roll_dateline=False, **kwargs):
-        """Create a quick filled contour plot of the data.
-
-        Parameters
-        ----------
-        map_kws : dict, optional
-            Keyword arguments for map creation.
-        roll_dateline : bool, default: False
-            Whether to roll the dateline for proper global visualization.
-        **kwargs : dict
-            Additional keyword arguments for contourf.
-
-        Returns
-        -------
-        matplotlib.axes.Axes
-            The plot axes.
-        """
-        import cartopy.crs as ccrs
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-        from cartopy.mpl.geoaxes import GeoAxes
-
-        from ..plots import _dynamic_fig_size, _set_outline_patch_alpha
-        from ..plots.mapgen import draw_map
-
-        if map_kws is None:
-            map_kws = {}
-
+    def quick_contourf(self, map_kws=None, roll_dateline=False, projection=None, colorbar=True, figsize=None, **kwargs):
+        """Create a quick filled contour plot of the data with flexible options."""
+        from ..plots.cartopy_utils import plot_quick_contourf
         da = self._dataset_to_monet(self._obj)
-        dlon = da.longitude.diff("x")
-        if not ((dlon >= 0).all() or (dlon <= 0).all()):  # monotonic
-            da["longitude"] = da.longitude % 360  # unwrap longitudes
-        crs_p = ccrs.PlateCarree()
-        if "crs" not in map_kws:
-            map_kws["crs"] = crs_p
-        if "figsize" in kwargs:
-            map_kws["figsize"] = kwargs["figsize"]
-            kwargs.pop("figsize", None)
-        else:
-            figsize = _dynamic_fig_size(da)
-            map_kws["figsize"] = figsize
-        if "transform" not in kwargs:
-            transform = crs_p
-        else:
-            transform = kwargs["transform"]
-            kwargs.pop("transform", None)
-        with sns.plotting_context("notebook"):
-            if "ax" not in kwargs:
-                ax = draw_map(**map_kws)
-            else:
-                ax = kwargs.pop("ax", None)
-                if not isinstance(ax, GeoAxes):
-                    raise TypeError("`ax` should be a Cartopy GeoAxes instance")
-            _set_outline_patch_alpha(ax)
-            if roll_dateline:
-                _ = da.roll(x=int(len(da.x) / 2), roll_coords=True).plot.contourf(
-                    x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
-                )
-            else:
-                _ = da.plot.contourf(
-                    x="longitude", y="latitude", ax=ax, transform=transform, **kwargs
-                )
-            plt.tight_layout()
-
-        return ax
+        return plot_quick_contourf(da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs)
 
     def _tight_layout(self):
         """Apply tight layout to the current figure.
@@ -643,17 +408,19 @@ class MONETAccessor(BaseAccessor):
         from pyresample.geometry import SwathDefinition
         return isinstance(defn, SwathDefinition)
 
-    def remap_nearest(self, data, radius_of_influence=1e6, **kwargs):
-        """Remap data using nearest neighbor interpolation.
+    def remap(self, data, method="nearest", radius_of_influence=1e6, **kwargs):
+        """Remap data using pyresample (nearest or bilinear).
 
         Parameters
         ----------
         data : xarray.DataArray or xarray.Dataset
             Data to remap.
+        method : str, default: 'nearest'
+            Resampling method: 'nearest' or 'bilinear'.
         radius_of_influence : float, default: 1e6
-            Search radius in meters.
+            Search radius in meters (for both methods).
         **kwargs : dict
-            Additional keyword arguments for regridding.
+            Additional keyword arguments for the resampler.
 
         Returns
         -------
@@ -662,34 +429,30 @@ class MONETAccessor(BaseAccessor):
         """
         if not has_pyresample:
             raise ImportError("pyresample is required for this functionality")
-
-        from pyresample import kd_tree
-
+        from ..util import resample
         source_data = self._dataset_to_monet(data)
         target_data = self._dataset_to_monet(self._obj)
         source = self._get_CoordinateDefinition(source_data)
         target = self._get_CoordinateDefinition(target_data)
-        r = kd_tree.XArrayResamplerNN(
-            source, target, radius_of_influence=radius_of_influence, **kwargs
+        result = resample.resample(
+            source_data, target,
+            method=method,
+            radius_of_influence=radius_of_influence,
+            **kwargs
         )
-        r.get_neighbour_info()
-        if isinstance(source_data, xr.DataArray):
-            result = r.get_sample_from_neighbour_info(source_data)
-            result.name = source_data.name
+        # Ensure coordinates are properly set
+        if isinstance(result, xr.DataArray):
             result["latitude"] = target_data.latitude
             result["longitude"] = target_data.longitude
-
-        elif isinstance(source_data, xr.Dataset):
-            results = {}
-            for i in source_data.data_vars.keys():
-                results[i] = r.get_sample_from_neighbour_info(source_data[i])
-            result = xr.Dataset(results)
-            if bool(source_data.attrs):
-                result.attrs = source_data.attrs
+            result.name = source_data.name
+        elif isinstance(result, xr.Dataset):
             result.coords["latitude"] = target_data.latitude
             result.coords["longitude"] = target_data.longitude
-
         return result
+
+    def remap_nearest(self, data, radius_of_influence=1e6, **kwargs):
+        """Remap data using nearest neighbor interpolation (wrapper for remap)."""
+        return self.remap(data, method="nearest", radius_of_influence=radius_of_influence, **kwargs)
 
     def remap_xesmf(self, data, **kwargs):
         """Remap data using xESMF regridding.
@@ -752,3 +515,308 @@ class MONETAccessor(BaseAccessor):
                 return combine_da_to_df_xesmf(da, data, suffix=suffix, **kwargs)
         else:
             print("`data` must be a pandas.DataFrame")
+
+    def remap_xesmf(self, data, parallel=True, n_workers=None, **kwargs):
+        """Remap data using xESMF regridding with optional parallelization.
+
+        Parameters
+        ----------
+        data : xarray.DataArray or xarray.Dataset
+            Data to remap.
+        parallel : bool, default: True
+            Whether to use parallel processing via dask.
+        n_workers : int, optional
+            Number of dask workers to use. If None, uses all available cores.
+        **kwargs : dict
+            Keyword arguments for xESMF regridding.
+
+        Returns
+        -------
+        xarray.DataArray
+            Remapped data array.
+        """
+        kwargs['method'] = kwargs.get('method', 'bilinear')
+        if has_xesmf:
+            from ..util import resample
+
+            target = self._rename_latlon(self._obj)
+            source = self._rename_latlon(data)
+
+            out = resample.resample_xesmf(
+                source, target,
+                parallel=parallel,
+                n_workers=n_workers,
+                **kwargs
+            )
+
+            return self._rename_to_monet_latlon(out)
+        else:
+            print("xesmf unavailable. Try `import xesmf` and check the failure message.")
+
+    def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
+        """Remap data using nearest neighbor interpolation with parallel processing.
+
+        Parameters
+        ----------
+        data : xarray.DataArray or xarray.Dataset
+            Data to remap.
+        radius_of_influence : float, default: 1e6
+            Search radius in meters.
+        n_processes : int, optional
+            Number of processes to use. If None, uses all available cores.
+        **kwargs : dict
+            Additional keyword arguments for regridding.
+
+        Returns
+        -------
+        xarray.DataArray
+            Remapped data array.
+        """
+        if not has_pyresample:
+            raise ImportError("pyresample is required for this functionality")
+
+        from ..util import resample
+
+        source_data = self._dataset_to_monet(data)
+        target_data = self._dataset_to_monet(self._obj)
+        source = self._get_CoordinateDefinition(source_data)
+        target = self._get_CoordinateDefinition(target_data)
+
+        result = resample.resample_pyresample_parallel(
+            source_data, target,
+            radius_of_influence=radius_of_influence,
+            n_processes=n_processes,
+            **kwargs
+        )
+
+        # Ensure coordinates are properly set
+        if isinstance(result, xr.DataArray):
+            result["latitude"] = target_data.latitude
+            result["longitude"] = target_data.longitude
+            result.name = source_data.name
+
+        return result
+
+    def combine_point_esmf(self, point_df, method='bilinear', **kwargs):
+        """Combine this DataArray with point data using ESMF LocStream.
+
+        Parameters
+        ----------
+        point_df : pandas.DataFrame
+            DataFrame containing point observations with latitude, longitude, and siteid columns.
+        method : str, default: 'bilinear'
+            Regridding method to use.
+        **kwargs : dict
+            Additional keyword arguments for ESMF regridding.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Combined dataframe with grid data interpolated to point locations.
+        """
+        from ..util.combinetool import combine_grid_to_point_esmf
+
+        grid_data = self._dataset_to_monet(self._obj)
+
+        return combine_grid_to_point_esmf(
+            grid_data, point_df,
+            method=method,
+            **kwargs
+        )
+
+    def to_area_def(self, projection='platea', resolution=None, area_id=None):
+        """Convert the dataarray's coordinates to a pyresample AreaDefinition.
+
+        Parameters
+        ----------
+        projection : str, default: 'platea'
+            Projection name. Options include:
+            - 'platea': Plate Carrée (equidistant cylindrical)
+            - 'lcc': Lambert Conformal Conic
+            - 'merc': Mercator
+            - 'stere': Stereographic
+            - 'gnom': Gnomonic (used by UFS SRW)
+            - 'auto': Try to determine from data attributes
+        resolution : float, optional
+            Resolution in meters. If None, calculated from data.
+        area_id : str, optional
+            Identifier for the area.
+
+        Returns
+        -------
+        pyresample.geometry.AreaDefinition
+            An AreaDefinition object representing this dataarray's grid.
+        """
+        if not has_pyresample:
+            raise ImportError("pyresample is required for this functionality")
+
+        from ..util.interp_util import guess_area_def_from_dataset
+
+        return guess_area_def_from_dataset(
+            self._obj,
+            projection=projection,
+            resolution=resolution,
+            area_id=area_id
+        )
+
+    def to_swath_def(self):
+        """Convert the dataarray's coordinates to a pyresample SwathDefinition.
+
+        This is particularly useful for unstructured or irregular grids.
+
+        Returns
+        -------
+        pyresample.geometry.SwathDefinition
+            A SwathDefinition object representing this dataarray's grid.
+        """
+        if not has_pyresample:
+            raise ImportError("pyresample is required for this functionality")
+
+        # Process as UGRID if it has mesh topology
+        for var in self._obj.coords:
+            if hasattr(self._obj[var], 'cf_role') and self._obj[var].cf_role == 'mesh_topology':
+                from ..util.interp_util import ugrid_to_swath_definition
+                return ugrid_to_swath_definition(self._obj)
+
+        # Otherwise use standard methods
+        da = self._dataset_to_monet(self._obj)
+        return self._get_CoordinateDefinition(da)
+
+    def compare(self, other, stat="diff", plot=True, plot_method="quick_map", stat_kwargs=None, plot_kwargs=None):
+        """
+        Compute and optionally plot a statistic between this DataArray and another, leveraging MONET's util.stats metrics.
+
+        Parameters
+        ----------
+        other : xarray.DataArray
+            The other DataArray to compare with.
+        stat : str or callable, default: "diff"
+            Statistic to compute. Can be any metric name from monet.util.stats (e.g., "RMSE", "MB", "NMB", "IOA", etc.), "diff", or a callable.
+        plot : bool, default: True
+            Whether to plot the result using a MONET quick plot method.
+        plot_method : str, default: "quick_map"
+            Which plotting method to use (e.g., "quick_map", "quick_imshow", "quick_contourf").
+        stat_kwargs : dict, optional
+            Additional kwargs for the statistic function.
+        plot_kwargs : dict, optional
+            Additional kwargs for the plotting function.
+
+        Returns
+        -------
+        xarray.DataArray or (fig, ax)
+            The statistic DataArray, or (fig, ax) if plot=True.
+        """
+        import numpy as np
+        import importlib
+        stat_kwargs = stat_kwargs or {}
+        plot_kwargs = plot_kwargs or {}
+        da1 = self._obj
+        da2 = other
+        # Align DataArrays
+        da1, da2 = xr.align(da1, da2, join="inner")
+        # Compute statistic
+        stat_da = None
+        if callable(stat):
+            stat_da = stat(da1, da2, **stat_kwargs)
+        elif isinstance(stat, str):
+            if stat.lower() == "diff":
+                stat_da = da1 - da2
+            else:
+                # Try to get the function from monet.util.stats
+                try:
+                    stats_mod = importlib.import_module("monet.util.stats")
+                    func = getattr(stats_mod, stat)
+                    stat_da = func(da1, da2, **stat_kwargs)
+                except (ImportError, AttributeError) as e:
+                    # fallback to built-in
+                    if stat.lower() == "rmse":
+                        stat_da = np.sqrt(((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None)))
+                    elif stat.lower() == "mae":
+                        stat_da = np.abs(da1 - da2).mean(dim=stat_kwargs.get("dim", None))
+                    elif stat.lower() == "mse":
+                        stat_da = ((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None))
+                    else:
+                        raise ValueError(f"Unknown stat: {stat}") from e
+        else:
+            raise ValueError(f"Unknown stat: {stat}")
+        stat_da.name = stat if isinstance(stat, str) else getattr(stat, "__name__", "statistic")
+        if plot:
+            plot_func = getattr(stat_da.monet, plot_method)
+            return plot_func(**plot_kwargs)
+        else:
+            return stat_da
+
+    def quick_facet_time_map(self, map_kws=None, projection=None, colorbar=True, figsize=None, cmap=None, vmin=None, vmax=None, norm=None, dpi=150, xlabel=None, ylabel=None, suptitle=None, cbar_label=None, xticks=None, yticks=None, annotations=None, export_path=None, export_formats=None, time_dim="time", ncols=3, **kwargs):
+        """
+        Create a facet grid of map plots for each time slice in a DataArray using Cartopy.
+
+        Parameters
+        ----------
+        map_kws : dict, optional
+            Dictionary of keyword arguments for map features.
+        projection : cartopy.crs.Projection, optional
+            Cartopy projection to use. Defaults to PlateCarree.
+        colorbar : bool, default: True
+            Whether to add a colorbar (shared).
+        figsize : tuple, optional
+            Figure size.
+        cmap : str or Colormap, optional
+            Colormap to use.
+        vmin, vmax : float, optional
+            Color limits.
+        norm : Normalize, optional
+            Matplotlib normalization.
+        dpi : int, optional
+            Dots per inch for export.
+        xlabel, ylabel, suptitle : str, optional
+            Axis labels and super title.
+        cbar_label : str, optional
+            Label for the colorbar.
+        xticks, yticks : list, optional
+            Custom tick locations.
+        annotations : list of dict, optional
+            List of annotation dicts for each subplot.
+        export_path : str, optional
+            Path to export the figure (without extension).
+        export_formats : list, optional
+            List of formats to export (e.g., ["png", "pdf"]).
+        time_dim : str, default: "time"
+            Name of the time dimension.
+        ncols : int, default: 3
+            Number of columns in the facet grid.
+        **kwargs : dict
+            Additional keyword arguments for plotting.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib figure object.
+        axes : ndarray of matplotlib.axes.Axes
+            The matplotlib axes objects.
+        """
+        from ..plots.cartopy_utils import facet_time_map
+        da = self._dataset_to_monet(self._obj)
+        return facet_time_map(
+            da,
+            time_dim=time_dim,
+            ncols=ncols,
+            map_kws=map_kws,
+            projection=projection,
+            colorbar=colorbar,
+            figsize=figsize,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            norm=norm,
+            dpi=dpi,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            suptitle=suptitle,
+            cbar_label=cbar_label,
+            xticks=xticks,
+            yticks=yticks,
+            annotations=annotations,
+            export_path=export_path,
+            export_formats=export_formats,
+            **kwargs
+        )

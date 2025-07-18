@@ -8,6 +8,52 @@ from .base import BaseAccessor, has_pyresample
 
 @pd.api.extensions.register_dataframe_accessor("monet")
 class MONETAccessorPandas(BaseAccessor):
+    def plot_points_map(self, lon_col="longitude", lat_col="latitude", projection=None, color="C0", marker="o", size=40, edgecolor="k", alpha=0.8, map_kws=None, figsize=(8, 6), dpi=150, title=None, export_path=None, export_formats=None, **kwargs):
+        """
+        Plot points from this DataFrame on a Cartopy map.
+        """
+        from ..plots.cartopy_utils import plot_points_map
+        return plot_points_map(
+            self._obj,
+            lon_col=lon_col,
+            lat_col=lat_col,
+            projection=projection,
+            color=color,
+            marker=marker,
+            size=size,
+            edgecolor=edgecolor,
+            alpha=alpha,
+            map_kws=map_kws,
+            figsize=figsize,
+            dpi=dpi,
+            title=title,
+            export_path=export_path,
+            export_formats=export_formats,
+            **kwargs
+        )
+
+    def plot_lines_map(self, lon_col="longitude", lat_col="latitude", group_col=None, projection=None, color="C0", linewidth=2, alpha=0.8, map_kws=None, figsize=(8, 6), dpi=150, title=None, export_path=None, export_formats=None, **kwargs):
+        """
+        Plot lines from this DataFrame on a Cartopy map. Optionally group by a column.
+        """
+        from ..plots.cartopy_utils import plot_lines_map
+        return plot_lines_map(
+            self._obj,
+            lon_col=lon_col,
+            lat_col=lat_col,
+            group_col=group_col,
+            projection=projection,
+            color=color,
+            linewidth=linewidth,
+            alpha=alpha,
+            map_kws=map_kws,
+            figsize=figsize,
+            dpi=dpi,
+            title=title,
+            export_path=export_path,
+            export_formats=export_formats,
+            **kwargs
+        )
     """Pandas DataFrame accessor for MONET functionality.
 
     This accessor adds MONET-specific methods to pandas DataFrames.
@@ -167,30 +213,45 @@ class MONETAccessorPandas(BaseAccessor):
         out = self.to_ascii2nc_df(**kwargs)
         return out.values.tolist()
 
-    def rename_for_monet(self, df=None):
+    @staticmethod
+    def rename_for_monet(df):
         """Rename latitude and longitude columns in the DataFrame.
 
         Parameters
         ----------
-        df : pandas.DataFrame, optional
-            To use instead of self.
+        df : pandas.DataFrame
+            DataFrame to rename columns in.
 
         Returns
         -------
         pandas.DataFrame
             DataFrame with renamed latitude/longitude columns.
         """
-        if df is None:
-            df = self._obj
-        if "lat" in df.columns:
-            df = df.rename({"lat": "latitude", "lon": "longitude"})
-        elif "Latitude" in df.columns:
-            df = df.rename({"Latitude": "latitude", "Longitude": "longitude"})
-        elif "Lat" in df.columns:
-            df = df.rename({"Lat": "latitude", "Lon": "longitude"})
-        elif "LAT" in df.columns:
-            df = df.rename({"LAT": "latitude", "LON": "longitude"})
-        return df
+        out = df.copy()
+        col_map = None
+        if "lat" in out.columns and "lon" in out.columns:
+            col_map = {"lat": "latitude", "lon": "longitude"}
+        elif "Latitude" in out.columns and "Longitude" in out.columns:
+            col_map = {"Latitude": "latitude", "Longitude": "longitude"}
+        elif "Lat" in out.columns and "Lon" in out.columns:
+            col_map = {"Lat": "latitude", "Lon": "longitude"}
+        elif "LAT" in out.columns and "LON" in out.columns:
+            col_map = {"LAT": "latitude", "LON": "longitude"}
+        if col_map:
+            out = out.rename(col_map)
+        # If neither, but already correct, do nothing
+        # If neither, but only one present, add missing as NaN
+        if "latitude" not in out.columns:
+            out["latitude"] = np.nan
+        if "longitude" not in out.columns:
+            out["longitude"] = np.nan
+        # Reorder columns to put latitude/longitude first if present
+        cols = list(out.columns)
+        for c in ["latitude", "longitude"]:
+            if c in cols:
+                cols.insert(0, cols.pop(cols.index(c)))
+        out = out[cols]
+        return out
 
     def get_sparse_SwathDefinition(self):
         """Creates a ``pyreample.geometry.SwathDefinition`` for a single point.
@@ -334,3 +395,9 @@ class MONETAccessorPandas(BaseAccessor):
         r.name = column_name
         df[column_name] = r
         return df
+
+    def quick_facet_time_map(self, *args, **kwargs):
+        """
+        Faceted map plotting is not supported for Pandas DataFrames.
+        """
+        raise NotImplementedError("Faceted map plotting is only available for xarray DataArray and Dataset accessors.")

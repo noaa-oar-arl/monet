@@ -24,6 +24,16 @@ except ImportError:
 
 class BaseAccessor:
     """Base class for MONET accessors with common utility methods."""
+    @staticmethod
+    def safe_import(module_name, error_msg=None):
+        """Import a module with a clear error message if not found."""
+        import importlib
+        try:
+            return importlib.import_module(module_name)
+        except ImportError:
+            if error_msg is None:
+                error_msg = f"Module '{module_name}' is required but not installed."
+            raise ImportError(error_msg)
 
     @staticmethod
     def _check_kwargs_and_set_defaults(**kwargs):
