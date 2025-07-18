@@ -296,7 +296,7 @@ def test_dataset_accessor_basic(sample_dataset):
             pass
 
 
-def test_dataset_accessor_dask(sample_dataset_dask):
+def test_dataset_accessor_dask(sample_dataset_dask_fixture):
     # Test remap to a different-shaped grid
     target_lat = np.linspace(-10, 10, 7)
     target_lon = np.linspace(100, 120, 7)
@@ -304,6 +304,7 @@ def test_dataset_accessor_dask(sample_dataset_dask):
         {"var": (("lat", "lon"), dask_array.zeros((7, 7), chunks=(7, 7)))},
         coords={"lat": target_lat, "lon": target_lon},
     )
+    sample_dataset_dask = sample_dataset_dask_fixture
     for method in ["nearest", "bilinear"]:
         try:
             remapped = sample_dataset_dask.monet.remap(target, method=method)

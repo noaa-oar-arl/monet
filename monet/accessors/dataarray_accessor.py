@@ -129,7 +129,7 @@ class MONETAccessor(BaseAccessor):
             da[name] = xr.apply_ufunc(vectorize(cf_to_dt64), da[name])
         return da
 
-    def structure_for_monet(self, lat_name="lat", lon_name="lon", return_obj=True):
+    def structure_for_monet(self, lat_name="lat", lon_name="lon", return_obj=True, coards_compliant=False):
         """Structure the DataArray for use with MONET functions.
 
         Parameters
@@ -140,6 +140,8 @@ class MONETAccessor(BaseAccessor):
             Name of the longitude coordinate.
         return_obj : bool, default: True
             Whether to return the restructured object.
+        coards_compliant : bool, default: False
+            Whether to enforce COARDS compliance.
 
         Returns
         -------
@@ -147,9 +149,9 @@ class MONETAccessor(BaseAccessor):
             Restructured DataArray if return_obj is True, otherwise None.
         """
         if return_obj:
-            return self._dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
+            return self._dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name, coards_compliant=coards_compliant)
         else:
-            self._obj = self._dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name)
+            self._obj = self._dataset_to_monet(self._obj, lat_name=lat_name, lon_name=lon_name, coards_compliant=coards_compliant)
 
     def stratify(self, levels, vertical, axis=1):
         """Vertically interpolate data to specified levels.

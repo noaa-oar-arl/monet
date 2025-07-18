@@ -326,9 +326,17 @@ def is_curvilinear_grid(ds):
     lat_var, lon_var = None, None
     try:
         if isinstance(ds, xr.Dataset):
-            lat_var, lon_var, _, _ = extract_latlon_dataset(ds, return_names=True)
+            result = extract_latlon_dataset(ds, return_names=True)
+            if len(result) == 4:
+                lat_var, lon_var, _, _ = result
+            else:
+                lat_var, lon_var = result
         else:
-            lat_var, lon_var, _, _ = extract_latlon_dataarray(ds, return_names=True)
+            result = extract_latlon_dataarray(ds, return_names=True)
+            if len(result) == 4:
+                lat_var, lon_var, _, _ = result
+            else:
+                lat_var, lon_var = result
     except ValueError:
         return False
 

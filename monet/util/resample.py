@@ -1,5 +1,6 @@
 try:
-    from pyresample.future.resamplers import BilinearXarrayResampler, KDTreeNearestXarrayResampler
+    from pyresample.future.resamplers import BilinearXarrayResampler
+    from pyresample.future.resamplers.nearest import KDTreeNearestXarrayResampler
     from pyresample.geometry import AreaDefinition, SwathDefinition
     from pyresample.kd_tree import XArrayResamplerNN  # noqa: F401
 
@@ -189,7 +190,7 @@ def resample_xesmf(
 
                 cluster = LocalCluster(n_workers=n_workers)
                 client = Client(cluster)
-                kwargs["dask_client"] = client
+                # dask_client argument is no longer supported in xESMF >=0.7.0; do not add it to kwargs
 
                 # Ensure data is chunked
                 if isinstance(source_da, xr.Dataset):

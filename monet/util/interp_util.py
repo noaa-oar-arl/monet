@@ -469,7 +469,10 @@ def create_area_def_from_esmf_mesh(mesh, projection="platea", resolution=None, a
     try:
         import ESMF
     except ImportError:
-        raise ImportError("ESMF is required for this functionality")
+        try:
+            import esmpy as ESMF
+        except ImportError:
+            raise ImportError("ESMF is required for this functionality")
 
     # Extract node coordinates from the mesh
     node_coords = mesh.get_coords()
