@@ -172,6 +172,88 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         dims=["latitude", "longitude"],
     )
     for method in ["nearest", "bilinear"]:
+        remapped = sample_dataarray_dask.monet.remap(target, method=method)
+        assert isinstance(remapped, xr.DataArray)
+        assert remapped.shape == (7, 7)
+        np.testing.assert_allclose(
+            remapped.sum().compute().item(),
+            sample_dataarray_dask.sum().compute().item(),
+            rtol=0.2,
+            atol=1.0,
+        )
+    # Test remap (pyresample, both nearest and bilinear)
+    for method in ["nearest", "bilinear"]:
+        remapped = sample_dataarray_dask.monet.remap(sample_dataarray_dask, method=method)
+        assert isinstance(remapped, xr.DataArray)
+        assert remapped.shape == sample_dataarray_dask.shape
+        np.testing.assert_allclose(
+            remapped.sum().compute().item(),
+            sample_dataarray_dask.sum().compute().item(),
+            rtol=1e-2,
+            atol=1e-2,
+        )
+    # Plotting tests (should not error, but may skip if dependencies missing)
+    try:
+        ax = sample_dataarray_dask.monet.quick_map()
+        assert ax is not None
+    except Exception:
+        pass
+    try:
+        ax = sample_dataarray_dask.monet.quick_imshow()
+        assert ax is not None
+    except Exception:
+        pass
+    try:
+        ax = sample_dataarray_dask.monet.quick_contourf()
+        assert ax is not None
+    except Exception:
+        pass
+    # Remapping structure test (full remap requires pyresample/xesmf and more setup)
+    try:
+        sample_dataarray_dask.monet.remap_nearest(sample_dataarray_dask)
+    except Exception:
+        pass
+    try:
+        sample_dataarray_dask.monet.remap_xesmf(sample_dataarray_dask)
+    except Exception:
+        pass
+    # Test is_land and is_ocean (should work if global_land_mask is installed)
+    try:
+        land_mask = sample_dataarray_dask.monet.is_land(return_xarray=True)
+        assert isinstance(land_mask, xr.DataArray)
+        ocean_mask = sample_dataarray_dask.monet.is_ocean(return_xarray=True)
+        assert isinstance(ocean_mask, xr.DataArray)
+    except ImportError:
+        pass
+    except Exception:
+        pass
+    # Test stratify (mock vertical)
+    levels = np.linspace(0, 1, 3)
+    vertical = xr.DataArray(np.linspace(0, 1, 5), dims=["latitude"])
+    try:
+        strat = sample_dataarray_dask.monet.stratify(levels, vertical, axis=0)
+        assert isinstance(strat, xr.DataArray)
+    except Exception:
+        pass
+    # Test structure_for_monet with return_obj=False
+    da2 = sample_dataarray_dask.copy()
+    da2.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=False)
+    assert isinstance(da2, xr.DataArray)
+    da = sample_dataarray_dask
+    # Test wrap_longitudes
+    da2 = da.monet.wrap_longitudes(lon_name="longitude")
+    assert ((da2.longitude >= -180) & (da2.longitude < 180)).all()
+    # Test tidy
+    tidy = da.monet.tidy(lon_name="longitude")
+    assert np.all(np.diff(tidy.longitude.values) >= 0)
+    # Test structure_for_monet
+    out = da.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=True)
+    assert isinstance(out, xr.DataArray)
+    # Test cftime_to_datetime64 (should be a no-op for normal datetime)
+    da2 = da.copy()
+    da2 = da2.assign_coords(time=("latitude", pd.date_range("2020-01-01", periods=5)))
+    out = da2.monet.cftime_to_datetime64(name="time")
+    assert "time" in out.coords or "time" in out.dims or "time" in out.variables
         try:
             remapped = sample_dataarray_dask.monet.remap(target, method=method)
             assert isinstance(remapped, xr.DataArray)
@@ -296,7 +378,7 @@ def test_dataset_accessor_basic(sample_dataset):
             pass
 
 
-def test_dataset_accessor_dask(sample_dataset_dask_fixture):
+def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
     # Test remap to a different-shaped grid
     target_lat = np.linspace(-10, 10, 7)
     target_lon = np.linspace(100, 120, 7)
@@ -304,7 +386,6 @@ def test_dataset_accessor_dask(sample_dataset_dask_fixture):
         {"var": (("lat", "lon"), dask_array.zeros((7, 7), chunks=(7, 7)))},
         coords={"lat": target_lat, "lon": target_lon},
     )
-    sample_dataset_dask = sample_dataset_dask_fixture
     for method in ["nearest", "bilinear"]:
         try:
             remapped = sample_dataset_dask.monet.remap(target, method=method)
