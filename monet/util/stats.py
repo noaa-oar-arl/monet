@@ -2,1518 +2,1552 @@ import numpy as np
 
 
 def STDO(obs, mod, axis=None):
-    """Standard deviation of Observations.
+    """Standard deviation of Observations
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array (not used in this function).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the standard deviation.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Standard deviation of observations.
+    type
+        Description of returned object.
+
     """
+
     return np.ma.std(obs, axis=axis)
 
 
 def STDP(obs, mod, axis=None):
-    """Standard deviation of Predictions (model values).
+    """Standard deviation of Predictions
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array (not used in this function).
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the standard deviation.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Standard deviation of model predictions.
+    type
+        Description of returned object.
+
     """
+
     return np.ma.std(mod, axis=axis)
 
 
 def MNB(obs, mod, axis=None):
-    """Mean Normalized Bias (%).
+    """Mean Normalized Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Mean normalized bias in percent.
+    type
+        Description of returned object.
+
     """
+
     return np.ma.masked_invalid((mod - obs) / obs).mean(axis=axis) * 100.0
 
 
 def MNE(obs, mod, axis=None):
-    """Mean Normalized Error (%).
+    """Mean Normalized Gross Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Mean normalized error in percent.
+    type
+        Description of returned object.
+
     """
-    return np.ma.masked_invalid(np.abs(mod - obs) / obs).mean(axis=axis) * 100.0
+
+    return np.ma.masked_invalid(np.ma.abs(mod - obs) / obs).mean(axis=axis) * 100.0
 
 
 def MdnNB(obs, mod, axis=None):
-    """Median Normalized Bias (%).
+    """Median Normalized Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Median normalized bias in percent.
+    type
+        Description of returned object.
+
     """
+
     return np.ma.median(np.ma.masked_invalid((mod - obs) / obs), axis=axis) * 100.0
 
 
 def MdnNE(obs, mod, axis=None):
-    """Median Normalized Error (%).
+    """Median Normalized Gross Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Median normalized error in percent.
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(np.ma.masked_invalid(np.abs(mod - obs) / obs), axis=axis) * 100.0
+
+    return np.ma.median(np.ma.masked_invalid(np.ma.abs(mod - obs) / obs), axis=axis) * 100.0
 
 
 def NMdnGE(obs, mod, axis=None):
-    """Normalized Median Gross Error.
+    """Normalized Median Gross Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized median gross error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(np.ma.masked_invalid(np.abs(mod - obs) / obs), axis=axis)
+
+    return np.ma.masked_invalid(np.ma.abs(mod - obs).mean(axis=axis) / obs.mean(axis=axis)) * 100.0
 
 
 def NO(obs, mod, axis=None):
-    """Number of Observations.
+    """N Observations (#)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array (not used in this function).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to count.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or int
-        Number of valid observation points.
+    type
+        Description of returned object.
+
     """
-    return np.ma.count(obs, axis=axis)
+
+    return (~np.ma.getmaskarray(obs)).sum(axis=axis)  # True where masked
 
 
 def NOP(obs, mod, axis=None):
-    """Number of Observation-Prediction Pairs.
+    """N Observations/Prediction Pairs (#)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to count.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or int
-        Number of valid observation-prediction pairs.
+    type
+        Description of returned object.
+
     """
-    return np.ma.count(np.ma.masked_invalid((obs - mod) / obs), axis=axis)
+
+    obsc, modc = matchmasks(obs, mod)
+    return (~np.ma.getmaskarray(obsc)).sum(axis=axis)
 
 
 def NP(obs, mod, axis=None):
-    """Number of Predictions.
+    """N Predictions (#)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array (not used in this function).
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to count.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or int
-        Number of valid model prediction points.
+    type
+        Description of returned object.
+
     """
-    return np.ma.count(mod, axis=axis)
+    return (~np.ma.getmaskarray(mod)).sum(axis=axis)
 
 
 def MO(obs, mod, axis=None):
-    """Mean of Observations.
+    """Mean Observations (obs unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array (not used in this function).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Mean of observations.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(obs, axis=axis)
+    return obs.mean(axis=axis)
 
 
 def MP(obs, mod, axis=None):
-    """Mean of Predictions.
+    """Mean Predictions (model unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array (not used in this function).
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Mean of model predictions.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(mod, axis=axis)
+    return mod.mean(axis=axis)
 
 
 def MdnO(obs, mod, axis=None):
-    """Median of Observations.
+    """Median Observations (obs unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array (not used in this function).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Median of observations.
+    type
+        Description of returned object.
+
     """
     return np.ma.median(obs, axis=axis)
 
 
 def MdnP(obs, mod, axis=None):
-    """Median of Predictions.
+    """Median Predictions (model unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array (not used in this function).
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Median of model predictions.
+    type
+        Description of returned object.
+
     """
+
     return np.ma.median(mod, axis=axis)
 
 
 def RM(obs, mod, axis=None):
-    """Ratio of Means (mod/obs).
+    """Mean Ratio Observations/Predictions (none)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the means.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Ratio of means (mod/obs).
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(mod, axis=axis) / np.ma.mean(obs, axis=axis)
+
+    return np.ma.masked_invalid(obs / mod).mean(axis=axis)
 
 
 def RMdn(obs, mod, axis=None):
-    """Ratio of Medians (mod/obs).
+    """Median Ratio Observations/Predictions (none)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the medians.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Ratio of medians (mod/obs).
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(mod, axis=axis) / np.ma.median(obs, axis=axis)
+
+    return np.ma.median(np.ma.masked_invalid(obs / mod), axis=axis)
 
 
 def MB(obs, mod, axis=None):
-    """Mean Bias (mod - obs).
+    """Mean Bias
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Mean bias.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(mod - obs, axis=axis)
+
+    return (mod - obs).mean(axis=axis)
 
 
 def MdnB(obs, mod, axis=None):
-    """Median Bias (mod - obs).
+    """Median Bias
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Median bias.
+    type
+        Description of returned object.
+
     """
+
     return np.ma.median(mod - obs, axis=axis)
 
 
 def WDMB_m(obs, mod, axis=None):
-    """Wind Direction Mean Bias - Modified.
+    """Wind Direction Mean Bias (avoid single block error in np.ma)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction mean bias (modified calculation).
+    type
+        Description of returned object.
+
     """
-    d = mod - obs
-    d = np.where(d > 180, d - 360, d)
-    d = np.where(d < -180, d + 360, d)
-    return np.ma.mean(d, axis=axis)
+
+    return circlebias_m(mod - obs).mean(axis=axis)
 
 
 def WDMB(obs, mod, axis=None):
-    """Wind Direction Mean Bias.
+    """Wind Direction Mean Bias
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction mean bias.
+    type
+        Description of returned object.
+
     """
-    d = (mod - obs) % 360
-    d = np.where(d > 180, d - 360, d)
-    return np.ma.mean(d, axis=axis)
+
+    return circlebias(mod - obs).mean(axis=axis)
 
 
 def WDMdnB(obs, mod, axis=None):
-    """Wind Direction Median Bias.
+    """Wind Direction Median Bias
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction median bias.
+    type
+        Description of returned object.
+
     """
-    d = (mod - obs) % 360
-    d = np.where(d > 180, d - 360, d)
-    return np.ma.median(d, axis=axis)
+
+    return np.ma.median(circlebias(mod - obs), axis=axis)
 
 
 def NMB(obs, mod, axis=None):
-    """Normalized Mean Bias.
+    """Normalized Mean Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the means.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized mean bias.
+    type
+        Description of returned object.
+
     """
-    return np.ma.sum(mod - obs, axis=axis) / np.ma.sum(obs, axis=axis)
+
+    return (mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.0
 
 
 def WDNMB_m(obs, mod, axis=None):
-    """Wind Direction Normalized Mean Bias - Modified.
+    """Wind Direction Normalized Mean Bias (%) (avoid single block error in np.ma)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction normalized mean bias (modified calculation).
+    type
+        Description of returned object.
+
     """
-    d = mod - obs
-    d = np.where(d > 180, d - 360, d)
-    d = np.where(d < -180, d + 360, d)
-    return np.ma.sum(d, axis=axis) / np.ma.sum(obs, axis=axis)
+
+    return circlebias_m(mod - obs).sum(axis=axis) / obs.sum(axis=axis) * 100.0
 
 
 def NMB_ABS(obs, mod, axis=None):
-    """Normalized Mean Bias using absolute values.
+    """Normalized Mean Bias - Absolute of the denominator (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the means.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized mean bias with absolute values.
+    type
+        Description of returned object.
+
     """
-    return np.ma.sum(mod - obs, axis=axis) / np.ma.sum(np.abs(obs), axis=axis)
+
+    return (mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis)) * 100.0
 
 
 def NMdnB(obs, mod, axis=None):
-    """Normalized Median Bias.
+    """Normalized Median Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized median bias.
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(mod - obs, axis=axis) / np.ma.median(obs, axis=axis)
+
+    return np.ma.median(mod - obs, axis=axis) / np.ma.median(obs, axis=axis) * 100.0
 
 
 def FB(obs, mod, axis=None):
-    """Fractional Bias.
+    """Fractional Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Fractional bias.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(2.0 * (mod - obs) / (mod + obs), axis=axis)
+
+    return ((np.ma.masked_invalid((mod - obs) / (mod + obs))).mean(axis=axis) * 2.0) * 100.0
 
 
 def ME(obs, mod, axis=None):
-    """Mean Error (absolute difference).
+    """Mean Gross Error (model and obs unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Mean error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(np.abs(mod - obs), axis=axis)
+
+    return np.ma.abs(mod - obs).mean(axis=axis)
 
 
 def MdnE(obs, mod, axis=None):
-    """Median Error (absolute difference).
+    """Median Gross Error (model and obs unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Median error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(np.abs(mod - obs), axis=axis)
+
+    return np.ma.median(np.ma.abs(mod - obs), axis=axis)
 
 
 def WDME_m(obs, mod, axis=None):
-    """Wind Direction Mean Error - Modified.
+    """Wind Direction Mean Gross Error (model and obs unit)
+    (avoid single block error in np.ma)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction mean error (modified calculation).
+    type
+        Description of returned object.
+
     """
-    d = np.abs(mod - obs)
-    d = np.where(d > 180, 360 - d, d)
-    return np.ma.mean(d, axis=axis)
+
+    return np.abs(circlebias_m(mod - obs)).mean(axis=axis)
 
 
 def WDME(obs, mod, axis=None):
-    """Wind Direction Mean Error.
+    """Wind Direction Mean Gross Error (model and obs unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction mean error.
+    type
+        Description of returned object.
+
     """
-    d = np.abs(mod - obs)
-    d = np.minimum(d, 360 - d)
-    return np.ma.mean(d, axis=axis)
+    return np.ma.abs(circlebias(mod - obs)).mean(axis=axis)
 
 
 def WDMdnE(obs, mod, axis=None):
-    """Wind Direction Median Error.
+    """Wind Direction Median Gross Error (model and obs unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction median error.
+    type
+        Description of returned object.
+
     """
-    d = np.abs(mod - obs)
-    d = np.minimum(d, 360 - d)
-    return np.ma.median(d, axis=axis)
+    cb = circlebias(mod - obs)
+    return np.ma.median(np.ma.abs(cb), axis=axis)
 
 
 def NME_m(obs, mod, axis=None):
-    """Normalized Mean Error - Modified.
+    """Normalized Mean Error (%) (avoid single block error in np.ma)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sum.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized mean error (modified calculation).
+    type
+        Description of returned object.
+
     """
-    return np.ma.sum(np.abs(mod - obs), axis=axis) / np.ma.sum(obs, axis=axis)
+
+    out = (np.abs(mod - obs).sum(axis=axis) / obs.sum(axis=axis)) * 100
+    return out
 
 
 def NME_m_ABS(obs, mod, axis=None):
-    """Normalized Mean Error - Modified, using absolute values.
+    """Normalized Mean Error (%) - Absolute of the denominator
+    (avoid single block error in np.ma)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sum.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized mean error using absolute values (modified calculation).
+    type
+        Description of returned object.
+
     """
-    return np.ma.sum(np.abs(mod - obs), axis=axis) / np.ma.sum(np.abs(obs), axis=axis)
+
+    out = (np.abs(mod - obs).sum(axis=axis) / np.abs(obs.sum(axis=axis))) * 100
+    return out
 
 
 def NME(obs, mod, axis=None):
-    """Normalized Mean Error.
+    """Normalized Mean Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized mean error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(np.abs(mod - obs) / obs, axis=axis)
+
+    out = (np.ma.abs(mod - obs).sum(axis=axis) / obs.sum(axis=axis)) * 100
+    return out
 
 
 def NMdnE(obs, mod, axis=None):
-    """Normalized Median Error.
+    """Normalized Median Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized median error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(np.abs(mod - obs), axis=axis) / np.ma.median(obs, axis=axis)
+
+    out = np.ma.median(np.ma.abs(mod - obs), axis=axis) / np.ma.median(obs, axis=axis) * 100
+    return out
 
 
 def FE(obs, mod, axis=None):
-    """Fractional Error.
+    """Fractional Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Fractional error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(2.0 * np.abs(mod - obs) / (np.abs(mod) + np.abs(obs)), axis=axis)
+
+    return (np.ma.abs(mod - obs) / (mod + obs)).mean(axis=axis) * 2.0 * 100.0
 
 
 def USUTPB(obs, mod, axis=None):
-    """Unpaired Space/Unpaired Time Peak Bias.
+    """Unpaired Space/Unpaired Time Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the maximum.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Unpaired space/unpaired time peak bias.
+    type
+        Description of returned object.
+
     """
-    return np.ma.max(mod, axis=axis) / np.ma.max(obs, axis=axis) - 1.0
+
+    return ((mod.max(axis=axis) - obs.max(axis=axis)) / obs.max(axis=axis)) * 100.0
 
 
 def USUTPE(obs, mod, axis=None):
-    """Unpaired Space/Unpaired Time Peak Error.
+    """Unpaired Space/Unpaired Time Peak Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the maximum.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Unpaired space/unpaired time peak error.
+    type
+        Description of returned object.
+
     """
-    return np.abs(np.ma.max(mod, axis=axis) / np.ma.max(obs, axis=axis) - 1.0)
+
+    return (np.ma.abs(mod.max(axis=axis) - obs.max(axis=axis)) / obs.max(axis=axis)) * 100.0
 
 
 def MNPB(obs, mod, paxis, axis=None):
-    """Mean Normalized Peak Bias.
+    """Mean Normalized Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    paxis : int or tuple of ints
-        Axis or axes along which to calculate the peak (maximum).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Mean normalized peak bias.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(
-        np.ma.max(mod, axis=paxis) / np.ma.max(obs, axis=paxis) - 1.0, axis=axis
-    )
+
+    return ((mod.max(axis=paxis) - obs.max(axis=paxis)) / obs.max(axis=paxis)).mean(
+        axis=axis
+    ) * 100.0
 
 
 def MdnNPB(obs, mod, paxis, axis=None):
-    """Median Normalized Peak Bias.
+    """Median Normalized Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    paxis : int or tuple of ints
-        Axis or axes along which to calculate the peak (maximum).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Median normalized peak bias.
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(
-        np.ma.max(mod, axis=paxis) / np.ma.max(obs, axis=paxis) - 1.0, axis=axis
+
+    return (
+        np.ma.median(((mod.max(axis=paxis) - obs.max(axis=paxis)) / obs.max(axis=paxis)), axis=axis)
+        * 100.0
     )
 
 
 def MNPE(obs, mod, paxis, axis=None):
-    """Mean Normalized Peak Error.
+    """Mean Normalized Peak Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    paxis : int or tuple of ints
-        Axis or axes along which to calculate the peak (maximum).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Mean normalized peak error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(
-        np.abs(np.ma.max(mod, axis=paxis) / np.ma.max(obs, axis=paxis) - 1.0), axis=axis
-    )
+
+    return ((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))) / obs.max(axis=paxis)).mean(
+        axis=axis
+    ) * 100.0
 
 
 def MdnNPE(obs, mod, paxis, axis=None):
-    """Median Normalized Peak Error.
+    """Median Normalized Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    paxis : int or tuple of ints
-        Axis or axes along which to calculate the peak (maximum).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Median normalized peak error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(
-        np.abs(np.ma.max(mod, axis=paxis) / np.ma.max(obs, axis=paxis) - 1.0), axis=axis
+
+    return (
+        np.ma.median(
+            ((np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))) / obs.max(axis=paxis)),
+            axis=axis,
+        )
+        * 100.0
     )
 
 
 def NMPB(obs, mod, paxis, axis=None):
-    """Normalized Mean Peak Bias.
+    """Normalized Mean Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    paxis : int or tuple of ints
-        Axis or axes along which to calculate the peak (maximum).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sum.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized mean peak bias.
+    type
+        Description of returned object.
+
     """
+
     return (
-        np.ma.sum(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis), axis=axis)
-        / np.ma.sum(np.ma.max(obs, axis=paxis), axis=axis)
+        (mod.max(axis=paxis) - obs.max(axis=paxis)).mean(axis=axis)
+        / obs.max(axis=paxis).mean(axis=axis)
+        * 100.0
     )
 
 
 def NMdnPB(obs, mod, paxis, axis=None):
-    """Normalized Median Peak Bias.
+    """Normalized Median Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    paxis : int or tuple of ints
-        Axis or axes along which to calculate the peak (maximum).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized median peak bias.
+    type
+        Description of returned object.
+
     """
+
     return (
-        np.ma.median(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis), axis=axis)
-        / np.ma.median(np.ma.max(obs, axis=paxis), axis=axis)
+        np.ma.median((mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis)
+        / np.ma.median(obs.max(axis=paxis), axis=axis)
+        * 100.0
     )
 
 
 def NMPE(obs, mod, paxis, axis=None):
-    """Normalized Mean Peak Error.
+    """Normalized Mean Peak Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    paxis : int or tuple of ints
-        Axis or axes along which to calculate the peak (maximum).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sum.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized mean peak error.
+    type
+        Description of returned object.
+
     """
+
     return (
-        np.ma.sum(np.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)), axis=axis)
-        / np.ma.sum(np.ma.max(obs, axis=paxis), axis=axis)
+        (np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis))).mean(axis=axis)
+        / obs.max(axis=paxis).mean(axis=axis)
+        * 100.0
     )
 
 
 def NMdnPE(obs, mod, paxis, axis=None):
-    """Normalized Median Peak Error.
+    """Normalized Median Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    paxis : int or tuple of ints
-        Axis or axes along which to calculate the peak (maximum).
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    paxis : type
+        Description of parameter `paxis`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Normalized median peak error.
+    type
+        Description of returned object.
+
     """
+
     return (
-        np.ma.median(np.abs(np.ma.max(mod, axis=paxis) - np.ma.max(obs, axis=paxis)), axis=axis)
-        / np.ma.median(np.ma.max(obs, axis=paxis), axis=axis)
+        np.ma.median(np.ma.abs(mod.max(axis=paxis) - obs.max(axis=paxis)), axis=axis)
+        / np.ma.median(obs.max(axis=paxis), axis=axis)
+        * 100.0
     )
 
 
 def PSUTMNPB(obs, mod, axis=None):
-    """Paired Space/Unpaired Time Mean Normalized Peak Bias.
+    """Paired Space/Unpaired Time Mean Normalized Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Paired space/unpaired time mean normalized peak bias.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(np.ma.max(mod, axis=axis) / np.ma.max(obs, axis=axis) - 1.0)
+
+    return MNPB(obs, mod, paxis=0, axis=None)
 
 
 def PSUTMdnNPB(obs, mod, axis=None):
-    """Paired Space/Unpaired Time Median Normalized Peak Bias.
+    """Paired Space/Unpaired Time Median Normalized Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Paired space/unpaired time median normalized peak bias.
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(np.ma.max(mod, axis=axis) / np.ma.max(obs, axis=axis) - 1.0)
+
+    return MdnNPB(obs, mod, paxis=0, axis=None)
 
 
 def PSUTMNPE(obs, mod, axis=None):
-    """Paired Space/Unpaired Time Mean Normalized Peak Error.
+    """Paired Space/Unpaired Time Mean Normalized Peak Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Paired space/unpaired time mean normalized peak error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.mean(np.abs(np.ma.max(mod, axis=axis) / np.ma.max(obs, axis=axis) - 1.0))
+
+    return MNPE(obs, mod, paxis=0, axis=None)
 
 
 def PSUTMdnNPE(obs, mod, axis=None):
-    """Paired Space/Unpaired Time Median Normalized Peak Error.
+    """Paired Space/Unpaired Time Median Normalized Peak Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Paired space/unpaired time median normalized peak error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.median(np.abs(np.ma.max(mod, axis=axis) / np.ma.max(obs, axis=axis) - 1.0))
+
+    return MdnNPE(obs, mod, paxis=0, axis=None)
 
 
 def PSUTNMPB(obs, mod, axis=None):
-    """Paired Space/Unpaired Time Normalized Mean Peak Bias.
+    """Paired Space/Unpaired Time Normalized Mean Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sum.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Paired space/unpaired time normalized mean peak bias.
+    type
+        Description of returned object.
+
     """
-    return (
-        np.ma.sum(np.ma.max(mod, axis=axis) - np.ma.max(obs, axis=axis))
-        / np.ma.sum(np.ma.max(obs, axis=axis))
-    )
+
+    return NMPB(obs, mod, paxis=0, axis=None)
 
 
 def PSUTNMPE(obs, mod, axis=None):
-    """Paired Space/Unpaired Time Normalized Mean Peak Error.
+    """Paired Space/Unpaired Time Normalized Mean Peak Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sum.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Paired space/unpaired time normalized mean peak error.
+    type
+        Description of returned object.
+
     """
-    return (
-        np.ma.sum(np.abs(np.ma.max(mod, axis=axis) - np.ma.max(obs, axis=axis)))
-        / np.ma.sum(np.ma.max(obs, axis=axis))
-    )
+
+    return NMPE(obs, mod, paxis=0, axis=None)
 
 
 def PSUTNMdnPB(obs, mod, axis=None):
-    """Paired Space/Unpaired Time Normalized Median Peak Bias.
+    """Paired Space/Unpaired Time Normalized Median Peak Bias (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Paired space/unpaired time normalized median peak bias.
+    type
+        Description of returned object.
+
     """
-    return (
-        np.ma.median(np.ma.max(mod, axis=axis) - np.ma.max(obs, axis=axis))
-        / np.ma.median(np.ma.max(obs, axis=axis))
-    )
+
+    return NMdnPB(obs, mod, paxis=0, axis=None)
 
 
 def PSUTNMdnPE(obs, mod, axis=None):
-    """Paired Space/Unpaired Time Normalized Median Peak Error.
+    """Paired Space/Unpaired Time Normalized Median Peak Error (%)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the median.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Paired space/unpaired time normalized median peak error.
+    type
+        Description of returned object.
+
     """
-    return (
-        np.ma.median(np.abs(np.ma.max(mod, axis=axis) - np.ma.max(obs, axis=axis)))
-        / np.ma.median(np.ma.max(obs, axis=axis))
-    )
+
+    return NMdnPE(obs, mod, paxis=0, axis=None)
 
 
 def R2(obs, mod, axis=None):
-    """Coefficient of determination (r-squared).
+    """Coefficient of Determination (unit squared)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the correlation.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Coefficient of determination (r-squared).
+    type
+        Description of returned object.
+
     """
-    return np.ma.corrcoef(obs, mod, rowvar=False)[0, 1] ** 2
+
+    from scipy.stats import pearsonr
+
+    if axis is None:
+        obsc, modc = matchedcompressed(obs, mod)
+        return pearsonr(obsc, modc)[0] ** 2
+    else:
+        raise ValueError("Not ready yet")
 
 
 def RMSE(obs, mod, axis=None):
-    """Root Mean Square Error.
+    """Root Mean Square Error (model unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Root mean square error.
+    type
+        Description of returned object.
+
     """
-    return np.ma.sqrt(np.ma.mean((mod - obs) ** 2, axis=axis))
+    return np.ma.sqrt(((mod - obs) ** 2).mean(axis=axis))
 
 
 def WDRMSE_m(obs, mod, axis=None):
-    """Wind Direction Root Mean Square Error - Modified.
+    """Wind Direction Root Mean Square Error (model unit) (avoid single block error in np.ma)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction root mean square error (modified calculation).
+    type
+        Description of returned object.
+
     """
-    d = mod - obs
-    d = np.where(d > 180, d - 360, d)
-    d = np.where(d < -180, d + 360, d)
-    return np.ma.sqrt(np.ma.mean(d ** 2, axis=axis))
+    return np.sqrt(((circlebias_m(mod - obs)) ** 2).mean(axis=axis))
 
 
 def WDRMSE(obs, mod, axis=None):
-    """Wind Direction Root Mean Square Error.
+    """Wind Direction Root Mean Square Error (model unit)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction root mean square error.
+    type
+        Description of returned object.
+
     """
-    d = (mod - obs) % 360
-    d = np.where(d > 180, d - 360, d)
-    return np.ma.sqrt(np.ma.mean(d ** 2, axis=axis))
+    return np.ma.sqrt(((circlebias(mod - obs)) ** 2).mean(axis=axis))
 
 
 def RMSEs(obs, mod, axis=None):
-    """Systematic Root Mean Square Error.
+    """Root Mean Squared Error (obs, mod_hat)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Systematic root mean square error.
-    """
-    import statsmodels.api as sm
+    type
+        Description of returned object.
 
-    a1, a0, r, p, std_err = sm.OLS(mod.ravel(), sm.add_constant(obs.ravel())).fit().params
-    p = a0 + a1 * obs
-    return np.ma.sqrt(np.ma.mean((p - obs) ** 2, axis=axis))
+    """
+    if axis is None:
+        try:
+            from scipy.stats import linregress
+
+            obsc, modc = matchedcompressed(obs, mod)
+            m, b, rval, pval, stderr = linregress(obsc, modc)
+            mod_hat = b + m * obs
+            return RMSE(obs, mod_hat)
+        except ValueError:
+            return None
+    else:
+        raise ValueError("Not ready yet")
 
 
 def matchmasks(a1, a2):
-    """Match masks between two masked arrays.
+    """Short summary.
 
     Parameters
     ----------
-    a1 : numpy.ndarray or numpy.ma.MaskedArray
-        First array.
-    a2 : numpy.ndarray or numpy.ma.MaskedArray
-        Second array.
+    a1 : type
+        Description of parameter `a1`.
+    a2 : type
+        Description of parameter `a2`.
 
     Returns
     -------
-    tuple of numpy.ma.MaskedArray
-        Tuple of (a1, a2) with matched masks.
-    """
-    # Convert regular arrays to masked arrays if needed
-    if not isinstance(a1, np.ma.MaskedArray):
-        a1 = np.ma.array(a1)
-    if not isinstance(a2, np.ma.MaskedArray):
-        a2 = np.ma.array(a2)
+    type
+        Description of returned object.
 
-    if np.any(a1.mask) or np.any(a2.mask):
-        mask = np.logical_or(a1.mask, a2.mask)
-        a1 = np.ma.masked_array(a1.data, mask=mask)
-        a2 = np.ma.masked_array(a2.data, mask=mask)
-    return a1, a2
+    """
+    mask = np.ma.getmaskarray(a1) | np.ma.getmaskarray(a2)
+    return np.ma.masked_where(mask, a1), np.ma.masked_where(mask, a2)
 
 
 def matchedcompressed(a1, a2):
-    """Return compressed arrays (no masked values) with matched masks.
+    """Short summary.
 
     Parameters
     ----------
-    a1 : numpy.ma.MaskedArray
-        First masked array.
-    a2 : numpy.ma.MaskedArray
-        Second masked array.
+    a1 : type
+        Description of parameter `a1`.
+    a2 : type
+        Description of parameter `a2`.
 
     Returns
     -------
-    tuple of numpy.ndarray
-        Tuple of (a1_compressed, a2_compressed) with no masked values.
+    type
+        Description of returned object.
+
     """
     a1, a2 = matchmasks(a1, a2)
     return a1.compressed(), a2.compressed()
 
 
 def RMSEu(obs, mod, axis=None):
-    """Unsystematic Root Mean Square Error.
+    """Root Mean Squared Error (mod_hat, mod)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the mean.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Unsystematic root mean square error.
-    """
-    import statsmodels.api as sm
+    type
+        Description of returned object.
 
-    a1, a0, r, p, std_err = sm.OLS(mod.ravel(), sm.add_constant(obs.ravel())).fit().params
-    p = a0 + a1 * obs
-    return np.ma.sqrt(np.ma.mean((mod - p) ** 2, axis=axis))
+    """
+    if axis is None:
+        try:
+            from scipy.stats import linregress
+
+            obsc, modc = matchedcompressed(obs, mod)
+            m, b, rval, pval, stderr = linregress(obsc, modc)
+            mod_hat = b + m * obs
+            return RMSE(mod_hat, mod)
+        except ValueError:
+            return None
+    else:
+        raise ValueError("Not ready yet")
 
 
 def d1(obs, mod, axis=None):
-    """Index of Agreement, d1, modified version of Willmott (1982).
+    """Modified Index of Agreement, d1
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sums.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Index of agreement, d1.
+    type
+        Description of returned object.
+
     """
     return 1.0 - (
-        np.ma.sum(np.abs(mod - obs), axis=axis)
-        / np.ma.sum(np.abs(mod - np.ma.mean(obs, axis=axis)) + np.abs(obs - np.ma.mean(obs, axis=axis)), axis=axis)
+        (np.ma.abs(obs - mod)).sum(axis=axis)
+        / (np.ma.abs(mod - obs.mean(axis=axis)) + np.ma.abs(obs - obs.mean(axis=axis))).sum(
+            axis=axis
+        )
     )
 
 
 def E1(obs, mod, axis=None):
-    """Nash-Sutcliffe coefficient of efficiency.
+    """Modified Coefficient of Efficiency, E1
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sums.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Nash-Sutcliffe coefficient of efficiency.
+    type
+        Description of returned object.
+
     """
-    return (
-        1.0
-        - np.ma.sum((mod - obs) ** 2, axis=axis)
-        / np.ma.sum((obs - np.ma.mean(obs, axis=axis)) ** 2, axis=axis)
+    return 1.0 - (
+        (np.ma.abs(obs - mod)).sum(axis=axis)
+        / (np.ma.abs(obs - obs.mean(axis=axis))).sum(axis=axis)
     )
 
 
 def IOA_m(obs, mod, axis=None):
-    """Index of Agreement - Modified.
+    """Index of Agreement, IOA (avoid single block error in np.ma)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sums.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Index of agreement (modified calculation).
+    type
+        Description of returned object.
+
     """
     obsmean = obs.mean(axis=axis)
     if axis is not None:
-        ax = list(np.arange(obs.ndim))
-        ax.remove(axis)
-        ax = tuple(ax)
-        denom = np.ma.sum(
-            (np.abs(mod - obsmean) + np.abs(obs - obsmean)),
-            axis=ax,
-        )
-    else:
-        denom = np.ma.sum(np.abs(mod - obsmean) + np.abs(obs - obsmean))
+        obsmean = np.expand_dims(obsmean, axis=axis)
     return 1.0 - (
-        np.ma.sum(np.abs(mod - obs), axis=axis) / denom
+        (np.abs(obs - mod) ** 2).sum(axis=axis)
+        / ((np.abs(mod - obsmean) + np.abs(obs - obsmean)) ** 2).sum(axis=axis)
     )
 
 
 def IOA(obs, mod, axis=None):
-    """Index of Agreement.
+    """Index of Agreement, IOA
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sums.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Index of agreement.
+    type
+        Description of returned object.
+
     """
     obsmean = obs.mean(axis=axis)
     if axis is not None:
-        ax = list(np.arange(obs.ndim))
-        ax.remove(axis)
-        ax = tuple(ax)
-        denom = np.ma.sum(
-            (np.abs(mod - obsmean) + np.abs(obs - obsmean)) ** 2,
-            axis=ax,
-        )
-    else:
-        denom = np.ma.sum((np.abs(mod - obsmean) + np.abs(obs - obsmean)) ** 2)
+        obsmean = np.expand_dims(obsmean, axis=axis)
     return 1.0 - (
-        np.ma.sum((mod - obs) ** 2, axis=axis) / denom
+        (np.ma.abs(obs - mod) ** 2).sum(axis=axis)
+        / ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis)
     )
 
 
 def circlebias_m(b):
-    """Circular Bias - Modified.
+    """avoid single block error in np.ma
 
     Parameters
     ----------
-    b : numpy.ndarray
-        Array of bias values in degrees.
+    b : type
+        Description of parameter `b`.
 
     Returns
     -------
-    numpy.ndarray
-        Modified circular bias in degrees.
+    type
+        Description of returned object.
+
     """
     b = np.where(b > 180, b - 360, b)
     b = np.where(b < -180, b + 360, b)
@@ -1521,354 +1555,319 @@ def circlebias_m(b):
 
 
 def circlebias(b):
-    """Circular Bias.
+    """Short summary.
 
     Parameters
     ----------
-    b : numpy.ndarray
-        Array of bias values in degrees.
+    b : type
+        Description of parameter `b`.
 
     Returns
     -------
-    numpy.ndarray
-        Circular bias in degrees.
+    type
+        Description of returned object.
+
     """
-    b = b % 360
-    b = np.where(b > 180, b - 360, b)
+    b = np.ma.where(b > 180, b - 360, b)
+    b = np.ma.where(b < -180, b + 360, b)
     return b
 
 
 def WDIOA_m(obs, mod, axis=None):
-    """Wind Direction Index of Agreement - Modified.
+    """Wind Direction Index of Agreement, IOA (avoid single block error in np.ma)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sums.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction index of agreement (modified calculation).
+    type
+        Description of returned object.
+
     """
-    d = mod - obs
-    d = circlebias_m(d)
     obsmean = obs.mean(axis=axis)
     if axis is not None:
-        ax = list(np.arange(obs.ndim))
-        ax.remove(axis)
-        ax = tuple(ax)
-        denom = np.ma.sum(
-            (np.abs(mod - obsmean) + np.abs(obs - obsmean)),
-            axis=ax,
-        )
-    else:
-        denom = np.ma.sum(np.abs(mod - obsmean) + np.abs(obs - obsmean))
+        obsmean = np.expand_dims(obsmean, axis=axis)
+    b = circlebias_m(mod - obs)
+
+    bhat = circlebias_m(mod - obsmean)
+
+    ohat = circlebias_m(obs - obsmean)
+
     return 1.0 - (
-        np.ma.sum(np.abs(d), axis=axis) / denom
+        (np.abs(b) ** 2).sum(axis=axis) / ((np.abs(bhat) + np.abs(ohat)) ** 2).sum(axis=axis)
     )
 
 
 def WDIOA(obs, mod, axis=None):
-    """Wind Direction Index of Agreement.
+    """Wind Direction Index of Agreement, IOA
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the sums.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction index of agreement.
+    type
+        Description of returned object.
+
     """
-    d = mod - obs
-    d = circlebias(d)
     obsmean = obs.mean(axis=axis)
     if axis is not None:
-        ax = list(np.arange(obs.ndim))
-        ax.remove(axis)
-        ax = tuple(ax)
-        denom = np.ma.sum(
-            (np.abs(mod - obsmean) + np.abs(obs - obsmean)) ** 2,
-            axis=ax,
-        )
-    else:
-        denom = np.ma.sum((np.abs(mod - obsmean) + np.abs(obs - obsmean)) ** 2)
+        obsmean = np.expand_dims(obsmean, axis=axis)
+    b = circlebias(mod - obs)
+
+    bhat = circlebias(mod - obsmean)
+
+    ohat = circlebias(obs - obsmean)
+
     return 1.0 - (
-        np.ma.sum(d ** 2, axis=axis) / denom
+        (np.ma.abs(b) ** 2).sum(axis=axis)
+        / ((np.ma.abs(bhat) + np.ma.abs(ohat)) ** 2).sum(axis=axis)
     )
 
 
 def AC(obs, mod, axis=None):
-    """Anomaly Correlation.
+    """Anomaly Correlation
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the means and sums.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Anomaly correlation.
+    type
+        Description of returned object.
+
     """
-    obsbar = np.ma.mean(obs, axis=axis)
-    modbar = np.ma.mean(mod, axis=axis)
-    top = np.ma.sum((obs - obsbar) * (mod - modbar), axis=axis)
-    bot = np.sqrt(
-        np.ma.sum((obs - obsbar) ** 2, axis=axis) * np.ma.sum((mod - modbar) ** 2, axis=axis)
-    )
-    return top / bot
+    obs_bar = obs.mean(axis=axis)
+    if axis is not None:
+        obs_bar = np.expand_dims(obs_bar, axis=axis)
+    p1 = ((mod - obs_bar) * (obs - obs_bar)).sum(axis=axis)
+    p2 = (((mod - obs_bar) ** 2).sum(axis=axis) * ((obs - obs_bar) ** 2).sum(axis=axis)) ** 0.5
+    return p1 / p2
 
 
 def WDAC(obs, mod, axis=None):
-    """Wind Direction Anomaly Correlation.
+    """Wind Direction Anomaly Correlation
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation wind direction data array in degrees.
-    mod : numpy.ndarray
-        Model wind direction data array in degrees.
-    axis : int or tuple of ints, optional
-        Axis or axes along which to calculate the means and sums.
-        If None, compute over the whole array.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    axis : type
+        Description of parameter `axis`.
 
     Returns
     -------
-    numpy.ndarray or float
-        Wind direction anomaly correlation.
+    type
+        Description of returned object.
+
     """
-    obsbar = np.ma.mean(obs, axis=axis)
-    modbar = np.ma.mean(mod, axis=axis)
-    o = circlebias(obs - obsbar)
-    m = circlebias(mod - modbar)
-    top = np.ma.sum(o * m, axis=axis)
-    bot = np.sqrt(np.ma.sum(o ** 2, axis=axis) * np.ma.sum(m ** 2, axis=axis))
-    return top / bot
+    obs_bar = obs.mean(axis=axis)
+    if axis is not None:
+        obs_bar = np.expand_dims(obs_bar, axis=axis)
+    p1 = (circlebias(mod - obs_bar) * circlebias(obs - obs_bar)).sum(axis=axis)
+    p2 = (
+        (circlebias(mod - obs_bar) ** 2).sum(axis=axis)
+        * (circlebias(obs - obs_bar) ** 2).sum(axis=axis)
+    ) ** 0.5
+    return p1 / p2
 
 
 def HSS(obs, mod, minval, maxval):
-    """Heidke Skill Score.
+    """Heidke Skill Score (1 is perfect - below zero means no confidence)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    minval : float
-        Minimum value for hit/miss categorization.
-    maxval : float
-        Maximum value for hit/miss categorization.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    minval : type
+        Description of parameter `minval`.
+    maxval : type
+        Description of parameter `maxval`.
 
     Returns
     -------
-    float
-        Heidke skill score.
+    type
+        Description of returned object.
+
     """
-    # need to iterate through al threshold values
-    hits = misses = false_alarms = correct_negatives = 0
-    obs, mod = matchedcompressed(obs, mod)
-    for i in range(len(obs)):
-        if (obs[i] >= minval) and (obs[i] <= maxval) and (mod[i] >= minval) and (mod[i] <= maxval):
-            hits += 1  # hit
-        elif ((obs[i] < minval) or (obs[i] > maxval)) and (
-            (mod[i] < minval) or (mod[i] > maxval)
-        ):
-            correct_negatives += 1  # correct negative
-        elif ((obs[i] < minval) or (obs[i] > maxval)) and (
-            (mod[i] >= minval) and (mod[i] <= maxval)
-        ):
-            false_alarms += 1  # false alarm
-        else:
-            misses += 1  # miss
-    try:
-        HSS = (
-            2.0
-            * (hits * correct_negatives - misses * false_alarms)
-            / (
-                (hits + misses) * (misses + correct_negatives)
-                + (hits + false_alarms) * (false_alarms + correct_negatives)
-            )
-        )
-    except ZeroDivisionError:
-        HSS = None
-    return HSS
+    a, b, c, d = scores(obs, mod, minval, maxval=maxval)
+    hss = 2 * (a * d - b * c) / ((a + c) * (c + d) + (a + b) * (b + d))
+    print("HSS for range " + str(minval) + " --> " + str(maxval) + ": " + hss)
+    return hss
 
 
 def ETS(obs, mod, minval, maxval):
-    """Equitable Threat Score.
+    """Equitable Threat Score (1 is perfect - Range -1/3 -> 1)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    minval : float
-        Minimum value for hit/miss categorization.
-    maxval : float
-        Maximum value for hit/miss categorization.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    minval : type
+        Description of parameter `minval`.
+    maxval : type
+        Description of parameter `maxval`.
 
     Returns
     -------
-    float
-        Equitable threat score.
+    type
+        Description of returned object.
+
     """
-    hits = misses = false_alarms = correct_negatives = 0
-    obs, mod = matchedcompressed(obs, mod)
-    for i in range(len(obs)):
-        if (obs[i] >= minval) and (obs[i] <= maxval) and (mod[i] >= minval) and (mod[i] <= maxval):
-            hits += 1  # hit
-        elif ((obs[i] < minval) or (obs[i] > maxval)) and (
-            (mod[i] < minval) or (mod[i] > maxval)
-        ):
-            correct_negatives += 1  # correct negative
-        elif ((obs[i] < minval) or (obs[i] > maxval)) and (
-            (mod[i] >= minval) and (mod[i] <= maxval)
-        ):
-            false_alarms += 1  # false alarm
-        else:
-            misses += 1  # miss
-    try:
-        ar = float(hits + false_alarms) * float(hits + misses) / float(
-            hits + misses + false_alarms + correct_negatives
-        )
-        ETS = (hits - ar) / (hits + misses + false_alarms - ar)
-    except ZeroDivisionError:
-        ETS = None
-    return ETS
+    a, b, c, d = scores(obs, mod, minval, maxval=maxval)
+    ar = (a + b) * (a + c) / (a + b + c + d)
+    ets = (a - ar) / (a + b + c - ar)
+    print("ETS for range " + str(minval) + " --> " + str(maxval) + ": " + ets)
+    return ets
 
 
 def CSI(obs, mod, minval, maxval):
-    """Critical Success Index.
+    """Critical Success Index (1 is perfect - Range 0 -> 1)
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    minval : float
-        Minimum value for hit/miss categorization.
-    maxval : float
-        Maximum value for hit/miss categorization.
+    obs : type
+        Description of parameter `obs`.
+    mod : type
+        Description of parameter `mod`.
+    minval : type
+        Description of parameter `minval`.
+    maxval : type
+        Description of parameter `maxval`.
 
     Returns
     -------
-    float
-        Critical success index.
+    type
+        Description of returned object.
+
     """
-    hits = misses = false_alarms = correct_negatives = 0
-    obs, mod = matchedcompressed(obs, mod)
-    for i in range(len(obs)):
-        if (obs[i] >= minval) and (obs[i] <= maxval) and (mod[i] >= minval) and (mod[i] <= maxval):
-            hits += 1  # hit
-        elif ((obs[i] < minval) or (obs[i] > maxval)) and (
-            (mod[i] < minval) or (mod[i] > maxval)
-        ):
-            correct_negatives += 1  # correct negative
-        elif ((obs[i] < minval) or (obs[i] > maxval)) and (
-            (mod[i] >= minval) and (mod[i] <= maxval)
-        ):
-            false_alarms += 1  # false alarm
-        else:
-            misses += 1  # miss
-    try:
-        CSI = hits / (hits + misses + false_alarms)
-    except ZeroDivisionError:
-        CSI = None
-    return CSI
+    a, b, c, d = scores(obs, mod, minval, maxval=maxval)
+    csi = a / a + b + c
+    print("CSI for range " + str(minval) + " --> " + str(maxval) + ": " + csi)
+    return csi
 
 
 def scores(obs, mod, minval, maxval=1.0e5):
-    """Calculate all categorical scores.
+    """Calculate scores.
 
     Parameters
     ----------
-    obs : numpy.ndarray
-        Observation data array.
-    mod : numpy.ndarray
-        Model data array.
-    minval : float
-        Minimum value for hit/miss categorization.
-    maxval : float, optional
-        Maximum value for hit/miss categorization (default: 1.0e5).
+    obs : array-like
+        Observation values ("truth").
+    mod : array-like
+        Model values ("prediction").
+        Should be the same size as `obs`.
+    minval, minval : float
+        Interval to test (exclusive on both sides).
 
     Returns
     -------
-    tuple
-        Tuple containing (HSS, ETS, CSI, POD) categorical scores.
+    a, b, c, d : float
+        Counts of hits, misses, false alarms, and correct negatives.
     """
-    h = HSS(obs, mod, minval, maxval)
-    e = ETS(obs, mod, minval, maxval)
-    c = CSI(obs, mod, minval, maxval)
+    import pandas as pd
 
-    # Calculate POD (Probability of Detection)
-    hits = misses = 0
-    obs, mod = matchedcompressed(obs, mod)
-    for i in range(len(obs)):
-        if (obs[i] >= minval) and (obs[i] <= maxval) and (mod[i] >= minval) and (mod[i] <= maxval):
-            hits += 1  # hit
-        elif ((obs[i] >= minval) and (obs[i] <= maxval)) and (
-            (mod[i] < minval) or (mod[i] > maxval)
-        ):
-            misses += 1  # miss
-    try:
-        pod = hits / (hits + misses)
-    except ZeroDivisionError:
-        pod = None
+    df = pd.DataFrame({"obs": obs, "mod": mod})
 
-    return h, e, c, pod
+    # If NaN is involved in a cond, it will be F, we want to skip those
+    df = df.dropna(subset=["obs", "mod"], how="any")
+
+    if df.empty:
+        zero = np.float64(0)
+        return zero, zero, zero, zero
+
+    ct = pd.crosstab(
+        (df["mod"] > minval) & (df["mod"] < maxval),
+        (df["obs"] > minval) & (df["obs"] < maxval),
+        rownames=["mod"],
+        colnames=["obs"],
+        margins=True,
+        margins_name="All",
+    )
+
+    # If there is a mix of T and F, the columns are [False, True, 'All']
+    # Otherwise, we need to add to get the full table
+    if set(ct.columns) == {True, "All"}:
+        ct.insert(0, False, 0)
+    elif set(ct.columns) == {False, "All"}:
+        ct.insert(0, True, 0)
+
+    # Same for the rows
+    if set(ct.index) == {True, "All"}:
+        ct = pd.concat([ct, pd.DataFrame(index=[False], data={False: 0, True: 0, "All": 0})])
+    elif set(ct.index) == {False, "All"}:
+        ct = pd.concat([ct, pd.DataFrame(index=[True], data={False: 0, True: 0, "All": 0})])
+
+    # Sort
+    ct = ct.loc[[True, False, "All"], [True, False, "All"]]
+
+    a = ct.at[True, True].astype("float")  # hit
+    b = ct.at[False, True].astype("float")  # miss
+    c = ct.at[True, False].astype("float")  # false alarm
+    d = ct.at[False, False].astype("float")  # correct negative
+
+    return a, b, c, d
 
 
 def stats(df, minval, maxval):
-    """Calculate standard statistics for observation-model comparisons.
+    """Short summary.
 
     Parameters
     ----------
-    df : pandas.DataFrame
-        DataFrame containing 'Obs' and 'CMAQ' columns for comparison.
-    minval : float
-        Minimum value for categorical scores.
-    maxval : float
-        Maximum value for categorical scores.
+    df : type
+        Description of parameter `df`.
+    minval : type
+        Description of parameter `minval`.
+    maxval : type
+        Description of parameter `maxval`.
 
     Returns
     -------
-    dict
-        Dictionary containing various statistical measures.
+    type
+        Description of returned object.
+
     """
-    obs = df.Obs.values
-    mod = df.CMAQ.values
-    svr = {}
-    svr["hss"] = HSS(obs, mod, minval, maxval)
-    svr["ets"] = ETS(obs, mod, minval, maxval)
-    svr["csi"] = CSI(obs, mod, minval, maxval)
-    svr["nobs"] = df.Obs.count()
-    svr["rmse"] = np.sqrt(((df.CMAQ - df.Obs) ** 2).mean())
-    svr["me"] = (df.CMAQ - df.Obs).mean()
-    svr["mb"] = (df.CMAQ - df.Obs).mean() / df.Obs.mean()
-    svr["ioa"] = 1.0 - (
-        (((df.CMAQ - df.Obs) ** 2).sum())
-        / ((np.abs(df.CMAQ - df.Obs.mean()) + np.abs(df.Obs - df.Obs.mean())) ** 2).sum()
-    )
-    svr["corr"] = df.CMAQ.corr(df.Obs)
-    return svr
+    from numpy import sqrt
+
+    dd = {}
+    dd["N"] = df.Obs.dropna().count()
+    dd["Obs"] = df.Obs.mean()
+    dd["Mod"] = df.CMAQ.mean()
+    dd["MB"] = MB(df.Obs.values, df.CMAQ.values)  # mean bias
+    dd["R"] = sqrt(R2(df.Obs.values, df.CMAQ.values))  # pearsonr ** 2
+    dd["IOA"] = IOA(df.Obs.values, df.CMAQ.values)  # Index of Agreement
+    dd["RMSE"] = RMSE(df.Obs.values, df.CMAQ.values)
+    dd["NMB"] = NMB(df.Obs.values, df.CMAQ.values)
+    try:
+        a, b, c, d = scores(df.Obs.values, df.CMAQ.values, 70, 1000)
+        dd["POD"] = a / (a + b)
+        dd["FAR"] = c / (a + c)
+    except Exception:
+        dd["POD"] = 1.0
+        dd["FAR"] = 0.0
+    return dd

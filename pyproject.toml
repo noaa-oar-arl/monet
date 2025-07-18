@@ -1,6 +1,46 @@
 [build-system]
-requires = ["setuptools>=39.2.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "monet"
+version = "2.2.12"
+description = "The Model and Observation Evaluation Toolkit (MONET)"
+readme = "README.md"
+requires-python = ">=3.6"
+authors = [
+  {name = "Barry D. Baker", email = "barry.baker@noaa.gov"},
+]
+maintainers = [
+  {name = "Barry D. Baker", email = "barry.baker@noaa.gov"},
+]
+license = {text = "MIT"}
+keywords = ["model", "verification", "hysplit", "cmaq", "atmosphere", "camx", "evaluation"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "cartopy",
+  "dask",
+  "matplotlib",
+  "netCDF4",
+  "numpy",
+  "pandas",
+  "pydecorate",
+  "pyresample",
+  "seaborn",
+  "xarray",
+  "xesmf; platform_system != 'Windows'"
+]
+
+[tool.setuptools]
+include-package-data = true
+packages = ["monet", "monet.accessors", "monet.plots", "monet.util", "monet.util.stats"]
+
+[tool.setuptools.package-data]
+"*" = ["data/*.png"]
 
 [tool.black]
 line-length = 100
@@ -15,5 +55,4 @@ filterwarnings = [
     "ignore:distutils Version classes:DeprecationWarning::",
     """ignore:elementwise comparison failed; returning scalar instead:\
        FutureWarning:xarray.core.dataarray:""",
-    # ^ looks to be coming from xESMF
 ]
