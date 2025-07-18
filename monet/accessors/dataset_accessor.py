@@ -220,15 +220,19 @@ class MONETAccessorDataset(BaseAccessor):
         loop_vars = vars.loc[~vars.isin(skip_keys)]
         dataarray = dset[loop_vars[0]]
         da = self._remap_xesmf_dataarray(dataarray, filename=filename, **kwargs)
-        self._obj[da.name] = da
+        # Ensure da is a DataArray with a name
         das = {}
-        das[da.name] = da
-        for i in loop_vars[1:]:
+        if hasattr(da, "name") and da.name is not None:
+            das[da.name] = da
+        else:
+            das["var0"] = da
+        for idx, i in enumerate(loop_vars[1:], start=1):
             dataarray = dset[i]
             tmp = self._remap_xesmf_dataarray(
                 dataarray, filename=filename, reuse_weights=True, **kwargs
             )
-            das[tmp.name] = tmp.copy()
+            key = tmp.name if hasattr(tmp, "name") and tmp.name is not None else f"var{idx}"
+            das[key] = tmp.copy()
         return xr.Dataset(das)
 
     def _remap_xesmf_dataarray(

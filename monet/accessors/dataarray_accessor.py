@@ -221,6 +221,8 @@ class MONETAccessor(BaseAccessor):
             result = d2.monet.remap_nearest(d1)
             return result
         elif has_xesmf:
+            from ..util.interp_util import constant_1d_xesmf
+            from ..util.resample import resample_xesmf
             output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
             out = resample_xesmf(self._obj, output, **kwargs)
             return self._rename_latlon(out)
@@ -240,10 +242,10 @@ class MONETAccessor(BaseAccessor):
         xarray.DataArray
             Interpolated DataArray.
         """
+        from numpy import asarray, linspace, ones
         if has_xesmf:
             from ..util.interp_util import constant_1d_xesmf
             from ..util.resample import resample_xesmf
-        from numpy import asarray, linspace, ones
 
         try:
             if lon is None:
@@ -263,10 +265,10 @@ class MONETAccessor(BaseAccessor):
                 d2 = self._dataset_to_monet(d2)
                 result = d2.monet.remap_nearest(d1)
                 return result.isel(x=0)
-            elif has_xesmf:
-                output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
-                out = resample_xesmf(self._obj, output, **kwargs)
-                return self._rename_latlon(out)
+        if has_xesmf:
+            output = constant_1d_xesmf(latitude=latitude, longitude=longitude)
+            out = resample_xesmf(self._obj, output, **kwargs)
+            return self._rename_latlon(out)
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Find the nearest grid indices to given lat/lon point(s).
@@ -305,10 +307,14 @@ class MONETAccessor(BaseAccessor):
         dset = self._dataset_to_monet(self._obj)
         lons, lats = utils.check_and_wrap(dset.longitude.values, dset.latitude.values)
         swath = llsd(longitude=lons, latitude=lats)
-        if lon is not None and lat is not None:
-            pswath = npsd(longitude=float(lon), latitude=float(lat))
-        else:
+        if lon is None or lat is None:
             raise ValueError("Longitude and latitude must not be None.")
+        try:
+            lon_f = float(lon)
+            lat_f = float(lat)
+        except (TypeError, ValueError):
+            raise ValueError("Longitude and latitude must be convertible to float and not None.")
+        pswath = npsd(longitude=lon_f, latitude=lat_f)
         row, col = utils.generate_nearest_neighbour_linesample_arrays(swath, pswath, float(1e6))
         y, x = row[0][0], col[0][0]
         return x, y
@@ -351,7 +357,15 @@ class MONETAccessor(BaseAccessor):
 
             lons, lats = utils.check_and_wrap(d.longitude.values, d.latitude.values)
             swath = self._get_CoordinateDefinition(d)
-            pswath = npsd(longitude=float(lon), latitude=float(lat))
+            # Ensure lon and lat are not None and are convertible to float
+            if lon is None or lat is None:
+                raise ValueError("Longitude and latitude must not be None.")
+            try:
+                lon_f = float(lon)
+                lat_f = float(lat)
+            except (TypeError, ValueError):
+                raise ValueError("Longitude and latitude must be convertible to float and not None.")
+            pswath = npsd(longitude=lon_f, latitude=lat_f)
             row, col = utils.generate_nearest_neighbour_linesample_arrays(swath, pswath, **kwargs)
             y, x = row[0][0], col[0][0]
             return d.isel(x=x, y=y)
