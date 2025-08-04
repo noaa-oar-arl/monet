@@ -206,8 +206,6 @@ Plotting Functions (monet.plots)
    plots.scatter
    taylordiagram_function
    mapgen.draw_map
-   colorbars.colorbar_index
-   colorbars.cmap_discretize
 
 .. _on GitHub: https://github.com/noaa-oar-arl/monet
 .. _xESMF: https://xesmf.readthedocs.io
