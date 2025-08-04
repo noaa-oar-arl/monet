@@ -53,7 +53,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
-    "sphinx_autosummary_accessors",
+    # "sphinx_autosummary_accessors",  # Temporarily disabled due to namespace conflicts
 ]
 
 # exclude_patterns = ['_build', '**.ipynb_checkpoints']
@@ -64,7 +64,7 @@ extlinks = {
 }
 
 autosummary_generate = True  # default in Sphinx v4
-templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
+templates_path = ["_templates"]  # removed sphinx_autosummary_accessors.templates_path
 autodoc_default_options = {
     "members": True,
     "special-members": "__init__",

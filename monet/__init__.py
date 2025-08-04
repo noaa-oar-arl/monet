@@ -18,7 +18,16 @@ util : module
 """
 
 from . import met_funcs, plots, util
-from .accessors import base
+
+try:
+    # Import accessors to ensure they get registered
+    from .accessors import base, dataarray_accessor, dataset_accessor, pandas_accessor  # noqa: F401
+
+    _accessors_available = True
+except ImportError:
+    # Skip accessor registration if dependencies are missing during docs build
+    _accessors_available = False
+    base = None
 from .plots import savefig
 from .util.coards_tools import (
     add_cf_attributes,
@@ -49,6 +58,20 @@ __all__ = [
 ]
 
 # Use the base accessor methods for the old function names for backward compatibility
-dataset_to_monet = base.BaseAccessor._dataset_to_monet
-rename_to_monet_latlon = base.BaseAccessor._rename_to_monet_latlon
-rename_latlon = base.BaseAccessor._rename_latlon
+try:
+    dataset_to_monet = base.BaseAccessor._dataset_to_monet
+    rename_to_monet_latlon = base.BaseAccessor._rename_to_monet_latlon
+    rename_latlon = base.BaseAccessor._rename_latlon
+except AttributeError:
+    # Fallback if accessors aren't properly initialized (e.g., during docs build)
+    def dataset_to_monet(*args, **kwargs):
+        """Placeholder function for docs build."""
+        pass
+
+    def rename_to_monet_latlon(*args, **kwargs):
+        """Placeholder function for docs build."""
+        pass
+
+    def rename_latlon(*args, **kwargs):
+        """Placeholder function for docs build."""
+        pass

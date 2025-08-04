@@ -1,5 +1,7 @@
 import warnings
 
+# Import taylordiagram module to make it available for documentation
+from . import taylordiagram
 from .colorbars import cmap_discretize, colorbar_index
 from .mapgen import draw_map
 from .plots import create_taylor_diagram  # Import with original name
@@ -16,9 +18,8 @@ from .plots import (
     wind_quiver,
 )
 
-# Don't import the taylordiagram module at all in __init__
 # Keep the function available under a clear name
-taylordiagram = create_taylor_diagram  # Rename for public API
+taylordiagram_function = create_taylor_diagram  # Rename for public API
 
 __all__ = (
     #

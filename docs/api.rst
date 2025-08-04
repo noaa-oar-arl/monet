@@ -62,11 +62,6 @@ Plotting Functions
    wind_barbs
    wind_quiver
 
-.. toctree::
-   :hidden:
-
-   api/monet.plots.taylordiagram
-
 .. _xarray-accessors:
 
 DataArray Accessor
@@ -155,16 +150,6 @@ DataFrame Accessor
 
 .. autosummary::
    :toctree: api/
-   :template: autosummary/class.rst
-
-   monet.accessors.dataarray_accessor.MONETAccessor
-   monet.accessors.dataset_accessor.MONETAccessorDataset
-   monet.accessors.pandas_accessor.MONETAccessorPandas
-   monet.accessors.base.BaseAccessor
-   monet.plots.taylordiagram.TaylorDiagram
-
-.. autosummary::
-   :toctree: api/
    :template: autosummary/accessor_attribute.rst
 
    DataFrame.monet.center
@@ -220,7 +205,7 @@ Plotting Functions (monet.plots)
    plots.timeseries
    plots.kdeplot
    plots.scatter
-   plots.taylordiagram
+   taylordiagram_function
    mapgen.draw_map
    colorbars.colorbar_index
    colorbars.cmap_discretize
