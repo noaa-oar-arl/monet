@@ -57,7 +57,6 @@ Plotting Functions
    sp_scatter_bias
    spatial
    spatial_bias_scatter
-   taylordiagram
    timeseries
    wind_barbs
    wind_quiver
@@ -205,7 +204,6 @@ Plotting Functions (monet.plots)
    plots.kdeplot
    plots.scatter
    taylordiagram_function
-   mapgen.draw_map
 
 .. _on GitHub: https://github.com/noaa-oar-arl/monet
 .. _xESMF: https://xesmf.readthedocs.io
