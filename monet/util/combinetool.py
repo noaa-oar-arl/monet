@@ -259,6 +259,12 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
     da_interped = _rename_latlon(da_interped)
     daz_interped = _rename_latlon(daz_interped)
 
+    # Ensure daz_interped and da_interped are xarray.DataArray before using .monet
+    if not hasattr(daz_interped, "monet"):
+        daz_interped = xr.DataArray(daz_interped)
+    if not hasattr(da_interped, "monet"):
+        da_interped = xr.DataArray(da_interped)
+
     # sort aircraft target altitudes and call stratfiy from resample to do vertical interpolation
     # resample_stratify from monet accessor
     daz_interped_xyz = daz_interped.monet.stratify(sorted(df["altitude"]), daz_interped, axis=1)

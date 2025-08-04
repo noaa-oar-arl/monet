@@ -3,6 +3,7 @@ import dask.array as da
 import numpy as np
 import pytest
 import xarray as xr
+import monet
 
 
 def make_test_dataarrays():

@@ -4,7 +4,11 @@ import xarray as xr
 
 try:
     import xesmf  # noqa: F401
-
+    # Check if ESMF backend is available (try both import patterns)
+    try:
+        import esmpy as ESMF  # noqa: F401
+    except ImportError:
+        import ESMF  # noqa: F401
     has_xesmf = True
 except ImportError:
     has_xesmf = False

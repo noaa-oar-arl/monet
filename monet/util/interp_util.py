@@ -51,16 +51,33 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
     xarray.Dataset
         A dataset with lon/lat coordinates suitable for use with xesmf.
     """
-    from numpy import asarray
+    from numpy import asarray, meshgrid
 
     lat = asarray(latitude)
     lon = asarray(longitude)
+
+    # Handle scalar values
     if lat.ndim == 0:
         lat = lat[None]
     if lon.ndim == 0:
         lon = lon[None]
+
+    # If both are 1D, create a 2D meshgrid
+    if lat.ndim == 1 and lon.ndim == 1:
+        lon_2d, lat_2d = meshgrid(lon, lat)
+    # If both are already 2D with same shape, use them directly
+    elif lat.ndim == 2 and lon.ndim == 2 and lat.shape == lon.shape:
+        lon_2d, lat_2d = lon, lat
+    # If they have different shapes or dimensions, create meshgrid
+    else:
+        if lat.ndim > 1:
+            lat = lat.flatten()
+        if lon.ndim > 1:
+            lon = lon.flatten()
+        lon_2d, lat_2d = meshgrid(lon, lat)
+
     dset = xr.Dataset(
-        coords={"lon": (["x", "y"], lon.reshape(-1, 1)), "lat": (["x", "y"], lat.reshape(-1, 1))}
+        coords={"lon": (["y", "x"], lon_2d), "lat": (["y", "x"], lat_2d)}
     )
     return dset
 
@@ -585,7 +602,13 @@ def mesh_to_swath_definition(mesh):
     This is more appropriate than AreaDefinition for unstructured grids.
     """
     try:
-        import ESMF
+        try:
+            import ESMF
+        except ImportError:
+            try:
+                import esmpy as ESMF
+            except ImportError:
+                raise ImportError("ESMF is required for this functionality")
 
         # import numpy as np  # unused
         from pyresample.geometry import SwathDefinition

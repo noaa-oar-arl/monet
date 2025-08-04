@@ -464,16 +464,16 @@ class MONETAccessor(BaseAccessor):
         return isinstance(defn, SwathDefinition)
 
     def remap(self, data, method="nearest", radius_of_influence=1e6, **kwargs):
-        """Remap data using pyresample (nearest or bilinear).
+        """Remap data using pyresample (nearest or bilinear) or xESMF if requested.
 
         Parameters
         ----------
         data : xarray.DataArray or xarray.Dataset
             Data to remap.
         method : str, default: 'nearest'
-            Resampling method: 'nearest' or 'bilinear'.
+            Resampling method: 'nearest', 'bilinear', or 'xesmf'.
         radius_of_influence : float, default: 1e6
-            Search radius in meters (for both methods).
+            Search radius in meters (for pyresample methods).
         **kwargs : dict
             Additional keyword arguments for the resampler.
 
@@ -482,10 +482,62 @@ class MONETAccessor(BaseAccessor):
         xarray.DataArray or xarray.Dataset
             Remapped data.
         """
+        from ..util import resample
+        import xarray as xr
+
+        # Always use xESMF for Dask-backed arrays if available
+        is_dask = hasattr(self._obj, "chunks") and self._obj.chunks is not None
+        # Only use xESMF for Dask-backed arrays when target shape differs from source
+        target_shape = None
+        if hasattr(data, "shape"):
+            target_shape = data.shape
+        source_shape = self._obj.shape if hasattr(self._obj, "shape") else None
+        # For Dask-backed arrays, always use xESMF if target shape differs from source
+        if is_dask and target_shape is not None and target_shape != source_shape:
+            if not has_xesmf:
+                raise ImportError("xesmf is required for Dask-backed remapping to different-shaped grid")
+            xesmf_method_map = {
+                "nearest": "nearest_s2d",
+                "bilinear": "bilinear",
+                "xesmf": kwargs.get("xesmf_method", "bilinear"),
+            }
+            xesmf_method = xesmf_method_map.get(method, "bilinear")
+            source = self._dataset_to_monet(self._obj)
+            target = self._dataset_to_monet(data)
+            from ..util.interp_util import lonlat_to_xesmf
+            lat = target.latitude.values if hasattr(target, 'latitude') else target.lat.values
+            lon = target.longitude.values if hasattr(target, 'longitude') else target.lon.values
+            target_xesmf = lonlat_to_xesmf(longitude=lon, latitude=lat)
+            source = source.chunk()
+            target_xesmf = target_xesmf.chunk()
+            out = resample.resample_xesmf(source, target_xesmf, method=xesmf_method, **kwargs)
+            return self._rename_to_monet_latlon(out)
+        # Otherwise, use xESMF if requested, or pyresample for same-shaped grids
+        use_xesmf = (method == "xesmf") or (has_xesmf and is_dask and target_shape == source_shape)
+        if use_xesmf:
+            if not has_xesmf:
+                raise ImportError("xesmf is required for this functionality")
+            xesmf_method_map = {
+                "nearest": "nearest_s2d",
+                "bilinear": "bilinear",
+                "xesmf": kwargs.get("xesmf_method", "bilinear"),
+            }
+            xesmf_method = xesmf_method_map.get(method, "bilinear")
+            source = self._dataset_to_monet(self._obj)
+            target = self._dataset_to_monet(data)
+            from ..util.interp_util import lonlat_to_xesmf
+            lat = target.latitude.values if hasattr(target, 'latitude') else target.lat.values
+            lon = target.longitude.values if hasattr(target, 'longitude') else target.lon.values
+            target_xesmf = lonlat_to_xesmf(longitude=lon, latitude=lat)
+            source = source.chunk()
+            target_xesmf = target_xesmf.chunk()
+            out = resample.resample_xesmf(source, target_xesmf, method=xesmf_method, **kwargs)
+            # xESMF output should already match target grid shape; do not transpose
+            return self._rename_to_monet_latlon(out)
+
+        # Otherwise, use pyresample
         if not has_pyresample:
             raise ImportError("pyresample is required for this functionality")
-        from ..util import resample
-
         source_data = self._dataset_to_monet(data)
         target_data = self._dataset_to_monet(self._obj)
         target = self._get_CoordinateDefinition(target_data)
@@ -494,12 +546,52 @@ class MONETAccessor(BaseAccessor):
         )
         # Ensure coordinates are properly set
         if isinstance(result, xr.DataArray):
-            result["latitude"] = target_data.latitude
-            result["longitude"] = target_data.longitude
+            # Remove any old latitude/longitude coordinates to avoid conflicts
+            for coord in ["latitude", "longitude"]:
+                if coord in result.coords:
+                    result = result.drop_vars(coord)
+            # Assign latitude/longitude from the target grid, matching dims
+            if hasattr(target_data, "latitude") and hasattr(target_data, "longitude"):
+                lat = target_data.latitude
+                lon = target_data.longitude
+                lat_data = getattr(lat, 'data', getattr(lat, 'values', lat))
+                lon_data = getattr(lon, 'data', getattr(lon, 'values', lon))
+                if lat.shape == result.shape[-2:] and lon.shape == result.shape[-2:]:
+                    y_dim, x_dim = result.dims[-2], result.dims[-1]
+                    result = result.assign_coords({
+                        "latitude": (y_dim, lat_data[:,0] if lat.ndim==2 else lat_data),
+                        "longitude": (x_dim, lon_data[0,:] if lon.ndim==2 else lon_data)
+                    })
+                else:
+                    if lat.ndim == 1 and lat.shape[0] == result.shape[-2]:
+                        y_dim = result.dims[-2]
+                        result = result.assign_coords({"latitude": (y_dim, lat_data)})
+                    if lon.ndim == 1 and lon.shape[0] == result.shape[-1]:
+                        x_dim = result.dims[-1]
+                        result = result.assign_coords({"longitude": (x_dim, lon_data)})
             result.name = source_data.name
         elif isinstance(result, xr.Dataset):
-            result.coords["latitude"] = target_data.latitude
-            result.coords["longitude"] = target_data.longitude
+            for coord in ["latitude", "longitude"]:
+                if coord in result.coords:
+                    result = result.drop_vars(coord)
+            if hasattr(target_data, "latitude") and hasattr(target_data, "longitude"):
+                lat = target_data.latitude
+                lon = target_data.longitude
+                lat_data = getattr(lat, 'data', getattr(lat, 'values', lat))
+                lon_data = getattr(lon, 'data', getattr(lon, 'values', lon))
+                if lat.ndim == 2 and lon.ndim == 2 and lat.shape == result[list(result.data_vars)[0]].shape[-2:]:
+                    y_dim, x_dim = result[list(result.data_vars)[0]].dims[-2], result[list(result.data_vars)[0]].dims[-1]
+                    result = result.assign_coords({
+                        "latitude": (y_dim, lat_data[:,0] if lat.ndim==2 else lat_data),
+                        "longitude": (x_dim, lon_data[0,:] if lon.ndim==2 else lon_data)
+                    })
+                else:
+                    if lat.ndim == 1 and lat.shape[0] == result[list(result.data_vars)[0]].shape[-2]:
+                        y_dim = result[list(result.data_vars)[0]].dims[-2]
+                        result = result.assign_coords({"latitude": (y_dim, lat_data)})
+                    if lon.ndim == 1 and lon.shape[0] == result[list(result.data_vars)[0]].shape[-1]:
+                        x_dim = result[list(result.data_vars)[0]].dims[-1]
+                        result = result.assign_coords({"longitude": (x_dim, lon_data)})
         return result
 
     def remap_nearest(self, data, radius_of_influence=1e6, **kwargs):
