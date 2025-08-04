@@ -95,6 +95,8 @@ Indices
    monet-accessor
    monet_wcoss
    tutorial
+   developer_guide
+   user_guide
 
 
 .. toctree::

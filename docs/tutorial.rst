@@ -36,7 +36,7 @@ For example, you can use the 'air_temperature' dataset:
    print(f"RMSE: {rmse}")
 
 This approach works with any xarray toy dataset (see `xr.tutorial`), and is a great way to learn MONET's API interactively.
-=====================
+===========================================================================================================================
 
 This tutorial demonstrates common and advanced workflows in MONET, including data loading, regridding, plotting, statistics, and especially how to use the MONET accessors for xarray and pandas objects.
 
@@ -80,11 +80,10 @@ Key Accessor Features
    ds = xr.open_dataset('model_output.nc')
    obs = xr.open_dataset('obs_data.nc')
    df = pd.read_csv('obs_points.csv')
-
    # Now you can use .monet on ds, obs, df, and any DataArray
 
 2. Regridding and Interpolation
-------------------------------
+-------------------------------
 .. code-block:: python
 
    # Regrid model to obs grid using ESMF/xesmf
@@ -158,7 +157,7 @@ Key Accessor Features
    ds_ocean = ds.where(ocean_mask)
 
 8. Pandas DataFrame Accessor Examples
-------------------------------------
+-------------------------------------
 .. code-block:: python
 
    # Plot points on a map
@@ -171,7 +170,7 @@ Key Accessor Features
    gridded = df.monet.remap_nearest(ds)
 
 9. Calculating Statistics and Chaining Accessors
------------------------------------------------
+------------------------------------------------
 .. code-block:: python
 
    from monet.util import stats
@@ -226,7 +225,7 @@ For more, see the :doc:`user_guide` and API documentation.
    crps = stats.CRPS(ensemble, obs_arr)
 
 13. Contingency Table Metrics
-----------------------------
+-----------------------------
 .. code-block:: python
 
    # Heidke Skill Score (HSS), Equitable Threat Score (ETS), Probability of Detection (POD), False Alarm Ratio (FAR)
@@ -264,7 +263,7 @@ For more advanced workflows, see the :doc:`user_guide` and API documentation.
 
 
 Accessor Plotting and Comparison Functions
-=========================================
+==========================================
 
 MONET provides a suite of plotting functions directly on xarray DataArrays and Datasets via the `.monet` accessor. These make it easy to visualize geospatial data with minimal code.
 

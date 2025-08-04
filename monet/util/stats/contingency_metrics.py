@@ -11,7 +11,7 @@ def HSS(obs, mod, minval, maxval=None):
     - Used in meteorology and environmental modeling to assess binary event prediction accuracy.
 
     Typical Values and Range
-    -----------------------
+    ------------------------
     - Range: -∞ to 1
     - 1: Perfect forecast
     - 0: No skill (random forecast)
@@ -58,7 +58,7 @@ def ETS(obs, mod, minval, maxval=None):
     - Used in meteorology and environmental modeling to assess binary event prediction accuracy.
 
     Typical Values and Range
-    -----------------------
+    ------------------------
     - Range: -1/3 to 1
     - 1: Perfect forecast
     - 0: No skill (random forecast)
@@ -108,7 +108,7 @@ def CSI(obs, mod, minval, maxval=None):
     - Used in meteorology and environmental modeling to assess event prediction accuracy.
 
     Typical Values and Range
-    -----------------------
+    ------------------------
     - Range: 0 to 1
     - 1: Perfect forecast
     - 0: No skill (no correct predictions)

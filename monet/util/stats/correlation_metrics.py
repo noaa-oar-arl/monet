@@ -823,7 +823,7 @@ def taylor_skill(obs, mod, axis=None):
     - Used in climate, weather, and environmental model evaluation.
 
     Typical Values and Range
-    -----------------------
+    ------------------------
     - Range: 0 to 1
     - 1: Perfect agreement between model and observations
     - 0: No skill
@@ -885,7 +885,7 @@ def KGE(obs, mod, axis=None):
     - Used in hydrology, meteorology, and environmental model evaluation.
 
     Typical Values and Range
-    -----------------------
+    ------------------------
     - Range: -∞ to 1
     - 1: Perfect agreement between model and observations
     - 0: Moderate skill

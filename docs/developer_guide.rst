@@ -1,5 +1,5 @@
 MONET Developer Guide
-====================
+=====================
 
 This guide is for contributors and maintainers of MONET. It covers project structure, design philosophy, contribution workflow, and best practices.
 

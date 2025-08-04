@@ -104,7 +104,7 @@ Full Tutorial
 More Examples
 
 Spatial Plot with Custom Map
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: python
 
    import monet
@@ -259,7 +259,7 @@ More Examples
 ~~~~~~~~~~~~~
 
 Using with xarray DataArrays
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. code-block:: python
 
    import xarray as xr
@@ -271,7 +271,7 @@ Using with xarray DataArrays
    rmse = stats.RMSE(ds['O3'], obs['O3'])
 
 Advanced Metrics
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 .. code-block:: python
 
    # Kling-Gupta Efficiency
@@ -285,7 +285,7 @@ Advanced Metrics
    fe = stats.FE(obs, mod)
 
 Spatial/Ensemble Metrics
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 .. code-block:: python
 
    # Fractions Skill Score (FSS)
@@ -299,7 +299,7 @@ Spatial/Ensemble Metrics
    crps = stats.CRPS(ensemble, obs)
 
 Contingency Metrics
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 .. code-block:: python
 
    # Heidke Skill Score (HSS)
