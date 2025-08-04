@@ -53,7 +53,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
-    # "sphinx_autosummary_accessors",  # Temporarily disabled due to namespace conflicts
+    "sphinx_autosummary_accessors",
 ]
 
 # exclude_patterns = ['_build', '**.ipynb_checkpoints']
