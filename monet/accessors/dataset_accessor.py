@@ -284,8 +284,9 @@ class MONETAccessorDataset(BaseAccessor):
         xarray.DataArray or xarray.Dataset
             Remapped data.
         """
-        from ..util import resample
         import xarray as xr
+
+        from ..util import resample
 
         # Always use xESMF for Dask-backed arrays if available
         is_dask = hasattr(self._obj, "chunks") and self._obj.chunks is not None
@@ -297,7 +298,9 @@ class MONETAccessorDataset(BaseAccessor):
         # For Dask-backed arrays, always use xESMF if target shape differs from source
         if is_dask and target_shape is not None and target_shape != source_shape:
             if not has_xesmf:
-                raise ImportError("xesmf is required for Dask-backed remapping to different-shaped grid")
+                raise ImportError(
+                    "xesmf is required for Dask-backed remapping to different-shaped grid"
+                )
             xesmf_method_map = {
                 "nearest": "nearest_s2d",
                 "bilinear": "bilinear",
@@ -307,8 +310,9 @@ class MONETAccessorDataset(BaseAccessor):
             source = self._dataset_to_monet(self._obj)
             target = self._dataset_to_monet(data)
             from ..util.interp_util import lonlat_to_xesmf
-            lat = target.latitude.values if hasattr(target, 'latitude') else target.lat.values
-            lon = target.longitude.values if hasattr(target, 'longitude') else target.lon.values
+
+            lat = target.latitude.values if hasattr(target, "latitude") else target.lat.values
+            lon = target.longitude.values if hasattr(target, "longitude") else target.lon.values
             target_xesmf = lonlat_to_xesmf(longitude=lon, latitude=lat)
             source = source.chunk()
             target_xesmf = target_xesmf.chunk()
@@ -328,8 +332,9 @@ class MONETAccessorDataset(BaseAccessor):
             source = self._dataset_to_monet(self._obj)
             target = self._dataset_to_monet(data)
             from ..util.interp_util import lonlat_to_xesmf
-            lat = target.latitude.values if hasattr(target, 'latitude') else target.lat.values
-            lon = target.longitude.values if hasattr(target, 'longitude') else target.lon.values
+
+            lat = target.latitude.values if hasattr(target, "latitude") else target.lat.values
+            lon = target.longitude.values if hasattr(target, "longitude") else target.lon.values
             target_xesmf = lonlat_to_xesmf(longitude=lon, latitude=lat)
             source = source.chunk()
             target_xesmf = target_xesmf.chunk()
@@ -356,14 +361,16 @@ class MONETAccessorDataset(BaseAccessor):
             if hasattr(target_data, "latitude") and hasattr(target_data, "longitude"):
                 lat = target_data.latitude
                 lon = target_data.longitude
-                lat_data = getattr(lat, 'data', getattr(lat, 'values', lat))
-                lon_data = getattr(lon, 'data', getattr(lon, 'values', lon))
+                lat_data = getattr(lat, "data", getattr(lat, "values", lat))
+                lon_data = getattr(lon, "data", getattr(lon, "values", lon))
                 if lat.shape == result.shape[-2:] and lon.shape == result.shape[-2:]:
                     y_dim, x_dim = result.dims[-2], result.dims[-1]
-                    result = result.assign_coords({
-                        "latitude": (y_dim, lat_data[:,0] if lat.ndim==2 else lat_data),
-                        "longitude": (x_dim, lon_data[0,:] if lon.ndim==2 else lon_data)
-                    })
+                    result = result.assign_coords(
+                        {
+                            "latitude": (y_dim, lat_data[:, 0] if lat.ndim == 2 else lat_data),
+                            "longitude": (x_dim, lon_data[0, :] if lon.ndim == 2 else lon_data),
+                        }
+                    )
                 else:
                     if lat.ndim == 1 and lat.shape[0] == result.shape[-2]:
                         y_dim = result.dims[-2]
@@ -379,19 +386,34 @@ class MONETAccessorDataset(BaseAccessor):
             if hasattr(target_data, "latitude") and hasattr(target_data, "longitude"):
                 lat = target_data.latitude
                 lon = target_data.longitude
-                lat_data = getattr(lat, 'data', getattr(lat, 'values', lat))
-                lon_data = getattr(lon, 'data', getattr(lon, 'values', lon))
-                if lat.ndim == 2 and lon.ndim == 2 and lat.shape == result[list(result.data_vars)[0]].shape[-2:]:
-                    y_dim, x_dim = result[list(result.data_vars)[0]].dims[-2], result[list(result.data_vars)[0]].dims[-1]
-                    result = result.assign_coords({
-                        "latitude": (y_dim, lat_data[:,0] if lat.ndim==2 else lat_data),
-                        "longitude": (x_dim, lon_data[0,:] if lon.ndim==2 else lon_data)
-                    })
+                lat_data = getattr(lat, "data", getattr(lat, "values", lat))
+                lon_data = getattr(lon, "data", getattr(lon, "values", lon))
+                if (
+                    lat.ndim == 2
+                    and lon.ndim == 2
+                    and lat.shape == result[list(result.data_vars)[0]].shape[-2:]
+                ):
+                    y_dim, x_dim = (
+                        result[list(result.data_vars)[0]].dims[-2],
+                        result[list(result.data_vars)[0]].dims[-1],
+                    )
+                    result = result.assign_coords(
+                        {
+                            "latitude": (y_dim, lat_data[:, 0] if lat.ndim == 2 else lat_data),
+                            "longitude": (x_dim, lon_data[0, :] if lon.ndim == 2 else lon_data),
+                        }
+                    )
                 else:
-                    if lat.ndim == 1 and lat.shape[0] == result[list(result.data_vars)[0]].shape[-2]:
+                    if (
+                        lat.ndim == 1
+                        and lat.shape[0] == result[list(result.data_vars)[0]].shape[-2]
+                    ):
                         y_dim = result[list(result.data_vars)[0]].dims[-2]
                         result = result.assign_coords({"latitude": (y_dim, lat_data)})
-                    if lon.ndim == 1 and lon.shape[0] == result[list(result.data_vars)[0]].shape[-1]:
+                    if (
+                        lon.ndim == 1
+                        and lon.shape[0] == result[list(result.data_vars)[0]].shape[-1]
+                    ):
                         x_dim = result[list(result.data_vars)[0]].dims[-1]
                         result = result.assign_coords({"longitude": (x_dim, lon_data)})
         return result

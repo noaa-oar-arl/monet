@@ -76,9 +76,7 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
             lon = lon.flatten()
         lon_2d, lat_2d = meshgrid(lon, lat)
 
-    dset = xr.Dataset(
-        coords={"lon": (["y", "x"], lon_2d), "lat": (["y", "x"], lat_2d)}
-    )
+    dset = xr.Dataset(coords={"lon": (["y", "x"], lon_2d), "lat": (["y", "x"], lat_2d)})
     return dset
 
 
