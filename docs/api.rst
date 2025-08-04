@@ -208,12 +208,6 @@ Plotting Functions (monet.plots)
    mapgen.draw_map
    colorbars.colorbar_index
    colorbars.cmap_discretize
-   cartopy_utils.plot_quick_imshow
-   cartopy_utils.plot_quick_map
-   cartopy_utils.plot_quick_contourf
-   cartopy_utils.facet_time_map
-   cartopy_utils.plot_points_map
-   cartopy_utils.plot_lines_map
 
 .. _on GitHub: https://github.com/noaa-oar-arl/monet
 .. _xESMF: https://xesmf.readthedocs.io
