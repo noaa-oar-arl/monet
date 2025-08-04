@@ -11,7 +11,6 @@ performance, including:
 Reference:
 Taylor, K.E., 2001. Summarizing multiple aspects of model performance in a
 single diagram. Journal of Geophysical Research, 106(D7), 7183-7192.
-http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm
 """
 
 import functools
