@@ -193,16 +193,6 @@ Plotting Functions (monet.plots)
    :toctree: api/
    :template: autosummary/function.rst
 
-   plots.make_spatial_plot
-   plots.spatial
-   plots.make_spatial_contours
-   plots.wind_quiver
-   plots.wind_barbs
-   plots.normval
-   plots.spatial_bias_scatter
-   plots.timeseries
-   plots.kdeplot
-   plots.scatter
    taylordiagram_function
 
 .. _on GitHub: https://github.com/noaa-oar-arl/monet
