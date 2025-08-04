@@ -80,7 +80,6 @@ DataArray Accessor
    DataArray.monet.cftime_to_datetime64
    DataArray.monet.structure_for_monet
    DataArray.monet.stratify
-   DataArray.monet.window
    DataArray.monet.interp_constant_lat
    DataArray.monet.interp_constant_lon
    DataArray.monet.nearest_ij
