@@ -4,11 +4,27 @@ import xarray as xr
 
 import monet  # noqa: F401
 
+# Try to import cf_xarray to ensure accessor is registered
+try:
+    import cf_xarray  # noqa: F401
+except ImportError:
+    pass
 
+# Check if xesmf is available
+try:
+    import xesmf  # noqa: F401
+
+    has_xesmf = True
+except ImportError:
+    has_xesmf = False
+
+
+@pytest.mark.skipif(not has_xesmf, reason="xesmf not installed")
 def test_import_xesmf():
     import xesmf  # noqa: F401
 
 
+@pytest.mark.skipif(not has_xesmf, reason="xesmf not installed")
 def test_remap_ds_ds():
     # Barry noted a problem with this
 

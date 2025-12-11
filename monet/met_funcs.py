@@ -14,7 +14,10 @@ References
    https://doi.org/10.1029/2000WR900033.
 """
 
+from typing import Tuple, Union
+
 import numpy as np
+from numpy.typing import ArrayLike
 
 # ==============================================================================
 # List of constants used in Meteorological computations
@@ -42,7 +45,7 @@ k = 0.4
 gravity = 9.8
 
 
-def calc_c_p(p, ea):
+def calc_c_p(p: ArrayLike, ea: ArrayLike) -> np.ndarray:
     """Calculates the heat capacity of air at constant pressure.
 
     Parameters
@@ -63,13 +66,15 @@ def calc_c_p(p, ea):
 
     # first calculate specific humidity, rearanged eq (5.22) from Maarten
     # Ambaum (2010), (pp 100)
+    p = np.asarray(p)
+    ea = np.asarray(ea)
     q = epsilon * ea / (p + (epsilon - 1.0) * ea)
     # then the heat capacity of (moist) air
     c_p = (1.0 - q) * c_pd + q * c_pv
     return np.asarray(c_p)
 
 
-def calc_lambda(T_A_K):
+def calc_lambda(T_A_K: ArrayLike) -> np.ndarray:
     """Calculates the latent heat of vaporization.
 
     Parameters
@@ -85,12 +90,12 @@ def calc_lambda(T_A_K):
     References
     ----------
     based on Eq. 3-1 Allen FAO98"""
-
+    T_A_K = np.asarray(T_A_K)
     Lambda = 1e6 * (2.501 - (2.361e-3 * (T_A_K - 273.15)))
     return np.asarray(Lambda)
 
 
-def calc_pressure(z):
+def calc_pressure(z: ArrayLike) -> np.ndarray:
     """Calculates the barometric pressure above sea level.
 
     Parameters
@@ -102,12 +107,12 @@ def calc_pressure(z):
     -------
     p: float
         air pressure (mb)."""
-
+    z = np.asarray(z)
     p = 1013.25 * (1.0 - 2.225577e-5 * z) ** 5.25588
     return np.asarray(p)
 
 
-def calc_psicr(c_p, p, Lambda):
+def calc_psicr(c_p: ArrayLike, p: ArrayLike, Lambda: ArrayLike) -> np.ndarray:
     """Calculates the psicrometric constant.
 
     Parameters
@@ -123,12 +128,14 @@ def calc_psicr(c_p, p, Lambda):
     -------
     psicr : float
         Psicrometric constant (mb C-1)."""
-
+    c_p = np.asarray(c_p)
+    p = np.asarray(p)
+    Lambda = np.asarray(Lambda)
     psicr = c_p * p / (epsilon * Lambda)
     return np.asarray(psicr)
 
 
-def calc_rho(p, ea, T_A_K):
+def calc_rho(p: ArrayLike, ea: ArrayLike, T_A_K: ArrayLike) -> np.ndarray:
     """Calculates the density of air.
 
     Parameters
@@ -148,13 +155,15 @@ def calc_rho(p, ea, T_A_K):
     References
     ----------
     based on equation (2.6) from Brutsaert (2005): Hydrology - An Introduction (pp 25)."""
-
+    p = np.asarray(p)
+    ea = np.asarray(ea)
+    T_A_K = np.asarray(T_A_K)
     # p is multiplied by 100 to convert from mb to Pascals
     rho = ((p * 100.0) / (R_d * T_A_K)) * (1.0 - (1.0 - epsilon) * ea / p)
     return np.asarray(rho)
 
 
-def calc_stephan_boltzmann(T_K):
+def calc_stephan_boltzmann(T_K: ArrayLike) -> np.ndarray:
     """Calculates the total energy radiated by a blackbody.
 
     Parameters
@@ -166,12 +175,19 @@ def calc_stephan_boltzmann(T_K):
     -------
     M : float
         Emitted radiance (W m-2)"""
-
+    T_K = np.asarray(T_K)
     M = sb * T_K**4
     return np.asarray(M)
 
 
-def calc_theta_s(xlat, xlong, stdlng, doy, year, ftime):
+def calc_theta_s(
+    xlat: ArrayLike,
+    xlong: ArrayLike,
+    stdlng: ArrayLike,
+    doy: ArrayLike,
+    year: ArrayLike,
+    ftime: ArrayLike,
+) -> np.ndarray:
     """Calculates the Sun Zenith Angle (SZA).
 
     Parameters
@@ -203,9 +219,12 @@ def calc_theta_s(xlat, xlong, stdlng, doy, year, ftime):
     pid2 = np.pi / 2.0
 
     # Latitude computations
-    xlat = np.radians(xlat)
+    xlat = np.radians(np.asarray(xlat))
     sinlat = np.sin(xlat)
     coslat = np.cos(xlat)
+    doy = np.asarray(doy)
+    year = np.asarray(year)
+    ftime = np.asarray(ftime)
 
     # Declination computations
     kday = (year - 1977.0) * 365.0 + doy + 28123.0
@@ -231,16 +250,18 @@ def calc_theta_s(xlat, xlong, stdlng, doy, year, ftime):
     return np.asarray(theta_s)
 
 
-def calc_sun_angles(lat, lon, stdlon, doy, ftime):
+def calc_sun_angles(
+    lat: ArrayLike, lon: ArrayLike, stdlon: ArrayLike, doy: ArrayLike, ftime: ArrayLike
+) -> Tuple[np.ndarray, np.ndarray]:
     """Calculates the Sun Zenith and Azimuth Angles (SZA & SAA).
 
     Parameters
     ----------
     lat : float
         latitude of the site (degrees).
-    long : float
+    lon : float
         longitude of the site (degrees).
-    stdlng : float
+    stdlon : float
         central longitude of the time zone of the site (degrees).
     doy : float
         day of year of measurement (1-366).
@@ -297,7 +318,7 @@ def calc_sun_angles(lat, lon, stdlon, doy, ftime):
     return np.asarray(sza), np.asarray(saa)
 
 
-def calc_vapor_pressure(T_K):
+def calc_vapor_pressure(T_K: ArrayLike) -> np.ndarray:
     """Calculate the saturation water vapour pressure.
 
     Parameters
@@ -310,13 +331,13 @@ def calc_vapor_pressure(T_K):
     ea : float
         saturation water vapour pressure (mb).
     """
-
+    T_K = np.asarray(T_K)
     T_C = T_K - 273.15
     ea = 6.112 * np.exp((17.67 * T_C) / (T_C + 243.5))
     return np.asarray(ea)
 
 
-def calc_delta_vapor_pressure(T_K):
+def calc_delta_vapor_pressure(T_K: ArrayLike) -> np.ndarray:
     """Calculate the slope of saturation water vapour pressure.
 
     Parameters
@@ -329,13 +350,13 @@ def calc_delta_vapor_pressure(T_K):
     s : float
         slope of the saturation water vapour pressure (kPa K-1)
     """
-
+    T_K = np.asarray(T_K)
     T_C = T_K - 273.15
     s = 4098.0 * (0.6108 * np.exp(17.27 * T_C / (T_C + 237.3))) / ((T_C + 237.3) ** 2)
     return np.asarray(s)
 
 
-def calc_mixing_ratio(ea, p):
+def calc_mixing_ratio(ea: ArrayLike, p: ArrayLike) -> np.ndarray:
     """Calculate ratio of mass of water vapour to the mass of dry air (-)
 
     Parameters
@@ -354,12 +375,13 @@ def calc_mixing_ratio(ea, p):
     ----------
     https://glossary.ametsoc.org/wiki/Mixing_ratio
     """
-
+    ea = np.asarray(ea)
+    p = np.asarray(p)
     r = epsilon * ea / (p - ea)
     return r
 
 
-def calc_lapse_rate_moist(T_A_K, ea, p):
+def calc_lapse_rate_moist(T_A_K: ArrayLike, ea: ArrayLike, p: ArrayLike) -> np.ndarray:
     """Calculate moist-adiabatic lapse rate (K/m)
 
     Parameters
@@ -380,6 +402,9 @@ def calc_lapse_rate_moist(T_A_K, ea, p):
     ----------
     https://glossary.ametsoc.org/wiki/Adiabatic_lapse_rate
     """
+    T_A_K = np.asarray(T_A_K)
+    ea = np.asarray(ea)
+    p = np.asarray(p)
 
     r = calc_mixing_ratio(ea, p)
     c_p = calc_c_p(p, ea)
@@ -392,7 +417,9 @@ def calc_lapse_rate_moist(T_A_K, ea, p):
     return Gamma_w
 
 
-def flux_2_evaporation(flux, T_K=20 + 273.15, time_domain=1):
+def flux_2_evaporation(
+    flux: ArrayLike, T_K: ArrayLike = 20 + 273.15, time_domain: float = 1
+) -> np.ndarray:
     """Converts heat flux units (W m-2) to evaporation rates (mm time-1) to a given temporal window
 
     Parameters
@@ -411,6 +438,8 @@ def flux_2_evaporation(flux, T_K=20 + 273.15, time_domain=1):
         evaporation rate at the time_domain. Default mm h-1
     """
     # Calculate latent heat of vaporization
+    flux = np.asarray(flux)
+    T_K = np.asarray(T_K)
     lambda_ = calc_lambda(T_K)  # J kg-1
     ET = flux / lambda_  # kg s-1
 
@@ -420,7 +449,9 @@ def flux_2_evaporation(flux, T_K=20 + 273.15, time_domain=1):
     return ET
 
 
-def calc_L(ustar, T_A_K, rho, c_p, H, LE):
+def calc_L(
+    ustar: ArrayLike, T_A_K: ArrayLike, rho: ArrayLike, c_p: ArrayLike, H: ArrayLike, LE: ArrayLike
+) -> np.ndarray:
     """Calculates the Monin-Obukhov length.
 
     Parameters
@@ -465,7 +496,7 @@ def calc_L(ustar, T_A_K, rho, c_p, H, LE):
     return np.asarray(L)
 
 
-def calc_Psi_H(zoL):
+def calc_Psi_H(zoL: ArrayLike) -> np.ndarray:
     """Calculates the adiabatic correction factor for heat transport.
 
     Parameters
@@ -504,7 +535,7 @@ def calc_Psi_H(zoL):
     return np.asarray(Psi_H)
 
 
-def calc_Psi_M(zoL):
+def calc_Psi_M(zoL: ArrayLike) -> np.ndarray:
     """Adiabatic correction factor for momentum transport.
 
     Parameters
@@ -550,7 +581,15 @@ def calc_Psi_M(zoL):
     return np.asarray(Psi_M)
 
 
-def calc_richardson(u, z_u, d_0, T_R0, T_R1, T_A0, T_A1):
+def calc_richardson(
+    u: ArrayLike,
+    z_u: ArrayLike,
+    d_0: ArrayLike,
+    T_R0: ArrayLike,
+    T_R1: ArrayLike,
+    T_A0: ArrayLike,
+    T_A1: ArrayLike,
+) -> np.ndarray:
     """Richardson number.
 
     Estimates the Bulk Richardson number for turbulence using
@@ -582,6 +621,13 @@ def calc_richardson(u, z_u, d_0, T_R0, T_R1, T_A0, T_A1):
     ----------
     [Norman2000]_
     """
+    u = np.asarray(u)
+    z_u = np.asarray(z_u)
+    d_0 = np.asarray(d_0)
+    T_R0 = np.asarray(T_R0)
+    T_R1 = np.asarray(T_R1)
+    T_A0 = np.asarray(T_A0)
+    T_A1 = np.asarray(T_A1)
 
     # See eq (2) from Louis 1979
     Ri = -(gravity * (z_u - d_0) / T_A1) * (
@@ -590,7 +636,9 @@ def calc_richardson(u, z_u, d_0, T_R0, T_R1, T_A0, T_A1):
     return np.asarray(Ri)
 
 
-def calc_u_star(u, z_u, L, d_0, z_0M):
+def calc_u_star(
+    u: ArrayLike, z_u: ArrayLike, L: ArrayLike, d_0: ArrayLike, z_0M: ArrayLike
+) -> np.ndarray:
     """Friction velocity.
 
     Parameters
