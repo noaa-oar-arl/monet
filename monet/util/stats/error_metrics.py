@@ -2,8 +2,12 @@
 Error Metrics for Model Evaluation
 """
 
+from typing import Optional, Union
+
+import dask.array as da
 import numpy as np
 import xarray as xr
+from numpy.typing import ArrayLike
 
 from .utils_stats import circlebias, circlebias_m, matchmasks
 
@@ -12,101 +16,135 @@ from .utils_stats import circlebias, circlebias_m, matchmasks
 ############################################################
 
 
-def STDO(obs, mod, axis=None):
+def STDO(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Standard deviation of Observations
 
     Parameters
     ----------
-    obs : array-like
+    obs : array-like or xarray.DataArray
         Observed values.
+    mod : array-like or xarray.DataArray
+        Model values (unused in this metric but kept for consistency).
     axis : int, optional
         Axis along which to compute the standard deviation.
 
     Returns
     -------
-    float or ndarray
+    float or ndarray or xarray.DataArray
         Standard deviation of observations.
     """
-    if hasattr(obs, "dims"):
+    if hasattr(obs, "dims") and isinstance(obs, xr.DataArray):
         return obs.std(dim=obs.dims[axis] if axis is not None else None)
     else:
         return np.std(obs, axis=axis)
 
 
-def STDP(obs, mod, axis=None):
+def STDP(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Standard deviation of Predictions
 
     Parameters
     ----------
-    mod : array-like
+    obs : array-like or xarray.DataArray
+        Observed values (unused in this metric but kept for consistency).
+    mod : array-like or xarray.DataArray
         Predicted/model values.
     axis : int, optional
         Axis along which to compute the standard deviation.
 
     Returns
     -------
-    float or ndarray
+    float or ndarray or xarray.DataArray
         Standard deviation of predictions.
     """
-    if hasattr(mod, "dims"):
+    if hasattr(mod, "dims") and isinstance(mod, xr.DataArray):
         return mod.std(dim=mod.dims[axis] if axis is not None else None)
     else:
         return np.std(mod, axis=axis)
 
 
-def MNB(obs, mod, axis=None):
+def MNB(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Mean Normalized Bias (%)
 
     Parameters
     ----------
-    obs : array-like
+    obs : array-like or xarray.DataArray
         Observed values.
-    mod : array-like
+    mod : array-like or xarray.DataArray
         Model predicted values.
     axis : int, optional
         Axis along which to compute the bias.
 
     Returns
     -------
-    float or ndarray
+    float or ndarray or xarray.DataArray
         Mean normalized bias (percent).
     """
-    if hasattr(obs, "dims") and hasattr(mod, "dims"):
+    if (
+        hasattr(obs, "dims")
+        and hasattr(mod, "dims")
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = obs.align(mod, join="inner")
         return ((mod - obs) / obs).mean(dim=obs.dims[axis] if axis is not None else None) * 100.0
     else:
         return np.ma.masked_invalid((mod - obs) / obs).mean(axis=axis) * 100.0
 
 
-def MNE(obs, mod, axis=None):
+def MNE(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Mean Normalized Gross Error (%)
 
     Parameters
     ----------
-    obs : array-like
+    obs : array-like or xarray.DataArray
         Observed values.
-    mod : array-like
+    mod : array-like or xarray.DataArray
         Model predicted values.
     axis : int, optional
         Axis along which to compute the error.
 
     Returns
     -------
-    float or ndarray
+    float or ndarray or xarray.DataArray
         Mean normalized gross error (percent).
     """
-    if hasattr(obs, "dims") and hasattr(mod, "dims"):
+    if (
+        hasattr(obs, "dims")
+        and hasattr(mod, "dims")
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = obs.align(mod, join="inner")
         return (abs(mod - obs) / obs).mean(dim=obs.dims[axis] if axis is not None else None) * 100.0
     else:
         return np.ma.masked_invalid(np.ma.abs(mod - obs) / obs).mean(axis=axis) * 100.0
 
 
-def MdnNB(obs, mod, axis=None):
+def MdnNB(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Median Normalized Bias (%)
 
@@ -117,27 +155,31 @@ def MdnNB(obs, mod, axis=None):
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    axis : type
-        Description of parameter `axis`.
+    obs : array-like or xarray.DataArray
+        Observed values.
+    mod : array-like or xarray.DataArray
+        Model predicted values.
+    axis : int, optional
+        Axis along which to compute the median.
 
     Returns
     -------
-    type
-        Description of returned object.
+    float or ndarray or xarray.DataArray
+        Median normalized bias (percent).
 
     """
-    if "xr" in globals() and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return ((mod - obs) / obs).median(dim=axis) * 100.0
     else:
         return np.ma.median(np.ma.masked_invalid((mod - obs) / obs), axis=axis) * 100.0
 
 
-def MdnNE(obs, mod, axis=None):
+def MdnNE(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Median Normalized Gross Error (%)
 
@@ -148,27 +190,31 @@ def MdnNE(obs, mod, axis=None):
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    axis : type
-        Description of parameter `axis`.
+    obs : array-like or xarray.DataArray
+        Observed values.
+    mod : array-like or xarray.DataArray
+        Model predicted values.
+    axis : int, optional
+        Axis along which to compute the median.
 
     Returns
     -------
-    type
-        Description of returned object.
+    float or ndarray or xarray.DataArray
+        Median normalized gross error (percent).
 
     """
-    if "xr" in globals() and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return (abs(mod - obs) / obs).median(dim=axis) * 100.0
     else:
         return np.ma.median(np.ma.masked_invalid(np.ma.abs(mod - obs) / obs), axis=axis) * 100.0
 
 
-def NMdnGE(obs, mod, axis=None):
+def NMdnGE(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Normalized Median Gross Error (%)
 
@@ -179,25 +225,20 @@ def NMdnGE(obs, mod, axis=None):
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    axis : type
-        Description of parameter `axis`.
+    obs : array-like or xarray.DataArray
+        Observed values.
+    mod : array-like or xarray.DataArray
+        Model predicted values.
+    axis : int, optional
+        Axis along which to compute the mean/median.
 
     Returns
     -------
-    type
-        Description of returned object.
+    float or ndarray or xarray.DataArray
+        Normalized median gross error (percent).
 
     """
-    xr = None
-    try:
-        import xarray as xr
-    except ImportError:
-        pass
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return (abs(mod - obs).mean(dim=axis) / obs.mean(dim=axis)) * 100.0
     else:
@@ -206,7 +247,11 @@ def NMdnGE(obs, mod, axis=None):
         )
 
 
-def NO(obs, mod, axis=None):
+def NO(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[int, np.ndarray, xr.DataArray]:
     """
     N Observations (#)
 
@@ -217,31 +262,30 @@ def NO(obs, mod, axis=None):
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    axis : type
-        Description of parameter `axis`.
+    obs : array-like or xarray.DataArray
+        Observed values.
+    mod : array-like or xarray.DataArray
+        Model values (unused in this metric but kept for consistency).
+    axis : int, optional
+        Axis along which to count.
 
     Returns
     -------
-    type
-        Description of returned object.
+    int or ndarray or xarray.DataArray
+        Count of valid observations.
 
     """
-    xr = None
-    try:
-        import xarray as xr
-    except ImportError:
-        pass
-    if xr is not None and isinstance(obs, xr.DataArray):
+    if isinstance(obs, xr.DataArray):
         return obs.count(dim=axis)
     else:
         return (~np.ma.getmaskarray(obs)).sum(axis=axis)
 
 
-def NOP(obs, mod, axis=None):
+def NOP(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[int, np.ndarray, xr.DataArray]:
     """
     N Observations/Prediction Pairs (#)
 
@@ -252,25 +296,20 @@ def NOP(obs, mod, axis=None):
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    axis : type
-        Description of parameter `axis`.
+    obs : array-like or xarray.DataArray
+        Observed values.
+    mod : array-like or xarray.DataArray
+        Model predicted values.
+    axis : int, optional
+        Axis along which to count.
 
     Returns
     -------
-    type
-        Description of returned object.
+    int or ndarray or xarray.DataArray
+        Count of valid pairs.
 
     """
-    xr = None
-    try:
-        import xarray as xr
-    except ImportError:
-        pass
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return obs.count(dim=axis)
     else:
@@ -278,7 +317,11 @@ def NOP(obs, mod, axis=None):
         return (~np.ma.getmaskarray(obsc)).sum(axis=axis)
 
 
-def NP(obs, mod, axis=None):
+def NP(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[int, np.ndarray, xr.DataArray]:
     """
     N Predictions (#)
 
@@ -289,31 +332,30 @@ def NP(obs, mod, axis=None):
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    axis : type
-        Description of parameter `axis`.
+    obs : array-like or xarray.DataArray
+        Observed values (unused in this metric but kept for consistency).
+    mod : array-like or xarray.DataArray
+        Model predicted values.
+    axis : int, optional
+        Axis along which to count.
 
     Returns
     -------
-    type
-        Description of returned object.
+    int or ndarray or xarray.DataArray
+        Count of valid predictions.
 
     """
-    xr = None
-    try:
-        import xarray as xr
-    except ImportError:
-        pass
-    if xr is not None and isinstance(mod, xr.DataArray):
+    if isinstance(mod, xr.DataArray):
         return mod.count(dim=axis)
     else:
         return (~np.ma.getmaskarray(mod)).sum(axis=axis)
 
 
-def MO(obs, mod, axis=None):
+def MO(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Mean Observations (obs unit)
 
@@ -324,25 +366,20 @@ def MO(obs, mod, axis=None):
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    axis : type
-        Description of parameter `axis`.
+    obs : array-like or xarray.DataArray
+        Observed values.
+    mod : array-like or xarray.DataArray
+        Model values (unused in this metric but kept for consistency).
+    axis : int, optional
+        Axis along which to compute the mean.
 
     Returns
     -------
-    type
-        Description of returned object.
+    float or ndarray or xarray.DataArray
+        Mean of observations.
 
     """
-    xr = None
-    try:
-        import xarray as xr
-    except ImportError:
-        pass
-    if xr is not None and isinstance(obs, xr.DataArray):
+    if isinstance(obs, xr.DataArray):
         return obs.mean(dim=axis)
     elif hasattr(obs, "mean"):
         return obs.mean(axis=axis)
@@ -350,7 +387,11 @@ def MO(obs, mod, axis=None):
         return np.mean(obs, axis=axis)
 
 
-def MP(obs, mod, axis=None):
+def MP(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Mean Predictions (model unit)
 
@@ -361,25 +402,20 @@ def MP(obs, mod, axis=None):
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    axis : type
-        Description of parameter `axis`.
+    obs : array-like or xarray.DataArray
+        Observed values (unused in this metric but kept for consistency).
+    mod : array-like or xarray.DataArray
+        Model predicted values.
+    axis : int, optional
+        Axis along which to compute the mean.
 
     Returns
     -------
-    type
-        Description of returned object.
+    float or ndarray or xarray.DataArray
+        Mean of predictions.
 
     """
-    xr = None
-    try:
-        import xarray as xr
-    except ImportError:
-        pass
-    if xr is not None and isinstance(mod, xr.DataArray):
+    if isinstance(mod, xr.DataArray):
         return mod.mean(dim=axis)
     elif hasattr(mod, "mean"):
         return mod.mean(axis=axis)
@@ -387,7 +423,11 @@ def MP(obs, mod, axis=None):
         return np.mean(mod, axis=axis)
 
 
-def MdnO(obs, mod, axis=None):
+def MdnO(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Median Observations (obs unit)
 
@@ -398,31 +438,24 @@ def MdnO(obs, mod, axis=None):
 
     Parameters
     ----------
-    obs : type
-        Description of parameter `obs`.
-    mod : type
-        Description of parameter `mod`.
-    axis : type
-        Description of parameter `axis`.
+    obs : array-like or xarray.DataArray
+        Observed values.
+    mod : array-like or xarray.DataArray
+        Model values (unused in this metric but kept for consistency).
+    axis : int, optional
+        Axis along which to compute the median.
 
     Returns
     -------
-    type
-        Description of returned object.
+    float or ndarray or xarray.DataArray
+        Median of observations.
 
     """
-    import dask.array as da
-
-    xr = None
-    try:
-        import xarray as xr
-    except ImportError:
-        pass
     if isinstance(obs, da.Array):
         if axis is None:
             axis = 0
         return da.median(obs, axis=axis)
-    if xr is not None and isinstance(obs, xr.DataArray):
+    if isinstance(obs, xr.DataArray):
         return obs.median(dim=axis)
     elif hasattr(obs, "median"):
         return obs.median(axis=axis)
@@ -430,7 +463,11 @@ def MdnO(obs, mod, axis=None):
         return np.median(obs, axis=axis)
 
 
-def MdnP(obs, mod, axis=None):
+def MdnP(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Median of Model Predictions (MdnP)
 
@@ -445,14 +482,10 @@ def MdnP(obs, mod, axis=None):
 
     Returns
     -------
-    float or xarray.DataArray
+    float or ndarray or xarray.DataArray
         Median of model predictions.
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(mod, xr.DataArray):
+    if isinstance(mod, xr.DataArray):
         return mod.median(dim=axis)
     elif hasattr(mod, "median"):
         return np.median(mod, axis=axis)
@@ -460,7 +493,11 @@ def MdnP(obs, mod, axis=None):
         return np.ma.median(mod, axis=axis)
 
 
-def RM(obs, mod, axis=None):
+def RM(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray]:
     """
     Mean of Model Predictions (RM)
 
@@ -475,7 +512,7 @@ def RM(obs, mod, axis=None):
 
     Returns
     -------
-    float or xarray.DataArray
+    float or ndarray
         Mean of model predictions.
     """
     obs = np.asarray(obs)
@@ -483,7 +520,11 @@ def RM(obs, mod, axis=None):
     return np.mean(obs / mod)
 
 
-def RMdn(obs, mod, axis=None):
+def RMdn(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray]:
     """
     Median of Model Predictions (RMdn)
 
@@ -498,7 +539,7 @@ def RMdn(obs, mod, axis=None):
 
     Returns
     -------
-    float or xarray.DataArray
+    float or ndarray
         Median of model predictions.
     """
     obs = np.asarray(obs)
@@ -506,7 +547,11 @@ def RMdn(obs, mod, axis=None):
     return np.median(obs / mod)
 
 
-def MB(obs, mod, axis=None):
+def MB(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Mean Bias (MB)
 
@@ -524,11 +569,7 @@ def MB(obs, mod, axis=None):
     float or xarray.DataArray
         Mean bias value(s).
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return (mod - obs).mean(dim=axis)
     elif hasattr(mod, "mean") and hasattr(obs, "mean"):
@@ -537,7 +578,11 @@ def MB(obs, mod, axis=None):
         return np.ma.mean(mod - obs, axis=axis)
 
 
-def MdnB(obs, mod, axis=None):
+def MdnB(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Median Bias (MdnB)
 
@@ -555,11 +600,7 @@ def MdnB(obs, mod, axis=None):
     float or xarray.DataArray
         Median bias value(s).
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return (mod - obs).median(dim=axis)
     elif hasattr(mod, "median") and hasattr(obs, "median"):
@@ -568,7 +609,11 @@ def MdnB(obs, mod, axis=None):
         return np.ma.median(mod - obs, axis=axis)
 
 
-def WDMB_m(obs, mod, axis=None):
+def WDMB_m(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Wind Direction Mean Bias (WDMB, robust version for masked arrays)
 
@@ -589,11 +634,7 @@ def WDMB_m(obs, mod, axis=None):
     float or xarray.DataArray
         Mean wind direction bias (degrees).
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return circlebias_m(mod - obs).mean(dim=axis)
     elif isinstance(mod, np.ndarray) and isinstance(obs, np.ndarray):
@@ -602,7 +643,11 @@ def WDMB_m(obs, mod, axis=None):
         return np.ma.mean(circlebias_m(mod - obs), axis=axis)
 
 
-def WDMB(obs, mod, axis=None):
+def WDMB(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Wind Direction Mean Bias (WDMB, standard version)
 
@@ -623,11 +668,7 @@ def WDMB(obs, mod, axis=None):
     float or xarray.DataArray
         Mean wind direction bias (degrees).
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return circlebias(mod - obs).mean(dim=axis)
     elif isinstance(mod, np.ndarray) and isinstance(obs, np.ndarray):
@@ -636,7 +677,11 @@ def WDMB(obs, mod, axis=None):
         return np.ma.mean(circlebias(mod - obs), axis=axis)
 
 
-def WDMdnB(obs, mod, axis=None):
+def WDMdnB(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Wind Direction Median Bias (WDMdnB)
 
@@ -654,11 +699,7 @@ def WDMdnB(obs, mod, axis=None):
     float or xarray.DataArray
         Median wind direction bias (degrees).
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return circlebias(mod - obs).median(dim=axis)
     elif isinstance(mod, np.ndarray) and isinstance(obs, np.ndarray):
@@ -667,7 +708,11 @@ def WDMdnB(obs, mod, axis=None):
         return np.ma.median(circlebias(mod - obs), axis=axis)
 
 
-def MAE(obs, mod, axis=None):
+def MAE(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Mean Absolute Error (MAE).
 
@@ -687,7 +732,7 @@ def MAE(obs, mod, axis=None):
 
     Returns
     -------
-    mae : float or ndarray
+    mae : float or ndarray or xarray.DataArray
         Mean absolute error.
 
     Examples
@@ -699,18 +744,18 @@ def MAE(obs, mod, axis=None):
     >>> stats.MAE(obs, mod)
     0.6666666666666666
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return abs(mod - obs).mean(dim=axis)
     else:
         return np.ma.abs(mod - obs).mean(axis=axis)
 
 
-def MedAE(obs, mod, axis=None):
+def MedAE(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Median Absolute Error (MedAE).
 
@@ -730,7 +775,7 @@ def MedAE(obs, mod, axis=None):
 
     Returns
     -------
-    medae : float or ndarray
+    medae : float or ndarray or xarray.DataArray
         Median absolute error.
 
     Examples
@@ -742,18 +787,18 @@ def MedAE(obs, mod, axis=None):
     >>> stats.MedAE(obs, mod)
     1.0
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return abs(mod - obs).median(dim=axis)
     else:
         return np.ma.median(np.ma.abs(mod - obs), axis=axis)
 
 
-def sMAPE(obs, mod, axis=None):
+def sMAPE(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Symmetric Mean Absolute Percentage Error (sMAPE).
 
@@ -773,7 +818,7 @@ def sMAPE(obs, mod, axis=None):
 
     Returns
     -------
-    smape : float or ndarray
+    smape : float or ndarray or xarray.DataArray
         Symmetric mean absolute percentage error (in percent).
 
     Examples
@@ -785,18 +830,18 @@ def sMAPE(obs, mod, axis=None):
     >>> stats.sMAPE(obs, mod)
     28.57142857142857
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         return (200 * abs(mod - obs) / (abs(mod) + abs(obs))).mean(dim=axis)
     else:
         return (200 * np.ma.abs(mod - obs) / (np.ma.abs(mod) + np.ma.abs(obs))).mean(axis=axis)
 
 
-def CRMSE(obs, mod, axis=None):
+def CRMSE(
+    obs: Union[ArrayLike, xr.DataArray],
+    mod: Union[ArrayLike, xr.DataArray],
+    axis: Optional[int] = None,
+) -> Union[float, np.ndarray, xr.DataArray]:
     """
     Centered Root Mean Square Error (CRMSE).
 
@@ -816,7 +861,7 @@ def CRMSE(obs, mod, axis=None):
 
     Returns
     -------
-    crmse : float or ndarray
+    crmse : float or ndarray or xarray.DataArray
         Centered root mean square error.
 
     Examples
@@ -828,11 +873,7 @@ def CRMSE(obs, mod, axis=None):
     >>> stats.CRMSE(obs, mod)
     0.4714045207910317
     """
-    try:
-        import xarray as xr
-    except ImportError:
-        xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
         obs, mod = xr.align(obs, mod, join="inner")
         o_ = obs - obs.mean(dim=axis)
         m_ = mod - mod.mean(dim=axis)

@@ -8,6 +8,14 @@ import xarray as xr
 from monet.accessors.dataset_accessor import MONETAccessorDataset as DS_Monet
 from monet.accessors.pandas_accessor import MONETAccessorPandas as DF_Monet
 
+# Check if xesmf is available
+try:
+    import xesmf  # noqa: F401
+
+    has_xesmf = True
+except ImportError:
+    has_xesmf = False
+
 
 # Dask-backed fixtures
 @pytest.fixture
@@ -162,6 +170,7 @@ def test_dataarray_accessor_basic(sample_dataarray):
     assert "time" in out.coords or "time" in out.dims or "time" in out.variables
 
 
+@pytest.mark.skipif(not has_xesmf, reason="xesmf not installed")
 def test_dataarray_accessor_dask(sample_dataarray_dask):
     # Test remap to a different-shaped grid
     target_lat = np.linspace(-10, 10, 7)
