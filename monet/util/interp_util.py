@@ -258,24 +258,26 @@ def create_area_def_from_latlon(lat, lon, projection="platea", resolution=None, 
     import pyproj
     from pyresample.geometry import AreaDefinition
 
-    # Convert 1D coordinates to 2D if needed
+    # Determine dimensions and boundaries
+    # Optimization: avoid creating 2D meshgrid if inputs are 1D, as we only need min/max and shape
     if lat.ndim == 1 and lon.ndim == 1:
-        lon_2d, lat_2d = np.meshgrid(lon, lat)
+        height = lat.size
+        width = lon.size
+        lat_min = lat.min()
+        lat_max = lat.max()
+        lon_min = lon.min()
+        lon_max = lon.max()
     else:
         lat_2d, lon_2d = lat, lon
-
-    # Get dimensions of the grid
-    height, width = lat_2d.shape
+        height, width = lat_2d.shape
+        lat_min = lat_2d.min()
+        lat_max = lat_2d.max()
+        lon_min = lon_2d.min()
+        lon_max = lon_2d.max()
 
     # Set the area_id
     if area_id is None:
         area_id = "generated_area"
-
-    # Determine data boundaries
-    lat_min = lat_2d.min()
-    lat_max = lat_2d.max()
-    lon_min = lon_2d.min()
-    lon_max = lon_2d.max()
 
     # Setup projection based on the input data
     if projection == "platea":
