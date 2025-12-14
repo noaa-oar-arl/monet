@@ -228,14 +228,12 @@ def search_listinlist(
     array1: np.ndarray, array2: np.ndarray
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Find matching indices between two arrays.
-
     Parameters
     ----------
     array1 : numpy.ndarray
         First array to search for matches
     array2 : numpy.ndarray
         Second array to search for matches
-
     Returns
     -------
     tuple
@@ -243,21 +241,16 @@ def search_listinlist(
         - index1: sorted array of indices in array1 where matches were found
         - index2: sorted array of indices in array2 where matches were found
     """
-    s1 = set(array1.flatten())
-    s2 = set(array2.flatten())
+    # Find the intersection of the two arrays
+    inter = np.intersect1d(array1, array2)
 
-    inter = s1.intersection(s2)
+    # Find the indices in array1
+    index1 = np.where(np.isin(array1, inter))[0]
 
-    index1 = np.array([])
-    index2 = np.array([])
-    # find the indexes in array1
-    for i in inter:
-        index11 = np.where(array1 == i)
-        index22 = np.where(array2 == i)
-        index1 = np.concatenate([index1[:], index11[0]])
-        index2 = np.concatenate([index2[:], index22[0]])
+    # Find the indices in array2
+    index2 = np.where(np.isin(array2, inter))[0]
 
-    return np.sort(np.int32(index1)), np.sort(np.int32(index2))
+    return np.sort(index1), np.sort(index2)
 
 
 def linregress(x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float, float]:
