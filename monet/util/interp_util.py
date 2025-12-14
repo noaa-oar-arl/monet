@@ -2,54 +2,20 @@
 
 import numpy as np
 import xarray as xr
-
+from .resample import resample
 
 def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
-    """Create pyresample SwathDefinition from xarray object.
+    """Deprecated: Create pyresample SwathDefinition from xarray object.
 
-    Converts xarray latitude and longitude coordinate arrays into a
-    pyresample CoordinateDefinition suitable for spatial interpolation.
-
-    Parameters
-    ----------
-    longitude : 2D xarray.DataArray
-        Longitude array -> must be from -180 -> 180 and monotonically increasing.
-    latitude : 2D xarray.DataArray
-        Latitude array -> must be from -90 -> 90 and monotonically increasing.
-
-    Returns
-    -------
-    pyresample.geometry.CoordinateDefinition
-        A coordinate definition object that can be used with pyresample.
+    This function was part of the pyresample dependency and is deprecated.
     """
-    from pyresample import geometry
-
-    if longitude is None or latitude is None:
-        raise ValueError("Both longitude and latitude must be provided.")
-    if not (isinstance(longitude, xr.DataArray) and isinstance(latitude, xr.DataArray)):
-        raise TypeError("longitude and latitude must be xarray.DataArray objects.")
-    if longitude.shape != latitude.shape:
-        raise ValueError("longitude and latitude must have the same shape.")
-    return geometry.CoordinateDefinition(lats=latitude, lons=longitude)
+    raise NotImplementedError("This function relies on pyresample which has been removed.")
 
 
 def lonlat_to_xesmf(longitude=None, latitude=None):
-    """Create an empty xarray.Dataset with longitude and latitude coordinates.
+    """Deprecated: Create an empty xarray.Dataset with longitude and latitude coordinates.
 
-    Creates a minimal xarray Dataset with the provided coordinates to be used
-    as a target grid for xESMF regridding.
-
-    Parameters
-    ----------
-    longitude : array-like
-        Longitude value(s).
-    latitude : array-like
-        Latitude value(s).
-
-    Returns
-    -------
-    xarray.Dataset
-        A dataset with lon/lat coordinates suitable for use with xesmf.
+    This function was part of the xesmf dependency and is deprecated.
     """
     from numpy import asarray, meshgrid
 
@@ -81,60 +47,15 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
 
 
 def lonlat_to_swathdefinition(longitude=None, latitude=None):
-    """Create a pyresample SwathDefinition from longitude and latitude arrays.
-
-    Parameters
-    ----------
-    longitude : array-like
-        Longitude values, either 1D or 2D.
-    latitude : array-like
-        Latitude values, either 1D or 2D.
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition
-        A SwathDefinition object for the provided coordinates.
+    """Deprecated: Create a pyresample SwathDefinition from longitude and latitude arrays.
     """
-    from numpy import meshgrid
-    from pyresample.geometry import SwathDefinition
-
-    if longitude is None or latitude is None:
-        raise ValueError("Both longitude and latitude must be provided.")
-    longitude = np.asarray(longitude)
-    latitude = np.asarray(latitude)
-    if longitude.ndim == 1 and latitude.ndim == 1:
-        lons, lats = meshgrid(longitude, latitude)
-    elif longitude.shape == latitude.shape:
-        lons, lats = longitude, latitude
-    else:
-        raise ValueError("longitude and latitude must be both 1D or both 2D with the same shape.")
-    return SwathDefinition(lons=lons, lats=lats)
+    raise NotImplementedError("This function relies on pyresample which has been removed.")
 
 
 def nearest_point_swathdefinition(longitude=None, latitude=None):
-    """Create a SwathDefinition for a single point.
-
-    Used for nearest neighbor point-to-point interpolation.
-
-    Parameters
-    ----------
-    longitude : float
-        Longitude of the point.
-    latitude : float
-        Latitude of the point.
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition
-        A SwathDefinition representing a single point.
+    """Deprecated: Create a SwathDefinition for a single point.
     """
-    from pyresample.geometry import SwathDefinition
-
-    if longitude is None or latitude is None:
-        raise ValueError("Both longitude and latitude must be provided.")
-    lons = np.atleast_1d(longitude)
-    lats = np.atleast_1d(latitude)
-    return SwathDefinition(lons=lons, lats=lats)
+    raise NotImplementedError("This function relies on pyresample which has been removed.")
 
 
 def constant_1d_xesmf(longitude=None, latitude=None):
@@ -150,7 +71,7 @@ def constant_1d_xesmf(longitude=None, latitude=None):
     Returns
     -------
     xarray.Dataset
-        A dataset with coordinates suitable for xesmf, where longitude varies
+        A dataset with coordinates suitable for regridding, where longitude varies
         but latitude is constant.
     """
     from numpy import asarray
@@ -169,35 +90,13 @@ def constant_1d_xesmf(longitude=None, latitude=None):
 
 
 def constant_lat_swathdefition(longitude=None, latitude=None):
-    """Create a SwathDefinition with constant latitude along a longitude array.
-
-    Parameters
-    ----------
-    longitude : array-like
-        Array of longitude values, 1D or 2D.
-    latitude : float
-        Constant latitude value to use for all points.
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition
-        A SwathDefinition with constant latitude.
+    """Deprecated: Create a SwathDefinition with constant latitude along a longitude array.
     """
-    from numpy import meshgrid
-    from pyresample import geometry
-
-    longitude = np.asarray(longitude)
-    if longitude.ndim == 1:
-        lons, lats = meshgrid(longitude, np.array([latitude]))
-    else:
-        lons = longitude
-        lats = np.full_like(lons, latitude)
-    return geometry.SwathDefinition(lons=lons, lats=lats)
+    raise NotImplementedError("This function relies on pyresample which has been removed.")
 
 
 def constant_lon_swathdefition(longitude=None, latitude=None):
-    """Create a SwathDefinition with constant longitude along a latitude array.
-
+    """Deprecated: Create a SwathDefinition with constant longitude along a latitude array
     Parameters
     ----------
     longitude : float
@@ -601,238 +500,5 @@ def mesh_to_swath_definition(mesh):
     -----
     This is more appropriate than AreaDefinition for unstructured grids.
     """
-    try:
-        try:
-            import ESMF
-        except ImportError:
-            try:
-                import esmpy as ESMF
-            except ImportError:
-                raise ImportError("ESMF is required for this functionality")
+    raise NotImplementedError("This function relies on pyresample which has been removed.")
 
-        # import numpy as np  # unused
-        from pyresample.geometry import SwathDefinition
-    except ImportError:
-        raise ImportError("ESMF and pyresample are required for this functionality")
-
-    # Extract node coordinates from the mesh
-    node_coords = mesh.get_coords()
-
-    if mesh.coord_sys == ESMF.CoordSys.SPH_DEG:
-        # Coordinates are in degrees (longitude/latitude)
-        lons = node_coords[0]
-        lats = node_coords[1]
-    else:
-        # For other coordinate systems, try to convert or raise an error
-        raise ValueError("Only spherical degree coordinate system is supported")
-
-    # Create SwathDefinition
-    return SwathDefinition(lons=lons, lats=lats)
-
-
-def ugrid_to_swath_definition(ugrid_dataset):
-    """Convert a UGRID-compliant dataset to a pyresample SwathDefinition.
-
-    Parameters
-    ----------
-    ugrid_dataset : xarray.Dataset
-        Dataset following the UGRID conventions with mesh topology
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition
-        A SwathDefinition object representing the mesh nodes
-
-    Notes
-    -----
-    This is more appropriate than AreaDefinition for unstructured grids.
-    """
-    # import numpy as np  # unused
-    # import xarray as xr  # unused
-    from pyresample.geometry import SwathDefinition
-
-    # First, identify the mesh topology variable
-    mesh_topology_var = None
-    for var in ugrid_dataset.variables:
-        if hasattr(ugrid_dataset[var], "cf_role") and ugrid_dataset[var].cf_role == "mesh_topology":
-            mesh_topology_var = var
-            break
-
-    if mesh_topology_var is None:
-        raise ValueError("No mesh_topology variable found in the dataset")
-
-    # Find node coordinates
-    topology = ugrid_dataset[mesh_topology_var]
-    if hasattr(topology, "node_coordinates"):
-        node_coords = topology.node_coordinates.split()
-        if len(node_coords) >= 2:
-            lon_var, lat_var = node_coords[0], node_coords[1]
-            lons = ugrid_dataset[lon_var].values
-            lats = ugrid_dataset[lat_var].values
-        else:
-            raise ValueError("Not enough node coordinates specified")
-    else:
-        # Try to find by standard names
-        lon_var = None
-        lat_var = None
-        for var in ugrid_dataset.variables:
-            if hasattr(ugrid_dataset[var], "standard_name"):
-                if ugrid_dataset[var].standard_name == "longitude":
-                    lon_var = var
-                elif ugrid_dataset[var].standard_name == "latitude":
-                    lat_var = var
-
-        if lon_var is None or lat_var is None:
-            raise ValueError("Could not identify latitude and longitude variables")
-
-        lons = ugrid_dataset[lon_var].values
-        lats = ugrid_dataset[lat_var].values
-
-    # Create SwathDefinition
-    return SwathDefinition(lons=lons, lats=lats)
-
-
-def guess_area_def_from_dataset(
-    dataset, resolution=None, max_grid_points=1000000, projection="auto", area_id=None
-):
-    """Create an AreaDefinition from any dataset by inferring grid characteristics.
-
-    Parameters
-    ----------
-    dataset : xarray.Dataset or xarray.DataArray
-        Dataset to create AreaDefinition from, can be regular, curvilinear, or unstructured
-    resolution : float or tuple, optional
-        Target resolution in degrees or (x_res, y_res). If None, inferred from data.
-    max_grid_points : int, default: 1000000
-        Maximum number of grid points in the resulting AreaDefinition to prevent
-        creating excessively large grids
-    projection : str, default: 'auto'
-        Projection to use. If 'auto', tries to determine from dataset attributes.
-        Options include: 'platea', 'lcc', 'merc', 'stere', 'gnom'
-    area_id : str, optional
-        Identifier for the area. Default is 'inferred_grid'.
-
-    Returns
-    -------
-    pyresample.geometry.AreaDefinition
-        An AreaDefinition object representing the dataset's grid
-
-    Notes
-    -----
-    - For unstructured grids, this creates a regular-grid approximation
-    - If the dataset contains projection information, it will be used
-    """
-    # import numpy as np  # unused
-    # import xarray as xr  # unused
-
-    # Set default area_id if not provided
-    if area_id is None:
-        area_id = "inferred_grid"
-
-    # First, check if dataset has UGRID attributes
-    is_ugrid = False
-    for var in dataset.variables:
-        if hasattr(dataset[var], "cf_role") and dataset[var].cf_role == "mesh_topology":
-            is_ugrid = True
-            break
-
-    if is_ugrid:
-        # For UGRID datasets, use the UGRID converter
-        return create_area_def_from_ugrid(
-            dataset, projection="platea" if projection == "auto" else projection, area_id=area_id
-        )
-
-    # Determine if we're dealing with a regular, rectilinear, or curvilinear grid
-    # Check attributes for projection information
-    if projection == "auto":
-        # Try to find projection information in global attributes
-        if hasattr(dataset, "grid_mapping"):
-            grid_mapping = dataset.grid_mapping
-            if hasattr(dataset, grid_mapping):
-                grid_map_var = dataset[grid_mapping]
-                if hasattr(grid_map_var, "grid_mapping_name"):
-                    mapping_name = grid_map_var.grid_mapping_name
-                    if mapping_name == "lambert_conformal_conic":
-                        projection = "lcc"
-                    elif mapping_name == "mercator":
-                        projection = "merc"
-                    elif mapping_name == "polar_stereographic":
-                        projection = "stere"
-                    elif mapping_name == "gnomonic":
-                        projection = "gnom"
-                    else:
-                        # Default to platea
-                        projection = "platea"
-                else:
-                    projection = "platea"
-            else:
-                projection = "platea"
-        else:
-            projection = "platea"
-
-    # Try to get coordinate information
-    from ..accessors.base import BaseAccessor
-
-    lat_name, lon_name = BaseAccessor._detect_latlon_names(dataset)
-
-    if lat_name is None or lon_name is None:
-        raise ValueError("Could not detect latitude and longitude coordinates")
-
-    # Get the latitude and longitude arrays
-    lats = dataset[lat_name].values
-    lons = dataset[lon_name].values
-
-    # Determine grid type
-    is_1d = lats.ndim == 1 and lons.ndim == 1
-    is_2d = lats.ndim == 2 and lons.ndim == 2
-
-    if is_1d:
-        # Regular rectilinear grid
-        # Create 2D mesh for area definition
-        lon_2d, lat_2d = np.meshgrid(lons, lats)
-        return create_area_def_from_latlon(lat_2d, lon_2d, projection, resolution, area_id)
-
-    elif is_2d:
-        # Curvilinear grid
-        return create_area_def_from_latlon(lats, lons, projection, resolution, area_id)
-
-    else:
-        # Assume unstructured data points
-        # Create a regular grid that encompasses all points
-        lat_min, lat_max = np.nanmin(lats), np.nanmax(lats)
-        lon_min, lon_max = np.nanmin(lons), np.nanmax(lons)
-
-        # Calculate default resolution if not provided
-        if resolution is None:
-            # Target resolution based on point density
-            point_count = len(lats)
-            # area = (lat_max - lat_min) * (lon_max - lon_min)  # unused
-            # density = np.sqrt(point_count / area)  # unused
-
-            # Limit resolution to prevent excessively large grids
-            target_points = min(point_count * 1.5, max_grid_points)
-            x_res = max(
-                (lon_max - lon_min)
-                / np.sqrt(target_points / ((lat_max - lat_min) / (lon_max - lon_min))),
-                0.01,
-            )
-            y_res = max(
-                (lat_max - lat_min)
-                / np.sqrt(target_points / ((lon_max - lon_min) / (lat_max - lat_min))),
-                0.01,
-            )
-            resolution = (x_res, y_res)
-
-        # If resolution is a single value, make it a tuple
-        if isinstance(resolution, (int, float)):
-            resolution = (resolution, resolution)
-
-        # Create regular grid
-        x_res, y_res = resolution
-        lats_reg = np.arange(lat_min, lat_max + y_res, y_res)
-        lons_reg = np.arange(lon_min, lon_max + x_res, x_res)
-
-        # Create 2D mesh
-        lon_2d, lat_2d = np.meshgrid(lons_reg, lats_reg)
-
-        return create_area_def_from_latlon(lat_2d, lon_2d, projection, None, area_id)

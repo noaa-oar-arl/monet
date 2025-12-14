@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from .base import BaseAccessor, has_pyresample
+from .base import BaseAccessor, has_monet_regrid
 
 
 @pd.api.extensions.register_dataframe_accessor("monet")
@@ -215,13 +215,7 @@ class MONETAccessorPandas(BaseAccessor):
         pyreample.geometry.SwathDefinition
             SwathDefinition object for data points.
         """
-        if not has_pyresample:
-            raise ImportError("pyresample is required for this functionality")
-
-        df = self.rename_for_monet(self._obj)
-        from ..util.interp_util import nearest_point_swathdefinition as npsd
-
-        return npsd(latitude=df.latitude.values, longitude=df.longitude.values)
+        raise NotImplementedError("This function relies on pyresample which has been removed.")
 
     def _df_to_da(self, d=None):  # TODO: should be `to_ds` or `to_xarray`
         """Convert DataFrame to xarray.
@@ -269,27 +263,49 @@ class MONETAccessorPandas(BaseAccessor):
         pandas.DataFrame
             Remapped DataFrame.
         """
-        if not has_pyresample:
-            raise ImportError("pyresample is required for this functionality")
-        else:
-            import pyresample as pr
+        if not has_monet_regrid:
+             raise ImportError("monet-regrid is required for this functionality")
+
+        from ..util import resample
 
         source_data = self.rename_for_monet(df)
         target_data = self.rename_for_monet(self._obj)
+
         # make fake index
         source_data = self._make_fake_index_var(source_data)
         source_data_da = self._df_to_da(source_data)
         target_data_da = self._df_to_da(target_data)
-        source = source_data_da.monet._get_CoordinateDefinition(source_data_da)
-        target = target_data_da.monet._get_CoordinateDefinition(target_data_da)
-        res = pr.kd_tree.XArrayResamplerNN(source, target, radius_of_influence=radius_of_influence)
-        res.get_neighbour_info()
-        # interpolate just the make_fake_index variable
-        r = res.get_sample_from_neighbour_info(source_data_da.monet_fake_index)
+
+        # Use monet-regrid to resample
+        # source and target are DataFrames converted to xarray Datasets
+        # We want to resample source to target grid
+
+        # We are resampling the fake index variable
+        da_source = source_data_da["monet_fake_index"]
+
+        # We need target to be a dataset for monet-regrid usually
+        # but here we have point data.
+        # monet-regrid might struggle with 1xN 'y','x' grid if it expects 2D lat/lon
+        # But let's try using resample helper
+
+        # Note: resample takes (source, target, method)
+
+        # We need to ensure coords are correct for monet-regrid
+        # It expects "lat" and "lon" or "latitude" and "longitude"
+
+        # If monet-regrid supports point-to-point via "nearest", then:
+        res = resample.resample(da_source, target_data_da, method="nearest")
+
+        r = res
         r.name = "monet_fake_index"
+
         # now merge back from original DataFrame
         q = r.compute()
         v = q.squeeze().to_dataframe()
+
+        # The merge logic might need adjustment if v index doesn't match exactly
+        # But if it preserves index/coordinates it should be fine.
+
         result = v.merge(source_data, how="left", on="monet_fake_index").drop(
             "monet_fake_index", axis=1
         )

@@ -1,9 +1,12 @@
 """MONET Accessor (Backward Compatibility Layer)"""
 
-from .accessors.base import BaseAccessor, has_pyresample, has_xesmf, wrap_longitudes  # noqa: F401
+from .accessors.base import BaseAccessor, has_monet_regrid, wrap_longitudes  # noqa: F401
 from .accessors.dataarray_accessor import MONETAccessor  # noqa: F401
 from .accessors.dataset_accessor import MONETAccessorDataset  # noqa: F401
 from .accessors.pandas_accessor import MONETAccessorPandas  # noqa: F401
+
+has_pyresample = False
+has_xesmf = False
 
 # Import old functions for backward compatibility
 _rename_latlon = BaseAccessor._rename_latlon

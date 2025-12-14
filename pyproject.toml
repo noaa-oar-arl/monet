@@ -25,14 +25,13 @@ dependencies = [
   "cartopy",
   "dask",
   "matplotlib",
+  "monet-regrid",
   "netCDF4",
   "numpy",
   "pandas",
   "pydecorate",
-  "pyresample",
   "seaborn",
   "xarray",
-  "xesmf; platform_system != 'Windows'"
 ]
 
 [tool.setuptools]

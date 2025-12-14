@@ -3,28 +3,16 @@
 import xarray as xr
 
 try:
-    import xesmf  # noqa: F401
+    import monet_regrid  # noqa: F401
 
-    # Check if ESMF backend is available (try both import patterns)
-    try:
-        import esmpy as ESMF  # noqa: F401
-    except ImportError:
-        import ESMF  # noqa: F401
-    has_xesmf = True
+    has_monet_regrid = True
 except ImportError:
-    has_xesmf = False
+    has_monet_regrid = False
 
-try:
-    import pyresample  # noqa: F401
-    from pyresample.utils import wrap_longitudes
 
-    has_pyresample = True
-except ImportError:
-    has_pyresample = False
-
-    def wrap_longitudes(lons):
-        """For longitudes that may be in [0, 360) format, return in [-180, 180) format."""
-        return (lons + 180) % 360 - 180
+def wrap_longitudes(lons):
+    """For longitudes that may be in [0, 360) format, return in [-180, 180) format."""
+    return (lons + 180) % 360 - 180
 
 
 class BaseAccessor:
@@ -503,27 +491,6 @@ class BaseAccessor:
             result = result.sel(x=slice(None, None, -1))
 
         return result
-
-    @staticmethod
-    def _get_CoordinateDefinition(data):
-        """Get a CoordinateDefinition from DataArray.
-
-        Parameters
-        ----------
-        data : xarray.DataArray
-            DataArray to get coordinates from.
-
-        Returns
-        -------
-        pyresample.geometry.CoordinateDefinition
-            CoordinateDefinition for the data.
-        """
-        if not has_pyresample:
-            raise ImportError("pyresample is required for this functionality")
-
-        from pyresample import geometry as geo
-
-        return geo.CoordinateDefinition(lats=data.latitude, lons=data.longitude)
 
     def structure_for_monet(
         self, lat_name="lat", lon_name="lon", return_obj=True, coards_compliant=False

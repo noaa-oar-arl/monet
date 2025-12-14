@@ -3,27 +3,15 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - python>=3.6
-  #
-  # core
+  - python>=3.8
   - cartopy
   - dask
   - matplotlib
+  - monet-regrid
   - netcdf4
   - numpy
-  - pandas>=1.0
+  - pandas
+  - pip
   - pydecorate
   - seaborn
   - xarray
-  #
-  # optional
-  - pyresample
-  - python-stratify
-  - xesmf # non-Windows only!
-  #
-  # test/dev
-  - ipykernel
-  - ipython
-  - packaging
-  - pooch
-  - pytest

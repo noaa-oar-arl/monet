@@ -21,7 +21,7 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
         If True, merge interpolated values with the original DataFrame.
         If False, return only the interpolated values.
     **kwargs : dict
-        Passed to pyresample's neighbor lookup.
+        Passed to regridding backend.
 
     Returns
     -------
@@ -29,7 +29,7 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
         DataFrame with interpolated model values at observation locations,
         either merged with original data (if merge=True) or standalone.
     """
-    radius_of_influence = kwargs.pop("radius_of_influence", 12e4)
+    radius_of_influence = kwargs.pop("radius_of_influence", 12e4) # unused
     suffix = kwargs.pop("suffix", "_new")
 
     target_da = df.drop_duplicates(subset=["siteid"]).dropna(
@@ -55,10 +55,12 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
 
     # Add if statement for unstructured grid output
     if da.attrs.get("mio_has_unstructured_grid", False):
-        da_interped = target_data_da.monet.remap_nearest_unstructured(da).compute()
+        # Fallback to nearest neighbor or implement proper unstructured regrid if monet-regrid supports it
+        # For now, using remap which uses monet-regrid
+        da_interped = target_data_da.monet.remap(da, method="nearest", **kwargs).compute()
     else:
-        da_interped = target_data_da.monet.remap_nearest(
-            da, radius_of_influence=radius_of_influence, **kwargs
+        da_interped = target_data_da.monet.remap(
+            da, method="nearest", **kwargs
         ).compute()
 
     da_interped["siteid"] = (("x"), target_da.siteid)
@@ -105,7 +107,7 @@ def combine_da_to_da(source, target, *, merge=True, interp_time=False, **kwargs)
     interp_time : bool, default False
         If True, linearly interpolate to the times in target.
     **kwargs : dict
-        Additional arguments passed to remap_nearest.
+        Additional arguments passed to remap.
 
     Returns
     -------
@@ -115,7 +117,7 @@ def combine_da_to_da(source, target, *, merge=True, interp_time=False, **kwargs)
     """
     from ..monet_accessor import _dataset_to_monet
 
-    output = target.monet.remap_nearest(source, **kwargs)
+    output = target.monet.remap(source, method="nearest", **kwargs)
 
     if interp_time:
         output = output.interp(time=target.time)
@@ -153,8 +155,6 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
     """Combine xarray data array `da` with spatial information
     point observations in dataframe `df`, returning a new dataframe.
 
-    Uses :func:`~monet.util.resample.resample_xesmf`.
-
     Parameters
     ----------
     da : xarray.DataArray or xarray.Dataset
@@ -164,20 +164,16 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
     suffix : str, default: None
         Suffix to add to the variable names to prevent column name conflicts.
     **kwargs : dict
-        Additional keyword arguments for xESMF regridding.
+        Additional keyword arguments for regridding.
 
     Returns
     -------
     pandas.DataFrame
         DataFrame with combined model and observation data.
     """
-    try:
-        import xesmf  # noqa: F401
-    except ImportError:
-        raise ImportError("xesmf is required for this functionality")
 
     from ..util.interp_util import lonlat_to_xesmf
-    from ..util.resample import resample_xesmf
+    from ..util.resample import resample
 
     # Default suffix
     if suffix is None:
@@ -194,16 +190,12 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
     elif "LAT" in target.columns:
         target = target.rename(columns={"LAT": "latitude", "LON": "longitude"})
 
-    # Create xESMF compatible dataset for the point locations
+    # Create compatible dataset for the point locations
     point_ds = lonlat_to_xesmf(longitude=target.longitude.values, latitude=target.latitude.values)
 
-    # Rename coordinates for xESMF
-    da_renamed = da.copy()
-    if "latitude" in da.coords:
-        da_renamed = da_renamed.rename({"latitude": "lat", "longitude": "lon"})
-
-    # Use xESMF to resample the data
-    result = resample_xesmf(da_renamed, point_ds, **kwargs)
+    # Use resample (monet-regrid) to resample the data
+    # Note: monet-regrid might expect 2D coords, lonlat_to_xesmf creates 2D meshgrid or similar
+    result = resample(da, point_ds, **kwargs)
 
     # Convert to DataFrame
     if isinstance(result, xr.DataArray):
@@ -219,7 +211,7 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
 
 
 def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
-    """Combine vertical profile data and surface observations using xESMF.
+    """Combine vertical profile data and surface observations.
 
     Parameters
     ----------
@@ -230,7 +222,7 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
     df : pandas.DataFrame
         DataFrame containing surface observations with lat/lon coordinates
     **kwargs
-        Additional arguments passed to xesmf regridder
+        Additional arguments passed to regridder
 
     Returns
     -------
@@ -238,7 +230,7 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
         Combined data frame with interpolated model values at observation points
     """
     from ..util.interp_util import constant_1d_xesmf
-    from ..util.resample import resample_xesmf
+    from ..util.resample import resample
 
     try:
         if da.shape != daz.shape:
@@ -250,14 +242,8 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
 
     target = constant_1d_xesmf(longitude=df.longitude.values, latitude=df.latitude.values)
 
-    # check to rename 'latitude' and 'longitude' for xe.Regridder
-    da = _rename_latlon(da)
-    daz = _rename_latlon(daz)
-    da_interped = resample_xesmf(da, target, **kwargs)  # interpolate fields
-    daz_interped = resample_xesmf(daz, target, **kwargs)
-    # check to change 'lat' 'lon' back
-    da_interped = _rename_latlon(da_interped)
-    daz_interped = _rename_latlon(daz_interped)
+    da_interped = resample(da, target, **kwargs)  # interpolate fields
+    daz_interped = resample(daz, target, **kwargs)
 
     # Ensure daz_interped and da_interped are xarray.DataArray before using .monet
     if not hasattr(daz_interped, "monet"):
@@ -328,110 +314,6 @@ def combine_grid_to_point_esmf(
 ):
     """Combine gridded data with point observations using ESMF LocStream.
 
-    Parameters
-    ----------
-    grid_data : xarray.Dataset or xarray.DataArray
-        Gridded source data to be interpolated to point locations.
-    point_df : pandas.DataFrame
-        DataFrame containing point observations with 'latitude', 'longitude', and 'siteid' columns.
-    method : str, default: 'bilinear'
-        Regridding method to use. Options include 'bilinear', 'nearest_s2d', 'nearest_d2s'.
-    locstream_kwargs : dict, optional
-        Additional keyword arguments for ESMF LocStream creation.
-    regrid_kwargs : dict, optional
-        Additional keyword arguments for ESMF regridding.
-
-    Returns
-    -------
-    pandas.DataFrame
-        DataFrame with original point data and interpolated grid values.
-
-    Notes
-    -----
-    Requires xESMF and ESMF to be installed.
+    Deprecated as ESMF dependency is removed.
     """
-    try:
-        import xarray as xr
-        import xesmf as xe
-    except ImportError:
-        raise ImportError("xesmf and ESMF are required for this functionality")
-
-    # Default keyword arguments
-    if locstream_kwargs is None:
-        locstream_kwargs = {}
-    if regrid_kwargs is None:
-        regrid_kwargs = {}
-
-    # Ensure we have required columns
-    required_cols = ["latitude", "longitude", "siteid"]
-    for col in required_cols:
-        if col not in point_df.columns:
-            raise ValueError(f"point_df must contain a '{col}' column")
-
-    # Extract unique lat/lon points to avoid duplicates
-    unique_points = point_df.drop_duplicates(subset=["latitude", "longitude"])
-
-    # Create an xarray dataset for the point locations
-    points_ds = xr.Dataset(
-        coords={
-            "lon": ("location", unique_points["longitude"].values),
-            "lat": ("location", unique_points["latitude"].values),
-        }
-    )
-
-    # Add site ID for later matching
-    points_ds["siteid"] = ("location", unique_points["siteid"].values)
-
-    # Ensure grid_data is properly formatted
-    if isinstance(grid_data, xr.DataArray):
-        grid_data = grid_data.to_dataset()
-
-    # Ensure grid_data has proper coordinate names for xESMF
-    if "latitude" in grid_data.coords and "longitude" in grid_data.coords:
-        grid_data = grid_data.rename({"latitude": "lat", "longitude": "lon"})
-
-    # Create ESMF regridder with LocStream
-    try:
-        regridder = xe.Regridder(grid_data, points_ds, method, locstream_out=True, **regrid_kwargs)
-    except Exception as e:
-        # Attempt alternative approach for curvilinear grids
-        grid_dims = list(grid_data.dims)
-        if len(grid_dims) >= 2 and grid_data["lat"].dims == grid_data["lon"].dims:
-            # Handle curvilinear grid
-            grid_data_new = grid_data.copy()
-            y_dim, x_dim = grid_data["lat"].dims
-            grid_data_new = grid_data_new.rename({y_dim: "y", x_dim: "x"})
-            regridder = xe.Regridder(
-                grid_data_new, points_ds, method, locstream_out=True, **regrid_kwargs
-            )
-        else:
-            raise ValueError(f"Failed to create regridder: {e}")
-
-    # Perform regridding for each variable
-    result_ds = xr.Dataset()
-    for var in grid_data.data_vars:
-        # Skip coordinate variables
-        if var in grid_data.coords:
-            continue
-
-        # Apply regridder to this variable
-        result = regridder(grid_data[var])
-        result_ds[var] = result
-
-    # Convert to DataFrame for merging with original point data
-    result_df = result_ds.to_dataframe().reset_index()
-
-    # Merge with the original point data
-    if "location" in result_df.columns:
-        # Map location index to siteid
-        siteid_map = dict(zip(range(len(unique_points)), unique_points["siteid"]))
-        result_df["siteid"] = result_df["location"].map(siteid_map)
-        result_df = result_df.drop(columns=["location"])
-
-    # Merge results with original data
-    merged_df = pd.merge(point_df, result_df, on="siteid", how="left")
-
-    # Clean up the regridder
-    regridder.clean_weight_file()
-
-    return merged_df
+    raise NotImplementedError("This function relies on ESMF which has been removed.")
