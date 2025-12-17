@@ -172,6 +172,9 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
         DataFrame with combined model and observation data.
     """
 
+    if df.empty:
+        return df
+
     from ..util.interp_util import lonlat_to_xesmf
     from ..util.resample import resample
 
