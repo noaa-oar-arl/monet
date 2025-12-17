@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 
 
-def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype="int", basemap=None):
+def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype="int", ax=None, **kwargs):
     """Create a colorbar with discrete colors and custom tick labels.
 
     Parameters
@@ -21,8 +21,10 @@ def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype="int", basemap
         will range from 0 or minval to ncolors.
     dtype : str or type, default "int"
         Data type for tick label values (e.g., "int", "float").
-    basemap : matplotlib.mpl_toolkits.basemap.Basemap, optional
-        Basemap instance to attach the colorbar to. If None, uses plt.colorbar.
+    ax : matplotlib.axes.Axes, optional
+        Axes to attach the colorbar to.
+    **kwargs
+        Additional keyword arguments to pass to `plt.colorbar`.
 
     Returns
     -------
@@ -38,10 +40,7 @@ def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype="int", basemap
     mappable = cm.ScalarMappable(cmap=cmap)
     mappable.set_array([])
     mappable.set_clim(-0.5, ncolors + 0.5)
-    if basemap is not None:
-        colorbar = basemap.colorbar(mappable, format="%1.2g")
-    else:
-        colorbar = plt.colorbar(mappable, format="%1.2g", fontsize=12)
+    colorbar = plt.colorbar(mappable, ax=ax, format="%1.2g", **kwargs)
     colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
     if (minval is None) & (maxval is not None):
         colorbar.set_ticklabels(np.around(np.linspace(0, maxval, ncolors).astype(dtype), 2))

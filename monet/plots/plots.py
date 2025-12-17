@@ -2,6 +2,7 @@
 
 import functools
 
+import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -23,19 +24,73 @@ def _default_sns_context(f):
     return inner
 
 
+def _savefig(fig, *, save_name=None, dpi=None, **kwargs):
+    """Save figure."""
+    if save_name is not None:
+        fig.savefig(save_name, dpi=dpi, **kwargs)
+        plt.close(fig)
+
+
+def _create_map(fig=None, ax=None, **kwargs):
+    """Create a map projection."""
+    if ax is None:
+        fig, ax = plt.subplots(
+            figsize=(11, 8),
+            subplot_kw={
+                "projection": ccrs.LambertConformal(
+                    central_longitude=-97.5, central_latitude=38.5
+                )
+            },
+            **kwargs,
+        )
+    return fig, ax
+
+
+@_default_sns_context
+def spatial_plot(
+    da,
+    fig=None,
+    ax=None,
+    **kwargs,
+):
+    """Create a spatial plot from an xarray.DataArray.
+
+    Parameters
+    ----------
+    da : xarray.DataArray
+        The data to plot.
+    fig : matplotlib.figure.Figure, optional
+        Figure to plot on.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on.
+    **kwargs
+        Additional keyword arguments to pass to xarray's plot method.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The axes containing the plot.
+    """
+    fig, ax = _create_map(fig=fig, ax=ax)
+    da.plot(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
+    ax.coastlines()
+    ax.gridlines()
+    return fig, ax
+
+
 # Spatial Plots
 @_default_sns_context
-def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
+def make_spatial_plot(
+    modelvar, gridobj, plotargs={}, ncolors=15, discrete=False, fig=None, ax=None
+):
     """Create a basic spatial plot using imshow.
 
     Parameters
     ----------
     modelvar : numpy.ndarray
         2D model variable array to plot.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
-    dpi : int, optional
-        Dots per inch for the figure. Higher values increase resolution.
+    gridobj : object
+        Object containing grid information with LAT and LON variables.
     plotargs : dict, default {}
         Additional arguments to pass to imshow. Common options include 'cmap',
         'vmin', 'vmax', and 'alpha'.
@@ -43,6 +98,10 @@ def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
         Number of discrete colors when using discrete colorbar.
     discrete : bool, default False
         If True, use a discrete colorbar instead of a continuous one.
+    fig : matplotlib.figure.Figure, optional
+        Figure to plot on.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on.
 
     Returns
     -------
@@ -54,33 +113,35 @@ def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=F
         - colormap: matplotlib Colormap instance
         - vmin, vmax: minimum and maximum values for the colormap
     """
-    f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
+    fig, ax = _create_map(fig=fig, ax=ax)
+    lat = gridobj.variables["LAT"][0].squeeze()
+    lon = gridobj.variables["LON"][0].squeeze()
     # determine colorbar
     if "cmap" not in plotargs:
         plotargs["cmap"] = "viridis"
+    extent = (lon.min(), lon.max(), lat.min(), lat.max())
     if discrete and "vmin" in plotargs and "vmax" in plotargs:
         c, cmap = colorbar_index(
-            ncolors, plotargs["cmap"], minval=plotargs["vmin"], maxval=plotargs["vmax"], basemap=m
+            ncolors, plotargs["cmap"], minval=plotargs["vmin"], maxval=plotargs["vmax"], ax=ax
         )
         plotargs["cmap"] = cmap
-        m.imshow(modelvar, **plotargs)
+        ax.imshow(modelvar, extent=extent, **plotargs)
         vmin, vmax = plotargs["vmin"], plotargs["vmax"]
     elif discrete:
-        temp = m.imshow(modelvar, **plotargs)
+        temp = ax.imshow(modelvar, extent=extent, **plotargs)
         vmin, vmax = temp.get_clim()
-        c, cmap = colorbar_index(ncolors, plotargs["cmap"], minval=vmin, maxval=vmax, basemap=m)
+        c, cmap = colorbar_index(ncolors, plotargs["cmap"], minval=vmin, maxval=vmax, ax=ax)
         plotargs["cmap"] = cmap
-        m.imshow(modelvar, vmin=vmin, vmax=vmax, **plotargs)
+        ax.imshow(modelvar, vmin=vmin, vmax=vmax, extent=extent, **plotargs)
     else:
-        temp = m.imshow(modelvar, **plotargs)
-        c = m.colorbar()
+        temp = ax.imshow(modelvar, extent=extent, **plotargs)
+        c = fig.colorbar(temp, ax=ax)
         vmin, vmax = temp.get_clim()
         cmap = plotargs["cmap"]
     # draw borders
-    m.drawstates()
-    m.drawcoastlines(linewidth=0.3)
-    m.drawcountries()
-    return f, ax, c, cmap, vmin, vmax
+    ax.coastlines()
+    ax.gridlines()
+    return fig, ax, c, cmap, vmin, vmax
 
 
 @_default_sns_context
@@ -115,12 +176,12 @@ def make_spatial_contours(
     modelvar,
     gridobj,
     date,
-    m,
-    dpi=None,
     savename="",
     discrete=True,
     ncolors=None,
     dtype="int",
+    fig=None,
+    ax=None,
     **kwargs,
 ):
     """Create a contour plot on a map with optional discrete colorbar.
@@ -133,10 +194,6 @@ def make_spatial_contours(
         Object containing grid information with LAT and LON variables.
     date : datetime.datetime
         Date/time for the plot title.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
-    dpi : int, optional
-        Dots per inch for the figure if saving.
     savename : str, default ""
         If provided, save the figure to this path with date appended.
     discrete : bool, default True
@@ -145,6 +202,10 @@ def make_spatial_contours(
         Number of discrete colors when using discrete colorbar.
     dtype : str, default "int"
         Data type for colorbar tick labels.
+    fig : matplotlib.figure.Figure, optional
+        Figure to plot on.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on.
     **kwargs
         Additional arguments to pass to contourf. Must include 'cmap' and 'levels'.
 
@@ -153,36 +214,34 @@ def make_spatial_contours(
     matplotlib.colorbar.Colorbar
         The colorbar instance.
     """
-    plt.figure(figsize=(11, 6), frameon=False)
-    lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
-    lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
+    if ax is None:
+        fig, ax = _create_map(fig=fig, ax=ax)
+    lat = gridobj.variables["LAT"][0].squeeze()
+    lon = gridobj.variables["LON"][0].squeeze()
     # define map and draw boundaries
-    m.drawstates()
-    m.drawcoastlines(linewidth=0.3)
-    m.drawcountries()
-    x, y = m(lon, lat)
-    plt.axis("off")
-    m.contourf(x, y, modelvar, **kwargs)
-    cmap = kwargs["cmap"]
-    levels = kwargs["levels"]
+    ax.coastlines()
+    ax.gridlines()
+    cs = ax.contourf(lon, lat, modelvar, transform=ccrs.PlateCarree(), **kwargs)
+    cmap = cs.get_cmap()
+    levels = cs.levels
     if discrete:
+        if ncolors is None:
+            ncolors = 10
         c, cmap = colorbar_index(
-            ncolors, cmap, minval=levels[0], maxval=levels[-1], basemap=m, dtype=dtype
+            ncolors, cmap, minval=levels[0], maxval=levels[-1], ax=ax, dtype=dtype
         )
     else:
-        c = m.colorbar()
+        c = fig.colorbar(cs, ax=ax)
     titstring = date.strftime("%B %d %Y %H")
     plt.title(titstring)
 
     plt.tight_layout()
-    if savename != "":
-        plt.savefig(savename + date.strftime("%Y%m%d_%H.jpg"), dpi=dpi)
-        plt.close()
-    return c
+    _savefig(fig, save_name=savename + date.strftime("%Y%m%d_%H.jpg"))
+    return fig, ax
 
 
 @_default_sns_context
-def wind_quiver(ws, wdir, gridobj, m, **kwargs):
+def wind_quiver(ws, wdir, gridobj, ax=None, **kwargs):
     """Create a quiver plot of wind vectors on a map.
 
     Parameters
@@ -193,8 +252,8 @@ def wind_quiver(ws, wdir, gridobj, m, **kwargs):
         2D array of wind directions (meteorological convention, degrees).
     gridobj : object
         Object containing grid information with LAT and LON variables.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on.
     **kwargs
         Additional arguments to pass to quiver. Common options include
         'scale', 'scale_units', and 'width'.
@@ -204,19 +263,28 @@ def wind_quiver(ws, wdir, gridobj, m, **kwargs):
     matplotlib.quiver.Quiver
         The quiver instance.
     """
-    from . import tools
+    from monet.util import tools
 
-    lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
-    lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
+    if ax is None:
+        fig, ax = _create_map(fig=None, ax=ax)
+
+    lat = gridobj.variables["LAT"][0].squeeze()
+    lon = gridobj.variables["LON"][0].squeeze()
     # define map and draw boundaries
-    x, y = m(lon, lat)
     u, v = tools.wsdir2uv(ws, wdir)
-    quiv = m.quiver(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
-    return quiv
+    quiv = ax.quiver(
+        lon[::15, ::15],
+        lat[::15, ::15],
+        u[::15, ::15],
+        v[::15, ::15],
+        transform=ccrs.PlateCarree(),
+        **kwargs,
+    )
+    return fig, ax
 
 
 @_default_sns_context
-def wind_barbs(ws, wdir, gridobj, m, **kwargs):
+def wind_barbs(ws, wdir, gridobj, ax=None, **kwargs):
     """Create a barbs plot of wind on a map.
 
     Parameters
@@ -227,8 +295,8 @@ def wind_barbs(ws, wdir, gridobj, m, **kwargs):
         2D array of wind directions (meteorological convention, degrees).
     gridobj : object
         Object containing grid information with LAT and LON variables.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on.
     **kwargs
         Additional arguments to pass to barbs. Common options include
         'length', 'pivot', and 'barb_increments'.
@@ -237,14 +305,24 @@ def wind_barbs(ws, wdir, gridobj, m, **kwargs):
     -------
     None
     """
-    import tools
+    from monet.util import tools
 
-    lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
-    lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
+    if ax is None:
+        fig, ax = _create_map(fig=None, ax=ax)
+
+    lat = gridobj.variables["LAT"][0].squeeze()
+    lon = gridobj.variables["LON"][0].squeeze()
     # define map and draw boundaries
-    x, y = m(lon, lat)
     u, v = tools.wsdir2uv(ws, wdir)
-    m.barbs(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
+    ax.barbs(
+        lon[::15, ::15],
+        lat[::15, ::15],
+        u[::15, ::15],
+        v[::15, ::15],
+        transform=ccrs.PlateCarree(),
+        **kwargs,
+    )
+    return fig, ax
 
 
 def normval(vmin, vmax, cmap):
@@ -274,16 +352,23 @@ def normval(vmin, vmax, cmap):
 
 @_default_sns_context
 def spatial_bias_scatter(
-    df, m, date, vmin=None, vmax=None, savename="", ncolors=15, fact=1.5, cmap="RdBu_r"
+    df,
+    date,
+    vmin=None,
+    vmax=None,
+    savename="",
+    ncolors=15,
+    fact=1.5,
+    cmap="RdBu_r",
+    fig=None,
+    ax=None,
 ):
-    """Create a scatter plot showing bias between model and observations on a map.
+    """Create a scatter plot showing bias on a map.
 
     Parameters
     ----------
     df : pandas.DataFrame
         DataFrame containing 'latitude', 'longitude', 'CMAQ', and 'Obs' columns.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
     date : str or datetime.datetime
         Date to filter the DataFrame. Only entries matching this date will be plotted.
     vmin : float, optional
@@ -298,6 +383,10 @@ def spatial_bias_scatter(
         Scaling factor for point sizes.
     cmap : str or matplotlib.colors.Colormap, default "RdBu_r"
         Colormap to use for bias values.
+    fig : matplotlib.figure.Figure, optional
+        Figure to plot on.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on.
 
     Returns
     -------
@@ -312,21 +401,22 @@ def spatial_bias_scatter(
     from numpy import around
     from scipy.stats import scoreatpercentile as score
 
-    #    plt.figure(figsize=(11, 6), frameon=False)
-    f, ax = plt.subplots(figsize=(11, 6), frameon=False)
+    fig, ax = _create_map(fig=fig, ax=ax)
+
     ax.set_facecolor("white")
     diff = df.CMAQ - df.Obs
     top = around(score(diff.abs(), per=95))
     new = df[df.datetime == date]
-    x, y = m(new.longitude.values, new.latitude.values)
-    c, cmap = colorbar_index(ncolors, cmap, minval=top * -1, maxval=top, basemap=m)
+    x = new.longitude.values
+    y = new.latitude.values
+    c, cmap = colorbar_index(ncolors, cmap, minval=top * -1, maxval=top, ax=ax)
 
     c.ax.tick_params(labelsize=13)
     #    cmap = cmap_discretize(cmap, ncolors)
     colors = new.CMAQ - new.Obs
     ss = (new.CMAQ - new.Obs).abs() / top * 100.0
     ss[ss > 300] = 300.0
-    plt.scatter(
+    ax.scatter(
         x,
         y,
         c=colors,
@@ -337,12 +427,11 @@ def spatial_bias_scatter(
         edgecolors="k",
         linewidths=0.25,
         alpha=0.7,
+        transform=ccrs.PlateCarree(),
     )
 
-    if savename != "":
-        plt.savefig(savename + date + ".jpg", dpi=75.0)
-        plt.close()
-    return f, ax, c
+    _savefig(fig, save_name=savename)
+    return fig, ax, c
 
 
 @_default_sns_context
