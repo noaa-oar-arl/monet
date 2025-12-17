@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [stable, develop]
+    branches: [stable, develop, feature/interp_improvements]
   pull_request:
-    branches: [stable, develop]
+    branches: [stable, develop, feature/interp_improvements]
   workflow_dispatch:
   schedule:
     - cron: "0 12 * * 1"
