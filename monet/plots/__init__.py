@@ -7,8 +7,8 @@ from .mapgen import draw_map
 from .plots import create_taylor_diagram  # Import with original name
 from .plots import (
     kdeplot,
-    make_spatial_contours,
-    make_spatial_plot,
+    spatial_contourf,
+    spatial_imshow,
     normval,
     scatter,
     spatial,
@@ -32,8 +32,8 @@ __all__ = (
     "mapgen",
     #
     "kdeplot",
-    "make_spatial_contours",
-    "make_spatial_plot",
+    "spatial_contourf",
+    "spatial_imshow",
     "normval",
     "scatter",
     "spatial",

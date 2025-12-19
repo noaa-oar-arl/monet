@@ -32,15 +32,6 @@ df = pd.DataFrame(
 )
 
 
-class GridObj:
-    def __init__(self, da):
-        lons, lats = np.meshgrid(da.lon, da.lat)
-        self.variables = {"LAT": [lats[np.newaxis, np.newaxis, ...]], "LON": [lons[np.newaxis, np.newaxis, ...]]}
-
-
-gridobj = GridObj(da)
-
-
 @pytest.mark.parametrize("which", ["imshow", "map", "contourf"])
 @pytest.mark.skipif(not CARTOPY_AVAILABLE, reason="Cartopy is not installed")
 def test_quick_with_cartopy_ax(which):
@@ -72,31 +63,31 @@ def test_spatial_bias_scatter():
 
 
 @pytest.mark.skipif(not CARTOPY_AVAILABLE, reason="Cartopy is not installed")
-def test_make_spatial_plot():
-    fig, ax, cbar, cmap, vmin, vmax = p.make_spatial_plot(da.values, gridobj)
+def test_spatial_imshow():
+    fig, ax = p.spatial_imshow(da)
     assert isinstance(fig, plt.Figure)
     assert isinstance(ax, plt.Axes)
 
 
 @pytest.mark.skipif(not CARTOPY_AVAILABLE, reason="Cartopy is not installed")
-def test_make_spatial_contours():
-    fig, ax = p.make_spatial_contours(
-        da.values, gridobj, date=pd.to_datetime("2013-01-01 01:00:00"), cmap="viridis", levels=5
-    )
+def test_spatial_contourf():
+    fig, ax = p.spatial_contourf(da, cmap="viridis", levels=5)
     assert isinstance(fig, plt.Figure)
     assert isinstance(ax, plt.Axes)
 
 
 @pytest.mark.skipif(not CARTOPY_AVAILABLE, reason="Cartopy is not installed")
 def test_wind_quiver():
-    fig, ax = p.wind_quiver(da.values, da.values, gridobj)
+    u, v = da, da
+    fig, ax = p.wind_quiver(u, v)
     assert isinstance(fig, plt.Figure)
     assert isinstance(ax, plt.Axes)
 
 
 @pytest.mark.skipif(not CARTOPY_AVAILABLE, reason="Cartopy is not installed")
 def test_wind_barbs():
-    fig, ax = p.wind_barbs(da.values, da.values, gridobj)
+    u, v = da, da
+    fig, ax = p.wind_barbs(u, v)
     assert isinstance(fig, plt.Figure)
     assert isinstance(ax, plt.Axes)
 
@@ -106,8 +97,8 @@ if __name__ == "__main__":
     test_draw_map_counties()
     test_spatial_plot()
     test_spatial_bias_scatter()
-    test_make_spatial_plot()
-    test_make_spatial_contours()
+    test_spatial_imshow()
+    test_spatial_contourf()
     test_wind_quiver()
     test_wind_barbs()
     plt.show()

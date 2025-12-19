@@ -4,7 +4,7 @@ on:
   push:
     branches: [stable, develop, feature/interp_improvements]
   pull_request:
-    branches: [stable, develop, feature/interp_improvements]
+    branches: [**]
   workflow_dispatch:
   schedule:
     - cron: "0 12 * * 1"

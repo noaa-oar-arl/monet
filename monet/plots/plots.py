@@ -4,6 +4,7 @@ import functools
 
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 
 from . import taylordiagram as td
@@ -80,68 +81,32 @@ def spatial_plot(
 
 # Spatial Plots
 @_default_sns_context
-def make_spatial_plot(
-    modelvar, gridobj, plotargs={}, ncolors=15, discrete=False, fig=None, ax=None
+def spatial_imshow(
+    da,
+    ax=None,
+    **kwargs,
 ):
-    """Create a basic spatial plot using imshow.
+    """Create a spatial plot from an xarray.DataArray using imshow.
 
     Parameters
     ----------
-    modelvar : numpy.ndarray
-        2D model variable array to plot.
-    gridobj : object
-        Object containing grid information with LAT and LON variables.
-    plotargs : dict, default {}
-        Additional arguments to pass to imshow. Common options include 'cmap',
-        'vmin', 'vmax', and 'alpha'.
-    ncolors : int, default 15
-        Number of discrete colors when using discrete colorbar.
-    discrete : bool, default False
-        If True, use a discrete colorbar instead of a continuous one.
-    fig : matplotlib.figure.Figure, optional
-        Figure to plot on.
+    da : xarray.DataArray
+        The data to plot.
     ax : matplotlib.axes.Axes, optional
         Axes to plot on.
+    **kwargs
+        Additional keyword arguments to pass to xarray's plot.imshow() method.
 
     Returns
     -------
-    tuple
-        (figure, axes, colorbar, colormap, vmin, vmax)
-        - figure: matplotlib Figure instance
-        - axes: matplotlib Axes instance
-        - colorbar: matplotlib Colorbar instance
-        - colormap: matplotlib Colormap instance
-        - vmin, vmax: minimum and maximum values for the colormap
+    matplotlib.axes.Axes
+        The axes containing the plot.
     """
-    fig, ax = _create_map(fig=fig, ax=ax)
-    lat = gridobj.variables["LAT"][0].squeeze()
-    lon = gridobj.variables["LON"][0].squeeze()
-    # determine colorbar
-    if "cmap" not in plotargs:
-        plotargs["cmap"] = "viridis"
-    extent = (lon.min(), lon.max(), lat.min(), lat.max())
-    if discrete and "vmin" in plotargs and "vmax" in plotargs:
-        c, cmap = colorbar_index(
-            ncolors, plotargs["cmap"], minval=plotargs["vmin"], maxval=plotargs["vmax"], ax=ax
-        )
-        plotargs["cmap"] = cmap
-        ax.imshow(modelvar, extent=extent, **plotargs)
-        vmin, vmax = plotargs["vmin"], plotargs["vmax"]
-    elif discrete:
-        temp = ax.imshow(modelvar, extent=extent, **plotargs)
-        vmin, vmax = temp.get_clim()
-        c, cmap = colorbar_index(ncolors, plotargs["cmap"], minval=vmin, maxval=vmax, ax=ax)
-        plotargs["cmap"] = cmap
-        ax.imshow(modelvar, vmin=vmin, vmax=vmax, extent=extent, **plotargs)
-    else:
-        temp = ax.imshow(modelvar, extent=extent, **plotargs)
-        c = fig.colorbar(temp, ax=ax)
-        vmin, vmax = temp.get_clim()
-        cmap = plotargs["cmap"]
-    # draw borders
+    fig, ax = _create_map(ax=ax)
+    da.plot.imshow(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
     ax.coastlines()
     ax.gridlines()
-    return fig, ax, c, cmap, vmin, vmax
+    return fig, ax
 
 
 @_default_sns_context
@@ -172,111 +137,63 @@ def spatial(modelvar, **kwargs):
 
 
 @_default_sns_context
-def make_spatial_contours(
-    modelvar,
-    gridobj,
-    date,
-    savename="",
-    discrete=True,
-    ncolors=None,
-    dtype="int",
-    fig=None,
+def spatial_contourf(
+    da,
     ax=None,
     **kwargs,
 ):
-    """Create a contour plot on a map with optional discrete colorbar.
+    """Create a spatial plot from an xarray.DataArray using contourf.
 
     Parameters
     ----------
-    modelvar : numpy.ndarray
-        2D model variable array to contour.
-    gridobj : object
-        Object containing grid information with LAT and LON variables.
-    date : datetime.datetime
-        Date/time for the plot title.
-    savename : str, default ""
-        If provided, save the figure to this path with date appended.
-    discrete : bool, default True
-        If True, use a discrete colorbar instead of a continuous one.
-    ncolors : int, optional
-        Number of discrete colors when using discrete colorbar.
-    dtype : str, default "int"
-        Data type for colorbar tick labels.
-    fig : matplotlib.figure.Figure, optional
-        Figure to plot on.
+    da : xarray.DataArray
+        The data to plot.
     ax : matplotlib.axes.Axes, optional
         Axes to plot on.
     **kwargs
-        Additional arguments to pass to contourf. Must include 'cmap' and 'levels'.
+        Additional keyword arguments to pass to xarray's plot.contourf() method.
 
     Returns
     -------
-    matplotlib.colorbar.Colorbar
-        The colorbar instance.
+    matplotlib.axes.Axes
+        The axes containing the plot.
     """
-    if ax is None:
-        fig, ax = _create_map(fig=fig, ax=ax)
-    lat = gridobj.variables["LAT"][0].squeeze()
-    lon = gridobj.variables["LON"][0].squeeze()
-    # define map and draw boundaries
+    fig, ax = _create_map(ax=ax)
+    da.plot.contourf(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
     ax.coastlines()
     ax.gridlines()
-    cs = ax.contourf(lon, lat, modelvar, transform=ccrs.PlateCarree(), **kwargs)
-    cmap = cs.get_cmap()
-    levels = cs.levels
-    if discrete:
-        if ncolors is None:
-            ncolors = 10
-        c, cmap = colorbar_index(
-            ncolors, cmap, minval=levels[0], maxval=levels[-1], ax=ax, dtype=dtype
-        )
-    else:
-        c = fig.colorbar(cs, ax=ax)
-    titstring = date.strftime("%B %d %Y %H")
-    plt.title(titstring)
-
-    plt.tight_layout()
-    _savefig(fig, save_name=savename + date.strftime("%Y%m%d_%H.jpg"))
     return fig, ax
 
 
 @_default_sns_context
-def wind_quiver(ws, wdir, gridobj, ax=None, **kwargs):
+def wind_quiver(u, v, ax=None, **kwargs):
     """Create a quiver plot of wind vectors on a map.
-
     Parameters
     ----------
-    ws : numpy.ndarray
-        2D array of wind speeds.
-    wdir : numpy.ndarray
-        2D array of wind directions (meteorological convention, degrees).
-    gridobj : object
-        Object containing grid information with LAT and LON variables.
+    u : xarray.DataArray
+        2D array of u-component of wind.
+    v : xarray.DataArray
+        2D array of v-component of wind.
     ax : matplotlib.axes.Axes, optional
         Axes to plot on.
     **kwargs
         Additional arguments to pass to quiver. Common options include
         'scale', 'scale_units', and 'width'.
-
     Returns
     -------
     matplotlib.quiver.Quiver
         The quiver instance.
     """
-    from monet.util import tools
-
     if ax is None:
-        fig, ax = _create_map(fig=None, ax=ax)
+        fig, ax = _create_map(ax=ax)
 
-    lat = gridobj.variables["LAT"][0].squeeze()
-    lon = gridobj.variables["LON"][0].squeeze()
+    lon2d, lat2d = np.meshgrid(u.lon, u.lat)
     # define map and draw boundaries
-    u, v = tools.wsdir2uv(ws, wdir)
-    quiv = ax.quiver(
-        lon[::15, ::15],
-        lat[::15, ::15],
-        u[::15, ::15],
-        v[::15, ::15],
+    ax.quiver(
+        lon2d[::15, ::15],
+        lat2d[::15, ::15],
+        u.values[::15, ::15],
+        v.values[::15, ::15],
         transform=ccrs.PlateCarree(),
         **kwargs,
     )
@@ -284,41 +201,33 @@ def wind_quiver(ws, wdir, gridobj, ax=None, **kwargs):
 
 
 @_default_sns_context
-def wind_barbs(ws, wdir, gridobj, ax=None, **kwargs):
+def wind_barbs(u, v, ax=None, **kwargs):
     """Create a barbs plot of wind on a map.
-
     Parameters
     ----------
-    ws : numpy.ndarray
-        2D array of wind speeds.
-    wdir : numpy.ndarray
-        2D array of wind directions (meteorological convention, degrees).
-    gridobj : object
-        Object containing grid information with LAT and LON variables.
+    u : xarray.DataArray
+        2D array of u-component of wind.
+    v : xarray.DataArray
+        2D array of v-component of wind.
     ax : matplotlib.axes.Axes, optional
         Axes to plot on.
     **kwargs
         Additional arguments to pass to barbs. Common options include
-        'length', 'pivot', and 'barb_increments'.
-
+        'length', 'pivot', 'barb_increments'.
     Returns
     -------
     None
     """
-    from monet.util import tools
-
     if ax is None:
-        fig, ax = _create_map(fig=None, ax=ax)
+        fig, ax = _create_map(ax=ax)
 
-    lat = gridobj.variables["LAT"][0].squeeze()
-    lon = gridobj.variables["LON"][0].squeeze()
+    lon2d, lat2d = np.meshgrid(u.lon, u.lat)
     # define map and draw boundaries
-    u, v = tools.wsdir2uv(ws, wdir)
     ax.barbs(
-        lon[::15, ::15],
-        lat[::15, ::15],
-        u[::15, ::15],
-        v[::15, ::15],
+        lon2d[::15, ::15],
+        lat2d[::15, ::15],
+        u.values[::15, ::15],
+        v.values[::15, ::15],
         transform=ccrs.PlateCarree(),
         **kwargs,
     )
