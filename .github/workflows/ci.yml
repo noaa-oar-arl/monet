@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [stable, develop, feature/interp_improvements]
+    branches: ['**']
   pull_request:
-    branches: [**]
+    branches: ['**']
   workflow_dispatch:
   schedule:
     - cron: "0 12 * * 1"
@@ -16,7 +16,7 @@ jobs:
     # if: github.repository == 'noaa-oar-arl/monet'
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12","3.13"]
     defaults:
       run:
         shell: bash -l {0}

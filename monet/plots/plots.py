@@ -166,7 +166,7 @@ def spatial_contourf(
 
 
 @_default_sns_context
-def wind_quiver(u, v, ax=None, **kwargs):
+def wind_quiver(u, v, ax=None, thin=15, **kwargs):
     """Create a quiver plot of wind vectors on a map.
     Parameters
     ----------
@@ -176,6 +176,8 @@ def wind_quiver(u, v, ax=None, **kwargs):
         2D array of v-component of wind.
     ax : matplotlib.axes.Axes, optional
         Axes to plot on.
+    thin : int, optional
+        The thinning factor for the wind vectors. Default is 15.
     **kwargs
         Additional arguments to pass to quiver. Common options include
         'scale', 'scale_units', and 'width'.
@@ -187,13 +189,19 @@ def wind_quiver(u, v, ax=None, **kwargs):
     if ax is None:
         fig, ax = _create_map(ax=ax)
 
-    lon2d, lat2d = np.meshgrid(u.lon, u.lat)
+    # Use isel for semantic, coordinate-based indexing
+    # Assumes 'lat' and 'lon' are dimensions.
+    u_thinned = u.isel(lat=slice(None, None, thin), lon=slice(None, None, thin))
+    v_thinned = v.isel(lat=slice(None, None, thin), lon=slice(None, None, thin))
+
+    lon2d, lat2d = np.meshgrid(u_thinned.lon, u_thinned.lat)
+
     # define map and draw boundaries
     ax.quiver(
-        lon2d[::15, ::15],
-        lat2d[::15, ::15],
-        u.values[::15, ::15],
-        v.values[::15, ::15],
+        lon2d,
+        lat2d,
+        u_thinned.values,
+        v_thinned.values,
         transform=ccrs.PlateCarree(),
         **kwargs,
     )
@@ -201,7 +209,7 @@ def wind_quiver(u, v, ax=None, **kwargs):
 
 
 @_default_sns_context
-def wind_barbs(u, v, ax=None, **kwargs):
+def wind_barbs(u, v, ax=None, thin=15, **kwargs):
     """Create a barbs plot of wind on a map.
     Parameters
     ----------
@@ -211,6 +219,8 @@ def wind_barbs(u, v, ax=None, **kwargs):
         2D array of v-component of wind.
     ax : matplotlib.axes.Axes, optional
         Axes to plot on.
+    thin : int, optional
+        The thinning factor for the wind vectors. Default is 15.
     **kwargs
         Additional arguments to pass to barbs. Common options include
         'length', 'pivot', 'barb_increments'.
@@ -221,13 +231,19 @@ def wind_barbs(u, v, ax=None, **kwargs):
     if ax is None:
         fig, ax = _create_map(ax=ax)
 
-    lon2d, lat2d = np.meshgrid(u.lon, u.lat)
+    # Use isel for semantic, coordinate-based indexing
+    # Assumes 'lat' and 'lon' are dimensions.
+    u_thinned = u.isel(lat=slice(None, None, thin), lon=slice(None, None, thin))
+    v_thinned = v.isel(lat=slice(None, None, thin), lon=slice(None, None, thin))
+
+    lon2d, lat2d = np.meshgrid(u_thinned.lon, u_thinned.lat)
+
     # define map and draw boundaries
     ax.barbs(
-        lon2d[::15, ::15],
-        lat2d[::15, ::15],
-        u.values[::15, ::15],
-        v.values[::15, ::15],
+        lon2d,
+        lat2d,
+        u_thinned.values,
+        v_thinned.values,
         transform=ccrs.PlateCarree(),
         **kwargs,
     )
