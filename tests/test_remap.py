@@ -18,6 +18,9 @@ try:
 except ImportError:
     has_xesmf = False
 
+# Check if monet_regrid is available by checking for the regrid accessor
+has_monet_regrid = hasattr(xr.Dataset, "regrid")
+
 
 @pytest.mark.skipif(not has_xesmf, reason="xesmf not installed")
 def test_import_xesmf():
@@ -55,6 +58,8 @@ def test_remap_ds_ds():
     # Use remap instead of remap_xesmf for new tests generally, but testing backward compat here
     target.monet.remap_xesmf(source, method="nearest_d2s")
 
+
+@pytest.mark.skipif(not has_monet_regrid, reason="monet-regrid not installed or accessor not available")
 def test_combine_da_da():
     # This is used in MM aircraft branch
 
