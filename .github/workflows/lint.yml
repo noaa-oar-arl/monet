@@ -4,19 +4,19 @@ on:
   push:
     branches: [stable, develop]
   pull_request:
-    branches: [stable, develop]
+    # branches: [stable, develop]
   workflow_dispatch:
 
 jobs:
   lint:
     name: pre-commit
     runs-on: ubuntu-latest
-    if: github.repository == 'noaa-oar-arl/monet'
-    steps:
+    # if: github.repository == 'noaa-oar-arl/monet'
+    csteps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.11"
       - uses: pre-commit/action@v3.0.1
 
   # spell:
