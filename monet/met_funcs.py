@@ -14,7 +14,7 @@ References
    https://doi.org/10.1029/2000WR900033.
 """
 
-from typing import Tuple, Union
+from typing import Tuple
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -294,9 +294,9 @@ def calc_sun_angles(
     w = np.asarray((solar_time - 12.0) * 15.0)
 
     # Get solar elevation angle
-    sin_thetha = np.cos(np.radians(w)) * np.cos(declination) * np.cos(np.radians(lat)) + np.sin(
-        declination
-    ) * np.sin(np.radians(lat))
+    sin_thetha = np.cos(np.radians(w)) * np.cos(declination) * np.cos(
+        np.radians(lat)
+    ) + np.sin(declination) * np.sin(np.radians(lat))
     sun_elev = np.arcsin(sin_thetha)
 
     # Get solar zenith angle
@@ -450,7 +450,12 @@ def flux_2_evaporation(
 
 
 def calc_L(
-    ustar: ArrayLike, T_A_K: ArrayLike, rho: ArrayLike, c_p: ArrayLike, H: ArrayLike, LE: ArrayLike
+    ustar: ArrayLike,
+    T_A_K: ArrayLike,
+    rho: ArrayLike,
+    c_p: ArrayLike,
+    H: ArrayLike,
+    LE: ArrayLike,
 ) -> np.ndarray:
     """Calculates the Monin-Obukhov length.
 
@@ -492,7 +497,7 @@ def calc_L(
     L = np.asarray(np.ones(ustar.shape) * float("inf"))
     i = Hv != 0
     L_const = np.asarray(k * gravity / T_A_K)
-    L[i] = -ustar[i] ** 3 / (L_const[i] * (Hv[i] / (rho[i] * c_p[i])))
+    L[i] = -(ustar[i] ** 3) / (L_const[i] * (Hv[i] / (rho[i] * c_p[i])))
     return np.asarray(L)
 
 

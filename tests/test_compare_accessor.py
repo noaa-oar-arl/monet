@@ -11,10 +11,14 @@ def make_test_dataarrays():
     data1 = np.arange(25).reshape(5, 5)
     data2 = data1 + 1
     da1 = xr.DataArray(
-        data1, coords={"latitude": lat, "longitude": lon}, dims=["latitude", "longitude"]
+        data1,
+        coords={"latitude": lat, "longitude": lon},
+        dims=["latitude", "longitude"],
     )
     da2 = xr.DataArray(
-        data2, coords={"latitude": lat, "longitude": lon}, dims=["latitude", "longitude"]
+        data2,
+        coords={"latitude": lat, "longitude": lon},
+        dims=["latitude", "longitude"],
     )
     return da1, da2
 
@@ -26,10 +30,14 @@ def make_dask_test_dataarrays():
     data1 = da.from_array(np.arange(25).reshape(5, 5), chunks=(5, 5))  # type: ignore
     data2 = data1 + 1
     da1 = xr.DataArray(
-        data1, coords={"latitude": lat, "longitude": lon}, dims=["latitude", "longitude"]
+        data1,
+        coords={"latitude": lat, "longitude": lon},
+        dims=["latitude", "longitude"],
     )
     da2 = xr.DataArray(
-        data2, coords={"latitude": lat, "longitude": lon}, dims=["latitude", "longitude"]
+        data2,
+        coords={"latitude": lat, "longitude": lon},
+        dims=["latitude", "longitude"],
     )
     return da1, da2
 

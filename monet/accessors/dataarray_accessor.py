@@ -10,6 +10,7 @@ from .base import BaseAccessor, has_monet_regrid
 has_pyresample = False
 has_xesmf = False
 
+
 @xr.register_dataarray_accessor("monet")
 class MONETAccessor(BaseAccessor):
     """DataArray accessor for MONET functionality."""
@@ -156,11 +157,17 @@ class MONETAccessor(BaseAccessor):
         """
         if return_obj:
             return self._dataset_to_monet(
-                self._obj, lat_name=lat_name, lon_name=lon_name, coards_compliant=coards_compliant
+                self._obj,
+                lat_name=lat_name,
+                lon_name=lon_name,
+                coards_compliant=coards_compliant,
             )
         else:
             self._obj = self._dataset_to_monet(
-                self._obj, lat_name=lat_name, lon_name=lon_name, coards_compliant=coards_compliant
+                self._obj,
+                lat_name=lat_name,
+                lon_name=lon_name,
+                coards_compliant=coards_compliant,
             )
 
     def stratify(self, levels, vertical, axis=1):
@@ -188,7 +195,9 @@ class MONETAccessor(BaseAccessor):
         out = resample_stratify(self._obj, levels, vertical, axis=axis)
         return out
 
-    def interp_constant_lat(self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs):
+    def interp_constant_lat(
+        self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs
+    ):
         """Interpolate data to a constant latitude.
 
         Parameters
@@ -225,6 +234,7 @@ class MONETAccessor(BaseAccessor):
 
         # Use new regridding
         from ..util.resample import resample
+
         out = resample(self._obj, target, **kwargs)
         return self._rename_latlon(out)
 
@@ -256,10 +266,12 @@ class MONETAccessor(BaseAccessor):
 
         # Create target grid
         from ..util.interp_util import constant_1d_xesmf
+
         target = constant_1d_xesmf(latitude=latitude, longitude=longitude)
 
         # Use new regridding
         from ..util.resample import resample
+
         out = resample(self._obj, target, **kwargs)
         return self._rename_latlon(out)
 
@@ -281,7 +293,6 @@ class MONETAccessor(BaseAccessor):
             (i, j) indices of nearest point(s).
         """
         raise NotImplementedError("nearest_ij is not yet implemented with monet-regrid")
-
 
     def nearest_latlon(self, lat=None, lon=None, cleanup=True, esmf=False, **kwargs):
         """Extract data at nearest lat/lon point(s).
@@ -305,7 +316,7 @@ class MONETAccessor(BaseAccessor):
             DataArray at nearest point(s).
         """
         if lat is None or lon is None:
-             raise ValueError("Must provide latitude and longitude")
+            raise ValueError("Must provide latitude and longitude")
 
         self._obj = self._rename_latlon(self._obj)
 
@@ -336,7 +347,12 @@ class MONETAccessor(BaseAccessor):
 
         da = self._dataset_to_monet(self._obj)
         return plot_quick_imshow(
-            da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs
+            da,
+            map_kws=map_kws,
+            projection=projection,
+            colorbar=colorbar,
+            figsize=figsize,
+            **kwargs,
         )
 
     def quick_map(
@@ -353,7 +369,12 @@ class MONETAccessor(BaseAccessor):
 
         da = self._dataset_to_monet(self._obj)
         return plot_quick_map(
-            da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs
+            da,
+            map_kws=map_kws,
+            projection=projection,
+            colorbar=colorbar,
+            figsize=figsize,
+            **kwargs,
         )
 
     def quick_contourf(
@@ -370,7 +391,12 @@ class MONETAccessor(BaseAccessor):
 
         da = self._dataset_to_monet(self._obj)
         return plot_quick_contourf(
-            da, map_kws=map_kws, projection=projection, colorbar=colorbar, figsize=figsize, **kwargs
+            da,
+            map_kws=map_kws,
+            projection=projection,
+            colorbar=colorbar,
+            figsize=figsize,
+            **kwargs,
         )
 
     def _tight_layout(self):
@@ -434,15 +460,14 @@ class MONETAccessor(BaseAccessor):
         source_shape = self._obj.shape if hasattr(self._obj, "shape") else None
 
         if is_dask and target_shape is not None and target_shape != source_shape:
-             source = self._dataset_to_monet(self._obj)
-             target = self._dataset_to_monet(data)
+            source = self._dataset_to_monet(self._obj)
+            target = self._dataset_to_monet(data)
         else:
-             source = self._dataset_to_monet(data)
-             target = self._dataset_to_monet(self._obj)
+            source = self._dataset_to_monet(data)
+            target = self._dataset_to_monet(self._obj)
 
         out = resample.resample(source, target, method=method, **kwargs)
         return self._rename_to_monet_latlon(out)
-
 
     def remap_nearest(self, data, radius_of_influence=1e6, **kwargs):
         """Deprecated: Remap data using nearest neighbor interpolation."""
@@ -450,9 +475,11 @@ class MONETAccessor(BaseAccessor):
             "remap_nearest is deprecated and will be removed in a future version. "
             "Please use remap(data, method='nearest') instead.",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
-        return self.remap(data, method="nearest", radius_of_influence=radius_of_influence, **kwargs)
+        return self.remap(
+            data, method="nearest", radius_of_influence=radius_of_influence, **kwargs
+        )
 
     def remap_xesmf(self, data, **kwargs):
         """Deprecated: Remap data using xESMF regridding."""
@@ -460,7 +487,7 @@ class MONETAccessor(BaseAccessor):
             "remap_xesmf is deprecated and will be removed in a future version. "
             "Please use remap(data, method='xesmf') or remap(data, method='conservative') instead.",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
         # Handle method argument from kwargs
         if "method" in kwargs:
@@ -491,16 +518,18 @@ class MONETAccessor(BaseAccessor):
 
         da = self._dataset_to_monet(self._obj)
         if isinstance(data, pd.DataFrame):
-             return combine_da_to_df(da, data, **kwargs)
+            return combine_da_to_df(da, data, **kwargs)
         else:
             print("`data` must be a pandas.DataFrame")
 
-    def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
+    def remap_nearest_parallel(
+        self, data, radius_of_influence=1e6, n_processes=None, **kwargs
+    ):
         """Deprecated: Remap data using nearest neighbor interpolation with parallel processing."""
         warnings.warn(
             "remap_nearest_parallel is deprecated. monet-regrid uses dask for parallelization.",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
         return self.remap(data, method="nearest", **kwargs)
 
@@ -509,15 +538,21 @@ class MONETAccessor(BaseAccessor):
 
         Deprecated as ESMF dependency is removed.
         """
-        raise NotImplementedError("This function relies on ESMF which has been removed.")
+        raise NotImplementedError(
+            "This function relies on ESMF which has been removed."
+        )
 
     def to_area_def(self, projection="platea", resolution=None, area_id=None):
         """Deprecated: Convert the dataarray's coordinates to a pyresample AreaDefinition."""
-        raise NotImplementedError("This function relies on pyresample which has been removed.")
+        raise NotImplementedError(
+            "This function relies on pyresample which has been removed."
+        )
 
     def to_swath_def(self):
         """Deprecated: Convert the dataarray's coordinates to a pyresample SwathDefinition."""
-        raise NotImplementedError("This function relies on pyresample which has been removed.")
+        raise NotImplementedError(
+            "This function relies on pyresample which has been removed."
+        )
 
     def compare(
         self,
@@ -580,16 +615,24 @@ class MONETAccessor(BaseAccessor):
                 except (ImportError, AttributeError) as e:
                     # fallback to built-in
                     if stat.lower() == "rmse":
-                        stat_da = np.sqrt(((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None)))
+                        stat_da = np.sqrt(
+                            ((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None))
+                        )
                     elif stat.lower() == "mae":
-                        stat_da = np.abs(da1 - da2).mean(dim=stat_kwargs.get("dim", None))
+                        stat_da = np.abs(da1 - da2).mean(
+                            dim=stat_kwargs.get("dim", None)
+                        )
                     elif stat.lower() == "mse":
-                        stat_da = ((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None))
+                        stat_da = ((da1 - da2) ** 2).mean(
+                            dim=stat_kwargs.get("dim", None)
+                        )
                     else:
                         raise ValueError(f"Unknown stat: {stat}") from e
         else:
             raise ValueError(f"Unknown stat: {stat}")
-        stat_da.name = stat if isinstance(stat, str) else getattr(stat, "__name__", "statistic")
+        stat_da.name = (
+            stat if isinstance(stat, str) else getattr(stat, "__name__", "statistic")
+        )
         if plot:
             plot_func = getattr(stat_da.monet, plot_method)
             return plot_func(**plot_kwargs)

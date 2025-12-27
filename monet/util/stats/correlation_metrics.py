@@ -45,7 +45,11 @@ def R2(obs, mod, axis=None):
         xr = None
     from scipy.stats import pearsonr
 
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         if axis is None:
             axis = -1
@@ -139,7 +143,11 @@ def RMSE(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         return ((mod - obs) ** 2).mean(dim=axis) ** 0.5
     elif hasattr(obs, "mean") and hasattr(mod, "mean"):
@@ -184,7 +192,11 @@ def WDRMSE_m(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         arr = (circlebias_m(mod - obs)) ** 2
         if axis is None:
@@ -197,7 +209,9 @@ def WDRMSE_m(obs, mod, axis=None):
             else:
                 raise ValueError("axis must be int or str for xarray.DataArray")
             if not isinstance(dim, (str, list, tuple)):
-                raise TypeError("dim must be a string, list, or tuple for xarray.DataArray.mean")
+                raise TypeError(
+                    "dim must be a string, list, or tuple for xarray.DataArray.mean"
+                )
             return arr.mean(dim=dim) ** 0.5
         else:
             return arr.mean(axis=axis) ** 0.5
@@ -243,7 +257,11 @@ def WDRMSE(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         arr = (circlebias(mod - obs)) ** 2
         if axis is None:
@@ -261,9 +279,13 @@ def WDRMSE(obs, mod, axis=None):
             elif isinstance(dim, (tuple, list)):
                 dim = [str(d) for d in dim]
                 if not all(isinstance(d, str) for d in dim):
-                    raise TypeError("All elements of dim must be str for xarray.DataArray.mean")
+                    raise TypeError(
+                        "All elements of dim must be str for xarray.DataArray.mean"
+                    )
             else:
-                raise TypeError("dim must be a string or list of strings for xarray.DataArray.mean")
+                raise TypeError(
+                    "dim must be a string or list of strings for xarray.DataArray.mean"
+                )
             if not (
                 isinstance(dim, str)
                 or (isinstance(dim, list) and all(isinstance(d, str) for d in dim))
@@ -444,7 +466,11 @@ def d1(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         pass
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         num = abs(obs - mod).sum(dim=axis)
         mean_obs = obs.mean(dim=axis)
@@ -499,7 +525,11 @@ def E1(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         pass
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         num = abs(obs - mod).sum(dim=axis)
         denom = abs(obs - obs.mean(dim=axis)).sum(dim=axis)
@@ -553,7 +583,11 @@ def IOA_m(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         pass
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         obsmean = obs.mean(dim=axis)
         num = ((obs - mod) ** 2).sum(dim=axis)
@@ -567,7 +601,9 @@ def IOA_m(obs, mod, axis=None):
     else:
         obsmean = obs.mean(axis=axis)
         num = (np.ma.abs(obs - mod) ** 2).sum(axis=axis)
-        denom = ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis)
+        denom = ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(
+            axis=axis
+        )
         return 1.0 - (num / denom)
 
 
@@ -608,7 +644,11 @@ def IOA(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         pass
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         obsmean = obs.mean(dim=axis)
         num = ((obs - mod) ** 2).sum(dim=axis)
@@ -622,7 +662,9 @@ def IOA(obs, mod, axis=None):
     else:
         obsmean = obs.mean(axis=axis)
         num = (np.ma.abs(obs - mod) ** 2).sum(axis=axis)
-        denom = ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(axis=axis)
+        denom = ((np.ma.abs(mod - obsmean) + np.ma.abs(obs - obsmean)) ** 2).sum(
+            axis=axis
+        )
         return 1.0 - (num / denom)
 
 
@@ -683,7 +725,11 @@ def WDIOA(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         num = abs(obs - mod).sum(dim=axis)
         mean_obs = obs.mean(dim=axis)
@@ -697,7 +743,9 @@ def WDIOA(obs, mod, axis=None):
     else:
         num = np.ma.sum(np.ma.abs(obs - mod), axis=axis)
         mean_obs = np.ma.mean(obs, axis=axis)
-        denom = np.ma.sum(np.ma.abs(mod - mean_obs) + np.ma.abs(obs - mean_obs), axis=axis)
+        denom = np.ma.sum(
+            np.ma.abs(mod - mean_obs) + np.ma.abs(obs - mean_obs), axis=axis
+        )
         return 1.0 - (num / denom)
 
 
@@ -732,12 +780,18 @@ def AC(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         obs_bar = obs.mean(dim=axis)
         mod_bar = mod.mean(dim=axis)
         p1 = ((mod - mod_bar) * (obs - obs_bar)).sum(dim=axis)
-        p2 = (((mod - mod_bar) ** 2).sum(dim=axis) * ((obs - obs_bar) ** 2).sum(dim=axis)) ** 0.5
+        p2 = (
+            ((mod - mod_bar) ** 2).sum(dim=axis) * ((obs - obs_bar) ** 2).sum(dim=axis)
+        ) ** 0.5
         return p1 / p2
     elif hasattr(obs, "mean") and hasattr(mod, "mean"):
         obs_bar = np.mean(obs, axis=axis)
@@ -746,7 +800,10 @@ def AC(obs, mod, axis=None):
             obs_bar = np.expand_dims(obs_bar, axis=axis)
             mod_bar = np.expand_dims(mod_bar, axis=axis)
         p1 = ((mod - mod_bar) * (obs - obs_bar)).sum(axis=axis)
-        p2 = (((mod - mod_bar) ** 2).sum(axis=axis) * ((obs - obs_bar) ** 2).sum(axis=axis)) ** 0.5
+        p2 = (
+            ((mod - mod_bar) ** 2).sum(axis=axis)
+            * ((obs - obs_bar) ** 2).sum(axis=axis)
+        ) ** 0.5
         return p1 / p2
     else:
         obs_bar = np.ma.mean(obs, axis=axis)
@@ -755,7 +812,10 @@ def AC(obs, mod, axis=None):
             obs_bar = np.ma.expand_dims(obs_bar, axis=axis)
             mod_bar = np.ma.expand_dims(mod_bar, axis=axis)
         p1 = ((mod - mod_bar) * (obs - obs_bar)).sum(axis=axis)
-        p2 = (((mod - mod_bar) ** 2).sum(axis=axis) * ((obs - obs_bar) ** 2).sum(axis=axis)) ** 0.5
+        p2 = (
+            ((mod - mod_bar) ** 2).sum(axis=axis)
+            * ((obs - obs_bar) ** 2).sum(axis=axis)
+        ) ** 0.5
         return p1 / p2
 
 
@@ -808,7 +868,8 @@ def WDAC(obs, mod, axis=None):
         mod_anom = mod_rad - np.mean(mod_rad, axis=axis)
         numerator = np.mean(np.sin(obs_anom) * np.sin(mod_anom), axis=axis)
         denominator = np.sqrt(
-            np.mean(np.sin(obs_anom) ** 2, axis=axis) * np.mean(np.sin(mod_anom) ** 2, axis=axis)
+            np.mean(np.sin(obs_anom) ** 2, axis=axis)
+            * np.mean(np.sin(mod_anom) ** 2, axis=axis)
         )
         return numerator / denominator
 
@@ -855,7 +916,11 @@ def taylor_skill(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         std_obs = float(obs.std(dim=axis))
         std_mod = float(mod.std(dim=axis))
@@ -872,7 +937,9 @@ def taylor_skill(obs, mod, axis=None):
             corr = float(pearsonr(obs.compressed(), mod.compressed())[0])  # type: ignore
         else:
             corr = float(pearsonr(obs, mod)[0])  # type: ignore
-        return (4.0 * corr * std_mod * std_obs) / ((std_mod**2 + std_obs**2) * (1.0 + corr) ** 2)
+        return (4.0 * corr * std_mod * std_obs) / (
+            (std_mod**2 + std_obs**2) * (1.0 + corr) ** 2
+        )
 
 
 def KGE(obs, mod, axis=None):
@@ -918,7 +985,11 @@ def KGE(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         r = float(xr.corr(obs, mod, dim=axis))
         alpha = float(mod.std(dim=axis) / obs.std(dim=axis))
@@ -968,7 +1039,11 @@ def spearmanr(obs, mod, axis=None):
         xr = None
     from scipy.stats import spearmanr as _spearmanr
 
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         if axis is None:
             axis = -1
@@ -1039,7 +1114,11 @@ def kendalltau(obs, mod, axis=None):
         xr = None
     from scipy.stats import kendalltau as _kendalltau
 
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         # Default to last dimension if axis is None
         if axis is None:

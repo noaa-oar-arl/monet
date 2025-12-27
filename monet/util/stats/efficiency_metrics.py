@@ -28,7 +28,11 @@ def NSE(obs, mod, axis=None):
         import xarray as xr
     except ImportError:
         xr = None
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         num = ((mod - obs) ** 2).sum(dim=axis)
         denom = ((obs - obs.mean(dim=axis)) ** 2).sum(dim=axis)

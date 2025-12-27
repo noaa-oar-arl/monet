@@ -128,7 +128,9 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
         if logo_height is not None:
             add_logo_kwargs["height"] = logo_height
         if ext.lower() not in {"png", "jpg", "jpeg"}:
-            raise ValueError(f"only PNG and JPEG supported, but detected extension is {ext!r}")
+            raise ValueError(
+                f"only PNG and JPEG supported, but detected extension is {ext!r}"
+            )
 
         img = Image.open(fname)
         dc = DecoratorAGG(img)  # cursor starts top-left

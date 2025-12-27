@@ -101,7 +101,9 @@ def MNB(
         and isinstance(mod, xr.DataArray)
     ):
         obs, mod = obs.align(mod, join="inner")
-        return ((mod - obs) / obs).mean(dim=obs.dims[axis] if axis is not None else None) * 100.0
+        return ((mod - obs) / obs).mean(
+            dim=obs.dims[axis] if axis is not None else None
+        ) * 100.0
     else:
         return np.ma.masked_invalid((mod - obs) / obs).mean(axis=axis) * 100.0
 
@@ -135,7 +137,9 @@ def MNE(
         and isinstance(mod, xr.DataArray)
     ):
         obs, mod = obs.align(mod, join="inner")
-        return (abs(mod - obs) / obs).mean(dim=obs.dims[axis] if axis is not None else None) * 100.0
+        return (abs(mod - obs) / obs).mean(
+            dim=obs.dims[axis] if axis is not None else None
+        ) * 100.0
     else:
         return np.ma.masked_invalid(np.ma.abs(mod - obs) / obs).mean(axis=axis) * 100.0
 
@@ -207,7 +211,10 @@ def MdnNE(
         obs, mod = xr.align(obs, mod, join="inner")
         return (abs(mod - obs) / obs).median(dim=axis) * 100.0
     else:
-        return np.ma.median(np.ma.masked_invalid(np.ma.abs(mod - obs) / obs), axis=axis) * 100.0
+        return (
+            np.ma.median(np.ma.masked_invalid(np.ma.abs(mod - obs) / obs), axis=axis)
+            * 100.0
+        )
 
 
 def NMdnGE(
@@ -243,7 +250,10 @@ def NMdnGE(
         return (abs(mod - obs).mean(dim=axis) / obs.mean(dim=axis)) * 100.0
     else:
         return (
-            np.ma.masked_invalid(np.ma.abs(mod - obs).mean(axis=axis) / obs.mean(axis=axis)) * 100.0
+            np.ma.masked_invalid(
+                np.ma.abs(mod - obs).mean(axis=axis) / obs.mean(axis=axis)
+            )
+            * 100.0
         )
 
 
@@ -834,7 +844,9 @@ def sMAPE(
         obs, mod = xr.align(obs, mod, join="inner")
         return (200 * abs(mod - obs) / (abs(mod) + abs(obs))).mean(dim=axis)
     else:
-        return (200 * np.ma.abs(mod - obs) / (np.ma.abs(mod) + np.ma.abs(obs))).mean(axis=axis)
+        return (200 * np.ma.abs(mod - obs) / (np.ma.abs(mod) + np.ma.abs(obs))).mean(
+            axis=axis
+        )
 
 
 def CRMSE(

@@ -131,13 +131,15 @@ class TaylorDiagram:
 
         # Add reference point and stddev contour
         print("Reference std:", self.refstd)
-        (l,) = self.ax.plot([0], self.refstd, "r*", ls="", ms=14, label=label, zorder=10)
+        (line,) = self.ax.plot(
+            [0], self.refstd, "r*", ls="", ms=14, label=label, zorder=10
+        )
         t = np.linspace(0, np.pi / 2)
         r = np.zeros_like(t) + self.refstd
         self.ax.plot(t, r, "k--", label="_")
 
         # Collect sample points for latter use (e.g. legend)
-        self.samplePoints = [l]
+        self.samplePoints = [line]
 
     @_sns_context
     def add_sample(self, stddev, corrcoef, *args, **kwargs):
@@ -165,10 +167,12 @@ class TaylorDiagram:
         Points closer to the reference point indicate better agreement with
         the reference dataset.
         """
-        (l,) = self.ax.plot(np.arccos(corrcoef), stddev, *args, **kwargs)  # (theta,radius)
-        self.samplePoints.append(l)
+        (line,) = self.ax.plot(
+            np.arccos(corrcoef), stddev, *args, **kwargs
+        )  # (theta,radius)
+        self.samplePoints.append(line)
 
-        return l
+        return line
 
     @_sns_context
     def add_contours(self, levels=5, **kwargs):
@@ -195,7 +199,9 @@ class TaylorDiagram:
         of differences in standard deviation and correlation.
         """
 
-        rs, ts = np.meshgrid(np.linspace(self.smin, self.smax), np.linspace(0, np.pi / 2))
+        rs, ts = np.meshgrid(
+            np.linspace(self.smin, self.smax), np.linspace(0, np.pi / 2)
+        )
         # Compute centered RMS difference
         rms = np.sqrt(self.refstd**2 + rs**2 - 2 * self.refstd * rs * np.cos(ts))
 
@@ -216,7 +222,9 @@ if __name__ == "__main__":
     m3 = np.sin(x - np.pi / 10)  # Model 3
 
     # Compute stddev and correlation coefficient of models
-    samples = np.array([[m.std(ddof=1), np.corrcoef(data, m)[0, 1]] for m in (m1, m2, m3)])
+    samples = np.array(
+        [[m.std(ddof=1), np.corrcoef(data, m)[0, 1]] for m in (m1, m2, m3)]
+    )
 
     fig = plt.figure(figsize=(10, 4))
 
@@ -234,7 +242,12 @@ if __name__ == "__main__":
     # Add samples to Taylor diagram
     for i, (stddev, corrcoef) in enumerate(samples):
         dia.add_sample(
-            stddev, corrcoef, marker="s", ls="", c=colors_[i], label="Model %d" % (i + 1)
+            stddev,
+            corrcoef,
+            marker="s",
+            ls="",
+            c=colors_[i],
+            label="Model %d" % (i + 1),
         )
 
     # Add RMS contours, and label them

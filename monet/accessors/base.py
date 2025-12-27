@@ -177,7 +177,10 @@ class BaseAccessor:
                 if "standard_name" in ds[var].attrs:
                     if ds[var].attrs["standard_name"] in ["latitude", "grid_latitude"]:
                         lat_name = var
-                    elif ds[var].attrs["standard_name"] in ["longitude", "grid_longitude"]:
+                    elif ds[var].attrs["standard_name"] in [
+                        "longitude",
+                        "grid_longitude",
+                    ]:
                         lon_name = var
 
             if lat_name is not None and lon_name is not None:
@@ -240,7 +243,9 @@ class BaseAccessor:
                     dset, lat_name="grid_yt", lon_name="grid_xt"
                 )
             elif isinstance(dset, xr.Dataset):
-                dset = BaseAccessor._coards_to_netcdf(dset, lat_name="grid_yt", lon_name="grid_xt")
+                dset = BaseAccessor._coards_to_netcdf(
+                    dset, lat_name="grid_yt", lon_name="grid_xt"
+                )
 
         # Handle WRF dimensions
         if "south_north" in dset.dims:  # WRF WPS file
@@ -266,22 +271,34 @@ class BaseAccessor:
         if isinstance(dset, xr.Dataset):
             for var in dset.variables:
                 if "standard_name" in dset[var].attrs:
-                    if dset[var].attrs["standard_name"] in ["latitude", "grid_latitude"]:
+                    if dset[var].attrs["standard_name"] in [
+                        "latitude",
+                        "grid_latitude",
+                    ]:
                         lat_name = var
-                    elif dset[var].attrs["standard_name"] in ["longitude", "grid_longitude"]:
+                    elif dset[var].attrs["standard_name"] in [
+                        "longitude",
+                        "grid_longitude",
+                    ]:
                         lon_name = var
 
         # Rename lat/lon coordinates to 'latitude'/'longitude'
         dset = BaseAccessor._rename_to_monet_latlon(dset)  # common cases
         if (
-            isinstance(dset, xr.Dataset) and not {"latitude", "longitude"} <= set(dset.variables)
-        ) or (isinstance(dset, xr.DataArray) and not {"latitude", "longitude"} <= set(dset.coords)):
+            isinstance(dset, xr.Dataset)
+            and not {"latitude", "longitude"} <= set(dset.variables)
+        ) or (
+            isinstance(dset, xr.DataArray)
+            and not {"latitude", "longitude"} <= set(dset.coords)
+        ):
             dset = dset.rename({lat_name: "latitude", lon_name: "longitude"})
 
         # Maybe wrap longitudes
         if lon180 is None:
             try:
-                lon180 = dset["longitude"].min() >= -180 and dset["longitude"].max() < 180
+                lon180 = (
+                    dset["longitude"].min() >= -180 and dset["longitude"].max() < 180
+                )
             except (ValueError, TypeError):
                 # Handle case where longitude might be multidimensional
                 if dset["longitude"].ndim > 1:
@@ -299,7 +316,9 @@ class BaseAccessor:
 
         # Maybe convert 1-D lat/lon coords to 2-D
         if latlon2d is None:
-            latlon2d = dset["latitude"].ndim >= 2 if "latitude" in dset.coords else False
+            latlon2d = (
+                dset["latitude"].ndim >= 2 if "latitude" in dset.coords else False
+            )
 
         if not latlon2d:
             try:
@@ -515,9 +534,15 @@ class BaseAccessor:
         """
         if return_obj:
             return self._dataset_to_monet(
-                self._obj, lat_name=lat_name, lon_name=lon_name, coards_compliant=coards_compliant
+                self._obj,
+                lat_name=lat_name,
+                lon_name=lon_name,
+                coards_compliant=coards_compliant,
             )
         else:
             self._obj = self._dataset_to_monet(
-                self._obj, lat_name=lat_name, lon_name=lon_name, coards_compliant=coards_compliant
+                self._obj,
+                lat_name=lat_name,
+                lon_name=lon_name,
+                coards_compliant=coards_compliant,
             )

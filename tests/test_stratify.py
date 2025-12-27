@@ -69,7 +69,9 @@ def test_accessor_stratify_ds(model):
     ds = model
     old_coord = model.height
     new_coord_vals = xr.DataArray(data=np.linspace(0, 1, 10), dims="z")
-    ds_interped = model.monet.stratify(levels=new_coord_vals, vertical=old_coord, axis=0)
+    ds_interped = model.monet.stratify(
+        levels=new_coord_vals, vertical=old_coord, axis=0
+    )
 
     assert set(ds_interped.dims) == {"z", "y", "x"}
     assert ds_interped.z.size == 10

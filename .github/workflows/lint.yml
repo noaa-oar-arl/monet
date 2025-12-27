@@ -1,30 +1,41 @@
-name: Lint
+name: Linting
 
 on:
   push:
-    branches: [stable, develop]
+    branches: [stable, master, develop, 'refactor/**']
   pull_request:
-    # branches: [stable, develop]
-  workflow_dispatch:
+    branches: [stable, master, develop, 'feature/**']
 
 jobs:
-  lint:
-    name: pre-commit
+  ruff:
+    name: Lint and Format with Ruff
     runs-on: ubuntu-latest
-    # if: github.repository == 'noaa-oar-arl/monet'
-    csteps:
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Check Formatting (Black style)
+        run: ruff format --check .
+
+      - name: Lint (Flake8/Isort style)
+        # --fix can be added locally, but in CI we just want to check
+        # --exit-zero can be added if you don't want it to fail the build yet
+        run: ruff check .
+
+  # Keep YAML linting to ensure workflow files are correct
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - uses: pre-commit/action@v3.0.1
-
-  # spell:
-  #   name: codespell
-  #   runs-on: ubuntu-latest
-  #   if: github.repository == 'noaa-oar-arl/monet'
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: codespell-project/actions-codespell@v2
-  #       with:
-  #         exclude_file: .codespell-exclude
+      - name: Install yamllint
+        run: pip install yamllint
+      - name: Run yamllint
+        run: yamllint .github/workflows/*.yml

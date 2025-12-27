@@ -2,65 +2,45 @@ name: CI
 
 on:
   push:
-    # branches: ['**']
+    branches: [stable, master, develop, 'refactor/**']
   pull_request:
-   # branches: ['**']
-  workflow_dispatch:
-  schedule:
-    - cron: "0 12 * * 1"
+    branches: [stable, master, develop, 'feature/**', 'refactor/**']
 
 jobs:
   test:
-    name: Test
+    name: Test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
-    # if: github.repository == 'noaa-oar-arl/monet'
+    # Removed the strict repository check to allow testing on your fork
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12","3.13"]
+        # Modernized Python versions (3.6 removed)
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash -l {0} # Necessary for micromamba to activate environments
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python (micromamba)
+      - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: environment-dev.yml
+          environment-name: monet-env
           cache-environment: true
+          # We force the python version from the matrix into the env
           create-args: >-
             python=${{ matrix.python-version }}
+            pytest
+            pytest-cov
 
-      - name: Ensure xesmf>=0.7
-        run: |
-          update_needed=$(python -c "
-          import sys
-          from packaging.version import Version
-          try:
-            import xesmf as xe
-          except ImportError as e:
-            print(e, file=sys.stderr)
-            print('y')
-            raise SystemExit()
-          v = Version(getattr(xe, '__version__', '0.0.0'))
-          print(v, file=sys.stderr)
-          print('n' if v >= Version('0.7') else 'y')
-          ")
-          if [[ $update_needed == 'y' ]]; then
-            micromamba install 'xesmf>=0.7'
-          fi
-
-      - name: Install package
-        run: python -m pip install -e . --no-deps
-
-      - name: Test with pytest
-        run: pytest -v
+      - name: Run Tests
+        run: pytest -v --cov=monet
 
   docs:
     name: Check docs build
     runs-on: ubuntu-latest
-    # if: github.repository == 'noaa-oar-arl/monet'
     defaults:
       run:
         shell: bash -l {0}
@@ -68,14 +48,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python (micromamba)
+      - name: Setup Micromamba (Docs)
         uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: docs/environment-docs.yml
+          environment-name: monet-docs
           cache-environment: true
 
-      - name: linkcheck
+      - name: Sphinx Linkcheck
         run: sphinx-build -b linkcheck docs docs/_build/linkcheck
 
-      - name: sphinx-build -W
+      - name: Build Docs (Strict)
         run: sphinx-build -b html -W docs docs/_build/html

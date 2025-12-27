@@ -2,7 +2,7 @@
 Utility tools for MONET.
 """
 
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -284,9 +284,7 @@ def linregress(x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float, float
     return a, b, rsquared, std_err
 
 
-def findclosest(
-    list_obj: list, value: float
-) -> Tuple[int, float]:
+def findclosest(list_obj: list, value: float) -> Tuple[int, float]:
     """Find the index and value of the closest element to a target value.
 
     Parameters
@@ -392,9 +390,7 @@ def wsdir2uv(ws: np.ndarray, wdir: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     return u, v
 
 
-def get_relhum(
-    temp: np.ndarray, press: np.ndarray, vap: np.ndarray
-) -> np.ndarray:
+def get_relhum(temp: np.ndarray, press: np.ndarray, vap: np.ndarray) -> np.ndarray:
     """Calculate relative humidity from temperature, pressure and vapor pressure.
 
     Parameters
@@ -432,7 +428,9 @@ def long_to_wide(df: pd.DataFrame) -> pd.DataFrame:
     pandas.DataFrame
         DataFrame in wide format with variables as columns
     """
-    w = df.pivot_table(values="obs", index=["time", "siteid"], columns="variable").reset_index()
+    w = df.pivot_table(
+        values="obs", index=["time", "siteid"], columns="variable"
+    ).reset_index()
     g = df.groupby("variable")
     for name, group in g:
         w[name + "_unit"] = group.units.unique()[0]
@@ -470,7 +468,10 @@ def calc_8hr_rolling_max(
         .dropna()
     )
     df_rolling_max = (
-        df_rolling.groupby("siteid").resample("D", on="time_local").max().reset_index(drop=True)
+        df_rolling.groupby("siteid")
+        .resample("D", on="time_local")
+        .max()
+        .reset_index(drop=True)
     )
     df = df.reset_index(drop=True)
     return df.merge(df_rolling_max, on=["siteid", "time_local"])
@@ -614,7 +615,9 @@ def get_giorgi_region_df(df: pd.DataFrame) -> pd.DataFrame:
     df["GIORGI_INDEX"] = None
     df["GIORGI_ACRO"] = None
     for i in range(22):
-        latmin, lonmin, latmax, lonmax, acro = get_giorgi_region_bounds(index=int(i + 1))
+        latmin, lonmin, latmax, lonmax, acro = get_giorgi_region_bounds(
+            index=int(i + 1)
+        )
         con = (
             (df.longitude <= lonmax)
             & (df.longitude >= lonmin)

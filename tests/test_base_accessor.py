@@ -17,7 +17,9 @@ def make_da():
     lat = np.linspace(30, 40, 5)
     lon = np.linspace(-90, -80, 4)
     data = np.random.rand(5, 4)
-    da = xr.DataArray(data, coords={"lat": lat, "lon": lon}, dims=("lat", "lon"), name="var")
+    da = xr.DataArray(
+        data, coords={"lat": lat, "lon": lon}, dims=("lat", "lon"), name="var"
+    )
     return da
 
 

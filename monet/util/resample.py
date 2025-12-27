@@ -1,6 +1,4 @@
-
 import xarray as xr
-import monet_regrid
 
 
 def resample(source_data, target_grid, method="nearest", **kwargs):
@@ -43,13 +41,21 @@ def resample(source_data, target_grid, method="nearest", **kwargs):
         elif xesmf_method == "conservative":
             real_method = "conservative"
         else:
-            real_method = "linear" # Fallback
+            real_method = "linear"  # Fallback
     else:
         real_method = method_map.get(method, method)
 
-    if real_method not in ["nearest", "linear", "conservative", "cubic", "least_common", "most_common", "stat"]:
-         # Fallback?
-         pass
+    if real_method not in [
+        "nearest",
+        "linear",
+        "conservative",
+        "cubic",
+        "least_common",
+        "most_common",
+        "stat",
+    ]:
+        # Fallback?
+        pass
 
     # Ensure target_grid is a Dataset as required by monet-regrid for curvilinear/some methods
     if isinstance(target_grid, xr.DataArray):
@@ -63,9 +69,10 @@ def resample(source_data, target_grid, method="nearest", **kwargs):
         if regridder:
             return regridder(target_grid, **kwargs)
         else:
-             raise ValueError(f"Method {real_method} not supported by monet-regrid")
+            raise ValueError(f"Method {real_method} not supported by monet-regrid")
     else:
         raise TypeError("source_data must be an xarray object with regrid accessor")
+
 
 def resample_stratify(da, levels, vertical, axis=1):
     """Vertically interpolate data to specified levels.

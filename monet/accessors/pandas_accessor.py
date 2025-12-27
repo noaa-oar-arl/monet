@@ -215,7 +215,9 @@ class MONETAccessorPandas(BaseAccessor):
         pyreample.geometry.SwathDefinition
             SwathDefinition object for data points.
         """
-        raise NotImplementedError("This function relies on pyresample which has been removed.")
+        raise NotImplementedError(
+            "This function relies on pyresample which has been removed."
+        )
 
     def _df_to_da(self, d=None):  # TODO: should be `to_ds` or `to_xarray`
         """Convert DataFrame to xarray.
@@ -264,7 +266,7 @@ class MONETAccessorPandas(BaseAccessor):
             Remapped DataFrame.
         """
         if not has_monet_regrid:
-             raise ImportError("monet-regrid is required for this functionality")
+            raise ImportError("monet-regrid is required for this functionality")
 
         from ..util import resample
 

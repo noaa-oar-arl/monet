@@ -57,7 +57,9 @@ def test_spatial_plot():
 
 @pytest.mark.skipif(not CARTOPY_AVAILABLE, reason="Cartopy is not installed")
 def test_spatial_bias_scatter():
-    fig, ax, cbar = p.spatial_bias_scatter(df, date=pd.to_datetime("2013-01-01 01:00:00"))
+    fig, ax, cbar = p.spatial_bias_scatter(
+        df, date=pd.to_datetime("2013-01-01 01:00:00")
+    )
     assert isinstance(fig, plt.Figure)
     assert isinstance(ax, plt.Axes)
 

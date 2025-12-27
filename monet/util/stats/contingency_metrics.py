@@ -327,7 +327,11 @@ def _contingency_table(obs, mod, minval, maxval=None):
     except ImportError:
         xr = None
     # Drop NaNs and align for xarray
-    if xr is not None and isinstance(obs, xr.DataArray) and isinstance(mod, xr.DataArray):
+    if (
+        xr is not None
+        and isinstance(obs, xr.DataArray)
+        and isinstance(mod, xr.DataArray)
+    ):
         obs, mod = xr.align(obs, mod, join="inner")
         mask = (~xr.ufuncs.isnan(obs)) & (~xr.ufuncs.isnan(mod))
         obs = obs.where(mask, drop=True)
