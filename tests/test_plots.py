@@ -1,9 +1,14 @@
 import typing as t
 
+import cartopy.crs as ccrs
+import matplotlib.axes
+import matplotlib.figure
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import xarray as xr
 
+from monet.plots import plots
 from monet.plots.plots import _thin_data
 
 
@@ -93,3 +98,40 @@ def test_thin_data_yx(wind_data_yx: t.Tuple[xr.DataArray, xr.DataArray]) -> None
     # Check that the first and last latitude values in the meshgrid match the thinned coordinates
     assert y2d[0, 0] == u_thinned.y.values[0]
     assert y2d[-1, 0] == u_thinned.y.values[-1]
+
+
+@pytest.fixture
+def spatial_data() -> xr.DataArray:
+    """Create a sample DataArray for spatial plots."""
+    lat = np.arange(40, 50, 1)
+    lon = np.arange(-100, -90, 1)
+    data = np.random.rand(len(lat), len(lon))
+    return xr.DataArray(
+        data,
+        coords=[("lat", lat), ("lon", lon)],
+        name="sample_variable",
+    )
+
+
+def test_spatial_no_ax(spatial_data: xr.DataArray) -> None:
+    """Test the spatial function when no ax is provided."""
+    fig, ax = plots.spatial(spatial_data)
+
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    plt.close(fig)
+
+
+def test_spatial_with_ax(spatial_data: xr.DataArray) -> None:
+    """Test the spatial function when an ax is provided."""
+    fig_in = plt.figure()
+    ax_in = fig_in.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+    initial_children = len(ax_in.get_children())
+
+    fig_out, ax_out = plots.spatial(spatial_data, ax=ax_in)
+
+    assert fig_out is fig_in
+    assert ax_out is ax_in
+    # Check that some plotting has occurred on the axes
+    assert len(ax_out.get_children()) > initial_children
+    plt.close(fig_in)

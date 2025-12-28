@@ -47,6 +47,9 @@ def _create_map(fig=None, ax=None, **kwargs):
             },
             **kwargs,
         )
+    else:
+        if fig is None:
+            fig = ax.figure
     return fig, ax
 
 
@@ -113,30 +116,34 @@ def spatial_imshow(
 
 
 @_default_sns_context
-def spatial(modelvar, **kwargs):
-    """Create a simple spatial plot from an xarray object.
+def spatial(
+    da: xr.DataArray,
+    ax: plt.Axes = None,
+    **kwargs,
+) -> t.Tuple[plt.Figure, plt.Axes]:
+    """Create a spatial plot from an xarray.DataArray.
 
     A convenience wrapper for xarray's plot method with consistent styling.
 
     Parameters
     ----------
-    modelvar : xarray.DataArray
+    da : xr.DataArray
         The data to plot spatially.
+    ax : plt.Axes, optional
+        Axes to plot on. If None, a new figure and axes will be created.
     **kwargs
         Additional keyword arguments passed to xarray's plot method.
-        If 'ax' is not provided, a new figure and axes will be created.
 
     Returns
     -------
-    matplotlib.axes.Axes
-        The axes containing the plot.
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
     """
-    if kwargs.get("ax") is None:
-        f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
-        kwargs["ax"] = ax
-    ax = modelvar.plot(**kwargs)
-    plt.tight_layout()
-    return ax
+    fig, ax = _create_map(ax=ax)
+    da.plot(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
+    ax.coastlines()
+    ax.gridlines()
+    return fig, ax
 
 
 @_default_sns_context
