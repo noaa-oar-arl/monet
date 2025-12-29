@@ -1,6 +1,7 @@
 """plotting routines"""
 
 import functools
+import warnings
 
 import typing as t
 
@@ -55,11 +56,11 @@ def _create_map(fig=None, ax=None, **kwargs):
 
 @_default_sns_context
 def spatial_plot(
-    da,
-    fig=None,
-    ax=None,
+    da: xr.DataArray,
+    fig: t.Optional[plt.Figure] = None,
+    ax: t.Optional[plt.Axes] = None,
     **kwargs,
-):
+) -> t.Tuple[plt.Figure, plt.Axes]:
     """Create a spatial plot from an xarray.DataArray.
 
     Parameters
@@ -75,13 +76,11 @@ def spatial_plot(
 
     Returns
     -------
-    matplotlib.axes.Axes
-        The axes containing the plot.
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
     """
     fig, ax = _create_map(fig=fig, ax=ax)
     da.plot(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
-    ax.coastlines()
-    ax.gridlines()
     return fig, ax
 
 
@@ -118,17 +117,25 @@ def spatial_imshow(
 @_default_sns_context
 def spatial(
     da: xr.DataArray,
-    ax: plt.Axes = None,
+    fig: t.Optional[plt.Figure] = None,
+    ax: t.Optional[plt.Axes] = None,
     **kwargs,
 ) -> t.Tuple[plt.Figure, plt.Axes]:
     """Create a spatial plot from an xarray.DataArray.
 
     A convenience wrapper for xarray's plot method with consistent styling.
 
+    .. deprecated:: 24.8.1
+        This function is deprecated and will be removed in a future version.
+        Please use `spatial_plot` and add map features like coastlines
+        and gridlines manually for more control.
+
     Parameters
     ----------
     da : xr.DataArray
         The data to plot spatially.
+    fig : matplotlib.figure.Figure, optional
+        Figure to plot on.
     ax : plt.Axes, optional
         Axes to plot on. If None, a new figure and axes will be created.
     **kwargs
@@ -139,8 +146,13 @@ def spatial(
     t.Tuple[plt.Figure, plt.Axes]
         The figure and axes containing the plot.
     """
-    fig, ax = _create_map(ax=ax)
-    da.plot(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
+    warnings.warn(
+        "The function `spatial` is deprecated and will be removed in a future version. "
+        "Please use `spatial_plot` instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    fig, ax = spatial_plot(da, fig=fig, ax=ax, **kwargs)
     ax.coastlines()
     ax.gridlines()
     return fig, ax

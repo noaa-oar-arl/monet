@@ -1,5 +1,7 @@
 import typing as t
 
+from cartopy.mpl.feature_artist import FeatureArtist
+from cartopy.mpl.gridliner import Gridliner
 import cartopy.crs as ccrs
 import matplotlib.axes
 import matplotlib.figure
@@ -115,7 +117,7 @@ def spatial_data() -> xr.DataArray:
 
 def test_spatial_no_ax(spatial_data: xr.DataArray) -> None:
     """Test the spatial function when no ax is provided."""
-    fig, ax = plots.spatial(spatial_data)
+    fig, ax = plots.spatial_plot(spatial_data)
 
     assert isinstance(fig, matplotlib.figure.Figure)
     assert isinstance(ax, matplotlib.axes.Axes)
@@ -128,10 +130,34 @@ def test_spatial_with_ax(spatial_data: xr.DataArray) -> None:
     ax_in = fig_in.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
     initial_children = len(ax_in.get_children())
 
-    fig_out, ax_out = plots.spatial(spatial_data, ax=ax_in)
+    fig_out, ax_out = plots.spatial_plot(spatial_data, ax=ax_in)
 
     assert fig_out is fig_in
     assert ax_out is ax_in
     # Check that some plotting has occurred on the axes
     assert len(ax_out.get_children()) > initial_children
     plt.close(fig_in)
+
+
+def test_spatial_deprecation_warning(spatial_data: xr.DataArray) -> None:
+    """Test that the `spatial` function raises a DeprecationWarning."""
+    with pytest.warns(DeprecationWarning, match="The function `spatial` is deprecated"):
+        plots.spatial(spatial_data)
+
+
+def test_spatial_map_features(spatial_data: xr.DataArray) -> None:
+    """Test that the `spatial` function adds coastlines and gridlines."""
+    with pytest.warns(DeprecationWarning):
+        fig, ax = plots.spatial(spatial_data)
+
+    # Check for coastlines by inspecting the collections on the axes
+    assert any(isinstance(artist, FeatureArtist) for artist in ax.collections), (
+        "Coastline artist not found on the axes."
+    )
+
+    # Check for gridlines by inspecting the `artists` list on the axes
+    assert any(isinstance(artist, Gridliner) for artist in ax.artists), (
+        "Gridliner artist not found on the axes."
+    )
+
+    plt.close(fig)
