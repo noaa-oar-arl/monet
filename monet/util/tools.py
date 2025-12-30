@@ -228,12 +228,14 @@ def search_listinlist(
     array1: np.ndarray, array2: np.ndarray
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Find matching indices between two arrays.
+
     Parameters
     ----------
     array1 : numpy.ndarray
         First array to search for matches
     array2 : numpy.ndarray
         Second array to search for matches
+
     Returns
     -------
     tuple

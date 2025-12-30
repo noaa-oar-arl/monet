@@ -49,15 +49,17 @@ Plotting Functions
    cmap_discretize
    colorbar_index
    kdeplot
-   make_spatial_contours
-   make_spatial_plot
    normval
    savefig
    scatter
    sp_scatter_bias
    spatial
    spatial_bias_scatter
+   spatial_contourf
+   spatial_imshow
    timeseries
+   wind_barbs
+   wind_quiver
    wind_barbs
    wind_quiver
 

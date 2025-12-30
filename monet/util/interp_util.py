@@ -104,7 +104,8 @@ def constant_lat_swathdefition(longitude=None, latitude=None):
 
 
 def constant_lon_swathdefition(longitude=None, latitude=None):
-    """Deprecated: Create a SwathDefinition with constant longitude along a latitude array
+    """Deprecated: Create a SwathDefinition with constant longitude along a latitude array.
+
     Parameters
     ----------
     longitude : float

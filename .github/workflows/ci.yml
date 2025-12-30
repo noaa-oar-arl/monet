@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [stable, master, develop, 'refactor/**']
+    branches: [stable, master, develop]
   pull_request:
-    branches: [stable, master, develop, 'feature/**', 'refactor/**']
+    branches: [stable, master, develop, 'feature/**']
 
 jobs:
   test:
@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         # Modernized Python versions (3.6 removed)
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
     defaults:
       run:
         shell: bash -l {0} # Necessary for micromamba to activate environments
@@ -30,10 +30,10 @@ jobs:
           environment-name: monet-env
           cache-environment: true
           # We force the python version from the matrix into the env
-          create-args: >-
-            python=${{ matrix.python-version }}
-            pytest
-            pytest-cov
+          create-args: python=${{ matrix.python-version }}
+
+      - name: Install MONET in development mode
+        run: pip install -e .
 
       - name: Run Tests
         run: pytest -v --cov=monet

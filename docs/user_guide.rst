@@ -195,9 +195,9 @@ Further Reading
 ---------------
 
 
-Statistics Utilities (monet.util.stats)
----------------------------------------
-MONET provides a comprehensive set of statistical metrics for model evaluation in ``monet.util.stats``. These include error metrics, relative/percentage metrics, correlation and agreement metrics, spatial/ensemble metrics, and contingency metrics.
+Statistics Utilities (monet_stats)
+-----------------------------------
+MONET provides access to comprehensive statistical metrics for model evaluation through the ``monet_stats`` package. These include error metrics, relative/percentage metrics, correlation and agreement metrics, spatial/ensemble metrics, and contingency metrics.
 
 Commonly used metrics include:
 
@@ -253,7 +253,7 @@ You can also use the ``stats.stats`` function to compute a summary dictionary fo
    summary = stats.stats(df, minval=0, maxval=10)
    print(summary)
 
-For a full list of available metrics and their documentation, see the API reference or browse the ``monet/util/stats/`` directory.
+For a full list of available metrics and their documentation, see the API reference for the ``monet_stats`` package.
 
 More Examples
 ~~~~~~~~~~~~~
@@ -263,7 +263,7 @@ Using with xarray DataArrays
 .. code-block:: python
 
    import xarray as xr
-   from monet.util import stats
+   import monet_stats as stats
 
    ds = xr.open_dataset('model_output.nc')
    obs = xr.open_dataset('obs_data.nc')

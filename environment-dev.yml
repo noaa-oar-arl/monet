@@ -7,7 +7,6 @@ dependencies:
   - cartopy
   - dask
   - matplotlib
-  - monet-regrid
   - netcdf4
   - numpy
   - pandas
@@ -15,3 +14,10 @@ dependencies:
   - pydecorate
   - seaborn
   - xarray
+  - pytest
+  - pytest-cov
+  - pooch
+  - python-stratify
+  - pip:
+    - monet-regrid @ git+https://github.com/noaa-oar-arl/monet-regrid
+    - monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats

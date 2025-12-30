@@ -2,9 +2,9 @@ name: Linting
 
 on:
   push:
-    branches: [stable, master, develop, 'refactor/**']
+    branches: [stable, master, develop, 'feature/**', 'refactor/**']
   pull_request:
-    branches: [stable, master, develop, 'feature/**']
+    branches: [stable, master, develop, 'feature/**', 'refactor/**']
 
 jobs:
   ruff:

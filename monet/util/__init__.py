@@ -7,7 +7,13 @@ geospatial data, interpolation, and statistics.
 
 import numpy as np
 
-from . import coards_tools, combinetool, interp_util, resample, stats, tools
+from . import coards_tools, combinetool, interp_util, resample, tools
+
+# Import monet_stats as stats for compatibility
+try:
+    import monet_stats as stats
+except ImportError:
+    stats = None
 
 __all__ = ["combinetool", "coards_tools", "interp_util", "resample", "stats", "tools"]
 
