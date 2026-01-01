@@ -87,10 +87,10 @@ def spatial_plot(
 # Spatial Plots
 @_default_sns_context
 def spatial_imshow(
-    da,
-    ax=None,
+    da: xr.DataArray,
+    ax: t.Optional[plt.Axes] = None,
     **kwargs,
-):
+) -> t.Tuple[plt.Figure, plt.Axes]:
     """Create a spatial plot from an xarray.DataArray using imshow.
 
     Parameters
@@ -98,14 +98,14 @@ def spatial_imshow(
     da : xarray.DataArray
         The data to plot.
     ax : matplotlib.axes.Axes, optional
-        Axes to plot on.
+        Axes to plot on. If None, a new figure and axes will be created.
     **kwargs
         Additional keyword arguments to pass to xarray's plot.imshow() method.
 
     Returns
     -------
-    matplotlib.axes.Axes
-        The axes containing the plot.
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
     """
     fig, ax = _create_map(ax=ax)
     da.plot.imshow(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
@@ -160,10 +160,10 @@ def spatial(
 
 @_default_sns_context
 def spatial_contourf(
-    da,
-    ax=None,
+    da: xr.DataArray,
+    ax: t.Optional[plt.Axes] = None,
     **kwargs,
-):
+) -> t.Tuple[plt.Figure, plt.Axes]:
     """Create a spatial plot from an xarray.DataArray using contourf.
 
     Parameters
@@ -171,14 +171,14 @@ def spatial_contourf(
     da : xarray.DataArray
         The data to plot.
     ax : matplotlib.axes.Axes, optional
-        Axes to plot on.
+        Axes to plot on. If None, a new figure and axes will be created.
     **kwargs
         Additional keyword arguments to pass to xarray's plot.contourf() method.
 
     Returns
     -------
-    matplotlib.axes.Axes
-        The axes containing the plot.
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
     """
     fig, ax = _create_map(ax=ax)
     da.plot.contourf(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
