@@ -184,6 +184,60 @@ def test_spatial_imshow_with_ax(spatial_data: xr.DataArray) -> None:
     plt.close(fig_in)
 
 
+def test_spatial_bias_scatter_with_ax() -> None:
+    """Test the spatial_bias_scatter function when an ax is provided."""
+    import pandas as pd
+
+    # Create a sample DataFrame
+    data = {
+        "latitude": [34.0, 35.0, 36.0],
+        "longitude": [-118.0, -119.0, -120.0],
+        "CMAQ": [10.0, 12.0, 15.0],
+        "Obs": [8.0, 11.0, 16.0],
+        "datetime": pd.to_datetime(["2023-01-01", "2023-01-01", "2023-01-01"]),
+    }
+    df = pd.DataFrame(data)
+    date = pd.to_datetime("2023-01-01")
+
+    # Create a figure and axes with a projection
+    fig_in = plt.figure()
+    ax_in = fig_in.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+
+    # Call the function with the provided axes
+    fig_out, ax_out, cbar_out = plots.spatial_bias_scatter(df, date, ax=ax_in)
+
+    # Assert that the returned figure and axes are the same as the ones provided
+    assert fig_out is fig_in
+    assert ax_out is ax_in
+    assert cbar_out is not None  # Check that a colorbar object is returned
+    plt.close(fig_in)
+
+
+def test_spatial_bias_scatter_no_ax() -> None:
+    """Test the spatial_bias_scatter function when no ax is provided."""
+    import pandas as pd
+
+    # Create a sample DataFrame
+    data = {
+        "latitude": [34.0, 35.0, 36.0],
+        "longitude": [-118.0, -119.0, -120.0],
+        "CMAQ": [10.0, 12.0, 15.0],
+        "Obs": [8.0, 11.0, 16.0],
+        "datetime": pd.to_datetime(["2023-01-01", "2023-01-01", "2023-01-01"]),
+    }
+    df = pd.DataFrame(data)
+    date = pd.to_datetime("2023-01-01")
+
+    # Call the function without providing an axes
+    fig, ax, cbar = plots.spatial_bias_scatter(df, date)
+
+    # Assert that a new figure and axes are created
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert cbar is not None  # Check that a colorbar object is returned
+    plt.close(fig)
+
+
 def test_spatial_contourf_no_ax(spatial_data: xr.DataArray) -> None:
     """Test the spatial_contourf function when no ax is provided."""
     fig, ax = plots.spatial_contourf(spatial_data)

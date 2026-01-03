@@ -356,7 +356,7 @@ def spatial_bias_scatter(
     cmap="RdBu_r",
     fig=None,
     ax=None,
-):
+) -> t.Tuple[plt.Figure, plt.Axes, t.Any]:
     """Create a scatter plot showing bias on a map.
 
     Parameters
@@ -384,8 +384,8 @@ def spatial_bias_scatter(
 
     Returns
     -------
-    tuple
-        (figure, axes, colorbar) containing the matplotlib objects.
+    t.Tuple[plt.Figure, plt.Axes, t.Any]
+        The figure, axes, and colorbar object containing the plot.
 
     Notes
     -----
