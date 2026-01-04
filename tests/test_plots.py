@@ -7,6 +7,7 @@ import matplotlib.axes
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
@@ -184,11 +185,9 @@ def test_spatial_imshow_with_ax(spatial_data: xr.DataArray) -> None:
     plt.close(fig_in)
 
 
-def test_spatial_bias_scatter_with_ax() -> None:
-    """Test the spatial_bias_scatter function when an ax is provided."""
-    import pandas as pd
-
-    # Create a sample DataFrame
+@pytest.fixture
+def bias_scatter_data() -> t.Tuple[pd.DataFrame, pd.Timestamp]:
+    """Create a sample DataFrame for spatial_bias_scatter."""
     data = {
         "latitude": [34.0, 35.0, 36.0],
         "longitude": [-118.0, -119.0, -120.0],
@@ -198,43 +197,50 @@ def test_spatial_bias_scatter_with_ax() -> None:
     }
     df = pd.DataFrame(data)
     date = pd.to_datetime("2023-01-01")
+    return df, date
+
+
+def test_spatial_bias_scatter_with_ax(bias_scatter_data) -> None:
+    """Test the spatial_bias_scatter function when an ax is provided."""
+    df, date = bias_scatter_data
 
     # Create a figure and axes with a projection
     fig_in = plt.figure()
     ax_in = fig_in.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+    initial_collections = len(ax_in.collections)
 
     # Call the function with the provided axes
-    fig_out, ax_out, cbar_out = plots.spatial_bias_scatter(df, date, ax=ax_in)
+    result = plots.spatial_bias_scatter(df, date, ax=ax_in)
+
+    assert isinstance(result, tuple)
+    assert len(result) == 2
+    fig_out, ax_out = result
 
     # Assert that the returned figure and axes are the same as the ones provided
     assert fig_out is fig_in
     assert ax_out is ax_in
-    assert cbar_out is not None  # Check that a colorbar object is returned
+
+    # Check that a scatter plot was added to the axes
+    assert len(ax_out.collections) > initial_collections
     plt.close(fig_in)
 
 
-def test_spatial_bias_scatter_no_ax() -> None:
+def test_spatial_bias_scatter_no_ax(bias_scatter_data) -> None:
     """Test the spatial_bias_scatter function when no ax is provided."""
-    import pandas as pd
-
-    # Create a sample DataFrame
-    data = {
-        "latitude": [34.0, 35.0, 36.0],
-        "longitude": [-118.0, -119.0, -120.0],
-        "CMAQ": [10.0, 12.0, 15.0],
-        "Obs": [8.0, 11.0, 16.0],
-        "datetime": pd.to_datetime(["2023-01-01", "2023-01-01", "2023-01-01"]),
-    }
-    df = pd.DataFrame(data)
-    date = pd.to_datetime("2023-01-01")
+    df, date = bias_scatter_data
 
     # Call the function without providing an axes
-    fig, ax, cbar = plots.spatial_bias_scatter(df, date)
+    result = plots.spatial_bias_scatter(df, date)
 
-    # Assert that a new figure and axes are created
+    # Assert that a new figure and axes are created and returned
+    assert isinstance(result, tuple)
+    assert len(result) == 2
+    fig, ax = result
     assert isinstance(fig, matplotlib.figure.Figure)
     assert isinstance(ax, matplotlib.axes.Axes)
-    assert cbar is not None  # Check that a colorbar object is returned
+
+    # Check that a scatter plot was actually created
+    assert len(ax.collections) > 0
     plt.close(fig)
 
 

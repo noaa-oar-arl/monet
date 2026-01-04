@@ -356,7 +356,7 @@ def spatial_bias_scatter(
     cmap="RdBu_r",
     fig=None,
     ax=None,
-) -> t.Tuple[plt.Figure, plt.Axes, t.Any]:
+) -> t.Tuple[plt.Figure, plt.Axes]:
     """Create a scatter plot showing bias on a map.
 
     Parameters
@@ -384,8 +384,8 @@ def spatial_bias_scatter(
 
     Returns
     -------
-    t.Tuple[plt.Figure, plt.Axes, t.Any]
-        The figure, axes, and colorbar object containing the plot.
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
 
     Notes
     -----
@@ -425,7 +425,7 @@ def spatial_bias_scatter(
     )
 
     _savefig(fig, save_name=savename)
-    return fig, ax, c
+    return fig, ax
 
 
 @_default_sns_context
