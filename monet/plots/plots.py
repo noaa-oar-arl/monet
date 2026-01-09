@@ -12,7 +12,6 @@ import seaborn as sns
 import xarray as xr
 
 from . import taylordiagram as td
-from .colorbars import colorbar_index
 
 # colors = ['#1e90ff','#045C5C','#00A847','#DB4291','#BB7E5D']
 colors = ["#1e90ff", "#DA70D6", "#228B22", "#FA8072", "#FF1493"]
@@ -346,41 +345,37 @@ def normval(vmin, vmax, cmap):
 
 @_default_sns_context
 def spatial_bias_scatter(
-    df,
-    date,
-    vmin=None,
-    vmax=None,
-    savename="",
-    ncolors=15,
-    fact=1.5,
-    cmap="RdBu_r",
-    fig=None,
-    ax=None,
+    ds: xr.Dataset,
+    *,
+    vmin: t.Optional[float] = None,
+    vmax: t.Optional[float] = None,
+    savename: str = "",
+    cmap: str = "RdBu_r",
+    fig: t.Optional[plt.Figure] = None,
+    ax: t.Optional[plt.Axes] = None,
+    **kwargs,
 ) -> t.Tuple[plt.Figure, plt.Axes]:
     """Create a scatter plot showing bias on a map.
 
     Parameters
     ----------
-    df : pandas.DataFrame
-        DataFrame containing 'latitude', 'longitude', 'CMAQ', and 'Obs' columns.
-    date : str or datetime.datetime
-        Date to filter the DataFrame. Only entries matching this date will be plotted.
+    ds : xr.Dataset
+        Dataset containing 'obs' and 'model' variables, and 'latitude' and
+        'longitude' coordinates.
     vmin : float, optional
         Minimum value for colorscale. If None, automatically determined.
     vmax : float, optional
         Maximum value for colorscale. If None, automatically determined.
     savename : str, default ""
-        If provided, save the figure to this path with date appended.
-    ncolors : int, default 15
-        Number of discrete colors for the colorbar.
-    fact : float, default 1.5
-        Scaling factor for point sizes.
+        If provided, save the figure to this path.
     cmap : str or matplotlib.colors.Colormap, default "RdBu_r"
         Colormap to use for bias values.
     fig : matplotlib.figure.Figure, optional
         Figure to plot on.
     ax : matplotlib.axes.Axes, optional
         Axes to plot on.
+    **kwargs
+        Additional keyword arguments to pass to `xarray.plot.scatter`.
 
     Returns
     -------
@@ -389,39 +384,40 @@ def spatial_bias_scatter(
 
     Notes
     -----
-    The scatter points are colored by the difference (CMAQ - Obs) and sized
+    The scatter points are colored by the difference (model - obs) and sized
     by the absolute magnitude of this difference, making larger biases more visible.
     """
-    from numpy import around
-    from scipy.stats import scoreatpercentile as score
-
     fig, ax = _create_map(fig=fig, ax=ax)
-
     ax.set_facecolor("white")
-    diff = df.CMAQ - df.Obs
-    top = around(score(diff.abs(), per=95))
-    new = df[df.datetime == date]
-    x = new.longitude.values
-    y = new.latitude.values
-    c, cmap = colorbar_index(ncolors, cmap, minval=top * -1, maxval=top, ax=ax)
 
-    c.ax.tick_params(labelsize=13)
-    #    cmap = cmap_discretize(cmap, ncolors)
-    colors = new.CMAQ - new.Obs
-    ss = (new.CMAQ - new.Obs).abs() / top * 100.0
-    ss[ss > 300] = 300.0
-    ax.scatter(
-        x,
-        y,
-        c=colors,
-        s=ss,
-        vmin=-1.0 * top,
-        vmax=top,
+    # Create a new dataset for plotting to avoid modifying the original
+    plot_ds = ds.copy(deep=False)
+    plot_ds["difference"] = ds["model"] - ds["obs"]
+
+    # Calculate size based on absolute difference.
+    # A zero size is invisible, so we add a minimum size and scale.
+    # The scaling factor is arbitrary and can be adjusted for better visualization.
+    size = np.abs(plot_ds["difference"])
+    # Avoid division by zero if all differences are zero
+    if size.max() > 0:
+        size = (size / size.max()) * 200 + 20
+    else:
+        size = xr.full_like(size, 20)
+
+    plot_ds.plot.scatter(
+        ax=ax,
+        x="longitude",
+        y="latitude",
+        hue="difference",
+        s=size,
+        vmin=vmin,
+        vmax=vmax,
         cmap=cmap,
         edgecolors="k",
         linewidths=0.25,
         alpha=0.7,
         transform=ccrs.PlateCarree(),
+        **kwargs,
     )
 
     _savefig(fig, save_name=savename)

@@ -57,7 +57,10 @@ def test_spatial_plot():
 
 @pytest.mark.skipif(not CARTOPY_AVAILABLE, reason="Cartopy is not installed")
 def test_spatial_bias_scatter():
-    fig, ax = p.spatial_bias_scatter(df, date=pd.to_datetime("2013-01-01 01:00:00"))
+    # Convert DataFrame to an xarray Dataset and rename columns for the new API
+    ds = df.rename(columns={"CMAQ": "model", "Obs": "obs"}).to_xarray()
+    ds = ds.set_coords(["latitude", "longitude"])
+    fig, ax = p.spatial_bias_scatter(ds)
     assert isinstance(fig, plt.Figure)
     assert isinstance(ax, plt.Axes)
 

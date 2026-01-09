@@ -7,7 +7,6 @@ import matplotlib.axes
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 
@@ -186,62 +185,43 @@ def test_spatial_imshow_with_ax(spatial_data: xr.DataArray) -> None:
 
 
 @pytest.fixture
-def bias_scatter_data() -> t.Tuple[pd.DataFrame, pd.Timestamp]:
-    """Create a sample DataFrame for spatial_bias_scatter."""
+def bias_scatter_data_xr() -> xr.Dataset:
+    """Create a sample xarray.Dataset for spatial_bias_scatter."""
     data = {
-        "latitude": [34.0, 35.0, 36.0],
-        "longitude": [-118.0, -119.0, -120.0],
-        "CMAQ": [10.0, 12.0, 15.0],
-        "Obs": [8.0, 11.0, 16.0],
-        "datetime": pd.to_datetime(["2023-01-01", "2023-01-01", "2023-01-01"]),
+        "latitude": ("station", [34.0, 35.0, 36.0]),
+        "longitude": ("station", [-118.0, -119.0, -120.0]),
+        "model": ("station", [10.0, 12.0, 15.0]),
+        "obs": ("station", [8.0, 11.0, 16.0]),
     }
-    df = pd.DataFrame(data)
-    date = pd.to_datetime("2023-01-01")
-    return df, date
+    ds = xr.Dataset(data)
+    ds = ds.set_coords(["latitude", "longitude"])
+    return ds
 
 
-def test_spatial_bias_scatter_with_ax(bias_scatter_data) -> None:
-    """Test the spatial_bias_scatter function when an ax is provided."""
-    df, date = bias_scatter_data
+def test_spatial_bias_scatter_xr(bias_scatter_data_xr: xr.Dataset) -> None:
+    """Test the xarray-native spatial_bias_scatter function."""
+    ds = bias_scatter_data_xr
 
-    # Create a figure and axes with a projection
+    # --- Test case 1: No ax provided ---
+    fig_out, ax_out = plots.spatial_bias_scatter(ds)
+    assert isinstance(fig_out, matplotlib.figure.Figure)
+    assert isinstance(ax_out, matplotlib.axes.Axes)
+    assert len(ax_out.collections) > 0, "Scatter plot should be added"
+    plt.close(fig_out)
+
+    # --- Test case 2: Pre-existing ax provided ---
     fig_in = plt.figure()
     ax_in = fig_in.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
     initial_collections = len(ax_in.collections)
 
-    # Call the function with the provided axes
-    result = plots.spatial_bias_scatter(df, date, ax=ax_in)
+    fig_out_2, ax_out_2 = plots.spatial_bias_scatter(ds, ax=ax_in)
 
-    assert isinstance(result, tuple)
-    assert len(result) == 2
-    fig_out, ax_out = result
-
-    # Assert that the returned figure and axes are the same as the ones provided
-    assert fig_out is fig_in
-    assert ax_out is ax_in
-
-    # Check that a scatter plot was added to the axes
-    assert len(ax_out.collections) > initial_collections
+    assert fig_out_2 is fig_in
+    assert ax_out_2 is ax_in
+    assert len(ax_out_2.collections) > initial_collections, (
+        "Scatter plot should be added to existing axes"
+    )
     plt.close(fig_in)
-
-
-def test_spatial_bias_scatter_no_ax(bias_scatter_data) -> None:
-    """Test the spatial_bias_scatter function when no ax is provided."""
-    df, date = bias_scatter_data
-
-    # Call the function without providing an axes
-    result = plots.spatial_bias_scatter(df, date)
-
-    # Assert that a new figure and axes are created and returned
-    assert isinstance(result, tuple)
-    assert len(result) == 2
-    fig, ax = result
-    assert isinstance(fig, matplotlib.figure.Figure)
-    assert isinstance(ax, matplotlib.axes.Axes)
-
-    # Check that a scatter plot was actually created
-    assert len(ax.collections) > 0
-    plt.close(fig)
 
 
 def test_spatial_contourf_no_ax(spatial_data: xr.DataArray) -> None:
