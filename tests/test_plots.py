@@ -7,6 +7,7 @@ import matplotlib.axes
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
@@ -243,3 +244,40 @@ def test_spatial_contourf_with_ax(spatial_data: xr.DataArray) -> None:
     assert fig_out is fig_in
     assert ax_out is ax_in
     plt.close(fig_in)
+
+
+@pytest.fixture
+def timeseries_df():
+    """Create a sample DataFrame for timeseries plotting."""
+    dates = pd.to_datetime(
+        [
+            "2024-08-01 00:00:00",
+            "2024-08-01 01:00:00",
+            "2024-08-01 02:00:00",
+            "2024-08-01 00:00:00",
+            "2024-08-01 01:00:00",
+            "2024-08-01 02:00:00",
+        ]
+    )
+    data = {
+        "time": dates,
+        "obs": [1.0, 1.5, 2.0, 1.2, 1.7, 2.2],
+        "model": [0.9, 1.6, 2.1, 1.1, 1.8, 2.3],
+        "variable": ["O3"] * 6,
+        "units": ["ppb"] * 6,
+    }
+    return pd.DataFrame(data)
+
+
+def test_timeseries_plot(timeseries_df):
+    """Test the timeseries plotting function."""
+    ax = plots.timeseries(timeseries_df, title="Ozone Timeseries", label="Observation")
+
+    assert isinstance(ax, plt.Axes)
+    assert ax.get_title() == "Ozone Timeseries"
+    assert ax.get_ylabel() == "O3 (ppb)"
+    assert len(ax.get_lines()) > 0
+    legend = ax.get_legend()
+    assert legend is not None
+    assert legend.get_texts()[0].get_text() == "Observation"
+    plt.close(ax.figure)
