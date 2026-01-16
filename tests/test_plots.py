@@ -281,3 +281,39 @@ def test_timeseries_plot(timeseries_df):
     assert legend is not None
     assert legend.get_texts()[0].get_text() == "Observation"
     plt.close(ax.figure)
+
+
+@pytest.fixture
+def taylor_data() -> t.Tuple[pd.Series, pd.Series, pd.Series]:
+    """Create sample data for a Taylor diagram."""
+    obs = pd.Series(np.random.rand(100) * 10, name="obs")
+    mod1 = pd.Series(np.random.rand(100) * 10 + 2, name="mod1")
+    mod2 = pd.Series(np.random.rand(100) * 10 - 2, name="mod2")
+    return obs, mod1, mod2
+
+
+def test_create_taylor_diagram(taylor_data):
+    """Test the create_taylor_diagram function."""
+    obs, mod1, mod2 = taylor_data
+
+    # --- Test case 1: Create a new diagram ---
+    dia = plots.create_taylor_diagram(obs, mod1, model_label="Model 1")
+
+    assert dia is not None
+    # The constructor adds the reference point, and create_taylor_diagram adds the model
+    assert len(dia.samplePoints) == 2
+    labels = [p.get_label() for p in dia.samplePoints]
+    assert "Model 1" in labels
+    assert "Reference" in labels  # Default obs_label
+    initial_fig = dia.fig
+
+    # --- Test case 2: Add a second model to the existing diagram ---
+    dia = plots.create_taylor_diagram(obs, mod2, model_label="Model 2", dia=dia)
+
+    assert dia.fig is initial_fig  # Should be the same figure
+    assert len(dia.samplePoints) == 3  # Ref + 2 models
+    labels = [p.get_label() for p in dia.samplePoints]
+    assert "Model 1" in labels
+    assert "Model 2" in labels
+    assert "Reference" in labels
+    plt.close(dia.fig)

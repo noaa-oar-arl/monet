@@ -5,9 +5,7 @@ import warnings
 
 import typing as t
 
-if t.TYPE_CHECKING:
-    import pandas as pd
-
+import pandas as pd
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import numpy as np
@@ -584,80 +582,99 @@ def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
 
 @_default_sns_context
 def create_taylor_diagram(
-    df,
-    marker="o",
-    col1="obs",
-    col2="model",
-    label1="OBS",
-    label2="MODEL",
-    scale=1.5,
-    addon=False,
-    dia=None,
-):
-    """
-    :no-index:
+    obs: "pd.Series",
+    model: "pd.Series",
+    model_label: str = "Model",
+    obs_label: str = "Reference",
+    scale: float = 1.5,
+    dia: t.Optional[td.TaylorDiagram] = None,
+    **kwargs,
+) -> td.TaylorDiagram:
+    """Create a Taylor diagram from observation and model data.
 
-    Create a DataFrame-based Taylor diagram using the TaylorDiagram class.
-
-    A convenience wrapper for easily creating Taylor diagrams from DataFrames.
-    For the main Taylor diagram implementation, see :mod:`monet.plots.taylordiagram`.
+    This function provides a simplified interface for creating Taylor
+    diagrams to compare model output with a reference (observation) dataset.
+    It can either create a new diagram or add a new model series to an
+    existing diagram.
 
     Parameters
     ----------
-    df : pandas.DataFrame
-        DataFrame containing observation and model data
-    marker : str, default "o"
-        Marker style for plotting model points
-    col1 : str, default "obs"
-        Column name for observations
-    col2 : str, default "model"
-        Column name for model predictions
-    label1 : str, default "OBS"
-        Label for observations in legend
-    label2 : str, default "MODEL"
-        Label for model in legend
+    obs : pd.Series
+        Time series of observations (reference data).
+    model : pd.Series
+        Time series of model predictions.
+    model_label : str, default "Model"
+        Label for the model data point in the diagram.
+    obs_label : str, default "Reference"
+        Label for the reference data point on the standard deviation axis.
     scale : float, default 1.5
-        Scale factor for diagram
-    addon : bool, default False
-        If True, add to existing diagram; if False, create new
+        The radial limit of the diagram, specified as a multiple of the
+        observation's standard deviation.
     dia : TaylorDiagram, optional
-        Existing diagram to add to if addon=True
+        If provided, add the model sample to this existing TaylorDiagram
+        instance instead of creating a new one.
+    **kwargs
+        Additional keyword arguments passed to `TaylorDiagram.add_sample()`.
+        Common options include `marker`, `color`, `ls`, and `zorder`.
 
     Returns
     -------
-    TaylorDiagram
-        The Taylor diagram instance
+    td.TaylorDiagram
+        The TaylorDiagram instance containing the plot.
+
+    Examples
+    --------
+    Create a simple Taylor diagram comparing one model to observations:
+
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> obs = pd.Series(np.random.rand(100), name="obs")
+    >>> mod = pd.Series(np.random.rand(100), name="mod")
+    >>> dia = create_taylor_diagram(obs, mod, model_label="MyModel")
+    >>> plt.show()
+
+    Add a second model to the same diagram:
+
+    >>> mod2 = pd.Series(np.random.rand(100) * 1.2, name="mod2")
+    >>> dia = create_taylor_diagram(obs, mod2, model_label="MyModel2", dia=dia)
+    >>> plt.show()
     """
-    # Same implementation as before
-    from numpy import corrcoef
+    # Ensure data is clean and aligned
+    df = pd.DataFrame({"obs": obs, "model": model}).dropna()
+    obs_clean = df["obs"]
+    model_clean = df["model"]
 
-    df = df.drop_duplicates().dropna(subset=[col1, col2])
-
-    if not addon and dia is None:
+    if dia is None:
+        # Create a new diagram
         with sns.axes_style("ticks"):
-            f = plt.figure(figsize=(12, 10))
-            obsstd = df[col1].std()
-
-            dia = td.TaylorDiagram(obsstd, scale=scale, fig=f, rect=111, label=label1)
-            plt.grid(linewidth=1, alpha=0.5)
-            cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
-            dia.add_sample(
-                df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label2
+            fig = plt.figure(figsize=(12, 10))
+            obs_std = obs_clean.std()
+            dia = td.TaylorDiagram(
+                obs_std, scale=scale, fig=fig, rect=111, label=obs_label
             )
+            plt.grid(linewidth=1, alpha=0.5)
             contours = dia.add_contours(colors="0.5")
             plt.clabel(contours, inline=1, fontsize=10)
             plt.grid(alpha=0.5)
-            plt.legend(fontsize="small", loc="best")
-
-    elif not addon and dia is not None:
-        print("Do you want to add this on? if so please turn the addon keyword to True")
-    elif addon and dia is None:
-        print("Please pass the previous Taylor Diagram Instance with dia keyword...")
     else:
-        cc = corrcoef(df.Obs.values, df.CMAQ.values)[0, 1]
-        dia.add_sample(
-            df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label1
-        )
-        plt.legend(fontsize="small", loc="best")
-        plt.tight_layout()
+        # Use the existing diagram, but ensure its reference is compatible
+        if not np.isclose(dia.refstd, obs_clean.std()):
+            warnings.warn(
+                "The reference standard deviation of the provided diagram "
+                "differs from the new observation data. "
+                "Statistics will be based on the diagram's original reference.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+    # Calculate correlation and add the model sample to the diagram
+    corr = np.corrcoef(obs_clean.values, model_clean.values)[0, 1]
+    model_std = model_clean.std()
+
+    dia.add_sample(model_std, corr, label=model_label, **kwargs)
+
+    # Finalize plot details
+    dia.ax.legend(fontsize="small", loc="best")
+    plt.tight_layout()
+
     return dia

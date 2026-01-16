@@ -103,9 +103,10 @@ class TaylorDiagram:
 
         if fig is None:
             fig = plt.figure()
+        self.fig = fig
 
-        ax = FA.FloatingSubplot(fig, rect, grid_helper=ghelper)
-        fig.add_subplot(ax)
+        ax = FA.FloatingSubplot(self.fig, rect, grid_helper=ghelper)
+        self.fig.add_subplot(ax)
 
         # Adjust axes
         ax.axis["top"].set_axis_direction("bottom")  # "Angle axis"
