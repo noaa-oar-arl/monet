@@ -4,8 +4,12 @@ Utility tools for MONET.
 
 from typing import Optional, Tuple
 
+import datetime
+from typing import Union
+
 import numpy as np
 import pandas as pd
+import xarray as xr
 from numpy import cos, pi, sin
 from pandas import merge
 
@@ -90,8 +94,6 @@ GIORGI_LONMIN = [
     95,
     100,
     65,
-    40,
-    75,
     40,
     75,
     40,
@@ -599,30 +601,66 @@ def get_giorgi_region_bounds(
         return df.loc[df.acronym == acronym.upper()].values.flatten()
 
 
-def _add_region_info(coords, bounds, region_indices, region_acronyms):
-    """Worker function to find region for a set of coordinates."""
-    is_inside = np.all(
-        (coords[:, np.newaxis, :] >= bounds[np.newaxis, :, :2])
-        & (coords[:, np.newaxis, :] <= bounds[np.newaxis, :, 2:]),
-        axis=2,
+def _find_region_indices(
+    lon: np.ndarray, lat: np.ndarray, bounds: np.ndarray, indices: np.ndarray
+) -> np.ndarray:
+    """Core logic to find region indices for given lon/lat.
+
+    Supports broadcasting for use with xarray.apply_ufunc.
+    """
+    # bounds: (N, 4) -> lonmin, latmin, lonmax, latmax
+    # lon, lat: (...)
+    # Add region dimension to lon/lat for broadcasting
+    lon_b = lon[..., np.newaxis]
+    lat_b = lat[..., np.newaxis]
+
+    is_inside = (
+        (lon_b >= bounds[:, 0])
+        & (lat_b >= bounds[:, 1])
+        & (lon_b <= bounds[:, 2])
+        & (lat_b <= bounds[:, 3])
     )
-    indices = np.argmax(is_inside, axis=1)
-    mask = is_inside.any(axis=1)
 
-    out_indices = np.full(len(coords), np.nan)
-    out_acronyms = np.full(len(coords), None, dtype=object)
+    any_match = np.any(is_inside, axis=-1)
+    region_idx = np.argmax(is_inside, axis=-1)
 
-    out_indices[mask] = np.array(region_indices)[indices[mask]]
-    out_acronyms[mask] = np.array(region_acronyms)[indices[mask]]
-
-    return out_indices, out_acronyms
+    out = np.full(lon.shape, np.nan)
+    out[any_match] = indices[region_idx[any_match]]
+    return out
 
 
-def get_giorgi_region_df(dset):
+def _find_region_acronyms(
+    lon: np.ndarray, lat: np.ndarray, bounds: np.ndarray, acronyms: np.ndarray
+) -> np.ndarray:
+    """Core logic to find region acronyms for given lon/lat.
+
+    Supports broadcasting for use with xarray.apply_ufunc.
+    """
+    lon_b = lon[..., np.newaxis]
+    lat_b = lat[..., np.newaxis]
+
+    is_inside = (
+        (lon_b >= bounds[:, 0])
+        & (lat_b >= bounds[:, 1])
+        & (lon_b <= bounds[:, 2])
+        & (lat_b <= bounds[:, 3])
+    )
+
+    any_match = np.any(is_inside, axis=-1)
+    region_idx = np.argmax(is_inside, axis=-1)
+
+    out = np.full(lon.shape, None, dtype=object)
+    out[any_match] = acronyms[region_idx[any_match]]
+    return out
+
+
+def get_giorgi_region_df(
+    dset: Union[pd.DataFrame, xr.Dataset],
+) -> Union[pd.DataFrame, xr.Dataset]:
     """Add Giorgi region index and acronym to DataFrame or Dataset.
 
-    This is a vectorized implementation using NumPy broadcasting for high
-    performance on large datasets.
+    This implementation is backend-agnostic and supports Dask-backed
+    xarray objects using xarray.apply_ufunc.
 
     Parameters
     ----------
@@ -636,28 +674,47 @@ def get_giorgi_region_df(dset):
         - GIORGI_INDEX: region index number (float, to accommodate NaN)
         - GIORGI_ACRO: region acronym (str)
     """
-    bounds = np.array(
-        [GIORGI_LONMIN[:22], GIORGI_LATMIN, GIORGI_LONMAX, GIORGI_LATMAX]
-    ).T
+    bounds = np.array([GIORGI_LONMIN, GIORGI_LATMIN, GIORGI_LONMAX, GIORGI_LATMAX]).T
+    indices = np.array(GIORGI_INDICES)
+    acronyms = np.array(GIORGI_ACRONYMS)
 
     if isinstance(dset, pd.DataFrame):
-        coords = dset[["longitude", "latitude"]].values
-        indices, acronyms = _add_region_info(
-            coords, bounds, GIORGI_INDICES, GIORGI_ACRONYMS
-        )
-        dset["GIORGI_INDEX"] = indices
-        dset["GIORGI_ACRO"] = acronyms
+        lon = dset.longitude.values
+        lat = dset.latitude.values
+        dset["GIORGI_INDEX"] = _find_region_indices(lon, lat, bounds, indices)
+        dset["GIORGI_ACRO"] = _find_region_acronyms(lon, lat, bounds, acronyms)
         return dset
-    else:  # xarray.Dataset
-        lon, lat = np.meshgrid(dset.longitude, dset.latitude)
-        coords = np.vstack([lon.ravel(), lat.ravel()]).T
-        indices, acronyms = _add_region_info(
-            coords, bounds, GIORGI_INDICES, GIORGI_ACRONYMS
+    elif isinstance(dset, xr.Dataset):
+        lat, lon = xr.broadcast(dset.latitude, dset.longitude)
+        # Use apply_ufunc for Dask compatibility
+        idx = xr.apply_ufunc(
+            _find_region_indices,
+            lon,
+            lat,
+            kwargs={"bounds": bounds, "indices": indices},
+            dask="parallelized",
+            output_dtypes=[float],
         )
+        acro = xr.apply_ufunc(
+            _find_region_acronyms,
+            lon,
+            lat,
+            kwargs={"bounds": bounds, "acronyms": acronyms},
+            dask="parallelized",
+            output_dtypes=[object],
+        )
+        dset["GIORGI_INDEX"] = idx
+        dset["GIORGI_ACRO"] = acro
 
-        dset["GIORGI_INDEX"] = (("latitude", "longitude"), indices.reshape(lon.shape))
-        dset["GIORGI_ACRO"] = (("latitude", "longitude"), acronyms.reshape(lon.shape))
+        # Update history
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = dset.attrs.get("history", "")
+        dset.attrs["history"] = (
+            history + f"\n{curr_time} > Added GIORGI regions via get_giorgi_region_df"
+        )
         return dset
+    else:
+        raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")
 
 
 def get_epa_region_bounds(
@@ -702,11 +759,13 @@ def get_epa_region_bounds(
         return df.loc[df.acronym == acronym.upper()].values.flatten()
 
 
-def get_epa_region_df(dset):
+def get_epa_region_df(
+    dset: Union[pd.DataFrame, xr.Dataset],
+) -> Union[pd.DataFrame, xr.Dataset]:
     """Add EPA region index and acronym to DataFrame or Dataset.
 
-    This is a vectorized implementation using NumPy broadcasting for high
-    performance on large datasets.
+    This implementation is backend-agnostic and supports Dask-backed
+    xarray objects using xarray.apply_ufunc.
 
     Parameters
     ----------
@@ -721,18 +780,43 @@ def get_epa_region_df(dset):
         - EPA_ACRO: region acronym (str)
     """
     bounds = np.array([EPA_LONMIN, EPA_LATMIN, EPA_LONMAX, EPA_LATMAX]).T
+    indices = np.array(EPA_INDICES)
+    acronyms = np.array(EPA_ACRONYMS)
 
     if isinstance(dset, pd.DataFrame):
-        coords = dset[["longitude", "latitude"]].values
-        indices, acronyms = _add_region_info(coords, bounds, EPA_INDICES, EPA_ACRONYMS)
-        dset["EPA_INDEX"] = indices
-        dset["EPA_ACRO"] = acronyms
+        lon = dset.longitude.values
+        lat = dset.latitude.values
+        dset["EPA_INDEX"] = _find_region_indices(lon, lat, bounds, indices)
+        dset["EPA_ACRO"] = _find_region_acronyms(lon, lat, bounds, acronyms)
         return dset
-    else:  # xarray.Dataset
-        lon, lat = np.meshgrid(dset.longitude, dset.latitude)
-        coords = np.vstack([lon.ravel(), lat.ravel()]).T
-        indices, acronyms = _add_region_info(coords, bounds, EPA_INDICES, EPA_ACRONYMS)
+    elif isinstance(dset, xr.Dataset):
+        lat, lon = xr.broadcast(dset.latitude, dset.longitude)
+        # Use apply_ufunc for Dask compatibility
+        idx = xr.apply_ufunc(
+            _find_region_indices,
+            lon,
+            lat,
+            kwargs={"bounds": bounds, "indices": indices},
+            dask="parallelized",
+            output_dtypes=[float],
+        )
+        acro = xr.apply_ufunc(
+            _find_region_acronyms,
+            lon,
+            lat,
+            kwargs={"bounds": bounds, "acronyms": acronyms},
+            dask="parallelized",
+            output_dtypes=[object],
+        )
+        dset["EPA_INDEX"] = idx
+        dset["EPA_ACRO"] = acro
 
-        dset["EPA_INDEX"] = (("latitude", "longitude"), indices.reshape(lon.shape))
-        dset["EPA_ACRO"] = (("latitude", "longitude"), acronyms.reshape(lon.shape))
+        # Update history
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = dset.attrs.get("history", "")
+        dset.attrs["history"] = (
+            history + f"\n{curr_time} > Added EPA regions via get_epa_region_df"
+        )
         return dset
+    else:
+        raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")

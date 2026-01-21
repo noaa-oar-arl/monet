@@ -112,6 +112,8 @@ def test_combine_da_da():
     assert new.dims == {"z": 5, "y": n, "x": n}
 
     a = new["data"]
-    assert a.shape == (model.dims["z"], n, n), (
-        "model levels but obs grid points (expanded)"
-    )
+    assert a.shape == (
+        model.dims["z"],
+        n,
+        n,
+    ), "model levels but obs grid points (expanded)"

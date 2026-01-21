@@ -1,3 +1,4 @@
+import dask.array as da
 import numpy as np
 import pandas as pd
 import pytest
@@ -133,3 +134,32 @@ def test_get_epa_region_ds():
     # Check the values
     np.testing.assert_array_equal(result_ds["EPA_INDEX"].values, expected_indices)
     np.testing.assert_array_equal(result_ds["EPA_ACRO"].values, expected_acros)
+
+
+def test_get_giorgi_region_dask():
+    """Verifies that get_giorgi_region_df works with both Eager and Lazy data."""
+    lats = np.array([40.0, 0.0])
+    lons = np.array([-95.0, -150.0])
+
+    # 1. Eager (NumPy) path
+    ds_eager = xr.Dataset(coords={"latitude": lats, "longitude": lons})
+    result_eager = get_giorgi_region_df(ds_eager)
+
+    # 2. Lazy (Dask) path
+    # We use data variables to ensure they stay lazy, as xarray often computes coordinates
+    ds_lazy = xr.Dataset(
+        data_vars={
+            "latitude": (["lat_dim"], da.from_array(lats, chunks=1)),
+            "longitude": (["lon_dim"], da.from_array(lons, chunks=1)),
+        }
+    )
+    result_lazy = get_giorgi_region_df(ds_lazy)
+
+    # Assertions
+    assert not hasattr(result_eager.GIORGI_INDEX.data, "chunks")
+    assert hasattr(result_lazy.GIORGI_INDEX.data, "chunks")
+
+    # Values should be identical after compute
+    np.testing.assert_allclose(
+        result_eager.GIORGI_INDEX.values, result_lazy.GIORGI_INDEX.compute().values
+    )
