@@ -2,10 +2,11 @@
 
 import warnings
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
-from .base import BaseAccessor, has_monet_regrid
+from .base import BaseAccessor, has_xregrid
 
 has_pyresample = False
 has_xesmf = False
@@ -134,9 +135,7 @@ class MONETAccessor(BaseAccessor):
             da[name] = xr.apply_ufunc(vectorize(cf_to_dt64), da[name])
         return da
 
-    def structure_for_monet(
-        self, lat_name="lat", lon_name="lon", return_obj=True, coards_compliant=False
-    ):
+    def structure_for_monet(self, lat_name="lat", lon_name="lon", return_obj=True, coards_compliant=False):
         """Structure the DataArray for use with MONET functions.
 
         Parameters
@@ -170,17 +169,19 @@ class MONETAccessor(BaseAccessor):
                 coards_compliant=coards_compliant,
             )
 
-    def stratify(self, levels, vertical, axis=1):
+    def stratify(self, levels, vertical, axis=1, tension=0.0):
         """Vertically interpolate data to specified levels.
 
         Parameters
         ----------
         levels : array-like
             Target vertical levels.
-        vertical : xarray.DataArray
-            Vertical coordinate values.
+        vertical : xarray.DataArray or str
+            Vertical coordinate values or name.
         axis : int, default: 1
             Axis along which to interpolate.
+        tension : float, default: 0.0
+            Tension factor for the spline interpolation.
 
         Returns
         -------
@@ -192,12 +193,10 @@ class MONETAccessor(BaseAccessor):
         if isinstance(vertical, str):
             vertical = self._obj[vertical]
 
-        out = resample_stratify(self._obj, levels, vertical, axis=axis)
+        out = resample_stratify(self._obj, levels, vertical, axis=axis, tension=tension)
         return out
 
-    def interp_constant_lat(
-        self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs
-    ):
+    def interp_constant_lat(self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs):
         """Interpolate data to a constant latitude.
 
         Parameters
@@ -292,7 +291,7 @@ class MONETAccessor(BaseAccessor):
         tuple
             (i, j) indices of nearest point(s).
         """
-        raise NotImplementedError("nearest_ij is not yet implemented with monet-regrid")
+        raise NotImplementedError("nearest_ij is not yet implemented with xregrid")
 
     def nearest_latlon(self, lat=None, lon=None, cleanup=True, esmf=False, **kwargs):
         """Extract data at nearest lat/lon point(s).
@@ -320,7 +319,7 @@ class MONETAccessor(BaseAccessor):
 
         self._obj = self._rename_latlon(self._obj)
 
-        # Use monet-regrid via resample
+        # Use xregrid via resample
         from ..util.interp_util import constant_1d_xesmf
         from ..util.resample import resample
 
@@ -427,16 +426,16 @@ class MONETAccessor(BaseAccessor):
         return False
 
     def remap(self, data, method="nearest", radius_of_influence=1e6, **kwargs):
-        """Remap data using monet-regrid.
+        """Remap data using xregrid.
 
         Parameters
         ----------
         data : xarray.DataArray or xarray.Dataset
             Data to remap.
         method : str, default: 'nearest'
-            Resampling method: 'nearest', 'bilinear', or others supported by monet-regrid.
+            Resampling method: 'nearest', 'bilinear', or others supported by xregrid.
         radius_of_influence : float, default: 1e6
-            Search radius in meters (unused in monet-regrid).
+            Search radius in meters (unused in xregrid).
         **kwargs : dict
             Additional keyword arguments for the resampler.
 
@@ -445,8 +444,8 @@ class MONETAccessor(BaseAccessor):
         xarray.DataArray or xarray.Dataset
             Remapped data.
         """
-        if not has_monet_regrid:
-            raise ImportError("monet-regrid is required for this functionality")
+        if not has_xregrid:
+            raise ImportError("xregrid is required for this functionality")
 
         from ..util import resample
 
@@ -477,9 +476,7 @@ class MONETAccessor(BaseAccessor):
             DeprecationWarning,
             stacklevel=2,
         )
-        return self.remap(
-            data, method="nearest", radius_of_influence=radius_of_influence, **kwargs
-        )
+        return self.remap(data, method="nearest", radius_of_influence=radius_of_influence, **kwargs)
 
     def remap_xesmf(self, data, **kwargs):
         """Deprecated: Remap data using xESMF regridding."""
@@ -522,12 +519,10 @@ class MONETAccessor(BaseAccessor):
         else:
             print("`data` must be a pandas.DataFrame")
 
-    def remap_nearest_parallel(
-        self, data, radius_of_influence=1e6, n_processes=None, **kwargs
-    ):
+    def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
         """Deprecated: Remap data using nearest neighbor interpolation with parallel processing."""
         warnings.warn(
-            "remap_nearest_parallel is deprecated. monet-regrid uses dask for parallelization.",
+            "remap_nearest_parallel is deprecated. xregrid uses dask for parallelization.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -538,21 +533,15 @@ class MONETAccessor(BaseAccessor):
 
         Deprecated as ESMF dependency is removed.
         """
-        raise NotImplementedError(
-            "This function relies on ESMF which has been removed."
-        )
+        raise NotImplementedError("This function relies on ESMF which has been removed.")
 
     def to_area_def(self, projection="platea", resolution=None, area_id=None):
         """Deprecated: Convert the dataarray's coordinates to a pyresample AreaDefinition."""
-        raise NotImplementedError(
-            "This function relies on pyresample which has been removed."
-        )
+        raise NotImplementedError("This function relies on pyresample which has been removed.")
 
     def to_swath_def(self):
         """Deprecated: Convert the dataarray's coordinates to a pyresample SwathDefinition."""
-        raise NotImplementedError(
-            "This function relies on pyresample which has been removed."
-        )
+        raise NotImplementedError("This function relies on pyresample which has been removed.")
 
     def compare(
         self,
@@ -590,8 +579,6 @@ class MONETAccessor(BaseAccessor):
             The statistic DataArray, or (fig, ax) if plot=True.
         """
 
-        import numpy as np
-
         stat_kwargs = stat_kwargs or {}
         plot_kwargs = plot_kwargs or {}
         da1 = self._obj
@@ -615,17 +602,11 @@ class MONETAccessor(BaseAccessor):
                 except (ImportError, AttributeError) as e:
                     # fallback to built-in
                     if stat.lower() == "rmse":
-                        stat_da = np.sqrt(
-                            ((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None))
-                        )
+                        stat_da = np.sqrt(((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None)))
                     elif stat.lower() == "mae":
-                        stat_da = np.abs(da1 - da2).mean(
-                            dim=stat_kwargs.get("dim", None)
-                        )
+                        stat_da = np.abs(da1 - da2).mean(dim=stat_kwargs.get("dim", None))
                     elif stat.lower() == "mse":
-                        stat_da = ((da1 - da2) ** 2).mean(
-                            dim=stat_kwargs.get("dim", None)
-                        )
+                        stat_da = ((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None))
                     else:
                         raise ValueError(f"Unknown stat: {stat}") from e
         else:
@@ -636,9 +617,7 @@ class MONETAccessor(BaseAccessor):
             # Convert scalar to DataArray if needed
             stat_da = xr.DataArray(stat_da)
 
-        stat_da.name = (
-            stat if isinstance(stat, str) else getattr(stat, "__name__", "statistic")
-        )
+        stat_da.name = stat if isinstance(stat, str) else getattr(stat, "__name__", "statistic")
         if plot:
             plot_func = getattr(stat_da.monet, plot_method)
             return plot_func(**plot_kwargs)

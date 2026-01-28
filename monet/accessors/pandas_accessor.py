@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from .base import BaseAccessor, has_monet_regrid
+from .base import BaseAccessor, has_xregrid
 
 
 @pd.api.extensions.register_dataframe_accessor("monet")
@@ -215,9 +215,7 @@ class MONETAccessorPandas(BaseAccessor):
         pyreample.geometry.SwathDefinition
             SwathDefinition object for data points.
         """
-        raise NotImplementedError(
-            "This function relies on pyresample which has been removed."
-        )
+        raise NotImplementedError("This function relies on pyresample which has been removed.")
 
     def _df_to_da(self, d=None):  # TODO: should be `to_ds` or `to_xarray`
         """Convert DataFrame to xarray.
@@ -265,8 +263,8 @@ class MONETAccessorPandas(BaseAccessor):
         pandas.DataFrame
             Remapped DataFrame.
         """
-        if not has_monet_regrid:
-            raise ImportError("monet-regrid is required for this functionality")
+        if not has_xregrid:
+            raise ImportError("xregrid is required for this functionality")
 
         from ..util import resample
 
@@ -278,24 +276,24 @@ class MONETAccessorPandas(BaseAccessor):
         source_data_da = self._df_to_da(source_data)
         target_data_da = self._df_to_da(target_data)
 
-        # Use monet-regrid to resample
+        # Use xregrid to resample
         # source and target are DataFrames converted to xarray Datasets
         # We want to resample source to target grid
 
         # We are resampling the fake index variable
         da_source = source_data_da["monet_fake_index"]
 
-        # We need target to be a dataset for monet-regrid usually
+        # We need target to be a dataset for xregrid usually
         # but here we have point data.
-        # monet-regrid might struggle with 1xN 'y','x' grid if it expects 2D lat/lon
+        # xregrid might struggle with 1xN 'y','x' grid if it expects 2D lat/lon
         # But let's try using resample helper
 
         # Note: resample takes (source, target, method)
 
-        # We need to ensure coords are correct for monet-regrid
+        # We need ensure coords are correct for xregrid
         # It expects "lat" and "lon" or "latitude" and "longitude"
 
-        # If monet-regrid supports point-to-point via "nearest", then:
+        # If xregrid supports point-to-point via "nearest", then:
         res = resample.resample(da_source, target_data_da, method="nearest")
 
         r = res
@@ -308,9 +306,7 @@ class MONETAccessorPandas(BaseAccessor):
         # The merge logic might need adjustment if v index doesn't match exactly
         # But if it preserves index/coordinates it should be fine.
 
-        result = v.merge(source_data, how="left", on="monet_fake_index").drop(
-            "monet_fake_index", axis=1
-        )
+        result = v.merge(source_data, how="left", on="monet_fake_index").drop("monet_fake_index", axis=1)
         if combine:
             columns_to_use = result.columns.difference(target_data.columns)
             return pd.merge(
@@ -373,9 +369,7 @@ class MONETAccessorPandas(BaseAccessor):
         """
         Faceted map plotting is not supported for Pandas DataFrames.
         """
-        raise NotImplementedError(
-            "Faceted map plotting is only available for xarray DataArray and Dataset accessors."
-        )
+        raise NotImplementedError("Faceted map plotting is only available for xarray DataArray and Dataset accessors.")
 
     def plot_points_map(
         self,

@@ -17,6 +17,8 @@ dependencies:
   - pydecorate
   - seaborn
   - xarray
+  - esmpy
+  - mpi4py
   #
   # optional
   - pyresample

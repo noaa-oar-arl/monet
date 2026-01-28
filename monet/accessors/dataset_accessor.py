@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from .base import BaseAccessor, has_monet_regrid
+from .base import BaseAccessor, has_xregrid
 
 has_pyresample = False
 has_xesmf = False
@@ -114,12 +114,10 @@ class MONETAccessorDataset(BaseAccessor):
 
         return self.remap(data, method="xesmf", **kwargs)
 
-    def remap_nearest_parallel(
-        self, data, radius_of_influence=1e6, n_processes=None, **kwargs
-    ):
+    def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
         """Deprecated: Remap data using nearest neighbor interpolation with parallel processing."""
         warnings.warn(
-            "remap_nearest_parallel is deprecated. monet-regrid uses dask for parallelization.",
+            "remap_nearest_parallel is deprecated. xregrid uses dask for parallelization.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -130,17 +128,11 @@ class MONETAccessorDataset(BaseAccessor):
 
         Deprecated as ESMF dependency is removed.
         """
-        raise NotImplementedError(
-            "This function relies on ESMF which has been removed."
-        )
+        raise NotImplementedError("This function relies on ESMF which has been removed.")
 
-    def _remap_xesmf_dataset(
-        self, dset, filename="monet_xesmf_regrid_file.nc", **kwargs
-    ):
+    def _remap_xesmf_dataset(self, dset, filename="monet_xesmf_regrid_file.nc", **kwargs):
         """Deprecated: Remap dataset using xESMF."""
-        warnings.warn(
-            "_remap_xesmf_dataset is deprecated.", DeprecationWarning, stacklevel=2
-        )
+        warnings.warn("_remap_xesmf_dataset is deprecated.", DeprecationWarning, stacklevel=2)
         return self.remap(dset, method="xesmf", **kwargs)
 
     def _remap_xesmf_dataarray(
@@ -151,9 +143,7 @@ class MONETAccessorDataset(BaseAccessor):
         **kwargs,
     ):
         """Deprecated: Remap DataArray using xESMF."""
-        warnings.warn(
-            "_remap_xesmf_dataarray is deprecated.", DeprecationWarning, stacklevel=2
-        )
+        warnings.warn("_remap_xesmf_dataarray is deprecated.", DeprecationWarning, stacklevel=2)
         # We can implement this via resample
         from ..util import resample
 
@@ -165,16 +155,16 @@ class MONETAccessorDataset(BaseAccessor):
         return out
 
     def remap(self, data, method="nearest", radius_of_influence=1e6, **kwargs):
-        """Remap data using monet-regrid.
+        """Remap data using xregrid.
 
         Parameters
         ----------
         data : xarray.DataArray or xarray.Dataset
             Data to remap (Source).
         method : str, default: 'nearest'
-            Resampling method: 'nearest', 'bilinear', or others supported by monet-regrid.
+            Resampling method: 'nearest', 'bilinear', or others supported by xregrid.
         radius_of_influence : float, default: 1e6
-            Search radius in meters (unused in monet-regrid).
+            Search radius in meters (unused in xregrid).
         **kwargs : dict
             Additional keyword arguments for the resampler.
 
@@ -183,8 +173,8 @@ class MONETAccessorDataset(BaseAccessor):
         xarray.DataArray or xarray.Dataset
             Remapped data.
         """
-        if not has_monet_regrid:
-            raise ImportError("monet-regrid is required for this functionality")
+        if not has_xregrid:
+            raise ImportError("xregrid is required for this functionality")
 
         from ..util import resample
 
@@ -215,9 +205,7 @@ class MONETAccessorDataset(BaseAccessor):
             DeprecationWarning,
             stacklevel=2,
         )
-        return self.remap(
-            data, method="nearest", radius_of_influence=radius_of_influence, **kwargs
-        )
+        return self.remap(data, method="nearest", radius_of_influence=radius_of_influence, **kwargs)
 
     def remap_nearest_unstructured(self, data):
         """Remap unstructured grid data using nearest neighbor interpolation.
@@ -254,10 +242,7 @@ class MONETAccessorDataset(BaseAccessor):
 
         for siteii in np.arange(len(obs_data["siteid"][0])):
             site_indices.append(
-                np.argmin(
-                    np.abs(site_latitudes[siteii] - model_latitudes)
-                    + np.abs(site_longitudes[siteii] - model_longitudes)
-                )
+                np.argmin(np.abs(site_latitudes[siteii] - model_latitudes) + np.abs(site_longitudes[siteii] - model_longitudes))
             )
 
         dict_data = {}
@@ -267,9 +252,7 @@ class MONETAccessorDataset(BaseAccessor):
             else:
                 dict_data[dvar] = (
                     ["time", "z", "y", "x"],
-                    model_data[dvar][:, 0, np.array(site_indices)].values.reshape(
-                        len(model_data["time"]), 1, 1, len(site_indices)
-                    ),
+                    model_data[dvar][:, 0, np.array(site_indices)].values.reshape(len(model_data["time"]), 1, 1, len(site_indices)),
                 )
 
         dict_coords = {
@@ -306,7 +289,7 @@ class MONETAccessorDataset(BaseAccessor):
         tuple
             (i, j) indices of nearest point(s).
         """
-        raise NotImplementedError("nearest_ij is not yet implemented with monet-regrid")
+        raise NotImplementedError("nearest_ij is not yet implemented with xregrid")
 
     def nearest_latlon(self, lat=None, lon=None, cleanup=True, esmf=False, **kwargs):
         """Extract data at nearest lat/lon point(s).
@@ -342,9 +325,7 @@ class MONETAccessorDataset(BaseAccessor):
 
         return self._rename_latlon(output.squeeze())
 
-    def interp_constant_lat(
-        self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs
-    ):
+    def interp_constant_lat(self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs):
         """Interpolate data to a constant latitude.
 
         Parameters
@@ -424,7 +405,7 @@ class MONETAccessorDataset(BaseAccessor):
         out = resample(self._obj, target, **kwargs)
         return self._rename_latlon(out)
 
-    def stratify(self, levels, vertical, axis=1):
+    def stratify(self, levels, vertical, axis=1, tension=0.0):
         """Vertically interpolate data to specified levels.
 
         Parameters
@@ -435,6 +416,8 @@ class MONETAccessorDataset(BaseAccessor):
             Vertical coordinate values or name of the vertical coordinate.
         axis : int, default: 1
             Axis along which to interpolate.
+        tension : float, default: 0.0
+            Tension factor for the spline interpolation.
 
         Returns
         -------
@@ -455,18 +438,16 @@ class MONETAccessorDataset(BaseAccessor):
         ]
 
         if not loop_vars:
-            raise ValueError(
-                "No variables found with vertical dimension matching the provided coordinate"
-            )
+            raise ValueError("No variables found with vertical dimension matching the provided coordinate")
 
         from ..util.resample import resample_stratify
 
-        orig = resample_stratify(self._obj[loop_vars[0]], levels, vertical, axis=axis)
+        orig = resample_stratify(self._obj[loop_vars[0]], levels, vertical, axis=axis, tension=tension)
         dset = orig.to_dataset(name=loop_vars[0])
         dset.attrs = self._obj.attrs.copy()
 
         for vn in loop_vars[1:]:
-            dset[vn] = resample_stratify(self._obj[vn], levels, vertical, axis=axis)
+            dset[vn] = resample_stratify(self._obj[vn], levels, vertical, axis=axis, tension=tension)
 
         return dset
 
@@ -493,11 +474,9 @@ class MONETAccessorDataset(BaseAccessor):
         # Since we removed pyresample, we should implement a simple fallback or raise error
         # A simple window selection using xarray.sel or where could work if lat/lon are coords
         # But if they are 2D arrays, it is more complex.
-        # Given "monet-regrid" doesn't seem to expose simple windowing logic, we can try using standard xarray logic if possible
+        # Given "xregrid" doesn't seem to expose simple windowing logic, we can try using standard xarray logic if possible
         # or just raise NotImplementedError for now as it wasn't explicitly requested to be ported (only regridding).
-        raise NotImplementedError(
-            "Window functionality is unavailable without pyresample"
-        )
+        raise NotImplementedError("Window functionality is unavailable without pyresample")
 
     def combine_point(self, data, suffix=None, pyresample=True, **kwargs):
         """Combine point data with this Dataset.
@@ -564,15 +543,11 @@ class MONETAccessorDataset(BaseAccessor):
 
     def to_area_def(self, projection="platea", resolution=None, area_id=None):
         """Deprecated: Convert the dataset's coordinates to a pyresample AreaDefinition."""
-        raise NotImplementedError(
-            "This function relies on pyresample which has been removed."
-        )
+        raise NotImplementedError("This function relies on pyresample which has been removed.")
 
     def to_swath_def(self):
         """Deprecated: Convert the dataset's coordinates to a pyresample SwathDefinition."""
-        raise NotImplementedError(
-            "This function relies on pyresample which has been removed."
-        )
+        raise NotImplementedError("This function relies on pyresample which has been removed.")
 
     def quick_facet_time_map(
         self,

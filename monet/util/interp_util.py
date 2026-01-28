@@ -9,9 +9,7 @@ def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
 
     This function was part of the pyresample dependency and is deprecated.
     """
-    raise NotImplementedError(
-        "This function relies on pyresample which has been removed."
-    )
+    raise NotImplementedError("This function relies on pyresample which has been removed.")
 
 
 def lonlat_to_xesmf(longitude=None, latitude=None):
@@ -50,16 +48,12 @@ def lonlat_to_xesmf(longitude=None, latitude=None):
 
 def lonlat_to_swathdefinition(longitude=None, latitude=None):
     """Deprecated: Create a pyresample SwathDefinition from longitude and latitude arrays."""
-    raise NotImplementedError(
-        "This function relies on pyresample which has been removed."
-    )
+    raise NotImplementedError("This function relies on pyresample which has been removed.")
 
 
 def nearest_point_swathdefinition(longitude=None, latitude=None):
     """Deprecated: Create a SwathDefinition for a single point."""
-    raise NotImplementedError(
-        "This function relies on pyresample which has been removed."
-    )
+    raise NotImplementedError("This function relies on pyresample which has been removed.")
 
 
 def constant_1d_xesmf(longitude=None, latitude=None):
@@ -98,9 +92,7 @@ def constant_1d_xesmf(longitude=None, latitude=None):
 
 def constant_lat_swathdefition(longitude=None, latitude=None):
     """Deprecated: Create a SwathDefinition with constant latitude along a longitude array."""
-    raise NotImplementedError(
-        "This function relies on pyresample which has been removed."
-    )
+    raise NotImplementedError("This function relies on pyresample which has been removed.")
 
 
 def constant_lon_swathdefition(longitude=None, latitude=None):
@@ -132,9 +124,7 @@ def constant_lon_swathdefition(longitude=None, latitude=None):
     return geometry.SwathDefinition(lons=lons, lats=lats)
 
 
-def create_area_def_from_latlon(
-    lat, lon, projection="platea", resolution=None, area_id=None
-):
+def create_area_def_from_latlon(lat, lon, projection="platea", resolution=None, area_id=None):
     """Create a pyresample AreaDefinition from latitude and longitude arrays.
 
     Parameters
@@ -283,14 +273,10 @@ def create_area_def_from_latlon(
     description = f"Generated area definition ({projection})"
     proj_id = projection
 
-    return AreaDefinition(
-        area_id, description, proj_id, proj_dict, width, height, area_extent
-    )
+    return AreaDefinition(area_id, description, proj_id, proj_dict, width, height, area_extent)
 
 
-def create_area_def_from_dataset(
-    dataset, projection="platea", resolution=None, area_id=None
-):
+def create_area_def_from_dataset(dataset, projection="platea", resolution=None, area_id=None):
     """Create an AreaDefinition from an xarray Dataset or DataArray.
 
     Parameters
@@ -374,14 +360,10 @@ def get_grid_area_def(
 
     lon_2d, lat_2d = np.meshgrid(lon, lat)
 
-    return create_area_def_from_latlon(
-        lat_2d, lon_2d, projection=projection, area_id=area_id
-    )
+    return create_area_def_from_latlon(lat_2d, lon_2d, projection=projection, area_id=area_id)
 
 
-def create_area_def_from_esmf_mesh(
-    mesh, projection="platea", resolution=None, area_id=None
-):
+def create_area_def_from_esmf_mesh(mesh, projection="platea", resolution=None, area_id=None):
     """Create a pyresample AreaDefinition from an ESMF Mesh.
 
     Parameters
@@ -437,9 +419,7 @@ def create_area_def_from_esmf_mesh(
     return create_area_def_from_latlon(lats, lons, projection, resolution, area_id)
 
 
-def create_area_def_from_ugrid(
-    ugrid_dataset, projection="platea", resolution=None, area_id=None
-):
+def create_area_def_from_ugrid(ugrid_dataset, projection="platea", resolution=None, area_id=None):
     """Create a pyresample AreaDefinition from a UGRID-compliant dataset.
 
     Parameters
@@ -473,10 +453,7 @@ def create_area_def_from_ugrid(
     # First, identify the mesh topology variable
     mesh_topology_var = None
     for var in ugrid_dataset.variables:
-        if (
-            hasattr(ugrid_dataset[var], "cf_role")
-            and ugrid_dataset[var].cf_role == "mesh_topology"
-        ):
+        if hasattr(ugrid_dataset[var], "cf_role") and ugrid_dataset[var].cf_role == "mesh_topology":
             mesh_topology_var = var
             break
 
@@ -534,6 +511,4 @@ def mesh_to_swath_definition(mesh):
     -----
     This is more appropriate than AreaDefinition for unstructured grids.
     """
-    raise NotImplementedError(
-        "This function relies on pyresample which has been removed."
-    )
+    raise NotImplementedError("This function relies on pyresample which has been removed.")

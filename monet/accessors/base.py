@@ -3,11 +3,11 @@
 import xarray as xr
 
 try:
-    import monet_regrid  # noqa: F401
+    import xregrid  # noqa: F401
 
-    has_monet_regrid = True
+    has_xregrid = True
 except ImportError:
-    has_monet_regrid = False
+    has_xregrid = False
 
 
 def wrap_longitudes(lons):
@@ -239,13 +239,9 @@ class BaseAccessor:
         # Handle grid_xt dimension in UFS files
         if "grid_xt" in dset.dims:  # UFS
             if isinstance(dset, xr.DataArray):
-                dset = BaseAccessor._dataarray_coards_to_netcdf(
-                    dset, lat_name="grid_yt", lon_name="grid_xt"
-                )
+                dset = BaseAccessor._dataarray_coards_to_netcdf(dset, lat_name="grid_yt", lon_name="grid_xt")
             elif isinstance(dset, xr.Dataset):
-                dset = BaseAccessor._coards_to_netcdf(
-                    dset, lat_name="grid_yt", lon_name="grid_xt"
-                )
+                dset = BaseAccessor._coards_to_netcdf(dset, lat_name="grid_yt", lon_name="grid_xt")
 
         # Handle WRF dimensions
         if "south_north" in dset.dims:  # WRF WPS file
@@ -284,21 +280,15 @@ class BaseAccessor:
 
         # Rename lat/lon coordinates to 'latitude'/'longitude'
         dset = BaseAccessor._rename_to_monet_latlon(dset)  # common cases
-        if (
-            isinstance(dset, xr.Dataset)
-            and not {"latitude", "longitude"} <= set(dset.variables)
-        ) or (
-            isinstance(dset, xr.DataArray)
-            and not {"latitude", "longitude"} <= set(dset.coords)
+        if (isinstance(dset, xr.Dataset) and not {"latitude", "longitude"} <= set(dset.variables)) or (
+            isinstance(dset, xr.DataArray) and not {"latitude", "longitude"} <= set(dset.coords)
         ):
             dset = dset.rename({lat_name: "latitude", lon_name: "longitude"})
 
         # Maybe wrap longitudes
         if lon180 is None:
             try:
-                lon180 = (
-                    dset["longitude"].min() >= -180 and dset["longitude"].max() < 180
-                )
+                lon180 = dset["longitude"].min() >= -180 and dset["longitude"].max() < 180
             except (ValueError, TypeError):
                 # Handle case where longitude might be multidimensional
                 if dset["longitude"].ndim > 1:
@@ -316,20 +306,14 @@ class BaseAccessor:
 
         # Maybe convert 1-D lat/lon coords to 2-D
         if latlon2d is None:
-            latlon2d = (
-                dset["latitude"].ndim >= 2 if "latitude" in dset.coords else False
-            )
+            latlon2d = dset["latitude"].ndim >= 2 if "latitude" in dset.coords else False
 
         if not latlon2d:
             try:
                 if isinstance(dset, xr.DataArray):
-                    dset = BaseAccessor._dataarray_coards_to_netcdf(
-                        dset, lat_name="latitude", lon_name="longitude"
-                    )
+                    dset = BaseAccessor._dataarray_coards_to_netcdf(dset, lat_name="latitude", lon_name="longitude")
                 elif isinstance(dset, xr.Dataset):
-                    dset = BaseAccessor._coards_to_netcdf(
-                        dset, lat_name="latitude", lon_name="longitude"
-                    )
+                    dset = BaseAccessor._coards_to_netcdf(dset, lat_name="latitude", lon_name="longitude")
             except Exception as e:
                 # If conversion fails, log error and return original dataset
                 print(f"Error converting COARDS format: {e}")
@@ -511,9 +495,7 @@ class BaseAccessor:
 
         return result
 
-    def structure_for_monet(
-        self, lat_name="lat", lon_name="lon", return_obj=True, coards_compliant=False
-    ):
+    def structure_for_monet(self, lat_name="lat", lon_name="lon", return_obj=True, coards_compliant=False):
         """Structure the DataArray for use with MONET functions.
 
         Parameters

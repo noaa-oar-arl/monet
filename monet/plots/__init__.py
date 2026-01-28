@@ -4,15 +4,15 @@ import warnings
 from . import taylordiagram
 from .colorbars import cmap_discretize, colorbar_index
 from .mapgen import draw_map
-from .plots import create_taylor_diagram  # Import with original name
 from .plots import (
+    create_taylor_diagram,  # Import with original name
     kdeplot,
-    spatial_contourf,
-    spatial_imshow,
     normval,
     scatter,
     spatial,
     spatial_bias_scatter,
+    spatial_contourf,
+    spatial_imshow,
     timeseries,
     wind_barbs,
     wind_quiver,
@@ -128,9 +128,7 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
         if logo_height is not None:
             add_logo_kwargs["height"] = logo_height
         if ext.lower() not in {"png", "jpg", "jpeg"}:
-            raise ValueError(
-                f"only PNG and JPEG supported, but detected extension is {ext!r}"
-            )
+            raise ValueError(f"only PNG and JPEG supported, but detected extension is {ext!r}")
 
         img = Image.open(fname)
         dc = DecoratorAGG(img)  # cursor starts top-left

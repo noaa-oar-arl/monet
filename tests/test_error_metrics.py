@@ -1,5 +1,5 @@
-import numpy as np
 import monet_stats as stats
+import numpy as np
 
 
 def test_MNB():

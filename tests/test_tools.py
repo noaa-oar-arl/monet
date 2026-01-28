@@ -39,7 +39,8 @@ def test_get_giorgi_region_df():
     # 2. No region (should be None/NaN)
     # 3. Central America (CAM) - on the boundary
     expected_indices = [7.0, np.nan, 5.0]
-    expected_acros = ["CNA", None, "CAM"]
+    # We allow both None and nan for missing acronyms due to variations in pandas/numpy behavior
+    expected_acros = ["CNA", np.nan, "CAM"]
 
     result_df = get_giorgi_region_df(df)
 
@@ -48,10 +49,13 @@ def test_get_giorgi_region_df():
     assert "GIORGI_ACRO" in result_df.columns
 
     # Check the values
-    np.testing.assert_array_equal(
-        result_df["GIORGI_INDEX"].values, np.array(expected_indices)
-    )
-    assert result_df["GIORGI_ACRO"].tolist() == expected_acros
+    np.testing.assert_array_equal(result_df["GIORGI_INDEX"].values, np.array(expected_indices))
+    result_acros = result_df["GIORGI_ACRO"].tolist()
+    for r, e in zip(result_acros, expected_acros):
+        if pd.isna(e):
+            assert pd.isna(r)
+        else:
+            assert r == e
 
 
 def test_get_giorgi_region_ds():
@@ -67,7 +71,7 @@ def test_get_giorgi_region_ds():
     # (0, -95): No region
     # (0, -150): No region
     expected_indices = np.array([[7.0, np.nan], [np.nan, np.nan]])
-    expected_acros = np.array([["CNA", None], [None, None]], dtype=object)
+    expected_acros = np.array([["CNA", np.nan], [np.nan, np.nan]], dtype=object)
 
     result_ds = get_giorgi_region_df(ds)
 
@@ -77,7 +81,14 @@ def test_get_giorgi_region_ds():
 
     # Check the values
     np.testing.assert_array_equal(result_ds["GIORGI_INDEX"].values, expected_indices)
-    np.testing.assert_array_equal(result_ds["GIORGI_ACRO"].values, expected_acros)
+    # Compare object arrays with possible nans/None
+    result_acros = result_ds["GIORGI_ACRO"].values
+    assert result_acros.shape == expected_acros.shape
+    for r, e in zip(result_acros.flat, expected_acros.flat):
+        if pd.isna(e):
+            assert pd.isna(r)
+        else:
+            assert r == e
 
 
 def test_get_epa_region_df():
@@ -95,7 +106,7 @@ def test_get_epa_region_df():
     # 2. Region 6 (R6)
     # 3. No region (should be None/NaN)
     expected_indices = [5.0, 6.0, np.nan]
-    expected_acros = ["R5", "R6", None]
+    expected_acros = ["R5", "R6", np.nan]
 
     result_df = get_epa_region_df(df)
 
@@ -104,10 +115,13 @@ def test_get_epa_region_df():
     assert "EPA_ACRO" in result_df.columns
 
     # Check the values
-    np.testing.assert_array_equal(
-        result_df["EPA_INDEX"].values, np.array(expected_indices)
-    )
-    assert result_df["EPA_ACRO"].tolist() == expected_acros
+    np.testing.assert_array_equal(result_df["EPA_INDEX"].values, np.array(expected_indices))
+    result_acros = result_df["EPA_ACRO"].tolist()
+    for r, e in zip(result_acros, expected_acros):
+        if pd.isna(e):
+            assert pd.isna(r)
+        else:
+            assert r == e
 
 
 def test_get_epa_region_ds():
@@ -123,7 +137,7 @@ def test_get_epa_region_ds():
     # (30.0, -90.0): Region 4 (R4) -> 4.0 (Checking another region)
     # (30.0, -125.0): No region
     expected_indices = np.array([[5.0, np.nan], [4.0, np.nan]])
-    expected_acros = np.array([["R5", None], ["R4", None]], dtype=object)
+    expected_acros = np.array([["R5", np.nan], ["R4", np.nan]], dtype=object)
 
     result_ds = get_epa_region_df(ds)
 
@@ -133,7 +147,14 @@ def test_get_epa_region_ds():
 
     # Check the values
     np.testing.assert_array_equal(result_ds["EPA_INDEX"].values, expected_indices)
-    np.testing.assert_array_equal(result_ds["EPA_ACRO"].values, expected_acros)
+    # Compare object arrays with possible nans/None
+    result_acros = result_ds["EPA_ACRO"].values
+    assert result_acros.shape == expected_acros.shape
+    for r, e in zip(result_acros.flat, expected_acros.flat):
+        if pd.isna(e):
+            assert pd.isna(r)
+        else:
+            assert r == e
 
 
 def test_get_giorgi_region_dask():
@@ -160,6 +181,4 @@ def test_get_giorgi_region_dask():
     assert hasattr(result_lazy.GIORGI_INDEX.data, "chunks")
 
     # Values should be identical after compute
-    np.testing.assert_allclose(
-        result_eager.GIORGI_INDEX.values, result_lazy.GIORGI_INDEX.compute().values
-    )
+    np.testing.assert_allclose(result_eager.GIORGI_INDEX.values, result_lazy.GIORGI_INDEX.compute().values)

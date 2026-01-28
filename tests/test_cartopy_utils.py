@@ -1,5 +1,5 @@
-import numpy as np
 import matplotlib
+import numpy as np
 
 matplotlib.use("Agg")
 from monet.plots import cartopy_utils

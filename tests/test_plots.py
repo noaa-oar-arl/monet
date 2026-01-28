@@ -1,7 +1,3 @@
-import typing as t
-
-from cartopy.mpl.feature_artist import FeatureArtist
-from cartopy.mpl.gridliner import Gridliner
 import cartopy.crs as ccrs
 import matplotlib.axes
 import matplotlib.figure
@@ -10,6 +6,8 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from cartopy.mpl.feature_artist import FeatureArtist
+from cartopy.mpl.gridliner import Gridliner
 
 from monet.plots import plots
 from monet.plots.plots import _thin_data
@@ -60,7 +58,7 @@ def test_thin_data(wind_data):
 
 
 @pytest.fixture
-def wind_data_yx() -> t.Tuple[xr.DataArray, xr.DataArray]:
+def wind_data_yx() -> tuple[xr.DataArray, xr.DataArray]:
     """Create sample wind component data with y/x dimensions."""
     y = np.arange(40, 50, 0.5)
     x = np.arange(-100, -90, 0.5)
@@ -75,7 +73,7 @@ def wind_data_yx() -> t.Tuple[xr.DataArray, xr.DataArray]:
     return u, v
 
 
-def test_thin_data_yx(wind_data_yx: t.Tuple[xr.DataArray, xr.DataArray]) -> None:
+def test_thin_data_yx(wind_data_yx: tuple[xr.DataArray, xr.DataArray]) -> None:
     """Test the _thin_data helper function with non-standard y/x dimensions."""
     u, v = wind_data_yx
     thin = 5
@@ -152,14 +150,10 @@ def test_spatial_map_features(spatial_data: xr.DataArray) -> None:
         fig, ax = plots.spatial(spatial_data)
 
     # Check for coastlines by inspecting the collections on the axes
-    assert any(isinstance(artist, FeatureArtist) for artist in ax.collections), (
-        "Coastline artist not found on the axes."
-    )
+    assert any(isinstance(artist, FeatureArtist) for artist in ax.collections), "Coastline artist not found on the axes."
 
     # Check for gridlines by inspecting the `artists` list on the axes
-    assert any(isinstance(artist, Gridliner) for artist in ax.artists), (
-        "Gridliner artist not found on the axes."
-    )
+    assert any(isinstance(artist, Gridliner) for artist in ax.artists), "Gridliner artist not found on the axes."
 
     plt.close(fig)
 
@@ -219,9 +213,7 @@ def test_spatial_bias_scatter_xr(bias_scatter_data_xr: xr.Dataset) -> None:
 
     assert fig_out_2 is fig_in
     assert ax_out_2 is ax_in
-    assert len(ax_out_2.collections) > initial_collections, (
-        "Scatter plot should be added to existing axes"
-    )
+    assert len(ax_out_2.collections) > initial_collections, "Scatter plot should be added to existing axes"
     plt.close(fig_in)
 
 
@@ -284,7 +276,7 @@ def test_timeseries_plot(timeseries_df):
 
 
 @pytest.fixture
-def taylor_data() -> t.Tuple[pd.Series, pd.Series, pd.Series]:
+def taylor_data() -> tuple[pd.Series, pd.Series, pd.Series]:
     """Create sample data for a Taylor diagram."""
     obs = pd.Series(np.random.rand(100) * 10, name="obs")
     mod1 = pd.Series(np.random.rand(100) * 10 + 2, name="mod1")

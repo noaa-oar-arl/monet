@@ -23,9 +23,7 @@ def sample_dataarray_dask():
     lat = np.linspace(-10, 10, 5)
     lon = np.linspace(100, 120, 5)
     data = dask_array.from_array(np.arange(25).reshape(5, 5), chunks=5)
-    da_xr = xr.DataArray(
-        data, coords={"latitude": lat, "longitude": lon}, dims=["latitude", "longitude"]
-    )
+    da_xr = xr.DataArray(data, coords={"latitude": lat, "longitude": lon}, dims=["latitude", "longitude"])
     return da_xr
 
 
@@ -43,9 +41,7 @@ def sample_dataarray():
     lat = np.linspace(-10, 10, 5)
     lon = np.linspace(100, 120, 5)
     data = np.arange(25).reshape(5, 5)
-    da_xr = xr.DataArray(
-        data, coords={"latitude": lat, "longitude": lon}, dims=["latitude", "longitude"]
-    )
+    da_xr = xr.DataArray(data, coords={"latitude": lat, "longitude": lon}, dims=["latitude", "longitude"])
     return da_xr
 
 
@@ -86,9 +82,7 @@ def test_dataarray_accessor_basic(sample_dataarray):
             remapped = sample_dataarray.monet.remap(target, method=method)
             assert isinstance(remapped, xr.DataArray)
             assert remapped.shape == (7, 7)
-            np.testing.assert_allclose(
-                remapped.sum().item(), sample_dataarray.sum().item(), rtol=0.2, atol=1.0
-            )
+            np.testing.assert_allclose(remapped.sum().item(), sample_dataarray.sum().item(), rtol=0.2, atol=1.0)
         except Exception:
             pass
 
@@ -153,9 +147,7 @@ def test_dataarray_accessor_basic(sample_dataarray):
         pass
     # Test structure_for_monet with return_obj=False
     da2 = sample_dataarray.copy()
-    da2.monet.structure_for_monet(
-        lat_name="latitude", lon_name="longitude", return_obj=False
-    )
+    da2.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=False)
     assert isinstance(da2, xr.DataArray)
     da = sample_dataarray
     # Test wrap_longitudes
@@ -165,9 +157,7 @@ def test_dataarray_accessor_basic(sample_dataarray):
     tidy = da.monet.tidy(lon_name="longitude")
     assert np.all(np.diff(tidy.longitude.values) >= 0)
     # Test structure_for_monet
-    out = da.monet.structure_for_monet(
-        lat_name="latitude", lon_name="longitude", return_obj=True
-    )
+    out = da.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=True)
     assert isinstance(out, xr.DataArray)
     # Test cftime_to_datetime64 (should be a no-op for normal datetime)
     da2 = da.copy()
@@ -203,9 +193,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         print(f"Original sum: {original_sum}")
     # Test remap (pyresample, both nearest and bilinear)
     for method in ["nearest", "bilinear"]:
-        remapped = sample_dataarray_dask.monet.remap(
-            sample_dataarray_dask, method=method
-        )
+        remapped = sample_dataarray_dask.monet.remap(sample_dataarray_dask, method=method)
         assert isinstance(remapped, xr.DataArray)
         assert remapped.shape == sample_dataarray_dask.shape
         np.testing.assert_allclose(
@@ -259,9 +247,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         pass
     # Test structure_for_monet with return_obj=False
     da2 = sample_dataarray_dask.copy()
-    da2.monet.structure_for_monet(
-        lat_name="latitude", lon_name="longitude", return_obj=False
-    )
+    da2.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=False)
     assert isinstance(da2, xr.DataArray)
     da = sample_dataarray_dask
     # Test wrap_longitudes
@@ -271,9 +257,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
     tidy = da.monet.tidy(lon_name="longitude")
     assert np.all(np.diff(tidy.longitude.values) >= 0)
     # Test structure_for_monet
-    out = da.monet.structure_for_monet(
-        lat_name="latitude", lon_name="longitude", return_obj=True
-    )
+    out = da.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=True)
     assert isinstance(out, xr.DataArray)
     # Test cftime_to_datetime64 (should be a no-op for normal datetime)
     da2 = da.copy()
@@ -283,9 +267,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
     # Test remap (pyresample, both nearest and bilinear)
     for method in ["nearest", "bilinear"]:
         try:
-            remapped = sample_dataarray_dask.monet.remap(
-                sample_dataarray_dask, method=method
-            )
+            remapped = sample_dataarray_dask.monet.remap(sample_dataarray_dask, method=method)
             assert isinstance(remapped, xr.DataArray)
             assert remapped.shape == sample_dataarray_dask.shape
             # Dask-backed, so compute before comparing sums
@@ -342,9 +324,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         pass
     # Test structure_for_monet with return_obj=False
     da2 = sample_dataarray_dask.copy()
-    da2.monet.structure_for_monet(
-        lat_name="latitude", lon_name="longitude", return_obj=False
-    )
+    da2.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=False)
     assert isinstance(da2, xr.DataArray)
     da = sample_dataarray_dask
     # Test wrap_longitudes
@@ -354,9 +334,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
     tidy = da.monet.tidy(lon_name="longitude")
     assert np.all(np.diff(tidy.longitude.values) >= 0)
     # Test structure_for_monet
-    out = da.monet.structure_for_monet(
-        lat_name="latitude", lon_name="longitude", return_obj=True
-    )
+    out = da.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=True)
     assert isinstance(out, xr.DataArray)
     # Test cftime_to_datetime64 (should be a no-op for normal datetime)
     da2 = da.copy()
@@ -426,9 +404,7 @@ def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
     # Test remap (pyresample, both nearest and bilinear)
     for method in ["nearest", "bilinear"]:
         try:
-            remapped = sample_dataset_dask.monet.remap(
-                sample_dataset_dask, method=method
-            )
+            remapped = sample_dataset_dask.monet.remap(sample_dataset_dask, method=method)
             assert isinstance(remapped, xr.Dataset)
             assert remapped["var"].shape == sample_dataset_dask["var"].shape
             np.testing.assert_allclose(
@@ -554,19 +530,13 @@ def test_pandas_accessor_basic(sample_dataframe):
     renamed2 = DF_Monet.rename_for_monet(sample_dataframe)
     assert "latitude" in renamed2.columns and "longitude" in renamed2.columns
     # Test rename_for_monet with other variants
-    df_lat = sample_dataframe.copy().rename(
-        {"latitude": "Latitude", "longitude": "Longitude"}, axis=1
-    )
+    df_lat = sample_dataframe.copy().rename({"latitude": "Latitude", "longitude": "Longitude"}, axis=1)
     renamed3 = DF_Monet.rename_for_monet(df_lat)
     assert "latitude" in renamed3.columns and "longitude" in renamed3.columns
-    df_lat = sample_dataframe.copy().rename(
-        {"latitude": "Lat", "longitude": "Lon"}, axis=1
-    )
+    df_lat = sample_dataframe.copy().rename({"latitude": "Lat", "longitude": "Lon"}, axis=1)
     renamed4 = DF_Monet.rename_for_monet(df_lat)
     assert "latitude" in renamed4.columns and "longitude" in renamed4.columns
-    df_lat = sample_dataframe.copy().rename(
-        {"latitude": "LAT", "longitude": "LON"}, axis=1
-    )
+    df_lat = sample_dataframe.copy().rename({"latitude": "LAT", "longitude": "LON"}, axis=1)
     renamed5 = DF_Monet.rename_for_monet(df_lat)
     assert "latitude" in renamed5.columns and "longitude" in renamed5.columns
     df = sample_dataframe

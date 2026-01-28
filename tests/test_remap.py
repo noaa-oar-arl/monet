@@ -1,6 +1,7 @@
-import pytest
 import numpy as np
+import pytest
 import xarray as xr
+
 import monet  # noqa: F401
 
 # Try to import cf_xarray to ensure accessor is registered
@@ -17,8 +18,13 @@ try:
 except ImportError:
     has_xesmf = False
 
-# Check if monet_regrid is available by checking for the regrid accessor
-has_monet_regrid = hasattr(xr.Dataset, "regrid")
+# Check if xregrid is available
+try:
+    import xregrid  # noqa: F401
+
+    has_xregrid = True
+except ImportError:
+    has_xregrid = False
 
 
 @pytest.mark.skipif(not has_xesmf, reason="xesmf not installed")
@@ -26,7 +32,7 @@ def test_import_xesmf():
     import xesmf  # noqa: F401
 
 
-@pytest.mark.skipif(not has_xesmf, reason="xesmf not installed")
+@pytest.mark.skipif(not has_xesmf and not has_xregrid, reason="xesmf/xregrid not installed")
 def test_remap_ds_ds():
     # Barry noted a problem with this
 
@@ -57,9 +63,7 @@ def test_remap_ds_ds():
     target.monet.remap_xesmf(source, method="nearest_d2s")
 
 
-@pytest.mark.skipif(
-    not has_monet_regrid, reason="monet-regrid not installed or accessor not available"
-)
+@pytest.mark.skipif(not has_xregrid, reason="xregrid not installed")
 def test_combine_da_da():
     # This is used in MM aircraft branch
 

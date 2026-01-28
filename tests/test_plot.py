@@ -12,10 +12,10 @@ try:
 except ImportError:
     CARTOPY_AVAILABLE = False
 
-import monet  # noqa: F401
 import numpy as np
 import pandas as pd
 
+import monet  # noqa: F401
 from monet.plots import plots as p
 from monet.plots.mapgen import draw_map
 

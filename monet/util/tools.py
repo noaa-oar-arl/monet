@@ -2,10 +2,7 @@
 Utility tools for MONET.
 """
 
-from typing import Optional, Tuple
-
 import datetime
-from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -226,9 +223,7 @@ EPA_LATMIN = [
 ]
 
 
-def search_listinlist(
-    array1: np.ndarray, array2: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray]:
+def search_listinlist(array1: np.ndarray, array2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Find matching indices between two arrays.
 
     Parameters
@@ -257,7 +252,7 @@ def search_listinlist(
     return np.sort(index1), np.sort(index2)
 
 
-def linregress(x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float, float]:
+def linregress(x: np.ndarray, y: np.ndarray) -> tuple[float, float, float, float]:
     """Perform a linear regression using statsmodels.
 
     Parameters
@@ -288,7 +283,7 @@ def linregress(x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float, float
     return a, b, rsquared, std_err
 
 
-def findclosest(list_obj: list, value: float) -> Tuple[int, float]:
+def findclosest(list_obj: list, value: float) -> tuple[int, float]:
     """Find the index and value of the closest element to a target value.
 
     Parameters
@@ -309,7 +304,7 @@ def findclosest(list_obj: list, value: float) -> Tuple[int, float]:
     return a[2], a[1]
 
 
-def _force_forder(x: np.ndarray) -> Tuple[np.ndarray, bool]:
+def _force_forder(x: np.ndarray) -> tuple[np.ndarray, bool]:
     """
     Converts arrays x to fortran order. Returns
     a tuple in the form (x, is_transposed).
@@ -332,9 +327,7 @@ def _force_forder(x: np.ndarray) -> Tuple[np.ndarray, bool]:
         return (x, False)
 
 
-def kolmogorov_zurbenko_filter(
-    df: pd.DataFrame, col: str, window: int, iterations: int
-) -> pd.DataFrame:
+def kolmogorov_zurbenko_filter(df: pd.DataFrame, col: str, window: int, iterations: int) -> pd.DataFrame:
     """Apply a Kolmogorov-Zurbenko filter to a specific column in a DataFrame.
 
     A Kolmogorov-Zurbenko filter is a low-pass filter created by iteratively
@@ -361,18 +354,12 @@ def kolmogorov_zurbenko_filter(
     z = df.copy()
     for i in range(iterations):
         z.index = z.time_local
-        z = (
-            z.groupby("siteid")[col]
-            .rolling(window, center=True, min_periods=1)
-            .mean()
-            .reset_index()
-            .dropna()
-        )
+        z = z.groupby("siteid")[col].rolling(window, center=True, min_periods=1).mean().reset_index().dropna()
     df = df.reset_index(drop=True)
     return df.merge(z, on=["siteid", "time_local"])
 
 
-def wsdir2uv(ws: np.ndarray, wdir: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def wsdir2uv(ws: np.ndarray, wdir: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Convert wind speed and direction to U and V components.
 
     Parameters
@@ -432,18 +419,14 @@ def long_to_wide(df: pd.DataFrame) -> pd.DataFrame:
     pandas.DataFrame
         DataFrame in wide format with variables as columns
     """
-    w = df.pivot_table(
-        values="obs", index=["time", "siteid"], columns="variable"
-    ).reset_index()
+    w = df.pivot_table(values="obs", index=["time", "siteid"], columns="variable").reset_index()
     g = df.groupby("variable")
     for name, group in g:
         w[name + "_unit"] = group.units.unique()[0]
     return merge(w, df, on=["siteid", "time"])
 
 
-def calc_8hr_rolling_max(
-    df: pd.DataFrame, col: Optional[str] = None, window: Optional[int] = None
-) -> pd.DataFrame:
+def calc_8hr_rolling_max(df: pd.DataFrame, col: str | None = None, window: int | None = None) -> pd.DataFrame:
     """Calculate 8-hour rolling maximum values.
 
     Parameters
@@ -464,24 +447,13 @@ def calc_8hr_rolling_max(
         raise ValueError("col and window must be provided")
 
     df.index = df.time_local
-    df_rolling = (
-        df.groupby("siteid")[col]
-        .rolling(window, center=True, win_type="boxcar")
-        .mean()
-        .reset_index()
-        .dropna()
-    )
-    df_rolling_max = (
-        df_rolling.groupby("siteid")
-        .resample("D", on="time_local")
-        .max()
-        .reset_index(drop=True)
-    )
+    df_rolling = df.groupby("siteid")[col].rolling(window, center=True, win_type="boxcar").mean().reset_index().dropna()
+    df_rolling_max = df_rolling.groupby("siteid").resample("D", on="time_local").max().reset_index(drop=True)
     df = df.reset_index(drop=True)
     return df.merge(df_rolling_max, on=["siteid", "time_local"])
 
 
-def calc_24hr_ave(df: pd.DataFrame, col: Optional[str] = None) -> pd.DataFrame:
+def calc_24hr_ave(df: pd.DataFrame, col: str | None = None) -> pd.DataFrame:
     """Calculate 24-hour averages.
 
     Parameters
@@ -505,7 +477,7 @@ def calc_24hr_ave(df: pd.DataFrame, col: Optional[str] = None) -> pd.DataFrame:
     return df.merge(df_24hr_ave, on=["siteid", "time_local"])
 
 
-def calc_3hr_ave(df: pd.DataFrame, col: Optional[str] = None) -> pd.DataFrame:
+def calc_3hr_ave(df: pd.DataFrame, col: str | None = None) -> pd.DataFrame:
     """Calculate 3-hour averages.
 
     Parameters
@@ -529,7 +501,7 @@ def calc_3hr_ave(df: pd.DataFrame, col: Optional[str] = None) -> pd.DataFrame:
     return df.merge(df_3hr_ave, on=["siteid", "time_local"])
 
 
-def calc_annual_ave(df: pd.DataFrame, col: Optional[str] = None) -> pd.DataFrame:
+def calc_annual_ave(df: pd.DataFrame, col: str | None = None) -> pd.DataFrame:
     """Calculate annual averages.
 
     Parameters
@@ -553,9 +525,7 @@ def calc_annual_ave(df: pd.DataFrame, col: Optional[str] = None) -> pd.DataFrame
     return df.merge(df_annual_ave, on=["siteid", "time_local"])
 
 
-def get_giorgi_region_bounds(
-    index: Optional[int] = None, acronym: Optional[str] = None
-) -> np.ndarray:
+def get_giorgi_region_bounds(index: int | None = None, acronym: str | None = None) -> np.ndarray:
     """Get lat/lon boundaries for a Giorgi region.
 
     Giorgi regions are geographical regions defined for climate studies.
@@ -601,9 +571,7 @@ def get_giorgi_region_bounds(
         return df.loc[df.acronym == acronym.upper()].values.flatten()
 
 
-def _find_region_indices(
-    lon: np.ndarray, lat: np.ndarray, bounds: np.ndarray, indices: np.ndarray
-) -> np.ndarray:
+def _find_region_indices(lon: np.ndarray, lat: np.ndarray, bounds: np.ndarray, indices: np.ndarray) -> np.ndarray:
     """Core logic to find region indices for given lon/lat.
 
     Supports broadcasting for use with xarray.apply_ufunc.
@@ -614,12 +582,7 @@ def _find_region_indices(
     lon_b = lon[..., np.newaxis]
     lat_b = lat[..., np.newaxis]
 
-    is_inside = (
-        (lon_b >= bounds[:, 0])
-        & (lat_b >= bounds[:, 1])
-        & (lon_b <= bounds[:, 2])
-        & (lat_b <= bounds[:, 3])
-    )
+    is_inside = (lon_b >= bounds[:, 0]) & (lat_b >= bounds[:, 1]) & (lon_b <= bounds[:, 2]) & (lat_b <= bounds[:, 3])
 
     any_match = np.any(is_inside, axis=-1)
     region_idx = np.argmax(is_inside, axis=-1)
@@ -629,9 +592,7 @@ def _find_region_indices(
     return out
 
 
-def _find_region_acronyms(
-    lon: np.ndarray, lat: np.ndarray, bounds: np.ndarray, acronyms: np.ndarray
-) -> np.ndarray:
+def _find_region_acronyms(lon: np.ndarray, lat: np.ndarray, bounds: np.ndarray, acronyms: np.ndarray) -> np.ndarray:
     """Core logic to find region acronyms for given lon/lat.
 
     Supports broadcasting for use with xarray.apply_ufunc.
@@ -639,12 +600,7 @@ def _find_region_acronyms(
     lon_b = lon[..., np.newaxis]
     lat_b = lat[..., np.newaxis]
 
-    is_inside = (
-        (lon_b >= bounds[:, 0])
-        & (lat_b >= bounds[:, 1])
-        & (lon_b <= bounds[:, 2])
-        & (lat_b <= bounds[:, 3])
-    )
+    is_inside = (lon_b >= bounds[:, 0]) & (lat_b >= bounds[:, 1]) & (lon_b <= bounds[:, 2]) & (lat_b <= bounds[:, 3])
 
     any_match = np.any(is_inside, axis=-1)
     region_idx = np.argmax(is_inside, axis=-1)
@@ -655,8 +611,8 @@ def _find_region_acronyms(
 
 
 def get_giorgi_region_df(
-    dset: Union[pd.DataFrame, xr.Dataset],
-) -> Union[pd.DataFrame, xr.Dataset]:
+    dset: pd.DataFrame | xr.Dataset,
+) -> pd.DataFrame | xr.Dataset:
     """Add Giorgi region index and acronym to DataFrame or Dataset.
 
     This implementation is backend-agnostic and supports Dask-backed
@@ -709,17 +665,13 @@ def get_giorgi_region_df(
         # Update history
         curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         history = dset.attrs.get("history", "")
-        dset.attrs["history"] = (
-            history + f"\n{curr_time} > Added GIORGI regions via get_giorgi_region_df"
-        )
+        dset.attrs["history"] = history + f"\n{curr_time} > Added GIORGI regions via get_giorgi_region_df"
         return dset
     else:
         raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")
 
 
-def get_epa_region_bounds(
-    index: Optional[int] = None, acronym: Optional[str] = None
-) -> np.ndarray:
+def get_epa_region_bounds(index: int | None = None, acronym: str | None = None) -> np.ndarray:
     """Get lat/lon boundaries for an EPA region.
 
     Parameters
@@ -760,8 +712,8 @@ def get_epa_region_bounds(
 
 
 def get_epa_region_df(
-    dset: Union[pd.DataFrame, xr.Dataset],
-) -> Union[pd.DataFrame, xr.Dataset]:
+    dset: pd.DataFrame | xr.Dataset,
+) -> pd.DataFrame | xr.Dataset:
     """Add EPA region index and acronym to DataFrame or Dataset.
 
     This implementation is backend-agnostic and supports Dask-backed
@@ -814,9 +766,7 @@ def get_epa_region_df(
         # Update history
         curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         history = dset.attrs.get("history", "")
-        dset.attrs["history"] = (
-            history + f"\n{curr_time} > Added EPA regions via get_epa_region_df"
-        )
+        dset.attrs["history"] = history + f"\n{curr_time} > Added EPA regions via get_epa_region_df"
         return dset
     else:
         raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")

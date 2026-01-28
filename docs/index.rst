@@ -48,7 +48,7 @@ MONET features include:
     using the ``.monet`` attribute
   * :ref:`pandas accessor <pandas-accessors>` for ``pandas.DataFrame``
     using the ``.monet`` attribute
-  * vertical interpolation using `python-stratify <https://github.com/SciTools/python-stratify>`_
+  * vertical interpolation using `pytspack <https://github.com/noaa-oar-arl/pytspack>`_
     using the ``.monet.stratify`` function
   * spatial interpolation using ``.monet.remap`` including:
 

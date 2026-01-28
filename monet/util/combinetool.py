@@ -31,9 +31,7 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
     """
     suffix = kwargs.pop("suffix", "_new")
 
-    target_da = df.drop_duplicates(subset=["siteid"]).dropna(
-        subset=["latitude", "longitude", "siteid"]
-    )
+    target_da = df.drop_duplicates(subset=["siteid"]).dropna(subset=["latitude", "longitude", "siteid"])
 
     # Rename lat/lon columns if needed
     if "lat" in target_da.columns:
@@ -54,15 +52,11 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
 
     # Add if statement for unstructured grid output
     if da.attrs.get("mio_has_unstructured_grid", False):
-        # Fallback to nearest neighbor or implement proper unstructured regrid if monet-regrid supports it
-        # For now, using remap which uses monet-regrid
-        da_interped = target_data_da.monet.remap(
-            da, method="nearest", **kwargs
-        ).compute()
+        # Fallback to nearest neighbor or implement proper unstructured regrid if xregrid supports it
+        # For now, using remap which uses xregrid
+        da_interped = target_data_da.monet.remap(da, method="nearest", **kwargs).compute()
     else:
-        da_interped = target_data_da.monet.remap(
-            da, method="nearest", **kwargs
-        ).compute()
+        da_interped = target_data_da.monet.remap(da, method="nearest", **kwargs).compute()
 
     da_interped["siteid"] = (("x"), target_da.siteid)
     da_interped_df = da_interped.to_dataframe().reset_index()
@@ -195,20 +189,16 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
         target = target.rename(columns={"LAT": "latitude", "LON": "longitude"})
 
     # Create compatible dataset for the point locations
-    point_ds = lonlat_to_xesmf(
-        longitude=target.longitude.values, latitude=target.latitude.values
-    )
+    point_ds = lonlat_to_xesmf(longitude=target.longitude.values, latitude=target.latitude.values)
 
-    # Use resample (monet-regrid) to resample the data
-    # Note: monet-regrid might expect 2D coords, lonlat_to_xesmf creates 2D meshgrid or similar
+    # Use resample (xregrid) to resample the data
+    # Note: xregrid might expect 2D coords, lonlat_to_xesmf creates 2D meshgrid or similar
     result = resample(da, point_ds, **kwargs)
 
     # Convert to DataFrame
     if isinstance(result, xr.DataArray):
         varname = result.name if result.name is not None else "model_data"
-        sdf = pd.DataFrame(
-            {varname + suffix: result.values.ravel()}, index=target.index
-        )
+        sdf = pd.DataFrame({varname + suffix: result.values.ravel()}, index=target.index)
     else:  # Dataset
         sdf = pd.DataFrame(index=target.index)
         for varname, datavar in result.data_vars.items():
@@ -248,9 +238,7 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
         print("da shape= ", da.shape, "daz shape= ", daz.shape)
         return -1
 
-    target = constant_1d_xesmf(
-        longitude=df.longitude.values, latitude=df.latitude.values
-    )
+    target = constant_1d_xesmf(longitude=df.longitude.values, latitude=df.latitude.values)
 
     da_interped = resample(da, target, **kwargs)  # interpolate fields
     daz_interped = resample(daz, target, **kwargs)
@@ -263,20 +251,14 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
 
     # sort aircraft target altitudes and call stratfiy from resample to do vertical interpolation
     # resample_stratify from monet accessor
-    daz_interped_xyz = daz_interped.monet.stratify(
-        sorted(df["altitude"]), daz_interped, axis=1
-    )
-    da_interped_xyz = da_interped.monet.stratify(
-        sorted(df["altitude"]), daz_interped, axis=1
-    )
+    daz_interped_xyz = daz_interped.monet.stratify(sorted(df["altitude"]), daz_interped, axis=1)
+    da_interped_xyz = da_interped.monet.stratify(sorted(df["altitude"]), daz_interped, axis=1)
     da_interped_xyz.name = da.name
     daz_interped_xyz.name = "altitude"
     df_interped_xyz = da_interped_xyz.to_dataframe().reset_index()
     dfz_interped_xyz = daz_interped_xyz.to_dataframe().reset_index()
 
-    df_interped_xyz.insert(
-        0, "altitude", dfz_interped_xyz["altitude"], allow_duplicates=True
-    )
+    df_interped_xyz.insert(0, "altitude", dfz_interped_xyz["altitude"], allow_duplicates=True)
 
     cols = Series(df_interped_xyz.columns)
     drop_cols = cols.loc[cols.isin(["x", "y", "z"])]
@@ -316,9 +298,7 @@ def combine_da_to_height_profile(da, dset, *, radius_of_influence=12e3):
     # from ..util.interp_util import nearest_point_swathdefinition
     lon, lat = dset.longitude, dset.latitude
     # target_grid = nearest_point_swathdefinition(longitude=lon, latitude=lat)
-    da_interped = da.monet.nearest_latlon(
-        lon=lon, lat=lat, radius_of_influence=radius_of_influence
-    )
+    da_interped = da.monet.nearest_latlon(lon=lon, lat=lat, radius_of_influence=radius_of_influence)
 
     # FIXME: interp to height here
 
@@ -327,9 +307,7 @@ def combine_da_to_height_profile(da, dset, *, radius_of_influence=12e3):
     return dset
 
 
-def combine_grid_to_point_esmf(
-    grid_data, point_df, method="bilinear", locstream_kwargs=None, regrid_kwargs=None
-):
+def combine_grid_to_point_esmf(grid_data, point_df, method="bilinear", locstream_kwargs=None, regrid_kwargs=None):
     """Combine gridded data with point observations using ESMF LocStream.
 
     Deprecated as ESMF dependency is removed.

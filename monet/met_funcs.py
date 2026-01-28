@@ -14,8 +14,6 @@ References
    https://doi.org/10.1029/2000WR900033.
 """
 
-from typing import Tuple
-
 import numpy as np
 from numpy.typing import ArrayLike
 
@@ -252,7 +250,7 @@ def calc_theta_s(
 
 def calc_sun_angles(
     lat: ArrayLike, lon: ArrayLike, stdlon: ArrayLike, doy: ArrayLike, ftime: ArrayLike
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """Calculates the Sun Zenith and Azimuth Angles (SZA & SAA).
 
     Parameters
@@ -294,9 +292,9 @@ def calc_sun_angles(
     w = np.asarray((solar_time - 12.0) * 15.0)
 
     # Get solar elevation angle
-    sin_thetha = np.cos(np.radians(w)) * np.cos(declination) * np.cos(
+    sin_thetha = np.cos(np.radians(w)) * np.cos(declination) * np.cos(np.radians(lat)) + np.sin(declination) * np.sin(
         np.radians(lat)
-    ) + np.sin(declination) * np.sin(np.radians(lat))
+    )
     sun_elev = np.arcsin(sin_thetha)
 
     # Get solar zenith angle
@@ -305,10 +303,7 @@ def calc_sun_angles(
 
     # Get solar azimuth angle
     cos_phi = np.asarray(
-        (
-            np.sin(declination) * np.cos(np.radians(lat))
-            - np.cos(np.radians(w)) * np.cos(declination) * np.sin(np.radians(lat))
-        )
+        (np.sin(declination) * np.cos(np.radians(lat)) - np.cos(np.radians(w)) * np.cos(declination) * np.sin(np.radians(lat)))
         / np.cos(sun_elev)
     )
     saa = np.zeros(sza.shape)
@@ -409,17 +404,11 @@ def calc_lapse_rate_moist(T_A_K: ArrayLike, ea: ArrayLike, p: ArrayLike) -> np.n
     r = calc_mixing_ratio(ea, p)
     c_p = calc_c_p(p, ea)
     lambda_v = calc_lambda(T_A_K)
-    Gamma_w = (
-        g
-        * (R_d * T_A_K**2 + lambda_v * r * T_A_K)
-        / (c_p * R_d * T_A_K**2 + lambda_v**2 * r * epsilon)
-    )
+    Gamma_w = g * (R_d * T_A_K**2 + lambda_v * r * T_A_K) / (c_p * R_d * T_A_K**2 + lambda_v**2 * r * epsilon)
     return Gamma_w
 
 
-def flux_2_evaporation(
-    flux: ArrayLike, T_K: ArrayLike = 20 + 273.15, time_domain: float = 1
-) -> np.ndarray:
+def flux_2_evaporation(flux: ArrayLike, T_K: ArrayLike = 20 + 273.15, time_domain: float = 1) -> np.ndarray:
     """Converts heat flux units (W m-2) to evaporation rates (mm time-1) to a given temporal window
 
     Parameters
@@ -635,15 +624,11 @@ def calc_richardson(
     T_A1 = np.asarray(T_A1)
 
     # See eq (2) from Louis 1979
-    Ri = -(gravity * (z_u - d_0) / T_A1) * (
-        ((T_R1 - T_R0) - (T_A1 - T_A0)) / u**2
-    )  # equation (12) [Norman2000]
+    Ri = -(gravity * (z_u - d_0) / T_A1) * (((T_R1 - T_R0) - (T_A1 - T_A0)) / u**2)  # equation (12) [Norman2000]
     return np.asarray(Ri)
 
 
-def calc_u_star(
-    u: ArrayLike, z_u: ArrayLike, L: ArrayLike, d_0: ArrayLike, z_0M: ArrayLike
-) -> np.ndarray:
+def calc_u_star(u: ArrayLike, z_u: ArrayLike, L: ArrayLike, d_0: ArrayLike, z_0M: ArrayLike) -> np.ndarray:
     """Friction velocity.
 
     Parameters

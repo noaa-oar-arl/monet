@@ -3,9 +3,7 @@
 import matplotlib.pyplot as plt
 
 
-def colorbar_index(
-    ncolors, cmap, minval=None, maxval=None, dtype="int", ax=None, **kwargs
-):
+def colorbar_index(ncolors, cmap, minval=None, maxval=None, dtype="int", ax=None, **kwargs):
     """Create a colorbar with discrete colors and custom tick labels.
 
     Parameters
@@ -45,17 +43,11 @@ def colorbar_index(
     colorbar = plt.colorbar(mappable, ax=ax, format="%1.2g", **kwargs)
     colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
     if (minval is None) & (maxval is not None):
-        colorbar.set_ticklabels(
-            np.around(np.linspace(0, maxval, ncolors).astype(dtype), 2)
-        )
+        colorbar.set_ticklabels(np.around(np.linspace(0, maxval, ncolors).astype(dtype), 2))
     elif (minval is None) & (maxval is None):
-        colorbar.set_ticklabels(
-            np.around(np.linspace(0, ncolors, ncolors).astype(dtype), 2)
-        )
+        colorbar.set_ticklabels(np.around(np.linspace(0, ncolors, ncolors).astype(dtype), 2))
     else:
-        colorbar.set_ticklabels(
-            np.around(np.linspace(minval, maxval, ncolors).astype(dtype), 2)
-        )
+        colorbar.set_ticklabels(np.around(np.linspace(minval, maxval, ncolors).astype(dtype), 2))
 
     return colorbar, cmap
 
@@ -100,12 +92,9 @@ def cmap_discretize(cmap, N):
     indices = np.linspace(0, 1.0, N + 1)
     cdict = {}
     for ki, key in enumerate(("red", "green", "blue")):
-        cdict[key] = [
-            (indices[i], colors_rgba[i - 1, ki], colors_rgba[i, ki])
-            for i in range(N + 1)
-        ]
+        cdict[key] = [(indices[i], colors_rgba[i - 1, ki], colors_rgba[i, ki]) for i in range(N + 1)]
     # Return colormap object.
-    return mcolors.LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)
+    return mcolors.LinearSegmentedColormap(f"{cmap.name}_{N}", cdict, 1024)
 
 
 # def o3cmap():

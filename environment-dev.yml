@@ -17,7 +17,9 @@ dependencies:
   - pytest
   - pytest-cov
   - pooch
-  - python-stratify
+  - esmpy
+  - mpi4py
   - pip:
-    - monet-regrid @ git+https://github.com/noaa-oar-arl/monet-regrid
-    - monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats
+      - xregrid @ git+https://github.com/bbakernoaa/xregrid
+      - pytspack @ git+https://github.com/noaa-oar-arl/pytspack
+      - monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats

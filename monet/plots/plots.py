@@ -1,14 +1,13 @@
 """plotting routines"""
 
 import functools
+import typing as t
 import warnings
 
-import typing as t
-
-import pandas as pd
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 import xarray as xr
 
@@ -41,11 +40,7 @@ def _create_map(fig=None, ax=None, **kwargs):
     if ax is None:
         fig, ax = plt.subplots(
             figsize=(11, 8),
-            subplot_kw={
-                "projection": ccrs.LambertConformal(
-                    central_longitude=-97.5, central_latitude=38.5
-                )
-            },
+            subplot_kw={"projection": ccrs.LambertConformal(central_longitude=-97.5, central_latitude=38.5)},
             **kwargs,
         )
     else:
@@ -57,10 +52,10 @@ def _create_map(fig=None, ax=None, **kwargs):
 @_default_sns_context
 def spatial_plot(
     da: xr.DataArray,
-    fig: t.Optional[plt.Figure] = None,
-    ax: t.Optional[plt.Axes] = None,
+    fig: plt.Figure | None = None,
+    ax: plt.Axes | None = None,
     **kwargs,
-) -> t.Tuple[plt.Figure, plt.Axes]:
+) -> tuple[plt.Figure, plt.Axes]:
     """Create a spatial plot from an xarray.DataArray.
 
     Parameters
@@ -88,9 +83,9 @@ def spatial_plot(
 @_default_sns_context
 def spatial_imshow(
     da: xr.DataArray,
-    ax: t.Optional[plt.Axes] = None,
+    ax: plt.Axes | None = None,
     **kwargs,
-) -> t.Tuple[plt.Figure, plt.Axes]:
+) -> tuple[plt.Figure, plt.Axes]:
     """Create a spatial plot from an xarray.DataArray using imshow.
 
     Parameters
@@ -117,10 +112,10 @@ def spatial_imshow(
 @_default_sns_context
 def spatial(
     da: xr.DataArray,
-    fig: t.Optional[plt.Figure] = None,
-    ax: t.Optional[plt.Axes] = None,
+    fig: plt.Figure | None = None,
+    ax: plt.Axes | None = None,
     **kwargs,
-) -> t.Tuple[plt.Figure, plt.Axes]:
+) -> tuple[plt.Figure, plt.Axes]:
     """Create a spatial plot from an xarray.DataArray.
 
     A convenience wrapper for xarray's plot method with consistent styling.
@@ -147,8 +142,7 @@ def spatial(
         The figure and axes containing the plot.
     """
     warnings.warn(
-        "The function `spatial` is deprecated and will be removed in a future version. "
-        "Please use `spatial_plot` instead.",
+        "The function `spatial` is deprecated and will be removed in a future version. Please use `spatial_plot` instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -161,9 +155,9 @@ def spatial(
 @_default_sns_context
 def spatial_contourf(
     da: xr.DataArray,
-    ax: t.Optional[plt.Axes] = None,
+    ax: plt.Axes | None = None,
     **kwargs,
-) -> t.Tuple[plt.Figure, plt.Axes]:
+) -> tuple[plt.Figure, plt.Axes]:
     """Create a spatial plot from an xarray.DataArray using contourf.
 
     Parameters
@@ -187,9 +181,7 @@ def spatial_contourf(
     return fig, ax
 
 
-def _thin_data(
-    u: xr.DataArray, v: xr.DataArray, thin: int = 15
-) -> t.Tuple[xr.DataArray, xr.DataArray, np.ndarray, np.ndarray]:
+def _thin_data(u: xr.DataArray, v: xr.DataArray, thin: int = 15) -> tuple[xr.DataArray, xr.DataArray, np.ndarray, np.ndarray]:
     """Thin the data for wind plotting.
 
     Parameters
@@ -230,7 +222,7 @@ def wind_quiver(
     ax: plt.Axes = None,
     thin: int = 15,
     **kwargs,
-) -> t.Tuple[plt.Figure, plt.Axes]:
+) -> tuple[plt.Figure, plt.Axes]:
     """Create a quiver plot of wind vectors on a map.
 
     Parameters
@@ -278,7 +270,7 @@ def wind_barbs(
     ax: plt.Axes = None,
     thin: int = 15,
     **kwargs,
-) -> t.Tuple[plt.Figure, plt.Axes]:
+) -> tuple[plt.Figure, plt.Axes]:
     """Create a barbs plot of wind on a map.
 
     Parameters
@@ -348,14 +340,14 @@ def normval(vmin, vmax, cmap):
 def spatial_bias_scatter(
     ds: xr.Dataset,
     *,
-    vmin: t.Optional[float] = None,
-    vmax: t.Optional[float] = None,
+    vmin: float | None = None,
+    vmax: float | None = None,
     savename: str = "",
     cmap: str = "RdBu_r",
-    fig: t.Optional[plt.Figure] = None,
-    ax: t.Optional[plt.Axes] = None,
+    fig: plt.Figure | None = None,
+    ax: plt.Axes | None = None,
     **kwargs,
-) -> t.Tuple[plt.Figure, plt.Axes]:
+) -> tuple[plt.Figure, plt.Axes]:
     """Create a scatter plot showing bias on a map.
 
     Parameters
@@ -430,12 +422,12 @@ def timeseries(
     df: "pd.DataFrame",
     x: str = "time",
     y: str = "obs",
-    ax: t.Optional[plt.Axes] = None,
-    plotargs: t.Optional[t.Dict[str, t.Any]] = None,
-    fillargs: t.Optional[t.Dict[str, t.Any]] = None,
+    ax: plt.Axes | None = None,
+    plotargs: dict[str, t.Any] | None = None,
+    fillargs: dict[str, t.Any] | None = None,
     title: str = "",
-    ylabel: t.Optional[str] = None,
-    label: t.Optional[str] = None,
+    ylabel: str | None = None,
+    label: str | None = None,
 ) -> plt.Axes:
     """Create a timeseries plot with shaded error bounds.
 
@@ -587,7 +579,7 @@ def create_taylor_diagram(
     model_label: str = "Model",
     obs_label: str = "Reference",
     scale: float = 1.5,
-    dia: t.Optional[td.TaylorDiagram] = None,
+    dia: td.TaylorDiagram | None = None,
     **kwargs,
 ) -> td.TaylorDiagram:
     """Create a Taylor diagram from observation and model data.
@@ -649,9 +641,7 @@ def create_taylor_diagram(
         with sns.axes_style("ticks"):
             fig = plt.figure(figsize=(12, 10))
             obs_std = obs_clean.std()
-            dia = td.TaylorDiagram(
-                obs_std, scale=scale, fig=fig, rect=111, label=obs_label
-            )
+            dia = td.TaylorDiagram(obs_std, scale=scale, fig=fig, rect=111, label=obs_label)
             plt.grid(linewidth=1, alpha=0.5)
             contours = dia.add_contours(colors="0.5")
             plt.clabel(contours, inline=1, fontsize=10)

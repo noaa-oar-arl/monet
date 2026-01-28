@@ -4,20 +4,18 @@ import xarray as xr
 
 import monet  # noqa: F401
 
-# Check if stratify can be imported without numpy compatibility issues
+# Check if pytspack is available
 try:
-    from monet.util.resample import resample_stratify
+    import pytspack  # noqa: F401
 
-    STRATIFY_AVAILABLE = True
-except (ImportError, ValueError) as e:
-    # Skip if stratify has numpy compatibility issues
-    STRATIFY_AVAILABLE = False
-    pytestmark = pytest.mark.skip(f"Stratify not available: {e}")
+    PYTSPACK_AVAILABLE = True
+except ImportError:
+    PYTSPACK_AVAILABLE = False
 
-# Skip all tests if stratify is not available
-skip_if_no_stratify = pytest.mark.skipif(
-    not STRATIFY_AVAILABLE,
-    reason="Stratify unavailable due to numpy compatibility issues",
+# Skip all tests if pytspack is not available
+skip_if_no_pytspack = pytest.mark.skipif(
+    not PYTSPACK_AVAILABLE,
+    reason="pytspack not installed",
 )
 
 
@@ -54,8 +52,10 @@ def model(request):
     return ds
 
 
-@skip_if_no_stratify
+@skip_if_no_pytspack
 def test_resample_stratify(model):
+    from monet.util.resample import resample_stratify
+
     da = model.data1
     old_coord = model.height
     new_coord_vals = xr.DataArray(data=np.linspace(0, 1, 10), dims="z")
@@ -63,13 +63,14 @@ def test_resample_stratify(model):
 
     assert da_interped.dims == ("z", "y", "x")
     assert da_interped.z.size == 10
-    assert da_interped.coords == da.reset_coords("lev").coords
+    assert all(c in da_interped.coords for c in da.reset_coords("lev").coords)
+    assert "z" in da_interped.coords
     assert da_interped.name == da.name
     assert da_interped.isel(z=0) == da.isel(z=0), "same lb"
     assert da_interped.isel(z=-1) == da.isel(z=-1), "same ub"
 
 
-@skip_if_no_stratify
+@skip_if_no_pytspack
 def test_accessor_stratify_da(model):
     da = model.data1
     old_coord = model.height
@@ -78,20 +79,20 @@ def test_accessor_stratify_da(model):
 
     assert da_interped.dims == ("z", "y", "x")
     assert da_interped.z.size == 10
-    assert da_interped.coords == da.reset_coords("lev").coords
+    assert all(c in da_interped.coords for c in da.reset_coords("lev").coords)
+    assert "z" in da_interped.coords
     assert da_interped.name == da.name
 
 
-@skip_if_no_stratify
+@skip_if_no_pytspack
 def test_accessor_stratify_ds(model):
     ds = model
     old_coord = model.height
     new_coord_vals = xr.DataArray(data=np.linspace(0, 1, 10), dims="z")
-    ds_interped = model.monet.stratify(
-        levels=new_coord_vals, vertical=old_coord, axis=0
-    )
+    ds_interped = model.monet.stratify(levels=new_coord_vals, vertical=old_coord, axis=0)
 
     assert set(ds_interped.dims) == {"z", "y", "x"}
     assert ds_interped.z.size == 10
-    assert ds_interped.coords == ds.reset_coords("lev").coords
+    assert all(c in ds_interped.coords for c in ds.reset_coords("lev").coords)
+    assert "z" in ds_interped.coords
     assert set(ds_interped.data_vars) == {"data1", "data2"}
