@@ -21,7 +21,7 @@ jobs:
         shell: bash -l {0} # Necessary for micromamba to activate environments
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v2
@@ -46,7 +46,7 @@ jobs:
         shell: bash -l {0}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Micromamba (Docs)
         uses: mamba-org/setup-micromamba@v2
