@@ -1,126 +1,251 @@
+import numpy as np
 import pandas as pd
 import xarray as xr
 from pandas import Series, merge_asof
+
+try:
+    import dask.dataframe as dd
+
+    has_dask_df = True
+except ImportError:
+    has_dask_df = False
+
+
+def pair(model, obs, *, method="nearest", interp_time=False, suffix="_model", merge=True, **kwargs):
+    """Unified interface for pairing model and observation data.
+
+    Supports xarray (Dataset/DataArray) and DataFrame (pandas/dask) objects.
+    Maintains laziness for Dask-backed objects.
+
+    Parameters
+    ----------
+    model : xarray.Dataset or xarray.DataArray
+        Model data (usually gridded).
+    obs : xarray.Dataset, xarray.DataArray, pandas.DataFrame, or dask.dataframe.DataFrame
+        Observation data.
+    method : str, default 'nearest'
+        Spatial interpolation method.
+    interp_time : bool, default False
+        Whether to interpolate in time.
+    suffix : str, default '_model'
+        Suffix for model variables if names conflict.
+    merge : bool, default True
+        Whether to merge the paired data with the original observations.
+    **kwargs : dict
+        Additional arguments passed to regridding backend.
+
+    Returns
+    -------
+    xarray.Dataset, pandas.DataFrame, or dask.dataframe.DataFrame
+        Matched object of the same type as `obs`.
+    """
+    if isinstance(obs, xr.Dataset | xr.DataArray):
+        return _pair_xarray(model, obs, method=method, interp_time=interp_time, suffix=suffix, merge=merge, **kwargs)
+    elif isinstance(obs, pd.DataFrame) or (has_dask_df and isinstance(obs, dd.DataFrame)):
+        return _pair_dataframe(model, obs, method=method, interp_time=interp_time, suffix=suffix, merge=merge, **kwargs)
+    else:
+        raise TypeError(f"Unsupported type for obs: {type(obs)}")
+
+
+def _pair_xarray(model, obs, *, method="nearest", interp_time=False, suffix="_model", merge=True, **kwargs):
+    """Pair xarray model with xarray observations."""
+    import datetime
+
+    from ..monet_accessor import _dataset_to_monet
+
+    # Standardize
+    model = _dataset_to_monet(model)
+    obs = _dataset_to_monet(obs)
+
+    # Use remap via accessor
+    paired = obs.monet.remap(model, method=method, **kwargs)
+
+    if interp_time:
+        paired = paired.interp(time=obs.time)
+
+    # Handle suffixes
+    if isinstance(model, xr.DataArray):
+        if model.name in obs.variables:
+            paired.name = model.name + suffix
+    else:  # Dataset
+        for var in model.data_vars:
+            if var in obs.variables:
+                paired = paired.rename({var: var + suffix})
+
+    # Update history
+    curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    history = paired.attrs.get("history", "")
+    paired.attrs["history"] = history + f"\n{curr_time} > Paired with observations via monet.pair"
+
+    if merge:
+        return xr.merge([obs, paired])
+    else:
+        return paired
+
+
+def _pair_dataframe(model, obs, *, method="nearest", interp_time=False, suffix="_model", merge=True, **kwargs):
+    """Pair xarray model with pandas or dask DataFrame observations."""
+    from ..monet_accessor import _dataset_to_monet
+
+    # Ensure model is standardized
+    model = _dataset_to_monet(model)
+
+    # Standardize DataFrame columns if needed
+    if "lat" in obs.columns:
+        obs = obs.rename(columns={"lat": "latitude", "lon": "longitude"})
+    elif "Lat" in obs.columns:
+        obs = obs.rename(columns={"Lat": "latitude", "Lon": "longitude"})
+
+    # Extract unique locations to minimize remapping work
+    # siteid is expected. If not present, we use lat/lon.
+    loc_cols = ["latitude", "longitude"]
+    if "siteid" in obs.columns:
+        loc_cols.append("siteid")
+
+    unique_locs = obs[loc_cols].drop_duplicates()
+
+    # Convert unique locations to xarray (lazily if obs is dask)
+    if has_dask_df and isinstance(obs, dd.DataFrame):
+        # ESMF/xregrid requires eager coordinate arrays to build weights.
+        # We compute only the unique locations (usually small).
+        unique_locs_p = unique_locs.compute()
+    else:
+        unique_locs_p = unique_locs
+
+    # Convert to xarray point Dataset
+    from ..accessors.pandas_accessor import MONETAccessorPandas
+
+    # Convert Arrow strings to objects in unique_locs_p to avoid Dask/Xarray issues later
+    for col in unique_locs_p.columns:
+        if pd.api.types.is_string_dtype(unique_locs_p[col]) and not pd.api.types.is_numeric_dtype(unique_locs_p[col]):
+            unique_locs_p[col] = np.asarray(unique_locs_p[col], dtype=object)
+
+    point_ds = MONETAccessorPandas(unique_locs_p)._df_to_da()
+    if "siteid" in unique_locs_p.columns:
+        # Add siteid as a coordinate so it is preserved during remap and conversion back to DF
+        point_ds = point_ds.assign_coords(siteid=(("x"), unique_locs_p.siteid.values))
+
+    # Remap model to points
+    paired_da = point_ds.monet.remap(model, method=method, **kwargs)
+
+    # Ensure siteid is preserved in coordinates for the join
+    if "siteid" in point_ds.coords:
+        if "x" in paired_da.dims:
+            paired_da = paired_da.assign_coords(siteid=(("x"), point_ds.siteid.data))
+
+    # Time interpolation if requested
+    if interp_time:
+        obs_times = obs.time.drop_duplicates()
+        if has_dask_df and isinstance(obs, dd.DataFrame):
+            obs_times = obs_times.compute()
+        paired_da = paired_da.interp(time=obs_times)
+
+    # Convert paired_da to DataFrame, matching laziness of model/paired_da
+    if isinstance(paired_da, xr.DataArray):
+        paired_da_ds = paired_da.to_dataset()
+    else:
+        paired_da_ds = paired_da
+
+    # Ensure all strings are object dtype to avoid Dask/Arrow issues during conversion
+    for var in paired_da_ds.variables:
+        if pd.api.types.is_string_dtype(paired_da_ds[var]) and not pd.api.types.is_numeric_dtype(paired_da_ds[var]):
+            paired_da_ds[var] = paired_da_ds[var].astype(object)
+
+    if paired_da.chunks:
+        paired_df = paired_da_ds.to_dask_dataframe().reset_index()
+    else:
+        paired_df = paired_da_ds.to_dataframe().reset_index()
+
+    # Clean up dimensions from conversion
+    cols_to_drop = [c for c in ["x", "y", "z", "latitude", "longitude"] if c in paired_df.columns]
+    paired_df = paired_df.drop(columns=cols_to_drop)
+
+    # Ensure no Arrow-backed strings remain in paired_df before merging
+    if has_dask_df and isinstance(paired_df, dd.DataFrame):
+        # We can't easily iterate and convert columns in dask.dataframe eagerly,
+        # but the previous conversions should have prevented them from getting into paired_da_ds.
+        pass
+    else:
+        for col in paired_df.columns:
+            if pd.api.types.is_string_dtype(paired_df[col]) and not pd.api.types.is_numeric_dtype(paired_df[col]):
+                paired_df[col] = np.asarray(paired_df[col], dtype=object)
+
+    # Handle suffixes and variable names
+    if isinstance(model, xr.DataArray):
+        model_name = model.name or "model_data"
+        if model_name in obs.columns:
+            paired_df = paired_df.rename(columns={model_name: model_name + suffix})
+    else:  # Dataset
+        for var in model.data_vars:
+            if var in obs.columns:
+                paired_df = paired_df.rename(columns={var: var + suffix})
+
+    if merge:
+        # Perform join
+        join_on = ["time"]
+        if "siteid" in obs.columns:
+            join_on.append("siteid")
+
+        # If paired_df is dask, the result must be dask
+        if has_dask_df and isinstance(paired_df, dd.DataFrame):
+            if not isinstance(obs, dd.DataFrame):
+                obs = dd.from_pandas(obs, npartitions=paired_df.npartitions)
+            return obs.merge(paired_df, on=join_on, how="left")
+        else:
+            # Both are pandas
+            return obs.merge(paired_df, on=join_on, how="left")
+    else:
+        return paired_df
 
 
 def combine_da_to_df(da, df, *, merge=True, **kwargs):
     """Combine xarray data with point observations in a dataframe.
 
-    Interpolates gridded data to observation points using nearest neighbor
-    interpolation, then merges with the original observation data.
+    Note: This is a backward compatibility wrapper for `monet.pair`.
 
     Parameters
     ----------
     da : xarray.DataArray or xarray.Dataset
         Gridded data to be interpolated to target points.
-        Can be unstructured-grid data
-        (detected by checking ``'mio_has_unstructured_grid'`` attribute).
     df : pandas.DataFrame
-        Point observations with 'latitude', 'longitude', and 'siteid' columns.
+        Point observations.
     merge : bool, default True
-        If True, merge interpolated values with the original DataFrame.
-        If False, return only the interpolated values.
+        Whether to merge with original DataFrame.
     **kwargs : dict
-        Passed to regridding backend.
+        Passed to `pair`.
 
     Returns
     -------
     pandas.DataFrame
-        DataFrame with interpolated model values at observation locations,
-        either merged with original data (if merge=True) or standalone.
+        Combined DataFrame.
     """
-    suffix = kwargs.pop("suffix", "_new")
-
-    target_da = df.drop_duplicates(subset=["siteid"]).dropna(subset=["latitude", "longitude", "siteid"])
-
-    # Rename lat/lon columns if needed
-    if "lat" in target_da.columns:
-        target_da = target_da.rename(columns={"lat": "latitude", "lon": "longitude"})
-    elif "Lat" in target_da.columns:
-        target_da = target_da.rename(columns={"Lat": "latitude", "Lon": "longitude"})
-    elif "LAT" in target_da.columns:
-        target_da = target_da.rename(columns={"LAT": "latitude", "LON": "longitude"})
-
-    # Convert to xarray for remapping
-    if not hasattr(target_da, "monet"):
-        # If someone passes a pandas DataFrame without the monet accessor registered
-        from ..accessors.pandas_accessor import MONETAccessorPandas
-
-        pd.api.extensions.register_dataframe_accessor("monet")(MONETAccessorPandas)
-
-    target_data_da = target_da.monet._df_to_da()
-
-    # Add if statement for unstructured grid output
-    if da.attrs.get("mio_has_unstructured_grid", False):
-        # Fallback to nearest neighbor or implement proper unstructured regrid if xregrid supports it
-        # For now, using remap which uses xregrid
-        da_interped = target_data_da.monet.remap(da, method="nearest", **kwargs).compute()
-    else:
-        da_interped = target_data_da.monet.remap(da, method="nearest", **kwargs).compute()
-
-    da_interped["siteid"] = (("x"), target_da.siteid)
-    da_interped_df = da_interped.to_dataframe().reset_index()
-    cols = pd.Series(da_interped_df.columns)
-
-    drop_cols = cols.loc[cols.isin(["x", "y", "z", "latitude", "longitude"])]
-    da_interped_df.drop(drop_cols, axis=1, inplace=True)
-
-    # Handle column naming conflicts
-    if isinstance(da, xr.DataArray):
-        if da.name in df.columns:
-            da_interped_df.rename(columns={da.name: da.name + suffix}, inplace=True)
-    else:  # Dataset
-        dup_names = [name for name in da.data_vars.keys() if name in df.columns]
-        if len(dup_names) > 0:
-            for name in dup_names:
-                da_interped_df.rename(columns={name: name + suffix}, inplace=True)
-
-    if merge:
-        df.reset_index(drop=True)
-        da_interped_df.reset_index(drop=True)
-        final_df = df.merge(da_interped_df, on=["time", "siteid"], how="left")
-        return final_df
-    else:
-        return da_interped_df
+    return pair(da, df, merge=merge, **kwargs)
 
 
 def combine_da_to_da(source, target, *, merge=True, interp_time=False, **kwargs):
     """Combine gridded data with point observation data in xarray format.
 
-    Interpolates source gridded data to target point locations using nearest neighbor
-    interpolation, with optional time interpolation and merging.
+    Note: This is a backward compatibility wrapper for `monet.pair`.
 
     Parameters
     ----------
     source : xarray.DataArray or xarray.Dataset
         Gridded data to interpolate from.
     target : xarray.DataArray or xarray.Dataset
-        Point observation data with target coordinates.
+        Point observation data.
     merge : bool, default True
-        If True, merge interpolated values with the original target data.
-        If False, return only the interpolated values.
+        Whether to merge.
     interp_time : bool, default False
-        If True, linearly interpolate to the times in target.
+        Whether to interpolate in time.
     **kwargs : dict
-        Additional arguments passed to remap.
+        Additional arguments passed to `pair`.
 
     Returns
     -------
     xarray.Dataset
-        Dataset with interpolated source data at target locations,
-        either merged with original target data (if merge=True) or standalone.
+        Combined Dataset.
     """
-    from ..monet_accessor import _dataset_to_monet
-
-    output = target.monet.remap(source, method="nearest", **kwargs)
-
-    if interp_time:
-        output = output.interp(time=target.time)
-
-    if merge:
-        output = xr.merge([_dataset_to_monet(target), output])
-
-    return output
+    return pair(source, target, merge=merge, interp_time=interp_time, **kwargs)
 
 
 def _rename_latlon(ds):
@@ -150,6 +275,8 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
     """Combine xarray data array `da` with spatial information
     point observations in dataframe `df`, returning a new dataframe.
 
+    Note: This is a backward compatibility wrapper for `monet.pair`.
+
     Parameters
     ----------
     da : xarray.DataArray or xarray.Dataset
@@ -157,7 +284,7 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
     df : pandas.DataFrame
         DataFrame containing point observations.
     suffix : str, default: None
-        Suffix to add to the variable names to prevent column name conflicts.
+        Suffix to add to the variable names.
     **kwargs : dict
         Additional keyword arguments for regridding.
 
@@ -166,46 +293,9 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
     pandas.DataFrame
         DataFrame with combined model and observation data.
     """
-
-    if df.empty:
-        return df
-
-    from ..util.interp_util import lonlat_to_xesmf
-    from ..util.resample import resample
-
-    # Default suffix
     if suffix is None:
         suffix = "_xesmf"
-
-    # Make a copy of the DataFrame
-    target = df.copy()
-
-    # Rename lat/lon columns if needed
-    if "lat" in target.columns:
-        target = target.rename(columns={"lat": "latitude", "lon": "longitude"})
-    elif "Lat" in target.columns:
-        target = target.rename(columns={"Lat": "latitude", "Lon": "longitude"})
-    elif "LAT" in target.columns:
-        target = target.rename(columns={"LAT": "latitude", "LON": "longitude"})
-
-    # Create compatible dataset for the point locations
-    point_ds = lonlat_to_xesmf(longitude=target.longitude.values, latitude=target.latitude.values)
-
-    # Use resample (xregrid) to resample the data
-    # Note: xregrid might expect 2D coords, lonlat_to_xesmf creates 2D meshgrid or similar
-    result = resample(da, point_ds, **kwargs)
-
-    # Convert to DataFrame
-    if isinstance(result, xr.DataArray):
-        varname = result.name if result.name is not None else "model_data"
-        sdf = pd.DataFrame({varname + suffix: result.values.ravel()}, index=target.index)
-    else:  # Dataset
-        sdf = pd.DataFrame(index=target.index)
-        for varname, datavar in result.data_vars.items():
-            sdf[varname + suffix] = datavar.values.ravel()
-
-    # Merge with original DataFrame
-    return pd.concat([target, sdf], axis=1)
+    return pair(da, df, suffix=suffix, **kwargs)
 
 
 def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):

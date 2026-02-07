@@ -301,15 +301,8 @@ class BaseAccessor:
 
         # Maybe wrap longitudes
         if lon180 is None:
-            try:
-                lon180 = dset["longitude"].min() >= -180 and dset["longitude"].max() < 180
-            except (ValueError, TypeError):
-                # Handle case where longitude might be multidimensional
-                if dset["longitude"].ndim > 1:
-                    lon_values = dset["longitude"].values
-                    lon180 = lon_values.min() >= -180 and lon_values.max() < 180
-                else:
-                    lon180 = True  # Default to avoiding unnecessary wrapping
+            # Idempotent wrapping is safer than forcing computation to check range
+            lon180 = False
 
         if not lon180:
             dset["longitude"] = wrap_longitudes(dset["longitude"])
@@ -360,8 +353,8 @@ class BaseAccessor:
             dset = da.to_dataset()
         else:
             dset = da.copy()
-        dset["x"] = da.longitude[0, :].values
-        dset["y"] = da.latitude[:, 0].values
+        dset["x"] = da.longitude[0, :]
+        dset["y"] = da.latitude[:, 0]
         dset = dset.drop_vars(["latitude", "longitude"])
         dset = dset.set_coords(["x", "y"])
         dset = dset.rename({"x": "lon", "y": "lat"})

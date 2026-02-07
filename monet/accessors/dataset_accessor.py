@@ -478,15 +478,36 @@ class MONETAccessorDataset(BaseAccessor):
         # or just raise NotImplementedError for now as it wasn't explicitly requested to be ported (only regridding).
         raise NotImplementedError("Window functionality is unavailable without pyresample")
 
+    def pair(self, obs, **kwargs):
+        """Pair this Dataset with observation data.
+
+        Parameters
+        ----------
+        obs : xarray.Dataset, xarray.DataArray, pandas.DataFrame, or dask.dataframe.DataFrame
+            Observation data to pair with.
+        **kwargs : dict
+            Additional arguments passed to `monet.pair`.
+
+        Returns
+        -------
+        matched object
+            Matched object of the same type as `obs`.
+        """
+        from ..util.combinetool import pair
+
+        return pair(self._obj, obs, **kwargs)
+
     def combine_point(self, data, suffix=None, pyresample=True, **kwargs):
         """Combine point data with this Dataset.
+
+        Note: This is a backward compatibility wrapper for `pair`.
 
         Parameters
         ----------
         data : pandas.DataFrame
             Point data to combine.
         suffix : str, optional
-            Suffix to add to variable names. Default is '_new'.
+            Suffix to add to variable names.
         pyresample : bool, default: True
             Deprecated flag.
         **kwargs : dict
@@ -497,14 +518,7 @@ class MONETAccessorDataset(BaseAccessor):
         pandas.DataFrame
             Combined data.
         """
-        if not isinstance(data, pd.DataFrame):
-            raise TypeError("`data` must be a pandas.DataFrame")
-
-        # use combinetool which we will update
-        from ..util.combinetool import combine_da_to_df_xesmf as combine_tool
-
-        da = self._dataset_to_monet(self._obj)
-        return combine_tool(da, data, suffix=suffix, **kwargs)
+        return self.pair(data, suffix=suffix, **kwargs)
 
     def wrap_longitudes(self, lon_name="longitude"):
         """Wrap longitude values to [-180, 180).

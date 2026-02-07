@@ -492,15 +492,36 @@ class MONETAccessor(BaseAccessor):
 
         return self.remap(data, method="xesmf", **kwargs)
 
+    def pair(self, obs, **kwargs):
+        """Pair this DataArray with observation data.
+
+        Parameters
+        ----------
+        obs : xarray.Dataset, xarray.DataArray, pandas.DataFrame, or dask.dataframe.DataFrame
+            Observation data to pair with.
+        **kwargs : dict
+            Additional arguments passed to `monet.pair`.
+
+        Returns
+        -------
+        matched object
+            Matched object of the same type as `obs`.
+        """
+        from ..util.combinetool import pair
+
+        return pair(self._obj, obs, **kwargs)
+
     def combine_point(self, data, suffix=None, pyresample=True, **kwargs):
         """Combine point data with this DataArray.
+
+        Note: This is a backward compatibility wrapper for `pair`.
 
         Parameters
         ----------
         data : pandas.DataFrame
             Point data to combine.
         suffix : str, optional
-            Suffix to add to variable names. Default is '_new'.
+            Suffix to add to variable names.
         pyresample : bool, default: True
              Deprecated flag.
         **kwargs : dict
@@ -511,13 +532,7 @@ class MONETAccessor(BaseAccessor):
         pandas.DataFrame
             Combined data.
         """
-        from ..util.combinetool import combine_da_to_df
-
-        da = self._dataset_to_monet(self._obj)
-        if isinstance(data, pd.DataFrame):
-            return combine_da_to_df(da, data, **kwargs)
-        else:
-            print("`data` must be a pandas.DataFrame")
+        return self.pair(data, suffix=suffix, **kwargs)
 
     def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
         """Deprecated: Remap data using nearest neighbor interpolation with parallel processing."""
