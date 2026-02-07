@@ -3,11 +3,25 @@
 import xarray as xr
 
 try:
+    import esmpy  # noqa: F401
     import xregrid  # noqa: F401
 
     has_xregrid = True
 except ImportError:
-    has_xregrid = False
+    try:
+        import ESMF as esmpy  # noqa: F401
+        import xregrid  # noqa: F401
+
+        has_xregrid = True
+    except ImportError:
+        has_xregrid = False
+
+try:
+    import monet_regrid  # noqa: F401
+
+    has_monet_regrid = True
+except ImportError:
+    has_monet_regrid = False
 
 
 def wrap_longitudes(lons):
@@ -228,7 +242,7 @@ class BaseAccessor:
         TypeError
             If dset is not an xarray DataArray or Dataset.
         """
-        if not isinstance(dset, (xr.DataArray, xr.Dataset)):
+        if not isinstance(dset, xr.DataArray | xr.Dataset):
             raise TypeError("dset must be an xarray.DataArray or xarray.Dataset")
 
         # Auto-detect lat/lon names for COARDS/CF formatted data

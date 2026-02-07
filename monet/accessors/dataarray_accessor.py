@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from .base import BaseAccessor, has_xregrid
+from .base import BaseAccessor, has_monet_regrid, has_xregrid
 
 has_pyresample = False
 has_xesmf = False
@@ -426,14 +426,14 @@ class MONETAccessor(BaseAccessor):
         return False
 
     def remap(self, data, method="nearest", radius_of_influence=1e6, **kwargs):
-        """Remap data using xregrid.
+        """Remap data using xregrid or monet-regrid fallback.
 
         Parameters
         ----------
         data : xarray.DataArray or xarray.Dataset
             Data to remap.
         method : str, default: 'nearest'
-            Resampling method: 'nearest', 'bilinear', or others supported by xregrid.
+            Resampling method: 'nearest', 'bilinear', or others supported by backends.
         radius_of_influence : float, default: 1e6
             Search radius in meters (unused in xregrid).
         **kwargs : dict
@@ -444,8 +444,8 @@ class MONETAccessor(BaseAccessor):
         xarray.DataArray or xarray.Dataset
             Remapped data.
         """
-        if not has_xregrid:
-            raise ImportError("xregrid is required for this functionality")
+        if not has_xregrid and not has_monet_regrid:
+            raise ImportError("xregrid (with esmpy) or monet-regrid is required for this functionality")
 
         from ..util import resample
 

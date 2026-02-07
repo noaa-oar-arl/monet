@@ -3,7 +3,7 @@ import xarray as xr
 
 
 def resample(source_data, target_grid, method="nearest", **kwargs):
-    """Resample data using xregrid.
+    """Resample data using xregrid (default) or monet-regrid (fallback).
 
     Parameters
     ----------
@@ -14,20 +14,33 @@ def resample(source_data, target_grid, method="nearest", **kwargs):
     method : str, default: 'nearest'
         Resampling method. Options include 'bilinear', 'nearest', 'conservative', etc.
     **kwargs : dict
-        Additional keyword arguments passed to the xregrid.Regridder.
+        Additional keyword arguments passed to the regridder.
 
     Returns
     -------
     xarray.DataArray or xarray.Dataset
         Regridded data on the target grid.
     """
-    from xregrid import Regridder
+    # Check for xregrid and esmpy
+    try:
+        import esmpy  # noqa: F401
+        from xregrid import Regridder
+
+        has_xregrid = True
+    except ImportError:
+        try:
+            import ESMF as esmpy  # noqa: F401
+            from xregrid import Regridder
+
+            has_xregrid = True
+        except ImportError:
+            has_xregrid = False
 
     # Handle backward compatibility for xesmf_method
     if method == "xesmf":
         method = kwargs.pop("xesmf_method", "bilinear")
 
-    # Map method names if necessary
+    # Map method names
     method_map = {
         "linear": "bilinear",
         "bilinear": "bilinear",
@@ -42,9 +55,23 @@ def resample(source_data, target_grid, method="nearest", **kwargs):
     if isinstance(target_grid, xr.DataArray):
         target_grid = target_grid.to_dataset()
 
-    # Create regridder and apply
-    regridder = Regridder(source_data, target_grid, method=real_method, **kwargs)
-    return regridder(source_data)
+    if has_xregrid:
+        # Create regridder and apply
+        regridder = Regridder(source_data, target_grid, method=real_method, **kwargs)
+        return regridder(source_data)
+    else:
+        # Fallback to monet-regrid
+        try:
+            import monet_regrid
+
+            regridder = monet_regrid.Regridder(source_data)
+            if real_method in ["bilinear", "linear"]:
+                return regridder.linear(target_grid, **kwargs)
+            else:
+                # nearest_s2d, nearest_d2s, nearest all map to nearest in monet-regrid
+                return regridder.nearest(target_grid, **kwargs)
+        except ImportError:
+            raise ImportError("Neither xregrid (with esmpy) nor monet-regrid is available.")
 
 
 def resample_stratify(da, levels, vertical, axis=1, tension=0.0):
