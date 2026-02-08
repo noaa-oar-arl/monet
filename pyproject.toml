@@ -38,6 +38,14 @@ dependencies = [
   "mpi4py",
 ]
 
+[project.optional-dependencies]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "mkdocs-gallery",
+]
+
 [tool.setuptools]
 include-package-data = true
 packages = ["monet", "monet.accessors", "monet.plots", "monet.util"]
