@@ -1,14 +1,37 @@
+import datetime
+import typing as t
+
 import numpy as np
 import xarray as xr
 
+# Check for xregrid and esmpy at module level for better mockability and performance
+try:
+    import esmpy  # noqa: F401
+    from xregrid import Regridder
 
-def resample(source_data, target_grid, method="nearest", **kwargs):
+    has_xregrid = True
+except ImportError:
+    try:
+        import ESMF as esmpy  # noqa: F401
+        from xregrid import Regridder
+
+        has_xregrid = True
+    except ImportError:
+        has_xregrid = False
+
+
+def resample(
+    source_data: xr.DataArray | xr.Dataset,
+    target_grid: xr.DataArray | xr.Dataset,
+    method: str = "nearest",
+    **kwargs: t.Any,
+) -> xr.DataArray | xr.Dataset:
     """Resample data using xregrid (default) or monet-regrid (fallback).
 
     Parameters
     ----------
     source_data : xarray.DataArray or xarray.Dataset
-        Source data to be regridded.
+        Source data to be regridded (Backend-agnostic: supports NumPy or Dask).
     target_grid : xarray.DataArray or xarray.Dataset
         Target grid definition.
     method : str, default: 'nearest'
@@ -20,21 +43,11 @@ def resample(source_data, target_grid, method="nearest", **kwargs):
     -------
     xarray.DataArray or xarray.Dataset
         Regridded data on the target grid.
+
+    Examples
+    --------
+    >>> out = resample(source, target, method='bilinear')
     """
-    # Check for xregrid and esmpy
-    try:
-        import esmpy  # noqa: F401
-        from xregrid import Regridder
-
-        has_xregrid = True
-    except ImportError:
-        try:
-            import ESMF as esmpy  # noqa: F401
-            from xregrid import Regridder
-
-            has_xregrid = True
-        except ImportError:
-            has_xregrid = False
 
     # Handle backward compatibility for xesmf_method
     if method == "xesmf":
@@ -58,7 +71,15 @@ def resample(source_data, target_grid, method="nearest", **kwargs):
     if has_xregrid:
         # Create regridder and apply
         regridder = Regridder(source_data, target_grid, method=real_method, **kwargs)
-        return regridder(source_data)
+        out = regridder(source_data)
+
+        # Update history for provenance
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = out.attrs.get("history", "")
+        msg = f"\n{curr_time} > Resampled via monet.util.resample (method={real_method})"
+        out.attrs["history"] = history + msg
+
+        return out
     else:
         # Fallback to monet-regrid
         try:
@@ -74,10 +95,17 @@ def resample(source_data, target_grid, method="nearest", **kwargs):
             raise ImportError("Neither xregrid (with esmpy) nor monet-regrid is available.")
 
 
-def resample_stratify(da, levels, vertical, axis=1, tension=0.0):
+def resample_stratify(
+    da: xr.DataArray,
+    levels: t.Sequence[float],
+    vertical: xr.DataArray | str | t.Sequence[float],
+    axis: int = 1,
+    tension: float = 0.0,
+) -> xr.DataArray:
     """Vertically interpolate data to specified levels.
 
     Uses pytspack package to interpolate a DataArray to new vertical levels.
+    Supports both Eager (NumPy) and Lazy (Dask) backends.
 
     Parameters
     ----------
@@ -97,6 +125,10 @@ def resample_stratify(da, levels, vertical, axis=1, tension=0.0):
     xarray.DataArray
         Data interpolated to the new vertical levels, preserving attributes
         and other coordinates.
+
+    Examples
+    --------
+    >>> out = resample_stratify(da, [100, 200, 500], 'altitude')
     """
     from pytspack import interpolate_vertical
 
@@ -129,5 +161,10 @@ def resample_stratify(da, levels, vertical, axis=1, tension=0.0):
 
     # Preserve the original name
     out.name = da.name
+
+    # Update history
+    curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    history = out.attrs.get("history", "")
+    out.attrs["history"] = history + f"\n{curr_time} > Vertically interpolated via monet.util.resample.resample_stratify"
 
     return out

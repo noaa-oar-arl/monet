@@ -119,7 +119,6 @@ Dataset Accessor
    Dataset.monet.nearest_ij
    Dataset.monet.nearest_latlon
    Dataset.monet.remap_nearest
-   Dataset.monet.remap_nearest_unstructured
    Dataset.monet.remap_xesmf
    Dataset.monet.combine_point
    Dataset.monet.remap_nearest_parallel

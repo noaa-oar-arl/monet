@@ -1,8 +1,9 @@
 """Dataset accessor for MONET functionality."""
 
+import datetime
+import typing as t
 import warnings
 
-import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -154,8 +155,15 @@ class MONETAccessorDataset(BaseAccessor):
         self._obj[out.name] = out
         return out
 
-    def remap(self, data, method="nearest", radius_of_influence=1e6, **kwargs):
+    def remap(
+        self,
+        data: xr.DataArray | xr.Dataset,
+        method: str = "nearest",
+        radius_of_influence: float = 1e6,
+        **kwargs: t.Any,
+    ) -> xr.DataArray | xr.Dataset:
         """Remap data using xregrid or monet-regrid fallback.
+        Supports both CF/COARDS and UGRID conventions.
 
         Parameters
         ----------
@@ -172,6 +180,10 @@ class MONETAccessorDataset(BaseAccessor):
         -------
         xarray.DataArray or xarray.Dataset
             Remapped data.
+
+        Examples
+        --------
+        >>> ds.monet.remap(other_ds, method='bilinear')
         """
         if not has_xregrid and not has_monet_regrid:
             raise ImportError("xregrid (with esmpy) or monet-regrid is required for this functionality")
@@ -195,6 +207,12 @@ class MONETAccessorDataset(BaseAccessor):
             target = self._dataset_to_monet(self._obj)
 
         out = resample.resample(source, target, method=method, **kwargs)
+
+        # Update history
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = out.attrs.get("history", "")
+        out.attrs["history"] = history + f"\n{curr_time} > Remapped via monet.remap"
+
         return self._rename_to_monet_latlon(out)
 
     def remap_nearest(self, data, radius_of_influence=1e6, **kwargs):
@@ -206,71 +224,6 @@ class MONETAccessorDataset(BaseAccessor):
             stacklevel=2,
         )
         return self.remap(data, method="nearest", radius_of_influence=radius_of_influence, **kwargs)
-
-    def remap_nearest_unstructured(self, data):
-        """Remap unstructured grid data using nearest neighbor interpolation.
-
-        Parameters
-        ----------
-        data : xarray.DataArray or xarray.Dataset
-            Unstructured grid data to remap.
-
-        Returns
-        -------
-        xarray.Dataset
-            Remapped dataset.
-        """
-        try:
-            check_error = False
-            if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
-                check_error = False
-            else:
-                check_error = True
-            if check_error:
-                raise TypeError
-        except TypeError:
-            print("data must be either an xarray.DataArray or xarray.Dataset")
-
-        model_data = data
-        obs_data = self._obj
-
-        site_indices = []
-        site_latitudes = obs_data["latitude"].values[0, :]
-        site_longitudes = obs_data["longitude"].values[0, :]
-        model_latitudes = model_data["latitude"].values
-        model_longitudes = model_data["longitude"].values
-
-        for siteii in np.arange(len(obs_data["siteid"][0])):
-            site_indices.append(
-                np.argmin(np.abs(site_latitudes[siteii] - model_latitudes) + np.abs(site_longitudes[siteii] - model_longitudes))
-            )
-
-        dict_data = {}
-        for dvar in model_data.data_vars:
-            if dvar in ["latitude", "longitude"]:
-                continue
-            else:
-                dict_data[dvar] = (
-                    ["time", "z", "y", "x"],
-                    model_data[dvar][:, 0, np.array(site_indices)].values.reshape(len(model_data["time"]), 1, 1, len(site_indices)),
-                )
-
-        dict_coords = {
-            "time": (["time"], model_data["time"].values),
-            "x": (["x"], np.arange(len(site_indices))),
-            "longitude": (
-                ["y", "x"],
-                model_longitudes[np.array(site_indices)].reshape(1, len(site_indices)),
-            ),
-            "latitude": (
-                ["y", "x"],
-                model_latitudes[np.array(site_indices)].reshape(1, len(site_indices)),
-            ),
-        }
-
-        result = xr.Dataset(data_vars=dict_data, coords=dict_coords)
-
-        return result
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Find the nearest grid indices to given lat/lon point(s).
@@ -405,8 +358,15 @@ class MONETAccessorDataset(BaseAccessor):
         out = resample(self._obj, target, **kwargs)
         return self._rename_latlon(out)
 
-    def stratify(self, levels, vertical, axis=1, tension=0.0):
+    def stratify(
+        self,
+        levels: t.Sequence[float],
+        vertical: xr.DataArray | str,
+        axis: int = 1,
+        tension: float = 0.0,
+    ) -> xr.Dataset:
         """Vertically interpolate data to specified levels.
+        Supports both Eager (NumPy) and Lazy (Dask) backends.
 
         Parameters
         ----------
@@ -423,6 +383,10 @@ class MONETAccessorDataset(BaseAccessor):
         -------
         xarray.Dataset
             Vertically interpolated dataset.
+
+        Examples
+        --------
+        >>> ds.monet.stratify([100, 500, 1000], 'altitude')
         """
         if isinstance(vertical, str):
             vertical = self._obj[vertical]

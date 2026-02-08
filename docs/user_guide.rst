@@ -37,35 +37,24 @@ Regridding Model Output
    regridded = ds.monet.remap_xesmf(obs)
 
 
-Regridding with xESMF and Pyresample
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-MONET supports two main regridding engines:
-
-- **xESMF** (ESMF/ESMPy): Flexible, supports many interpolation methods (bilinear, conservative, etc.).
-- **pyresample**: Fast nearest-neighbor regridding, especially useful for large or irregular grids.
-
-You can choose the method by calling the appropriate accessor function:
+Regridding and UGRID Support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+MONET uses `xregrid <https://github.com/bbakernoaa/xregrid>`_ (based on ESMF/ESMPy) for flexible and high-performance spatial remapping. It supports both standard gridded data (CF/COARDS) and unstructured grids (UGRID).
 
 .. code-block:: python
 
-   # xESMF (requires xesmf and ESMF/ESMPy installed)
-   regridded_xesmf = ds.monet.remap_xesmf(obs, method="bilinear")  # or "nearest_s2d", "conservative", etc.
+   # Remap gridded data to target points or grid
+   regridded = ds.monet.remap(obs, method="bilinear")
 
-   # Pyresample (nearest neighbor)
-   regridded_nn = ds.monet.remap_nearest(obs, radius_of_influence=1e5)  # radius in meters
+   # UGRID support: Unstructured grids are automatically detected and handled
+   # if they follow UGRID conventions (e.g., cf_role="mesh_topology").
+   ugrid_paired = ugrid_ds.monet.remap(obs_points, method="nearest")
 
-   # For DataArrays:
-   regridded_xesmf = ds['O3'].monet.remap_xesmf(obs['O3'])
-   regridded_nn = ds['O3'].monet.remap_nearest(obs['O3'])
-
-   # You can also regrid to a coarser or custom grid:
-   coarse = ds['O3'].coarsen(time=1, lat=2, lon=2, boundary='trim').mean()
-   regridded = ds['O3'].monet.remap_nearest(coarse)
+Methods include ``"bilinear"``, ``"nearest"``, ``"conservative"``, etc.
 
 Notes:
-- xESMF requires the `xesmf` and `ESMF/ESMPy` packages. Install with `pip install xesmf` and see xesmf docs for ESMF/ESMPy setup.
-- Pyresample is used automatically for `remap_nearest` if installed (`pip install pyresample`).
-- Both methods require latitude and longitude coordinates to be named or standardized (see COARDS/CF section above).
+- Remapping requires ``xregrid`` and ``esmpy`` to be installed.
+- Latitude and longitude coordinates are automatically standardized (see COARDS/CF section below).
 
 For more advanced options (parallelization, custom weights, etc.), see the API docs and the tutorial.
 
@@ -146,22 +135,32 @@ MONET's accessors provide a convenient `compare` function for model-vs-obs or di
    ds.monet.compare(obs, stat='diff', plot=True)
 
 
-COARDS/CF Format and Renaming Utilities
----------------------------------------
-Many datasets use different names for latitude/longitude. MONET provides utilities to standardize these to COARDS/CF-compliant names ('latitude', 'longitude'), which is required for many MONET functions.
+COARDS/CF and UGRID Conventions
+-------------------------------
+Many datasets use different names for spatial coordinates. MONET provides utilities to standardize these to consistent names (``'latitude'``, ``'longitude'``) and detect UGRID mesh topologies.
 
 .. code-block:: python
 
-   # Standardize coordinate names
+   # Standardize coordinate names and detect UGRID meshes
    ds_std = ds.monet.structure_for_monet()
-   # Or use the base utility directly:
-   from monet.accessors.base import BaseAccessor
-   ds_std = BaseAccessor._dataset_to_monet(ds)
 
-   # Convert to COARDS/CF-compliant NetCDF
-   ds_coards = BaseAccessor._coards_to_netcdf(ds_std)
+   # Check if a dataset is UGRID compliant
+   from monet.util.coards_tools import is_ugrid_compliant
+   if is_ugrid_compliant(ds):
+       print("UGRID detected!")
 
-See the tutorial for more details and examples.
+The Aero Protocol (Performance & Provenance)
+--------------------------------------------
+MONET follows the **Aero Protocol** to ensure that scientific pipelines are efficient, maintainable, and traceable.
+
+1. **Optional Dask (Laziness):** All pairing and interpolation routines are backend-agnostic. They run eagerly on NumPy arrays and lazily on Dask-backed arrays, maintaining the Dask graph without triggering immediate computation.
+2. **Provenance Tracking:** Every transformation (remapping, vertical interpolation, pairing) automatically updates the dataset's ``history`` attribute with a timestamp and description of the operation.
+3. **Strict Typing:** Core functions use strict type hints and follow NumPy-style docstrings for better maintainability.
+
+.. code-block:: python
+
+   # Check the history of a transformed dataset
+   print(regridded.attrs['history'])
 
 Stratify Data by Level
 ~~~~~~~~~~~~~~~~~~~~~~

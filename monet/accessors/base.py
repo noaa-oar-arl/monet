@@ -104,8 +104,8 @@ class BaseAccessor:
             Dataset with renamed coordinates.
         """
         # To consider unstructured grid
-        if ds.attrs.get("mio_has_unstructured_grid", False):
-            check_list = ds.data_vars
+        if ds.attrs.get("mio_has_unstructured_grid", False) or ds.attrs.get("mio_has_ugrid", False):
+            check_list = ds.variables
         else:
             check_list = ds.coords
 
@@ -121,6 +121,28 @@ class BaseAccessor:
             return ds.rename({"XLAT": "latitude", "XLONG": "longitude"})
         else:
             return ds.copy()
+
+    @staticmethod
+    def _detect_ugrid(ds):
+        """Detect UGRID mesh topology in a dataset.
+
+        Parameters
+        ----------
+        ds : xarray.Dataset or xarray.DataArray
+            The input xarray object to check.
+
+        Returns
+        -------
+        str or None
+            The name of the mesh topology variable if found, otherwise None.
+        """
+        if isinstance(ds, xr.DataArray):
+            return None
+
+        for var in ds.variables:
+            if ds[var].attrs.get("cf_role") == "mesh_topology":
+                return var
+        return None
 
     @staticmethod
     def _detect_latlon_names(ds):
@@ -204,13 +226,13 @@ class BaseAccessor:
 
     @staticmethod
     def _dataset_to_monet(
-        dset,
-        lat_name="latitude",
-        lon_name="longitude",
-        latlon2d=None,
-        lon180=None,
-        coards_compliant=False,
-    ):
+        dset: xr.DataArray | xr.Dataset,
+        lat_name: str = "latitude",
+        lon_name: str = "longitude",
+        latlon2d: bool | None = None,
+        lon180: bool | None = None,
+        coards_compliant: bool = False,
+    ) -> xr.DataArray | xr.Dataset:
         """Rename xarray DataArray or Dataset coordinate variables for use with monet functions.
 
         Parameters
@@ -244,6 +266,12 @@ class BaseAccessor:
         """
         if not isinstance(dset, xr.DataArray | xr.Dataset):
             raise TypeError("dset must be an xarray.DataArray or xarray.Dataset")
+
+        # Auto-detect UGRID
+        mesh_var = BaseAccessor._detect_ugrid(dset)
+        if mesh_var:
+            dset.attrs["mio_has_ugrid"] = True
+            dset.attrs["ugrid_mesh"] = mesh_var
 
         # Auto-detect lat/lon names for COARDS/CF formatted data
         detected_lat, detected_lon = BaseAccessor._detect_latlon_names(dset)
@@ -294,21 +322,32 @@ class BaseAccessor:
 
         # Rename lat/lon coordinates to 'latitude'/'longitude'
         dset = BaseAccessor._rename_to_monet_latlon(dset)  # common cases
-        if (isinstance(dset, xr.Dataset) and not {"latitude", "longitude"} <= set(dset.variables)) or (
-            isinstance(dset, xr.DataArray) and not {"latitude", "longitude"} <= set(dset.coords)
-        ):
-            dset = dset.rename({lat_name: "latitude", lon_name: "longitude"})
+
+        # Determine if we still need to rename based on detection or defaults
+        needs_lat_rename = "latitude" not in (dset.variables if isinstance(dset, xr.Dataset) else dset.coords)
+        needs_lon_rename = "longitude" not in (dset.variables if isinstance(dset, xr.Dataset) else dset.coords)
+
+        rename_dict = {}
+        if needs_lat_rename and lat_name in (dset.variables if isinstance(dset, xr.Dataset) else dset.coords):
+            rename_dict[lat_name] = "latitude"
+        if needs_lon_rename and lon_name in (dset.variables if isinstance(dset, xr.Dataset) else dset.coords):
+            rename_dict[lon_name] = "longitude"
+
+        if rename_dict:
+            dset = dset.rename(rename_dict)
 
         # Maybe wrap longitudes
         if lon180 is None:
             # Idempotent wrapping is safer than forcing computation to check range
             lon180 = False
 
-        if not lon180:
+        # Explicitly check coordinates or variables without triggering data loading
+        check_obj = dset.variables if isinstance(dset, xr.Dataset) else dset.coords
+        if not lon180 and "longitude" in check_obj:
             dset["longitude"] = wrap_longitudes(dset["longitude"])
 
         # lat & lon are not coordinate variables in unstructured grid, so we're done
-        if dset.attrs.get("mio_has_unstructured_grid", False):
+        if dset.attrs.get("mio_has_unstructured_grid", False) or dset.attrs.get("mio_has_ugrid", False):
             return dset
 
         # Maybe convert 1-D lat/lon coords to 2-D

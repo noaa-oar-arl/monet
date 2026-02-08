@@ -20,7 +20,7 @@ Design Philosophy
 - **Extensibility:** Use accessors to add methods to xarray and pandas objects without modifying their core classes.
 - **Modularity:** Keep plotting, regridding, and utility code in separate modules.
 - **Interoperability:** Support common data formats and conventions (e.g., CF, COARDS).
-- **Performance:** Use parallelization and efficient libraries (e.g., xesmf, pyresample) where possible.
+- **Performance:** Adhere to the **Aero Protocol**: ensure pipelines support both Eager (NumPy) and Lazy (Dask) evaluation, prioritize vectorization, and never force computation within processing functions.
 
 How to Contribute
 -----------------
@@ -61,9 +61,10 @@ Best Practices
 
 Design Decisions
 ----------------
-- Accessors are used to extend xarray and pandas objects for seamless integration.
-- Regridding uses xesmf (ESMF) and pyresample for flexibility and performance.
-- Plotting is built on Cartopy and Matplotlib for high-quality geospatial visualizations.
+- **Accessors:** Use accessors to extend xarray and pandas objects for seamless integration without class inheritance.
+- **Remapping:** Primary remapping is handled via ``xregrid`` (ESMF-based), supporting both standard gridded data and UGRID unstructured meshes.
+- **Aero Protocol:** All core routines must be backend-agnostic and preserve Dask laziness.
+- **Plotting:** Built on Cartopy and Matplotlib for high-quality static visualizations, with HvPlot recommendations for interactive exploration.
 
 Getting Help
 ------------

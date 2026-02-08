@@ -1,3 +1,6 @@
+import datetime
+import typing as t
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -11,11 +14,21 @@ except ImportError:
     has_dask_df = False
 
 
-def pair(model, obs, *, method="nearest", interp_time=False, suffix="_model", merge=True, **kwargs):
+def pair(
+    model: xr.Dataset | xr.DataArray,
+    obs: xr.Dataset | xr.DataArray | pd.DataFrame | t.Any,
+    *,
+    method: str = "nearest",
+    interp_time: bool = False,
+    suffix: str = "_model",
+    merge: bool = True,
+    **kwargs: t.Any,
+) -> xr.Dataset | xr.DataArray | pd.DataFrame | t.Any:
     """Unified interface for pairing model and observation data.
 
     Supports xarray (Dataset/DataArray) and DataFrame (pandas/dask) objects.
     Maintains laziness for Dask-backed objects.
+    Supports both CF/COARDS and UGRID conventions via automatic standardization.
 
     Parameters
     ----------
@@ -36,8 +49,12 @@ def pair(model, obs, *, method="nearest", interp_time=False, suffix="_model", me
 
     Returns
     -------
-    xarray.Dataset, pandas.DataFrame, or dask.dataframe.DataFrame
+    xarray.Dataset, xarray.DataArray, pandas.DataFrame, or dask.dataframe.DataFrame
         Matched object of the same type as `obs`.
+
+    Examples
+    --------
+    >>> paired_df = pair(model_ds, obs_df, method='bilinear')
     """
     if isinstance(obs, xr.Dataset | xr.DataArray):
         return _pair_xarray(model, obs, method=method, interp_time=interp_time, suffix=suffix, merge=merge, **kwargs)
@@ -47,10 +64,17 @@ def pair(model, obs, *, method="nearest", interp_time=False, suffix="_model", me
         raise TypeError(f"Unsupported type for obs: {type(obs)}")
 
 
-def _pair_xarray(model, obs, *, method="nearest", interp_time=False, suffix="_model", merge=True, **kwargs):
+def _pair_xarray(
+    model: xr.Dataset | xr.DataArray,
+    obs: xr.Dataset | xr.DataArray,
+    *,
+    method: str = "nearest",
+    interp_time: bool = False,
+    suffix: str = "_model",
+    merge: bool = True,
+    **kwargs: t.Any,
+) -> xr.Dataset | xr.DataArray:
     """Pair xarray model with xarray observations."""
-    import datetime
-
     from ..monet_accessor import _dataset_to_monet
 
     # Standardize
@@ -66,7 +90,7 @@ def _pair_xarray(model, obs, *, method="nearest", interp_time=False, suffix="_mo
     # Handle suffixes
     if isinstance(model, xr.DataArray):
         if model.name in obs.variables:
-            paired.name = model.name + suffix
+            paired.name = str(model.name) + suffix
     else:  # Dataset
         for var in model.data_vars:
             if var in obs.variables:
@@ -83,7 +107,16 @@ def _pair_xarray(model, obs, *, method="nearest", interp_time=False, suffix="_mo
         return paired
 
 
-def _pair_dataframe(model, obs, *, method="nearest", interp_time=False, suffix="_model", merge=True, **kwargs):
+def _pair_dataframe(
+    model: xr.Dataset | xr.DataArray,
+    obs: pd.DataFrame | t.Any,
+    *,
+    method: str = "nearest",
+    interp_time: bool = False,
+    suffix: str = "_model",
+    merge: bool = True,
+    **kwargs: t.Any,
+) -> pd.DataFrame | t.Any:
     """Pair xarray model with pandas or dask DataFrame observations."""
     from ..monet_accessor import _dataset_to_monet
 
@@ -190,15 +223,29 @@ def _pair_dataframe(model, obs, *, method="nearest", interp_time=False, suffix="
         if has_dask_df and isinstance(paired_df, dd.DataFrame):
             if not isinstance(obs, dd.DataFrame):
                 obs = dd.from_pandas(obs, npartitions=paired_df.npartitions)
-            return obs.merge(paired_df, on=join_on, how="left")
+            res = obs.merge(paired_df, on=join_on, how="left")
         else:
             # Both are pandas
-            return obs.merge(paired_df, on=join_on, how="left")
+            res = obs.merge(paired_df, on=join_on, how="left")
     else:
-        return paired_df
+        res = paired_df
+
+    # Provenance (limited for DataFrames, but we can add to attrs if it's pandas)
+    if isinstance(res, pd.DataFrame) and hasattr(res, "attrs"):
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = res.attrs.get("history", "")
+        res.attrs["history"] = history + f"\n{curr_time} > Paired with xarray model via monet.pair"
+
+    return res
 
 
-def combine_da_to_df(da, df, *, merge=True, **kwargs):
+def combine_da_to_df(
+    da: xr.DataArray | xr.Dataset,
+    df: pd.DataFrame,
+    *,
+    merge: bool = True,
+    **kwargs: t.Any,
+) -> pd.DataFrame:
     """Combine xarray data with point observations in a dataframe.
 
     Note: This is a backward compatibility wrapper for `monet.pair`.
@@ -219,10 +266,17 @@ def combine_da_to_df(da, df, *, merge=True, **kwargs):
     pandas.DataFrame
         Combined DataFrame.
     """
-    return pair(da, df, merge=merge, **kwargs)
+    return pair(da, df, merge=merge, **kwargs)  # type: ignore
 
 
-def combine_da_to_da(source, target, *, merge=True, interp_time=False, **kwargs):
+def combine_da_to_da(
+    source: xr.DataArray | xr.Dataset,
+    target: xr.DataArray | xr.Dataset,
+    *,
+    merge: bool = True,
+    interp_time: bool = False,
+    **kwargs: t.Any,
+) -> xr.Dataset | xr.DataArray:
     """Combine gridded data with point observation data in xarray format.
 
     Note: This is a backward compatibility wrapper for `monet.pair`.
@@ -242,13 +296,13 @@ def combine_da_to_da(source, target, *, merge=True, interp_time=False, **kwargs)
 
     Returns
     -------
-    xarray.Dataset
+    xarray.Dataset or xarray.DataArray
         Combined Dataset.
     """
-    return pair(source, target, merge=merge, interp_time=interp_time, **kwargs)
+    return pair(source, target, merge=merge, interp_time=interp_time, **kwargs)  # type: ignore
 
 
-def _rename_latlon(ds):
+def _rename_latlon(ds: xr.Dataset) -> xr.Dataset:
     """Standardize latitude/longitude coordinate names.
 
     Converts between 'latitude'/'longitude' and 'lat'/'lon' naming conventions.
@@ -271,7 +325,13 @@ def _rename_latlon(ds):
         return ds
 
 
-def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
+def combine_da_to_df_xesmf(
+    da: xr.DataArray | xr.Dataset,
+    df: pd.DataFrame,
+    *,
+    suffix: str | None = None,
+    **kwargs: t.Any,
+) -> pd.DataFrame:
     """Combine xarray data array `da` with spatial information
     point observations in dataframe `df`, returning a new dataframe.
 
@@ -283,7 +343,7 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
         Data to be interpolated to target grid points.
     df : pandas.DataFrame
         DataFrame containing point observations.
-    suffix : str, default: None
+    suffix : str, optional
         Suffix to add to the variable names.
     **kwargs : dict
         Additional keyword arguments for regridding.
@@ -295,10 +355,15 @@ def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
     """
     if suffix is None:
         suffix = "_xesmf"
-    return pair(da, df, suffix=suffix, **kwargs)
+    return pair(da, df, suffix=suffix, **kwargs)  # type: ignore
 
 
-def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
+def combine_da_to_df_xesmf_strat(
+    da: xr.DataArray,
+    daz: xr.DataArray,
+    df: pd.DataFrame,
+    **kwargs: t.Any,
+) -> pd.DataFrame:
     """Combine vertical profile data and surface observations.
 
     Parameters
@@ -306,16 +371,16 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
     da : xarray.DataArray
         Data to interpolate.
     daz : xarray.DataArray
-        Vertical coordinate data array
+        Vertical coordinate data array.
     df : pandas.DataFrame
-        DataFrame containing surface observations with lat/lon coordinates
-    **kwargs
-        Additional arguments passed to regridder
+        DataFrame containing surface observations with lat/lon coordinates.
+    **kwargs : dict
+        Additional arguments passed to regridder.
 
     Returns
     -------
     pandas.DataFrame
-        Combined data frame with interpolated model values at observation points
+        Combined data frame with interpolated model values at observation points.
     """
     from ..util.interp_util import constant_1d_xesmf
     from ..util.resample import resample

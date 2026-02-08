@@ -65,7 +65,7 @@ Key Accessor Features
 ---------------------
 
 - **Plotting:** `quick_map`, `quick_imshow`, `quick_contourf`, `quick_facet_time_map`, `plot_points_map`, `plot_lines_map`
-- **Regridding/Interpolation:** `remap_xesmf`, `remap_nearest`, `remap_nearest_unstructured`, `interp_constant_lat`, `interp_constant_lon`, `stratify`
+- **Regridding/Interpolation:** `remap_xesmf`, `remap_nearest`, `interp_constant_lat`, `interp_constant_lon`, `stratify`
 - **Geospatial utilities:** `nearest_latlon`, `window`, `is_land`, `is_ocean`, `wrap_longitudes`, `tidy`, `structure_for_monet`
 - **Combining data:** `combine_point`, `combine_point_esmf`, `combine_da_to_df`
 
@@ -256,8 +256,8 @@ For more, see the :doc:`user_guide` and API documentation.
 ---------------------------------------------
 .. code-block:: python
 
-   # If you have unstructured grid data, use remap_nearest_unstructured
-   regridded = ds.monet.remap_nearest_unstructured(obs)
+   # Unstructured grid data (UGRID) is automatically handled by remap
+   regridded = ds.monet.remap(obs, method="nearest")
 
 For more advanced workflows, see the :doc:`user_guide` and API documentation.
 

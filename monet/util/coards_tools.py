@@ -7,6 +7,28 @@ import pandas as pd
 import xarray as xr
 
 
+def is_ugrid_compliant(ds):
+    """Check if a dataset appears to follow UGRID conventions.
+
+    Parameters
+    ----------
+    ds : xarray.Dataset or xarray.DataArray
+        Dataset to check for UGRID compliance
+
+    Returns
+    -------
+    bool
+        True if the dataset appears to follow UGRID conventions
+    """
+    if isinstance(ds, xr.DataArray):
+        return False
+
+    for var in ds.variables:
+        if ds[var].attrs.get("cf_role") == "mesh_topology":
+            return True
+    return False
+
+
 def is_coards_compliant(ds):
     """Check if a dataset appears to follow COARDS or CF conventions.
 

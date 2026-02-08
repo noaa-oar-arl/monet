@@ -1,5 +1,7 @@
 """DataArray accessor for MONET functionality."""
 
+import datetime
+import typing as t
 import warnings
 
 import numpy as np
@@ -425,8 +427,15 @@ class MONETAccessor(BaseAccessor):
         # pyresample dependency removed
         return False
 
-    def remap(self, data, method="nearest", radius_of_influence=1e6, **kwargs):
+    def remap(
+        self,
+        data: xr.DataArray | xr.Dataset,
+        method: str = "nearest",
+        radius_of_influence: float = 1e6,
+        **kwargs: t.Any,
+    ) -> xr.DataArray | xr.Dataset:
         """Remap data using xregrid or monet-regrid fallback.
+        Supports both CF/COARDS and UGRID conventions.
 
         Parameters
         ----------
@@ -443,6 +452,10 @@ class MONETAccessor(BaseAccessor):
         -------
         xarray.DataArray or xarray.Dataset
             Remapped data.
+
+        Examples
+        --------
+        >>> da.monet.remap(target_ds, method='bilinear')
         """
         if not has_xregrid and not has_monet_regrid:
             raise ImportError("xregrid (with esmpy) or monet-regrid is required for this functionality")
@@ -466,6 +479,12 @@ class MONETAccessor(BaseAccessor):
             target = self._dataset_to_monet(self._obj)
 
         out = resample.resample(source, target, method=method, **kwargs)
+
+        # Update history
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = out.attrs.get("history", "")
+        out.attrs["history"] = history + f"\n{curr_time} > Remapped via monet.remap"
+
         return self._rename_to_monet_latlon(out)
 
     def remap_nearest(self, data, radius_of_influence=1e6, **kwargs):
