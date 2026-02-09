@@ -7,7 +7,7 @@ geospatial data, interpolation, and statistics.
 
 import numpy as np
 
-from . import coards_tools, combinetool, interp_util, resample, tools
+from . import coards_tools, combinetool, interp_util, resample, tools, vertical
 
 # Import monet_stats as stats for compatibility
 try:
@@ -15,7 +15,7 @@ try:
 except ImportError:
     stats = None
 
-__all__ = ["combinetool", "coards_tools", "interp_util", "resample", "stats", "tools"]
+__all__ = ["combinetool", "coards_tools", "interp_util", "resample", "stats", "tools", "vertical"]
 
 
 def nearest(items, pivot):
