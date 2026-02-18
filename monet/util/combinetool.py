@@ -75,13 +75,7 @@ def _pair_xarray(
     **kwargs: t.Any,
 ) -> xr.Dataset | xr.DataArray:
     """Pair xarray model with xarray observations."""
-    from ..monet_accessor import _dataset_to_monet
-
-    # Standardize
-    model = _dataset_to_monet(model)
-    obs = _dataset_to_monet(obs)
-
-    # Use remap via accessor
+    # Use remap via accessor - convention aware
     paired = obs.monet.remap(model, method=method, **kwargs)
 
     if interp_time:
@@ -118,20 +112,18 @@ def _pair_dataframe(
     **kwargs: t.Any,
 ) -> pd.DataFrame | t.Any:
     """Pair xarray model with pandas or dask DataFrame observations."""
-    from ..monet_accessor import _dataset_to_monet
+    # Detect spatial columns in DataFrame
+    lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+    lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+    lat_col = next((c for c in lat_names if c in obs.columns), None)
+    lon_col = next((c for c in lon_names if c in obs.columns), None)
 
-    # Ensure model is standardized
-    model = _dataset_to_monet(model)
-
-    # Standardize DataFrame columns if needed
-    if "lat" in obs.columns:
-        obs = obs.rename(columns={"lat": "latitude", "lon": "longitude"})
-    elif "Lat" in obs.columns:
-        obs = obs.rename(columns={"Lat": "latitude", "Lon": "longitude"})
+    if lat_col is None or lon_col is None:
+        raise AttributeError("Could not detect latitude and longitude columns in observation DataFrame.")
 
     # Extract unique locations to minimize remapping work
     # siteid is expected. If not present, we use lat/lon.
-    loc_cols = ["latitude", "longitude"]
+    loc_cols = [lat_col, lon_col]
     if "siteid" in obs.columns:
         loc_cols.append("siteid")
 
@@ -157,6 +149,9 @@ def _pair_dataframe(
     if "siteid" in unique_locs_p.columns:
         # Add siteid as a coordinate so it is preserved during remap and conversion back to DF
         point_ds = point_ds.assign_coords(siteid=(("x"), unique_locs_p.siteid.values))
+
+    # Ensure model standard names match point_ds for xregrid if needed,
+    # but remap is already convention-aware.
 
     # Remap model to points
     paired_da = point_ds.monet.remap(model, method=method, **kwargs)
@@ -279,27 +274,67 @@ def combine_da_to_da(
 ) -> xr.Dataset | xr.DataArray:
     """Combine gridded data with point observation data in xarray format.
 
-    Note: This is a backward compatibility wrapper for `monet.pair`.
+    Note: This is a backward compatibility wrapper. It restores the old behavior
+    of expanding 1D coordinates to a 2D meshgrid for compatibility with legacy tests.
+    For point-to-point pairing, use `monet.pair`.
 
     Parameters
     ----------
     source : xarray.DataArray or xarray.Dataset
         Gridded data to interpolate from.
     target : xarray.DataArray or xarray.Dataset
-        Point observation data.
+        Target grid or point observation data.
     merge : bool, default True
         Whether to merge.
     interp_time : bool, default False
         Whether to interpolate in time.
     **kwargs : dict
-        Additional arguments passed to `pair`.
+        Additional arguments passed to `resample`.
 
     Returns
     -------
     xarray.Dataset or xarray.DataArray
         Combined Dataset.
     """
-    return pair(source, target, merge=merge, interp_time=interp_time, **kwargs)  # type: ignore
+    from .interp_util import lonlat_to_dataset
+    from .resample import resample
+
+    # Check for legacy meshgrid expansion (if lat/lon are 1D and share a dimension)
+    target_grid = target
+
+    # Direct coordinate detection for expansion to be more robust
+    lat_names = ["latitude", "lat", "Latitude", "y"]
+    lon_names = ["longitude", "lon", "Longitude", "x"]
+
+    lat_da = None
+    for n in lat_names:
+        if n in target.coords:
+            lat_da = target[n]
+            break
+
+    lon_da = None
+    for n in lon_names:
+        if n in target.coords:
+            lon_da = target[n]
+            break
+
+    if lat_da is not None and lon_da is not None:
+        if lat_da.ndim == 1 and lon_da.ndim == 1 and lat_da.dims == lon_da.dims:
+            # Legacy behavior: expand to meshgrid
+            target_grid = lonlat_to_dataset(lon_da.values, lat_da.values)
+
+    # Use resample directly instead of pair to avoid point-mode logic in pair
+    paired = resample(source, target_grid, **kwargs)
+
+    if interp_time and "time" in target.coords:
+        paired = paired.interp(time=target.time)
+
+    if merge:
+        # Note: Merging an expanded grid with the original points might lead to
+        # unexpected results (broadcasting), but this matches legacy behavior if merge=True was used.
+        return xr.merge([target, paired])
+    else:
+        return paired
 
 
 def _rename_latlon(ds: xr.Dataset) -> xr.Dataset:

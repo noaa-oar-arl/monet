@@ -32,6 +32,26 @@ def wrap_longitudes(lons):
 class BaseAccessor:
     """Base class for MONET accessors with common utility methods."""
 
+    @property
+    def lat(self) -> xr.DataArray | None:
+        """Detected latitude coordinate or variable.
+        Uses convention-aware detection without renaming.
+        """
+        name, _ = self._detect_latlon_names(self._obj)
+        if name:
+            return self._obj[name]
+        return None
+
+    @property
+    def lon(self) -> xr.DataArray | None:
+        """Detected longitude coordinate or variable.
+        Uses convention-aware detection without renaming.
+        """
+        _, name = self._detect_latlon_names(self._obj)
+        if name:
+            return self._obj[name]
+        return None
+
     @staticmethod
     def safe_import(module_name, error_msg=None):
         """Import a module with a clear error message if not found."""
@@ -61,8 +81,6 @@ class BaseAccessor:
         defaults = {
             "reuse_weights": False,
             "method": "bilinear",
-            "periodic": False,
-            "filename": "monet_xesmf_regrid_file.nc",
         }
         return {**defaults, **kwargs}
 
@@ -146,7 +164,7 @@ class BaseAccessor:
 
     @staticmethod
     def _detect_latlon_names(ds):
-        """Detect possible latitude/longitude coordinate names in COARDS/CF datasets.
+        """Detect possible latitude/longitude coordinate names in COARDS/CF/UGRID datasets.
 
         Parameters
         ----------
@@ -158,6 +176,23 @@ class BaseAccessor:
         tuple
             (lat_name, lon_name) if found, otherwise (None, None)
         """
+        # First check for UGRID node coordinates
+        mesh_var = BaseAccessor._detect_ugrid(ds)
+        if mesh_var:
+            topology = ds[mesh_var]
+            node_coords_str = topology.attrs.get("node_coordinates", "")
+            if node_coords_str:
+                node_coords = node_coords_str.split()
+                if len(node_coords) >= 2:
+                    # UGRID spec: node_coordinates is a space separated list of variable names.
+                    # Usually "lon_var lat_var" -> return (lat, lon)
+                    # We look for lat/lon keywords to be sure
+                    c1, c2 = node_coords[0], node_coords[1]
+                    if "lat" in c1.lower() or "y" in c1.lower():
+                        return c1, c2
+                    else:
+                        return c2, c1
+
         # Common latitude/longitude naming patterns, including non-rectilinear grid names
         lat_names = [
             "latitude",
@@ -183,7 +218,6 @@ class BaseAccessor:
             "LON",
             "x",
             "Long",
-            "Lon",
             "XLONG",
             "XLONG_M",
             "grid_xt",
@@ -193,16 +227,39 @@ class BaseAccessor:
             "lon_centers",
         ]
 
-        # First check in coordinates
-        for lat, lon in zip(lat_names, lon_names):
-            if lat in ds.coords and lon in ds.coords:
-                return lat, lon
+        # Search for any combination of lat and lon names
+        found_lat = None
+        found_lon = None
 
-        # Then check in variables if it's a Dataset
+        # Check coordinates first
+        for lat in lat_names:
+            if lat in ds.coords:
+                found_lat = lat
+                break
+
+        for lon in lon_names:
+            if lon in ds.coords:
+                found_lon = lon
+                break
+
+        if found_lat and found_lon:
+            return found_lat, found_lon
+
+        # Then check variables if it's a Dataset
         if isinstance(ds, xr.Dataset):
-            for lat, lon in zip(lat_names, lon_names):
-                if lat in ds.variables and lon in ds.variables:
-                    return lat, lon
+            if found_lat is None:
+                for lat in lat_names:
+                    if lat in ds.variables:
+                        found_lat = lat
+                        break
+            if found_lon is None:
+                for lon in lon_names:
+                    if lon in ds.variables:
+                        found_lon = lon
+                        break
+
+        if found_lat and found_lon:
+            return found_lat, found_lon
 
         # Look for variables with standard_name attribute
         lat_name = None
@@ -541,8 +598,16 @@ class BaseAccessor:
 
         return result
 
-    def structure_for_monet(self, lat_name="lat", lon_name="lon", return_obj=True, coards_compliant=False):
-        """Structure the DataArray for use with MONET functions.
+    def structure_for_monet(
+        self,
+        lat_name: str = "lat",
+        lon_name: str = "lon",
+        return_obj: bool = True,
+        coards_compliant: bool = False,
+    ) -> xr.DataArray | xr.Dataset | None:
+        """Structure the object for use with MONET functions.
+        Deprecated in favor of convention-aware processing, but preserved for
+        explicit dimension renaming to 'x'/'y'.
 
         Parameters
         ----------
@@ -557,20 +622,62 @@ class BaseAccessor:
 
         Returns
         -------
-        xarray.DataArray or None
-            Restructured DataArray if return_obj is True, otherwise None.
+        xarray.DataArray, xarray.Dataset, or None
+            Restructured object if return_obj is True, otherwise None.
         """
+        import warnings
+
+        warnings.warn(
+            "structure_for_monet is deprecated. Most MONET functions are now convention-aware "
+            "and do not require dimension renaming.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+        res = self._dataset_to_monet(
+            self._obj,
+            lat_name=lat_name,
+            lon_name=lon_name,
+            coards_compliant=coards_compliant,
+        )
+
         if return_obj:
-            return self._dataset_to_monet(
-                self._obj,
-                lat_name=lat_name,
-                lon_name=lon_name,
-                coards_compliant=coards_compliant,
-            )
+            return res
         else:
-            self._obj = self._dataset_to_monet(
-                self._obj,
-                lat_name=lat_name,
-                lon_name=lon_name,
-                coards_compliant=coards_compliant,
-            )
+            self._obj = res
+            return None
+
+    def standardize(self) -> xr.DataArray | xr.Dataset:
+        """Standardize the object coordinates and attributes without renaming dimensions.
+        Convention-aware: adds standard_name attributes and ensures longitudes are wrapped.
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+            The standardized object.
+        """
+        import datetime
+
+        obj = self._obj.copy()
+
+        # Wrap longitudes if present
+        lat_name, lon_name = self._detect_latlon_names(obj)
+        if lon_name:
+            obj[lon_name] = (obj[lon_name] + 180) % 360 - 180
+            if "standard_name" not in obj[lon_name].attrs:
+                obj[lon_name].attrs["standard_name"] = "longitude"
+            if "units" not in obj[lon_name].attrs:
+                obj[lon_name].attrs["units"] = "degrees_east"
+
+        if lat_name:
+            if "standard_name" not in obj[lat_name].attrs:
+                obj[lat_name].attrs["standard_name"] = "latitude"
+            if "units" not in obj[lat_name].attrs:
+                obj[lat_name].attrs["units"] = "degrees_north"
+
+        # Update history
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = obj.attrs.get("history", "")
+        obj.attrs["history"] = history + f"\n{curr_time} > Standardized via monet.standardize"
+
+        return obj

@@ -10,9 +10,6 @@ from .accessors.dataarray_accessor import MONETAccessor  # noqa: F401
 from .accessors.dataset_accessor import MONETAccessorDataset  # noqa: F401
 from .accessors.pandas_accessor import MONETAccessorPandas  # noqa: F401
 
-has_pyresample = False
-has_xesmf = False
-
 # Import old functions for backward compatibility
 _rename_latlon = BaseAccessor._rename_latlon
 _monet_to_latlon = BaseAccessor._monet_to_latlon

@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 from .base import BaseAccessor, has_monet_regrid, has_xregrid
 
@@ -25,8 +26,8 @@ class MONETAccessorPandas(BaseAccessor):
         self._obj = pandas_obj
 
     @staticmethod
-    def _validate(obj):
-        """Verify there is a column ``'latitude'`` and a column ``'longitude'``.
+    def _validate(obj: pd.DataFrame):
+        """Verify there is a column for latitude and longitude.
 
         Parameters
         ----------
@@ -36,13 +37,20 @@ class MONETAccessorPandas(BaseAccessor):
         Raises
         ------
         AttributeError
-            If obj does not have 'latitude' and 'longitude' columns.
+            If obj does not have latitude and longitude columns.
         """
-        if "latitude" not in obj.columns or "longitude" not in obj.columns:
-            raise AttributeError("Must have 'latitude' and 'longitude'.")
+        # More flexible validation to support common variants before rename_for_monet
+        lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+        lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+
+        has_lat = any(name in obj.columns for name in lat_names)
+        has_lon = any(name in obj.columns for name in lon_names)
+
+        if not (has_lat and has_lon):
+            raise AttributeError("Must have latitude and longitude columns.")
 
     @property
-    def center(self):
+    def center(self) -> tuple[float, float]:
         """The geographic center point of this DataFrame.
 
         .. note::
@@ -55,9 +63,31 @@ class MONETAccessorPandas(BaseAccessor):
         tuple
             (lon, lat)
         """
-        lat = self._obj.latitude
-        lon = self._obj.longitude
+        # Use detected names
+        lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+        lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+
+        lat_col = next((c for c in lat_names if c in self._obj.columns), None)
+        lon_col = next((c for c in lon_names if c in self._obj.columns), None)
+
+        if lat_col is None or lon_col is None:
+            raise AttributeError("Could not detect latitude and longitude columns.")
+
+        lat = self._obj[lat_col]
+        lon = self._obj[lon_col]
         return (float(lon.mean()), float(lat.mean()))
+
+    def _get_latlon_cols(self) -> tuple[str, str]:
+        """Get the detected latitude and longitude column names."""
+        lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+        lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+
+        lat_col = next((c for c in lat_names if c in self._obj.columns), None)
+        lon_col = next((c for c in lon_names if c in self._obj.columns), None)
+
+        if lat_col is None or lon_col is None:
+            raise AttributeError("Could not detect latitude and longitude columns.")
+        return lat_col, lon_col
 
     def to_ascii2nc_df(
         self,
@@ -117,13 +147,14 @@ class MONETAccessorPandas(BaseAccessor):
             df["ascii2nc_height_agl"] = df[height_agl]
         else:
             df["ascii2nc_height_agl"] = height_agl
+        lat_col, lon_col = self._get_latlon_cols()
         out = df[
             [
                 "ascii2nc_message",
                 "siteid",
                 "ascii2nc_time",
-                "latitude",
-                "longitude",
+                lat_col,
+                lon_col,
                 "ascii2nc_elevation",
                 "ascii2nc_gribcode",
                 "ascii2nc_pressure",
@@ -137,8 +168,7 @@ class MONETAccessorPandas(BaseAccessor):
                 ascii2nc_message="typ",
                 siteid="sid",
                 ascii2nc_time="vld",
-                latitude="lat",
-                longitude="lon",
+                **{lat_col: "lat", lon_col: "lon"},
                 ascii2nc_elevation="elv",
                 ascii2nc_gribcode="var",
                 ascii2nc_pressure="lvl",
@@ -168,8 +198,8 @@ class MONETAccessorPandas(BaseAccessor):
         return out.values.tolist()
 
     @staticmethod
-    def rename_for_monet(df):
-        """Rename latitude and longitude columns in the DataFrame.
+    def rename_for_monet(df: pd.DataFrame) -> pd.DataFrame:
+        """Rename latitude and longitude columns in the DataFrame to MONET standard.
 
         Parameters
         ----------
@@ -191,14 +221,17 @@ class MONETAccessorPandas(BaseAccessor):
             col_map = {"Lat": "latitude", "Lon": "longitude"}
         elif "LAT" in out.columns and "LON" in out.columns:
             col_map = {"LAT": "latitude", "LON": "longitude"}
+
         if col_map:
-            out = out.rename(col_map)
+            out = out.rename(columns=col_map)
+
         # If neither, but already correct, do nothing
         # If neither, but only one present, add missing as NaN
         if "latitude" not in out.columns:
             out["latitude"] = np.nan
         if "longitude" not in out.columns:
             out["longitude"] = np.nan
+
         # Reorder columns to put latitude/longitude first if present
         cols = list(out.columns)
         for c in ["latitude", "longitude"]:
@@ -217,8 +250,9 @@ class MONETAccessorPandas(BaseAccessor):
         """
         raise NotImplementedError("This function relies on pyresample which has been removed.")
 
-    def _df_to_da(self, d=None):  # TODO: should be `to_ds` or `to_xarray`
+    def _df_to_da(self, d: pd.DataFrame | None = None) -> xr.Dataset:  # TODO: should be `to_ds` or `to_xarray`
         """Convert DataFrame to xarray.
+        Preserves detected spatial columns as coordinates.
 
         Parameters
         ----------
@@ -235,9 +269,7 @@ class MONETAccessorPandas(BaseAccessor):
         else:
             d = d.copy()
 
-        # Avoid issues with Arrow-backed strings during expand_dims which uses newaxis indexing
-        # not supported by ArrowStringArray in some versions of pandas/pyarrow.
-        # Also avoid issues with Dask/Xarray trying to interpret Arrow dtypes.
+        # Avoid issues with Arrow-backed strings
         for col in d.columns:
             if pd.api.types.is_string_dtype(d[col]) and not pd.api.types.is_numeric_dtype(d[col]):
                 d[col] = np.asarray(d[col], dtype=object)
@@ -249,16 +281,29 @@ class MONETAccessorPandas(BaseAccessor):
         ds = d.to_xarray().rename({index_name: "x"}).expand_dims("y")
         if "time" in ds.data_vars.keys():
             ds["time"] = ds.time.squeeze()  # it is only 1D
-        if "latitude" in ds.data_vars.keys():
-            ds = ds.set_coords(["latitude", "longitude"])
+
+        # Detect spatial columns to set as coords
+        lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+        lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+        lat_col = next((c for c in lat_names if c in ds.data_vars), None)
+        lon_col = next((c for c in lon_names if c in ds.data_vars), None)
+
+        coords_to_set = []
+        if lat_col:
+            coords_to_set.append(lat_col)
+        if lon_col:
+            coords_to_set.append(lon_col)
+        if coords_to_set:
+            ds = ds.set_coords(coords_to_set)
+
         return ds
 
     def remap_nearest(
         self,
-        df,
-        radius_of_influence=1e5,
-        combine=False,
-    ):
+        df: pd.DataFrame,
+        radius_of_influence: float = 1e5,
+        combine: bool = False,
+    ) -> pd.DataFrame:
         """Remap data using nearest neighbor interpolation (xregrid or monet-regrid).
 
         Parameters
@@ -266,7 +311,7 @@ class MONETAccessorPandas(BaseAccessor):
         df : pandas.DataFrame
             DataFrame to remap.
         radius_of_influence : float, default: 1e5
-            Search radius in meters.
+            Search radius in meters (unused in xregrid).
         combine : bool, default: False
             Whether to combine the remapped data with the original data.
 
@@ -278,7 +323,7 @@ class MONETAccessorPandas(BaseAccessor):
         if not has_xregrid and not has_monet_regrid:
             raise ImportError("xregrid (with esmpy) or monet-regrid is required for this functionality")
 
-        from ..util import resample
+        from ..util.resample import resample
 
         source_data = self.rename_for_monet(df)
         target_data = self.rename_for_monet(self._obj)
@@ -289,36 +334,26 @@ class MONETAccessorPandas(BaseAccessor):
         target_data_da = self._df_to_da(target_data)
 
         # Use xregrid to resample
-        # source and target are DataFrames converted to xarray Datasets
-        # We want to resample source to target grid
-
-        # We are resampling the fake index variable
         da_source = source_data_da["monet_fake_index"]
-
-        # We need target to be a dataset for xregrid usually
-        # but here we have point data.
-        # xregrid might struggle with 1xN 'y','x' grid if it expects 2D lat/lon
-        # But let's try using resample helper
-
-        # Note: resample takes (source, target, method)
-
-        # We need ensure coords are correct for xregrid
-        # It expects "lat" and "lon" or "latitude" and "longitude"
-
-        # If xregrid supports point-to-point via "nearest", then:
-        res = resample.resample(da_source, target_data_da, method="nearest")
+        res = resample(da_source, target_data_da, method="nearest")
 
         r = res
         r.name = "monet_fake_index"
 
         # now merge back from original DataFrame
         q = r.compute()
-        v = q.squeeze().to_dataframe()
+        v = q.to_dataframe()
 
-        # The merge logic might need adjustment if v index doesn't match exactly
-        # But if it preserves index/coordinates it should be fine.
+        # Ensure we have the fake index column to merge on
+        if "monet_fake_index" not in v.columns:
+            # It might be in the index if xarray conversion put it there
+            v = v.reset_index()
 
         result = v.merge(source_data, how="left", on="monet_fake_index").drop("monet_fake_index", axis=1)
+
+        # Restore index if it was lost
+        result.index = target_data.index
+
         if combine:
             columns_to_use = result.columns.difference(target_data.columns)
             return pd.merge(
@@ -331,7 +366,7 @@ class MONETAccessorPandas(BaseAccessor):
         else:
             return result
 
-    def cftime_to_datetime64(self, col=None):
+    def cftime_to_datetime64(self, col: str | None = None) -> pd.DataFrame:
         """Convert cftime column to numpy datetime64.
 
         Parameters
@@ -344,14 +379,19 @@ class MONETAccessorPandas(BaseAccessor):
         pandas.DataFrame
             DataFrame with converted time column.
         """
-        df = self._obj
+        df = self._obj.copy()
 
         def cf_to_dt64(x):
-            return pd.to_datetime(x.strftime("%Y-%m-%d %H:%M:%S"))
+            try:
+                return pd.to_datetime(x.strftime("%Y-%m-%d %H:%M:%S"))
+            except AttributeError:
+                return x
 
         if col is None:  # assume 'time' is the column name to transform
             col = "time"
-        df[col] = df[col].apply(cf_to_dt64)
+
+        if col in df.columns:
+            df[col] = df[col].apply(cf_to_dt64)
         return df
 
     def _make_fake_index_var(self, df):

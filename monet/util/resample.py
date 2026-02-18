@@ -154,7 +154,13 @@ def resample_stratify(
     if da_renamed.chunks is not None:
         da_renamed = da_renamed.chunk({vertical_name: -1})
 
-    out = interpolate_vertical(da_renamed, levels, level_dim=vertical_name, tension=tension)
+    # Convert levels to raw array to avoid xarray broadcast issues in pytspack when levels is a DataArray
+    if isinstance(levels, xr.DataArray):
+        levels_arr = levels.data
+    else:
+        levels_arr = np.asarray(levels)
+
+    out = interpolate_vertical(da_renamed, levels_arr, level_dim=vertical_name, tension=tension)
 
     # Rename the dimension back to the original name
     out = out.rename({vertical_name: orig_dim})
