@@ -1115,17 +1115,10 @@ class BaseAccessor:
 
         from ..util.resample import resample
 
-        # Check for Dask to replicate original inconsistent API behavior
-        is_dask = hasattr(self._obj, "chunks") and self._obj.chunks is not None
-        target_shape = getattr(data, "shape", None)
-        source_shape = getattr(self._obj, "shape", None)
-
-        if is_dask and target_shape is not None and target_shape != source_shape:
-            source = self._obj
-            target = data
-        else:
-            source = data
-            target = self._obj
+        # Ensure consistent behavior: always remap the argument 'data' to 'self._obj' grid.
+        # This resolves issues where dask-backed targets caused an erroneous swap of source and target.
+        source = data
+        target = self._obj
 
         out = resample(source, target, method=method, **kwargs)
 

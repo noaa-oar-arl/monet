@@ -76,7 +76,28 @@ def _pair_xarray(
 ) -> xr.Dataset | xr.DataArray:
     """Pair xarray model with xarray observations."""
     # Use remap via accessor - convention aware
-    paired = obs.monet.remap(model, method=method, **kwargs)
+
+    # Detect if we have a trajectory (time-varying coordinates)
+    lat_name, lon_name = obs.monet._detect_latlon_names(obs)
+    is_trajectory = False
+    if lat_name and "time" in obs[lat_name].dims:
+        is_trajectory = True
+    elif lon_name and "time" in obs[lon_name].dims:
+        is_trajectory = True
+
+    if interp_time and is_trajectory:
+        # For moving platforms, interpolate time before spatial remapping
+        # to ensure we sample at the right location for each time step.
+        model = model.interp(time=obs.time)
+        paired = obs.monet.remap(model, method=method, **kwargs)
+    elif not is_trajectory and "time" in obs.dims:
+        # For fixed grids, use a single time slice as the target grid to avoid
+        # AlignmentError if model and obs have different time dimension sizes.
+        target_grid = obs.isel(time=0)
+        paired = target_grid.monet.remap(model, method=method, **kwargs)
+    else:
+        # Default behavior: attempt direct remap
+        paired = obs.monet.remap(model, method=method, **kwargs)
 
     if interp_time:
         paired = paired.interp(time=obs.time)
