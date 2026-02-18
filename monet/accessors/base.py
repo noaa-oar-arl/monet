@@ -1,5 +1,8 @@
 """Base accessor implementation for MONET"""
 
+import datetime
+import typing as t
+
 import xarray as xr
 
 try:
@@ -33,23 +36,37 @@ class BaseAccessor:
     """Base class for MONET accessors with common utility methods."""
 
     @property
-    def lat(self) -> xr.DataArray | None:
+    def lat(self) -> t.Any:
         """Detected latitude coordinate or variable.
         Uses convention-aware detection without renaming.
+        Supports Xarray and Pandas.
         """
-        name, _ = self._detect_latlon_names(self._obj)
-        if name:
-            return self._obj[name]
+        if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
+            name, _ = self._detect_latlon_names(self._obj)
+            if name:
+                return self._obj[name]
+        elif hasattr(self._obj, "columns"):  # Pandas
+            lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+            lat_col = next((c for c in lat_names if c in self._obj.columns), None)
+            if lat_col:
+                return self._obj[lat_col]
         return None
 
     @property
-    def lon(self) -> xr.DataArray | None:
+    def lon(self) -> t.Any:
         """Detected longitude coordinate or variable.
         Uses convention-aware detection without renaming.
+        Supports Xarray and Pandas.
         """
-        _, name = self._detect_latlon_names(self._obj)
-        if name:
-            return self._obj[name]
+        if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
+            _, name = self._detect_latlon_names(self._obj)
+            if name:
+                return self._obj[name]
+        elif hasattr(self._obj, "columns"):  # Pandas
+            lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+            lon_col = next((c for c in lon_names if c in self._obj.columns), None)
+            if lon_col:
+                return self._obj[lon_col]
         return None
 
     @staticmethod
@@ -656,8 +673,6 @@ class BaseAccessor:
         xarray.DataArray or xarray.Dataset
             The standardized object.
         """
-        import datetime
-
         obj = self._obj.copy()
 
         # Wrap longitudes if present
@@ -681,3 +696,454 @@ class BaseAccessor:
         obj.attrs["history"] = history + f"\n{curr_time} > Standardized via monet.standardize"
 
         return obj
+
+    def is_land(self, return_xarray: bool = False) -> xr.DataArray | xr.Dataset | t.Any:
+        """Check if points are on land.
+        Supports both Eager (NumPy) and Lazy (Dask) backends via ``xarray.apply_ufunc``.
+        Convention-aware: works with CF/COARDS and UGRID without forced renaming.
+        Also supports Pandas DataFrames.
+
+        Parameters
+        ----------
+        return_xarray : bool, default: False
+            If True, return results as masked object.
+            Otherwise, return the boolean mask.
+
+        Returns
+        -------
+        xarray.DataArray, xarray.Dataset, or any
+            If return_xarray is True, returns the object masked by land.
+            Otherwise, returns a boolean mask.
+        """
+        return self._mask_land_ocean(mask_type="land", return_xarray=return_xarray)
+
+    def is_ocean(self, return_xarray: bool = False) -> xr.DataArray | xr.Dataset | t.Any:
+        """Check if points are on ocean.
+        Supports both Eager (NumPy) and Lazy (Dask) backends via ``xarray.apply_ufunc``.
+        Convention-aware: works with CF/COARDS and UGRID without forced renaming.
+        Also supports Pandas DataFrames.
+
+        Parameters
+        ----------
+        return_xarray : bool, default: False
+            If True, return results as masked object.
+            Otherwise, return the boolean mask.
+
+        Returns
+        -------
+        xarray.DataArray, xarray.Dataset, or any
+            If return_xarray is True, returns the object masked by ocean.
+            Otherwise, returns a boolean mask.
+        """
+        return self._mask_land_ocean(mask_type="ocean", return_xarray=return_xarray)
+
+    def _mask_land_ocean(self, mask_type: str = "land", return_xarray: bool = False) -> xr.DataArray | xr.Dataset | t.Any:
+        """Helper method to compute land/ocean mask.
+
+        Parameters
+        ----------
+        mask_type : str, default: 'land'
+            Type of mask to compute: 'land' or 'ocean'.
+        return_xarray : bool, default: False
+            If True, return results as xarray (masked object).
+            Otherwise, return the boolean mask as a DataArray.
+
+        Returns
+        -------
+        xarray.DataArray, xarray.Dataset, or t.Any
+            If return_xarray is True, returns the object masked.
+            Otherwise, returns the boolean mask.
+        """
+        try:
+            import global_land_mask as glm
+        except ImportError:
+            raise ImportError("Please install global-land-mask from pypi")
+
+        lat = self.lat
+        lon = self.lon
+        if lat is None or lon is None:
+            raise ValueError("Could not detect latitude and longitude coordinates.")
+
+        func = glm.is_land if mask_type == "land" else glm.is_ocean
+
+        if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
+            # Use apply_ufunc to be backend-agnostic (handles Dask automatically if parallelized=True)
+            res = xr.apply_ufunc(
+                func,
+                lat,
+                lon,
+                dask="parallelized",
+                output_dtypes=[bool],
+            )
+            res.name = f"is_{mask_type}"
+
+            if return_xarray:
+                res = self._obj.where(res)
+
+            # Update history for provenance
+            curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            history = res.attrs.get("history", "")
+            res.attrs["history"] = history + f"\n{curr_time} > Computed {mask_type} mask via monet.is_{mask_type}"
+
+            return res
+        else:
+            # Assume Pandas
+            import numpy as np
+            import pandas as pd
+
+            mask = func(np.asarray(lat), np.asarray(lon))
+            if return_xarray:
+                # For pandas, where() with a Series will align on index if axis=0
+                mask_series = pd.Series(mask, index=self._obj.index)
+                return self._obj.where(mask_series, axis=0)
+            return mask
+
+    def wrap_longitudes(self, lon_name: str | None = None) -> xr.DataArray | xr.Dataset:
+        """Wrap longitude values to [-180, 180).
+        Convention-aware: auto-detects longitude if lon_name is None.
+
+        Parameters
+        ----------
+        lon_name : str, optional
+            Name of the longitude coordinate. If None, auto-detects.
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+            Object with wrapped longitudes.
+        """
+        if lon_name is None:
+            _, lon_name = self._detect_latlon_names(self._obj)
+            if lon_name is None:
+                raise ValueError("Could not detect longitude coordinate.")
+
+        obj = self._obj.copy()
+        obj[lon_name] = (obj[lon_name] + 180) % 360 - 180
+
+        # Update history for provenance
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = obj.attrs.get("history", "")
+        obj.attrs["history"] = history + f"\n{curr_time} > Wrapped longitudes ({lon_name}) via monet.wrap_longitudes"
+
+        return obj
+
+    def tidy(self, lon_name: str | None = None) -> xr.DataArray | xr.Dataset:
+        """Apply tidying operations to the data.
+        Wraps longitudes and sorts by longitude.
+        Convention-aware: auto-detects longitude if lon_name is None.
+
+        Parameters
+        ----------
+        lon_name : str, optional
+            Name of the longitude coordinate. If None, auto-detects.
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+            Tidied object.
+        """
+        if lon_name is None:
+            _, lon_name = self._detect_latlon_names(self._obj)
+            if lon_name is None:
+                raise ValueError("Could not detect longitude coordinate.")
+
+        wd = self.wrap_longitudes(lon_name=lon_name)
+        wdl = wd.sortby(wd[lon_name])
+
+        # Update history for provenance
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = wdl.attrs.get("history", "")
+        wdl.attrs["history"] = history + f"\n{curr_time} > Tidied via monet.tidy (lon_name={lon_name})"
+
+        return wdl
+
+    def cftime_to_datetime64(self, name: str | None = None) -> xr.DataArray | xr.Dataset:
+        """Convert cftime coordinates to numpy datetime64.
+        Preserves Dask laziness if the time coordinate is Dask-backed.
+
+        Parameters
+        ----------
+        name : str, optional
+            Name of the coordinate to convert. If None, tries to detect the time coordinate.
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+            Object with converted time coordinate.
+        """
+        import pandas as pd
+        from numpy import vectorize
+
+        obj = self._obj.copy()
+
+        def cf_to_dt64(x):
+            try:
+                return pd.to_datetime(x.strftime("%Y-%m-%d %H:%M:%S"))
+            except AttributeError:
+                return x
+
+        if name is None:  # assume 'time' is the column name to transform
+            name = "time"
+
+        if hasattr(obj, "coords") and name in obj.coords and isinstance(obj[name].to_index(), xr.CFTimeIndex):
+            obj[name] = xr.apply_ufunc(
+                vectorize(cf_to_dt64),
+                obj[name],
+                dask="parallelized",
+                output_dtypes=["datetime64[ns]"],
+            )
+
+            # Update history
+            curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            history = obj.attrs.get("history", "")
+            obj.attrs["history"] = history + f"\n{curr_time} > Converted {name} from cftime to datetime64"
+
+        return obj
+
+    def interp_constant_lat(self, lat: float | None = None, **kwargs: t.Any) -> xr.DataArray | xr.Dataset:
+        """Interpolate data to a constant latitude.
+        Convention-aware: supports both CF/COARDS and UGRID.
+
+        Parameters
+        ----------
+        lat : float, optional
+            Latitude value to interpolate to.
+        **kwargs : dict
+            Additional keyword arguments for interpolation.
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+            Interpolated object.
+        """
+        from numpy import asarray, linspace, ones
+
+        if lat is None:
+            raise ValueError("Must provide a latitude value ('lat')")
+
+        obj = self._obj.copy()
+        lat_da = self.lat
+        lon_da = self.lon
+
+        if lat_da is None or lon_da is None:
+            raise ValueError("Could not detect latitude and longitude coordinates.")
+
+        # Determine target points along detected longitude range
+        # Note: We compute bounds eagerly for linspace
+        lon_min = lon_da.min().values.item() if hasattr(lon_da.data, "chunks") else lon_da.min().item()
+        lon_max = lon_da.max().values.item() if hasattr(lon_da.data, "chunks") else lon_da.max().item()
+
+        longitude = linspace(lon_min, lon_max, lon_da.size)
+        latitude = ones(longitude.shape) * asarray(lat)
+
+        # Create target grid
+        from ..util.interp_util import points_to_dataset
+
+        target = points_to_dataset(latitude=latitude, longitude=longitude)
+
+        # Use new regridding
+        from ..util.resample import resample
+
+        out = resample(obj, target, **kwargs)
+
+        # Update history
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = out.attrs.get("history", "")
+        out.attrs["history"] = history + f"\n{curr_time} > Interpolated to constant latitude: {lat}"
+
+        return out
+
+    def interp_constant_lon(self, lon: float | None = None, **kwargs: t.Any) -> xr.DataArray | xr.Dataset:
+        """Interpolate data to a constant longitude.
+        Convention-aware: supports both CF/COARDS and UGRID.
+
+        Parameters
+        ----------
+        lon : float, optional
+            Longitude value to interpolate to.
+        **kwargs : dict
+            Additional keyword arguments for interpolation.
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+            Interpolated object.
+        """
+        from numpy import asarray, linspace, ones
+
+        if lon is None:
+            raise ValueError("Must provide a longitude value ('lon')")
+
+        obj = self._obj.copy()
+        lat_da = self.lat
+        lon_da = self.lon
+
+        if lat_da is None or lon_da is None:
+            raise ValueError("Could not detect latitude and longitude coordinates.")
+
+        # Determine target points along detected latitude range
+        # Note: We compute bounds eagerly for linspace
+        lat_min = lat_da.min().values.item() if hasattr(lat_da.data, "chunks") else lat_da.min().item()
+        lat_max = lat_da.max().values.item() if hasattr(lat_da.data, "chunks") else lat_da.max().item()
+
+        latitude = linspace(lat_min, lat_max, lat_da.size)
+        longitude = ones(latitude.shape) * asarray(lon)
+
+        # Create target grid
+        from ..util.interp_util import points_to_dataset
+
+        target = points_to_dataset(latitude=latitude, longitude=longitude)
+
+        # Use new regridding
+        from ..util.resample import resample
+
+        out = resample(obj, target, **kwargs)
+
+        # Update history
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = out.attrs.get("history", "")
+        out.attrs["history"] = history + f"\n{curr_time} > Interpolated to constant longitude: {lon}"
+
+        return out
+
+    def nearest_latlon(
+        self,
+        lat: float | t.Sequence[float] | None = None,
+        lon: float | t.Sequence[float] | None = None,
+        cleanup: bool = True,
+        esmf: bool = False,
+        **kwargs: t.Any,
+    ) -> xr.DataArray | xr.Dataset:
+        """Extract data at nearest lat/lon point(s).
+
+        Parameters
+        ----------
+        lat : float or array-like, optional
+            Latitude value(s).
+        lon : float or array-like, optional
+            Longitude value(s).
+        cleanup : bool, default: True
+            Whether to clean up temporary files after regridding.
+        esmf : bool, default: False
+            Whether to use ESMF for regridding.
+        **kwargs : dict
+            Additional keyword arguments.
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+            Object at nearest point(s).
+        """
+        if lat is None or lon is None:
+            raise ValueError("Must provide latitude and longitude")
+
+        obj = self._obj.copy()
+
+        # Use xregrid via resample
+        from ..util.interp_util import points_to_dataset
+        from ..util.resample import resample
+
+        # Create target grid
+        target = points_to_dataset(latitude=lat, longitude=lon)
+        output = resample(obj, target, method="nearest", **kwargs)
+
+        res = output.squeeze()
+
+        # Update history
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = res.attrs.get("history", "")
+        res.attrs["history"] = history + f"\n{curr_time} > Extracted nearest lat/lon points"
+
+        return res
+
+    def remap(
+        self,
+        data: xr.DataArray | xr.Dataset,
+        method: str = "nearest",
+        radius_of_influence: float = 1e6,
+        **kwargs: t.Any,
+    ) -> xr.DataArray | xr.Dataset:
+        """Remap data using xregrid or monet-regrid fallback.
+        Supports both CF/COARDS and UGRID conventions.
+
+        Parameters
+        ----------
+        data : xarray.DataArray or xarray.Dataset
+            Data to remap.
+        method : str, default: 'nearest'
+            Resampling method: 'nearest', 'bilinear', or others supported by backends.
+        radius_of_influence : float, default: 1e6
+            Search radius in meters (unused in xregrid).
+        **kwargs : dict
+            Additional keyword arguments for the resampler.
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+            Remapped data.
+        """
+        if not has_xregrid and not has_monet_regrid:
+            raise ImportError("xregrid (with esmpy) or monet-regrid is required for this functionality")
+
+        from ..util.resample import resample
+
+        # Check for Dask to replicate original inconsistent API behavior
+        is_dask = hasattr(self._obj, "chunks") and self._obj.chunks is not None
+        target_shape = getattr(data, "shape", None)
+        source_shape = getattr(self._obj, "shape", None)
+
+        if is_dask and target_shape is not None and target_shape != source_shape:
+            source = self._obj
+            target = data
+        else:
+            source = data
+            target = self._obj
+
+        out = resample(source, target, method=method, **kwargs)
+
+        # Update history
+        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        history = out.attrs.get("history", "")
+        out.attrs["history"] = history + f"\n{curr_time} > Remapped via monet.remap (method={method})"
+
+        return out
+
+    def pair(self, obs: t.Any, **kwargs: t.Any) -> t.Any:
+        """Pair this object with observation data.
+
+        Parameters
+        ----------
+        obs : xarray.Dataset, xarray.DataArray, pandas.DataFrame, or dask.dataframe.DataFrame
+            Observation data to pair with.
+        **kwargs : dict
+            Additional arguments passed to `monet.pair`.
+
+        Returns
+        -------
+        matched object
+            Matched object of the same type as `obs`.
+        """
+        from ..util.combinetool import pair
+
+        return pair(self._obj, obs, **kwargs)
+
+    def combine_point(self, data: t.Any, suffix: str | None = None, **kwargs: t.Any) -> t.Any:
+        """Combine point data with this object.
+
+        Note: This is a backward compatibility wrapper for `pair`.
+
+        Parameters
+        ----------
+        data : pandas.DataFrame or t.Any
+            Point data to combine.
+        suffix : str, optional
+            Suffix to add to variable names.
+        **kwargs : dict
+            Additional keyword arguments for regridding.
+
+        Returns
+        -------
+        combined data
+            Combined data.
+        """
+        return self.pair(data, suffix=suffix, **kwargs)

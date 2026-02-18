@@ -69,9 +69,21 @@ def resample(
         target_grid = target_grid.to_dataset()
 
     if has_xregrid:
+        # xregrid.Regridder detection logic works better with Datasets.
+        # If source_data is a DataArray, we pass a temporary Dataset for detection and application.
+        was_da = isinstance(source_data, xr.DataArray)
+        src_for_regrid = source_data
+        if was_da:
+            da_name = source_data.name or "data"
+            src_for_regrid = source_data.to_dataset(name=da_name)
+
         # Create regridder and apply
-        regridder = Regridder(source_data, target_grid, method=real_method, **kwargs)
-        out = regridder(source_data)
+        regridder = Regridder(src_for_regrid, target_grid, method=real_method, **kwargs)
+        out = regridder(src_for_regrid)
+
+        # Convert back to DataArray if necessary
+        if was_da:
+            out = out[da_name]
 
         # Update history for provenance
         curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

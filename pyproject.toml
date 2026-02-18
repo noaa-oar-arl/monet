@@ -36,6 +36,7 @@ dependencies = [
   "pooch",
   "pytspack @ git+https://github.com/noaa-oar-arl/pytspack",
   "mpi4py",
+  "global-land-mask",
 ]
 
 [project.optional-dependencies]

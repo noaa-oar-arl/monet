@@ -147,3 +147,146 @@ def test_compare_dask():
 
     rmse = da1.monet.compare(da2, stat="rmse", plot=False)
     assert hasattr(rmse.data, "chunks")
+
+
+@pytest.mark.skipif(not has_glm, reason="global_land_mask not installed")
+def test_is_land_ocean_advanced_lazy():
+    """Advanced verification of is_land and is_ocean logic with Dask backends."""
+    import dask.array as da
+
+    # 1. Setup Eager Data
+    lon = np.linspace(-180, 180, 10)
+    lat = np.linspace(-90, 90, 10)
+
+    data = np.random.rand(10, 10)
+
+    ds_eager = xr.Dataset({"test": (("lat", "lon"), data)}, coords={"lat": lat, "lon": lon})
+    # Add attributes to test provenance
+    ds_eager.attrs["history"] = "Original"
+
+    # 2. Setup Lazy Data
+    # To strictly verify laziness of coordinates, we assign them as dask-backed DataArrays.
+    ds_lazy = ds_eager.copy()
+    ds_lazy = ds_lazy.assign(
+        lat_lazy=xr.DataArray(da.from_array(lat, chunks=5), dims="lat", attrs={"standard_name": "latitude"}),
+        lon_lazy=xr.DataArray(da.from_array(lon, chunks=5), dims="lon", attrs={"standard_name": "longitude"}),
+    )
+    ds_lazy = ds_lazy.drop_vars(["lat", "lon"]).rename({"lat_lazy": "lat", "lon_lazy": "lon"}).set_coords(["lat", "lon"])
+    ds_lazy = ds_lazy.chunk({"lat": 5, "lon": 5})
+
+    # 3. Test is_land Eager
+    land_mask_eager = ds_eager.monet.is_land()
+    assert isinstance(land_mask_eager, xr.DataArray)
+    assert not hasattr(land_mask_eager.data, "chunks")
+    assert "history" in land_mask_eager.attrs
+    assert "Computed land mask" in land_mask_eager.attrs["history"]
+
+    # 4. Test is_land Lazy
+    land_mask_lazy = ds_lazy.monet.is_land()
+    assert isinstance(land_mask_lazy, xr.DataArray)
+    assert hasattr(land_mask_lazy.data, "chunks")
+
+    # 5. Verify results are identical
+    xr.testing.assert_allclose(land_mask_eager, land_mask_lazy.compute())
+
+    # 6. Test is_ocean with return_xarray=True
+    ds_masked_eager = ds_eager.monet.is_ocean(return_xarray=True)
+    ds_masked_lazy = ds_lazy.monet.is_ocean(return_xarray=True)
+
+    assert isinstance(ds_masked_eager, xr.Dataset)
+    assert isinstance(ds_masked_lazy, xr.Dataset)
+    assert hasattr(ds_masked_lazy.test.data, "chunks")
+
+    xr.testing.assert_allclose(ds_masked_eager, ds_masked_lazy.compute())
+    assert "Computed ocean mask" in ds_masked_eager.attrs["history"]
+
+
+def test_wrap_longitudes_da_ds():
+    """Verify wrap_longitudes works for both DataArray and Dataset."""
+    # DataArray
+    da = xr.DataArray([200.0], coords={"lon": ("x", [200.0]), "lat": ("x", [40.0])}, dims="x", name="test")
+    wrapped_da = da.monet.wrap_longitudes()
+    assert wrapped_da.lon.values[0] == -160.0
+    assert "Wrapped longitudes" in wrapped_da.attrs["history"]
+
+    # Dataset
+    ds = xr.Dataset({"test": da})
+    wrapped_ds = ds.monet.wrap_longitudes()
+    assert wrapped_ds.lon.values[0] == -160.0
+    assert "Wrapped longitudes" in wrapped_ds.attrs["history"]
+
+
+def test_tidy_da_ds():
+    """Verify tidy works for both DataArray and Dataset."""
+    # DataArray
+    da = xr.DataArray([1.0, 2.0], coords={"lon": ("x", [10.0, 5.0]), "lat": ("x", [40, 40])}, dims="x", name="test")
+    tidied_da = da.monet.tidy()
+    assert tidied_da.lon.values[0] == 5.0
+    assert "Tidied" in tidied_da.attrs["history"]
+
+    # Dataset
+    ds = xr.Dataset({"test": da})
+    tidied_ds = ds.monet.tidy()
+    assert tidied_ds.lon.values[0] == 5.0
+    assert "Tidied" in tidied_ds.attrs["history"]
+
+
+def test_is_land_pandas():
+    """Verify is_land support for Pandas."""
+    if not has_glm:
+        pytest.skip("global_land_mask not installed")
+
+    df = pd.DataFrame({"lat": [45.0, 0.0], "lon": [-100.0, 0.0], "val": [1.0, 2.0]})
+    # 45, -100 is land, 0, 0 is ocean
+    mask = df.monet.is_land()
+    assert mask[0]
+    assert not mask[1]
+
+    # Test return_xarray (which for pandas returns masked dataframe)
+    masked_df = df.monet.is_land(return_xarray=True)
+    assert not np.isnan(masked_df.val[0])
+    assert np.isnan(masked_df.val[1])
+
+
+@pytest.mark.skipif(not monet.accessors.base.has_xregrid, reason="xregrid not installed")
+def test_interp_constant_lat_lon_da_ds():
+    """Verify interp_constant_lat/lon works for both DataArray and Dataset."""
+    # Setup
+    lat = np.linspace(30, 50, 10)
+    lon = np.linspace(-120, -70, 10)
+    data = np.random.rand(10, 10)
+    # Use standard y, x dimensions and standardize to add attributes
+    da = xr.DataArray(data, coords={"lat": (("y",), lat), "lon": (("x",), lon)}, dims=("y", "x"), name="test").monet.standardize()
+    ds = xr.Dataset({"test": da}).monet.standardize()
+
+    # DataArray
+    interp_da = da.monet.interp_constant_lat(lat=40.0)
+    assert isinstance(interp_da, xr.DataArray)
+    # Result of interp is a 1D trajectory along longitude
+    assert np.allclose(interp_da.lat.values, 40.0)
+    assert "Interpolated to constant latitude" in interp_da.attrs["history"]
+
+    # Dataset
+    interp_ds = ds.monet.interp_constant_lon(lon=-100.0)
+    assert isinstance(interp_ds, xr.Dataset)
+    assert np.allclose(interp_ds.lon.values, -100.0)
+    assert "Interpolated to constant longitude" in interp_ds.attrs["history"]
+
+
+def test_cftime_to_datetime64_da_ds():
+    """Verify cftime_to_datetime64 works for both DataArray and Dataset."""
+    import cftime
+
+    times = [cftime.DatetimeNoLeap(2020, 1, 1), cftime.DatetimeNoLeap(2020, 1, 2)]
+
+    # DataArray
+    da = xr.DataArray([1.0, 2.0], coords={"time": times}, dims="time", name="test")
+    res_da = da.monet.cftime_to_datetime64()
+    assert res_da.time.dtype.kind == "M"
+    assert "Converted time from cftime to datetime64" in res_da.attrs["history"]
+
+    # Dataset
+    ds = xr.Dataset({"test": da})
+    res_ds = ds.monet.cftime_to_datetime64()
+    assert res_ds.time.dtype.kind == "M"
+    assert "Converted time from cftime to datetime64" in res_ds.attrs["history"]
