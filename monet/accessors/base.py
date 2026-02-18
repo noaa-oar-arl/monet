@@ -754,49 +754,77 @@ class BaseAccessor:
             If return_xarray is True, returns the object masked.
             Otherwise, returns the boolean mask.
         """
-        try:
-            import global_land_mask as glm
-        except ImportError:
-            raise ImportError("Please install global-land-mask from pypi")
+        from ..util.mask import get_mask
+
+        mask = get_mask("land")
 
         lat = self.lat
         lon = self.lon
         if lat is None or lon is None:
             raise ValueError("Could not detect latitude and longitude coordinates.")
 
-        func = glm.is_land if mask_type == "land" else glm.is_ocean
-
         if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
             # Use apply_ufunc to be backend-agnostic (handles Dask automatically if parallelized=True)
             res = xr.apply_ufunc(
-                func,
+                mask.query,
                 lat,
                 lon,
                 dask="parallelized",
-                output_dtypes=[bool],
+                output_dtypes=[object],
             )
-            res.name = f"is_{mask_type}"
+            if mask_type == "land":
+                is_type = res == "land"
+            else:
+                is_type = res != "land"
+
+            is_type.name = f"is_{mask_type}"
 
             if return_xarray:
-                res = self._obj.where(res)
+                is_type = self._obj.where(is_type)
 
             # Update history for provenance
             curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            history = res.attrs.get("history", "")
-            res.attrs["history"] = history + f"\n{curr_time} > Computed {mask_type} mask via monet.is_{mask_type}"
+            history = is_type.attrs.get("history", "")
+            is_type.attrs["history"] = history + f"\n{curr_time} > Computed {mask_type} mask via monet.is_{mask_type}"
 
-            return res
+            return is_type
         else:
             # Assume Pandas
             import numpy as np
             import pandas as pd
 
-            mask = func(np.asarray(lat), np.asarray(lon))
+            res = mask.query(np.asarray(lat), np.asarray(lon))
+            if mask_type == "land":
+                is_type = res == "land"
+            else:
+                is_type = res != "land"
+
             if return_xarray:
                 # For pandas, where() with a Series will align on index if axis=0
-                mask_series = pd.Series(mask, index=self._obj.index)
+                mask_series = pd.Series(is_type, index=self._obj.index)
                 return self._obj.where(mask_series, axis=0)
-            return mask
+            return is_type
+
+    def get_region(self, mask_name: str, resolution: float = 0.05, new_var: str | None = None) -> xr.DataArray | xr.Dataset | t.Any:
+        """Add region information to the object using a pre-computed mask.
+
+        Parameters
+        ----------
+        mask_name : str
+            Name of the mask (e.g., 'giorgi', 'ipcc_ar6', 'epa_eco', 'timezones', 'epa_admin').
+        resolution : float, default: 0.05
+            Resolution of the mask in degrees.
+        new_var : str, optional
+            Name of the new variable/column to create. Defaults to mask_name.
+
+        Returns
+        -------
+        xarray.DataArray, xarray.Dataset, or pandas.DataFrame
+            The object with the added region information.
+        """
+        from ..util.mask import query_mask
+
+        return query_mask(self._obj, mask_name, resolution=resolution, new_var=new_var)
 
     def wrap_longitudes(self, lon_name: str | None = None) -> xr.DataArray | xr.Dataset:
         """Wrap longitude values to [-180, 180).

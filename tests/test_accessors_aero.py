@@ -6,11 +6,21 @@ import xarray as xr
 import monet
 
 try:
-    import global_land_mask  # noqa: F401
+    import os
 
-    has_glm = True
+    from monet.util.mask import HAS_REGIONS_DEPS, MONET_CACHE_DIR
+
+    def _check_masks():
+        if HAS_REGIONS_DEPS:
+            return True
+        if os.path.exists(MONET_CACHE_DIR):
+            if any(f.startswith("land") for f in os.listdir(MONET_CACHE_DIR)):
+                return True
+        return False
+
+    has_masks = _check_masks()
 except ImportError:
-    has_glm = False
+    has_masks = False
 
 
 def test_base_accessor_convention_aware():
@@ -32,7 +42,7 @@ def test_base_accessor_convention_aware():
     assert ds2.monet.lon.name == "longitude"
 
 
-@pytest.mark.skipif(not has_glm, reason="global_land_mask not installed")
+@pytest.mark.skipif(not has_masks, reason="Mask system not available")
 def test_is_land_no_rename():
     # Kansas, USA
     ds = xr.Dataset({"data": (("x",), [1.0])}, coords={"lat": (("x",), [40.0]), "lon": (("x",), [-100.0])})
@@ -44,7 +54,7 @@ def test_is_land_no_rename():
     assert "latitude" not in ds.coords
 
 
-@pytest.mark.skipif(not has_glm, reason="global_land_mask not installed")
+@pytest.mark.skipif(not has_masks, reason="Mask system not available")
 def test_is_land_eager_vs_lazy():
     lats = np.array([40.0, 0.0])
     lons = np.array([-100.0, 0.0])
@@ -119,8 +129,8 @@ def test_ugrid_detection():
     assert ds.monet.lon.name == "node_x"
 
     # Test is_land on UGRID (should detect coordinates correctly)
-    if not has_glm:
-        pytest.skip("global_land_mask not installed")
+    if not has_masks:
+        pytest.skip("Mask system not available")
     land = ds.monet.is_land()
     assert len(land) == 2
     assert land[0]  # approx 40N, 0E is ocean? Wait, let's check
@@ -149,7 +159,7 @@ def test_compare_dask():
     assert hasattr(rmse.data, "chunks")
 
 
-@pytest.mark.skipif(not has_glm, reason="global_land_mask not installed")
+@pytest.mark.skipif(not has_masks, reason="Mask system not available")
 def test_is_land_ocean_advanced_lazy():
     """Advanced verification of is_land and is_ocean logic with Dask backends."""
     import dask.array as da
@@ -233,8 +243,8 @@ def test_tidy_da_ds():
 
 def test_is_land_pandas():
     """Verify is_land support for Pandas."""
-    if not has_glm:
-        pytest.skip("global_land_mask not installed")
+    if not has_masks:
+        pytest.skip("Mask system not available")
 
     df = pd.DataFrame({"lat": [45.0, 0.0], "lon": [-100.0, 0.0], "val": [1.0, 2.0]})
     # 45, -100 is land, 0, 0 is ocean
@@ -290,3 +300,20 @@ def test_cftime_to_datetime64_da_ds():
     res_ds = ds.monet.cftime_to_datetime64()
     assert res_ds.time.dtype.kind == "M"
     assert "Converted time from cftime to datetime64" in res_ds.attrs["history"]
+
+
+def test_get_region_accessor():
+    """Verify get_region accessor adds correct region information."""
+    if not has_masks:
+        pytest.skip("Mask system not available")
+
+    # NYC: 40.7128, -74.0060
+    ds = xr.Dataset(coords={"latitude": [40.7128], "longitude": [-74.0060]})
+    # We already built giorgi_0.05.npz in previous steps
+    res = ds.monet.get_region("giorgi")
+    assert res.giorgi.values[0] == "ENA"
+    assert "Queried giorgi mask" in res.attrs["history"]
+
+    # Test with custom name
+    res2 = ds.monet.get_region("giorgi", new_var="my_region")
+    assert res2.my_region.values[0] == "ENA"

@@ -671,6 +671,32 @@ def get_giorgi_region_df(
         raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")
 
 
+def add_mask(
+    dset: pd.DataFrame | xr.Dataset, mask_name: str, resolution: float = 0.05, new_var: str | None = None
+) -> pd.DataFrame | xr.Dataset:
+    """Add a mask to a DataFrame or Dataset using the pre-computed mask system.
+
+    Parameters
+    ----------
+    dset : pandas.DataFrame or xarray.Dataset
+        Input object containing latitude and longitude.
+    mask_name : str
+        Name of the mask (e.g., 'giorgi', 'ipcc_ar6', 'epa_eco', 'timezones', 'epa_admin', 'land').
+    resolution : float, default: 0.05
+        Resolution of the mask in degrees.
+    new_var : str, optional
+        Name of the new variable/column to create. Defaults to mask_name.
+
+    Returns
+    -------
+    pandas.DataFrame or xarray.Dataset
+        The input object with the added mask information.
+    """
+    from .mask import query_mask
+
+    return query_mask(dset, mask_name, resolution=resolution, new_var=new_var)
+
+
 def get_epa_region_bounds(index: int | None = None, acronym: str | None = None) -> np.ndarray:
     """Get lat/lon boundaries for an EPA region.
 

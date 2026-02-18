@@ -34,9 +34,9 @@ dependencies = [
   "seaborn",
   "xarray",
   "pooch",
+  "requests",
   "pytspack @ git+https://github.com/noaa-oar-arl/pytspack",
   "mpi4py",
-  "global-land-mask",
 ]
 
 [project.optional-dependencies]
@@ -45,6 +45,11 @@ docs = [
     "mkdocs-material",
     "mkdocstrings[python]",
     "mkdocs-gallery",
+]
+regions = [
+    "geopandas",
+    "rasterio",
+    "shapely",
 ]
 
 [tool.setuptools]
