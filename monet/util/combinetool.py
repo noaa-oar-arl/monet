@@ -85,15 +85,22 @@ def _pair_xarray(
     elif lon_name and "time" in obs[lon_name].dims:
         is_trajectory = True
 
-    if interp_time and is_trajectory:
-        # For moving platforms, interpolate time before spatial remapping
+    if is_trajectory:
+        # For moving platforms, we must align time before spatial remapping
         # to ensure we sample at the right location for each time step.
-        model = model.interp(time=obs.time)
+        if interp_time:
+            model = model.interp(time=obs.time)
+        else:
+            # If not interpolating, use nearest neighbor time alignment
+            # Use .values to avoid issues if obs.time is part of a MultiIndex (fixes CI failure)
+            model = model.reindex(time=obs.time.values, method="nearest")
+
         paired = obs.monet.remap(model, method=method, **kwargs)
     elif not is_trajectory and "time" in obs.dims:
         # For fixed grids, use a single time slice as the target grid to avoid
         # AlignmentError if model and obs have different time dimension sizes.
-        target_grid = obs.isel(time=0)
+        # Must drop 'time' coord to avoid conflict with model's time dimension in output
+        target_grid = obs.isel(time=0).drop_vars("time", errors="ignore")
         paired = target_grid.monet.remap(model, method=method, **kwargs)
     else:
         # Default behavior: attempt direct remap
@@ -117,7 +124,9 @@ def _pair_xarray(
     paired.attrs["history"] = history + f"\n{curr_time} > Paired with observations via monet.pair"
 
     if merge:
-        return xr.merge([obs, paired])
+        # Use compat='override' to prefer obs coordinates if there are slight mismatches
+        # (e.g. from regridding precision issues)
+        return xr.merge([obs, paired], compat="override")
     else:
         return paired
 
