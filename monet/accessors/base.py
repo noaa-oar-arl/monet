@@ -32,6 +32,46 @@ def wrap_longitudes(lons):
     return (lons + 180) % 360 - 180
 
 
+LAT_NAMES = [
+    "latitude",
+    "lat",
+    "Latitude",
+    "LATITUDE",
+    "LAT",
+    "y",
+    "Lat",
+    "XLAT",
+    "XLAT_M",
+    "grid_yt",
+    "nav_lat",
+    "NY",
+    "lat_b",
+    "lat_centers",
+    "node_lat",
+    "face_lat",
+    "edge_lat",
+]
+LON_NAMES = [
+    "longitude",
+    "lon",
+    "Longitude",
+    "LONGITUDE",
+    "LON",
+    "x",
+    "Long",
+    "XLONG",
+    "XLONG_M",
+    "grid_xt",
+    "nav_lon",
+    "NX",
+    "lon_b",
+    "lon_centers",
+    "node_lon",
+    "face_lon",
+    "edge_lon",
+]
+
+
 class BaseAccessor:
     """Base class for MONET accessors with common utility methods."""
 
@@ -172,6 +212,13 @@ class BaseAccessor:
             The name of the mesh topology variable if found, otherwise None.
         """
         if isinstance(ds, xr.DataArray):
+            # Check for 'mesh' attribute pointing to a topology variable
+            if "mesh" in ds.attrs:
+                return ds.attrs["mesh"]
+            # Check if any coordinate has a cf_role
+            for coord in ds.coords:
+                if ds[coord].attrs.get("cf_role") == "mesh_topology":
+                    return coord
             return None
 
         for var in ds.variables:
@@ -193,108 +240,98 @@ class BaseAccessor:
         tuple
             (lat_name, lon_name) if found, otherwise (None, None)
         """
-        # First check for UGRID node coordinates
+        # First check for UGRID coordinates
         mesh_var = BaseAccessor._detect_ugrid(ds)
         if mesh_var:
-            topology = ds[mesh_var]
-            node_coords_str = topology.attrs.get("node_coordinates", "")
-            if node_coords_str:
-                node_coords = node_coords_str.split()
-                if len(node_coords) >= 2:
-                    # UGRID spec: node_coordinates is a space separated list of variable names.
-                    # Usually "lon_var lat_var" -> return (lat, lon)
-                    # We look for lat/lon keywords to be sure
-                    c1, c2 = node_coords[0], node_coords[1]
-                    if "lat" in c1.lower() or "y" in c1.lower():
-                        return c1, c2
-                    else:
-                        return c2, c1
+            # If it's a DataArray, we might not have the topology variable directly,
+            # but we can check if lat/lon are in coordinates and have UGRID attributes.
+            if isinstance(ds, xr.DataArray):
+                topology = None
+            else:
+                topology = ds[mesh_var]
 
-        # Common latitude/longitude naming patterns, including non-rectilinear grid names
-        lat_names = [
-            "latitude",
-            "lat",
-            "Latitude",
-            "LATITUDE",
-            "LAT",
-            "y",
-            "Lat",
-            "XLAT",
-            "XLAT_M",
-            "grid_yt",
-            "nav_lat",
-            "NY",
-            "lat_b",
-            "lat_centers",
-        ]
-        lon_names = [
-            "longitude",
-            "lon",
-            "Longitude",
-            "LONGITUDE",
-            "LON",
-            "x",
-            "Long",
-            "XLONG",
-            "XLONG_M",
-            "grid_xt",
-            "nav_lon",
-            "NX",
-            "lon_b",
-            "lon_centers",
-        ]
+            if topology is not None:
+                # Try node, face, and edge coordinates
+                for attr in ["node_coordinates", "face_coordinates", "edge_coordinates"]:
+                    coords_str = topology.attrs.get(attr, "")
+                    if coords_str:
+                        coords = coords_str.split()
+                        if len(coords) >= 2:
+                            c1, c2 = coords[0], coords[1]
+                            # Check which one is lat and which one is lon
+                            if any(x in c1.lower() for x in ["lat", "y"]):
+                                return c1, c2
+                            elif any(x in c2.lower() for x in ["lat", "y"]):
+                                return c2, c1
+                            else:
+                                # Default to (c2, c1) as UGRID often uses (lon, lat)
+                                return c2, c1
 
         # Search for any combination of lat and lon names
         found_lat = None
         found_lon = None
 
-        # Check coordinates first
-        for lat in lat_names:
-            if lat in ds.coords:
+        # Check coordinates/columns first
+        check_coords = []
+        if hasattr(ds, "coords"):
+            check_coords = ds.coords
+        elif hasattr(ds, "columns"):
+            check_coords = ds.columns
+
+        for lat in LAT_NAMES:
+            if lat in check_coords:
                 found_lat = lat
                 break
 
-        for lon in lon_names:
-            if lon in ds.coords:
+        for lon in LON_NAMES:
+            if lon in check_coords:
                 found_lon = lon
                 break
 
         if found_lat and found_lon:
             return found_lat, found_lon
 
+        # Check for standard_name attribute (CF)
+        lat_std = None
+        lon_std = None
+
+        # Only apply attribute-based detection for xarray objects
+        if hasattr(ds, "variables") or hasattr(ds, "coords"):
+            check_obj = ds.variables if hasattr(ds, "variables") else ds.coords
+            for var in check_obj:
+                attrs = ds[var].attrs
+                if "standard_name" in attrs:
+                    if attrs["standard_name"] in ["latitude", "grid_latitude"]:
+                        lat_std = var
+                    elif attrs["standard_name"] in ["longitude", "grid_longitude"]:
+                        lon_std = var
+
+                # Also check units for latitude/longitude
+                if "units" in attrs:
+                    u = str(attrs["units"]).lower()
+                    if any(x in u for x in ["degrees_north", "degree_north", "degree_n", "degrees_n"]):
+                        lat_std = var
+                    elif any(x in u for x in ["degrees_east", "degree_east", "degree_e", "degrees_e"]):
+                        lon_std = var
+
+                if lat_std and lon_std:
+                    return lat_std, lon_std
+
         # Then check variables if it's a Dataset
         if isinstance(ds, xr.Dataset):
             if found_lat is None:
-                for lat in lat_names:
+                for lat in LAT_NAMES:
                     if lat in ds.variables:
                         found_lat = lat
                         break
             if found_lon is None:
-                for lon in lon_names:
+                for lon in LON_NAMES:
                     if lon in ds.variables:
                         found_lon = lon
                         break
 
         if found_lat and found_lon:
             return found_lat, found_lon
-
-        # Look for variables with standard_name attribute
-        lat_name = None
-        lon_name = None
-
-        if isinstance(ds, xr.Dataset):
-            for var in ds.variables:
-                if "standard_name" in ds[var].attrs:
-                    if ds[var].attrs["standard_name"] in ["latitude", "grid_latitude"]:
-                        lat_name = var
-                    elif ds[var].attrs["standard_name"] in [
-                        "longitude",
-                        "grid_longitude",
-                    ]:
-                        lon_name = var
-
-            if lat_name is not None and lon_name is not None:
-                return lat_name, lon_name
 
         return None, None
 

@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from ..accessors.base import LAT_NAMES, LON_NAMES
+
 
 def is_ugrid_compliant(ds):
     """Check if a dataset appears to follow UGRID conventions.
@@ -63,40 +65,6 @@ def is_coards_compliant(ds):
         return True
 
     # Check for common lat/lon naming patterns
-    lat_names = [
-        "latitude",
-        "lat",
-        "Latitude",
-        "LATITUDE",
-        "LAT",
-        "y",
-        "Lat",
-        "XLAT",
-        "XLAT_M",
-        "grid_yt",
-        "nav_lat",
-        "NY",
-        "lat_b",
-        "lat_centers",
-    ]
-    lon_names = [
-        "longitude",
-        "lon",
-        "Longitude",
-        "LONGITUDE",
-        "LON",
-        "x",
-        "Long",
-        "Lon",
-        "XLONG",
-        "XLONG_M",
-        "grid_xt",
-        "nav_lon",
-        "NX",
-        "lon_b",
-        "lon_centers",
-    ]
-
     if isinstance(ds, xr.Dataset):
         coord_names = list(ds.coords)
         var_names = list(ds.data_vars)
@@ -104,8 +72,8 @@ def is_coards_compliant(ds):
     else:  # DataArray
         all_names = list(ds.coords)
 
-    lat_matches = any(name in all_names for name in lat_names)
-    lon_matches = any(name in all_names for name in lon_names)
+    lat_matches = any(name in all_names for name in LAT_NAMES)
+    lon_matches = any(name in all_names for name in LON_NAMES)
 
     return lat_matches and lon_matches
 
@@ -126,41 +94,6 @@ def extract_latlon_dataarray(ds, return_names=False):
         If return_names is False: (latitude_array, longitude_array)
         If return_names is True: (latitude_array, longitude_array, lat_name, lon_name)
     """
-    # Common latitude/longitude naming patterns, including non-rectilinear grid names
-    lat_names = [
-        "latitude",
-        "lat",
-        "Latitude",
-        "LATITUDE",
-        "LAT",
-        "y",
-        "Lat",
-        "XLAT",
-        "XLAT_M",
-        "grid_yt",
-        "nav_lat",
-        "NY",
-        "lat_b",
-        "lat_centers",
-    ]
-    lon_names = [
-        "longitude",
-        "lon",
-        "Longitude",
-        "LONGITUDE",
-        "LON",
-        "x",
-        "Long",
-        "Lon",
-        "XLONG",
-        "XLONG_M",
-        "grid_xt",
-        "nav_lon",
-        "NX",
-        "lon_b",
-        "lon_centers",
-    ]
-
     # Check coordinates for standard names
     lat_coord = None
     lon_coord = None
@@ -179,13 +112,13 @@ def extract_latlon_dataarray(ds, return_names=False):
 
     # If that fails, look for common coordinate names
     if lat_coord is None or lon_coord is None:
-        for lat_name_candidate in lat_names:
+        for lat_name_candidate in LAT_NAMES:
             if lat_name_candidate in ds.coords:
                 lat_coord = ds[lat_name_candidate]
                 lat_name = lat_name_candidate
                 break
 
-        for lon_name_candidate in lon_names:
+        for lon_name_candidate in LON_NAMES:
             if lon_name_candidate in ds.coords:
                 lon_coord = ds[lon_name_candidate]
                 lon_name = lon_name_candidate
@@ -194,10 +127,10 @@ def extract_latlon_dataarray(ds, return_names=False):
     # If coordinates still not found, try using dimensions
     if lat_coord is None or lon_coord is None:
         for dim in ds.dims:
-            if dim in lat_names and lat_coord is None:
+            if dim in LAT_NAMES and lat_coord is None:
                 lat_coord = ds[dim]
                 lat_name = dim
-            if dim in lon_names and lon_coord is None:
+            if dim in LON_NAMES and lon_coord is None:
                 lon_coord = ds[dim]
                 lon_name = dim
 
@@ -226,41 +159,6 @@ def extract_latlon_dataset(ds, return_names=False):
         If return_names is False: (latitude_array, longitude_array)
         If return_names is True: (latitude_array, longitude_array, lat_name, lon_name)
     """
-    # Common latitude/longitude naming patterns, including non-rectilinear grid names
-    lat_names = [
-        "latitude",
-        "lat",
-        "Latitude",
-        "LATITUDE",
-        "LAT",
-        "y",
-        "Lat",
-        "XLAT",
-        "XLAT_M",
-        "grid_yt",
-        "nav_lat",
-        "NY",
-        "lat_b",
-        "lat_centers",
-    ]
-    lon_names = [
-        "longitude",
-        "lon",
-        "Longitude",
-        "LONGITUDE",
-        "LON",
-        "x",
-        "Long",
-        "Lon",
-        "XLONG",
-        "XLONG_M",
-        "grid_xt",
-        "nav_lon",
-        "NX",
-        "lon_b",
-        "lon_centers",
-    ]
-
     # First check in coordinates
     lat_var = None
     lon_var = None
@@ -279,13 +177,13 @@ def extract_latlon_dataset(ds, return_names=False):
 
     # If not found, check by common coordinate names
     if lat_var is None or lon_var is None:
-        for lat_name_candidate in lat_names:
+        for lat_name_candidate in LAT_NAMES:
             if lat_name_candidate in ds.coords:
                 lat_var = ds[lat_name_candidate]
                 lat_name = lat_name_candidate
                 break
 
-        for lon_name_candidate in lon_names:
+        for lon_name_candidate in LON_NAMES:
             if lon_name_candidate in ds.coords:
                 lon_var = ds[lon_name_candidate]
                 lon_name = lon_name_candidate
@@ -304,13 +202,13 @@ def extract_latlon_dataset(ds, return_names=False):
 
         # If not found by standard_name, check common names in data variables
         if lat_var is None or lon_var is None:
-            for lat_name_candidate in lat_names:
+            for lat_name_candidate in LAT_NAMES:
                 if lat_name_candidate in ds.data_vars:
                     lat_var = ds[lat_name_candidate]
                     lat_name = lat_name_candidate
                     break
 
-            for lon_name_candidate in lon_names:
+            for lon_name_candidate in LON_NAMES:
                 if lon_name_candidate in ds.data_vars:
                     lon_var = ds[lon_name_candidate]
                     lon_name = lon_name_candidate

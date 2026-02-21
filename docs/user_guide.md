@@ -90,11 +90,41 @@ ds.monet.compare(obs, stat='diff', plot=True)
 
 ## COARDS/CF and UGRID Conventions
 
-MONET provides utilities to standardize spatial coordinates to consistent names (`'latitude'`, `'longitude'`).
+MONET is convention-aware and provides utilities to work with both standard gridded data (COARDS/CF) and unstructured grids (UGRID).
+
+### Convention-Awareness
+
+Most MONET functions automatically detect latitude and longitude coordinates. This means you can often skip manual renaming steps. Supported detection includes:
+
+*   **Common Names**: `lat`, `latitude`, `lon`, `longitude`, `XLAT`, `XLONG`, etc.
+*   **CF Standard Names**: `latitude`, `longitude`, `grid_latitude`, `grid_longitude`.
+*   **Units**: Coordinates with units of `degrees_north` or `degrees_east`.
+*   **UGRID**: Detects mesh topology and associated node, face, or edge coordinates.
+
+### Standardizing for MONET
+
+If you need to explicitly transform a dataset to use MONET-standard coordinate names (`'latitude'`, `'longitude'`), you can use:
 
 ```python
-# Standardize coordinate names and detect UGRID meshes
+# Rename coordinates to 'latitude'/'longitude' and wrap longitudes to [-180, 180)
+ds_std = ds.monet.standardize()
+```
+
+For legacy support or specific dimension renaming to `x`/`y`:
+
+```python
+# Deprecated: Renames dimensions to x/y and coords to latitude/longitude
 ds_std = ds.monet.structure_for_monet()
+```
+
+### UGRID Support
+
+MONET's `remap` and `pair` routines are fully UGRID-compliant when using the `xregrid` backend.
+
+```python
+# UGRID datasets are automatically recognized if they have a mesh topology variable
+ds_ugrid = xr.open_dataset("unstructured_mesh.nc")
+paired = ds_ugrid.monet.pair(obs_df)
 ```
 
 ## The Aero Protocol (Performance & Provenance)

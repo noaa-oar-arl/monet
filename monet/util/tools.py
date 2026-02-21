@@ -617,11 +617,12 @@ def get_giorgi_region_df(
 
     This implementation is backend-agnostic and supports Dask-backed
     xarray objects using xarray.apply_ufunc.
+    Convention-aware: supports CF/COARDS and UGRID via MONET accessors.
 
     Parameters
     ----------
     dset : pandas.DataFrame or xarray.Dataset
-        DataFrame or Dataset containing 'latitude' and 'longitude' columns/coordinates.
+        DataFrame or Dataset containing latitude and longitude.
 
     Returns
     -------
@@ -634,14 +635,18 @@ def get_giorgi_region_df(
     indices = np.array(GIORGI_INDICES)
     acronyms = np.array(GIORGI_ACRONYMS)
 
+    lat = dset.monet.lat
+    lon = dset.monet.lon
+
+    if lat is None or lon is None:
+        raise ValueError("Could not detect latitude and longitude coordinates.")
+
     if isinstance(dset, pd.DataFrame):
-        lon = dset.longitude.values
-        lat = dset.latitude.values
-        dset["GIORGI_INDEX"] = _find_region_indices(lon, lat, bounds, indices)
-        dset["GIORGI_ACRO"] = _find_region_acronyms(lon, lat, bounds, acronyms)
+        dset["GIORGI_INDEX"] = _find_region_indices(lon.values, lat.values, bounds, indices)
+        dset["GIORGI_ACRO"] = _find_region_acronyms(lon.values, lat.values, bounds, acronyms)
         return dset
     elif isinstance(dset, xr.Dataset):
-        lat, lon = xr.broadcast(dset.latitude, dset.longitude)
+        lat, lon = xr.broadcast(lat, lon)
         # Use apply_ufunc for Dask compatibility
         idx = xr.apply_ufunc(
             _find_region_indices,
@@ -744,11 +749,12 @@ def get_epa_region_df(
 
     This implementation is backend-agnostic and supports Dask-backed
     xarray objects using xarray.apply_ufunc.
+    Convention-aware: supports CF/COARDS and UGRID via MONET accessors.
 
     Parameters
     ----------
     dset : pandas.DataFrame or xarray.Dataset
-        DataFrame or Dataset containing 'latitude' and 'longitude' columns/coordinates.
+        DataFrame or Dataset containing latitude and longitude.
 
     Returns
     -------
@@ -761,14 +767,18 @@ def get_epa_region_df(
     indices = np.array(EPA_INDICES)
     acronyms = np.array(EPA_ACRONYMS)
 
+    lat = dset.monet.lat
+    lon = dset.monet.lon
+
+    if lat is None or lon is None:
+        raise ValueError("Could not detect latitude and longitude coordinates.")
+
     if isinstance(dset, pd.DataFrame):
-        lon = dset.longitude.values
-        lat = dset.latitude.values
-        dset["EPA_INDEX"] = _find_region_indices(lon, lat, bounds, indices)
-        dset["EPA_ACRO"] = _find_region_acronyms(lon, lat, bounds, acronyms)
+        dset["EPA_INDEX"] = _find_region_indices(lon.values, lat.values, bounds, indices)
+        dset["EPA_ACRO"] = _find_region_acronyms(lon.values, lat.values, bounds, acronyms)
         return dset
     elif isinstance(dset, xr.Dataset):
-        lat, lon = xr.broadcast(dset.latitude, dset.longitude)
+        lat, lon = xr.broadcast(lat, lon)
         # Use apply_ufunc for Dask compatibility
         idx = xr.apply_ufunc(
             _find_region_indices,
