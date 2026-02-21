@@ -51,13 +51,16 @@ regions = [
     "rasterio",
     "shapely",
 ]
+obs = [
+    "monetio @ git+https://github.com/bbakernoaa/monetio@develop",
+]
 
 [tool.setuptools]
 include-package-data = true
 packages = ["monet", "monet.accessors", "monet.plots", "monet.util"]
 
 [tool.setuptools.package-data]
-"*" = ["data/*.png"]
+"*" = ["data/*.png", "util/data/masks/*.npz"]
 
 [tool.black]
 line-length = 132

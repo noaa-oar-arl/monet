@@ -21,6 +21,7 @@ dependencies:
   - mpi4py
   - pip:
       - global-land-mask
+      - monetio @ git+https://github.com/bbakernoaa/monetio@develop
       - xregrid @ git+https://github.com/bbakernoaa/xregrid
       - pytspack @ git+https://github.com/noaa-oar-arl/pytspack
       - monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats

@@ -23,6 +23,8 @@ except ImportError:
 
 # Default cache directory for MONET masks
 MONET_CACHE_DIR = os.path.join(os.path.expanduser("~"), ".monet", "masks")
+# Package data directory for masks
+PACKAGE_MASK_DIR = os.path.join(os.path.dirname(__file__), "data", "masks")
 
 
 class RegionDefinitions:
@@ -371,7 +373,13 @@ def get_mask(mask_name: str, resolution: float = 0.05) -> EarthMask:
     EarthMask
         The requested mask.
     """
-    mask_path = os.path.join(MONET_CACHE_DIR, f"{mask_name}_{resolution}.npz")
+    # 1. Check in package data directory (shipped with the repository)
+    mask_file = f"{mask_name}_{resolution}.npz"
+    mask_path = os.path.join(PACKAGE_MASK_DIR, mask_file)
+
+    if not os.path.exists(mask_path):
+        # 2. Check in user cache directory
+        mask_path = os.path.join(MONET_CACHE_DIR, mask_file)
 
     if not os.path.exists(mask_path):
         if not HAS_REGIONS_DEPS:
