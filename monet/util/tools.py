@@ -3,11 +3,12 @@ Utility tools for MONET.
 """
 
 import datetime
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numpy import cos, pi, sin
 from pandas import merge
 
 try:
@@ -223,6 +224,31 @@ EPA_LATMIN = [
 ]
 
 
+def _apply_aero(func: Callable, *args: Any, name: str = "", **kwargs: Any) -> Any:
+    """Helper to apply a function following Aero Protocol."""
+    is_xr = any(isinstance(arg, (xr.DataArray, xr.Dataset)) for arg in args)
+
+    if is_xr:
+        result = xr.apply_ufunc(
+            func,
+            *args,
+            kwargs=kwargs,
+            dask="parallelized",
+            output_dtypes=[float],
+        )
+
+        # Update history
+        if hasattr(result, "attrs"):
+            curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            msg = f"{curr_time} > Computed {name} via monet.util.tools"
+            history = result.attrs.get("history", "")
+            result.attrs["history"] = (history + f"\n{msg}").strip()
+
+        return result
+
+    return func(*args, **kwargs)
+
+
 def search_listinlist(array1: np.ndarray, array2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Find matching indices between two arrays.
 
@@ -304,6 +330,24 @@ def findclosest(list_obj: list, value: float) -> tuple[int, float]:
     return a[2], a[1]
 
 
+def nearest(items: Any, pivot: Any) -> Any:
+    """Find the nearest value to pivot in a collection.
+
+    Parameters
+    ----------
+    items : iterable
+        Collection of values to search through.
+    pivot : float or int
+        The value to find the nearest match to.
+
+    Returns
+    -------
+    object
+        The item from the collection that is closest to the pivot value.
+    """
+    return min(items, key=lambda x: abs(x - pivot))
+
+
 def _force_forder(x: np.ndarray) -> tuple[np.ndarray, bool]:
     """
     Converts arrays x to fortran order. Returns
@@ -359,50 +403,150 @@ def kolmogorov_zurbenko_filter(df: pd.DataFrame, col: str, window: int, iteratio
     return df.merge(z, on=["siteid", "time_local"])
 
 
-def wsdir2uv(ws: np.ndarray, wdir: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def wsdir2uv(ws: Any, wdir: Any) -> Any:
     """Convert wind speed and direction to U and V components.
+
+    This implementation is backend-agnostic and supports Dask-backed
+    xarray objects using xarray.apply_ufunc.
 
     Parameters
     ----------
-    ws : array-like
+    ws : float, numpy.ndarray, or xarray.DataArray
         Wind speed values.
-    wdir : array-like
+    wdir : float, numpy.ndarray, or xarray.DataArray
         Wind direction values in degrees (meteorological convention: 0=North, 90=East).
 
     Returns
     -------
-    tuple
-        (u, v) where:
+    u, v : same type as input
         - u is the zonal wind component (positive for eastward wind)
         - v is the meridional wind component (positive for northward wind)
     """
-    u = -ws * sin(wdir * pi / 180.0)
-    v = -ws * cos(wdir * pi / 180.0)
-    return u, v
+
+    def _logic(ws, wdir):
+        u = -ws * np.sin(wdir * np.pi / 180.0)
+        v = -ws * np.cos(wdir * np.pi / 180.0)
+        return u, v
+
+    is_xr = any(isinstance(arg, (xr.DataArray, xr.Dataset)) for arg in (ws, wdir))
+
+    if is_xr:
+        result = xr.apply_ufunc(
+            _logic,
+            ws,
+            wdir,
+            dask="parallelized",
+            output_dtypes=[float, float],
+            output_core_dims=[[], []],
+        )
+
+        # Update history
+        for res in result:
+            if hasattr(res, "attrs"):
+                curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                msg = "Computed U and V wind components via monet.util.tools.wsdir2uv"
+                history = res.attrs.get("history", "")
+                res.attrs["history"] = (history + f"\n{curr_time} > {msg}").strip()
+
+        return result
+
+    return _logic(ws, wdir)
 
 
-def get_relhum(temp: np.ndarray, press: np.ndarray, vap: np.ndarray) -> np.ndarray:
+def get_relhum(temp: Any, press: Any, vap: Any) -> Any:
     """Calculate relative humidity from temperature, pressure and vapor pressure.
+
+    This implementation is backend-agnostic and supports Dask-backed
+    xarray objects using xarray.apply_ufunc.
 
     Parameters
     ----------
-    temp : array-like
+    temp : float, numpy.ndarray, or xarray.DataArray
         Temperature in Kelvin
-    press : array-like
+    press : float, numpy.ndarray, or xarray.DataArray
         Pressure in hPa/mb
-    vap : array-like
+    vap : float, numpy.ndarray, or xarray.DataArray
         Vapor pressure in hPa/mb
 
     Returns
     -------
-    array-like
+    relhum : same type as input
         Relative humidity as a percentage (0-100)
     """
-    temp_o = 273.16
-    es_vap = 611.0 * np.exp(17.67 * ((temp - temp_o) / (temp - 29.65)))
-    ws_vap = 0.622 * (es_vap / press)
-    relhum = 100.0 * (vap / ws_vap)
-    return relhum
+
+    def _logic(temp, press, vap):
+        temp_o = 273.16
+        es_vap = 611.0 * np.exp(17.67 * ((temp - temp_o) / (temp - 29.65)))
+        ws_vap = 0.622 * (es_vap / press)
+        return 100.0 * (vap / ws_vap)
+
+    return _apply_aero(_logic, temp, press, vap, name="relative humidity")
+
+
+def calc_13_category_usda_soil_type(clay: Any, sand: Any, silt: Any) -> Any:
+    """Calculate the 13 category USDA soil type from clay, sand and silt percentages.
+
+    Categories:
+    0 -- WATER
+    1 -- SAND
+    2 -- LOAMY SAND
+    3 -- SANDY LOAM
+    4 -- SILT LOAM
+    5 -- SILT
+    6 -- LOAM
+    7 -- SANDY CLAY LOAM
+    8 -- SILTY CLAY LOAM
+    9 -- CLAY LOAM
+    10 -- SANDY CLAY
+    11 -- SILTY CLAY
+    12 -- CLAY
+
+    Parameters
+    ----------
+    clay : float, numpy.ndarray, or xarray.DataArray
+        Clay percentage (0-100).
+    sand : float, numpy.ndarray, or xarray.DataArray
+        Sand percentage (0-100).
+    silt : float, numpy.ndarray, or xarray.DataArray
+        Silt percentage (0-100).
+
+    Returns
+    -------
+    stype : same type as input
+        USDA soil type category (0-12).
+    """
+
+    def _logic(clay, sand, silt):
+        stype = np.zeros(clay.shape)
+        # 1 -- SAND
+        stype[(silt + clay * 1.5 < 15.0) & (clay != 255)] = 1.0
+        # 2 -- LOAMY SAND
+        stype[(silt + 1.5 * clay >= 15.0) & (silt + 1.5 * clay < 30) & (clay != 255)] = 2.0
+        # 3 -- SANDY LOAM
+        stype[(clay >= 7.0) & (clay < 20) & (sand > 52) & (silt + 2 * clay >= 30) & (clay != 255)] = 3.0
+        stype[(clay < 7) & (silt < 50) & (silt + 2 * clay >= 30) & (clay != 255)] = 3.0
+        # 4 -- SILT LOAM
+        stype[(silt >= 50) & (clay >= 12) & (clay < 27) & (clay != 255)] = 4.0
+        stype[(silt >= 50) & (silt < 80) & (clay < 12) & (clay != 255)] = 4.0
+        # 5 -- SILT
+        stype[(silt >= 80) & (clay < 12) & (clay != 255)] = 5.0
+        # 6 -- LOAM
+        stype[(clay >= 7) & (clay < 27) & (silt >= 28) & (silt < 50) & (sand <= 52) & (clay != 255)] = 6.0
+        # 7 -- SANDY CLAY LOAM
+        stype[(clay >= 20) & (clay < 35) & (silt < 28) & (sand > 45) & (clay != 255)] = 7.0
+        # 8 -- SILTY CLAY LOAM
+        stype[(clay >= 27) & (clay < 40.0) & (sand > 40) & (clay != 255)] = 8.0
+        # 9 -- CLAY LOAM
+        stype[(clay >= 27) & (clay < 40.0) & (sand > 20) & (sand <= 45) & (clay != 255)] = 9.0
+        # 10 -- SANDY CLAY
+        stype[(clay >= 35) & (sand > 45) & (clay != 255)] = 10.0
+        # 11 -- SILTY CLAY
+        stype[(clay >= 40) & (silt >= 40) & (clay != 255)] = 11.0
+        # 12 -- CLAY
+        stype[(clay >= 40) & (sand <= 45) & (silt < 40) & (clay != 255)] = 12.0
+        return stype
+
+    return _apply_aero(_logic, clay, sand, silt, name="USDA soil type")
 
 
 def long_to_wide(df: pd.DataFrame) -> pd.DataFrame:
