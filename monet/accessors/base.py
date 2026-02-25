@@ -82,9 +82,9 @@ class BaseAccessor:
         Supports Xarray and Pandas.
         """
         if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-            name, _ = self._detect_latlon_names(self._obj)
-            if name:
-                return self._obj[name]
+            from ..util.conventions import find_coords
+
+            return find_coords(self._obj, "latitude")
         elif hasattr(self._obj, "columns"):  # Pandas
             lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
             lat_col = next((c for c in lat_names if c in self._obj.columns), None)
@@ -99,9 +99,9 @@ class BaseAccessor:
         Supports Xarray and Pandas.
         """
         if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-            _, name = self._detect_latlon_names(self._obj)
-            if name:
-                return self._obj[name]
+            from ..util.conventions import find_coords
+
+            return find_coords(self._obj, "longitude")
         elif hasattr(self._obj, "columns"):  # Pandas
             lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
             lon_col = next((c for c in lon_names if c in self._obj.columns), None)
@@ -178,8 +178,10 @@ class BaseAccessor:
         xarray.DataArray or xarray.Dataset
             Dataset with renamed coordinates.
         """
+        from ..util.conventions import detect_grid_type
+
         # To consider unstructured grid
-        if ds.attrs.get("mio_has_unstructured_grid", False) or ds.attrs.get("mio_has_ugrid", False):
+        if detect_grid_type(ds) == "unstructured":
             check_list = ds.variables
         else:
             check_list = ds.coords
@@ -211,20 +213,10 @@ class BaseAccessor:
         str or None
             The name of the mesh topology variable if found, otherwise None.
         """
-        if isinstance(ds, xr.DataArray):
-            # Check for 'mesh' attribute pointing to a topology variable
-            if "mesh" in ds.attrs:
-                return ds.attrs["mesh"]
-            # Check if any coordinate has a cf_role
-            for coord in ds.coords:
-                if ds[coord].attrs.get("cf_role") == "mesh_topology":
-                    return coord
-            return None
+        from ..util.conventions import get_ugrid_info
 
-        for var in ds.variables:
-            if ds[var].attrs.get("cf_role") == "mesh_topology":
-                return var
-        return None
+        info = get_ugrid_info(ds)
+        return info.get("mesh_name")
 
     @staticmethod
     def _detect_latlon_names(ds):
@@ -240,100 +232,15 @@ class BaseAccessor:
         tuple
             (lat_name, lon_name) if found, otherwise (None, None)
         """
-        # First check for UGRID coordinates
-        mesh_var = BaseAccessor._detect_ugrid(ds)
-        if mesh_var:
-            # If it's a DataArray, we might not have the topology variable directly,
-            # but we can check if lat/lon are in coordinates and have UGRID attributes.
-            if isinstance(ds, xr.DataArray):
-                topology = None
-            else:
-                topology = ds[mesh_var]
+        from ..util.conventions import find_coords
 
-            if topology is not None:
-                # Try node, face, and edge coordinates
-                for attr in ["node_coordinates", "face_coordinates", "edge_coordinates"]:
-                    coords_str = topology.attrs.get(attr, "")
-                    if coords_str:
-                        coords = coords_str.split()
-                        if len(coords) >= 2:
-                            c1, c2 = coords[0], coords[1]
-                            # Check which one is lat and which one is lon
-                            if any(x in c1.lower() for x in ["lat", "y"]):
-                                return c1, c2
-                            elif any(x in c2.lower() for x in ["lat", "y"]):
-                                return c2, c1
-                            else:
-                                # Default to (c2, c1) as UGRID often uses (lon, lat)
-                                return c2, c1
+        lat_da = find_coords(ds, "latitude")
+        lon_da = find_coords(ds, "longitude")
 
-        # Search for any combination of lat and lon names
-        found_lat = None
-        found_lon = None
+        lat_name = getattr(lat_da, "name", None) if lat_da is not None else None
+        lon_name = getattr(lon_da, "name", None) if lon_da is not None else None
 
-        # Check coordinates/columns first
-        check_coords = []
-        if hasattr(ds, "coords"):
-            check_coords = ds.coords
-        elif hasattr(ds, "columns"):
-            check_coords = ds.columns
-
-        for lat in LAT_NAMES:
-            if lat in check_coords:
-                found_lat = lat
-                break
-
-        for lon in LON_NAMES:
-            if lon in check_coords:
-                found_lon = lon
-                break
-
-        if found_lat and found_lon:
-            return found_lat, found_lon
-
-        # Check for standard_name attribute (CF)
-        lat_std = None
-        lon_std = None
-
-        # Only apply attribute-based detection for xarray objects
-        if hasattr(ds, "variables") or hasattr(ds, "coords"):
-            check_obj = ds.variables if hasattr(ds, "variables") else ds.coords
-            for var in check_obj:
-                attrs = ds[var].attrs
-                if "standard_name" in attrs:
-                    if attrs["standard_name"] in ["latitude", "grid_latitude"]:
-                        lat_std = var
-                    elif attrs["standard_name"] in ["longitude", "grid_longitude"]:
-                        lon_std = var
-
-                # Also check units for latitude/longitude
-                if "units" in attrs:
-                    u = str(attrs["units"]).lower()
-                    if any(x in u for x in ["degrees_north", "degree_north", "degree_n", "degrees_n"]):
-                        lat_std = var
-                    elif any(x in u for x in ["degrees_east", "degree_east", "degree_e", "degrees_e"]):
-                        lon_std = var
-
-                if lat_std and lon_std:
-                    return lat_std, lon_std
-
-        # Then check variables if it's a Dataset
-        if isinstance(ds, xr.Dataset):
-            if found_lat is None:
-                for lat in LAT_NAMES:
-                    if lat in ds.variables:
-                        found_lat = lat
-                        break
-            if found_lon is None:
-                for lon in LON_NAMES:
-                    if lon in ds.variables:
-                        found_lon = lon
-                        break
-
-        if found_lat and found_lon:
-            return found_lat, found_lon
-
-        return None, None
+        return lat_name, lon_name
 
     @staticmethod
     def _dataset_to_monet(
@@ -458,7 +365,9 @@ class BaseAccessor:
             dset["longitude"] = wrap_longitudes(dset["longitude"])
 
         # lat & lon are not coordinate variables in unstructured grid, so we're done
-        if dset.attrs.get("mio_has_unstructured_grid", False) or dset.attrs.get("mio_has_ugrid", False):
+        from ..util.conventions import detect_grid_type
+
+        if detect_grid_type(dset) == "unstructured":
             return dset
 
         # Maybe convert 1-D lat/lon coords to 2-D
@@ -534,42 +443,51 @@ class BaseAccessor:
         xarray.Dataset
             Dataset with 2D lat/lon coordinates.
         """
-        from numpy import arange, meshgrid
+        import numpy as np
+
+        from ..util.conventions import find_coords, update_history
 
         # Check if lat/lon coordinate names exist, otherwise try to detect them
         if lat_name not in dset.variables or lon_name not in dset.variables:
-            detected_lat, detected_lon = BaseAccessor._detect_latlon_names(dset)
-            if detected_lat and detected_lon:
-                lat_name, lon_name = detected_lat, detected_lon
+            lat_da = find_coords(dset, "latitude")
+            lon_da = find_coords(dset, "longitude")
+            if lat_da is not None and lon_da is not None:
+                lat_name, lon_name = lat_da.name, lon_da.name
 
         # Extract coordinates and handle reversed coordinates if needed
         lon = dset[lon_name]
         lat = dset[lat_name]
 
+        lat_dim = lat.dims[0]
+        lon_dim = lon.dims[0]
+
         # Check for monotonicity and handle reversed coordinates
-        lat_decreasing = lat[0] > lat[-1] if len(lat) > 1 else False
-        lon_decreasing = lon[0] > lon[-1] if len(lon) > 1 else False
+        # Note: Indexing for metadata check is acceptable.
+        lat_decreasing = bool(lat[0] > lat[-1]) if lat.size > 1 else False
+        lon_decreasing = bool(lon[0] > lon[-1]) if lon.size > 1 else False
 
         if lat_decreasing:
             lat = lat[::-1]
         if lon_decreasing:
             lon = lon[::-1]
 
-        # Create 2D meshgrid
-        lons, lats = meshgrid(lon, lat)
+        # Create 2D meshgrid lazily via broadcast
+        lons, lats = xr.broadcast(lon, lat)
+
+        # Standardize dimension order to (lat_dim, lon_dim) -> (y, x)
+        lons = lons.transpose(lat_dim, lon_dim)
+        lats = lats.transpose(lat_dim, lon_dim)
 
         # Create new coordinates
-        x = arange(len(lon))
-        y = arange(len(lat))
+        x = np.arange(len(lon))
+        y = np.arange(len(lat))
 
-        # Create new dataset with renamed coordinates
-        result = dset.rename({lon_name: "x", lat_name: "y"})
+        # Create new dataset with renamed dimensions
+        result = dset.rename({lon_dim: "x", lat_dim: "y"})
 
-        # Add 2D latitude/longitude arrays
-        result.coords["longitude"] = (("y", "x"), lons)
-        result.coords["latitude"] = (("y", "x"), lats)
-
-        # Add 1D coordinate arrays
+        # Add 2D latitude/longitude arrays and 1D coords
+        result.coords["longitude"] = lons.rename({lon_dim: "x", lat_dim: "y"})
+        result.coords["latitude"] = lats.rename({lon_dim: "x", lat_dim: "y"})
         result["x"] = x
         result["y"] = y
 
@@ -581,6 +499,8 @@ class BaseAccessor:
             result = result.sel(y=slice(None, None, -1))
         if lon_decreasing:
             result = result.sel(x=slice(None, None, -1))
+
+        update_history(result, f"Converted 1D {lat_name}/{lon_name} to 2D latitude/longitude (Lazy).")
 
         return result
 
@@ -605,42 +525,50 @@ class BaseAccessor:
         xarray.DataArray
             DataArray with 2D lat/lon coordinates.
         """
-        from numpy import arange, meshgrid
+        import numpy as np
+
+        from ..util.conventions import find_coords, update_history
 
         # Check if lat/lon coordinate names exist, otherwise try to detect them
         if lat_name not in dset.coords or lon_name not in dset.coords:
-            detected_lat, detected_lon = BaseAccessor._detect_latlon_names(dset)
-            if detected_lat and detected_lon:
-                lat_name, lon_name = detected_lat, detected_lon
+            lat_da = find_coords(dset, "latitude")
+            lon_da = find_coords(dset, "longitude")
+            if lat_da is not None and lon_da is not None:
+                lat_name, lon_name = lat_da.name, lon_da.name
 
         # Extract coordinates and handle reversed coordinates if needed
         lon = dset[lon_name]
         lat = dset[lat_name]
 
+        lat_dim = lat.dims[0]
+        lon_dim = lon.dims[0]
+
         # Check for monotonicity and handle reversed coordinates
-        lat_decreasing = lat[0] > lat[-1] if len(lat) > 1 else False
-        lon_decreasing = lon[0] > lon[-1] if len(lon) > 1 else False
+        lat_decreasing = bool(lat[0] > lat[-1]) if lat.size > 1 else False
+        lon_decreasing = bool(lon[0] > lon[-1]) if lon.size > 1 else False
 
         if lat_decreasing:
             lat = lat[::-1]
         if lon_decreasing:
             lon = lon[::-1]
 
-        # Create 2D meshgrid
-        lons, lats = meshgrid(lon, lat)
+        # Create 2D meshgrid lazily via broadcast
+        lons, lats = xr.broadcast(lon, lat)
+
+        # Standardize dimension order to (lat_dim, lon_dim) -> (y, x)
+        lons = lons.transpose(lat_dim, lon_dim)
+        lats = lats.transpose(lat_dim, lon_dim)
 
         # Create new coordinates
-        x = arange(len(lon))
-        y = arange(len(lat))
+        x = np.arange(len(lon))
+        y = np.arange(len(lat))
 
-        # Create new dataset with renamed coordinates
-        result = dset.rename({lon_name: "x", lat_name: "y"})
+        # Create new dataset with renamed dimensions
+        result = dset.rename({lon_dim: "x", lat_dim: "y"})
 
-        # Add 2D latitude/longitude arrays
-        result.coords["latitude"] = (("y", "x"), lats)
-        result.coords["longitude"] = (("y", "x"), lons)
-
-        # Add 1D coordinate arrays
+        # Add 2D latitude/longitude arrays and 1D coords
+        result.coords["latitude"] = lats.rename({lon_dim: "x", lat_dim: "y"})
+        result.coords["longitude"] = lons.rename({lon_dim: "x", lat_dim: "y"})
         result["x"] = x
         result["y"] = y
 
@@ -649,6 +577,8 @@ class BaseAccessor:
             result = result.sel(y=slice(None, None, -1))
         if lon_decreasing:
             result = result.sel(x=slice(None, None, -1))
+
+        update_history(result, f"Converted 1D {lat_name}/{lon_name} to 2D latitude/longitude (Lazy).")
 
         return result
 
@@ -710,6 +640,8 @@ class BaseAccessor:
         xarray.DataArray or xarray.Dataset
             The standardized object.
         """
+        from ..util.conventions import update_history
+
         obj = self._obj.copy()
 
         # Wrap longitudes if present
@@ -727,10 +659,7 @@ class BaseAccessor:
             if "units" not in obj[lat_name].attrs:
                 obj[lat_name].attrs["units"] = "degrees_north"
 
-        # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = obj.attrs.get("history", "")
-        obj.attrs["history"] = history + f"\n{curr_time} > Standardized via monet.standardize"
+        update_history(obj, "Standardized coordinates and attributes.")
 
         return obj
 

@@ -226,7 +226,7 @@ EPA_LATMIN = [
 
 def _apply_aero(func: Callable, *args: Any, name: str = "", **kwargs: Any) -> Any:
     """Helper to apply a function following Aero Protocol."""
-    is_xr = any(isinstance(arg, (xr.DataArray, xr.Dataset)) for arg in args)
+    is_xr = any(isinstance(arg, xr.DataArray | xr.Dataset) for arg in args)
 
     if is_xr:
         result = xr.apply_ufunc(
@@ -428,7 +428,7 @@ def wsdir2uv(ws: Any, wdir: Any) -> Any:
         v = -ws * np.cos(wdir * np.pi / 180.0)
         return u, v
 
-    is_xr = any(isinstance(arg, (xr.DataArray, xr.Dataset)) for arg in (ws, wdir))
+    is_xr = any(isinstance(arg, xr.DataArray | xr.Dataset) for arg in (ws, wdir))
 
     if is_xr:
         result = xr.apply_ufunc(

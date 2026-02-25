@@ -50,7 +50,7 @@ gravity = 9.8
 
 def _apply_aero(func: Callable, *args: Any, name: str = "", **kwargs: Any) -> Any:
     """Helper to apply a function following Aero Protocol."""
-    is_xr = any(isinstance(arg, (xr.DataArray, xr.Dataset)) for arg in args)
+    is_xr = any(isinstance(arg, xr.DataArray | xr.Dataset) for arg in args)
 
     if is_xr:
         # Broadcast xarray objects
@@ -346,7 +346,7 @@ def calc_sun_angles(lat: ArrayLike, lon: ArrayLike, stdlon: ArrayLike, doy: Arra
 
         return sza_deg, saa_deg
 
-    is_xr = any(isinstance(arg, (xr.DataArray, xr.Dataset)) for arg in (lat, lon, stdlon, doy, ftime))
+    is_xr = any(isinstance(arg, xr.DataArray | xr.Dataset) for arg in (lat, lon, stdlon, doy, ftime))
 
     if is_xr:
         # For multiple outputs from apply_ufunc

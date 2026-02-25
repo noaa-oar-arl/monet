@@ -1,92 +1,60 @@
 """Utilities for working with COARDS and CF convention data in MONET."""
 
 import datetime as dt
+import typing as t
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-from ..accessors.base import LAT_NAMES, LON_NAMES
 
-
-def is_ugrid_compliant(ds):
+def is_ugrid_compliant(ds: xr.Dataset | xr.DataArray) -> bool:
     """Check if a dataset appears to follow UGRID conventions.
 
     Parameters
     ----------
     ds : xarray.Dataset or xarray.DataArray
-        Dataset to check for UGRID compliance
+        Dataset to check for UGRID compliance.
 
     Returns
     -------
     bool
-        True if the dataset appears to follow UGRID conventions
+        True if the dataset appears to follow UGRID conventions.
     """
-    if isinstance(ds, xr.DataArray):
-        return False
+    from .conventions import detect_grid_type
 
-    for var in ds.variables:
-        if ds[var].attrs.get("cf_role") == "mesh_topology":
-            return True
-    return False
+    return detect_grid_type(ds) == "unstructured"
 
 
-def is_coards_compliant(ds):
+def is_coards_compliant(ds: xr.Dataset | xr.DataArray) -> bool:
     """Check if a dataset appears to follow COARDS or CF conventions.
 
     Parameters
     ----------
     ds : xarray.Dataset or xarray.DataArray
-        Dataset to check for COARDS/CF compliance
+        Dataset to check for COARDS/CF compliance.
 
     Returns
     -------
     bool
-        True if the dataset appears to follow COARDS or CF conventions
+        True if the dataset appears to follow COARDS or CF conventions.
     """
-    # Check for COARDS/CF global attributes
-    if isinstance(ds, xr.Dataset):
-        if "Conventions" in ds.attrs:
-            if "COARDS" in ds.attrs["Conventions"] or "CF-" in ds.attrs["Conventions"]:
-                return True
+    from .conventions import find_coords
 
-    # Check for standard_name attributes in variables
-    standard_names = []
-    if isinstance(ds, xr.Dataset):
-        for var in ds.variables:
-            if "standard_name" in ds[var].attrs:
-                standard_names.append(ds[var].attrs["standard_name"])
-    else:  # DataArray
-        for coord in ds.coords:
-            if "standard_name" in ds[coord].attrs:
-                standard_names.append(ds[coord].attrs["standard_name"])
-
-    if "latitude" in standard_names or "longitude" in standard_names:
-        return True
-
-    # Check for common lat/lon naming patterns
-    if isinstance(ds, xr.Dataset):
-        coord_names = list(ds.coords)
-        var_names = list(ds.data_vars)
-        all_names = coord_names + var_names
-    else:  # DataArray
-        all_names = list(ds.coords)
-
-    lat_matches = any(name in all_names for name in LAT_NAMES)
-    lon_matches = any(name in all_names for name in LON_NAMES)
-
-    return lat_matches and lon_matches
+    lat = find_coords(ds, "latitude")
+    lon = find_coords(ds, "longitude")
+    return lat is not None and lon is not None
 
 
-def extract_latlon_dataarray(ds, return_names=False):
+def extract_latlon_dataarray(ds: xr.DataArray, return_names: bool = False) -> t.Any:
     """Extract latitude/longitude arrays from a COARDS or CF-compliant DataArray.
 
     Parameters
     ----------
     ds : xarray.DataArray
-        DataArray to extract latitude/longitude arrays from
+        DataArray to extract latitude/longitude arrays from.
     return_names : bool, default: False
-        If True, also return the names of the coordinates
+        If True, also return the names of the coordinates.
 
     Returns
     -------
@@ -94,64 +62,29 @@ def extract_latlon_dataarray(ds, return_names=False):
         If return_names is False: (latitude_array, longitude_array)
         If return_names is True: (latitude_array, longitude_array, lat_name, lon_name)
     """
-    # Check coordinates for standard names
-    lat_coord = None
-    lon_coord = None
-    lat_name = None
-    lon_name = None
+    from .conventions import find_coords
 
-    # First try using standard_name attribute
-    for coord_name, coord in ds.coords.items():
-        if "standard_name" in coord.attrs:
-            if coord.attrs["standard_name"] in ["latitude", "grid_latitude"]:
-                lat_coord = coord
-                lat_name = coord_name
-            if coord.attrs["standard_name"] in ["longitude", "grid_longitude"]:
-                lon_coord = coord
-                lon_name = coord_name
-
-    # If that fails, look for common coordinate names
-    if lat_coord is None or lon_coord is None:
-        for lat_name_candidate in LAT_NAMES:
-            if lat_name_candidate in ds.coords:
-                lat_coord = ds[lat_name_candidate]
-                lat_name = lat_name_candidate
-                break
-
-        for lon_name_candidate in LON_NAMES:
-            if lon_name_candidate in ds.coords:
-                lon_coord = ds[lon_name_candidate]
-                lon_name = lon_name_candidate
-                break
-
-    # If coordinates still not found, try using dimensions
-    if lat_coord is None or lon_coord is None:
-        for dim in ds.dims:
-            if dim in LAT_NAMES and lat_coord is None:
-                lat_coord = ds[dim]
-                lat_name = dim
-            if dim in LON_NAMES and lon_coord is None:
-                lon_coord = ds[dim]
-                lon_name = dim
+    lat_coord = find_coords(ds, "latitude")
+    lon_coord = find_coords(ds, "longitude")
 
     if lat_coord is None or lon_coord is None:
         raise ValueError("Could not find latitude/longitude coordinates in DataArray")
 
     if return_names:
-        return lat_coord, lon_coord, lat_name, lon_name
+        return lat_coord, lon_coord, lat_coord.name, lon_coord.name
     else:
         return lat_coord, lon_coord
 
 
-def extract_latlon_dataset(ds, return_names=False):
+def extract_latlon_dataset(ds: xr.Dataset, return_names: bool = False) -> t.Any:
     """Extract latitude/longitude arrays from a COARDS or CF-compliant Dataset.
 
     Parameters
     ----------
     ds : xarray.Dataset
-        Dataset to extract latitude/longitude arrays from
+        Dataset to extract latitude/longitude arrays from.
     return_names : bool, default: False
-        If True, also return the names of the variables
+        If True, also return the names of the variables.
 
     Returns
     -------
@@ -159,82 +92,32 @@ def extract_latlon_dataset(ds, return_names=False):
         If return_names is False: (latitude_array, longitude_array)
         If return_names is True: (latitude_array, longitude_array, lat_name, lon_name)
     """
-    # First check in coordinates
-    lat_var = None
-    lon_var = None
-    lat_name = None
-    lon_name = None
+    from .conventions import find_coords
 
-    # First try using standard_name attribute in coordinates
-    for coord_name, coord in ds.coords.items():
-        if "standard_name" in coord.attrs:
-            if coord.attrs["standard_name"] in ["latitude", "grid_latitude"]:
-                lat_var = coord
-                lat_name = coord_name
-            if coord.attrs["standard_name"] in ["longitude", "grid_longitude"]:
-                lon_var = coord
-                lon_name = coord_name
-
-    # If not found, check by common coordinate names
-    if lat_var is None or lon_var is None:
-        for lat_name_candidate in LAT_NAMES:
-            if lat_name_candidate in ds.coords:
-                lat_var = ds[lat_name_candidate]
-                lat_name = lat_name_candidate
-                break
-
-        for lon_name_candidate in LON_NAMES:
-            if lon_name_candidate in ds.coords:
-                lon_var = ds[lon_name_candidate]
-                lon_name = lon_name_candidate
-                break
-
-    # If still not found, check data variables
-    if lat_var is None or lon_var is None:
-        for var_name, var in ds.data_vars.items():
-            if "standard_name" in var.attrs:
-                if var.attrs["standard_name"] in ["latitude", "grid_latitude"]:
-                    lat_var = var
-                    lat_name = var_name
-                if var.attrs["standard_name"] in ["longitude", "grid_longitude"]:
-                    lon_var = var
-                    lon_name = var_name
-
-        # If not found by standard_name, check common names in data variables
-        if lat_var is None or lon_var is None:
-            for lat_name_candidate in LAT_NAMES:
-                if lat_name_candidate in ds.data_vars:
-                    lat_var = ds[lat_name_candidate]
-                    lat_name = lat_name_candidate
-                    break
-
-            for lon_name_candidate in LON_NAMES:
-                if lon_name_candidate in ds.data_vars:
-                    lon_var = ds[lon_name_candidate]
-                    lon_name = lon_name_candidate
-                    break
+    lat_var = find_coords(ds, "latitude")
+    lon_var = find_coords(ds, "longitude")
 
     if lat_var is None or lon_var is None:
         raise ValueError("Could not find latitude/longitude variables in Dataset")
 
     if return_names:
-        return lat_var, lon_var, lat_name, lon_name
+        return lat_var, lon_var, lat_var.name, lon_var.name
     else:
         return lat_var, lon_var
 
 
-def is_curvilinear_grid(ds):
+def is_curvilinear_grid(ds: xr.Dataset | xr.DataArray) -> bool:
     """Detect if a dataset uses a curvilinear (non-rectilinear) grid.
 
     Parameters
     ----------
     ds : xarray.Dataset or xarray.DataArray
-        Dataset to check for curvilinear grid
+        Dataset to check for curvilinear grid.
 
     Returns
     -------
     bool
-        True if the dataset appears to use a curvilinear grid
+        True if the dataset appears to use a curvilinear grid.
     """
     # Check for explicit grid_mapping attribute
     if isinstance(ds, xr.Dataset):
@@ -262,13 +145,21 @@ def is_curvilinear_grid(ds):
 
     # If lat/lon are 2D, and their values are not strictly monotonic along rows and columns, it's curvilinear
     if lat_var is not None and lon_var is not None and lat_var.ndim == 2 and lon_var.ndim == 2:
-        lat_vals = lat_var.values
-        lon_vals = lon_var.values
-        # Check if all rows of lat are constant (rectilinear)
-        lat_rect = np.allclose(lat_vals, lat_vals[:, [0]])
-        # Check if all columns of lon are constant (rectilinear)
-        lon_rect = np.allclose(lon_vals, lon_vals[[0], :])
-        if not (lat_rect and lon_rect):
+        # Use lazy check for rectilinear vs curvilinear
+        # A grid is rectilinear if lat only varies with y and lon only varies with x.
+        # We check this by comparing the array with its first row/column.
+        lat_dim_x = lat_var.dims[1]
+        lon_dim_y = lon_var.dims[0]
+
+        # lat(y, x) == lat(y, 0) for all x
+        # Note: Indexing for metadata check is acceptable.
+        lat_diff = abs(lat_var - lat_var.isel({lat_dim_x: 0})).max()
+        lon_diff = abs(lon_var - lon_var.isel({lon_dim_y: 0})).max()
+
+        # Explicit compute for boolean check is intentional for metadata logic
+        is_rect = bool(lat_diff < 1e-5) and bool(lon_diff < 1e-5)
+
+        if not is_rect:
             return True
 
     # Check for dimensions like 'nx', 'ny' that are common in curvilinear grids
@@ -370,24 +261,26 @@ def add_cf_attributes(ds, **kwargs):
     return result
 
 
-def monet_to_coards(ds, add_bounds=True, add_metadata=True, version="CF-1.8"):
+def monet_to_coards(
+    ds: xr.Dataset | xr.DataArray, add_bounds: bool = True, add_metadata: bool = True, version: str = "CF-1.8"
+) -> xr.Dataset | xr.DataArray:
     """Convert a MONET-formatted Dataset or DataArray to COARDS/CF compliant format.
 
     Parameters
     ----------
     ds : xarray.Dataset or xarray.DataArray
-        MONET-formatted dataset to convert to COARDS/CF format
+        MONET-formatted dataset to convert to COARDS/CF format.
     add_bounds : bool, default: True
-        Whether to add cell bounds for coordinate variables
+        Whether to add cell bounds for coordinate variables.
     add_metadata : bool, default: True
-        Whether to add recommended global metadata attributes
+        Whether to add recommended global metadata attributes.
     version : str, default: "CF-1.8"
-        CF Convention version to comply with
+        CF Convention version to comply with.
 
     Returns
     -------
     xarray.Dataset or xarray.DataArray
-        COARDS/CF compliant dataset
+        COARDS/CF compliant dataset.
     """
     result = ds.copy()
 
@@ -421,21 +314,17 @@ def monet_to_coards(ds, add_bounds=True, add_metadata=True, version="CF-1.8"):
                         lon_1d = result["longitude"][0, :]
 
                         # Verify the grid is truly rectilinear by checking if lat/lon are constant along rows/columns
-                        lat_constant_along_x = np.allclose(
-                            result["latitude"].values,
-                            result["latitude"].values[:, 0:1],
-                            rtol=1e-5,
-                        )
-                        lon_constant_along_y = np.allclose(
-                            result["longitude"].values,
-                            result["longitude"].values[0:1, :],
-                            rtol=1e-5,
-                        )
+                        # Use lazy check: take difference and see if it's all zero
+                        # Explicit compute for metadata check is intentional.
+                        lat_diff = abs(result["latitude"] - result["latitude"].isel(x=0)).max()
+                        lon_diff = abs(result["longitude"] - result["longitude"].isel(y=0)).max()
+                        is_rect = bool(lat_diff < 1e-5) and bool(lon_diff < 1e-5)
 
-                        if lat_constant_along_x and lon_constant_along_y:
+                        if is_rect:
                             # Create new 1D coordinate variables with CF attributes
-                            result.coords["lat"] = ("y", lat_1d.values)
-                            result.coords["lon"] = ("x", lon_1d.values)
+                            # Use .data to preserve laziness if possible (DataArray will handle it)
+                            result.coords["lat"] = ("y", lat_1d.data)
+                            result.coords["lon"] = ("x", lon_1d.data)
 
                             # Add CF standard attributes to coordinate variables
                             result["lat"].attrs["standard_name"] = "latitude"
@@ -449,19 +338,16 @@ def monet_to_coards(ds, add_bounds=True, add_metadata=True, version="CF-1.8"):
                             # Add bounds if requested
                             if add_bounds:
                                 # Add bounds variables
-                                dlat = abs(lat_1d.diff("y").mean().values) / 2 if len(lat_1d) > 1 else 0.5
-                                dlon = abs(lon_1d.diff("x").mean().values) / 2 if len(lon_1d) > 1 else 0.5
+                                # For metadata resolution, we compute eagerly
+                                dlat = float(abs(lat_1d.diff("y").mean())) if len(lat_1d) > 1 else 0.5
+                                dlon = float(abs(lon_1d.diff("x").mean())) if len(lon_1d) > 1 else 0.5
 
-                                lat_bounds = np.zeros((len(lat_1d), 2))
-                                lat_bounds[:, 0] = lat_1d.values - dlat
-                                lat_bounds[:, 1] = lat_1d.values + dlat
+                                # Generate bounds lazily
+                                lat_bounds = xr.concat([lat_1d - dlat, lat_1d + dlat], dim="bounds").transpose("y", "bounds")
+                                lon_bounds = xr.concat([lon_1d - dlon, lon_1d + dlon], dim="bounds").transpose("x", "bounds")
 
-                                lon_bounds = np.zeros((len(lon_1d), 2))
-                                lon_bounds[:, 0] = lon_1d.values - dlon
-                                lon_bounds[:, 1] = lon_1d.values + dlon
-
-                                result["lat_bounds"] = (("y", "bounds"), lat_bounds)
-                                result["lon_bounds"] = (("x", "bounds"), lon_bounds)
+                                result["lat_bounds"] = lat_bounds
+                                result["lon_bounds"] = lon_bounds
 
                                 result["lat"].attrs["bounds"] = "lat_bounds"
                                 result["lon"].attrs["bounds"] = "lon_bounds"
@@ -536,17 +422,19 @@ def monet_to_coards(ds, add_bounds=True, add_metadata=True, version="CF-1.8"):
             # Add bounds if requested and not already present
             if add_bounds and "bounds" not in result[vc].attrs:
                 try:
-                    vc_vals = result[vc].values
-                    vc_dim = result[vc].dims[0]
-                    if len(vc_vals) > 1:
-                        dz = np.abs(np.diff(vc_vals)).mean() / 2
-                        vc_bounds = np.zeros((len(vc_vals), 2))
-                        vc_bounds[:-1, 1] = (vc_vals[:-1] + vc_vals[1:]) / 2
-                        vc_bounds[1:, 0] = vc_bounds[:-1, 1]
-                        vc_bounds[0, 0] = vc_vals[0] - dz
-                        vc_bounds[-1, 1] = vc_vals[-1] + dz
+                    vc_da = result[vc]
+                    vc_dim = vc_da.dims[0]
+                    if len(vc_da) > 1:
+                        # Compute mean diff eagerly for metadata
+                        dz = float(np.abs(vc_da.diff(vc_dim)).mean()) / 2
 
-                        result[f"{vc}_bounds"] = ((vc_dim, "bounds"), vc_bounds)
+                        # Create bounds (approximated for non-uniform grids if necessary)
+                        # but keep it lazy
+                        vc_lower = vc_da - dz
+                        vc_upper = vc_da + dz
+                        vc_bounds = xr.concat([vc_lower, vc_upper], dim="bounds").transpose(vc_dim, "bounds")
+
+                        result[f"{vc}_bounds"] = vc_bounds
                         result[vc].attrs["bounds"] = f"{vc}_bounds"
                 except Exception as e:
                     print(f"Warning: Could not create bounds for {vc}: {e}")

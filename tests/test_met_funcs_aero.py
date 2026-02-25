@@ -13,7 +13,7 @@ def test_calc_c_p_aero():
     # Eager (NumPy)
     res_eager = calc_c_p(p_val, ea_val)
     # Check that it returns a scalar or array-like
-    assert isinstance(res_eager, (np.ndarray, np.floating, float))
+    assert isinstance(res_eager, np.ndarray | np.floating | float)
 
     # Lazy (Dask/Xarray)
     p_lazy = xr.DataArray(da.from_array([p_val], chunks=1), dims="x")
