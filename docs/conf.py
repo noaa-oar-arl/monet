@@ -79,7 +79,7 @@ napoleon_use_ivar = False  # True
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "xarray": ("https://docs.xarray.dev/en/stable/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),  # stable
     "numpy": ("https://numpy.org/doc/stable/", None),
     "monetio": ("https://monetio.readthedocs.io/en/stable/", None),
     "matplotlib": ("https://matplotlib.org/stable/", None),
