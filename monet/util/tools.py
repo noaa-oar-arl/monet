@@ -224,25 +224,43 @@ EPA_LATMIN = [
 ]
 
 
-def _apply_aero(func: Callable, *args: Any, name: str = "", **kwargs: Any) -> Any:
+def _apply_aero(
+    func: Callable,
+    *args: Any,
+    name: str = "",
+    output_dtypes: list[Any] | None = None,
+    output_core_dims: list[list[str]] | None = None,
+    input_core_dims: list[list[str]] | None = None,
+    **kwargs: Any,
+) -> Any:
     """Helper to apply a function following Aero Protocol."""
     is_xr = any(isinstance(arg, xr.DataArray | xr.Dataset) for arg in args)
 
     if is_xr:
-        result = xr.apply_ufunc(
-            func,
-            *args,
-            kwargs=kwargs,
-            dask="parallelized",
-            output_dtypes=[float],
-        )
+        if output_dtypes is None:
+            output_dtypes = [float]
+
+        # Only pass core dimensions if provided, to avoid xarray issues with None
+        apply_kwargs = {
+            "kwargs": kwargs,
+            "dask": "parallelized",
+            "output_dtypes": output_dtypes,
+        }
+        if output_core_dims is not None:
+            apply_kwargs["output_core_dims"] = output_core_dims
+        if input_core_dims is not None:
+            apply_kwargs["input_core_dims"] = input_core_dims
+
+        result = xr.apply_ufunc(func, *args, **apply_kwargs)
 
         # Update history
-        if hasattr(result, "attrs"):
-            curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            msg = f"{curr_time} > Computed {name} via monet.util.tools"
-            history = result.attrs.get("history", "")
-            result.attrs["history"] = (history + f"\n{msg}").strip()
+        results = result if isinstance(result, tuple) else (result,)
+        for res in results:
+            if hasattr(res, "attrs"):
+                curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                msg = f"{curr_time} > Computed {name} via monet.util.tools"
+                history = res.attrs.get("history", "")
+                res.attrs["history"] = (history + f"\n{msg}").strip()
 
         return result
 
@@ -278,54 +296,150 @@ def search_listinlist(array1: np.ndarray, array2: np.ndarray) -> tuple[np.ndarra
     return np.sort(index1), np.sort(index2)
 
 
-def linregress(x: np.ndarray, y: np.ndarray) -> tuple[float, float, float, float]:
-    """Perform a linear regression using statsmodels.
+def linregress(x: xr.DataArray | np.ndarray, y: xr.DataArray | np.ndarray, dim: str | None = None) -> Any:
+    """Perform a linear regression.
+
+    This implementation is backend-agnostic and supports Dask-backed
+    xarray objects using xarray.apply_ufunc. If x and y are multi-dimensional,
+    the regression is performed over the specified dimension (for xarray)
+    or the last dimension (for numpy).
 
     Parameters
     ----------
-    x : array-like
+    x : numpy.ndarray or xarray.DataArray
         Independent variable values.
-    y : array-like
+    y : numpy.ndarray or xarray.DataArray
         Dependent variable values.
+    dim : str, optional
+        The dimension along which to perform the regression. Only used if
+        inputs are xarray objects. If None and inputs are xarray, the last
+        dimension is used.
 
     Returns
     -------
-    tuple
-        (slope, intercept, r_squared, standard_error) where:
-        - slope is the regression line slope
-        - intercept is the regression line y-intercept
-        - r_squared is the coefficient of determination
-        - standard_error is the standard error of the residuals
+    slope, intercept, r_squared, std_err : same type as input
+        - slope: regression line slope
+        - intercept: regression line y-intercept
+        - r_squared: coefficient of determination
+        - std_err: standard error of the residuals
     """
-    if sm is None:
-        raise ImportError("statsmodels is required for linregress")
 
-    xx = sm.add_constant(x)
-    model = sm.OLS(y, xx)
-    fit = model.fit()
-    b, a = fit.params[0], fit.params[1]
-    rsquared = fit.rsquared
-    std_err = np.sqrt(fit.mse_resid)
-    return a, b, rsquared, std_err
+    def _logic(x, y):
+        # We use numpy for the core logic to avoid statsmodels dependency
+        # and support vectorized operations across chunks.
+        # Ensure we are working with at least 1D arrays
+        x = np.asanyarray(x)
+        y = np.asanyarray(y)
+
+        # Handle multi-dimensional arrays by calculating along the last axis
+        # This is compatible with apply_ufunc(..., input_core_dims=[['dim'], ['dim']])
+        n = x.shape[-1]
+        sum_x = np.sum(x, axis=-1)
+        sum_y = np.sum(y, axis=-1)
+        sum_xx = np.sum(x * x, axis=-1)
+        sum_yy = np.sum(y * y, axis=-1)
+        sum_xy = np.sum(x * y, axis=-1)
+
+        denominator = n * sum_xx - sum_x**2
+        # Use np.where to avoid division by zero
+        # Ensure floating point division to match xr.apply_ufunc expectations and avoid casting errors
+        slope = np.divide(
+            (n * sum_xy - sum_x * sum_y).astype(float),
+            denominator.astype(float),
+            out=np.zeros_like(denominator, dtype=float),
+            where=denominator != 0,
+        )
+        intercept = (sum_y.astype(float) - slope * sum_x.astype(float)) / n
+
+        # R-squared
+        # SS_tot = sum((y - y_mean)**2) = sum(y**2) - (sum(y)**2)/n
+        # SS_res = sum((y - (slope*x + intercept))**2)
+        ss_tot = sum_yy - (sum_y**2) / n
+        y_pred = slope[..., np.newaxis] * x + intercept[..., np.newaxis]
+        ss_res = np.sum((y - y_pred) ** 2, axis=-1)
+
+        r_squared = np.divide(ss_tot - ss_res, ss_tot, out=np.zeros_like(ss_tot), where=ss_tot != 0)
+        std_err = np.sqrt(np.divide(ss_res, n - 2, out=np.zeros_like(ss_res), where=n > 2))
+
+        return slope, intercept, r_squared, std_err
+
+    # Determine core dimension for xarray
+    if dim is None and isinstance(x, xr.DataArray):
+        dim = x.dims[-1]
+    elif dim is None:
+        dim = "core_dim"  # Placeholder for numpy
+
+    return _apply_aero(
+        _logic,
+        x,
+        y,
+        name="linear regression",
+        output_dtypes=[float, float, float, float],
+        input_core_dims=[[dim], [dim]],
+        output_core_dims=[[], [], [], []],
+    )
 
 
-def findclosest(list_obj: list, value: float) -> tuple[int, float]:
+def findclosest(list_obj: Any, value: Any) -> Any:
     """Find the index and value of the closest element to a target value.
 
+    This implementation is backend-agnostic and supports Dask-backed
+    xarray objects.
+
     Parameters
     ----------
-    list_obj : list-like
+    list_obj : array-like
         Collection of values to search through.
-    value : float or int
-        The target value to find the closest match to.
+    value : float, int, or array-like
+        The target value(s) to find the closest match to.
 
     Returns
     -------
-    tuple
-        (index, closest_value) where:
-        - index is the position in the list of the closest value
-        - closest_value is the value from the list that is closest to the target
+    index, closest_value : same type as input
+        - index: the position in list_obj of the closest value
+        - closest_value: the value from list_obj that is closest to the target
     """
+    if isinstance(list_obj, xr.DataArray | xr.Dataset) or isinstance(value, xr.DataArray | xr.Dataset):
+        # Use xarray operations to preserve laziness and avoid apply_ufunc scalar issues
+        # Ensure they are DataArrays for indexing
+        if not isinstance(list_obj, xr.DataArray):
+            list_obj = xr.DataArray(list_obj, dims=["search_dim"])
+        if not isinstance(value, xr.DataArray):
+            value = xr.DataArray(value)
+
+        # Name search dimension if not already named
+        if len(list_obj.dims) == 1 and list_obj.dims[0] == "dim_0":
+            list_obj = list_obj.rename({"dim_0": "search_dim"})
+        search_dim = list_obj.dims[0]
+
+        diff = np.abs(list_obj - value)
+        idx = diff.argmin(dim=search_dim)
+        res = list_obj.isel({search_dim: idx})
+
+        # Add history
+        for out in (idx, res):
+            if hasattr(out, "attrs"):
+                curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                history = out.attrs.get("history", "")
+                out.attrs["history"] = (history + f"\n{curr_time} > Found closest element via monet.util.tools").strip()
+
+        return idx, res
+
+    # Fallback for non-xarray (NumPy or small lists)
+    arr = np.asanyarray(list_obj)
+    val = np.asanyarray(value)
+
+    if arr.ndim == 1 and (val.ndim == 0 or val.size == 1):
+        # Original simple path
+        a = min((abs(x - float(val)), x, i) for i, x in enumerate(list_obj))
+        return a[2], a[1]
+
+    # Vectorized NumPy path
+    diff = np.abs(arr[np.newaxis, :] - val[..., np.newaxis])
+    idx = np.argmin(diff, axis=-1)
+    return idx, arr[idx]
+
+    # Original scalar/list logic preserved for small inputs
     a = min((abs(x - value), x, i) for i, x in enumerate(list_obj))
     return a[2], a[1]
 
@@ -333,19 +447,23 @@ def findclosest(list_obj: list, value: float) -> tuple[int, float]:
 def nearest(items: Any, pivot: Any) -> Any:
     """Find the nearest value to pivot in a collection.
 
+    This implementation is backend-agnostic and supports Dask-backed
+    xarray objects using xarray.apply_ufunc.
+
     Parameters
     ----------
-    items : iterable
+    items : array-like
         Collection of values to search through.
-    pivot : float or int
-        The value to find the nearest match to.
+    pivot : float, int, or array-like
+        The value(s) to find the nearest match to.
 
     Returns
     -------
-    object
+    closest_value : same type as input
         The item from the collection that is closest to the pivot value.
     """
-    return min(items, key=lambda x: abs(x - pivot))
+    _, val = findclosest(items, pivot)
+    return val
 
 
 def _force_forder(x: np.ndarray) -> tuple[np.ndarray, bool]:
