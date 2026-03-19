@@ -2,12 +2,10 @@
 Vertical coordinate utilities for MONET.
 """
 
-import datetime
-
 import numpy as np
 import xarray as xr
 
-from ..met_funcs import R_d, g
+from .constants import R_d, g
 
 
 def calc_fv3_pressure(
@@ -69,9 +67,9 @@ def calc_fv3_pressure(
         all_dims = [dim] + [d for d in res.dims if d != dim]
         res = res.transpose(*all_dims)
 
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = res.attrs.get("history", "")
-        res.attrs["history"] = history + f"\n{curr_time} > Calculated pressure via calc_fv3_pressure"
+        from .conventions import update_history
+
+        update_history(res, "Calculated pressure via calc_fv3_pressure")
         res.name = "pressure"
         if hasattr(ps, "attrs") and "units" in ps.attrs:
             res.attrs["units"] = ps.attrs["units"]
@@ -161,9 +159,9 @@ def calc_fv3_height(
         all_dims = [dim] + [d for d in res.dims if d != dim]
         res = res.transpose(*all_dims)
 
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = res.attrs.get("history", "")
-        res.attrs["history"] = history + f"\n{curr_time} > Calculated geopotential height via calc_fv3_height"
+        from .conventions import update_history
+
+        update_history(res, "Calculated geopotential height via calc_fv3_height")
         res.name = "height"
         res.attrs["units"] = "m"
 

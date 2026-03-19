@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pandas as pd
+import pytest
 import xarray as xr
 
 from monet.util.combinetool import pair
@@ -208,3 +209,38 @@ def test_ugrid_pairing_smoke(monkeypatch):
     paired = pair(ds, obs_df, method="nearest")
     assert "temp" in paired.columns
     assert len(paired) == 2
+
+
+def test_apply_aero_numpy():
+    """Verify _apply_aero works with NumPy/Scalars."""
+    from monet.util.aero import _apply_aero
+
+    def dummy_logic(x, y):
+        return x + y
+
+    res = _apply_aero(dummy_logic, 10, 5, name="test")
+    assert res == 15
+
+
+def test_apply_aero_xarray_lazy():
+    """Verify _apply_aero works with Lazy (Dask) xarray objects."""
+    pytest.importorskip("dask.array")
+
+    from monet.util.aero import _apply_aero
+
+    def dummy_logic(x, y):
+        return x + y
+
+    da1 = xr.DataArray(np.array([1, 2, 3]), dims="x", name="a").chunk({"x": 2})
+    da2 = xr.DataArray(np.array([4, 5, 6]), dims="x", name="b").chunk({"x": 2})
+
+    res = _apply_aero(dummy_logic, da1, da2, name="lazy_addition")
+
+    assert isinstance(res, xr.DataArray)
+    assert res.chunks is not None
+    # Ensure it's still lazy
+    assert hasattr(res.data, "dask")
+
+    # Compute and verify
+    assert np.array_equal(res.compute().values, [5, 7, 9])
+    assert "lazy_addition" in res.attrs.get("history", "")

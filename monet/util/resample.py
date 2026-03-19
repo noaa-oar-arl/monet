@@ -1,4 +1,3 @@
-import datetime
 import typing as t
 
 import numpy as np
@@ -86,10 +85,9 @@ def resample(
             out = out[da_name]
 
         # Update history for provenance
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = out.attrs.get("history", "")
-        msg = f"\n{curr_time} > Resampled via monet.util.resample (method={real_method})"
-        out.attrs["history"] = history + msg
+        from .conventions import update_history
+
+        update_history(out, f"Resampled via monet.util.resample (method={real_method})")
 
         return out
     else:
@@ -181,8 +179,8 @@ def resample_stratify(
     out.name = da.name
 
     # Update history
-    curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    history = out.attrs.get("history", "")
-    out.attrs["history"] = history + f"\n{curr_time} > Vertically interpolated via monet.util.resample.resample_stratify"
+    from .conventions import update_history
+
+    update_history(out, "Vertically interpolated via monet.util.resample.resample_stratify")
 
     return out

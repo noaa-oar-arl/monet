@@ -1,6 +1,5 @@
 """Base accessor implementation for MONET"""
 
-import datetime
 import typing as t
 
 import xarray as xr
@@ -749,9 +748,9 @@ class BaseAccessor:
                 is_type = self._obj.where(is_type)
 
             # Update history for provenance
-            curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            history = is_type.attrs.get("history", "")
-            is_type.attrs["history"] = history + f"\n{curr_time} > Computed {mask_type} mask via monet.is_{mask_type}"
+            from ..util.conventions import update_history
+
+            update_history(is_type, f"Computed {mask_type} mask via monet.is_{mask_type}")
 
             return is_type
         else:
@@ -815,9 +814,9 @@ class BaseAccessor:
         obj[lon_name] = (obj[lon_name] + 180) % 360 - 180
 
         # Update history for provenance
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = obj.attrs.get("history", "")
-        obj.attrs["history"] = history + f"\n{curr_time} > Wrapped longitudes ({lon_name}) via monet.wrap_longitudes"
+        from ..util.conventions import update_history
+
+        update_history(obj, f"Wrapped longitudes ({lon_name}) via monet.wrap_longitudes")
 
         return obj
 
@@ -845,9 +844,9 @@ class BaseAccessor:
         wdl = wd.sortby(wd[lon_name])
 
         # Update history for provenance
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = wdl.attrs.get("history", "")
-        wdl.attrs["history"] = history + f"\n{curr_time} > Tidied via monet.tidy (lon_name={lon_name})"
+        from ..util.conventions import update_history
+
+        update_history(wdl, f"Tidied via monet.tidy (lon_name={lon_name})")
 
         return wdl
 
@@ -888,9 +887,9 @@ class BaseAccessor:
             )
 
             # Update history
-            curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            history = obj.attrs.get("history", "")
-            obj.attrs["history"] = history + f"\n{curr_time} > Converted {name} from cftime to datetime64"
+            from ..util.conventions import update_history
+
+            update_history(obj, f"Converted {name} from cftime to datetime64")
 
         return obj
 
@@ -941,9 +940,9 @@ class BaseAccessor:
         out = resample(obj, target, **kwargs)
 
         # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = out.attrs.get("history", "")
-        out.attrs["history"] = history + f"\n{curr_time} > Interpolated to constant latitude: {lat}"
+        from ..util.conventions import update_history
+
+        update_history(out, f"Interpolated to constant latitude: {lat}")
 
         return out
 
@@ -994,9 +993,9 @@ class BaseAccessor:
         out = resample(obj, target, **kwargs)
 
         # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = out.attrs.get("history", "")
-        out.attrs["history"] = history + f"\n{curr_time} > Interpolated to constant longitude: {lon}"
+        from ..util.conventions import update_history
+
+        update_history(out, f"Interpolated to constant longitude: {lon}")
 
         return out
 
@@ -1044,9 +1043,9 @@ class BaseAccessor:
         res = output.squeeze()
 
         # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = res.attrs.get("history", "")
-        res.attrs["history"] = history + f"\n{curr_time} > Extracted nearest lat/lon points"
+        from ..util.conventions import update_history
+
+        update_history(res, "Extracted nearest lat/lon points")
 
         return res
 
@@ -1089,9 +1088,9 @@ class BaseAccessor:
         out = resample(source, target, method=method, **kwargs)
 
         # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = out.attrs.get("history", "")
-        out.attrs["history"] = history + f"\n{curr_time} > Remapped via monet.remap (method={method})"
+        from ..util.conventions import update_history
+
+        update_history(out, f"Remapped via monet.remap (method={method})")
 
         return out
 

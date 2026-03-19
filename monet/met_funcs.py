@@ -14,67 +14,16 @@ References
    https://doi.org/10.1029/2000WR900033.
 """
 
-import datetime
-from collections.abc import Callable
 from typing import Any
 
 import numpy as np
-import xarray as xr
 from numpy.typing import ArrayLike
 
-# ==============================================================================
-# List of constants used in Meteorological computations
-# ==============================================================================
-# Stephan Boltzmann constant (W m-2 K-4)
-sb = 5.670373e-8
-# heat capacity of dry air at constant pressure (J kg-1 K-1)
-c_pd = 1003.5
-# heat capacity of water vapour at constant pressure (J kg-1 K-1)
-c_pv = 1865
-# ratio of the molecular weight of water vapor to dry air
-epsilon = 0.622
-# Psicrometric Constant kPa K-1
-psicr = 0.0658
-# gas constant for dry air, J/(kg*degK)
-R_d = 287.04
-# acceleration of gravity (m s-2)
-g = 9.8
-# ==============================================================================
-# List of constants used in MO similarity
-# ==============================================================================
-# von Karman's constant
-k = 0.4
-# acceleration of gravity (m s-2)
-gravity = 9.8
+from .util.aero import _apply_aero
+from .util.constants import R_d, c_pd, c_pv, epsilon, g, gravity, k, sb
 
-
-def _apply_aero(func: Callable, *args: Any, name: str = "", **kwargs: Any) -> Any:
-    """Helper to apply a function following Aero Protocol."""
-    is_xr = any(isinstance(arg, xr.DataArray | xr.Dataset) for arg in args)
-
-    if is_xr:
-        # Broadcast xarray objects
-        # result = xr.apply_ufunc(func, *args, kwargs=kwargs, dask="parallelized", output_dtypes=[float])
-        # Note: sometimes we need to broadcast before apply_ufunc if they have different dims
-        # but apply_ufunc with dask='parallelized' handles most cases if they share dims or are broadcastable.
-        result = xr.apply_ufunc(
-            func,
-            *args,
-            kwargs=kwargs,
-            dask="parallelized",
-            output_dtypes=[float],
-        )
-
-        # Update history
-        if hasattr(result, "attrs"):
-            curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            msg = f"{curr_time} > Computed {name} via monet.met_funcs"
-            history = result.attrs.get("history", "")
-            result.attrs["history"] = (history + f"\n{msg}").strip()
-
-        return result
-
-    return func(*args, **kwargs)
+# Default source for this module
+_SOURCE = "monet.met_funcs"
 
 
 def calc_c_p(p: ArrayLike, ea: ArrayLike) -> Any:
@@ -104,7 +53,7 @@ def calc_c_p(p: ArrayLike, ea: ArrayLike) -> Any:
         # then the heat capacity of (moist) air
         return (1.0 - q) * c_pd + q * c_pv
 
-    return _apply_aero(_logic, p, ea, name="heat capacity (c_p)")
+    return _apply_aero(_logic, p, ea, name="heat capacity (c_p)", source=_SOURCE)
 
 
 def calc_lambda(T_A_K: ArrayLike) -> Any:
@@ -127,7 +76,7 @@ def calc_lambda(T_A_K: ArrayLike) -> Any:
     def _logic(T_A_K):
         return 1e6 * (2.501 - (2.361e-3 * (T_A_K - 273.15)))
 
-    return _apply_aero(_logic, T_A_K, name="latent heat of vaporization")
+    return _apply_aero(_logic, T_A_K, name="latent heat of vaporization", source=_SOURCE)
 
 
 def calc_pressure(z: ArrayLike) -> Any:
@@ -146,7 +95,7 @@ def calc_pressure(z: ArrayLike) -> Any:
     def _logic(z):
         return 1013.25 * (1.0 - 2.225577e-5 * z) ** 5.25588
 
-    return _apply_aero(_logic, z, name="barometric pressure")
+    return _apply_aero(_logic, z, name="barometric pressure", source=_SOURCE)
 
 
 def calc_psicr(c_p: ArrayLike, p: ArrayLike, Lambda: ArrayLike) -> Any:
@@ -169,7 +118,7 @@ def calc_psicr(c_p: ArrayLike, p: ArrayLike, Lambda: ArrayLike) -> Any:
     def _logic(c_p, p, Lambda):
         return c_p * p / (epsilon * Lambda)
 
-    return _apply_aero(_logic, c_p, p, Lambda, name="psicrometric constant")
+    return _apply_aero(_logic, c_p, p, Lambda, name="psicrometric constant", source=_SOURCE)
 
 
 def calc_rho(p: ArrayLike, ea: ArrayLike, T_A_K: ArrayLike) -> Any:
@@ -197,7 +146,7 @@ def calc_rho(p: ArrayLike, ea: ArrayLike, T_A_K: ArrayLike) -> Any:
         # p is multiplied by 100 to convert from mb to Pascals
         return ((p * 100.0) / (R_d * T_A_K)) * (1.0 - (1.0 - epsilon) * ea / p)
 
-    return _apply_aero(_logic, p, ea, T_A_K, name="air density")
+    return _apply_aero(_logic, p, ea, T_A_K, name="air density", source=_SOURCE)
 
 
 def calc_stephan_boltzmann(T_K: ArrayLike) -> Any:
@@ -216,7 +165,7 @@ def calc_stephan_boltzmann(T_K: ArrayLike) -> Any:
     def _logic(T_K):
         return sb * T_K**4
 
-    return _apply_aero(_logic, T_K, name="emitted radiance")
+    return _apply_aero(_logic, T_K, name="emitted radiance", source=_SOURCE)
 
 
 def calc_theta_s(
@@ -284,7 +233,7 @@ def calc_theta_s(
         theta_s = np.minimum(theta_s, pid2 - 0.0000001)
         return np.degrees(theta_s)
 
-    return _apply_aero(_logic, xlat, xlong, stdlng, doy, year, ftime, name="sun zenith angle")
+    return _apply_aero(_logic, xlat, xlong, stdlng, doy, year, ftime, name="sun zenith angle", source=_SOURCE)
 
 
 def calc_sun_angles(lat: ArrayLike, lon: ArrayLike, stdlon: ArrayLike, doy: ArrayLike, ftime: ArrayLike) -> Any:
@@ -346,34 +295,19 @@ def calc_sun_angles(lat: ArrayLike, lon: ArrayLike, stdlon: ArrayLike, doy: Arra
 
         return sza_deg, saa_deg
 
-    is_xr = any(isinstance(arg, xr.DataArray | xr.Dataset) for arg in (lat, lon, stdlon, doy, ftime))
-
-    if is_xr:
-        # For multiple outputs from apply_ufunc
-        result = xr.apply_ufunc(
-            _logic,
-            lat,
-            lon,
-            stdlon,
-            doy,
-            ftime,
-            dask="parallelized",
-            output_dtypes=[float, float],
-            input_core_dims=[[]] * 5,
-            output_core_dims=[[], []],
-        )
-
-        # Update history
-        for res in result:
-            if hasattr(res, "attrs"):
-                curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                msg = "Computed sun angles via monet.met_funcs"
-                history = res.attrs.get("history", "")
-                res.attrs["history"] = (history + f"\n{curr_time} > {msg}").strip()
-
-        return result
-
-    return _logic(lat, lon, stdlon, doy, ftime)
+    return _apply_aero(
+        _logic,
+        lat,
+        lon,
+        stdlon,
+        doy,
+        ftime,
+        name="sun angles",
+        output_dtypes=[float, float],
+        input_core_dims=[[]] * 5,
+        output_core_dims=[[], []],
+        source=_SOURCE,
+    )
 
 
 def calc_vapor_pressure(T_K: ArrayLike) -> Any:
@@ -394,7 +328,7 @@ def calc_vapor_pressure(T_K: ArrayLike) -> Any:
         T_C = T_K - 273.15
         return 6.112 * np.exp((17.67 * T_C) / (T_C + 243.5))
 
-    return _apply_aero(_logic, T_K, name="saturation vapor pressure")
+    return _apply_aero(_logic, T_K, name="saturation vapor pressure", source=_SOURCE)
 
 
 def calc_delta_vapor_pressure(T_K: ArrayLike) -> Any:
@@ -415,7 +349,7 @@ def calc_delta_vapor_pressure(T_K: ArrayLike) -> Any:
         T_C = T_K - 273.15
         return 4098.0 * (0.6108 * np.exp(17.27 * T_C / (T_C + 237.3))) / ((T_C + 237.3) ** 2)
 
-    return _apply_aero(_logic, T_K, name="slope of saturation vapor pressure")
+    return _apply_aero(_logic, T_K, name="slope of saturation vapor pressure", source=_SOURCE)
 
 
 def calc_mixing_ratio(ea: ArrayLike, p: ArrayLike) -> Any:
@@ -441,7 +375,7 @@ def calc_mixing_ratio(ea: ArrayLike, p: ArrayLike) -> Any:
     def _logic(ea, p):
         return epsilon * ea / (p - ea)
 
-    return _apply_aero(_logic, ea, p, name="mixing ratio")
+    return _apply_aero(_logic, ea, p, name="mixing ratio", source=_SOURCE)
 
 
 def calc_lapse_rate_moist(T_A_K: ArrayLike, ea: ArrayLike, p: ArrayLike) -> Any:
@@ -475,7 +409,7 @@ def calc_lapse_rate_moist(T_A_K: ArrayLike, ea: ArrayLike, p: ArrayLike) -> Any:
         lambda_v = 1e6 * (2.501 - (2.361e-3 * (T_A_K - 273.15)))
         return g * (R_d * T_A_K**2 + lambda_v * r * T_A_K) / (c_p * R_d * T_A_K**2 + lambda_v**2 * r * epsilon)
 
-    return _apply_aero(_logic, T_A_K, ea, p, name="moist-adiabatic lapse rate")
+    return _apply_aero(_logic, T_A_K, ea, p, name="moist-adiabatic lapse rate", source=_SOURCE)
 
 
 def flux_2_evaporation(flux: ArrayLike, T_K: ArrayLike = 20 + 273.15, time_domain: float = 1) -> Any:
@@ -505,7 +439,7 @@ def flux_2_evaporation(flux: ArrayLike, T_K: ArrayLike = 20 + 273.15, time_domai
         # Convert instantaneous rate to the time_domain rate
         return ET * time_domain * 3600.0
 
-    return _apply_aero(_logic, flux, T_K, time_domain, name="evaporation rate")
+    return _apply_aero(_logic, flux, T_K, time_domain, name="evaporation rate", source=_SOURCE)
 
 
 def calc_L(
@@ -556,7 +490,7 @@ def calc_L(
         L[i] = -(ustar[i] ** 3) / (L_const[i] * (Hv[i] / (rho[i] * c_p[i])))
         return L
 
-    return _apply_aero(_logic, ustar, T_A_K, rho, c_p, H, LE, name="Obukhov stability length")
+    return _apply_aero(_logic, ustar, T_A_K, rho, c_p, H, LE, name="Obukhov stability length", source=_SOURCE)
 
 
 def calc_Psi_H(zoL: ArrayLike) -> Any:
@@ -595,7 +529,7 @@ def calc_Psi_H(zoL: ArrayLike) -> Any:
         Psi_H[i] = ((1.0 - d) / n) * np.log((c + y**n) / c)
         return Psi_H
 
-    return _apply_aero(_logic, zoL, name="adiabatic correction factor (heat)")
+    return _apply_aero(_logic, zoL, name="adiabatic correction factor (heat)", source=_SOURCE)
 
 
 def calc_Psi_M(zoL: ArrayLike) -> Any:
@@ -640,7 +574,7 @@ def calc_Psi_M(zoL: ArrayLike) -> Any:
         )
         return Psi_M
 
-    return _apply_aero(_logic, zoL, name="adiabatic correction factor (momentum)")
+    return _apply_aero(_logic, zoL, name="adiabatic correction factor (momentum)", source=_SOURCE)
 
 
 def calc_richardson(
@@ -688,7 +622,7 @@ def calc_richardson(
         # See eq (2) from Louis 1979
         return -(gravity * (z_u - d_0) / T_A1) * (((T_R1 - T_R0) - (T_A1 - T_A0)) / u**2)  # equation (12) [Norman2000]
 
-    return _apply_aero(_logic, u, z_u, d_0, T_R0, T_R1, T_A0, T_A1, name="Richardson number")
+    return _apply_aero(_logic, u, z_u, d_0, T_R0, T_R1, T_A0, T_A1, name="Richardson number", source=_SOURCE)
 
 
 def calc_u_star(u: ArrayLike, z_u: ArrayLike, L: ArrayLike, d_0: ArrayLike, z_0M: ArrayLike) -> Any:
@@ -721,32 +655,9 @@ def calc_u_star(u: ArrayLike, z_u: ArrayLike, L: ArrayLike, d_0: ArrayLike, z_0M
         # calculate correction factors in other conditions
         L_adj = np.where(L == 0.0, 1e-36, L)
 
-        # Re-implementing calc_Psi_M logic here to keep it within _logic for apply_ufunc if needed,
-        # but since calc_Psi_M now handles numpy arrays via _apply_aero, we can just call it.
-        # Wait, inside _logic (called by apply_ufunc), inputs are numpy arrays.
-        # So we can call the original logic of calc_Psi_M.
-        def _psi_m_logic(zoL):
-            Psi_M = np.zeros(zoL.shape)
-            i = zoL >= 0.0
-            a, b = 6.1, 2.5
-            Psi_M[i] = -a * np.log(zoL[i] + (1.0 + zoL[i] ** b) ** (1.0 / b))
-            i = zoL < 0
-            y = -zoL[i]
-            a, b = 0.33, 0.41
-            x = (y / a) ** 0.333333
-            Psi_0 = -np.log(a) + 3**0.5 * b * a**0.333333 * np.pi / 6.0
-            y_min = np.minimum(y, b**-3)
-            Psi_M[i] = (
-                np.log(a + y_min)
-                - 3.0 * b * y_min**0.333333
-                + (b * a**0.333333) / 2.0 * np.log((1.0 + x) ** 2 / (1.0 - x + x**2))
-                + 3.0**0.5 * b * a**0.333333 * np.arctan((2.0 * x - 1.0) / 3**0.5)
-                + Psi_0
-            )
-            return Psi_M
-
-        Psi_M = _psi_m_logic((z_u - d_0) / L_adj)
-        Psi_M0 = _psi_m_logic(z_0M / L_adj)
+        # Since calc_Psi_M handles numpy arrays via _apply_aero, we can reuse it
+        Psi_M = calc_Psi_M((z_u - d_0) / L_adj)
+        Psi_M0 = calc_Psi_M(z_0M / L_adj)
         return u * k / (np.log((z_u - d_0) / z_0M) - Psi_M + Psi_M0)
 
-    return _apply_aero(_logic, u, z_u, L, d_0, z_0M, name="friction velocity (u*)")
+    return _apply_aero(_logic, u, z_u, L, d_0, z_0M, name="friction velocity (u*)", source=_SOURCE)

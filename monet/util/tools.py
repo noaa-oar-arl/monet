@@ -2,14 +2,15 @@
 Utility tools for MONET.
 """
 
-import datetime
-from collections.abc import Callable
 from typing import Any
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 from pandas import merge
+
+from .aero import _apply_aero
+from .conventions import update_history
 
 try:
     import statsmodels.api as sm
@@ -224,49 +225,6 @@ EPA_LATMIN = [
 ]
 
 
-def _apply_aero(
-    func: Callable,
-    *args: Any,
-    name: str = "",
-    output_dtypes: list[Any] | None = None,
-    output_core_dims: list[list[str]] | None = None,
-    input_core_dims: list[list[str]] | None = None,
-    **kwargs: Any,
-) -> Any:
-    """Helper to apply a function following Aero Protocol."""
-    is_xr = any(isinstance(arg, xr.DataArray | xr.Dataset) for arg in args)
-
-    if is_xr:
-        if output_dtypes is None:
-            output_dtypes = [float]
-
-        # Only pass core dimensions if provided, to avoid xarray issues with None
-        apply_kwargs = {
-            "kwargs": kwargs,
-            "dask": "parallelized",
-            "output_dtypes": output_dtypes,
-        }
-        if output_core_dims is not None:
-            apply_kwargs["output_core_dims"] = output_core_dims
-        if input_core_dims is not None:
-            apply_kwargs["input_core_dims"] = input_core_dims
-
-        result = xr.apply_ufunc(func, *args, **apply_kwargs)
-
-        # Update history
-        results = result if isinstance(result, tuple) else (result,)
-        for res in results:
-            if hasattr(res, "attrs"):
-                curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                msg = f"{curr_time} > Computed {name} via monet.util.tools"
-                history = res.attrs.get("history", "")
-                res.attrs["history"] = (history + f"\n{msg}").strip()
-
-        return result
-
-    return func(*args, **kwargs)
-
-
 def search_listinlist(array1: np.ndarray, array2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Find matching indices between two arrays.
 
@@ -377,6 +335,7 @@ def linregress(x: xr.DataArray | np.ndarray, y: xr.DataArray | np.ndarray, dim: 
         output_dtypes=[float, float, float, float],
         input_core_dims=[[dim], [dim]],
         output_core_dims=[[], [], [], []],
+        source="monet.util.tools",
     )
 
 
@@ -419,9 +378,7 @@ def findclosest(list_obj: Any, value: Any) -> Any:
         # Add history
         for out in (idx, res):
             if hasattr(out, "attrs"):
-                curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                history = out.attrs.get("history", "")
-                out.attrs["history"] = (history + f"\n{curr_time} > Found closest element via monet.util.tools").strip()
+                update_history(out, "Found closest element via monet.util.tools")
 
         return idx, res
 
@@ -438,10 +395,6 @@ def findclosest(list_obj: Any, value: Any) -> Any:
     diff = np.abs(arr[np.newaxis, :] - val[..., np.newaxis])
     idx = np.argmin(diff, axis=-1)
     return idx, arr[idx]
-
-    # Original scalar/list logic preserved for small inputs
-    a = min((abs(x - value), x, i) for i, x in enumerate(list_obj))
-    return a[2], a[1]
 
 
 def nearest(items: Any, pivot: Any) -> Any:
@@ -546,29 +499,15 @@ def wsdir2uv(ws: Any, wdir: Any) -> Any:
         v = -ws * np.cos(wdir * np.pi / 180.0)
         return u, v
 
-    is_xr = any(isinstance(arg, xr.DataArray | xr.Dataset) for arg in (ws, wdir))
-
-    if is_xr:
-        result = xr.apply_ufunc(
-            _logic,
-            ws,
-            wdir,
-            dask="parallelized",
-            output_dtypes=[float, float],
-            output_core_dims=[[], []],
-        )
-
-        # Update history
-        for res in result:
-            if hasattr(res, "attrs"):
-                curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                msg = "Computed U and V wind components via monet.util.tools.wsdir2uv"
-                history = res.attrs.get("history", "")
-                res.attrs["history"] = (history + f"\n{curr_time} > {msg}").strip()
-
-        return result
-
-    return _logic(ws, wdir)
+    return _apply_aero(
+        _logic,
+        ws,
+        wdir,
+        name="U and V wind components",
+        output_dtypes=[float, float],
+        output_core_dims=[[], []],
+        source="monet.util.tools.wsdir2uv",
+    )
 
 
 def get_relhum(temp: Any, press: Any, vap: Any) -> Any:
@@ -598,7 +537,7 @@ def get_relhum(temp: Any, press: Any, vap: Any) -> Any:
         ws_vap = 0.622 * (es_vap / press)
         return 100.0 * (vap / ws_vap)
 
-    return _apply_aero(_logic, temp, press, vap, name="relative humidity")
+    return _apply_aero(_logic, temp, press, vap, name="relative humidity", source="monet.util.tools")
 
 
 def calc_13_category_usda_soil_type(clay: Any, sand: Any, silt: Any) -> Any:
@@ -664,7 +603,7 @@ def calc_13_category_usda_soil_type(clay: Any, sand: Any, silt: Any) -> Any:
         stype[(clay >= 40) & (sand <= 45) & (silt < 40) & (clay != 255)] = 12.0
         return stype
 
-    return _apply_aero(_logic, clay, sand, silt, name="USDA soil type")
+    return _apply_aero(_logic, clay, sand, silt, name="USDA soil type", source="monet.util.tools")
 
 
 def long_to_wide(df: pd.DataFrame) -> pd.DataFrame:
@@ -910,29 +849,28 @@ def get_giorgi_region_df(
     elif isinstance(dset, xr.Dataset):
         lat, lon = xr.broadcast(lat, lon)
         # Use apply_ufunc for Dask compatibility
-        idx = xr.apply_ufunc(
+        idx = _apply_aero(
             _find_region_indices,
             lon,
             lat,
-            kwargs={"bounds": bounds, "indices": indices},
-            dask="parallelized",
-            output_dtypes=[float],
+            bounds=bounds,
+            indices=indices,
+            name="GIORGI region indices",
+            source="monet.util.tools",
         )
-        acro = xr.apply_ufunc(
+        acro = _apply_aero(
             _find_region_acronyms,
             lon,
             lat,
-            kwargs={"bounds": bounds, "acronyms": acronyms},
-            dask="parallelized",
+            bounds=bounds,
+            acronyms=acronyms,
+            name="GIORGI region acronyms",
             output_dtypes=[object],
+            source="monet.util.tools",
         )
         dset["GIORGI_INDEX"] = idx
         dset["GIORGI_ACRO"] = acro
 
-        # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = dset.attrs.get("history", "")
-        dset.attrs["history"] = history + f"\n{curr_time} > Added GIORGI regions via get_giorgi_region_df"
         return dset
     else:
         raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")
@@ -1042,29 +980,28 @@ def get_epa_region_df(
     elif isinstance(dset, xr.Dataset):
         lat, lon = xr.broadcast(lat, lon)
         # Use apply_ufunc for Dask compatibility
-        idx = xr.apply_ufunc(
+        idx = _apply_aero(
             _find_region_indices,
             lon,
             lat,
-            kwargs={"bounds": bounds, "indices": indices},
-            dask="parallelized",
-            output_dtypes=[float],
+            bounds=bounds,
+            indices=indices,
+            name="EPA region indices",
+            source="monet.util.tools",
         )
-        acro = xr.apply_ufunc(
+        acro = _apply_aero(
             _find_region_acronyms,
             lon,
             lat,
-            kwargs={"bounds": bounds, "acronyms": acronyms},
-            dask="parallelized",
+            bounds=bounds,
+            acronyms=acronyms,
+            name="EPA region acronyms",
             output_dtypes=[object],
+            source="monet.util.tools",
         )
         dset["EPA_INDEX"] = idx
         dset["EPA_ACRO"] = acro
 
-        # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = dset.attrs.get("history", "")
-        dset.attrs["history"] = history + f"\n{curr_time} > Added EPA regions via get_epa_region_df"
         return dset
     else:
         raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")

@@ -1,6 +1,5 @@
 """Masking and region utilities for MONET."""
 
-import datetime
 import io
 import os
 import typing as t
@@ -466,9 +465,9 @@ def query_mask(
             out = res
 
         # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = out.attrs.get("history", "")
-        out.attrs["history"] = history + f"\n{curr_time} > Queried {mask_name} mask via monet.util.mask.query_mask"
+        from .conventions import update_history
+
+        update_history(out, f"Queried {mask_name} mask via monet.util.mask.query_mask")
         return out
     else:
         # Assume Pandas

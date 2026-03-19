@@ -1,4 +1,3 @@
-import datetime
 import typing as t
 
 import numpy as np
@@ -119,9 +118,9 @@ def _pair_xarray(
                 paired = paired.rename({var: var + suffix})
 
     # Update history
-    curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    history = paired.attrs.get("history", "")
-    paired.attrs["history"] = history + f"\n{curr_time} > Paired with observations via monet.pair"
+    from .conventions import update_history
+
+    update_history(paired, "Paired with observations via monet.pair")
 
     if merge:
         # Use compat='override' to prefer obs coordinates if there are slight mismatches
@@ -257,9 +256,9 @@ def _pair_dataframe(
 
     # Provenance (limited for DataFrames, but we can add to attrs if it's pandas)
     if isinstance(res, pd.DataFrame) and hasattr(res, "attrs"):
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = res.attrs.get("history", "")
-        res.attrs["history"] = history + f"\n{curr_time} > Paired with xarray model via monet.pair"
+        from .conventions import update_history
+
+        update_history(res, "Paired with xarray model via monet.pair")
 
     return res
 

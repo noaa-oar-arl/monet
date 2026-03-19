@@ -1,6 +1,5 @@
 """DataArray accessor for MONET functionality."""
 
-import datetime
 import typing as t
 import warnings
 
@@ -262,9 +261,9 @@ class MONETAccessor(BaseAccessor):
         stat_da.name = stat_name
 
         # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = stat_da.attrs.get("history", "")
-        stat_da.attrs["history"] = history + f"\n{curr_time} > Computed comparison statistic: {stat_name}"
+        from ..util.conventions import update_history
+
+        update_history(stat_da, f"Computed comparison statistic: {stat_name}")
 
         if plot:
             plot_func = getattr(stat_da.monet, plot_method)

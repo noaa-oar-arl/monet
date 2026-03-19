@@ -1,6 +1,5 @@
 """Dataset accessor for MONET functionality."""
 
-import datetime
 import typing as t
 import warnings
 
@@ -155,9 +154,9 @@ class MONETAccessorDataset(BaseAccessor):
             dset[vn] = resample_stratify(self._obj[vn], levels, vertical, axis=axis, tension=tension)
 
         # Update history
-        curr_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        history = dset.attrs.get("history", "")
-        dset.attrs["history"] = history + f"\n{curr_time} > Vertically stratified entire Dataset"
+        from ..util.conventions import update_history
+
+        update_history(dset, "Vertically stratified entire Dataset")
 
         return dset
 
