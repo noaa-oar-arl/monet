@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from .base import BaseAccessor, has_monet_regrid, has_xregrid
+from .base import BaseAccessor, has_xregrid
 
 
 @pd.api.extensions.register_dataframe_accessor("monet")
@@ -304,7 +304,7 @@ class MONETAccessorPandas(BaseAccessor):
         radius_of_influence: float = 1e5,
         combine: bool = False,
     ) -> pd.DataFrame:
-        """Remap data using nearest neighbor interpolation (xregrid or monet-regrid).
+        """Remap data using nearest neighbor interpolation (xregrid).
 
         Parameters
         ----------
@@ -320,8 +320,8 @@ class MONETAccessorPandas(BaseAccessor):
         pandas.DataFrame
             Remapped DataFrame.
         """
-        if not has_xregrid and not has_monet_regrid:
-            raise ImportError("xregrid (with esmpy) or monet-regrid is required for this functionality")
+        if not has_xregrid:
+            raise ImportError("xregrid (with esmpy) is required for this functionality")
 
         from ..util.resample import resample
 

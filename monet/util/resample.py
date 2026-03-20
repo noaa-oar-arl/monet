@@ -18,13 +18,6 @@ except ImportError:
     except ImportError:
         has_xregrid = False
 
-try:
-    import monet_regrid  # noqa: F401
-
-    has_monet_regrid = True
-except ImportError:
-    has_monet_regrid = False
-
 
 def resample(
     source_data: xr.DataArray | xr.Dataset,
@@ -32,7 +25,7 @@ def resample(
     method: str = "nearest",
     **kwargs: t.Any,
 ) -> xr.DataArray | xr.Dataset:
-    """Resample data using xregrid (default) or monet-regrid (fallback).
+    """Resample data using xregrid.
 
     Parameters
     ----------
@@ -74,42 +67,31 @@ def resample(
     if isinstance(target_grid, xr.DataArray):
         target_grid = target_grid.to_dataset()
 
-    if has_xregrid:
-        # xregrid.Regridder detection logic works better with Datasets.
-        # If source_data is a DataArray, we pass a temporary Dataset for detection and application.
-        was_da = isinstance(source_data, xr.DataArray)
-        src_for_regrid = source_data
-        if was_da:
-            da_name = source_data.name or "data"
-            src_for_regrid = source_data.to_dataset(name=da_name)
+    if not has_xregrid:
+        raise ImportError("xregrid (with esmpy) is required for this functionality.")
 
-        # Create regridder and apply
-        regridder = Regridder(src_for_regrid, target_grid, method=real_method, **kwargs)
-        out = regridder(src_for_regrid)
+    # xregrid.Regridder detection logic works better with Datasets.
+    # If source_data is a DataArray, we pass a temporary Dataset for detection and application.
+    was_da = isinstance(source_data, xr.DataArray)
+    src_for_regrid = source_data
+    if was_da:
+        da_name = source_data.name or "data"
+        src_for_regrid = source_data.to_dataset(name=da_name)
 
-        # Convert back to DataArray if necessary
-        if was_da:
-            out = out[da_name]
+    # Create regridder and apply
+    regridder = Regridder(src_for_regrid, target_grid, method=real_method, **kwargs)
+    out = regridder(src_for_regrid)
 
-        # Update history for provenance
-        from .conventions import update_history
+    # Convert back to DataArray if necessary
+    if was_da:
+        out = out[da_name]
 
-        update_history(out, f"Resampled via monet.util.resample (method={real_method})")
+    # Update history for provenance
+    from .conventions import update_history
 
-        return out
-    else:
-        # Fallback to monet-regrid
-        try:
-            import monet_regrid
+    update_history(out, f"Resampled via monet.util.resample (method={real_method})")
 
-            regridder = monet_regrid.Regridder(source_data)
-            if real_method in ["bilinear", "linear"]:
-                return regridder.linear(target_grid, **kwargs)
-            else:
-                # nearest_s2d, nearest_d2s, nearest all map to nearest in monet-regrid
-                return regridder.nearest(target_grid, **kwargs)
-        except ImportError:
-            raise ImportError("Neither xregrid (with esmpy) nor monet-regrid is available.")
+    return out
 
 
 def resample_stratify(

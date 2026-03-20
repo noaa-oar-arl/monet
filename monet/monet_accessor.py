@@ -2,7 +2,6 @@
 
 from .accessors.base import (  # noqa: F401
     BaseAccessor,
-    has_monet_regrid,
     has_xregrid,
     wrap_longitudes,
 )

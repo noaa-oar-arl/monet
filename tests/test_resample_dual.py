@@ -1,14 +1,8 @@
-import sys
-
 import numpy as np
 import pytest
 import xarray as xr
 
-# Remove the MagicMock for monet_regrid if it exists (from conftest.py)
-if "monet_regrid" in sys.modules and hasattr(sys.modules["monet_regrid"], "_mock_methods"):
-    del sys.modules["monet_regrid"]
-
-from monet.accessors.base import has_monet_regrid, has_xregrid
+from monet.accessors.base import has_xregrid
 from monet.util.resample import resample
 
 
@@ -35,7 +29,7 @@ def make_target_grid(nx=5, ny=5):
     return ds
 
 
-@pytest.mark.skipif(not (has_xregrid or has_monet_regrid), reason="No regridding backend available")
+@pytest.mark.skipif(not has_xregrid, reason="xregrid not available")
 def test_resample_eager():
     source = make_test_data(dask=False)
     target = make_target_grid()
@@ -44,18 +38,14 @@ def test_resample_eager():
     out_nearest = resample(source, target, method="nearest")
     assert out_nearest["var1"].shape == (5, 5)
     assert isinstance(out_nearest["var1"].values, np.ndarray)
-    if not has_xregrid and has_monet_regrid:
-        assert "monet_regrid" in out_nearest.attrs.get("history", "")
 
     # Test bilinear
     out_linear = resample(source, target, method="bilinear")
     assert out_linear["var1"].shape == (5, 5)
     assert isinstance(out_linear["var1"].values, np.ndarray)
-    if not has_xregrid and has_monet_regrid:
-        assert "monet_regrid" in out_linear.attrs.get("history", "")
 
 
-@pytest.mark.skipif(not (has_xregrid or has_monet_regrid), reason="No regridding backend available")
+@pytest.mark.skipif(not has_xregrid, reason="xregrid not available")
 def test_resample_lazy():
     source = make_test_data(dask=True)
     target = make_target_grid()
@@ -72,7 +62,7 @@ def test_resample_lazy():
     assert hasattr(out_linear["var1"].data, "chunks")
 
 
-@pytest.mark.skipif(not (has_xregrid or has_monet_regrid), reason="No regridding backend available")
+@pytest.mark.skipif(not has_xregrid, reason="xregrid not available")
 def test_resample_dataarray():
     source = make_test_data(dask=False)["var1"]
     target = make_target_grid()

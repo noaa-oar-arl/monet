@@ -4,7 +4,7 @@ import typing as t
 
 import xarray as xr
 
-from ..util.resample import has_monet_regrid, has_xregrid
+from ..util.resample import has_xregrid
 
 
 def wrap_longitudes(lons):
@@ -1048,7 +1048,7 @@ class BaseAccessor:
         radius_of_influence: float = 1e6,
         **kwargs: t.Any,
     ) -> xr.DataArray | xr.Dataset:
-        """Remap data using xregrid or monet-regrid fallback.
+        """Remap data using xregrid.
         Supports both CF/COARDS and UGRID conventions.
 
         Parameters
@@ -1067,8 +1067,8 @@ class BaseAccessor:
         xarray.DataArray or xarray.Dataset
             Remapped data.
         """
-        if not has_xregrid and not has_monet_regrid:
-            raise ImportError("xregrid (with esmpy) or monet-regrid is required for this functionality")
+        if not has_xregrid:
+            raise ImportError("xregrid (with esmpy) is required for this functionality")
 
         from ..util.resample import resample
 
