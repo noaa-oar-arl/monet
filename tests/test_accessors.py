@@ -8,8 +8,9 @@ import xarray as xr
 from monet.accessors.dataset_accessor import MONETAccessorDataset as DS_Monet
 from monet.accessors.pandas_accessor import MONETAccessorPandas as DF_Monet
 
-# Check if xesmf is available
+# Check if xesmf and esmpy are available
 try:
+    import esmpy  # noqa: F401
     import xesmf  # noqa: F401
 
     has_xesmf = True

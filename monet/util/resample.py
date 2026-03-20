@@ -18,6 +18,13 @@ except ImportError:
     except ImportError:
         has_xregrid = False
 
+try:
+    import monet_regrid  # noqa: F401
+
+    has_monet_regrid = True
+except ImportError:
+    has_monet_regrid = False
+
 
 def resample(
     source_data: xr.DataArray | xr.Dataset,

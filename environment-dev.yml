@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - python>=3.8
+  - python>=3.10
   - cartopy
   - dask
   - matplotlib
@@ -11,17 +11,16 @@ dependencies:
   - netcdf4
   - numpy
   - pandas
+  - pillow>=9.1.0
   - pip
-  - pydecorate
   - seaborn
   - xarray
   - pytest
   - pytest-cov
   - pooch
   - esmpy
-  - mpi4py
+  - scipy
   - pip:
-      - global-land-mask
       - monetio @ git+https://github.com/bbakernoaa/monetio@develop
       - xregrid @ git+https://github.com/bbakernoaa/xregrid
       - pytspack @ git+https://github.com/noaa-oar-arl/pytspack

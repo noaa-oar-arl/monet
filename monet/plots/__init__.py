@@ -1,4 +1,14 @@
 import warnings
+from pathlib import Path
+from typing import Any
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import xarray as xr
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+from PIL import Image
+from scipy.stats import scoreatpercentile as score
 
 # Import taylordiagram module to make it available for documentation
 from . import taylordiagram
@@ -48,19 +58,26 @@ __all__ = (
 # This is the driver for all verify objects
 
 
-def _dynamic_fig_size(obj):
-    """Try to determine a generic figure size based on the shape of obj
+def _dynamic_fig_size(obj: xr.DataArray) -> tuple[float, float]:
+    """Try to determine a generic figure size based on the shape of obj.
 
     Parameters
     ----------
-    obj : A 2D xarray DataArray
-        Description of parameter `obj`.
+    obj : xarray.DataArray
+        A 2D DataArray with spatial dimensions.
 
     Returns
     -------
-    type
-        Description of returned object.
+    tuple
+        A tuple containing (width, height) for the figure size.
 
+    Examples
+    --------
+    >>> import xarray as xr
+    >>> import numpy as np
+    >>> da = xr.DataArray(np.zeros((10, 20)), dims=['lat', 'lon'])
+    >>> _dynamic_fig_size(da)
+    (10, 5.0)
     """
     if "x" in obj.dims:
         nx, ny = len(obj.x), len(obj.y)
@@ -75,7 +92,16 @@ def _dynamic_fig_size(obj):
     return figsize
 
 
-def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwargs):
+def savefig(
+    fname: str,
+    *,
+    fig: Figure | None = None,
+    loc: int = 1,
+    decorate: bool = True,
+    logo: str | None = None,
+    logo_height: float | int | None = None,
+    **kwargs: Any,
+) -> None:
     """Save figure and add logo.
 
     Parameters
@@ -83,6 +109,8 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
     fname : str
         Output file name or path. Passed to ``plt.savefig``.
         Must include desired file extension (``.jpg`` or ``.png``).
+    fig : matplotlib.figure.Figure, optional
+        The figure to save. If None, the current figure (plt.gcf()) is used.
     loc : int
         The location for the logo.
 
@@ -105,66 +133,85 @@ def savefig(fname, *, loc=1, decorate=True, logo=None, logo_height=None, **kwarg
     Returns
     -------
     None
+
+    Notes
+    -----
+    This function replaces the previous ``pydecorate`` implementation with a direct
+    ``Pillow`` implementation for greater flexibility and reduced dependencies.
+
+    Examples
+    --------
+    >>> import matplotlib.pyplot as plt
+    >>> plt.plot([1, 2], [3, 4])
+    >>> savefig("plot.png", loc=1)
     """
-    from pathlib import Path
-
-    import matplotlib.pyplot as plt
-    from PIL import Image
-    from pydecorate import DecoratorAGG
-
     parts = fname.split(".")
     if not len(parts) > 1:
         raise ValueError("`fname` must include a file extension, e.g. '.png'")
     ext = fname.split(".")[-1]
 
     # Save current figure
-    plt.savefig(fname, **kwargs)
+    if fig is None:
+        fig = plt.gcf()
+    fig.savefig(fname, **kwargs)
 
     # Add logo
     if decorate:
         if logo is None:
             logo = Path(__file__).parent / "../data/MONET-logo.png"
-        add_logo_kwargs = {}
-        if logo_height is not None:
-            add_logo_kwargs["height"] = logo_height
         if ext.lower() not in {"png", "jpg", "jpeg"}:
             raise ValueError(f"only PNG and JPEG supported, but detected extension is {ext!r}")
 
         img = Image.open(fname)
-        dc = DecoratorAGG(img)  # cursor starts top-left
+        logo_img = Image.open(logo)
+
+        # Resize logo if requested
+        if logo_height is not None:
+            aspect_ratio = logo_img.width / logo_img.height
+            logo_width = int(logo_height * aspect_ratio)
+            logo_img = logo_img.resize((logo_width, int(logo_height)), Image.Resampling.LANCZOS)
+
+        # Calculate position
+        # 1 -- bottom left (default)
+        # 2 -- bottom right
+        # 3 -- top right
+        # 4 -- top left
         if loc == 1:
-            dc.align_bottom()
+            pos = (0, img.height - logo_img.height)
         elif loc == 2:
-            dc.align_bottom()
-            dc.align_right()
+            pos = (img.width - logo_img.width, img.height - logo_img.height)
         elif loc == 3:
-            dc.align_right()
+            pos = (img.width - logo_img.width, 0)
         elif loc == 4:
-            pass
+            pos = (0, 0)
         else:
             raise ValueError(f"invalid `loc` {loc!r}")
-        dc.add_logo(logo, **add_logo_kwargs)
+
+        # Paste logo (using the logo itself as mask for transparency if it has alpha)
+        mask = logo_img if logo_img.mode in ("RGBA", "LA", "P") else None
+        img.paste(logo_img, pos, mask)
 
         # PIL.Image will determine format from the filename extension
         img.save(fname)
 
         img.close()
+        logo_img.close()
 
 
 def sp_scatter_bias(
-    df,
-    col1=None,
-    col2=None,
-    ax=None,
-    outline=False,
-    tight=True,
-    global_map=True,
-    map_kwargs={},
-    cbar_kwargs={},
-    val_max=None,
-    val_min=None,
-    **kwargs,
-):
+    df: pd.DataFrame,
+    col1: str | None = None,
+    col2: str | None = None,
+    ax: Axes | None = None,
+    outline: bool = False,
+    tight: bool = True,
+    global_map: bool = True,
+    map_kwargs: dict[str, Any] | None = None,
+    cbar_kwargs: dict[str, Any] | None = None,
+    val_max: float | None = None,
+    val_min: float | None = None,
+    **kwargs: Any,
+) -> Axes:
     """Create a spatial scatter plot showing the bias (difference) between two columns in a DataFrame.
 
     Parameters
@@ -204,49 +251,54 @@ def sp_scatter_bias(
     The point size is scaled by the magnitude of the difference between col2 and col1,
     making larger differences more visually prominent. Differences are capped at 300 units
     for display purposes.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({'latitude': [40, 41], 'longitude': [-70, -71], 'obs': [1, 2], 'mod': [1.1, 1.9]})
+    >>> ax = sp_scatter_bias(df, col1='obs', col2='mod')
     """
-    import matplotlib.pyplot as plt
-    from scipy.stats import scoreatpercentile as score
+    if map_kwargs is None:
+        map_kwargs = {}
+    if cbar_kwargs is None:
+        cbar_kwargs = {}
 
     if ax is None:
         ax = draw_map(**map_kwargs)
-    try:
-        if col1 is None or col2 is None:
-            print("User must specify col1 and col2 in the dataframe")
-            raise ValueError
-        else:
-            dfnew = df[["latitude", "longitude", col1, col2]].dropna().copy(deep=True)
-            dfnew["sp_diff"] = dfnew[col2] - dfnew[col1]
-            top = score(dfnew["sp_diff"].abs(), per=95)
-            if val_max is not None:
-                top = val_max
-            # x, y = df.longitude.values, df.latitude.values
-            dfnew["sp_diff_size"] = dfnew["sp_diff"].abs() / top * 100.0
-            dfnew.loc[dfnew["sp_diff_size"] > 300, "sp_diff_size"] = 300.0
-            dfnew.plot.scatter(
-                x="longitude",
-                y="latitude",
-                c=dfnew["sp_diff"],
-                s=dfnew["sp_diff_size"],
-                vmin=-1 * top,
-                vmax=top,
-                ax=ax,
-                colorbar=True,
-                **kwargs,
-            )
-            if not outline:
-                _set_outline_patch_alpha(ax)
-            if global_map:
-                plt.xlim([-180, 180])
-                plt.ylim([-90, 90])
-            if tight:
-                plt.tight_layout(pad=0)
-            return ax
-    except ValueError:
-        exit
+
+    if col1 is None or col2 is None:
+        raise ValueError("User must specify col1 and col2 in the dataframe")
+
+    dfnew = df[["latitude", "longitude", col1, col2]].dropna().copy(deep=True)
+    dfnew["sp_diff"] = dfnew[col2] - dfnew[col1]
+    top = score(dfnew["sp_diff"].abs(), per=95)
+    if val_max is not None:
+        top = val_max
+    # x, y = df.longitude.values, df.latitude.values
+    dfnew["sp_diff_size"] = dfnew["sp_diff"].abs() / top * 100.0
+    dfnew.loc[dfnew["sp_diff_size"] > 300, "sp_diff_size"] = 300.0
+    dfnew.plot.scatter(
+        x="longitude",
+        y="latitude",
+        c=dfnew["sp_diff"],
+        s=dfnew["sp_diff_size"],
+        vmin=-1 * top,
+        vmax=top,
+        ax=ax,
+        colorbar=True,
+        **kwargs,
+    )
+    if not outline:
+        _set_outline_patch_alpha(ax)
+    if global_map:
+        plt.xlim([-180, 180])
+        plt.ylim([-90, 90])
+    if tight:
+        plt.tight_layout(pad=0)
+    return ax
 
 
-def _set_outline_patch_alpha(ax, alpha=0):
+def _set_outline_patch_alpha(ax: Axes, alpha: float = 0.0) -> None:
     """Set the transparency of map outline patches for Cartopy GeoAxes.
 
     This function attempts multiple methods to set the alpha (transparency) of
@@ -259,10 +311,21 @@ def _set_outline_patch_alpha(ax, alpha=0):
     alpha : float, default 0
         Alpha value between 0 (fully transparent) and 1 (fully opaque).
 
+    Returns
+    -------
+    None
+
     Notes
     -----
     The function tries multiple approaches to accommodate different Cartopy versions
     and configurations. If all attempts fail, a warning is issued.
+
+    Examples
+    --------
+    >>> import cartopy.crs as ccrs
+    >>> import matplotlib.pyplot as plt
+    >>> ax = plt.axes(projection=ccrs.PlateCarree())
+    >>> _set_outline_patch_alpha(ax, alpha=0.5)
     """
     for f in [
         lambda alpha: ax.axes.outline_patch.set_alpha(alpha),

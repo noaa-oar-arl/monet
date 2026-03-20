@@ -6,17 +6,23 @@
 - [numpy](https://numpy.org)
 - [pandas](https://pandas.pydata.org)
 - [xarray](https://docs.xarray.dev)
-- [dask](https://docs.dask.org)
 - [netcdf4](https://unidata.github.io/netcdf4-python/)
 - [matplotlib](https://matplotlib.org/)
 - [seaborn](https://seaborn.pydata.org/)
 - [cartopy](https://scitools.org.uk/cartopy/docs/latest/)
 - [pooch](https://github.com/fatiando/pooch)
-- [pydecorate](https://github.com/pytroll/pydecorate)
-- [mpi4py](https://mpi4py.readthedocs.io/)
 - [xregrid](https://github.com/bbakernoaa/xregrid)
 - [monet-stats](https://github.com/noaa-oar-arl/monet-stats)
 - [pytspack](https://github.com/noaa-oar-arl/pytspack)
+- [dask](https://docs.dask.org)
+- [pillow](https://python-pillow.org)
+- [scipy](https://scipy.org)
+
+## Optional Dependencies
+
+Some features require additional dependencies:
+- [geopandas](https://geopandas.org), [rasterio](https://rasterio.readthedocs.io), [shapely](https://shapely.readthedocs.io): For advanced spatial masking (`pip install monet[regions]`)
+- [monetio](https://github.com/noaa-oar-arl/monetio): For reading various model and observation formats (`pip install monet[obs]`)
 
 ## Instructions
 

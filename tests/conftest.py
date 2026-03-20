@@ -1,3 +1,4 @@
+import importlib.machinery
 import sys
 from unittest.mock import MagicMock
 
@@ -9,6 +10,8 @@ def mock_if_missing(module_names):
         except (ImportError, AttributeError, ModuleNotFoundError):
             if name not in sys.modules:
                 m = MagicMock()
+                # Use a real ModuleSpec to avoid xarray/importlib issues
+                m.__spec__ = importlib.machinery.ModuleSpec(name, None)
                 # Ensure mocked packages have __path__ and __version__ where needed
                 if "." in name or name in ["cartopy", "monetio"]:
                     m.__path__ = []
@@ -17,38 +20,14 @@ def mock_if_missing(module_names):
                 sys.modules[name] = m
 
 
+# Only mock truly optional dependencies.
+# Core dependencies like dask, xregrid, monet_stats, pytspack should NOT be mocked
+# so that Aero Protocol compliance and proper test skipping can be verified.
 mock_if_missing(
     [
-        "cartopy",
-        "cartopy.crs",
-        "cartopy.feature",
-        "cartopy.mpl.gridliner",
-        "cartopy.io.shapereader",
-        "cartopy.mpl",
-        "cartopy.mpl.feature_artist",
-        "cartopy.mpl.geoaxes",
-        "cartopy.mpl.ticker",
-        "matplotlib",
-        "matplotlib.pyplot",
-        "matplotlib.colors",
-        "matplotlib.cm",
-        "matplotlib.ticker",
-        "seaborn",
-        "pydecorate",
-        "xregrid",
-        "monet_stats",
-        "pytspack",
-        "mpi4py",
+        "monetio",
+        "geopandas",
+        "rasterio",
+        "shapely",
     ]
 )
-
-# For monet_regrid, keep it as it was or make it conditional
-if "monet_regrid" not in sys.modules:
-    try:
-        # Use find_spec instead of import to avoid unused import warning
-        import importlib.util
-
-        if importlib.util.find_spec("monet_regrid") is None:
-            sys.modules["monet_regrid"] = MagicMock()
-    except Exception:
-        sys.modules["monet_regrid"] = MagicMock()

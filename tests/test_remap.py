@@ -10,16 +10,18 @@ try:
 except ImportError:
     pass
 
-# Check if xesmf is available
+# Check if xesmf and esmpy are available
 try:
+    import esmpy  # noqa: F401
     import xesmf  # noqa: F401
 
     has_xesmf = True
 except ImportError:
     has_xesmf = False
 
-# Check if xregrid is available
+# Check if xregrid and esmpy are available
 try:
+    import esmpy  # noqa: F401
     import xregrid  # noqa: F401
 
     has_xregrid = True

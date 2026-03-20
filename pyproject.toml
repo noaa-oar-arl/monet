@@ -23,20 +23,20 @@ classifiers = [
 ]
 dependencies = [
   "cartopy",
-  "dask",
   "matplotlib",
   "xregrid @ git+https://github.com/bbakernoaa/xregrid",
   "monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats",
   "netCDF4",
   "numpy",
   "pandas",
-  "pydecorate",
   "seaborn",
   "xarray",
   "pooch",
   "requests",
+  "Pillow>=9.1.0",
   "pytspack @ git+https://github.com/noaa-oar-arl/pytspack",
-  "mpi4py",
+  "dask",
+  "scipy",
 ]
 
 [project.optional-dependencies]

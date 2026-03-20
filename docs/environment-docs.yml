@@ -14,14 +14,10 @@ dependencies:
   - netcdf4
   - numpy
   - pandas>=1.0
-  - pydecorate
+  - pillow>=9.1.0
   - seaborn
   - xarray
   - esmpy
-  - mpi4py
-  #
-  # optional
-  - pyresample
   #
   #
   - pip>=21.1

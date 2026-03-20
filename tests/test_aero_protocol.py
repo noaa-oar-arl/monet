@@ -27,12 +27,14 @@ except ImportError:
 
 def test_resample_aero_protocol(monkeypatch):
     # Always mock for consistency in protocol testing
+    import monet.accessors.base
     import monet.util.resample
 
     mock_regridder = MagicMock()
     mock_regridder.side_effect = lambda x: x  # Identity for testing
     monkeypatch.setattr(monet.util.resample, "Regridder", MagicMock(return_value=mock_regridder), raising=False)
     monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
+    monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
 
     """Verify resample follows Aero Protocol: NumPy and Dask consistency."""
     # Create source data
@@ -67,11 +69,13 @@ def test_resample_aero_protocol(monkeypatch):
 
 def test_pair_aero_protocol(monkeypatch):
     # Always mock for consistency in protocol testing
+    import monet.accessors.base
     import monet.util.resample
 
     mock_regridder_cls = MagicMock()
     monkeypatch.setattr(monet.util.resample, "Regridder", mock_regridder_cls, raising=False)
     monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
+    monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
 
     mock_regridder = MagicMock()
     mock_regridder_cls.return_value = mock_regridder
@@ -162,11 +166,13 @@ def test_ugrid_detection():
 
 def test_ugrid_pairing_smoke(monkeypatch):
     # Always mock for consistency in protocol testing
+    import monet.accessors.base
     import monet.util.resample
 
     mock_regridder_cls = MagicMock()
     monkeypatch.setattr(monet.util.resample, "Regridder", mock_regridder_cls, raising=False)
     monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
+    monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
 
     mock_regridder = MagicMock()
     mock_regridder_cls.return_value = mock_regridder

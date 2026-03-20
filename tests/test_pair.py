@@ -16,6 +16,16 @@ except ImportError:
 from monet.util.combinetool import pair
 
 
+@pytest.fixture(autouse=True)
+def mock_regridding_available(monkeypatch):
+    """Ensure regridding backend is seen as available for tests that use mocks."""
+    import monet.accessors.base
+    import monet.util.resample
+
+    monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
+    monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
+
+
 @pytest.fixture
 def sample_model():
     nx, ny = 10, 10

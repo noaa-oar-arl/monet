@@ -4,26 +4,7 @@ import typing as t
 
 import xarray as xr
 
-try:
-    import esmpy  # noqa: F401
-    import xregrid  # noqa: F401
-
-    has_xregrid = True
-except ImportError:
-    try:
-        import ESMF as esmpy  # noqa: F401
-        import xregrid  # noqa: F401
-
-        has_xregrid = True
-    except ImportError:
-        has_xregrid = False
-
-try:
-    import monet_regrid  # noqa: F401
-
-    has_monet_regrid = True
-except ImportError:
-    has_monet_regrid = False
+from ..util.resample import has_monet_regrid, has_xregrid
 
 
 def wrap_longitudes(lons):
@@ -730,19 +711,30 @@ class BaseAccessor:
 
         if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
             # Use apply_ufunc to be backend-agnostic (handles Dask automatically if parallelized=True)
+            # We align inputs and use a template to preserve coordinates and dimensions
             res = xr.apply_ufunc(
                 mask.query,
                 lat,
                 lon,
                 dask="parallelized",
                 output_dtypes=[object],
+                keep_attrs=True,
             )
+
+            # Ensure coordinates are preserved (xr.apply_ufunc with multiple inputs and different dims
+            # might not automatically combine them into the result as we expect here)
             if mask_type == "land":
                 is_type = res == "land"
             else:
                 is_type = res != "land"
 
             is_type.name = f"is_{mask_type}"
+
+            # Re-assign coordinates from the original object to ensure they are preserved
+            # especially for the lazy case where they might have been dropped
+            for coord in self._obj.coords:
+                if set(self._obj.coords[coord].dims).issubset(is_type.dims):
+                    is_type = is_type.assign_coords({coord: self._obj.coords[coord]})
 
             if return_xarray:
                 is_type = self._obj.where(is_type)
