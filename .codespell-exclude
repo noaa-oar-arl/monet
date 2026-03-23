@@ -5,3 +5,12 @@
           <th>CAf</th>
           <td>CAf</td>
 __author__ = "Yannick Copin <yannick.copin@laposte.net>"
+def MAPE(obs, mod, axis=None):
+    mape = np.ma.mean(np.ma.abs(np.ma.masked_invalid(ratio)) * 100, axis=axis)
+    return np.ma.filled(mape, np.nan)[()]
+from monet.util.stats import MAE, MAPE, MSE, SMAPE, scores
+    # First element is undefined for MAPE and should be excluded.
+    out = MAPE(obs, mod)
+    assert np.isclose(MAPE(obs, mod), 50.0)
+@pytest.mark.parametrize("func", [MAE, MSE, MAPE, SMAPE])
+        (MAPE, [0.0, 2.0], [5.0, 1.0], 50.0),

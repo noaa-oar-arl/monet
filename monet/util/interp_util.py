@@ -1,4 +1,4 @@
-""" Interpolation functions """
+"""Interpolation functions"""
 
 
 def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
