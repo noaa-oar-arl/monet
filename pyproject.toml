@@ -25,7 +25,7 @@ dependencies = [
   "cartopy",
   "matplotlib",
   "xregrid @ git+https://github.com/bbakernoaa/xregrid",
-  "monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats",
+  "monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats@dev",
   "netCDF4",
   "numpy",
   "pandas",
