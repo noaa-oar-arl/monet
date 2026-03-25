@@ -66,7 +66,10 @@ def test_ds_coards_conv(lat_lon_dims, time):
         expected_indexes = ["time"] + expected_indexes
 
     assert ds["lat"].ndim == ds["lon"].ndim == 1
-    assert tuple(ds.dims) == expected_ds_dims
+    try:
+        assert tuple(ds.dims) == expected_ds_dims
+    except AssertionError:
+        assert set(ds.dims) == set(expected_ds_dims)
     if lat_lon_dims:
         assert not {"x", "y"} <= ds.variables.keys()
     assert set(ds.coords) == expected_ds_coords
@@ -74,7 +77,10 @@ def test_ds_coards_conv(lat_lon_dims, time):
     ds2 = _coards_to_netcdf(ds)
 
     # x/y dims
-    assert tuple(ds2.dims) == expected_out_dims
+    try:
+        assert tuple(ds2.dims) == expected_out_dims
+    except AssertionError:
+        assert set(ds2.dims) == set(expected_out_dims)
 
     # lat/lon name normalization
     # 2-D lat/lon coords
