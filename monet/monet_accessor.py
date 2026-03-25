@@ -207,14 +207,14 @@ def _coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
     return dset
 
 
-def _dataarray_coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
+def _dataarray_coards_to_netcdf(da, lat_name="lat", lon_name="lon"):
     """Convert 1-D lat/lon coords to x/y convention, with
     lat/lon as 2-D variables with (y, x) dimensions,
     returning a new xarray object.
 
     Parameters
     ----------
-    dset : xarray.DataArray
+    da : xarray.DataArray
     lat_name : str
         Name of the latitude array.
     lon_name : str
@@ -222,17 +222,20 @@ def _dataarray_coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
     """
     from numpy import arange, meshgrid
 
-    lon = dset[lon_name]
-    lat = dset[lat_name]
+    lon = da[lon_name]
+    lat = da[lat_name]
     lons, lats = meshgrid(lon, lat)
     x = arange(len(lon))
     y = arange(len(lat))
-    dset = dset.rename({lon_name: "x", lat_name: "y"})
-    dset.coords["latitude"] = (("y", "x"), lats)
-    dset.coords["longitude"] = (("y", "x"), lons)
-    dset["x"] = x
-    dset["y"] = y
-    return dset
+    for name, dim in {lon_name: "x", lat_name: "y"}.items():
+        if name in da.dims:
+            da = da.swap_dims({name: dim})
+    da = da.drop_vars([lon_name, lat_name])
+    da.coords["latitude"] = (("y", "x"), lats)
+    da.coords["longitude"] = (("y", "x"), lons)
+    da["x"] = x
+    da["y"] = y
+    return da
 
 
 @pd.api.extensions.register_dataframe_accessor("monet")
