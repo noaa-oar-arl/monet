@@ -195,7 +195,10 @@ def _coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
     lons, lats = meshgrid(lon, lat)
     x = arange(len(lon))
     y = arange(len(lat))
-    dset = dset.rename({lon_name: "x", lat_name: "y"})
+    for name, dim in {lon_name: "x", lat_name: "y"}.items():
+        if name in dset.dims:
+            dset = dset.swap_dims({name: dim})
+    dset = dset.drop_vars([lon_name, lat_name])
     dset.coords["longitude"] = (("y", "x"), lons)
     dset.coords["latitude"] = (("y", "x"), lats)
     dset["x"] = x
