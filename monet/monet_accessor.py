@@ -188,21 +188,19 @@ def _coards_to_netcdf(dset, lat_name="lat", lon_name="lon"):
     lon_name : str
         Name of the longitude array.
     """
-    from numpy import arange, meshgrid
+    from numpy import meshgrid
 
     lon = dset[lon_name]
     lat = dset[lat_name]
     lons, lats = meshgrid(lon, lat)
-    x = arange(len(lon))
-    y = arange(len(lat))
     for name, dim in {lon_name: "x", lat_name: "y"}.items():
         if name in dset.dims:
             dset = dset.swap_dims({name: dim})
     dset = dset.drop_vars([lon_name, lat_name])
     dset.coords["longitude"] = (("y", "x"), lons)
     dset.coords["latitude"] = (("y", "x"), lats)
-    dset["x"] = x
-    dset["y"] = y
+    dset["x"] = pd.RangeIndex(len(lon))
+    dset["y"] = pd.RangeIndex(len(lat))
     dset = dset.set_coords(["latitude", "longitude"])
     return dset
 
@@ -220,21 +218,19 @@ def _dataarray_coards_to_netcdf(da, lat_name="lat", lon_name="lon"):
     lon_name : str
         Name of the longitude array.
     """
-    from numpy import arange, meshgrid
+    from numpy import meshgrid
 
     lon = da[lon_name]
     lat = da[lat_name]
     lons, lats = meshgrid(lon, lat)
-    x = arange(len(lon))
-    y = arange(len(lat))
     for name, dim in {lon_name: "x", lat_name: "y"}.items():
         if name in da.dims:
             da = da.swap_dims({name: dim})
     da = da.drop_vars([lon_name, lat_name])
     da.coords["latitude"] = (("y", "x"), lats)
     da.coords["longitude"] = (("y", "x"), lons)
-    da["x"] = x
-    da["y"] = y
+    da["x"] = pd.RangeIndex(len(lon))
+    da["y"] = pd.RangeIndex(len(lat))
     return da
 
 

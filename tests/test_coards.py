@@ -77,9 +77,6 @@ def test_ds_coards_conv(lat_lon_dims, time):
     assert tuple(ds2.dims) == expected_out_dims
 
     # lat/lon name normalization
-    assert {"latitude", "longitude"} <= ds2.variables.keys()
-    assert set(ds2.coords) == expected_out_coords
-
     # 2-D lat/lon coords
     assert ds2["latitude"].ndim == ds2["longitude"].ndim == 2
     assert set(ds2.coords) == expected_out_coords
@@ -112,6 +109,7 @@ def test_ds_coards_conv(lat_lon_dims, time):
 def test_da_coards_conv(lat_lon_dims, time):
     da = make_ds(lat_lon_dims=lat_lon_dims, time=time)["data"]
     da2 = _dataarray_coards_to_netcdf(da)
+    assert isinstance(da2, xr.DataArray)
 
     expected_dims = ("y", "x")
     expected_coords = {"latitude", "longitude", "x", "y"}
@@ -125,8 +123,6 @@ def test_da_coards_conv(lat_lon_dims, time):
     assert da2.dims == expected_dims
 
     # lat/lon name normalization
-    assert {"latitude", "longitude"} <= da2.coords.keys()
-
     # 2-D lat/lon coords
     assert set(da2.coords) == expected_coords
     assert da2["latitude"].ndim == da2["longitude"].ndim == 2
