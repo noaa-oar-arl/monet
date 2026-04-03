@@ -34,9 +34,9 @@ copyright = "2018, Barry Baker"
 author = "Barry Baker"
 
 # The short X.Y version
-version = "2.3.0"
+version = "2.3.1"
 # The full version, including alpha/beta/rc tags
-release = "2.3.0"
+release = "2.3.1"
 
 # -- General configuration ---------------------------------------------------
 
@@ -228,12 +228,10 @@ if not os.path.exists("_templates/autosummary"):
 
 # Create custom template for functions
 with open("_templates/autosummary/accessor_function.rst", "w") as f:
-    f.write(
-        """{{ fullname | escape | underline}}
+    f.write("""{{ fullname | escape | underline}}
 
 .. currentmodule:: {{ module }}
 
 .. autofunction:: {{ objname }}
    :no-index:
-"""
-    )
+""")

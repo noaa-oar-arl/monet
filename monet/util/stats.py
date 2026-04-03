@@ -1753,6 +1753,109 @@ def ETS(obs, mod, minval, maxval):
     return ets
 
 
+def MAE(obs, mod, axis=None):
+    """Mean absolute error.
+
+    Parameters
+    ----------
+    obs : array_like
+        Observed values.
+    mod : array_like
+        Modeled values.
+    axis : int, optional
+        Axis along which to compute. Default is None (all axes).
+
+    Returns
+    -------
+    float or numpy.ndarray
+        Mean absolute error value(s), in the same units as ``obs`` and ``mod``.
+    """
+    obs = np.asanyarray(obs)
+    mod = np.asanyarray(mod)
+    mae = np.ma.mean(np.ma.abs(np.ma.masked_invalid(obs - mod)), axis=axis)
+    return np.ma.filled(mae, np.nan)[()]
+
+
+def MSE(obs, mod, axis=None):
+    """Mean squared error.
+
+    Parameters
+    ----------
+    obs : array_like
+        Observed values.
+    mod : array_like
+        Modeled values.
+    axis : int, optional
+        Axis along which to compute. Default is None (all axes).
+
+    Returns
+    -------
+    float or numpy.ndarray
+        Mean squared error value(s), in squared units of ``obs`` and ``mod``.
+    """
+    obs = np.asanyarray(obs)
+    mod = np.asanyarray(mod)
+    return np.ma.filled(np.ma.mean(np.ma.masked_invalid((obs - mod) ** 2), axis=axis), np.nan)[()]
+
+
+def MAPE(obs, mod, axis=None):
+    """Mean absolute percentage error.
+
+    Parameters
+    ----------
+    obs : array_like
+        Observed values.
+    mod : array_like
+        Modeled values.
+    axis : int, optional
+        Axis along which to compute. Default is None (all axes).
+
+    Returns
+    -------
+    float or numpy.ndarray
+        Mean absolute percentage error value(s), expressed as percent.
+
+    Notes
+    -----
+    Elements where ``obs == 0`` are masked and excluded from the mean.
+    """
+    obs = np.asanyarray(obs)
+    mod = np.asanyarray(mod)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        # Ignore intentional division by zero (will be masked)
+        ratio = np.ma.masked_where(obs == 0, (obs - mod) / obs)
+    mape = np.ma.mean(np.ma.abs(np.ma.masked_invalid(ratio)) * 100, axis=axis)
+    return np.ma.filled(mape, np.nan)[()]
+
+
+def SMAPE(obs, mod, axis=None):
+    """Symmetric mean absolute percentage error.
+
+    Parameters
+    ----------
+    obs : array_like
+        Observed values.
+    mod : array_like
+        Modeled values.
+    axis : int, optional
+        Axis along which to compute. Default is None (all axes).
+
+    Returns
+    -------
+    float or numpy.ndarray
+        Symmetric mean absolute percentage error value(s), expressed as percent.
+
+    Notes
+    -----
+    Elements where ``abs(obs)`` and ``abs(mod)`` are both zero are masked and excluded from the mean.
+    """
+    obs = np.asanyarray(obs)
+    mod = np.asanyarray(mod)
+    denom = np.ma.abs(obs) + np.ma.abs(mod)
+    frac = np.ma.masked_where(denom == 0, 2 * np.ma.abs(obs - mod) / denom)
+    return np.ma.filled(np.ma.mean(np.ma.masked_invalid(frac) * 100, axis=axis), np.nan)[()]
+
+
 def CSI(obs, mod, minval, maxval):
     """Critical Success Index (1 is perfect - Range 0 -> 1)
 
