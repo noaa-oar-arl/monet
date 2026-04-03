@@ -228,12 +228,10 @@ if not os.path.exists("_templates/autosummary"):
 
 # Create custom template for functions
 with open("_templates/autosummary/accessor_function.rst", "w") as f:
-    f.write(
-        """{{ fullname | escape | underline}}
+    f.write("""{{ fullname | escape | underline}}
 
 .. currentmodule:: {{ module }}
 
 .. autofunction:: {{ objname }}
    :no-index:
-"""
-    )
+""")

@@ -762,9 +762,9 @@ class MONETAccessor:
                 raise ImportError
         except ImportError:
             print(
-                """If this is a rectilinear grid and you don't have pyresample
-                  please add the rectilinear=True to the call.  Otherwise the window
-                  functionality is unavailable without pyresample"""
+                "If this is a rectilinear grid and you don't have pyresample "
+                "please add the rectilinear=True to the call. "
+                "Otherwise the window functionality is unavailable without pyresample."
             )
 
     def interp_constant_lat(self, lat=None, lat_name="latitude", lon_name="longitude", **kwargs):
