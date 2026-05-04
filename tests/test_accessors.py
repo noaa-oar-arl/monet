@@ -132,6 +132,7 @@ def test_dataarray_accessor_basic(sample_dataarray):
     # Test interpolate_vertical (mock vertical)
     try:
         import pytspack  # noqa: F401
+
         da_v = sample_dataarray.assign_coords(latitude=sample_dataarray.latitude)
         strat = da_v.monet.interpolate_vertical(np.linspace(-10, 10, 3), level_dim="latitude")
         assert isinstance(strat, xr.DataArray)
@@ -231,6 +232,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
     # Test interpolate_vertical (mock vertical)
     try:
         import pytspack  # noqa: F401
+
         strat = sample_dataarray_dask.monet.interpolate_vertical(np.linspace(-10, 10, 3), level_dim="latitude")
         assert isinstance(strat, xr.DataArray)
     except Exception:
@@ -307,6 +309,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
     # Test interpolate_vertical (mock vertical)
     try:
         import pytspack  # noqa: F401
+
         strat = sample_dataarray_dask.monet.interpolate_vertical(np.linspace(-10, 10, 3), level_dim="latitude")
         assert isinstance(strat, xr.DataArray)
     except Exception:

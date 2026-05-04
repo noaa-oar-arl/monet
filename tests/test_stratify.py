@@ -119,4 +119,3 @@ def test_resample_stratify_deprecated(model):
     with pytest.warns(DeprecationWarning, match="pytspack.interpolate_vertical"):
         result = resample_stratify(da, target_levels, "z", axis=0)
     assert result.z.size == 10
-

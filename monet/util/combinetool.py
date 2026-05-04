@@ -268,6 +268,7 @@ def combine_da_to_df(
     df: pd.DataFrame,
     *,
     merge: bool = True,
+    suffix: str | None = None,
     **kwargs: t.Any,
 ) -> pd.DataFrame:
     """Combine xarray data with point observations in a dataframe.
@@ -282,6 +283,8 @@ def combine_da_to_df(
         Point observations.
     merge : bool, default True
         Whether to merge with original DataFrame.
+    suffix : str, optional
+        Suffix to add to variable names.
     **kwargs : dict
         Passed to `pair`.
 
@@ -290,6 +293,8 @@ def combine_da_to_df(
     pandas.DataFrame
         Combined DataFrame.
     """
+    if suffix is not None:
+        kwargs["suffix"] = suffix
     return pair(da, df, merge=merge, **kwargs)  # type: ignore
 
 
@@ -387,39 +392,6 @@ def _rename_latlon(ds: xr.Dataset) -> xr.Dataset:
         return ds.rename({"lat": "latitude", "lon": "longitude"})
     else:
         return ds
-
-
-def combine_da_to_df(
-    da: xr.DataArray | xr.Dataset,
-    df: pd.DataFrame,
-    *,
-    suffix: str | None = None,
-    **kwargs: t.Any,
-) -> pd.DataFrame:
-    """Combine xarray data array `da` with spatial information
-    point observations in dataframe `df`, returning a new dataframe.
-
-    Note: This is a backward compatibility wrapper for `monet.pair`.
-
-    Parameters
-    ----------
-    da : xarray.DataArray or xarray.Dataset
-        Data to be interpolated to target grid points.
-    df : pandas.DataFrame
-        DataFrame containing point observations.
-    suffix : str, optional
-        Suffix to add to the variable names.
-    **kwargs : dict
-        Additional keyword arguments for regridding.
-
-    Returns
-    -------
-    pandas.DataFrame
-        DataFrame with combined model and observation data.
-    """
-    if suffix is None:
-        suffix = "_model"
-    return pair(da, df, suffix=suffix, **kwargs)  # type: ignore
 
 
 def combine_da_to_df_strat(

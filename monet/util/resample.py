@@ -141,4 +141,3 @@ def resample_stratify(
         levels = levels.values
 
     return interpolate_vertical(da, np.asarray(levels), level_dim=level_dim, tension=tension)
-
