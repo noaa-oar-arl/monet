@@ -25,7 +25,7 @@ dependencies = [
   "cartopy",
   "matplotlib",
   "xregrid @ git+https://github.com/bbakernoaa/xregrid",
-  "monet-stats @ git+https://github.com/bbakernoaa/monet-stats@dev",
+  "monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats",
   "netCDF4",
   "numpy",
   "pandas",
@@ -51,9 +51,8 @@ regions = [
     "rasterio",
     "shapely",
 ]
-obs = [
-    "monetio @ git+https://github.com/bbakernoaa/monetio@develop",
-]
+obs = []
+
 
 [tool.setuptools]
 include-package-data = true
