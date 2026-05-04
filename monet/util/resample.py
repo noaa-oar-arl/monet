@@ -64,7 +64,11 @@ def resample(
         target_grid = target_grid.to_dataset()
 
     if not has_xregrid:
-        raise ImportError("xregrid (with esmpy) is required for this functionality.")
+        raise ImportError(
+            "xregrid (with esmpy/ESMF) is required for regridding. "
+            "Install it with: pip install xregrid\n"
+            "  or: conda install -c conda-forge esmpy xregrid"
+        )
 
     # xregrid.Regridder detection logic works better with Datasets.
     # If source_data is a DataArray, we pass a temporary Dataset for detection and application.

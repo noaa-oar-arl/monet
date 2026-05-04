@@ -110,6 +110,26 @@ def calc_fv3_height(
     (index 0 is the top of the atmosphere, last index is the surface).
     It is backend-agnostic and supports both NumPy and Dask-backed xarray objects.
     """
+    # --- Validate vertical ordering ----------------------------------------
+    # phalf pressure should *decrease* from index 0 (TOA) to last (surface)
+    # when ordered top-to-bottom.  Check the first slice to detect a
+    # bottom-up array and raise early rather than produce a wrong result.
+    if isinstance(phalf, xr.DataArray):
+        _p_check = phalf.isel({dim: slice(None, 2)}).values
+    else:
+        _p_check = np.asarray(phalf).flat[:2] if np.asarray(phalf).ndim >= 1 else None
+    if _p_check is not None and len(_p_check) >= 2:
+        # Flatten to 1-D for the comparison (handles multi-dim arrays)
+        _p_flat = np.asarray(_p_check).ravel()
+        if _p_flat[0] < _p_flat[1]:
+            raise ValueError(
+                "calc_fv3_height expects phalf ordered top-to-bottom "
+                "(pressure *decreasing* from index 0 toward the surface). "
+                "Received an array where phalf[0] < phalf[1], which indicates "
+                "bottom-up ordering. Reverse the vertical dimension before "
+                "calling this function (e.g. phalf = phalf.isel(z=slice(None, None, -1)))."
+            )
+    # -----------------------------------------------------------------------
     if not isinstance(temp, xr.DataArray):
         temp = xr.DataArray(temp, dims=[dim] + [f"__dim_{i}" for i in range(temp.ndim - 1)])
     if not isinstance(phalf, xr.DataArray):

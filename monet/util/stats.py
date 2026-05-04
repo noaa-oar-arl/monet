@@ -6,24 +6,33 @@ The actual statistical functions are now provided by the monet-stats package.
 """
 
 try:
-    # Import all functions from monet_stats for backward compatibility
-    import monet_stats
+    import monet_stats as _monet_stats
 
-    # Re-export all public functions
-    from monet_stats import *  # noqa: F403
+    # Build an explicit public API instead of using star-import so that
+    # IDEs and documentation tools can introspect available symbols.
+    __all__ = [name for name in dir(_monet_stats) if not name.startswith("_")]
 
-    # Keep the original stats function if it exists
-    if hasattr(monet_stats, "stats"):
-        stats = monet_stats.stats
+    # Populate this module's namespace from monet_stats
+    import sys as _sys
+
+    _this = _sys.modules[__name__]
+    for _name in __all__:
+        setattr(_this, _name, getattr(_monet_stats, _name))
+
+    # Convenience alias kept for backward compatibility
+    if hasattr(_monet_stats, "stats"):
+        stats = _monet_stats.stats
 
 except ImportError:
     import warnings
 
     warnings.warn(
-        "monet_stats package is not installed. Please install it with 'pip install monet-stats' to use statistical functions.",
+        "monet_stats package is not installed. " "Install it with: pip install monet-stats",
         ImportWarning,
+        stacklevel=2,
     )
 
-    # Define a placeholder function
+    __all__ = ["stats"]
+
     def stats(*args, **kwargs):
-        raise ImportError("monet_stats package is required for statistical functions. Install with 'pip install monet-stats'")
+        raise ImportError("monet_stats package is required for statistical functions. " "Install with: pip install monet-stats")

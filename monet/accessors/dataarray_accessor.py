@@ -229,22 +229,40 @@ class MONETAccessor(BaseAccessor):
             if stat.lower() == "diff":
                 stat_da = da1 - da2
             else:
-                # Try to get the function from monet_stats
-                try:
-                    import monet_stats
+                # Detect Dask-backed inputs — prefer lazy built-in implementations
+                # when possible so the graph is never materialised prematurely.
+                _is_dask = hasattr(da1.data, "chunks")
+                _stat_lower = stat.lower()
+                _lazy_stats = {"rmse", "mae", "mse"}
 
-                    func = getattr(monet_stats, stat)
-                    stat_da = func(da1, da2, **stat_kwargs)
-                except (ImportError, AttributeError) as e:
-                    # fallback to built-in (Dask-safe)
-                    if stat.lower() == "rmse":
-                        stat_da = np.sqrt(((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None)))
-                    elif stat.lower() == "mae":
-                        stat_da = np.abs(da1 - da2).mean(dim=stat_kwargs.get("dim", None))
-                    elif stat.lower() == "mse":
+                if _is_dask and _stat_lower in _lazy_stats:
+                    # Always use the lazy path for Dask inputs
+                    if _stat_lower == "rmse":
+                        stat_da = (((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None))) ** 0.5
+                    elif _stat_lower == "mae":
+                        stat_da = (da1 - da2).pipe(abs).mean(dim=stat_kwargs.get("dim", None))
+                    elif _stat_lower == "mse":
                         stat_da = ((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None))
-                    else:
-                        raise ValueError(f"Unknown stat: {stat}") from e
+                else:
+                    # Try monet_stats with case-insensitive lookup (uppercase
+                    # variants like RMSE are lazy; lowercase are not).
+                    try:
+                        import monet_stats
+
+                        # Prefer uppercase variant if available (lazy)
+                        func = getattr(monet_stats, stat.upper(), None) or getattr(monet_stats, stat, None)
+                        if func is None:
+                            raise AttributeError(stat)
+                        stat_da = func(da1, da2, **stat_kwargs)
+                    except (ImportError, AttributeError) as e:
+                        if _stat_lower == "rmse":
+                            stat_da = (((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None))) ** 0.5
+                        elif _stat_lower == "mae":
+                            stat_da = (da1 - da2).pipe(abs).mean(dim=stat_kwargs.get("dim", None))
+                        elif _stat_lower == "mse":
+                            stat_da = ((da1 - da2) ** 2).mean(dim=stat_kwargs.get("dim", None))
+                        else:
+                            raise ValueError(f"Unknown stat: {stat}") from e
         else:
             raise ValueError(f"Unknown stat: {stat}")
 

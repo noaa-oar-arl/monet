@@ -55,39 +55,50 @@ LON_NAMES = [
 class BaseAccessor:
     """Base class for MONET accessors with common utility methods."""
 
+    # Cached coordinate detection results — keyed by object id so that
+    # replacing the underlying object (rare) doesn't silently return stale data.
+    _lat_cache: dict = {}
+    _lon_cache: dict = {}
+
     @property
     def lat(self) -> t.Any:
         """Detected latitude coordinate or variable.
         Uses convention-aware detection without renaming.
-        Supports Xarray and Pandas.
+        Supports Xarray and Pandas. Result is cached after the first lookup.
         """
-        if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-            from ..util.conventions import find_coords
+        key = id(self._obj)
+        if key not in BaseAccessor._lat_cache:
+            if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
+                from ..util.conventions import find_coords
 
-            return find_coords(self._obj, "latitude")
-        elif hasattr(self._obj, "columns"):  # Pandas
-            lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
-            lat_col = next((c for c in lat_names if c in self._obj.columns), None)
-            if lat_col:
-                return self._obj[lat_col]
-        return None
+                BaseAccessor._lat_cache[key] = find_coords(self._obj, "latitude")
+            elif hasattr(self._obj, "columns"):  # Pandas
+                lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+                lat_col = next((c for c in lat_names if c in self._obj.columns), None)
+                BaseAccessor._lat_cache[key] = self._obj[lat_col] if lat_col else None
+            else:
+                BaseAccessor._lat_cache[key] = None
+        return BaseAccessor._lat_cache[key]
 
     @property
     def lon(self) -> t.Any:
         """Detected longitude coordinate or variable.
         Uses convention-aware detection without renaming.
-        Supports Xarray and Pandas.
+        Supports Xarray and Pandas. Result is cached after the first lookup.
         """
-        if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-            from ..util.conventions import find_coords
+        key = id(self._obj)
+        if key not in BaseAccessor._lon_cache:
+            if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
+                from ..util.conventions import find_coords
 
-            return find_coords(self._obj, "longitude")
-        elif hasattr(self._obj, "columns"):  # Pandas
-            lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
-            lon_col = next((c for c in lon_names if c in self._obj.columns), None)
-            if lon_col:
-                return self._obj[lon_col]
-        return None
+                BaseAccessor._lon_cache[key] = find_coords(self._obj, "longitude")
+            elif hasattr(self._obj, "columns"):  # Pandas
+                lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+                lon_col = next((c for c in lon_names if c in self._obj.columns), None)
+                BaseAccessor._lon_cache[key] = self._obj[lon_col] if lon_col else None
+            else:
+                BaseAccessor._lon_cache[key] = None
+        return BaseAccessor._lon_cache[key]
 
     @staticmethod
     def safe_import(module_name, error_msg=None):
@@ -466,10 +477,12 @@ class BaseAccessor:
         result = dset.rename({lon_dim: "x", lat_dim: "y"})
 
         # Add 2D latitude/longitude arrays and 1D coords
+        # Assign y before x so the index order is [y, x] (lat before lon)
         result.coords["longitude"] = lons.rename({lon_dim: "x", lat_dim: "y"})
         result.coords["latitude"] = lats.rename({lon_dim: "x", lat_dim: "y"})
-        result["x"] = x
-        result["y"] = y
+        # Use assign_coords (not item assignment) so xarray preserves the
+        # original dimension order in Dataset.indexes (time, y, x).
+        result = result.assign_coords({"y": ("y", y), "x": ("x", x)})
 
         # Set as coordinates
         result = result.set_coords(["latitude", "longitude"])
@@ -479,6 +492,13 @@ class BaseAccessor:
             result = result.sel(y=slice(None, None, -1))
         if lon_decreasing:
             result = result.sel(x=slice(None, None, -1))
+
+        # Drop the original 1D coords if they were kept under the old name
+        # (happens when lat_dim != lat_name, e.g. lat is a non-dim coord on dim 'y')
+        if lat_name != "latitude" and lat_name in result.coords:
+            result = result.drop_vars(lat_name)
+        if lon_name != "longitude" and lon_name in result.coords:
+            result = result.drop_vars(lon_name)
 
         update_history(result, f"Converted 1D {lat_name}/{lon_name} to 2D latitude/longitude (Lazy).")
 
@@ -547,16 +567,24 @@ class BaseAccessor:
         result = dset.rename({lon_dim: "x", lat_dim: "y"})
 
         # Add 2D latitude/longitude arrays and 1D coords
+        # Assign y before x so the index order is [y, x] (lat before lon)
         result.coords["latitude"] = lats.rename({lon_dim: "x", lat_dim: "y"})
         result.coords["longitude"] = lons.rename({lon_dim: "x", lat_dim: "y"})
-        result["x"] = x
-        result["y"] = y
+        # Use assign_coords (not item assignment) so xarray preserves the
+        # original dimension order in DataArray.indexes (time, y, x).
+        result = result.assign_coords({"y": ("y", y), "x": ("x", x)})
 
         # If coordinates were reversed, make sure data is properly oriented
         if lat_decreasing:
             result = result.sel(y=slice(None, None, -1))
         if lon_decreasing:
             result = result.sel(x=slice(None, None, -1))
+
+        # Drop the original 1D coords if they were kept under the old name
+        if lat_name != "latitude" and lat_name in result.coords:
+            result = result.drop_vars(lat_name)
+        if lon_name != "longitude" and lon_name in result.coords:
+            result = result.drop_vars(lon_name)
 
         update_history(result, f"Converted 1D {lat_name}/{lon_name} to 2D latitude/longitude (Lazy).")
 

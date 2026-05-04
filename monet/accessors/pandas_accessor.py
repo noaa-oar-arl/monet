@@ -47,7 +47,8 @@ class MONETAccessorPandas(BaseAccessor):
         has_lon = any(name in obj.columns for name in lon_names)
 
         if not (has_lat and has_lon):
-            raise AttributeError("Must have latitude and longitude columns.")
+            searched = f"latitude cols tried: {lat_names}; longitude cols tried: {lon_names}"
+            raise AttributeError(f"Must have latitude and longitude columns. {searched}. " f"Found columns: {list(obj.columns)}")
 
     @property
     def center(self) -> tuple[float, float]:
@@ -124,45 +125,51 @@ class MONETAccessorPandas(BaseAccessor):
             DataFrame formatted for MET ASCII2NC.
         """
         df = self._obj
-        df["ascii2nc_time"] = df.time.dt.strftime("%Y%m%d_%H%M%S")
-        df["ascii2nc_gribcode"] = int(grib_code)
+        # Work on a local dict to avoid mutating the caller's DataFrame
+        data: dict = {}
+        data["ascii2nc_time"] = df.time.dt.strftime("%Y%m%d_%H%M%S")
+        data["ascii2nc_gribcode"] = int(grib_code)
         if isinstance(height_msl, str):
-            df["ascii2nc_elevation"] = df[height_msl]
+            data["ascii2nc_elevation"] = df[height_msl]
         else:
-            df["ascii2nc_elevation"] = height_msl
-        df["ascii2nc_message"] = message_type
+            data["ascii2nc_elevation"] = height_msl
+        data["ascii2nc_message"] = message_type
         if isinstance(pressure, str):
-            df["ascii2nc_pressure"] = df[pressure]
+            data["ascii2nc_pressure"] = df[pressure]
         else:
-            df["ascii2nc_pressure"] = pressure
-        df["ascii2nc_value"] = df[column]
+            data["ascii2nc_pressure"] = pressure
+        data["ascii2nc_value"] = df[column]
         if qc is None:
-            df["ascii2nc_qc"] = "0"
-            df.loc[df["ascii2nc_value"].isnull(), "ascii2nc_qc"] = "1"
+            qc_series = pd.Series("0", index=df.index)
+            qc_series[data["ascii2nc_value"].isnull()] = "1"
+            data["ascii2nc_qc"] = qc_series
         else:
-            df["ascii2nc_qc"] = "0"
+            data["ascii2nc_qc"] = "0"
+        elevation = data["ascii2nc_elevation"]
         if height_agl is None:
-            df["ascii2nc_height_agl"] = df["ascii2nc_elevation"]
+            data["ascii2nc_height_agl"] = elevation
         elif isinstance(height_agl, str):
-            df["ascii2nc_height_agl"] = df[height_agl]
+            data["ascii2nc_height_agl"] = df[height_agl]
         else:
-            df["ascii2nc_height_agl"] = height_agl
+            data["ascii2nc_height_agl"] = height_agl
         lat_col, lon_col = self._get_latlon_cols()
-        out = df[
-            [
-                "ascii2nc_message",
-                "siteid",
-                "ascii2nc_time",
-                lat_col,
-                lon_col,
-                "ascii2nc_elevation",
-                "ascii2nc_gribcode",
-                "ascii2nc_pressure",
-                "ascii2nc_height_agl",
-                "ascii2nc_qc",
-                "ascii2nc_value",
-            ]
-        ]
+        # Build the output DataFrame from the local data dict + needed original columns
+        out = pd.DataFrame(
+            {
+                "ascii2nc_message": data["ascii2nc_message"],
+                "siteid": df["siteid"],
+                "ascii2nc_time": data["ascii2nc_time"],
+                lat_col: df[lat_col],
+                lon_col: df[lon_col],
+                "ascii2nc_elevation": data["ascii2nc_elevation"],
+                "ascii2nc_gribcode": data["ascii2nc_gribcode"],
+                "ascii2nc_pressure": data["ascii2nc_pressure"],
+                "ascii2nc_height_agl": data["ascii2nc_height_agl"],
+                "ascii2nc_qc": data["ascii2nc_qc"],
+                "ascii2nc_value": data["ascii2nc_value"],
+            },
+            index=df.index,
+        )
         out = out.rename(
             dict(
                 ascii2nc_message="typ",

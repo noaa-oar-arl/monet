@@ -208,7 +208,7 @@ def _pair_dataframe(
         if pd.api.types.is_string_dtype(paired_da_ds[var]) and not pd.api.types.is_numeric_dtype(paired_da_ds[var]):
             paired_da_ds[var] = paired_da_ds[var].astype(object)
 
-    if paired_da.chunks:
+    if paired_da.chunks and has_dask_df:
         paired_df = paired_da_ds.to_dask_dataframe().reset_index()
     else:
         paired_df = paired_da_ds.to_dataframe().reset_index()

@@ -57,13 +57,13 @@ def test_ds_coards_conv(lat_lon_dims, time):
     expected_ds_coords = {"lat", "lon"}
     expected_out_dims = ("y", "x")
     expected_out_coords = {"latitude", "longitude", "x", "y"}
-    expected_indexes = ["x", "y"]
+    expected_indexes = ["y", "x"]
     if time:
         expected_ds_dims = ("time",) + expected_ds_dims
         expected_ds_coords = {"time"} | expected_ds_coords
         expected_out_dims = ("time",) + expected_out_dims
         expected_out_coords = {"time"} | expected_out_coords
-        expected_indexes = ["time"] + expected_indexes
+        expected_indexes = ["time", "y", "x"]
 
     assert ds["lat"].ndim == ds["lon"].ndim == 1
     try:
@@ -119,11 +119,11 @@ def test_da_coards_conv(lat_lon_dims, time):
 
     expected_dims = ("y", "x")
     expected_coords = {"latitude", "longitude", "x", "y"}
-    expected_indexes = ["x", "y"]
+    expected_indexes = ["y", "x"]
     if time:
         expected_dims = ("time",) + expected_dims
         expected_coords = {"time"} | expected_coords
-        expected_indexes = ["time"] + expected_indexes
+        expected_indexes = ["time", "y", "x"]
 
     # x/y dims
     assert da2.dims == expected_dims
