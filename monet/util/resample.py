@@ -92,80 +92,53 @@ def resample(
 
 def resample_stratify(
     da: xr.DataArray,
-    levels: t.Sequence[float],
-    vertical: xr.DataArray | str | t.Sequence[float],
+    levels,
+    vertical: xr.DataArray | str,
     axis: int = 1,
     tension: float = 0.0,
 ) -> xr.DataArray:
-    """Vertically interpolate data to specified levels.
-
-    Uses pytspack package to interpolate a DataArray to new vertical levels.
-    Supports both Eager (NumPy) and Lazy (Dask) backends.
+    """Deprecated: use ``pytspack.interpolate_vertical`` directly.
 
     Parameters
     ----------
     da : xarray.DataArray
-        The data to interpolate. Must have a vertical dimension.
+        The data to interpolate.
     levels : array-like
-        The target vertical levels to interpolate to.
-    vertical : array-like or str
-        The current vertical coordinate values or coordinate name.
+        Target vertical level values.
+    vertical : xarray.DataArray or str
+        Vertical coordinate DataArray or coordinate name.
     axis : int, default 1
-        The axis representing the vertical dimension.
+        Axis index used only to infer ``level_dim`` when ``vertical`` is a DataArray
+        without a name.
     tension : float, default 0.0
         Tension factor for the spline interpolation.
 
     Returns
     -------
     xarray.DataArray
-        Data interpolated to the new vertical levels, preserving attributes
-        and other coordinates.
-
-    Examples
-    --------
-    >>> out = resample_stratify(da, [100, 200, 500], 'altitude')
+        Data interpolated to the new vertical levels.
     """
+    import warnings
+
     from pytspack import interpolate_vertical
 
-    orig_dim = da.dims[axis]
+    warnings.warn(
+        "resample_stratify() is deprecated. Use pytspack.interpolate_vertical() directly.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
-    # Handle different types of 'vertical' input
-    if isinstance(vertical, xr.DataArray):
-        vertical_name = vertical.name or "vertical_coord"
-        if vertical_name not in da.coords:
-            da = da.assign_coords({vertical_name: vertical})
-    elif isinstance(vertical, str):
-        vertical_name = vertical
+    if isinstance(vertical, str):
+        level_dim = vertical
+    elif isinstance(vertical, xr.DataArray) and vertical.name:
+        level_dim = vertical.name
     else:
-        # array-like
-        vertical_name = "vertical_coord"
-        da = da.assign_coords({vertical_name: (orig_dim, np.asarray(vertical))})
+        level_dim = da.dims[axis]
+        if not isinstance(vertical, str) and isinstance(vertical, xr.DataArray):
+            da = da.assign_coords({level_dim: vertical})
 
-    # interpolate_vertical expects the vertical coordinate name and the dimension name
-    # to be the same (level_dim). We temporarily rename the dimension to match.
-    da_renamed = da.rename({orig_dim: vertical_name})
-
-    # Ensure vertical dimension is not chunked for apply_ufunc in pytspack
-    if da_renamed.chunks is not None:
-        da_renamed = da_renamed.chunk({vertical_name: -1})
-
-    # Convert levels to raw array to avoid xarray broadcast issues in pytspack when levels is a DataArray
     if isinstance(levels, xr.DataArray):
-        levels_arr = levels.data
-    else:
-        levels_arr = np.asarray(levels)
+        levels = levels.values
 
-    out = interpolate_vertical(da_renamed, levels_arr, level_dim=vertical_name, tension=tension)
+    return interpolate_vertical(da, np.asarray(levels), level_dim=level_dim, tension=tension)
 
-    # Rename the dimension back to the original name
-    out = out.rename({vertical_name: orig_dim})
-
-    # Preserve the original name
-    out.name = da.name
-
-    # Update history
-    from .conventions import update_history
-
-    update_history(out, "Vertically interpolated via monet.util.resample.resample_stratify")
-
-    return out

@@ -34,31 +34,41 @@ class MONETAccessor(BaseAccessor):
         return self.remap(data, method="nearest", **kwargs)
 
     def stratify(self, levels, vertical, axis=1, tension=0.0):
-        """Vertically interpolate data to specified levels.
+        """Deprecated: use ``interpolate_vertical`` instead."""
+        import warnings
+
+        warnings.warn(
+            "stratify() is deprecated. Use interpolate_vertical(target_levels, level_dim) instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        level_dim = vertical if isinstance(vertical, str) else (vertical.name or self._obj.dims[axis])
+        return self.interpolate_vertical(np.asarray(levels), level_dim=level_dim, tension=tension)
+
+    def interpolate_vertical(self, target_levels, level_dim: str = "level", tension: float = 0.0):
+        """Vertically interpolate data to new levels using pytspack tension splines.
 
         Parameters
         ----------
-        levels : array-like
-            Target vertical levels.
-        vertical : xarray.DataArray or str
-            Vertical coordinate values or name.
-        axis : int, default: 1
-            Axis along which to interpolate.
-        tension : float, default: 0.0
-            Tension factor for the spline interpolation.
+        target_levels : array-like
+            Target vertical level values.
+        level_dim : str, default: ``"level"``
+            Name of the vertical dimension in the DataArray.
+        tension : float, default: ``0.0``
+            Tension factor for the spline. ``0.0`` gives a standard cubic spline.
 
         Returns
         -------
         xarray.DataArray
-            Vertically interpolated data.
+            Data interpolated to ``target_levels``.
+
+        Examples
+        --------
+        >>> da.monet.interpolate_vertical([850, 700, 500], level_dim='pressure')
         """
-        from ..util.resample import resample_stratify
+        from pytspack import interpolate_vertical
 
-        if isinstance(vertical, str):
-            vertical = self._obj[vertical]
-
-        out = resample_stratify(self._obj, levels, vertical, axis=axis, tension=tension)
-        return out
+        return interpolate_vertical(self._obj, target_levels, level_dim=level_dim, tension=tension)
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Find the nearest grid indices to given lat/lon point(s).

@@ -60,67 +60,47 @@ class MONETAccessorDataset(BaseAccessor):
         """
         raise NotImplementedError("nearest_ij is not yet implemented with xregrid")
 
-    def stratify(
+    def stratify(self, levels, vertical, axis=1, tension=0.0):
+        """Deprecated: use ``interpolate_vertical`` instead."""
+        import warnings
+
+        warnings.warn(
+            "stratify() is deprecated. Use interpolate_vertical(target_levels, level_dim) instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        level_dim = vertical if isinstance(vertical, str) else (vertical.name or self._obj.dims[axis])
+        return self.interpolate_vertical(np.asarray(levels), level_dim=level_dim, tension=tension)
+
+    def interpolate_vertical(
         self,
-        levels: t.Sequence[float],
-        vertical: xr.DataArray | str,
-        axis: int = 1,
+        target_levels,
+        level_dim: str = "level",
         tension: float = 0.0,
     ) -> xr.Dataset:
-        """Vertically interpolate data to specified levels.
-        Supports both Eager (NumPy) and Lazy (Dask) backends.
+        """Vertically interpolate all variables in the Dataset to new levels using pytspack tension splines.
 
         Parameters
         ----------
-        levels : array-like
-            Target vertical levels.
-        vertical : xarray.DataArray or str
-            Vertical coordinate values or name of the vertical coordinate.
-        axis : int, default: 1
-            Axis along which to interpolate.
-        tension : float, default: 0.0
-            Tension factor for the spline interpolation.
+        target_levels : array-like
+            Target vertical level values.
+        level_dim : str, default: ``"level"``
+            Name of the vertical dimension to interpolate along.
+        tension : float, default: ``0.0``
+            Tension factor for the spline. ``0.0`` gives a standard cubic spline.
 
         Returns
         -------
         xarray.Dataset
-            Vertically interpolated dataset.
+            Dataset with all variables that have ``level_dim`` interpolated to ``target_levels``.
 
         Examples
         --------
-        >>> ds.monet.stratify([100, 500, 1000], 'altitude')
+        >>> ds.monet.interpolate_vertical([850, 700, 500], level_dim='pressure')
         """
-        if isinstance(vertical, str):
-            vertical = self._obj[vertical]
-        vertical_shape = vertical.shape
-        vlen = -len(vertical_shape)
-        loop_vars = [
-            vn
-            for vn in self._obj.variables
-            if "z" in self._obj[vn].dims
-            and vn != vertical.name
-            and len(self._obj[vn].shape) >= len(vertical_shape)
-            and self._obj[vn].shape[vlen:] == vertical_shape
-        ]
+        from pytspack import interpolate_vertical
 
-        if not loop_vars:
-            raise ValueError("No variables found with vertical dimension matching the provided coordinate")
-
-        from ..util.resample import resample_stratify
-
-        orig = resample_stratify(self._obj[loop_vars[0]], levels, vertical, axis=axis, tension=tension)
-        dset = orig.to_dataset(name=loop_vars[0])
-        dset.attrs = self._obj.attrs.copy()
-
-        for vn in loop_vars[1:]:
-            dset[vn] = resample_stratify(self._obj[vn], levels, vertical, axis=axis, tension=tension)
-
-        # Update history
-        from ..util.conventions import update_history
-
-        update_history(dset, "Vertically stratified entire Dataset")
-
-        return dset
+        return interpolate_vertical(self._obj, target_levels, level_dim=level_dim, tension=tension)
 
     def quick_facet_time_map(
         self,

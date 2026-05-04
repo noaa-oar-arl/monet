@@ -25,7 +25,7 @@ MONET features include:
 
 * **xarray accessor** for both `xarray.DataArray` and `xarray.Dataset` using the `.monet` attribute
 * **pandas accessor** for `pandas.DataFrame` using the `.monet` attribute
-* Vertical interpolation using [pytspack](https://github.com/noaa-oar-arl/pytspack) via the `.monet.stratify` function
+* Vertical interpolation using [pytspack](https://github.com/noaa-oar-arl/pytspack) via the `.monet.interpolate_vertical` function
 * Spatial interpolation using `.monet.remap` including:
     * Nearest neighbor finder
     * Constant latitude interpolation

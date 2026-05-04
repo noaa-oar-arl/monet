@@ -48,19 +48,17 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - is_ocean
         - cftime_to_datetime64
         - structure_for_monet
+        - interpolate_vertical
         - stratify
+        - window
         - interp_constant_lat
         - interp_constant_lon
         - nearest_ij
         - nearest_latlon
-        - quick_imshow
-        - quick_map
-        - quick_contourf
         - remap_nearest
         - combine_point
-        - compare
-        - quick_facet_time_map
         - remap_nearest_parallel
+        - quick_facet_time_map
         - to_area_def
         - to_swath_def
 
@@ -75,6 +73,7 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - is_land
         - is_ocean
         - cftime_to_datetime64
+        - interpolate_vertical
         - stratify
         - window
         - interp_constant_lat

@@ -47,7 +47,7 @@ df = pd.read_csv('obs_points.csv')
 ### Key Accessor Features
 
 - **Plotting:** `quick_map`, `quick_imshow`, `quick_contourf`, `quick_facet_time_map`, `plot_points_map`, `plot_lines_map`
-- **Regridding/Interpolation:** `remap` (via xregrid), `remap_nearest`, `interp_constant_lat`, `interp_constant_lon`, `stratify`
+- **Regridding/Interpolation:** `remap` (via xregrid), `remap_nearest`, `interp_constant_lat`, `interp_constant_lon`, `interpolate_vertical`
 - **Geospatial utilities:** `nearest_latlon`, `window`, `is_land`, `is_ocean`, `wrap_longitudes`, `tidy`, `structure_for_monet`
 - **Combining data:** `combine_point`, `combine_point_esmf`, `combine_da_to_df`
 
@@ -73,8 +73,8 @@ regridded_nn = ds.monet.remap_nearest(obs)
 # Interpolate to a constant latitude or longitude
 lat_slice = ds['O3'].monet.interp_constant_lat(lat=40.0)
 
-# Stratify by pressure levels
-stratified = ds['O3'].monet.stratify(levels=[850, 700, 500], vertical='level')
+# Interpolate O3 to pressure levels using pytspack tension splines
+interped = ds['O3'].monet.interpolate_vertical([850, 700, 500], level_dim='level')
 ```
 
 ### 3. Quick Map and Faceted Plots

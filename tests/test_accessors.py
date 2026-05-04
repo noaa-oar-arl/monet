@@ -129,11 +129,11 @@ def test_dataarray_accessor_basic(sample_dataarray):
         pass
     except Exception:
         pass
-    # Test stratify (mock vertical)
-    levels = np.linspace(0, 1, 3)
-    vertical = xr.DataArray(np.linspace(0, 1, 5), dims=["latitude"])
+    # Test interpolate_vertical (mock vertical)
     try:
-        strat = sample_dataarray.monet.stratify(levels, vertical, axis=0)
+        import pytspack  # noqa: F401
+        da_v = sample_dataarray.assign_coords(latitude=sample_dataarray.latitude)
+        strat = da_v.monet.interpolate_vertical(np.linspace(-10, 10, 3), level_dim="latitude")
         assert isinstance(strat, xr.DataArray)
     except Exception:
         pass
@@ -228,11 +228,10 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         pass
     except Exception:
         pass
-    # Test stratify (mock vertical)
-    levels = np.linspace(0, 1, 3)
-    vertical = xr.DataArray(np.linspace(0, 1, 5), dims=["latitude"])
+    # Test interpolate_vertical (mock vertical)
     try:
-        strat = sample_dataarray_dask.monet.stratify(levels, vertical, axis=0)
+        import pytspack  # noqa: F401
+        strat = sample_dataarray_dask.monet.interpolate_vertical(np.linspace(-10, 10, 3), level_dim="latitude")
         assert isinstance(strat, xr.DataArray)
     except Exception:
         pass
@@ -305,11 +304,10 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         pass
     except Exception:
         pass
-    # Test stratify (mock vertical)
-    levels = np.linspace(0, 1, 3)
-    vertical = xr.DataArray(np.linspace(0, 1, 5), dims=["latitude"])
+    # Test interpolate_vertical (mock vertical)
     try:
-        strat = sample_dataarray_dask.monet.stratify(levels, vertical, axis=0)
+        import pytspack  # noqa: F401
+        strat = sample_dataarray_dask.monet.interpolate_vertical(np.linspace(-10, 10, 3), level_dim="latitude")
         assert isinstance(strat, xr.DataArray)
     except Exception:
         pass

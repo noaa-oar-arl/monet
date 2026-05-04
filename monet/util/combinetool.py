@@ -468,10 +468,13 @@ def combine_da_to_df_strat(
     if not hasattr(da_interped, "monet"):
         da_interped = xr.DataArray(da_interped)
 
-    # sort aircraft target altitudes and call stratfiy from resample to do vertical interpolation
-    # resample_stratify from monet accessor
-    daz_interped_xyz = daz_interped.monet.stratify(sorted(df["altitude"]), daz_interped, axis=1)
-    da_interped_xyz = da_interped.monet.stratify(sorted(df["altitude"]), daz_interped, axis=1)
+    # sort aircraft target altitudes and do vertical interpolation via pytspack
+    from pytspack import interpolate_vertical
+
+    altitude_levels = sorted(df["altitude"])
+    level_dim = da_interped.dims[1] if da_interped.ndim > 1 else da_interped.dims[0]
+    daz_interped_xyz = interpolate_vertical(daz_interped, altitude_levels, level_dim=level_dim)
+    da_interped_xyz = interpolate_vertical(da_interped, altitude_levels, level_dim=level_dim)
     da_interped_xyz.name = da.name
     daz_interped_xyz.name = "altitude"
     df_interped_xyz = da_interped_xyz.to_dataframe().reset_index()

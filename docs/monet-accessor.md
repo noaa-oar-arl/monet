@@ -129,22 +129,25 @@ rmse_da = ds.O3.monet.compare(obs.O3, stat='RMSE', plot=False)
 
 Supported statistics include metrics from `monet-stats` (e.g., `RMSE`, `MB`, `MAE`, `NMB`, `IOA`).
 
-### Vertical Interpolation (Stratify)
+### Vertical Interpolation
 
-The `stratify` method provides vertical interpolation using tension splines (via `pytspack`).
+The `interpolate_vertical` method provides vertical interpolation using pytspack tension splines, following the same API as `pytspack.interpolate_vertical`.
 
 ```python
 # Interpolate O3 to specific altitude levels
-# 'altitude' is the name of the vertical coordinate in the dataset
-stratified = ds.O3.monet.stratify(levels=[100, 500, 1000], vertical='altitude')
+# 'altitude' is the name of the vertical dimension in the dataset
+interped = ds.O3.monet.interpolate_vertical([100, 500, 1000], level_dim='altitude')
 ```
 
-For `Dataset` objects, `stratify` will attempt to interpolate all variables that share the same vertical dimension as the provided coordinate.
+For `Dataset` objects, `interpolate_vertical` will interpolate all variables that have the specified vertical dimension.
 
 ```python
 # Interpolate entire dataset to pressure levels
-ds_interp = ds.monet.stratify(levels=[850, 700, 500], vertical='pres')
+ds_interp = ds.monet.interpolate_vertical([850, 700, 500], level_dim='pres')
 ```
+
+!!! note
+    `stratify()` is still available as a deprecated backward-compatibility alias.
 
 ## Land and Ocean Masking
 
