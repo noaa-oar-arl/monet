@@ -154,8 +154,8 @@ def test_non_spatial_dims():
     assert "lon" not in non_spatial
 
 
-def test_coards_tools_aero():
-    """Verify coards_tools functions are Aero compliant and correct."""
+def test_coards_tools_vectorized():
+    """Verify coards_tools functions are Vectorized compliant and correct."""
 
     # 1. is_curvilinear_grid
     # Rectilinear

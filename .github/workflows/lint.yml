@@ -1,6 +1,7 @@
+---
 name: Linting
 
-on:
+"on":
   push:
     branches: [stable, master, develop, 'feature/**', 'refactor/**']
   pull_request:

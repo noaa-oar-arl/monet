@@ -5,8 +5,8 @@ import xarray as xr
 from monet.met_funcs import calc_c_p, calc_Psi_H
 
 
-def test_calc_c_p_aero():
-    """Verify calc_c_p follows Aero Protocol."""
+def test_calc_c_p_vectorized():
+    """Verify calc_c_p follows Vectorized Protocol."""
     p_val = 1013.25
     ea_val = 10.0
 
@@ -33,8 +33,8 @@ def test_calc_c_p_aero():
     assert "Computed heat capacity (c_p) via monet.met_funcs" in res_lazy.attrs["history"]
 
 
-def test_calc_Psi_H_aero():
-    """Verify calc_Psi_H follows Aero Protocol."""
+def test_calc_Psi_H_vectorized():
+    """Verify calc_Psi_H follows Vectorized Protocol."""
     zoL_vals = np.array([-1.0, 0.0, 1.0])
 
     # Eager (NumPy)

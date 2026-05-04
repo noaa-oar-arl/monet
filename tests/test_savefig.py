@@ -78,7 +78,7 @@ def test_savefig_custom_logo(sample_fig, tmp_path):
         assert img.size == (500, 500)
 
 
-def test_dynamic_fig_size_aero():
+def test_dynamic_fig_size_vectorized():
     # Eager
     da_eager = xr.DataArray(np.zeros((10, 20)), dims=["lat", "lon"], coords={"lat": range(10), "lon": range(20)})
     size_eager = _dynamic_fig_size(da_eager)
@@ -92,7 +92,7 @@ def test_dynamic_fig_size_aero():
     assert size_lazy == size_eager
 
 
-def test_savefig_full_pipeline_aero(tmp_path):
+def test_savefig_full_pipeline_vectorized(tmp_path):
     # Demonstrate plotting a Dask-backed array and then saving
     da_lazy = xr.DataArray(da.random.random((10, 10), chunks=5), dims=["x", "y"], name="test")
     fig, ax = plt.subplots()

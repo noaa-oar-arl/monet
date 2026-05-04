@@ -9,7 +9,7 @@ import pandas as pd
 import xarray as xr
 from pandas import merge
 
-from .aero import _apply_aero
+from .compute_utils import _apply_vectorized
 from .conventions import update_history
 
 try:
@@ -327,7 +327,7 @@ def linregress(x: xr.DataArray | np.ndarray, y: xr.DataArray | np.ndarray, dim: 
     elif dim is None:
         dim = "core_dim"  # Placeholder for numpy
 
-    return _apply_aero(
+    return _apply_vectorized(
         _logic,
         x,
         y,
@@ -499,7 +499,7 @@ def wsdir2uv(ws: Any, wdir: Any) -> Any:
         v = -ws * np.cos(wdir * np.pi / 180.0)
         return u, v
 
-    return _apply_aero(
+    return _apply_vectorized(
         _logic,
         ws,
         wdir,
@@ -537,7 +537,7 @@ def get_relhum(temp: Any, press: Any, vap: Any) -> Any:
         ws_vap = 0.622 * (es_vap / press)
         return 100.0 * (vap / ws_vap)
 
-    return _apply_aero(_logic, temp, press, vap, name="relative humidity", source="monet.util.tools")
+    return _apply_vectorized(_logic, temp, press, vap, name="relative humidity", source="monet.util.tools")
 
 
 def calc_13_category_usda_soil_type(clay: Any, sand: Any, silt: Any) -> Any:
@@ -603,7 +603,7 @@ def calc_13_category_usda_soil_type(clay: Any, sand: Any, silt: Any) -> Any:
         stype[(clay >= 40) & (sand <= 45) & (silt < 40) & (clay != 255)] = 12.0
         return stype
 
-    return _apply_aero(_logic, clay, sand, silt, name="USDA soil type", source="monet.util.tools")
+    return _apply_vectorized(_logic, clay, sand, silt, name="USDA soil type", source="monet.util.tools")
 
 
 def long_to_wide(df: pd.DataFrame) -> pd.DataFrame:
@@ -849,7 +849,7 @@ def get_giorgi_region_df(
     elif isinstance(dset, xr.Dataset):
         lat, lon = xr.broadcast(lat, lon)
         # Use apply_ufunc for Dask compatibility
-        idx = _apply_aero(
+        idx = _apply_vectorized(
             _find_region_indices,
             lon,
             lat,
@@ -858,7 +858,7 @@ def get_giorgi_region_df(
             name="GIORGI region indices",
             source="monet.util.tools",
         )
-        acro = _apply_aero(
+        acro = _apply_vectorized(
             _find_region_acronyms,
             lon,
             lat,
@@ -980,7 +980,7 @@ def get_epa_region_df(
     elif isinstance(dset, xr.Dataset):
         lat, lon = xr.broadcast(lat, lon)
         # Use apply_ufunc for Dask compatibility
-        idx = _apply_aero(
+        idx = _apply_vectorized(
             _find_region_indices,
             lon,
             lat,
@@ -989,7 +989,7 @@ def get_epa_region_df(
             name="EPA region indices",
             source="monet.util.tools",
         )
-        acro = _apply_aero(
+        acro = _apply_vectorized(
             _find_region_acronyms,
             lon,
             lat,

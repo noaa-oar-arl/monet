@@ -1,5 +1,5 @@
 """
-Aero Protocol utilities for MONET.
+Compute and vectorization utilities for MONET.
 """
 
 from collections.abc import Callable
@@ -10,7 +10,7 @@ import xarray as xr
 from .conventions import update_history
 
 
-def _apply_aero(
+def _apply_vectorized(
     func: Callable,
     *args: Any,
     name: str = "",
@@ -20,9 +20,9 @@ def _apply_aero(
     source: str = "monet",
     **kwargs: Any,
 ) -> Any:
-    """Helper to apply a function following Aero Protocol.
+    """Helper to apply a function across backends (NumPy/Dask).
 
-    This function facilitates backend-agnostic computations (NumPy/Dask)
+    This function facilitates backend-agnostic computations
     using xarray.apply_ufunc and ensures data provenance via history tracking.
 
     Parameters

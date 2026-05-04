@@ -192,7 +192,7 @@ def test_get_giorgi_region_dask():
     np.testing.assert_allclose(result_eager.GIORGI_INDEX.values, result_lazy.GIORGI_INDEX.compute().values)
 
 
-def test_linregress_aero():
+def test_linregress_vectorized():
     """Verifies that linregress works with both Eager and Lazy data."""
     # Create sample data
     x_data = np.linspace(0, 10, 100)
@@ -243,7 +243,7 @@ def test_linregress_aero():
     np.testing.assert_allclose(slope_l_2d.compute(), [slope_e, slope_e])
 
 
-def test_findclosest_aero():
+def test_findclosest_vectorized():
     """Verifies findclosest works with both Eager and Lazy data."""
     arr = np.array([0, 10, 20, 30, 40, 50])
     val = 22.5
@@ -266,7 +266,7 @@ def test_findclosest_aero():
     np.testing.assert_array_equal(res_l.compute().values, [20, 40])
 
 
-def test_nearest_aero():
+def test_nearest_vectorized():
     """Verifies nearest works with both Eager and Lazy data."""
     arr = np.array([0, 10, 20, 30, 40, 50])
     val = 22.5
@@ -281,7 +281,7 @@ def test_nearest_aero():
     assert res_l.compute() == 20
 
 
-def test_lonlat_to_dataset_aero():
+def test_lonlat_to_dataset_vectorized():
     """Verifies lonlat_to_dataset preserves laziness."""
     lon = xr.DataArray(np.linspace(0, 360, 10), dims=["x"]).chunk({"x": 5})
     lat = xr.DataArray(np.linspace(-90, 90, 5), dims=["y"]).chunk({"y": 5})
@@ -298,7 +298,7 @@ def test_lonlat_to_dataset_aero():
     np.testing.assert_allclose(ds.lon.compute().values, ds_e.lon.values)
 
 
-def test_points_to_dataset_aero():
+def test_points_to_dataset_vectorized():
     """Verifies points_to_dataset preserves laziness."""
     lon = xr.DataArray(np.linspace(0, 360, 10), dims=["site"]).chunk({"site": 5})
     lat = xr.DataArray(np.linspace(-90, 90, 10), dims=["site"]).chunk({"site": 5})

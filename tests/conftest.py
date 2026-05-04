@@ -22,7 +22,7 @@ def mock_if_missing(module_names):
 
 # Only mock truly optional dependencies.
 # Core dependencies like dask, xregrid, monet_stats, pytspack should NOT be mocked
-# so that Aero Protocol compliance and proper test skipping can be verified.
+# so that Vectorized Protocol compliance and proper test skipping can be verified.
 mock_if_missing(
     [
         "monetio",

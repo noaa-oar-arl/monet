@@ -25,7 +25,7 @@ except ImportError:
     has_dask = False
 
 
-def test_resample_aero_protocol(monkeypatch):
+def test_resample_vectorized_protocol(monkeypatch):
     # Always mock for consistency in protocol testing
     import monet.accessors.base
     import monet.util.resample
@@ -36,7 +36,7 @@ def test_resample_aero_protocol(monkeypatch):
     monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
     monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
 
-    """Verify resample follows Aero Protocol: NumPy and Dask consistency."""
+    """Verify resample follows Vectorized Protocol: NumPy and Dask consistency."""
     # Create source data
     nx, ny = 20, 10
     lon = np.linspace(0, 359, nx)
@@ -67,7 +67,7 @@ def test_resample_aero_protocol(monkeypatch):
         xr.testing.assert_allclose(out_eager, out_lazy.compute())
 
 
-def test_pair_aero_protocol(monkeypatch):
+def test_pair_vectorized_protocol(monkeypatch):
     # Always mock for consistency in protocol testing
     import monet.accessors.base
     import monet.util.resample
@@ -102,7 +102,7 @@ def test_pair_aero_protocol(monkeypatch):
         return res
 
     mock_regridder.side_effect = mock_apply
-    """Verify pair follows Aero Protocol: NumPy and Dask consistency."""
+    """Verify pair follows Vectorized Protocol: NumPy and Dask consistency."""
     # Create model data
     nx, ny = 10, 5
     lon = np.linspace(0, 359, nx)
@@ -217,22 +217,22 @@ def test_ugrid_pairing_smoke(monkeypatch):
     assert len(paired) == 2
 
 
-def test_apply_aero_numpy():
-    """Verify _apply_aero works with NumPy/Scalars."""
-    from monet.util.aero import _apply_aero
+def test_apply_vectorized_numpy():
+    """Verify _apply_vectorized works with NumPy/Scalars."""
+    from monet.util.compute_utils import _apply_vectorized
 
     def dummy_logic(x, y):
         return x + y
 
-    res = _apply_aero(dummy_logic, 10, 5, name="test")
+    res = _apply_vectorized(dummy_logic, 10, 5, name="test")
     assert res == 15
 
 
-def test_apply_aero_xarray_lazy():
-    """Verify _apply_aero works with Lazy (Dask) xarray objects."""
+def test_apply_vectorized_xarray_lazy():
+    """Verify _apply_vectorized works with Lazy (Dask) xarray objects."""
     pytest.importorskip("dask.array")
 
-    from monet.util.aero import _apply_aero
+    from monet.util.compute_utils import _apply_vectorized
 
     def dummy_logic(x, y):
         return x + y
@@ -240,7 +240,7 @@ def test_apply_aero_xarray_lazy():
     da1 = xr.DataArray(np.array([1, 2, 3]), dims="x", name="a").chunk({"x": 2})
     da2 = xr.DataArray(np.array([4, 5, 6]), dims="x", name="b").chunk({"x": 2})
 
-    res = _apply_aero(dummy_logic, da1, da2, name="lazy_addition")
+    res = _apply_vectorized(dummy_logic, da1, da2, name="lazy_addition")
 
     assert isinstance(res, xr.DataArray)
     assert res.chunks is not None

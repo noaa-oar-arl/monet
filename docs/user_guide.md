@@ -127,16 +127,16 @@ ds_ugrid = xr.open_dataset("unstructured_mesh.nc")
 paired = ds_ugrid.monet.pair(obs_df)
 ```
 
-## The Aero Protocol (Performance & Provenance)
+## Performance & Provenance
 
-MONET follows the **Aero Protocol**:
+MONET is designed for high-performance scientific workflows:
 
-1. **Optional Dask (Laziness):** Routines are backend-agnostic, maintaining laziness on Dask-backed arrays.
-2. **Provenance Tracking:** Transformations automatically update the dataset's `history` attribute.
-3. **Strict Typing:** Core functions use strict type hints and NumPy-style docstrings.
+1. **Backend Agnostic (Laziness):** Routines are designed to work with both NumPy and Dask backends, maintaining laziness on Dask-backed arrays to support large-scale data processing.
+2. **Provenance Tracking:** Computational steps and transformations automatically update the dataset's `history` attribute, ensuring reproducibility.
+3. **Optimized Vectorization:** Core routines leverage `xarray.apply_ufunc` for efficient, parallelized execution across spatial dimensions.
 
 ```python
-# Check history
+# Check history to see transformations
 print(regridded.attrs['history'])
 ```
 

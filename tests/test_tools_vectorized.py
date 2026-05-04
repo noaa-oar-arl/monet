@@ -5,8 +5,8 @@ import xarray as xr
 from monet.util.tools import calc_13_category_usda_soil_type, get_relhum, wsdir2uv
 
 
-def test_wsdir2uv_aero():
-    """Verify wsdir2uv follows Aero Protocol."""
+def test_wsdir2uv_vectorized():
+    """Verify wsdir2uv follows Vectorized Protocol."""
     ws_val = 10.0
     wdir_val = 90.0  # East wind (meteorological) -> U = -10, V = 0
 
@@ -36,8 +36,8 @@ def test_wsdir2uv_aero():
     assert "Computed U and V wind components" in u_lazy.attrs["history"]
 
 
-def test_get_relhum_aero():
-    """Verify get_relhum follows Aero Protocol."""
+def test_get_relhum_vectorized():
+    """Verify get_relhum follows Vectorized Protocol."""
     temp = 300.0
     press = 1013.25
     vap = 10.0
@@ -65,8 +65,8 @@ def test_get_relhum_aero():
     assert "Computed relative humidity" in rh_lazy.attrs["history"]
 
 
-def test_calc_13_category_usda_soil_type_aero():
-    """Verify calc_13_category_usda_soil_type follows Aero Protocol."""
+def test_calc_13_category_usda_soil_type_vectorized():
+    """Verify calc_13_category_usda_soil_type follows Vectorized Protocol."""
     clay = 20.0
     sand = 40.0
     silt = 40.0

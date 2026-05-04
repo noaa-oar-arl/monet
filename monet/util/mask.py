@@ -301,7 +301,11 @@ class MaskBuilder:
 
 
 class EarthMask:
-    """Reader for pre-computed masks with Xarray/Dask support."""
+    """Reader for pre-computed masks with Xarray/Dask support.
+
+    This class provides efficient, backend-agnostic (NumPy/Dask) querying
+    of global raster masks.
+    """
 
     def __init__(self, npz_path: str):
         """Initialize EarthMask.
@@ -319,30 +323,25 @@ class EarthMask:
         self.region_map = data["region_map"].item()
         self.height, self.width = self.mask.shape
 
-    def query(self, lat: t.Any, lon: t.Any) -> t.Any:
-        """Query the mask for given latitude and longitude.
-
-        Supports both scalar and array inputs. Handles longitude wrapping.
+    def _logic(self, lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
+        """Core masking logic for NumPy arrays.
 
         Parameters
         ----------
-        lat : array-like or float
+        lat : numpy.ndarray
             Latitude values.
-        lon : array-like or float
+        lon : numpy.ndarray
             Longitude values.
 
         Returns
         -------
-        array-like or object
-            Region names at the given coordinates.
+        numpy.ndarray
+            Region names at given coordinates.
         """
-        lat_arr = np.asarray(lat)
-        lon_arr = np.asarray(lon)
-
         # Wrap longitudes to [-180, 180)
-        lon_arr = (lon_arr + 180) % 360 - 180
+        lon_arr = (lon + 180) % 360 - 180
 
-        lat_idx = self.height - 1 - ((lat_arr - self.lat_min) / self.resolution).astype(int)
+        lat_idx = self.height - 1 - ((lat - self.lat_min) / self.resolution).astype(int)
         lon_idx = ((lon_arr - self.lon_min) / self.resolution).astype(int)
 
         safe_lat = np.clip(lat_idx, 0, self.height - 1)
@@ -355,6 +354,42 @@ class EarthMask:
 
         lookup = np.vectorize(lambda i: self.region_map.get(i, None), otypes=[object])
         return lookup(ids)
+
+    def query(self, lat: t.Any, lon: t.Any, name: str = "mask") -> t.Any:
+        """Query the mask for given latitude and longitude.
+
+        Supports both Eager (NumPy) and Lazy (Dask) backends via
+        vectorized computation.
+
+        Parameters
+        ----------
+        lat : array-like or xarray.DataArray
+            Latitude values.
+        lon : array-like or xarray.DataArray
+            Longitude values.
+        name : str, optional
+            Description for history tracking.
+
+        Returns
+        -------
+        array-like or xarray.DataArray
+            Region names at the given coordinates.
+
+        Examples
+        --------
+        >>> mask = EarthMask('land.npz')
+        >>> regions = mask.query(ds.lat, ds.lon)
+        """
+        from .compute_utils import _apply_vectorized
+
+        return _apply_vectorized(
+            self._logic,
+            lat,
+            lon,
+            name=f"EarthMask query ({name})",
+            output_dtypes=[object],
+            source="monet.util.mask",
+        )
 
 
 def get_mask(mask_name: str, resolution: float = 0.05) -> EarthMask:
@@ -450,13 +485,7 @@ def query_mask(
         raise ValueError("Could not find latitude and longitude in object.")
 
     if isinstance(obj, xr.DataArray | xr.Dataset):
-        res = xr.apply_ufunc(
-            mask.query,
-            lat,
-            lon,
-            dask="parallelized",
-            output_dtypes=[object],
-        )
+        res = mask.query(lat, lon, name=mask_name)
         if isinstance(obj, xr.Dataset):
             obj[new_var] = res
             out = obj

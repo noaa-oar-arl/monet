@@ -19,6 +19,31 @@ This guide is for contributors and maintainers of MONET. It covers project struc
 - **Interoperability:** Support common data formats and conventions (e.g., CF, COARDS).
 - **Performance:** Adhere to the **Aero Protocol**: ensure pipelines support both Eager (NumPy) and Lazy (Dask) evaluation, prioritize vectorization, and never force computation within processing functions.
 
+## The Aero Protocol 🍃⚡
+
+MONET adheres to the **Aero Protocol** for architecting scientific pipelines that balance flexibility, maintainability, and provenance.
+
+### 1. Architecture & Compute (The "Optional Dask" Rule)
+
+- **Backend Agnostic**: Write functions that accept generic `xr.DataArray` inputs. Do not assume the data is Dask-backed or NumPy-backed.
+- **No Hidden Computes**: NEVER call `.compute()`, `.load()`, or `.values` inside a processing function. This breaks laziness for Dask users.
+- **No Forced Chunking**: Do not hardcode `.chunk()` inside functions. Chunking is the user's responsibility (at the I/O stage) or an optional argument.
+- **Vectorization**: Use `xarray.apply_ufunc` with `dask='parallelized'` capability to support both backends simultaneously.
+
+### 2. Code Style & Documentation
+
+- **NumPy Docstrings**: EVERY function must have a docstring following the NumPy format (Parameters, Returns, Examples).
+- **Type Hinting**: Use `xarray.DataArray` or `xarray.Dataset` types, never specific backend types like `dask.array`.
+- **Scientific Hygiene**: Update `ds.attrs['history']` when transforming data. Never drop coordinates.
+
+### 3. Quality & Validation (The "Pre-Commit" Rule)
+
+- **Zero-Trust Coding**: Do not trust your own code until it is tested.
+- **Enforcement**: Use `pre-commit run --all-files` before every commit.
+- **Testing**: Provide pytest unit tests that verify the logic twice: once with Eager (NumPy) data and once with Lazy (Dask) data.
+
+---
+
 ## How to Contribute
 
 1. **Fork and Clone:** Fork the repo and clone your fork.

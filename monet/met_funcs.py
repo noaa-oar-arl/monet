@@ -19,7 +19,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import ArrayLike
 
-from .util.aero import _apply_aero
+from .util.compute_utils import _apply_vectorized
 from .util.constants import R_d, c_pd, c_pv, epsilon, g, gravity, k, sb
 
 # Default source for this module
@@ -53,7 +53,7 @@ def calc_c_p(p: ArrayLike, ea: ArrayLike) -> Any:
         # then the heat capacity of (moist) air
         return (1.0 - q) * c_pd + q * c_pv
 
-    return _apply_aero(_logic, p, ea, name="heat capacity (c_p)", source=_SOURCE)
+    return _apply_vectorized(_logic, p, ea, name="heat capacity (c_p)", source=_SOURCE)
 
 
 def calc_lambda(T_A_K: ArrayLike) -> Any:
@@ -76,7 +76,7 @@ def calc_lambda(T_A_K: ArrayLike) -> Any:
     def _logic(T_A_K):
         return 1e6 * (2.501 - (2.361e-3 * (T_A_K - 273.15)))
 
-    return _apply_aero(_logic, T_A_K, name="latent heat of vaporization", source=_SOURCE)
+    return _apply_vectorized(_logic, T_A_K, name="latent heat of vaporization", source=_SOURCE)
 
 
 def calc_pressure(z: ArrayLike) -> Any:
@@ -95,7 +95,7 @@ def calc_pressure(z: ArrayLike) -> Any:
     def _logic(z):
         return 1013.25 * (1.0 - 2.225577e-5 * z) ** 5.25588
 
-    return _apply_aero(_logic, z, name="barometric pressure", source=_SOURCE)
+    return _apply_vectorized(_logic, z, name="barometric pressure", source=_SOURCE)
 
 
 def calc_psicr(c_p: ArrayLike, p: ArrayLike, Lambda: ArrayLike) -> Any:
@@ -118,7 +118,7 @@ def calc_psicr(c_p: ArrayLike, p: ArrayLike, Lambda: ArrayLike) -> Any:
     def _logic(c_p, p, Lambda):
         return c_p * p / (epsilon * Lambda)
 
-    return _apply_aero(_logic, c_p, p, Lambda, name="psicrometric constant", source=_SOURCE)
+    return _apply_vectorized(_logic, c_p, p, Lambda, name="psicrometric constant", source=_SOURCE)
 
 
 def calc_rho(p: ArrayLike, ea: ArrayLike, T_A_K: ArrayLike) -> Any:
@@ -146,7 +146,7 @@ def calc_rho(p: ArrayLike, ea: ArrayLike, T_A_K: ArrayLike) -> Any:
         # p is multiplied by 100 to convert from mb to Pascals
         return ((p * 100.0) / (R_d * T_A_K)) * (1.0 - (1.0 - epsilon) * ea / p)
 
-    return _apply_aero(_logic, p, ea, T_A_K, name="air density", source=_SOURCE)
+    return _apply_vectorized(_logic, p, ea, T_A_K, name="air density", source=_SOURCE)
 
 
 def calc_stephan_boltzmann(T_K: ArrayLike) -> Any:
@@ -165,7 +165,7 @@ def calc_stephan_boltzmann(T_K: ArrayLike) -> Any:
     def _logic(T_K):
         return sb * T_K**4
 
-    return _apply_aero(_logic, T_K, name="emitted radiance", source=_SOURCE)
+    return _apply_vectorized(_logic, T_K, name="emitted radiance", source=_SOURCE)
 
 
 def calc_theta_s(
@@ -233,7 +233,7 @@ def calc_theta_s(
         theta_s = np.minimum(theta_s, pid2 - 0.0000001)
         return np.degrees(theta_s)
 
-    return _apply_aero(_logic, xlat, xlong, stdlng, doy, year, ftime, name="sun zenith angle", source=_SOURCE)
+    return _apply_vectorized(_logic, xlat, xlong, stdlng, doy, year, ftime, name="sun zenith angle", source=_SOURCE)
 
 
 def calc_sun_angles(lat: ArrayLike, lon: ArrayLike, stdlon: ArrayLike, doy: ArrayLike, ftime: ArrayLike) -> Any:
@@ -295,7 +295,7 @@ def calc_sun_angles(lat: ArrayLike, lon: ArrayLike, stdlon: ArrayLike, doy: Arra
 
         return sza_deg, saa_deg
 
-    return _apply_aero(
+    return _apply_vectorized(
         _logic,
         lat,
         lon,
@@ -328,7 +328,7 @@ def calc_vapor_pressure(T_K: ArrayLike) -> Any:
         T_C = T_K - 273.15
         return 6.112 * np.exp((17.67 * T_C) / (T_C + 243.5))
 
-    return _apply_aero(_logic, T_K, name="saturation vapor pressure", source=_SOURCE)
+    return _apply_vectorized(_logic, T_K, name="saturation vapor pressure", source=_SOURCE)
 
 
 def calc_delta_vapor_pressure(T_K: ArrayLike) -> Any:
@@ -349,7 +349,7 @@ def calc_delta_vapor_pressure(T_K: ArrayLike) -> Any:
         T_C = T_K - 273.15
         return 4098.0 * (0.6108 * np.exp(17.27 * T_C / (T_C + 237.3))) / ((T_C + 237.3) ** 2)
 
-    return _apply_aero(_logic, T_K, name="slope of saturation vapor pressure", source=_SOURCE)
+    return _apply_vectorized(_logic, T_K, name="slope of saturation vapor pressure", source=_SOURCE)
 
 
 def calc_mixing_ratio(ea: ArrayLike, p: ArrayLike) -> Any:
@@ -375,7 +375,7 @@ def calc_mixing_ratio(ea: ArrayLike, p: ArrayLike) -> Any:
     def _logic(ea, p):
         return epsilon * ea / (p - ea)
 
-    return _apply_aero(_logic, ea, p, name="mixing ratio", source=_SOURCE)
+    return _apply_vectorized(_logic, ea, p, name="mixing ratio", source=_SOURCE)
 
 
 def calc_lapse_rate_moist(T_A_K: ArrayLike, ea: ArrayLike, p: ArrayLike) -> Any:
@@ -409,7 +409,7 @@ def calc_lapse_rate_moist(T_A_K: ArrayLike, ea: ArrayLike, p: ArrayLike) -> Any:
         lambda_v = 1e6 * (2.501 - (2.361e-3 * (T_A_K - 273.15)))
         return g * (R_d * T_A_K**2 + lambda_v * r * T_A_K) / (c_p * R_d * T_A_K**2 + lambda_v**2 * r * epsilon)
 
-    return _apply_aero(_logic, T_A_K, ea, p, name="moist-adiabatic lapse rate", source=_SOURCE)
+    return _apply_vectorized(_logic, T_A_K, ea, p, name="moist-adiabatic lapse rate", source=_SOURCE)
 
 
 def flux_2_evaporation(flux: ArrayLike, T_K: ArrayLike = 20 + 273.15, time_domain: float = 1) -> Any:
@@ -439,7 +439,7 @@ def flux_2_evaporation(flux: ArrayLike, T_K: ArrayLike = 20 + 273.15, time_domai
         # Convert instantaneous rate to the time_domain rate
         return ET * time_domain * 3600.0
 
-    return _apply_aero(_logic, flux, T_K, time_domain, name="evaporation rate", source=_SOURCE)
+    return _apply_vectorized(_logic, flux, T_K, time_domain, name="evaporation rate", source=_SOURCE)
 
 
 def calc_L(
@@ -490,7 +490,7 @@ def calc_L(
         L[i] = -(ustar[i] ** 3) / (L_const[i] * (Hv[i] / (rho[i] * c_p[i])))
         return L
 
-    return _apply_aero(_logic, ustar, T_A_K, rho, c_p, H, LE, name="Obukhov stability length", source=_SOURCE)
+    return _apply_vectorized(_logic, ustar, T_A_K, rho, c_p, H, LE, name="Obukhov stability length", source=_SOURCE)
 
 
 def calc_Psi_H(zoL: ArrayLike) -> Any:
@@ -529,7 +529,7 @@ def calc_Psi_H(zoL: ArrayLike) -> Any:
         Psi_H[i] = ((1.0 - d) / n) * np.log((c + y**n) / c)
         return Psi_H
 
-    return _apply_aero(_logic, zoL, name="adiabatic correction factor (heat)", source=_SOURCE)
+    return _apply_vectorized(_logic, zoL, name="adiabatic correction factor (heat)", source=_SOURCE)
 
 
 def calc_Psi_M(zoL: ArrayLike) -> Any:
@@ -574,7 +574,7 @@ def calc_Psi_M(zoL: ArrayLike) -> Any:
         )
         return Psi_M
 
-    return _apply_aero(_logic, zoL, name="adiabatic correction factor (momentum)", source=_SOURCE)
+    return _apply_vectorized(_logic, zoL, name="adiabatic correction factor (momentum)", source=_SOURCE)
 
 
 def calc_richardson(
@@ -622,7 +622,7 @@ def calc_richardson(
         # See eq (2) from Louis 1979
         return -(gravity * (z_u - d_0) / T_A1) * (((T_R1 - T_R0) - (T_A1 - T_A0)) / u**2)  # equation (12) [Norman2000]
 
-    return _apply_aero(_logic, u, z_u, d_0, T_R0, T_R1, T_A0, T_A1, name="Richardson number", source=_SOURCE)
+    return _apply_vectorized(_logic, u, z_u, d_0, T_R0, T_R1, T_A0, T_A1, name="Richardson number", source=_SOURCE)
 
 
 def calc_u_star(u: ArrayLike, z_u: ArrayLike, L: ArrayLike, d_0: ArrayLike, z_0M: ArrayLike) -> Any:
@@ -655,9 +655,9 @@ def calc_u_star(u: ArrayLike, z_u: ArrayLike, L: ArrayLike, d_0: ArrayLike, z_0M
         # calculate correction factors in other conditions
         L_adj = np.where(L == 0.0, 1e-36, L)
 
-        # Since calc_Psi_M handles numpy arrays via _apply_aero, we can reuse it
+        # Since calc_Psi_M handles numpy arrays via _apply_vectorized, we can reuse it
         Psi_M = calc_Psi_M((z_u - d_0) / L_adj)
         Psi_M0 = calc_Psi_M(z_0M / L_adj)
         return u * k / (np.log((z_u - d_0) / z_0M) - Psi_M + Psi_M0)
 
-    return _apply_aero(_logic, u, z_u, L, d_0, z_0M, name="friction velocity (u*)", source=_SOURCE)
+    return _apply_vectorized(_logic, u, z_u, L, d_0, z_0M, name="friction velocity (u*)", source=_SOURCE)

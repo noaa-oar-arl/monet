@@ -7,7 +7,7 @@ name = "monet"
 version = "2.2.12"
 description = "The Model and Observation Evaluation Toolkit (MONET)"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [
   {name = "Barry D. Baker", email = "barry.baker@noaa.gov"},
 ]
