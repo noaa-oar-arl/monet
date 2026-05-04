@@ -48,7 +48,7 @@ class MONETAccessorPandas(BaseAccessor):
 
         if not (has_lat and has_lon):
             searched = f"latitude cols tried: {lat_names}; longitude cols tried: {lon_names}"
-            raise AttributeError(f"Must have latitude and longitude columns. {searched}. " f"Found columns: {list(obj.columns)}")
+            raise AttributeError(f"Must have latitude and longitude columns. {searched}. Found columns: {list(obj.columns)}")
 
     @property
     def center(self) -> tuple[float, float]:

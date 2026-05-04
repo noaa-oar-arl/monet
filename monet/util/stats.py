@@ -27,7 +27,7 @@ except ImportError:
     import warnings
 
     warnings.warn(
-        "monet_stats package is not installed. " "Install it with: pip install monet-stats",
+        "monet_stats package is not installed. Install it with: pip install monet-stats",
         ImportWarning,
         stacklevel=2,
     )
@@ -35,4 +35,4 @@ except ImportError:
     __all__ = ["stats"]
 
     def stats(*args, **kwargs):
-        raise ImportError("monet_stats package is required for statistical functions. " "Install with: pip install monet-stats")
+        raise ImportError("monet_stats package is required for statistical functions. Install with: pip install monet-stats")
