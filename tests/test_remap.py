@@ -10,15 +10,6 @@ try:
 except ImportError:
     pass
 
-# Check if xesmf and esmpy are available
-try:
-    import esmpy  # noqa: F401
-    import xesmf  # noqa: F401
-
-    has_xesmf = True
-except ImportError:
-    has_xesmf = False
-
 # Check if xregrid and esmpy are available
 try:
     import esmpy  # noqa: F401
@@ -29,12 +20,7 @@ except ImportError:
     has_xregrid = False
 
 
-@pytest.mark.skipif(not has_xesmf, reason="xesmf not installed")
-def test_import_xesmf():
-    import xesmf  # noqa: F401
-
-
-@pytest.mark.skipif(not has_xesmf and not has_xregrid, reason="xesmf/xregrid not installed")
+@pytest.mark.skipif(not has_xregrid, reason="xregrid not installed")
 def test_remap_ds_ds():
     # Barry noted a problem with this
 
@@ -55,14 +41,13 @@ def test_remap_ds_ds():
     source = make_ds(nx=5)
 
     # On the data DataArray directly
-    target.monet.remap_xesmf(source["data"])
+    target.monet.remap(source["data"])
 
     # On the Dataset
     if "data_y" in target.variables:
         target = target.drop_vars("data_y")
 
-    # Use remap instead of remap_xesmf for new tests generally, but testing backward compat here
-    target.monet.remap_xesmf(source, method="nearest_d2s")
+    target.monet.remap(source, method="nearest_d2s")
 
 
 @pytest.mark.skipif(not has_xregrid, reason="xregrid not installed")

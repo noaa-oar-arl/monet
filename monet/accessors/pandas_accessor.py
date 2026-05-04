@@ -240,16 +240,6 @@ class MONETAccessorPandas(BaseAccessor):
         out = out[cols]
         return out
 
-    def get_sparse_SwathDefinition(self):
-        """Creates a ``pyreample.geometry.SwathDefinition`` for a single point.
-
-        Returns
-        -------
-        pyreample.geometry.SwathDefinition
-            SwathDefinition object for data points.
-        """
-        raise NotImplementedError("This function relies on pyresample which has been removed.")
-
     def _df_to_da(self, d: pd.DataFrame | None = None) -> xr.Dataset:  # TODO: should be `to_ds` or `to_xarray`
         """Convert DataFrame to xarray.
         Preserves detected spatial columns as coordinates.

@@ -9,7 +9,7 @@ lonmin, latmin, lonmax, latmax = [0, 0, 10, 10]
 
 def make_ds(*, nx=8, ny=5, lat_lon_dims=True, time=False):
     data = np.arange(nx * ny).reshape((ny, nx))
-    assert data.flags["C_CONTIGUOUS"], "xESMF wants this"
+    assert data.flags["C_CONTIGUOUS"], "xregrid requires C-contiguous arrays"
 
     if lat_lon_dims:
         lat_dim, lon_dim = "lat", "lon"

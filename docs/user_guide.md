@@ -36,7 +36,7 @@ ds = xr.open_dataset('model_output.nc')
 obs = xr.open_dataset('obs_data.nc')
 
 # Remap model to obs grid using ESMF (via xregrid)
-regridded = ds.monet.remap_xesmf(obs)
+regridded = ds.monet.remap(obs)
 ```
 
 ### Regridding and UGRID Support

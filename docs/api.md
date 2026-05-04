@@ -57,7 +57,6 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - quick_map
         - quick_contourf
         - remap_nearest
-        - remap_xesmf
         - combine_point
         - compare
         - quick_facet_time_map
@@ -83,7 +82,6 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - nearest_ij
         - nearest_latlon
         - remap_nearest
-        - remap_xesmf
         - combine_point
         - remap_nearest_parallel
         - quick_facet_time_map
@@ -99,7 +97,6 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - to_ascii2nc_df
         - to_ascii2nc_list
         - rename_for_monet
-        - get_sparse_SwathDefinition
         - remap_nearest
         - cftime_to_datetime64
         - plot_points_map

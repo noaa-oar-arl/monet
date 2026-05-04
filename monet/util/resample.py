@@ -48,10 +48,6 @@ def resample(
     >>> out = resample(source, target, method='bilinear')
     """
 
-    # Handle backward compatibility for xesmf_method
-    if method == "xesmf":
-        method = kwargs.pop("xesmf_method", "bilinear")
-
     # Map method names
     method_map = {
         "linear": "bilinear",

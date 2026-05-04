@@ -8,15 +8,6 @@ import xarray as xr
 from monet.accessors.dataset_accessor import MONETAccessorDataset as DS_Monet
 from monet.accessors.pandas_accessor import MONETAccessorPandas as DF_Monet
 
-# Check if xesmf and esmpy are available
-try:
-    import esmpy  # noqa: F401
-    import xesmf  # noqa: F401
-
-    has_xesmf = True
-except ImportError:
-    has_xesmf = False
-
 
 # Dask-backed fixtures
 @pytest.fixture
@@ -87,7 +78,7 @@ def test_dataarray_accessor_basic(sample_dataarray):
         except Exception:
             pass
 
-    # Test remap (pyresample, both nearest and bilinear)
+    # Test remap (nearest and bilinear)
     for method in ["nearest", "bilinear"]:
         try:
             remapped = sample_dataarray.monet.remap(sample_dataarray, method=method)
@@ -118,14 +109,14 @@ def test_dataarray_accessor_basic(sample_dataarray):
         assert ax is not None
     except Exception:
         pass
-    # Remapping structure test (full remap requires pyresample/xesmf and more setup)
+    # Remapping structure test
     try:
-        # Just check that remap_nearest and remap_xesmf exist and can be called (will likely error if not installed)
+        # Just check that remap_nearest exists and can be called
         sample_dataarray.monet.remap_nearest(sample_dataarray)
     except Exception:
         pass
     try:
-        sample_dataarray.monet.remap_xesmf(sample_dataarray)
+        sample_dataarray.monet.remap(sample_dataarray)
     except Exception:
         pass
     # Test is_land and is_ocean (should work if global_land_mask is installed)
@@ -168,7 +159,6 @@ def test_dataarray_accessor_basic(sample_dataarray):
     assert "time" in out.coords or "time" in out.dims or "time" in out.variables
 
 
-@pytest.mark.skipif(not has_xesmf, reason="xesmf not installed")
 def test_dataarray_accessor_dask(sample_dataarray_dask):
     # Test remap to a different-shaped grid
     target_lat = np.linspace(-10, 10, 7)
@@ -181,18 +171,18 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
     for method in ["nearest", "bilinear"]:
         remapped = sample_dataarray_dask.monet.remap(target, method=method)
         assert isinstance(remapped, xr.DataArray)
-        # For Dask/xESMF, output shape should match target grid
+        # Output shape should match target grid
         if hasattr(remapped, "chunks") and remapped.chunks is not None:
             assert remapped.shape == target.shape
         else:
-            # For pyresample, output shape matches source grid
+            # Output shape matches source grid
             assert remapped.shape == target.shape
         remapped_sum = remapped.sum().compute().item()
         original_sum = sample_dataarray_dask.sum().compute().item()
         print(f"Method: {method}")
         print(f"Remapped sum: {remapped_sum}")
         print(f"Original sum: {original_sum}")
-    # Test remap (pyresample, both nearest and bilinear)
+    # Test remap (nearest and bilinear)
     for method in ["nearest", "bilinear"]:
         remapped = sample_dataarray_dask.monet.remap(sample_dataarray_dask, method=method)
         assert isinstance(remapped, xr.DataArray)
@@ -219,13 +209,13 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         assert ax is not None
     except Exception:
         pass
-    # Remapping structure test (full remap requires pyresample/xesmf and more setup)
+    # Remapping structure test
     try:
         sample_dataarray_dask.monet.remap_nearest(sample_dataarray_dask)
     except Exception:
         pass
     try:
-        sample_dataarray_dask.monet.remap_xesmf(sample_dataarray_dask)
+        sample_dataarray_dask.monet.remap(sample_dataarray_dask)
     except Exception:
         pass
     # Test is_land and is_ocean (should work if global_land_mask is installed)
@@ -265,7 +255,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
     da2 = da2.assign_coords(time=("latitude", pd.date_range("2020-01-01", periods=5)))
     out = da2.monet.cftime_to_datetime64(name="time")
     assert "time" in out.coords or "time" in out.dims or "time" in out.variables
-    # Test remap (pyresample, both nearest and bilinear)
+    # Test remap (nearest and bilinear)
     for method in ["nearest", "bilinear"]:
         try:
             remapped = sample_dataarray_dask.monet.remap(sample_dataarray_dask, method=method)
@@ -296,13 +286,13 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         assert ax is not None
     except Exception:
         pass
-    # Remapping structure test (full remap requires pyresample/xesmf and more setup)
+    # Remapping structure test
     try:
         sample_dataarray_dask.monet.remap_nearest(sample_dataarray_dask)
     except Exception:
         pass
     try:
-        sample_dataarray_dask.monet.remap_xesmf(sample_dataarray_dask)
+        sample_dataarray_dask.monet.remap(sample_dataarray_dask)
     except Exception:
         pass
     # Test is_land and is_ocean (should work if global_land_mask is installed)
@@ -365,7 +355,7 @@ def test_dataset_accessor_basic(sample_dataset):
             )
         except Exception:
             pass
-    # Test remap (pyresample, both nearest and bilinear)
+    # Test remap (nearest and bilinear)
     for method in ["nearest", "bilinear"]:
         try:
             remapped = sample_dataset.monet.remap(sample_dataset, method=method)
@@ -402,7 +392,7 @@ def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
             )
         except Exception:
             pass
-    # Test remap (pyresample, both nearest and bilinear)
+    # Test remap (nearest and bilinear)
     for method in ["nearest", "bilinear"]:
         try:
             remapped = sample_dataset_dask.monet.remap(sample_dataset_dask, method=method)
@@ -432,13 +422,13 @@ def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
         assert ax is not None
     except Exception:
         pass
-    # Remapping structure test (full remap requires pyresample/xesmf and more setup)
+    # Remapping structure test
     try:
         sample_dataset_dask.monet.remap_nearest(sample_dataset_dask)
     except Exception:
         pass
     try:
-        sample_dataset_dask.monet.remap_xesmf(sample_dataset_dask)
+        sample_dataset_dask.monet.remap(sample_dataset_dask)
     except Exception:
         pass
     # Test is_land and is_ocean (should work if global_land_mask is installed)
@@ -465,7 +455,7 @@ def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
     ds2 = ds2.assign_coords(time=("lat", pd.date_range("2020-01-01", periods=5)))
     out = DS_Monet(ds2).cftime_to_datetime64(name="time")
     assert "time" in out.coords or "time" in out.dims or "time" in out.variables
-    # Test remap (pyresample, both nearest and bilinear)
+    # Test remap (nearest and bilinear)
     try:
         sample_dataset.monet.remap(sample_dataset, method="nearest")
     except Exception:
@@ -490,13 +480,13 @@ def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
         assert ax is not None
     except Exception:
         pass
-    # Remapping structure test (full remap requires pyresample/xesmf and more setup)
+    # Remapping structure test
     try:
         sample_dataset.monet.remap_nearest(sample_dataset)
     except Exception:
         pass
     try:
-        sample_dataset.monet.remap_xesmf(sample_dataset)
+        sample_dataset.monet.remap(sample_dataset)
     except Exception:
         pass
     # Test is_land and is_ocean (should work if global_land_mask is installed)

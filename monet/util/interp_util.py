@@ -170,39 +170,3 @@ def points_to_dataset(
         }
     )
     return dset
-
-
-def create_area_def_from_latlon(*args, **kwargs):
-    """Deprecated: Part of removed pyresample dependency."""
-    raise NotImplementedError("This function relies on pyresample which has been removed.")
-
-
-def create_area_def_from_dataset(*args, **kwargs):
-    """Deprecated: Part of removed pyresample dependency."""
-    raise NotImplementedError("This function relies on pyresample which has been removed.")
-
-
-def get_grid_area_def(*args, **kwargs):
-    """Deprecated: Part of removed pyresample dependency."""
-    raise NotImplementedError("This function relies on pyresample which has been removed.")
-
-
-def create_area_def_from_esmf_mesh(*args, **kwargs):
-    """Deprecated: Part of removed pyresample dependency."""
-    raise NotImplementedError("This function relies on pyresample which has been removed.")
-
-
-def create_area_def_from_ugrid(*args, **kwargs):
-    """Deprecated: Part of removed pyresample dependency."""
-    raise NotImplementedError("This function relies on pyresample which has been removed.")
-
-
-# Backward compatibility aliases
-def lonlat_to_xesmf(longitude=None, latitude=None):
-    """Alias for lonlat_to_dataset."""
-    return lonlat_to_dataset(longitude, latitude)
-
-
-def constant_1d_xesmf(longitude=None, latitude=None):
-    """Alias for points_to_dataset."""
-    return points_to_dataset(longitude, latitude)

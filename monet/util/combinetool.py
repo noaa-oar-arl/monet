@@ -389,7 +389,7 @@ def _rename_latlon(ds: xr.Dataset) -> xr.Dataset:
         return ds
 
 
-def combine_da_to_df_xesmf(
+def combine_da_to_df(
     da: xr.DataArray | xr.Dataset,
     df: pd.DataFrame,
     *,
@@ -418,11 +418,11 @@ def combine_da_to_df_xesmf(
         DataFrame with combined model and observation data.
     """
     if suffix is None:
-        suffix = "_xesmf"
+        suffix = "_model"
     return pair(da, df, suffix=suffix, **kwargs)  # type: ignore
 
 
-def combine_da_to_df_xesmf_strat(
+def combine_da_to_df_strat(
     da: xr.DataArray,
     daz: xr.DataArray,
     df: pd.DataFrame,
@@ -446,7 +446,7 @@ def combine_da_to_df_xesmf_strat(
     pandas.DataFrame
         Combined data frame with interpolated model values at observation points.
     """
-    from ..util.interp_util import constant_1d_xesmf
+    from ..util.interp_util import points_to_dataset
     from ..util.resample import resample
 
     try:
@@ -457,7 +457,7 @@ def combine_da_to_df_xesmf_strat(
         print("da shape= ", da.shape, "daz shape= ", daz.shape)
         return -1
 
-    target = constant_1d_xesmf(longitude=df.longitude.values, latitude=df.latitude.values)
+    target = points_to_dataset(longitude=df.longitude.values, latitude=df.latitude.values)
 
     da_interped = resample(da, target, **kwargs)  # interpolate fields
     daz_interped = resample(daz, target, **kwargs)

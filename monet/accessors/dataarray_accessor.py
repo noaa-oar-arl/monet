@@ -24,20 +24,6 @@ class MONETAccessor(BaseAccessor):
         """
         self._obj = xray_obj
 
-    def remap_xesmf(self, data, **kwargs):
-        """Deprecated: Remap data using xESMF regridding."""
-        warnings.warn(
-            "remap_xesmf is deprecated and will be removed in a future version. "
-            "Please use remap(data, method='xesmf') or remap(data, method='conservative') instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        # Handle method argument from kwargs
-        if "method" in kwargs:
-            kwargs["xesmf_method"] = kwargs.pop("method")
-
-        return self.remap(data, method="xesmf", **kwargs)
-
     def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
         """Deprecated: Remap data using nearest neighbor interpolation with parallel processing."""
         warnings.warn(
