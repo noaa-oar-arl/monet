@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Modernized Python versions (3.10 removed for monet-stats)
+        # 3.9 dropped for monet-stats compatibility; 3.13 not yet supported
         python-version: ["3.11", "3.12"]
     defaults:
       run:
@@ -24,8 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v2
+      - name: Set up Python (micromamba)
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: environment-dev.yml
           environment-name: monet-env
@@ -33,7 +33,7 @@ jobs:
           # We force the python version from the matrix into the env
           create-args: python=${{ matrix.python-version }}
 
-      - name: Install MONET in development mode
+      - name: Install package
         run: pip install -e .
 
       - name: Run Tests
@@ -49,8 +49,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup Micromamba (Docs)
-        uses: mamba-org/setup-micromamba@v2
+      - name: Set up Python (micromamba)
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: docs/environment-docs.yml
           environment-name: monet-docs

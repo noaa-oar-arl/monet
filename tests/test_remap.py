@@ -115,11 +115,18 @@ def test_combine_da_da():
     new = combine_da_to_da(model, obs, merge=False, interp_time=False)
 
     # Check
-    assert new.dims == {"z": 5, "y": n, "x": n}
+    assert new.sizes == {"z": 5, "y": n, "x": n}
+    assert float(new.longitude.min()) == pytest.approx(0.1)
+    assert float(new.longitude.max()) == pytest.approx(0.9)
+    assert float(new.latitude.min()) == pytest.approx(0.1)
+    assert float(new.latitude.max()) == pytest.approx(0.9)
 
-    a = new["data"]
-    assert a.shape == (
-        model.dims["z"],
-        n,
-        n,
-    ), "model levels but obs grid points (expanded)"
+    assert (obs.longitude.values == x).all(), "preserved"
+    assert (new.latitude.isel(x=0).values == obs.latitude.values).all(), "same as target"
+    assert (new.longitude.isel(y=0).values == obs.longitude.values).all(), "same as target"
+
+    # Use orthogonal selection to get track
+    a = new.data.values[:, new.y, new.x]
+    assert a.shape == (model.sizes["z"], n), "model levels but obs grid points"
+    assert (np.diff(a.mean(axis=0)) >= 0).all(), "obs profile goes S"
+    assert np.isclose(np.diff(a.mean(axis=1)), 1, atol=1e-15, rtol=0).all(), "obs profile goes U"
