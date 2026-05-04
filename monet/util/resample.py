@@ -144,4 +144,8 @@ def resample_stratify(
     if isinstance(levels, xr.DataArray):
         levels = levels.values
 
+    # pytspack requires a single chunk along the core (vertical) dimension
+    if hasattr(da.data, "chunks") and level_dim in da.dims:
+        da = da.chunk({level_dim: -1})
+
     return interpolate_vertical(da, np.asarray(levels), level_dim=level_dim, tension=tension)

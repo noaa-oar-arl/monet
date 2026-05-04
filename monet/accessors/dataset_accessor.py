@@ -100,7 +100,10 @@ class MONETAccessorDataset(BaseAccessor):
         """
         from pytspack import interpolate_vertical
 
-        return interpolate_vertical(self._obj, target_levels, level_dim=level_dim, tension=tension)
+        ds = self._obj
+        if any(hasattr(ds[v].data, "chunks") for v in ds.data_vars) and level_dim in ds.dims:
+            ds = ds.chunk({level_dim: -1})
+        return interpolate_vertical(ds, target_levels, level_dim=level_dim, tension=tension)
 
     def quick_facet_time_map(
         self,

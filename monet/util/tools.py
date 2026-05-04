@@ -868,6 +868,11 @@ def get_giorgi_region_df(
             output_dtypes=[object],
             source="monet.util.tools",
         )
+        # Drop coords that already exist as data variables to avoid MergeError
+        conflict = [v for v in list(idx.coords) if v in dset.data_vars]
+        if conflict:
+            idx = idx.drop_vars(conflict)
+            acro = acro.drop_vars([v for v in conflict if v in acro.coords])
         dset["GIORGI_INDEX"] = idx
         dset["GIORGI_ACRO"] = acro
 

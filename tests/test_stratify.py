@@ -56,6 +56,9 @@ def test_interpolate_vertical_da(model):
     from pytspack import interpolate_vertical
 
     da = model.data1
+    # pytspack requires a single chunk along the core (vertical) dimension
+    if hasattr(da.data, "chunks"):
+        da = da.chunk({"z": -1})
     target_levels = np.linspace(0, 1, 10)
     result = interpolate_vertical(da, target_levels, level_dim="z")
 
@@ -68,8 +71,12 @@ def test_interpolate_vertical_da(model):
 def test_interpolate_vertical_ds(model):
     from pytspack import interpolate_vertical
 
+    ds = model
+    # pytspack requires a single chunk along the core (vertical) dimension
+    if any(hasattr(ds[v].data, "chunks") for v in ds.data_vars):
+        ds = ds.chunk({"z": -1})
     target_levels = np.linspace(0, 1, 10)
-    result = interpolate_vertical(model, target_levels, level_dim="z")
+    result = interpolate_vertical(ds, target_levels, level_dim="z")
 
     assert isinstance(result, xr.Dataset)
     assert result["z"].size == 10

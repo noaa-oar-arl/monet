@@ -68,7 +68,10 @@ class MONETAccessor(BaseAccessor):
         """
         from pytspack import interpolate_vertical
 
-        return interpolate_vertical(self._obj, target_levels, level_dim=level_dim, tension=tension)
+        da = self._obj
+        if hasattr(da.data, "chunks") and level_dim in da.dims:
+            da = da.chunk({level_dim: -1})
+        return interpolate_vertical(da, target_levels, level_dim=level_dim, tension=tension)
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Find the nearest grid indices to given lat/lon point(s).
