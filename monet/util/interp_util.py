@@ -1,191 +1,172 @@
-"""Interpolation functions"""
+"""Interpolation utility functions for MONET"""
+
+import typing as t
+
+import numpy as np
+import xarray as xr
 
 
-def latlon_xarray_to_CoordinateDefinition(longitude=None, latitude=None):
-    """Create pyresample SwathDefinition from xarray object.
+def lonlat_to_dataset(
+    longitude: t.Sequence[float] | np.ndarray | xr.DataArray, latitude: t.Sequence[float] | np.ndarray | xr.DataArray
+) -> xr.Dataset:
+    """Create a Dataset with longitude and latitude coordinates.
+    Supports both 1D coordinates (creates a meshgrid) and 2D arrays.
 
-    Converts xarray latitude and longitude coordinate arrays into a
-    pyresample CoordinateDefinition suitable for spatial interpolation.
-
-    Parameters
-    ----------
-    longitude : 2D xarray.DataArray
-        Longitude array -> must be from -180 -> 180 and monotonically increasing.
-    latitude : 2D xarray.DataArray
-        Latitude array -> must be from -90 -> 90 and monotonically increasing.
-
-    Returns
-    -------
-    pyresample.geometry.CoordinateDefinition
-        A coordinate definition object that can be used with pyresample.
-    """
-    from pyresample import geometry
-
-    return geometry.CoordinateDefinition(lats=latitude, lons=longitude)
-
-
-def lonlat_to_xesmf(longitude=None, latitude=None):
-    """Create an empty xarray.Dataset with longitude and latitude coordinates.
-
-    Creates a minimal xarray Dataset with the provided coordinates to be used
-    as a target grid for xESMF regridding.
+    This implementation is backend-agnostic and preserves Dask laziness
+    by using xarray broadcasting instead of numpy meshgrid for xarray inputs.
 
     Parameters
     ----------
     longitude : array-like
-        Longitude value(s).
+        Longitude values.
     latitude : array-like
-        Latitude value(s).
+        Latitude values.
 
     Returns
     -------
     xarray.Dataset
-        A dataset with lon/lat coordinates suitable for use with xesmf.
+        Dataset with 'lon' and 'lat' coordinates on (y, x) dimensions.
     """
-    import xarray as xr
-    from numpy import asarray
+    if isinstance(longitude, xr.DataArray) and isinstance(latitude, xr.DataArray):
+        # Use xarray broadcasting to preserve Dask laziness
+        # We want (y, x) ordering to match numpy meshgrid default
+        # First ensure they have the expected dimension names if they are 1D
+        if longitude.ndim == 1 and latitude.ndim == 1:
+            if longitude.dims[0] != "x":
+                longitude = longitude.rename({longitude.dims[0]: "x"})
+            if latitude.dims[0] != "y":
+                latitude = latitude.rename({latitude.dims[0]: "y"})
 
-    lat = asarray(latitude)
-    lon = asarray(longitude)
+        lon_2d, lat_2d = xr.broadcast(longitude, latitude)
+
+        # Force transpose to (y, x) to match expectations
+        if "y" in lon_2d.dims and "x" in lon_2d.dims:
+            lon_2d = lon_2d.transpose("y", "x")
+            lat_2d = lat_2d.transpose("y", "x")
+    else:
+        from numpy import asarray, meshgrid
+
+        lat = asarray(latitude)
+        lon = asarray(longitude)
+
+        # Handle scalar values
+        if lat.ndim == 0:
+            lat = lat[None]
+        if lon.ndim == 0:
+            lon = lon[None]
+
+        # If both are 1D, create a 2D meshgrid
+        if lat.ndim == 1 and lon.ndim == 1:
+            lon_2d, lat_2d = meshgrid(lon, lat)
+        # If both are already 2D with same shape, use them directly
+        elif lat.ndim == 2 and lon.ndim == 2 and lat.shape == lon.shape:
+            lon_2d, lat_2d = lon, lat
+        # If they have different shapes or dimensions, create meshgrid
+        else:
+            if lat.ndim > 1:
+                lat = lat.flatten()
+            if lon.ndim > 1:
+                lon = lon.flatten()
+            lon_2d, lat_2d = meshgrid(lon, lat)
+
+    dims = ["y", "x"]
+    if hasattr(lon_2d, "dims") and len(lon_2d.dims) == 2:
+        dims = lon_2d.dims
+
     dset = xr.Dataset(
-        coords={"lon": (["x", "y"], lon.reshape(1, 1)), "lat": (["x", "y"], lat.reshape(1, 1))}
+        coords={
+            "longitude": (
+                dims,
+                lon_2d.data if hasattr(lon_2d, "data") else lon_2d,
+                {"standard_name": "longitude", "units": "degrees_east"},
+            ),
+            "latitude": (
+                dims,
+                lat_2d.data if hasattr(lat_2d, "data") else lat_2d,
+                {"standard_name": "latitude", "units": "degrees_north"},
+            ),
+            "lon": (
+                dims,
+                lon_2d.data if hasattr(lon_2d, "data") else lon_2d,
+                {"standard_name": "longitude", "units": "degrees_east"},
+            ),
+            "lat": (
+                dims,
+                lat_2d.data if hasattr(lat_2d, "data") else lat_2d,
+                {"standard_name": "latitude", "units": "degrees_north"},
+            ),
+        }
     )
     return dset
 
 
-def lonlat_to_swathdefinition(longitude=None, latitude=None):
-    """Create a pyresample SwathDefinition from longitude and latitude arrays.
+def points_to_dataset(
+    longitude: t.Sequence[float] | np.ndarray | xr.DataArray, latitude: t.Sequence[float] | np.ndarray | xr.DataArray
+) -> xr.Dataset:
+    """Create a dataset for a set of points (1D).
 
-    Parameters
-    ----------
-    longitude : array-like
-        Longitude values, either 1D or 2D.
-    latitude : array-like
-        Latitude values, either 1D or 2D.
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition
-        A SwathDefinition object for the provided coordinates.
-    """
-    from numpy import vstack
-    from pyresample.geometry import SwathDefinition
-
-    if len(longitude.shape) < 2:
-        lons = vstack(longitude)
-        lats = vstack(latitude)
-    else:
-        lons = longitude
-        lats = latitude
-    return SwathDefinition(lons=lons, lats=lats)
-
-
-def nearest_point_swathdefinition(longitude=None, latitude=None):
-    """Create a SwathDefinition for a single point.
-
-    Used for nearest neighbor point-to-point interpolation.
-
-    Parameters
-    ----------
-    longitude : float
-        Longitude of the point.
-    latitude : float
-        Latitude of the point.
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition
-        A SwathDefinition representing a single point.
-    """
-    from numpy import vstack
-    from pyresample.geometry import SwathDefinition
-
-    lons = vstack([longitude])
-    lats = vstack([latitude])
-    return SwathDefinition(lons=lons, lats=lats)
-
-
-def constant_1d_xesmf(longitude=None, latitude=None):
-    """Create a dataset with a constant latitude along a longitude array.
+    This implementation is backend-agnostic and preserves Dask laziness.
 
     Parameters
     ----------
     longitude : array-like
         Array of longitude values.
-    latitude : float or array-like
-        Latitude value(s) to use as a constant.
+    latitude : array-like
+        Array of latitude values.
 
     Returns
     -------
     xarray.Dataset
-        A dataset with coordinates suitable for xesmf, where longitude varies
-        but latitude is constant.
+        A dataset with coordinates suitable for regridding.
     """
-    import xarray as xr
-    from numpy import asarray
+    if isinstance(longitude, xr.DataArray) and isinstance(latitude, xr.DataArray):
+        # Ensure they are aligned if possible, or assume they are point pairs
+        lon = longitude
+        lat = latitude
+    else:
+        from numpy import asanyarray
 
-    lat = asarray(latitude)
-    lon = asarray(longitude)
-    s = lat.shape[0]
+        lat = asanyarray(latitude)
+        lon = asanyarray(longitude)
+        if lat.ndim == 0:
+            lat = lat[None]
+        if lon.ndim == 0:
+            lon = lon[None]
+
+        # Ensure they are the same length
+        if lat.shape != lon.shape:
+            # If one is scalar and other is array, broadcast
+            if lat.size == 1:
+                lat = np.full_like(lon, lat[0])
+            elif lon.size == 1:
+                lon = np.full_like(lat, lon[0])
+            else:
+                raise ValueError("Latitude and longitude must have the same shape or one must be scalar.")
+
+    # Reshape to (N, 1) for regridding compatibility
+    # If xarray, we use expand_dims to keep it lazy
+    if isinstance(lon, xr.DataArray):
+        lon_out = lon.expand_dims("y", axis=-1)
+        lat_out = lat.expand_dims("y", axis=-1)
+        dims = lon_out.dims
+    else:
+        s = lat.shape[0]
+        lon_out = lon.reshape(s, 1)
+        lat_out = lat.reshape(s, 1)
+        dims = ["x", "y"]
+
     dset = xr.Dataset(
-        coords={"lon": (["x", "y"], lon.reshape(s, 1)), "lat": (["x", "y"], lat.reshape(s, 1))}
+        coords={
+            "lon": (
+                dims,
+                lon_out.data if hasattr(lon_out, "data") else lon_out,
+                {"standard_name": "longitude", "units": "degrees_east"},
+            ),
+            "lat": (
+                dims,
+                lat_out.data if hasattr(lat_out, "data") else lat_out,
+                {"standard_name": "latitude", "units": "degrees_north"},
+            ),
+        }
     )
     return dset
-
-
-def constant_lat_swathdefition(longitude=None, latitude=None):
-    """Create a SwathDefinition with constant latitude along a longitude array.
-
-    Parameters
-    ----------
-    longitude : array-like
-        Array of longitude values, 1D or 2D.
-    latitude : float
-        Constant latitude value to use for all points.
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition
-        A SwathDefinition with constant latitude.
-    """
-    from numpy import vstack
-    from pyresample import geometry
-    from xarray import DataArray
-
-    if len(longitude.shape) < 2:
-        lons = vstack(longitude)
-    else:
-        lons = longitude
-    lats = lons * 0.0 + latitude
-    if isinstance(lats, DataArray):
-        lats.name = "lats"
-    return geometry.SwathDefinition(lons=lons, lats=lats)
-
-
-def constant_lon_swathdefition(longitude=None, latitude=None):
-    """Create a SwathDefinition with constant longitude along a latitude array.
-
-    Parameters
-    ----------
-    longitude : float
-        Constant longitude value to use for all points.
-    latitude : array-like
-        Array of latitude values, 1D or 2D.
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition
-        A SwathDefinition with constant longitude.
-    """
-    from numpy import vstack
-    from pyresample import geometry
-    from xarray import DataArray
-
-    if len(latitude.shape) < 2:
-        lats = vstack(latitude)
-    else:
-        lats = latitude
-    lons = lats * 0.0 + longitude
-    if isinstance(lats, DataArray):
-        lons.name = "lons"
-    return geometry.SwathDefinition(lons=lons, lats=lats)

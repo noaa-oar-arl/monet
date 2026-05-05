@@ -18,7 +18,7 @@ def draw_map(
     figsize=(10, 5),
     linewidth=0.25,
     return_fig=False,
-    **kwargs
+    **kwargs,
 ):
     """Draw a map with Cartopy.
 
@@ -93,6 +93,19 @@ def draw_map(
     else:
         if "projection" not in kwargs["subplot_kw"]:
             kwargs["subplot_kw"]["projection"] = ccrs.PlateCarree()
+
+    # Auto-select resolution when the caller hasn't overridden it and an
+    # extent is provided: use lower-res datasets for large/global views so
+    # rendering stays fast, fall back to '10m' for small regional views.
+    if resolution == "10m" and extent is not None:
+        lon_span = abs(extent[1] - extent[0])
+        lat_span = abs(extent[3] - extent[2])
+        area_deg2 = lon_span * lat_span
+        if area_deg2 >= 20_000:  # roughly continental/global
+            resolution = "110m"
+        elif area_deg2 >= 3_000:  # large regional
+            resolution = "50m"
+        # else keep '10m' for small/detailed views
 
     fig, ax = plt.subplots(**kwargs)
 

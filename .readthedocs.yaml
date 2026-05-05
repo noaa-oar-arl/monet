@@ -5,12 +5,12 @@ build:
   tools:
     python: "mambaforge-23.11"
 
-sphinx:
-  configuration: docs/conf.py
+mkdocs:
+  configuration: mkdocs.yml
 
 conda:
   environment: docs/environment-docs.yml
 
-formats:
-  - epub
-  - pdf
+# formats:
+#   - epub
+#   - pdf

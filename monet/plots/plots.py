@@ -1,12 +1,17 @@
 """plotting routines"""
 
 import functools
+import typing as t
+import warnings
 
+import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
+import xarray as xr
 
 from . import taylordiagram as td
-from .colorbars import colorbar_index
 
 # colors = ['#1e90ff','#045C5C','#00A847','#DB4291','#BB7E5D']
 colors = ["#1e90ff", "#DA70D6", "#228B22", "#FA8072", "#FF1493"]
@@ -23,228 +28,287 @@ def _default_sns_context(f):
     return inner
 
 
-# Spatial Plots
+def _savefig(fig, *, save_name=None, dpi=None, **kwargs):
+    """Save figure."""
+    if save_name is not None:
+        fig.savefig(save_name, dpi=dpi, **kwargs)
+        plt.close(fig)
+
+
+def _create_map(fig=None, ax=None, **kwargs):
+    """Create a map projection."""
+    if ax is None:
+        fig, ax = plt.subplots(
+            figsize=(11, 8),
+            subplot_kw={"projection": ccrs.LambertConformal(central_longitude=-97.5, central_latitude=38.5)},
+            **kwargs,
+        )
+    else:
+        if fig is None:
+            fig = ax.figure
+    return fig, ax
+
+
 @_default_sns_context
-def make_spatial_plot(modelvar, m, dpi=None, plotargs={}, ncolors=15, discrete=False):
-    """Create a basic spatial plot using imshow.
+def spatial_plot(
+    da: xr.DataArray,
+    fig: plt.Figure | None = None,
+    ax: plt.Axes | None = None,
+    **kwargs,
+) -> tuple[plt.Figure, plt.Axes]:
+    """Create a spatial plot from an xarray.DataArray.
 
     Parameters
     ----------
-    modelvar : numpy.ndarray
-        2D model variable array to plot.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
-    dpi : int, optional
-        Dots per inch for the figure. Higher values increase resolution.
-    plotargs : dict, default {}
-        Additional arguments to pass to imshow. Common options include 'cmap',
-        'vmin', 'vmax', and 'alpha'.
-    ncolors : int, default 15
-        Number of discrete colors when using discrete colorbar.
-    discrete : bool, default False
-        If True, use a discrete colorbar instead of a continuous one.
+    da : xarray.DataArray
+        The data to plot.
+    fig : matplotlib.figure.Figure, optional
+        Figure to plot on.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on.
+    **kwargs
+        Additional keyword arguments to pass to xarray's plot method.
 
     Returns
     -------
-    tuple
-        (figure, axes, colorbar, colormap, vmin, vmax)
-        - figure: matplotlib Figure instance
-        - axes: matplotlib Axes instance
-        - colorbar: matplotlib Colorbar instance
-        - colormap: matplotlib Colormap instance
-        - vmin, vmax: minimum and maximum values for the colormap
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
     """
-    f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
-    # determine colorbar
-    if "cmap" not in plotargs:
-        plotargs["cmap"] = "viridis"
-    if discrete and "vmin" in plotargs and "vmax" in plotargs:
-        c, cmap = colorbar_index(
-            ncolors, plotargs["cmap"], minval=plotargs["vmin"], maxval=plotargs["vmax"], basemap=m
-        )
-        plotargs["cmap"] = cmap
-        m.imshow(modelvar, **plotargs)
-        vmin, vmax = plotargs["vmin"], plotargs["vmax"]
-    elif discrete:
-        temp = m.imshow(modelvar, **plotargs)
-        vmin, vmax = temp.get_clim()
-        c, cmap = colorbar_index(ncolors, plotargs["cmap"], minval=vmin, maxval=vmax, basemap=m)
-        plotargs["cmap"] = cmap
-        m.imshow(modelvar, vmin=vmin, vmax=vmax, **plotargs)
-    else:
-        temp = m.imshow(modelvar, **plotargs)
-        c = m.colorbar()
-        vmin, vmax = temp.get_clim()
-        cmap = plotargs["cmap"]
-    # draw borders
-    m.drawstates()
-    m.drawcoastlines(linewidth=0.3)
-    m.drawcountries()
-    return f, ax, c, cmap, vmin, vmax
+    fig, ax = _create_map(fig=fig, ax=ax)
+    da.plot(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
+    return fig, ax
+
+
+# Spatial Plots
+@_default_sns_context
+def spatial_imshow(
+    da: xr.DataArray,
+    ax: plt.Axes | None = None,
+    **kwargs,
+) -> tuple[plt.Figure, plt.Axes]:
+    """Create a spatial plot from an xarray.DataArray using imshow.
+
+    Parameters
+    ----------
+    da : xarray.DataArray
+        The data to plot.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on. If None, a new figure and axes will be created.
+    **kwargs
+        Additional keyword arguments to pass to xarray's plot.imshow() method.
+
+    Returns
+    -------
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
+    """
+    fig, ax = _create_map(ax=ax)
+    da.plot.imshow(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
+    ax.coastlines()
+    ax.gridlines()
+    return fig, ax
 
 
 @_default_sns_context
-def spatial(modelvar, **kwargs):
-    """Create a simple spatial plot from an xarray object.
+def spatial(
+    da: xr.DataArray,
+    fig: plt.Figure | None = None,
+    ax: plt.Axes | None = None,
+    **kwargs,
+) -> tuple[plt.Figure, plt.Axes]:
+    """Create a spatial plot from an xarray.DataArray.
 
     A convenience wrapper for xarray's plot method with consistent styling.
 
+    .. deprecated:: 24.8.1
+        This function is deprecated and will be removed in a future version.
+        Please use `spatial_plot` and add map features like coastlines
+        and gridlines manually for more control.
+
     Parameters
     ----------
-    modelvar : xarray.DataArray
+    da : xr.DataArray
         The data to plot spatially.
+    fig : matplotlib.figure.Figure, optional
+        Figure to plot on.
+    ax : plt.Axes, optional
+        Axes to plot on. If None, a new figure and axes will be created.
     **kwargs
         Additional keyword arguments passed to xarray's plot method.
-        If 'ax' is not provided, a new figure and axes will be created.
 
     Returns
     -------
-    matplotlib.axes.Axes
-        The axes containing the plot.
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
     """
-    if kwargs.get("ax") is None:
-        f, ax = plt.subplots(1, 1, figsize=(11, 6), frameon=False)
-        kwargs["ax"] = ax
-    ax = modelvar.plot(**kwargs)
-    plt.tight_layout()
-    return ax
+    warnings.warn(
+        "The function `spatial` is deprecated and will be removed in a future version. Please use `spatial_plot` instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    fig, ax = spatial_plot(da, fig=fig, ax=ax, **kwargs)
+    ax.coastlines()
+    ax.gridlines()
+    return fig, ax
 
 
 @_default_sns_context
-def make_spatial_contours(
-    modelvar,
-    gridobj,
-    date,
-    m,
-    dpi=None,
-    savename="",
-    discrete=True,
-    ncolors=None,
-    dtype="int",
-    **kwargs
-):
-    """Create a contour plot on a map with optional discrete colorbar.
+def spatial_contourf(
+    da: xr.DataArray,
+    ax: plt.Axes | None = None,
+    **kwargs,
+) -> tuple[plt.Figure, plt.Axes]:
+    """Create a spatial plot from an xarray.DataArray using contourf.
 
     Parameters
     ----------
-    modelvar : numpy.ndarray
-        2D model variable array to contour.
-    gridobj : object
-        Object containing grid information with LAT and LON variables.
-    date : datetime.datetime
-        Date/time for the plot title.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
-    dpi : int, optional
-        Dots per inch for the figure if saving.
-    savename : str, default ""
-        If provided, save the figure to this path with date appended.
-    discrete : bool, default True
-        If True, use a discrete colorbar instead of a continuous one.
-    ncolors : int, optional
-        Number of discrete colors when using discrete colorbar.
-    dtype : str, default "int"
-        Data type for colorbar tick labels.
+    da : xarray.DataArray
+        The data to plot.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on. If None, a new figure and axes will be created.
     **kwargs
-        Additional arguments to pass to contourf. Must include 'cmap' and 'levels'.
+        Additional keyword arguments to pass to xarray's plot.contourf() method.
 
     Returns
     -------
-    matplotlib.colorbar.Colorbar
-        The colorbar instance.
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
     """
-    plt.figure(figsize=(11, 6), frameon=False)
-    lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
-    lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
-    # define map and draw boundaries
-    m.drawstates()
-    m.drawcoastlines(linewidth=0.3)
-    m.drawcountries()
-    x, y = m(lon, lat)
-    plt.axis("off")
-    m.contourf(x, y, modelvar, **kwargs)
-    cmap = kwargs["cmap"]
-    levels = kwargs["levels"]
-    if discrete:
-        c, cmap = colorbar_index(
-            ncolors, cmap, minval=levels[0], maxval=levels[-1], basemap=m, dtype=dtype
-        )
-    else:
-        c = m.colorbar()
-    titstring = date.strftime("%B %d %Y %H")
-    plt.title(titstring)
+    fig, ax = _create_map(ax=ax)
+    da.plot.contourf(ax=ax, transform=ccrs.PlateCarree(), **kwargs)
+    ax.coastlines()
+    ax.gridlines()
+    return fig, ax
 
-    plt.tight_layout()
-    if savename != "":
-        plt.savefig(savename + date.strftime("%Y%m%d_%H.jpg"), dpi=dpi)
-        plt.close()
-    return c
+
+def _thin_data(u: xr.DataArray, v: xr.DataArray, thin: int = 15) -> tuple[xr.DataArray, xr.DataArray, np.ndarray, np.ndarray]:
+    """Thin the data for wind plotting.
+
+    Parameters
+    ----------
+    u : xr.DataArray
+        u-component of wind.
+    v : xr.DataArray
+        v-component of wind.
+    thin : int, optional
+        The thinning factor for the wind vectors. Default is 15.
+    Returns
+    -------
+    t.Tuple[xr.DataArray, xr.DataArray, np.ndarray, np.ndarray]
+        Thinned u, v, and meshgrid x and y coordinates.
+    """
+    # Programmatically find the spatial dimension names
+    if "lat" in u.coords and "lon" in u.coords:
+        y_dim, x_dim = "lat", "lon"
+    elif "y" in u.coords and "x" in u.coords:
+        y_dim, x_dim = "y", "x"
+    else:
+        # Fallback to the last two dimensions, assuming (..., y, x) order
+        y_dim, x_dim = u.dims[-2:]
+
+    thinner = {y_dim: slice(None, None, thin), x_dim: slice(None, None, thin)}
+    u_thinned = u.isel(**thinner)
+    v_thinned = v.isel(**thinner)
+
+    x2d, y2d = np.meshgrid(u_thinned[x_dim], u_thinned[y_dim])
+
+    return u_thinned, v_thinned, x2d, y2d
 
 
 @_default_sns_context
-def wind_quiver(ws, wdir, gridobj, m, **kwargs):
+def wind_quiver(
+    u: xr.DataArray,
+    v: xr.DataArray,
+    ax: plt.Axes = None,
+    thin: int = 15,
+    **kwargs,
+) -> tuple[plt.Figure, plt.Axes]:
     """Create a quiver plot of wind vectors on a map.
 
     Parameters
     ----------
-    ws : numpy.ndarray
-        2D array of wind speeds.
-    wdir : numpy.ndarray
-        2D array of wind directions (meteorological convention, degrees).
-    gridobj : object
-        Object containing grid information with LAT and LON variables.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
+    u : xr.DataArray
+        2D array of u-component of wind.
+    v : xr.DataArray
+        2D array of v-component of wind.
+    ax : plt.Axes, optional
+        Axes to plot on.
+    thin : int, optional
+        The thinning factor for the wind vectors. Default is 15.
     **kwargs
         Additional arguments to pass to quiver. Common options include
         'scale', 'scale_units', and 'width'.
 
     Returns
     -------
-    matplotlib.quiver.Quiver
-        The quiver instance.
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes objects.
     """
-    from . import tools
+    if ax is None:
+        fig, ax = _create_map(ax=ax)
+    else:
+        fig = ax.figure
 
-    lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
-    lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
+    u_thinned, v_thinned, x2d, y2d = _thin_data(u, v, thin)
+
     # define map and draw boundaries
-    x, y = m(lon, lat)
-    u, v = tools.wsdir2uv(ws, wdir)
-    quiv = m.quiver(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
-    return quiv
+    ax.quiver(
+        x2d,
+        y2d,
+        u_thinned.values,
+        v_thinned.values,
+        transform=ccrs.PlateCarree(),
+        **kwargs,
+    )
+    return fig, ax
 
 
 @_default_sns_context
-def wind_barbs(ws, wdir, gridobj, m, **kwargs):
+def wind_barbs(
+    u: xr.DataArray,
+    v: xr.DataArray,
+    ax: plt.Axes = None,
+    thin: int = 15,
+    **kwargs,
+) -> tuple[plt.Figure, plt.Axes]:
     """Create a barbs plot of wind on a map.
 
     Parameters
     ----------
-    ws : numpy.ndarray
-        2D array of wind speeds.
-    wdir : numpy.ndarray
-        2D array of wind directions (meteorological convention, degrees).
-    gridobj : object
-        Object containing grid information with LAT and LON variables.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
+    u : xr.DataArray
+        2D array of u-component of wind.
+    v : xr.DataArray
+        2D array of v-component of wind.
+    ax : plt.Axes, optional
+        Axes to plot on.
+    thin : int, optional
+        The thinning factor for the wind vectors. Default is 15.
     **kwargs
         Additional arguments to pass to barbs. Common options include
-        'length', 'pivot', and 'barb_increments'.
+        'length', 'pivot', 'barb_increments'.
 
     Returns
     -------
-    None
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes objects.
     """
-    import tools
+    if ax is None:
+        fig, ax = _create_map(ax=ax)
+    else:
+        fig = ax.figure
 
-    lat = gridobj.variables["LAT"][0, 0, :, :].squeeze()
-    lon = gridobj.variables["LON"][0, 0, :, :].squeeze()
+    u_thinned, v_thinned, x2d, y2d = _thin_data(u, v, thin)
+
     # define map and draw boundaries
-    x, y = m(lon, lat)
-    u, v = tools.wsdir2uv(ws, wdir)
-    m.barbs(x[::15, ::15], y[::15, ::15], u[::15, ::15], v[::15, ::15], **kwargs)
+    ax.barbs(
+        x2d,
+        y2d,
+        u_thinned.values,
+        v_thinned.values,
+        transform=ccrs.PlateCarree(),
+        **kwargs,
+    )
+    return fig, ax
 
 
 def normval(vmin, vmax, cmap):
@@ -274,115 +338,124 @@ def normval(vmin, vmax, cmap):
 
 @_default_sns_context
 def spatial_bias_scatter(
-    df, m, date, vmin=None, vmax=None, savename="", ncolors=15, fact=1.5, cmap="RdBu_r"
-):
-    """Create a scatter plot showing bias between model and observations on a map.
+    ds: xr.Dataset,
+    *,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    savename: str = "",
+    cmap: str = "RdBu_r",
+    fig: plt.Figure | None = None,
+    ax: plt.Axes | None = None,
+    **kwargs,
+) -> tuple[plt.Figure, plt.Axes]:
+    """Create a scatter plot showing bias on a map.
 
     Parameters
     ----------
-    df : pandas.DataFrame
-        DataFrame containing 'latitude', 'longitude', 'CMAQ', and 'Obs' columns.
-    m : mpl_toolkits.basemap.Basemap
-        Basemap instance for mapping.
-    date : str or datetime.datetime
-        Date to filter the DataFrame. Only entries matching this date will be plotted.
+    ds : xr.Dataset
+        Dataset containing 'obs' and 'model' variables, and 'latitude' and
+        'longitude' coordinates.
     vmin : float, optional
         Minimum value for colorscale. If None, automatically determined.
     vmax : float, optional
         Maximum value for colorscale. If None, automatically determined.
     savename : str, default ""
-        If provided, save the figure to this path with date appended.
-    ncolors : int, default 15
-        Number of discrete colors for the colorbar.
-    fact : float, default 1.5
-        Scaling factor for point sizes.
+        If provided, save the figure to this path.
     cmap : str or matplotlib.colors.Colormap, default "RdBu_r"
         Colormap to use for bias values.
+    fig : matplotlib.figure.Figure, optional
+        Figure to plot on.
+    ax : matplotlib.axes.Axes, optional
+        Axes to plot on.
+    **kwargs
+        Additional keyword arguments to pass to `xarray.plot.scatter`.
 
     Returns
     -------
-    tuple
-        (figure, axes, colorbar) containing the matplotlib objects.
+    t.Tuple[plt.Figure, plt.Axes]
+        The figure and axes containing the plot.
 
     Notes
     -----
-    The scatter points are colored by the difference (CMAQ - Obs) and sized
+    The scatter points are colored by the difference (model - obs) and sized
     by the absolute magnitude of this difference, making larger biases more visible.
     """
-    from numpy import around
-    from scipy.stats import scoreatpercentile as score
-
-    #    plt.figure(figsize=(11, 6), frameon=False)
-    f, ax = plt.subplots(figsize=(11, 6), frameon=False)
+    fig, ax = _create_map(fig=fig, ax=ax)
     ax.set_facecolor("white")
-    diff = df.CMAQ - df.Obs
-    top = around(score(diff.abs(), per=95))
-    new = df[df.datetime == date]
-    x, y = m(new.longitude.values, new.latitude.values)
-    c, cmap = colorbar_index(ncolors, cmap, minval=top * -1, maxval=top, basemap=m)
 
-    c.ax.tick_params(labelsize=13)
-    #    cmap = cmap_discretize(cmap, ncolors)
-    colors = new.CMAQ - new.Obs
-    ss = (new.CMAQ - new.Obs).abs() / top * 100.0
-    ss[ss > 300] = 300.0
-    plt.scatter(
-        x,
-        y,
-        c=colors,
-        s=ss,
-        vmin=-1.0 * top,
-        vmax=top,
+    # Create a new dataset for plotting to avoid modifying the original
+    plot_ds = ds.copy(deep=False)
+    plot_ds["difference"] = ds["model"] - ds["obs"]
+
+    # Calculate size based on absolute difference.
+    # A zero size is invisible, so we add a minimum size and scale.
+    # The scaling factor is arbitrary and can be adjusted for better visualization.
+    size = np.abs(plot_ds["difference"])
+    # Avoid division by zero if all differences are zero
+    if size.max() > 0:
+        size = (size / size.max()) * 200 + 20
+    else:
+        size = xr.full_like(size, 20)
+
+    plot_ds.plot.scatter(
+        ax=ax,
+        x="longitude",
+        y="latitude",
+        hue="difference",
+        s=size,
+        vmin=vmin,
+        vmax=vmax,
         cmap=cmap,
         edgecolors="k",
         linewidths=0.25,
         alpha=0.7,
+        transform=ccrs.PlateCarree(),
+        **kwargs,
     )
 
-    if savename != "":
-        plt.savefig(savename + date + ".jpg", dpi=75.0)
-        plt.close()
-    return f, ax, c
+    _savefig(fig, save_name=savename)
+    return fig, ax
 
 
 @_default_sns_context
 def timeseries(
-    df,
-    x="time",
-    y="obs",
-    ax=None,
-    plotargs={},
-    fillargs={"alpha": 0.2},
-    title="",
-    ylabel=None,
-    label=None,
-):
+    df: "pd.DataFrame",
+    x: str = "time",
+    y: str = "obs",
+    ax: plt.Axes | None = None,
+    plotargs: dict[str, t.Any] | None = None,
+    fillargs: dict[str, t.Any] | None = None,
+    title: str = "",
+    ylabel: str | None = None,
+    label: str | None = None,
+) -> plt.Axes:
     """Create a timeseries plot with shaded error bounds.
 
     Parameters
     ----------
-    df : pandas.DataFrame
+    df : pd.DataFrame
         DataFrame containing the data to plot.
     x : str, default "time"
         Column name to use for the x-axis (time).
     y : str, default "obs"
         Column name to use for the y-axis (values to plot).
-    ax : matplotlib.axes.Axes, optional
+    ax : plt.Axes, optional
         Axes to plot on. If None, creates a new figure and axes.
-    plotargs : dict, default {}
+    plotargs : dict, optional
         Additional arguments to pass to DataFrame.plot().
-    fillargs : dict, default {"alpha": 0.2}
+    fillargs : dict, optional
         Additional arguments to pass to fill_between for the error shading.
+        Defaults to `{"alpha": 0.2}`.
     title : str, default ""
         Title for the plot.
     ylabel : str, optional
         Y-axis label. If None, uses variable name and units from DataFrame.
     label : str, optional
-        Label for the plotted line (for legend). If None, uses y.
+        Label for the plotted line (for legend). If None, uses `y`.
 
     Returns
     -------
-    matplotlib.axes.Axes
+    plt.Axes
         The axes containing the plot.
 
     Notes
@@ -390,36 +463,42 @@ def timeseries(
     This function groups the data by time, plots the mean values, and adds
     shading for ±1 standard deviation around the mean.
     """
+
+    if plotargs is None:
+        plotargs = {}
+    if fillargs is None:
+        fillargs = {"alpha": 0.2}
+
     with sns.axes_style("ticks"):
         if ax is None:
-            f, ax = plt.subplots(figsize=(11, 6), frameon=False)
-        df.index = df[x]
-        m = df.groupby("time").mean()  # mean values for each sample time period
-        e = df.groupby("time").std()  # std values for each sample time period
-        variable = df.variable[0]
-        if df.columns.isin(["units"]).max():
-            unit = df.units[0]
-        else:
-            unit = "None"
+            _, ax = plt.subplots(figsize=(11, 6), frameon=False)
+
+        # Group by the specified time column
+        grouped = df.groupby(x)
+        m = grouped.mean(numeric_only=True)
+        e = grouped.std(numeric_only=True)
+
+        variable = df["variable"].iloc[0] if "variable" in df.columns else ""
+        unit = df["units"].iloc[0] if "units" in df.columns else "None"
+
         upper = m[y] + e[y]
         lower = m[y] - e[y]
         lower.loc[lower < 0] = 0
-        lower = lower.values
-        if "alpha" not in fillargs:
-            fillargs["alpha"] = 0.2
-        if label is not None:
-            m.rename(columns={y: label}, inplace=True)
-        else:
-            label = y
-        m[label].plot(ax=ax, **plotargs)
-        ax.fill_between(m[label].index, lower, upper, **fillargs)
+
+        plot_label = label if label is not None else y
+        m = m.rename(columns={y: plot_label})
+
+        m[plot_label].plot(ax=ax, **plotargs)
+        ax.fill_between(m.index, lower.values, upper.values, **fillargs)
+
         if ylabel is None:
-            ax.set_ylabel(variable + " (" + unit + ")")
+            ax.set_ylabel(f"{variable} ({unit})")
         else:
-            ax.set_ylabel(label)
+            ax.set_ylabel(ylabel)
+
         ax.set_xlabel("")
-        plt.legend()
-        plt.title(title)
+        ax.legend()
+        ax.set_title(title)
         plt.tight_layout()
 
     return ax
@@ -495,76 +574,97 @@ def scatter(df, x=None, y=None, title=None, label=None, ax=None, **kwargs):
 
 @_default_sns_context
 def create_taylor_diagram(
-    df,
-    marker="o",
-    col1="obs",
-    col2="model",
-    label1="OBS",
-    label2="MODEL",
-    scale=1.5,
-    addon=False,
-    dia=None,
-):
-    """
-    :no-index:
+    obs: "pd.Series",
+    model: "pd.Series",
+    model_label: str = "Model",
+    obs_label: str = "Reference",
+    scale: float = 1.5,
+    dia: td.TaylorDiagram | None = None,
+    **kwargs,
+) -> td.TaylorDiagram:
+    """Create a Taylor diagram from observation and model data.
 
-    Create a DataFrame-based Taylor diagram using the TaylorDiagram class.
-
-    A convenience wrapper for easily creating Taylor diagrams from DataFrames.
-    For the main Taylor diagram implementation, see :mod:`monet.plots.taylordiagram`.
+    This function provides a simplified interface for creating Taylor
+    diagrams to compare model output with a reference (observation) dataset.
+    It can either create a new diagram or add a new model series to an
+    existing diagram.
 
     Parameters
     ----------
-    df : pandas.DataFrame
-        DataFrame containing observation and model data
-    marker : str, default "o"
-        Marker style for plotting model points
-    col1 : str, default "obs"
-        Column name for observations
-    col2 : str, default "model"
-        Column name for model predictions
-    label1 : str, default "OBS"
-        Label for observations in legend
-    label2 : str, default "MODEL"
-        Label for model in legend
+    obs : pd.Series
+        Time series of observations (reference data).
+    model : pd.Series
+        Time series of model predictions.
+    model_label : str, default "Model"
+        Label for the model data point in the diagram.
+    obs_label : str, default "Reference"
+        Label for the reference data point on the standard deviation axis.
     scale : float, default 1.5
-        Scale factor for diagram
-    addon : bool, default False
-        If True, add to existing diagram; if False, create new
+        The radial limit of the diagram, specified as a multiple of the
+        observation's standard deviation.
     dia : TaylorDiagram, optional
-        Existing diagram to add to if addon=True
+        If provided, add the model sample to this existing TaylorDiagram
+        instance instead of creating a new one.
+    **kwargs
+        Additional keyword arguments passed to `TaylorDiagram.add_sample()`.
+        Common options include `marker`, `color`, `ls`, and `zorder`.
 
     Returns
     -------
-    TaylorDiagram
-        The Taylor diagram instance
+    td.TaylorDiagram
+        The TaylorDiagram instance containing the plot.
+
+    Examples
+    --------
+    Create a simple Taylor diagram comparing one model to observations:
+
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> obs = pd.Series(np.random.rand(100), name="obs")
+    >>> mod = pd.Series(np.random.rand(100), name="mod")
+    >>> dia = create_taylor_diagram(obs, mod, model_label="MyModel")
+    >>> plt.show()
+
+    Add a second model to the same diagram:
+
+    >>> mod2 = pd.Series(np.random.rand(100) * 1.2, name="mod2")
+    >>> dia = create_taylor_diagram(obs, mod2, model_label="MyModel2", dia=dia)
+    >>> plt.show()
     """
-    # Same implementation as before
-    from numpy import corrcoef
+    # Ensure data is clean and aligned
+    df = pd.DataFrame({"obs": obs, "model": model}).dropna()
+    obs_clean = df["obs"]
+    model_clean = df["model"]
 
-    df = df.drop_duplicates().dropna(subset=[col1, col2])
-
-    if not addon and dia is None:
+    if dia is None:
+        # Create a new diagram
         with sns.axes_style("ticks"):
-            f = plt.figure(figsize=(12, 10))
-            obsstd = df[col1].std()
-
-            dia = td.TaylorDiagram(obsstd, scale=scale, fig=f, rect=111, label=label1)
+            fig = plt.figure(figsize=(12, 10))
+            obs_std = obs_clean.std()
+            dia = td.TaylorDiagram(obs_std, scale=scale, fig=fig, rect=111, label=obs_label)
             plt.grid(linewidth=1, alpha=0.5)
-            cc = corrcoef(df[col1].values, df[col2].values)[0, 1]
-            dia.add_sample(df[col2].std(), cc, marker=marker, zorder=9, ls=None, label=label2)
             contours = dia.add_contours(colors="0.5")
             plt.clabel(contours, inline=1, fontsize=10)
             plt.grid(alpha=0.5)
-            plt.legend(fontsize="small", loc="best")
-
-    elif not addon and dia is not None:
-        print("Do you want to add this on? if so please turn the addon keyword to True")
-    elif addon and dia is None:
-        print("Please pass the previous Taylor Diagram Instance with dia keyword...")
     else:
-        cc = corrcoef(df.Obs.values, df.CMAQ.values)[0, 1]
-        dia.add_sample(df.CMAQ.std(), cc, marker=marker, zorder=9, ls=None, label=label1)
-        plt.legend(fontsize="small", loc="best")
-        plt.tight_layout()
+        # Use the existing diagram, but ensure its reference is compatible
+        if not np.isclose(dia.refstd, obs_clean.std()):
+            warnings.warn(
+                "The reference standard deviation of the provided diagram "
+                "differs from the new observation data. "
+                "Statistics will be based on the diagram's original reference.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+    # Calculate correlation and add the model sample to the diagram
+    corr = np.corrcoef(obs_clean.values, model_clean.values)[0, 1]
+    model_std = model_clean.std()
+
+    dia.add_sample(model_std, corr, label=model_label, **kwargs)
+
+    # Finalize plot details
+    dia.ax.legend(fontsize="small", loc="best")
+    plt.tight_layout()
+
     return dia

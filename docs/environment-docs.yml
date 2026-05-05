@@ -14,20 +14,16 @@ dependencies:
   - netcdf4
   - numpy
   - pandas>=1.0
-  - pydecorate
+  - pillow>=9.1.0
   - seaborn
   - xarray
+  - esmpy
   #
-  # optional
-  - pyresample
-  #
-  # docs
-  - nbsphinx
-  - sphinx=7.*
-  - sphinx-autobuild
-  - sphinx-autosummary-accessors
-  - sphinx_rtd_theme>=0.4
   #
   - pip>=21.1
   - pip:
+      - mkdocs
+      - mkdocs-material
+      - mkdocstrings[python]
+      - mkdocs-gallery
       - "-e ../"

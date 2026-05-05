@@ -1,107 +1,377 @@
+import typing as t
+
+import numpy as np
+import pandas as pd
 import xarray as xr
 from pandas import Series, merge_asof
 
+try:
+    import dask.dataframe as dd
 
-def combine_da_to_df(da, df, *, merge=True, **kwargs):
-    """Combine xarray data array with point observations in a DataFrame.
+    has_dask_df = True
+except ImportError:
+    has_dask_df = False
 
-    Interpolates gridded data to observation points using nearest neighbor
-    interpolation, then merges with the original observation data.
+
+def pair(
+    model: xr.Dataset | xr.DataArray,
+    obs: xr.Dataset | xr.DataArray | pd.DataFrame | t.Any,
+    *,
+    method: str = "nearest",
+    interp_time: bool = False,
+    suffix: str = "_model",
+    merge: bool = True,
+    **kwargs: t.Any,
+) -> xr.Dataset | xr.DataArray | pd.DataFrame | t.Any:
+    """Unified interface for pairing model and observation data.
+
+    Supports xarray (Dataset/DataArray) and DataFrame (pandas/dask) objects.
+    Maintains laziness for Dask-backed objects.
+    Supports both CF/COARDS and UGRID conventions via automatic standardization.
+
+    Parameters
+    ----------
+    model : xarray.Dataset or xarray.DataArray
+        Model data (usually gridded).
+    obs : xarray.Dataset, xarray.DataArray, pandas.DataFrame, or dask.dataframe.DataFrame
+        Observation data.
+    method : str, default 'nearest'
+        Spatial interpolation method.
+    interp_time : bool, default False
+        Whether to interpolate in time.
+    suffix : str, default '_model'
+        Suffix for model variables if names conflict.
+    merge : bool, default True
+        Whether to merge the paired data with the original observations.
+    **kwargs : dict
+        Additional arguments passed to regridding backend.
+
+    Returns
+    -------
+    xarray.Dataset, xarray.DataArray, pandas.DataFrame, or dask.dataframe.DataFrame
+        Matched object of the same type as `obs`.
+
+    Examples
+    --------
+    >>> paired_df = pair(model_ds, obs_df, method='bilinear')
+    """
+    if isinstance(obs, xr.Dataset | xr.DataArray):
+        return _pair_xarray(model, obs, method=method, interp_time=interp_time, suffix=suffix, merge=merge, **kwargs)
+    elif isinstance(obs, pd.DataFrame) or (has_dask_df and isinstance(obs, dd.DataFrame)):
+        return _pair_dataframe(model, obs, method=method, interp_time=interp_time, suffix=suffix, merge=merge, **kwargs)
+    else:
+        raise TypeError(f"Unsupported type for obs: {type(obs)}")
+
+
+def _pair_xarray(
+    model: xr.Dataset | xr.DataArray,
+    obs: xr.Dataset | xr.DataArray,
+    *,
+    method: str = "nearest",
+    interp_time: bool = False,
+    suffix: str = "_model",
+    merge: bool = True,
+    **kwargs: t.Any,
+) -> xr.Dataset | xr.DataArray:
+    """Pair xarray model with xarray observations."""
+    # Use remap via accessor - convention aware
+
+    # Detect if we have a trajectory (time-varying coordinates)
+    lat_name, lon_name = obs.monet._detect_latlon_names(obs)
+    is_trajectory = False
+    if lat_name and "time" in obs[lat_name].dims:
+        is_trajectory = True
+    elif lon_name and "time" in obs[lon_name].dims:
+        is_trajectory = True
+
+    if is_trajectory:
+        # For moving platforms, we must align time before spatial remapping
+        # to ensure we sample at the right location for each time step.
+        if interp_time:
+            model = model.interp(time=obs.time)
+        else:
+            # If not interpolating, use nearest neighbor time alignment
+            # Use .values to avoid issues if obs.time is part of a MultiIndex (fixes CI failure)
+            model = model.reindex(time=obs.time.values, method="nearest")
+
+        paired = obs.monet.remap(model, method=method, **kwargs)
+    elif not is_trajectory and "time" in obs.dims:
+        # For fixed grids, use a single time slice as the target grid to avoid
+        # AlignmentError if model and obs have different time dimension sizes.
+        # Must drop 'time' coord to avoid conflict with model's time dimension in output
+        target_grid = obs.isel(time=0).drop_vars("time", errors="ignore")
+        paired = target_grid.monet.remap(model, method=method, **kwargs)
+    else:
+        # Default behavior: attempt direct remap
+        paired = obs.monet.remap(model, method=method, **kwargs)
+
+    if interp_time:
+        paired = paired.interp(time=obs.time)
+
+    # Handle suffixes
+    if isinstance(model, xr.DataArray):
+        if model.name in obs.variables:
+            paired.name = str(model.name) + suffix
+    else:  # Dataset
+        for var in model.data_vars:
+            if var in obs.variables:
+                paired = paired.rename({var: var + suffix})
+
+    # Update history
+    from .conventions import update_history
+
+    update_history(paired, "Paired with observations via monet.pair")
+
+    if merge:
+        # Use compat='override' to prefer obs coordinates if there are slight mismatches
+        # (e.g. from regridding precision issues)
+        return xr.merge([obs, paired], compat="override")
+    else:
+        return paired
+
+
+def _pair_dataframe(
+    model: xr.Dataset | xr.DataArray,
+    obs: pd.DataFrame | t.Any,
+    *,
+    method: str = "nearest",
+    interp_time: bool = False,
+    suffix: str = "_model",
+    merge: bool = True,
+    **kwargs: t.Any,
+) -> pd.DataFrame | t.Any:
+    """Pair xarray model with pandas or dask DataFrame observations."""
+    # Detect spatial columns in DataFrame
+    lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+    lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+    lat_col = next((c for c in lat_names if c in obs.columns), None)
+    lon_col = next((c for c in lon_names if c in obs.columns), None)
+
+    if lat_col is None or lon_col is None:
+        raise AttributeError("Could not detect latitude and longitude columns in observation DataFrame.")
+
+    # Extract unique locations to minimize remapping work
+    # siteid is expected. If not present, we use lat/lon.
+    loc_cols = [lat_col, lon_col]
+    if "siteid" in obs.columns:
+        loc_cols.append("siteid")
+
+    unique_locs = obs[loc_cols].drop_duplicates()
+
+    # Convert unique locations to xarray (lazily if obs is dask)
+    if has_dask_df and isinstance(obs, dd.DataFrame):
+        # ESMF/xregrid requires eager coordinate arrays to build weights.
+        # We compute only the unique locations (usually small).
+        unique_locs_p = unique_locs.compute()
+    else:
+        unique_locs_p = unique_locs
+
+    # Convert to xarray point Dataset
+    from ..accessors.pandas_accessor import MONETAccessorPandas
+
+    # Convert Arrow strings to objects in unique_locs_p to avoid Dask/Xarray issues later
+    for col in unique_locs_p.columns:
+        if pd.api.types.is_string_dtype(unique_locs_p[col]) and not pd.api.types.is_numeric_dtype(unique_locs_p[col]):
+            unique_locs_p[col] = np.asarray(unique_locs_p[col], dtype=object)
+
+    point_ds = MONETAccessorPandas(unique_locs_p)._df_to_da()
+    if "siteid" in unique_locs_p.columns:
+        # Add siteid as a coordinate so it is preserved during remap and conversion back to DF
+        point_ds = point_ds.assign_coords(siteid=(("x"), unique_locs_p.siteid.values))
+
+    # Ensure model standard names match point_ds for xregrid if needed,
+    # but remap is already convention-aware.
+
+    # Remap model to points
+    paired_da = point_ds.monet.remap(model, method=method, **kwargs)
+
+    # Ensure siteid is preserved in coordinates for the join
+    if "siteid" in point_ds.coords:
+        if "x" in paired_da.dims:
+            paired_da = paired_da.assign_coords(siteid=(("x"), point_ds.siteid.data))
+
+    # Time interpolation if requested
+    if interp_time:
+        obs_times = obs.time.drop_duplicates()
+        if has_dask_df and isinstance(obs, dd.DataFrame):
+            obs_times = obs_times.compute()
+        paired_da = paired_da.interp(time=obs_times)
+
+    # Convert paired_da to DataFrame, matching laziness of model/paired_da
+    if isinstance(paired_da, xr.DataArray):
+        paired_da_ds = paired_da.to_dataset()
+    else:
+        paired_da_ds = paired_da
+
+    # Ensure all strings are object dtype to avoid Dask/Arrow issues during conversion
+    for var in paired_da_ds.variables:
+        if pd.api.types.is_string_dtype(paired_da_ds[var]) and not pd.api.types.is_numeric_dtype(paired_da_ds[var]):
+            paired_da_ds[var] = paired_da_ds[var].astype(object)
+
+    if paired_da.chunks and has_dask_df:
+        paired_df = paired_da_ds.to_dask_dataframe().reset_index()
+    else:
+        paired_df = paired_da_ds.to_dataframe().reset_index()
+
+    # Clean up dimensions from conversion
+    cols_to_drop = [c for c in ["x", "y", "z", "latitude", "longitude"] if c in paired_df.columns]
+    paired_df = paired_df.drop(columns=cols_to_drop)
+
+    # Ensure no Arrow-backed strings remain in paired_df before merging
+    if has_dask_df and isinstance(paired_df, dd.DataFrame):
+        # We can't easily iterate and convert columns in dask.dataframe eagerly,
+        # but the previous conversions should have prevented them from getting into paired_da_ds.
+        pass
+    else:
+        for col in paired_df.columns:
+            if pd.api.types.is_string_dtype(paired_df[col]) and not pd.api.types.is_numeric_dtype(paired_df[col]):
+                paired_df[col] = np.asarray(paired_df[col], dtype=object)
+
+    # Handle suffixes and variable names
+    if isinstance(model, xr.DataArray):
+        model_name = model.name or "model_data"
+        if model_name in obs.columns:
+            paired_df = paired_df.rename(columns={model_name: model_name + suffix})
+    else:  # Dataset
+        for var in model.data_vars:
+            if var in obs.columns:
+                paired_df = paired_df.rename(columns={var: var + suffix})
+
+    if merge:
+        # Perform join
+        join_on = ["time"]
+        if "siteid" in obs.columns:
+            join_on.append("siteid")
+
+        # If paired_df is dask, the result must be dask
+        if has_dask_df and isinstance(paired_df, dd.DataFrame):
+            if not isinstance(obs, dd.DataFrame):
+                obs = dd.from_pandas(obs, npartitions=paired_df.npartitions)
+            res = obs.merge(paired_df, on=join_on, how="left")
+        else:
+            # Both are pandas
+            res = obs.merge(paired_df, on=join_on, how="left")
+    else:
+        res = paired_df
+
+    # Provenance (limited for DataFrames, but we can add to attrs if it's pandas)
+    if isinstance(res, pd.DataFrame) and hasattr(res, "attrs"):
+        from .conventions import update_history
+
+        update_history(res, "Paired with xarray model via monet.pair")
+
+    return res
+
+
+def combine_da_to_df(
+    da: xr.DataArray | xr.Dataset,
+    df: pd.DataFrame,
+    *,
+    merge: bool = True,
+    suffix: str | None = None,
+    **kwargs: t.Any,
+) -> pd.DataFrame:
+    """Combine xarray data with point observations in a dataframe.
+
+    Note: This is a backward compatibility wrapper for `monet.pair`.
 
     Parameters
     ----------
     da : xarray.DataArray or xarray.Dataset
         Gridded data to be interpolated to target points.
-        Can be unstructured-grid data
-        (detected by checking ``'mio_has_unstructured_grid'`` attribute).
     df : pandas.DataFrame
-        Point observations with 'latitude', 'longitude', and 'siteid' columns.
+        Point observations.
     merge : bool, default True
-        If True, merge interpolated values with the original DataFrame.
-        If False, return only the interpolated values.
+        Whether to merge with original DataFrame.
+    suffix : str, optional
+        Suffix to add to variable names.
     **kwargs : dict
-        Additional arguments passed to remap_nearest or remap_nearest_unstructured.
+        Passed to `pair`.
 
     Returns
     -------
     pandas.DataFrame
-        DataFrame with interpolated model values at observation locations,
-        either merged with original data (if merge=True) or standalone.
+        Combined DataFrame.
     """
-    target_da = df.drop_duplicates(subset=["siteid"]).dropna(
-        subset=["latitude", "longitude", "siteid"]
-    )
-    target_data_da = target_da.monet._df_to_da()
-
-    # Add if statement for unstructured grid output
-    if da.attrs.get("mio_has_unstructured_grid", False):
-        da_interped = target_data_da.monet.remap_nearest_unstructured(da).compute()
-    else:
-        da_interped = target_data_da.monet.remap_nearest(da, **kwargs).compute()
-
-    da_interped["siteid"] = (("x"), target_da.siteid)
-    da_interped_df = da_interped.to_dataframe().reset_index()
-    cols = Series(da_interped_df.columns)
-
-    drop_cols = cols.loc[cols.isin(["x", "y", "z", "latitude", "longitude"])]
-    da_interped_df.drop(drop_cols, axis=1, inplace=True)
-    if isinstance(da, xr.DataArray):
-        if da.name in df.columns:
-            da_interped_df.rename(columns={da.name: da.name + "_new"}, inplace=True)
-    else:
-        dup_names = [name for name in da.data_vars.keys() if name in df.columns]
-        if len(dup_names) > 0:
-            for name in dup_names:
-                da_interped_df.rename(columns={name: name + "_new"}, inplace=True)
-    if merge:
-        df.reset_index(drop=True)
-        da_interped_df.reset_index(drop=True)
-        final_df = df.merge(da_interped_df, on=["time", "siteid"], how="left")
-        return final_df
-    else:
-        return da_interped_df
+    if suffix is not None:
+        kwargs["suffix"] = suffix
+    return pair(da, df, merge=merge, **kwargs)  # type: ignore
 
 
-def combine_da_to_da(source, target, *, merge=True, interp_time=False, **kwargs):
+def combine_da_to_da(
+    source: xr.DataArray | xr.Dataset,
+    target: xr.DataArray | xr.Dataset,
+    *,
+    merge: bool = True,
+    interp_time: bool = False,
+    **kwargs: t.Any,
+) -> xr.Dataset | xr.DataArray:
     """Combine gridded data with point observation data in xarray format.
 
-    Interpolates source gridded data to target point locations using nearest neighbor
-    interpolation, with optional time interpolation and merging.
+    Note: This is a backward compatibility wrapper. It restores the old behavior
+    of expanding 1D coordinates to a 2D meshgrid for compatibility with legacy tests.
+    For point-to-point pairing, use `monet.pair`.
 
     Parameters
     ----------
     source : xarray.DataArray or xarray.Dataset
         Gridded data to interpolate from.
     target : xarray.DataArray or xarray.Dataset
-        Point observation data with target coordinates.
+        Target grid or point observation data.
     merge : bool, default True
-        If True, merge interpolated values with the original target data.
-        If False, return only the interpolated values.
+        Whether to merge.
     interp_time : bool, default False
-        If True, linearly interpolate to the times in target.
+        Whether to interpolate in time.
     **kwargs : dict
-        Additional arguments passed to remap_nearest.
+        Additional arguments passed to `resample`.
 
     Returns
     -------
-    xarray.Dataset
-        Dataset with interpolated source data at target locations,
-        either merged with original target data (if merge=True) or standalone.
+    xarray.Dataset or xarray.DataArray
+        Combined Dataset.
     """
-    from ..monet_accessor import _dataset_to_monet
+    from .interp_util import lonlat_to_dataset
+    from .resample import resample
 
-    output = target.monet.remap_nearest(source, **kwargs)
+    # Check for legacy meshgrid expansion (if lat/lon are 1D and share a dimension)
+    target_grid = target
 
-    if interp_time:
-        output = output.interp(time=target.time)
+    # Direct coordinate detection for expansion to be more robust
+    lat_names = ["latitude", "lat", "Latitude", "y"]
+    lon_names = ["longitude", "lon", "Longitude", "x"]
+
+    lat_da = None
+    for n in lat_names:
+        if n in target.coords:
+            lat_da = target[n]
+            break
+
+    lon_da = None
+    for n in lon_names:
+        if n in target.coords:
+            lon_da = target[n]
+            break
+
+    if lat_da is not None and lon_da is not None:
+        if lat_da.ndim == 1 and lon_da.ndim == 1 and lat_da.dims == lon_da.dims:
+            # Legacy behavior: expand to meshgrid
+            target_grid = lonlat_to_dataset(lon_da.values, lat_da.values)
+
+    # Use resample directly instead of pair to avoid point-mode logic in pair
+    paired = resample(source, target_grid, **kwargs)
+
+    if interp_time and "time" in target.coords:
+        paired = paired.interp(time=target.time)
 
     if merge:
-        output = xr.merge([_dataset_to_monet(target), output])
+        # Note: Merging an expanded grid with the original points might lead to
+        # unexpected results (broadcasting), but this matches legacy behavior if merge=True was used.
+        return xr.merge([target, paired])
+    else:
+        return paired
 
-    return output
 
-
-def _rename_latlon(ds):
+def _rename_latlon(ds: xr.Dataset) -> xr.Dataset:
     """Standardize latitude/longitude coordinate names.
 
     Converts between 'latitude'/'longitude' and 'lat'/'lon' naming conventions.
@@ -124,87 +394,32 @@ def _rename_latlon(ds):
         return ds
 
 
-def combine_da_to_df_xesmf(da, df, *, suffix=None, **kwargs):
-    """Combine xarray data array `da` with spatial information
-    point observations in dataframe `df`, returning a new dataframe.
-
-    Uses :func:`~monet.util.resample.resample_xesmf`.
-
-    Parameters
-    ----------
-    da : xarray.DataArray or xarray.Dataset
-        Data to be interpolated to target grid points.
-    df : pandas.DataFrame
-        Data on target points.
-    suffix : str, optional
-        Added to the ``name`` of the new variable, defaults to ``'_new'``.
-    kwargs : dict
-        Passed on to :func:`~monet.util.resample.resample_xesmf`
-        (and then to ``xesmf.Regridder``).
-
-    Returns
-    -------
-    pandas.DataFrame
-    """
-    from ..util.interp_util import constant_1d_xesmf
-    from ..util.resample import resample_xesmf
-
-    # dfn = df.dropna(subset=[col])
-    dfnn = df.drop_duplicates(subset=["latitude", "longitude"])
-    # unit = dfnn[col + '_unit'].unique()[0]
-    # target_grid = lonlat_to_swathdefinition(
-    #     longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
-    target = constant_1d_xesmf(longitude=dfnn.longitude.values, latitude=dfnn.latitude.values)
-
-    da = _rename_latlon(da)  # check to rename latitude and longitude
-    da_interped = resample_xesmf(da, target, **kwargs)
-    da_interped = _rename_latlon(da_interped)  # check to change back
-    if suffix is None:
-        suffix = "_new"
-    rename_dict = {}
-    if isinstance(da_interped, xr.DataArray):
-        if da_interped.name in dfnn.keys():
-            da_interped.name = da_interped.name + suffix
-    else:
-        for i in da_interped.data_vars.keys():
-            if i in dfnn.keys():
-                rename_dict[i] = i + suffix
-        da_interped = da_interped.rename(rename_dict)
-    df_interped = da_interped.to_dataframe().reset_index()
-    cols = Series(df_interped.columns)
-    drop_cols = cols.loc[cols.isin(["x", "y", "z"])]
-    df_interped.drop(drop_cols, axis=1, inplace=True)
-
-    # if da.name in df.columns:
-    #     df_interped.rename(columns={da.name: da.name + '_new'}, inplace=True)
-    # print(df_interped.keys())
-    final_df = df.merge(
-        df_interped, on=["latitude", "longitude", "time"], how="left", suffixes=("", suffix)
-    )
-    return final_df
-
-
-def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
-    """Combine vertical profile data and surface observations using xESMF.
+def combine_da_to_df_strat(
+    da: xr.DataArray,
+    daz: xr.DataArray,
+    df: pd.DataFrame,
+    **kwargs: t.Any,
+) -> pd.DataFrame:
+    """Combine vertical profile data and surface observations.
 
     Parameters
     ----------
     da : xarray.DataArray
         Data to interpolate.
     daz : xarray.DataArray
-        Vertical coordinate data array
+        Vertical coordinate data array.
     df : pandas.DataFrame
-        DataFrame containing surface observations with lat/lon coordinates
-    **kwargs
-        Additional arguments passed to xesmf regridder
+        DataFrame containing surface observations with lat/lon coordinates.
+    **kwargs : dict
+        Additional arguments passed to regridder.
 
     Returns
     -------
     pandas.DataFrame
-        Combined data frame with interpolated model values at observation points
+        Combined data frame with interpolated model values at observation points.
     """
-    from ..util.interp_util import constant_1d_xesmf
-    from ..util.resample import resample_xesmf
+    from ..util.interp_util import points_to_dataset
+    from ..util.resample import resample
 
     try:
         if da.shape != daz.shape:
@@ -214,21 +429,24 @@ def combine_da_to_df_xesmf_strat(da, daz, df, **kwargs):
         print("da shape= ", da.shape, "daz shape= ", daz.shape)
         return -1
 
-    target = constant_1d_xesmf(longitude=df.longitude.values, latitude=df.latitude.values)
+    target = points_to_dataset(longitude=df.longitude.values, latitude=df.latitude.values)
 
-    # check to rename 'latitude' and 'longitude' for xe.Regridder
-    da = _rename_latlon(da)
-    daz = _rename_latlon(daz)
-    da_interped = resample_xesmf(da, target, **kwargs)  # interpolate fields
-    daz_interped = resample_xesmf(daz, target, **kwargs)
-    # check to change 'lat' 'lon' back
-    da_interped = _rename_latlon(da_interped)
-    daz_interped = _rename_latlon(daz_interped)
+    da_interped = resample(da, target, **kwargs)  # interpolate fields
+    daz_interped = resample(daz, target, **kwargs)
 
-    # sort aircraft target altitudes and call stratfiy from resample to do vertical interpolation
-    # resample_stratify from monet accessor
-    daz_interped_xyz = daz_interped.monet.stratify(sorted(df["altitude"]), daz_interped, axis=1)
-    da_interped_xyz = da_interped.monet.stratify(sorted(df["altitude"]), daz_interped, axis=1)
+    # Ensure daz_interped and da_interped are xarray.DataArray before using .monet
+    if not hasattr(daz_interped, "monet"):
+        daz_interped = xr.DataArray(daz_interped)
+    if not hasattr(da_interped, "monet"):
+        da_interped = xr.DataArray(da_interped)
+
+    # sort aircraft target altitudes and do vertical interpolation via pytspack
+    from pytspack import interpolate_vertical
+
+    altitude_levels = sorted(df["altitude"])
+    level_dim = da_interped.dims[1] if da_interped.ndim > 1 else da_interped.dims[0]
+    daz_interped_xyz = interpolate_vertical(daz_interped, altitude_levels, level_dim=level_dim)
+    da_interped_xyz = interpolate_vertical(da_interped, altitude_levels, level_dim=level_dim)
     da_interped_xyz.name = da.name
     daz_interped_xyz.name = "altitude"
     df_interped_xyz = da_interped_xyz.to_dataframe().reset_index()
@@ -283,1333 +501,9 @@ def combine_da_to_height_profile(da, dset, *, radius_of_influence=12e3):
     return dset
 
 
-#
-# def combine_to_df(model=None,
-#                   obs=None,
-#                   mapping_table=None,
-#                   lay=None,
-#                   radius=None):
-#     # first get mapping table for obs to model
-#     if radius is None:
-#         try:
-#             radius = model.dset.XCELL
-#         except AttributeError:
-#             radius = 40e3
-#     if mapping_table is None:
-#         mapping_table = get_mapping_table(model, obs)
-#     # get the data inside of the obs dataset (check for tolnet)
-#     if obs.objtype is not 'TOLNET' and obs.objtype is not 'AERONET':
-#         obslist = Series(obs.df.variable.unique())
-#         # find all variables to map
-#         comparelist = obslist.loc[obslist.isin(mapping_table.keys())]
-#         dfs = []
-#         for i in comparelist:
-#             print('Pairing: ' + i)
-#             obsdf = obs.df.groupby('variable').get_group(
-#                 i)  # get observations locations
-#             obsunit = obsdf.units.unique()[0]  # get observation unit
-#             # get observation lat and lons
-#             dfn = obsdf.drop_duplicates(subset=['latitude', 'longitude'])
-#           factor = check_units(model, obsunit, variable=mapping_table[i][0])
-#             try:
-#                 if lay is None and Series([model.objtype]).isin(
-#                     ['CAMX', 'CMAQ']).max():
-#                     modelvar = get_model_fields(
-#                         model, mapping_table[i], lay=0).compute() * factor
-#                 else:
-#                     modelvar = get_model_fields(
-#                         model, mapping_table[i], lay=lay).compute() * factor
-#                 mvar_interped = interpo.interp_latlon(
-#                     modelvar,
-#                     dfn.latitude.values,
-#                     dfn.longitude.values,
-#                     radius=radius)
-#                 combined_df = merge_obs_and_model(
-#                     mvar_interped,
-#                     obsdf,
-#                     dfn,
-#                     model_time=modelvar.time.to_index(),
-#                     daily=obs.daily,
-#                     obstype=obs.objtype)
-#                 dfs.append(combined_df)
-#             except KeyError:
-#                 print(i + ' not in dataset and will not be paired')
-#         df = concat(dfs)
-#
-#     return df
-#
-#
-# def merge_obs_and_model(model,
-#                         obs,
-#                         dfn,
-#                         model_time=None,
-#                         daily=False,
-#                         obstype=None):
-#     import pandas as pd
-#     e = pd.DataFrame(model, index=dfn.siteid, columns=model_time)
-#     w = e.stack(dropna=False).reset_index().rename(columns={
-#         'level_1': 'time',
-#         0: 'model'
-#     })
-#   if daily and pd.Series(['AirNow', 'AQS', 'IMPROVE']).isin([obstype]).max():
-#         w = w.merge(
-#             dfn[['siteid', 'variable', 'gmt_offset', 'pollutant_standard']],
-#             on='siteid',
-#             how='left')
-#         w = epa_util.regulatory_resample(w)
-#         w = w.merge(
-#             obs.drop(['time', 'gmt_offset', 'variable'], axis=1),
-#             on=['siteid', 'time_local', 'pollutant_standard'],
-#             how='left')
-#     elif daily:
-#         w.index = w.time
-#         w = w.resample('D').mean().reset_index().rename(
-#             columns={'level_1': 'time'})
-#         w = w.merge(obs, on=['siteid', 'time'], how='left')
-#     else:
-#         w = w.merge(
-#             obs, on=['siteid', 'time'],
-#             how='left')  # assume outputs are hourly
-#     return w
-#
-#
-# def get_model_fields(model, findkeys, lay=None, weights=None):
-#     from numpy import ones
-#     keys = model.dset.keys()
-#     print(findkeys)
-#     newkeys = Series(findkeys).loc[Series(findkeys).isin(keys)]
-#     if len(newkeys) > 1:
-#         mvar = model.select_layer(model.dset[newkeys[0]], lay=lay)
-#         for i in newkeys:
-#             mvar = mvar + model.select_layer(model.dset[newkeys[0]], lay=lay)
-#     else:
-#         mvar = model.get_var(findkeys[0], lay=lay)
-#     return mvar
-#
-#
-# def check_units(model, obsunit, variable=None):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     df : type
-#         Description of parameter `df`.
-#     param : type
-#         Description of parameter `param` (the default is 'O3').
-#     aqs_param : type
-#         Description of parameter `aqs_param` (the default is 'OZONE').
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#     if obsunit == 'UG/M3':
-#         fac = 1.
-#     elif obsunit == 'PPB':
-#         fac = 1000.
-#     elif obsunit == 'ppbC':
-#         fac = 1000.
-#         if variable == 'ISOPRENE':
-#             fac *= 5.
-#         elif variable == 'BENZENE':
-#             fac *= 6.
-#         elif variable == 'TOLUENE':
-#             fac *= 7.
-#         elif variable == 'O-XYLENE':
-#             fac *= 8.
-#     else:
-#         fac = 1.
-#     return fac
+def combine_grid_to_point_esmf(grid_data, point_df, method="bilinear", locstream_kwargs=None, regrid_kwargs=None):
+    """Combine gridded data with point observations using ESMF LocStream.
 
-# from __future__ import absolute_import, print_function
-#
-# from numpy import NaN, sort
-# from pandas import concat
-#
-# from . import interpolation as interpo
-# from ..obs import epa_util
-#
-#
-# def combine(model=None, obs=None):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     model : type
-#         Description of parameter `model` (the default is None).
-#     obs : type
-#         Description of parameter `obs` (the default is None).
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#     if model.objtype is 'CMAQ' and obs.objtype is 'AirNow':
-#         df = combine_aqs_cmaq(model, obs)
-#     if model.objtype is 'CAMX' and obs.objtype is 'AirNow':
-#         df = combine_aqs_camx(model, obs)
-#     if model.objtype is 'CMAQ' and obs.objtype is 'AQS':
-#         if obs.daily:
-#             df = combine_daily_aqs_cmaq(model, obs)
-#         else:
-#             df = combine_aqs_cmaq(model, obs)
-#     if model.objtype is 'CAMX' and obs.objtype is 'AQS':
-#         if obs.daily:
-#             df = combine_daily_aqs_camx(model, obs)
-#         else:
-#             df = combine_aqs_cmaq(model, obs)
-#     if (model.objtype is 'CMAQ' or model.objtype is 'CAMX') and obs.objtype is 'TOLNET':
-#         model_dset, obs_dset = combine_tolnet_model(model, obs)
-#     return df
-#
-#
-# def combine_crn(model, obs):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     model : type
-#         Description of parameter `model`.
-#     obs : type
-#         Description of parameter `obs`.
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#     comparelist = obs.df.Species.unique()
-#     g = obs.df.groupby('Species')
-#     dfs = []
-#     for i in comparelist:
-#         if i == 'SUR_TEMP':
-#             if ('TEMPG' in self.cmaq.metcrokeys):
-#                 dfmet = g.get_group(i)
-#                 cmaq = model.get_var(param='TEMPG').compute()
-#                 dfmet = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                               radius=model.dset.XCELL)
-#                 dfmet.Obs += 273.15
-#                 dfs.append(dfmet)
-#         elif i == 'T_HR_AVG':
-#             if (self.cmaq.metcro2d is None) | ('TEMP2' not in self.cmaq.metcrokeys):
-#                 dfmet = g.get_group(i)
-#                 cmaq = model.get_var(param='TEMP2').compute()
-#                 dfmet = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                               radius=model.dset.XCELL)
-#                 dfmet.Obs += 273.15
-#                 dfs.append(dfmet)
-#         elif i == 'SOLARAD':
-#             if (self.cmaq.metcro2d is None) | ('RGRND' not in self.cmaq.metcrokeys):
-#                 dfmet = g.get_group(i)
-#                 cmaq = model.get_var(param='RGRND').compute()
-#                 dfmet = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                               radius=model.dset.XCELL)
-#                 dfs.append(dfmet)
-#         elif i == 'SOIL_MOISTURE_5':
-#             if (self.cmaq.metcro2d is None) | ('SOIM1' not in self.cmaq.metcrokeys):
-#                 dfmet = g.get_group(i)
-#                 cmaq = model.get_var(param='SOILW').compute()
-#                 dfmet = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                               radius=model.dset.XCELL)
-#                 dfs.append(dfmet)
-#         elif i == 'SOIL_MOISTURE_10':
-#             if (self.cmaq.metcro2d is None) | ('SOIM1' not in self.cmaq.metcrokeys):
-#                 dfmet = g.get_group(i)
-#                 cmaq = model.get_var(param='SOILW').compute()
-#                 dfmet = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                               radius=model.dset.XCELL)
-#                 dfs.append(dfmet)
-#     df = pd.concat(dfs)
-#     df.dropna(inplace=True, subset=['Obs', 'model'])
-#     return df
-#
-#
-# def combine_improve_cmaq(model=None, obs=None):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     model : type
-#         Description of parameter `model` (the default is None).
-#     obs : type
-#         Description of parameter `obs` (the default is None).
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#     comparelist = sort(obs.self.improve.df.Species.unique())
-#     g = obs.df.groupby('Species')
-#     dfs = []
-#     for i in comparelist:
-#         if i == 'CLf':
-#             if ('ACLI' in self.cmaq.keys) | ('ACLJ' in self.cmaq.keys) | ('PM25_CL' in self.cmaq.keys):
-#                 dfpm25 = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='CLf', improve_param=i)
-#                 cmaq = self.cmaq.get_cmaqvar(lay=0, param='CLf').compute() * fac
-#                 dfpm25 = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                                radius=model.dset.XCELL)
-#                 self.cmaqpm25 = cmaq
-#                 dfs.append(dfpm25)
-#         elif i == 'PM10':
-#             dfpm = g.get_group(i)
-#             fac = epa_util.check_cmaq_units(param='PM10', improve_param=i)
-#             cmaqvar = model.get_var(lay=0, param='PM10').compute() * fac
-#             dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                          radius=model.dset.XCELL)
-#             self.cmaqpm10 = cmaqvar
-#             dfs.append(dfpm)
-#         elif i == 'PM2.5':
-#             dfpm = g.get_group(i)
-#             fac = epa_util.check_cmaq_units(param='PM25', improve_param=i)
-#             cmaqvar = model.get_var(lay=0, param='PM25').compute() * fac
-#             dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                          radius=model.dset.XCELL)
-#             self.cmaqpm25 = cmaqvar
-#             dfs.append(dfpm)
-#         elif i == 'NAf':
-#             if ('ANAI' in self.cmaq.keys) | ('ANAJ' in self.cmaq.keys) | ('PM25_NA' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='NAf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='NAf').compute() * fac
-#                 dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                              radius=model.dset.XCELL)
-#                 self.cmaqna = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'MGf':
-#             if ('AMGI' in self.cmaq.keys) | ('AMGJ' in self.cmaq.keys) | ('PM25_MG' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='MGf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='AMGJ').compute() * fac
-#                 dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                              radius=model.dset.XCELL)
-#                 self.cmaqmg = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'TIf':
-#             if ('ATIJ' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='TIj', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='ATIJ').compute() * fac
-#                 dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                              radius=model.dset.XCELL)
-#                 self.cmaqti = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'SIf':
-#             if ('ASIf' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='SIj', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='ASIJ').compute() * fac
-#                 dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                              radius=model.dset.XCELL)
-#                 self.cmaqti = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'Kf':
-#             if ('AKI' in self.cmaq.keys) | ('AKJ' in self.cmaq.keys) | ('PM25_K' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='Kf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='Kf').compute() * fac
-#                 dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                              radius=model.dset.XCELL)
-#                 self.cmaqk = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'CAf':
-#             if ('ACAJ' in self.cmaq.keys) | ('PM25_CA' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='CAf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='ACAJ').compute() * fac
-#                 dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                              radius=model.dset.XCELL)
-#                 self.cmaqca = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'SO4f':
-#             if ('ASO4I' in self.cmaq.keys) | ('ASO4J' in self.cmaq.keys) | ('PM25_SO4' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='SO4f', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='SO4f').compute() * fac
-#                 dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                              radius=model.dset.XCELL)
-#                 self.cmaqso4 = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'NH4f':
-#             if ('ANH4I' in self.cmaq.keys) | ('ANH4J' in self.cmaq.keys) | ('PM25_NH4' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='NH4f', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='NH4f').compute() * fac
-#                 dfpm = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                              radius=model.dset.XCELL)
-#                 self.cmaqnh4 = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'ammSO4f':
-#             if ('ANH4I' in self.cmaq.keys) | ('ANH4J' in self.cmaq.keys) | ('PM25_NH4' in self.cmaq.keys):
-#                 dfpmso4 = g.get_group(i)
-#                 dfpmno3 = g.get_group('ammNO3f')
-#                 dfpmso4.Species = 'NH4f'
-#                 dfpm = merge(dfpmso4, dfpmno3[['Obs', 'datetime', 'Site_Code']], on=['datetime', 'Site_Code'])
-#                 dfpm.rename(columns={'Obs_x': 'Obs'}, inplace=True)
-#                 dfpm.Obs = 2 * dfpm.Obs * 18. / 132. + dfpm.Obs_y * 18. / 80.
-#                 dfpm.drop('Obs_y', axis=1, inplace=True)
-#                 cmaqvar = model.get_var(lay=0, param='NH4f')
-#                 dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-#                 self.cmaqnh4 = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'NO3f':
-#             if ('ANO3I' in self.cmaq.keys) | ('ANO3J' in self.cmaq.keys) | ('PM25_NO3' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='NO3f', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='NO3f').compute() * fac
-#                 dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-#                 self.cmaqno3 = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'FEf':
-#             if ('AFEJ' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='FEf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='AFEJ').compute() * fac
-#                 dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-#                 self.cmaqfe = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'ALf':
-#             if ('AALF' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='ALf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='AALF').compute() * fac
-#                 dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-#                 self.cmaqal = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'MNf':
-#             if ('AMNJ' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='MNf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='AMNJ').compute() * fac
-#                 dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-#                 self.cmaqmn = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#         elif i == 'OCf':
-#             if ('APOCJ' in self.cmaq.keys):
-#                 dfpm = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(param='OCf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='OC').compute() * fac
-#                 dfpm = self.interp_to_improve(cmaqvar, dfpm, interp=interp, r=radius, weight_func=weight_func)
-#                 self.cmaqmn = cmaqvar
-#                 dfs.append(dfpm)
-#             else:
-#                 pass
-#
-#
-# def combine_aqs_camx(model, obs):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     model : type
-#         Description of parameter `model`.
-#     obs : type
-#         Description of parameter `obs`.
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#     g = obs.df.groupby('Species')
-#     comparelist = sort(obs.df.Species.unique())
-#     dfs = []
-#     for i in comparelist:
-#         if (i == 'OZONE') and ('O3' in model.keys):
-#             print('Interpolating Ozone:')
-#             df = g.get_group(i)
-#             fac = epa_util.check_cmaq_units(df, param='O3', aqs_param=i)
-#             cmaq = model.get_var(lay=0, param='O3').compute() * fac
-#             df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                        radius=model.dset.XCELL)
-#             df.Units = 'PPB'
-#             dfs.append(df)
-#         elif i == 'PM2.5':
-#             if ('PM25_TOT' in model.keys) | ('ASO4J' in model.keys):
-#                 print('Interpolating PM2.5:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='PM25', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='PM25').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'CO':
-#             if 'CO' in model.keys:
-#                 print('Interpolating CO:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='CO', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='CO').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NOY':
-#             if 'NOY' in model.keys:
-#                 print('Interpolating NOY:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NOY', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NOY').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'SO2':
-#             if 'SO2' in model.keys:
-#                 print('Interpolating SO2')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='SO2', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='SO2').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NOX':
-#             if ('NO' in model.keys) | ('NO2' in model.keys):
-#                 print('Interpolating NOX:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NOX', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NOX').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NO':
-#             if ('NO' in model.keys):
-#                 print('Interpolating NO:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NO2':
-#             if ('NO2' in model.keys):
-#                 print('Interpolating NO2:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO2', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO2').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'SO4f':
-#             if ('PM25_SO4' in model.keys) | ('ASO4J' in model.keys) | ('ASO4I' in model.keys):
-#                 print('Interpolating PSO4:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='SO4f', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='SO4f').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'PM10':
-#             if ('PM_TOTAL' in self.camx.keys) | ('ASO4K' in self.camx.keys):
-#                 print('Interpolating PM10:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='PM10', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='PM10').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NO3f':
-#             if ('PM25_NO3' in model.keys) | ('ANO3J' in model.keys) | ('ANO3I' in model.keys):
-#                 print('Interpolating PNO3:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO3f', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO3F').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'ECf':
-#             if ('PM25_EC' in model.keys) | ('AECI' in model.keys) | ('AECJ' in model.keys):
-#                 print('Interpolating PEC:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ECf', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ECf').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'OCf':
-#             if ('APOCJ' in model.keys):
-#                 print('Interpolating OCf:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='OCf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='OC').compute() * fac
-#                 df = interpo.interp_to_obs(cmaqvar, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'ETHANE':
-#             if ('ETHA' in model.keys):
-#                 print('Interpolating Ethane:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ETHA', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ETHA').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'BENZENE':
-#             if ('BENZENE' in model.keys):
-#                 print('Interpolating BENZENE:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df,
-#                                                 param='BENZENE', aqs_param=i)
-#                 cmaq = model.get_var(
-#                     lay=0, param='BENZENE').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'TOLUENE':
-#             if ('TOL' in model.keys):
-#                 print('Interpolating Toluene:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df,
-#                                                 param='TOL', aqs_param=i)
-#                 cmaq = model.get_var(
-#                     lay=0, param='TOL').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'ISOPRENE':
-#             if ('ISOP' in model.keys):
-#                 print('Interpolating Isoprene:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ISOP', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ISOP').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'O-XYLENE':
-#             if ('XYL' in model.keys):
-#                 print('Interpolating Xylene')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='XYL', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='XYL').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'WS':
-#             if ('WSPD10' in model.keys):
-#                 print('Interpolating WS:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='WSPD10')
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'TEMP':
-#             if 'TEMP2' in model.keys:
-#                 print('Interpolating TEMP:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='TEMP2')
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'WD':
-#             if ('WDIR10' in model.keys):
-#                 print('Interpolating WD:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='WDIR10')
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#     df = concat(dfs)
-#     df.dropna(subset=['Obs', 'CAMx'], inplace=True)
-#     return df
-#
-#
-# def combine_aqs_cmaq(model, obs):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     model : type
-#         Description of parameter `model`.
-#     obs : type
-#         Description of parameter `obs`.
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#
-#     g = obs.df.groupby('Species')
-#     comparelist = sort(obs.df.Species.unique())
-#     dfs = []
-#     for i in comparelist:
-#         if (i == 'OZONE'):  # & ('O3' in model.keys):
-#             print('Interpolating Ozone:')
-#             df = g.get_group(i)
-#             fac = epa_util.check_cmaq_units(df, param='O3', aqs_param=i)
-#             print(fac)
-#             cmaq = model.get_var(lay=0, param='O3').compute() * fac
-#             df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                        radius=model.dset.XCELL)
-#             #                    df.Obs, df.CMAQ = df.Obs, df.CMAQ
-#             df.Units = 'PPB'
-#             dfs.append(df)
-#         elif i == 'PM2.5':
-#             if ('PM25_TOT' in model.keys) | ('ASO4J' in model.keys):
-#                 print('Interpolating PM2.5:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='PM25', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='PM25').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'CO':
-#             if 'CO' in model.keys:
-#                 print('Interpolating CO:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='CO', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='CO').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NOY':
-#             if 'NOY' in model.keys:
-#                 print('Interpolating NOY:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NOY', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NOY').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'SO2':
-#             if 'SO2' in model.keys:
-#                 print('Interpolating SO2')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='SO2', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='SO2').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NOX':
-#             if ('NO' in model.keys) | ('NO2' in model.keys):
-#                 print('Interpolating NOX:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NOX', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NOX').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NO':
-#             if ('NO' in model.keys):
-#                 print('Interpolating NO:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NO2':
-#             if ('NO2' in model.keys):
-#                 print('Interpolating NO2:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO2', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO2').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'SO4f':
-#             if ('PM25_SO4' in model.keys) | ('ASO4J' in model.keys) | ('ASO4I' in model.keys):
-#                 print('Interpolating PSO4:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='SO4f', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='SO4f').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'PM10':
-#             if ('PM_TOTAL' in model.keys) or ('ASO4K' in model.keys):
-#                 print('Interpolating PM10:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='PM10', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='PM10').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'NO3f':
-#             if ('PM25_NO3' in model.keys) | ('ANO3J' in model.keys) | ('ANO3I' in model.keys):
-#                 print('Interpolating PNO3:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO3f', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO3F').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'ECf':
-#             if ('PM25_EC' in model.keys) | ('AECI' in model.keys) | ('AECJ' in model.keys):
-#                 print('Interpolating PEC:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ECf', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ECf').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'OCf':
-#             if ('APOCJ' in model.keys):
-#                 print('Interpolating OCf:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='OCf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='OC').compute() * fac
-#                 df = interpo.interp_to_obs(cmaqvar, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'ETHANE':
-#             if ('ETHA' in model.keys):
-#                 print('Interpolating Ethane:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ETHA', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ETHA').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'BENZENE':
-#             if ('BENZENE' in model.keys):
-#                 print('Interpolating BENZENE:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='BENZENE', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='BENZENE').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'TOLUENE':
-#             if ('TOL' in model.keys):
-#                 print('Interpolating Toluene:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='TOL', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='TOL').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'ISOPRENE':
-#             if ('ISOP' in model.keys):
-#                 print('Interpolating Isoprene:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ISOP', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ISOP').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'O-XYLENE':
-#             if ('XYL' in model.keys):
-#                 print('Interpolating Xylene')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='XYL', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='XYL').compute() * fac
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'WS':
-#             if ('WSPD10' in model.keys):
-#                 print('Interpolating WS:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='WSPD10')
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'TEMP':
-#             if 'TEMP2' in model.keys:
-#                 print('Interpolating TEMP:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='TEMP2')
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#         elif i == 'WD':
-#             if ('WDIR10' in model.keys):
-#                 print('Interpolating WD:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='WDIR10')
-#                 df = interpo.interp_to_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                            radius=model.dset.XCELL)
-#                 dfs.append(df)
-#     df = concat(dfs)
-#     df.dropna(subset=['Obs', 'model'], inplace=True)
-#     return df
-#
-#
-# def combine_daily_aqs_cmaq(model, obs):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     model : type
-#         Description of parameter `model`.
-#     obs : type
-#         Description of parameter `obs`.
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#
-#     g = obs.d_df.groupby('Species')
-#     comparelist = sort(obs.d_df.Species.unique())
-#     for i in comparelist:
-#         if (i == 'OZONE') and ('O3' in model.keys):
-#             print('Interpolating Ozone:')
-#             df = g.get_group(i)
-#             fac = 1000.
-#             cmaq = model.get_var(lay=0, param='O3').compute() * fac
-#             df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                           radius=model.dset.XCELL, daily=True)
-#             df.Units = 'PPB'
-#             print(df)
-#             dfs.append(df)
-#         elif i == 'PM2.5':
-#             if ('PM25_TOT' in model.keys) | ('ASO4J' in model.keys):
-#                 print('Interpolating PM2.5:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='PM25', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='PM25').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'CO':
-#             if 'CO' in model.keys:
-#                 print('Interpolating CO:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='CO', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='CO').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'NOY':
-#             if 'NOY' in model.keys:
-#                 print('Interpolating NOY:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NOY', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NOY').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'SO2':
-#             if 'SO2' in model.keys:
-#                 print('Interpolating SO2')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='SO2', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='SO2').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#
-#                 dfs.append(df)
-#         elif i == 'NOX':
-#             if ('NO' in model.keys) & ('NO2' in model.keys):
-#                 print('Interpolating NOX:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NOX', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NOX').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'NO':
-#             if ('NO' in model.keys):
-#                 print('Interpolating NO:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'NO2':
-#             if ('NO2' in model.keys):
-#                 print('Interpolating NO2:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO2', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO2').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'SO4f':
-#             if ('PM25_SO4' in model.keys) | ('ASO4J' in model.keys) | ('ASO4I' in model.keys):
-#                 print('Interpolating PSO4:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='SO4f', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='SO4f').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'PM10':
-#             if ('PM_TOTAL' in model.keys) | ('ASO4K' in model.keys):
-#                 print('Interpolating PM10:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='PM10', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='PM10').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                               radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'NO3f':
-#             if ('PM25_NO3' in model.keys) | ('ANO3J' in model.keys) | ('ANO3I' in model.keys):
-#                 print('Interpolating PNO3:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO3f', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO3F').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'ECf':
-#             if ('PM25_EC' in model.keys) | ('AECI' in model.keys) | ('AECJ' in model.keys):
-#                 print('Interpolating PEC:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ECf', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ECf').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'OCf':
-#             if ('APOCJ' in model.keys):
-#                 print('Interpolating OCf:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df,
-#                                                 param='OCf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='OC').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaqvar, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'ETHANE':
-#             if ('ETHA' in model.keys):
-#                 print('Interpolating Ethane:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ETHA', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ETHA').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'BENZENE':
-#             if ('BENZENE' in model.keys):
-#                 print('Interpolating BENZENE:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='BENZENE', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='BENZENE').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'TOLUENE':
-#             if ('TOL' in model.keys):
-#                 print('Interpolating Toluene:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='TOL', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='TOL').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'ISOPRENE':
-#             if ('ISOP' in model.keys):
-#                 print('Interpolating Isoprene:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ISOP', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ISOP').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'O-XYLENE':
-#             if ('XYL' in model.keys):
-#                 print('Interpolating Xylene')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='XYL', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='XYL').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'WS':
-#             if ('WSPD10' in model.keys):
-#                 print('Interpolating WS:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='WSPD10')
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'TEMP':
-#             if 'TEMP2' in model.keys:
-#                 print('Interpolating TEMP:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='TEMP2')
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'WD':
-#             if 'WDIR10' in model.keys:
-#                 print('Interpolating WD:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='WDIR10')
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#     df = concat(dfs)
-#     df.loc[df.Obs < 0] = NaN
-#     return df
-#
-#
-# def combine_daily_aqs_camx(model, obs):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     model : type
-#         Description of parameter `model`.
-#     obs : type
-#         Description of parameter `obs`.
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#     g = obs.d_df.groupby('Species')
-#     comparelist = sort(obs.d_df.Species.unique())
-#     for i in comparelist:
-#         if (i == 'OZONE') and ('O3' in model.keys):
-#             print('Interpolating Ozone:')
-#             df = g.get_group(i)
-#             fac = 1000.
-#             camx = model.get_var(lay=0, param='O3').compute() * fac
-#             df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                           radius=model.dset.XCELL, daily=True)
-#             df.Units = 'PPB'
-#             dfs.append(df)
-#         elif i == 'PM2.5':
-#             if ('PM25_TOT' in model.keys) | ('ASO4J' in model.keys):
-#                 print('Interpolating PM2.5:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='PM25', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='PM25').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'CO':
-#             if 'CO' in model.keys:
-#                 print('Interpolating CO:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='CO', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='CO').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'NOY':
-#             if 'NOY' in model.keys:
-#                 print('Interpolating NOY:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NOY', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NOY').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'SO2':
-#             if 'SO2' in model.keys:
-#                 print('Interpolating SO2')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='SO2', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='SO2').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'NOX':
-#             if ('NO' in model.keys) | ('NO2' in model.keys):
-#                 print('Interpolating NOX:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NOX', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NOX').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'NO':
-#             if ('NO' in model.keys):
-#                 print('Interpolating NO:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'NO2':
-#             if ('NO2' in model.keys):
-#                 print('Interpolating NO2:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO2', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO2').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'SO4f':
-#             if ('PM25_SO4' in model.keys) | ('ASO4J' in model.keys) | ('ASO4I' in model.keys):
-#                 print('Interpolating PSO4:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='SO4f', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='SO4f').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'PM10':
-#             if ('PM_TOTAL' in model.keys) | ('ASO4K' in model.keys):
-#                 print('Interpolating PM10:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='PM10', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='PM10').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values, model.longitude.values,
-#                                               radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'NO3f':
-#             if ('PM25_NO3' in model.keys) | ('ANO3J' in model.keys) | ('ANO3I' in model.keys):
-#                 print('Interpolating PNO3:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='NO3f', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='NO3F').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'ECf':
-#             if ('PM25_EC' in model.keys) | ('AECI' in model.keys) | ('AECJ' in model.keys):
-#                 print('Interpolating PEC:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ECf', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ECf').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'OCf':
-#             if ('APOCJ' in model.keys):
-#                 print('Interpolating OCf:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df,
-#                                                 param='OCf', improve_param=i)
-#                 cmaqvar = model.get_var(lay=0, param='OC').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaqvar, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'ETHANE':
-#             if ('ETHA' in model.keys):
-#                 print('Interpolating Ethane:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ETHA', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ETHA').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'BENZENE':
-#             if ('BENZENE' in model.keys):
-#                 print('Interpolating BENZENE:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='BENZENE', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='BENZENE').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'TOLUENE':
-#             if ('TOL' in model.keys):
-#                 print('Interpolating Toluene:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='TOL', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='TOL').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'ISOPRENE':
-#             if ('ISOP' in model.keys):
-#                 print('Interpolating Isoprene:')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='ISOP', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='ISOP').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'O-XYLENE':
-#             if ('XYL' in model.keys):
-#                 print('Interpolating Xylene')
-#                 df = g.get_group(i)
-#                 fac = epa_util.check_cmaq_units(df, param='XYL', aqs_param=i)
-#                 cmaq = model.get_var(lay=0, param='XYL').compute() * fac
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'WS':
-#             if ('WSPD10' in model.keys):
-#                 print('Interpolating WS:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='WSPD10')
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'TEMP':
-#             if 'TEMP2' in model.keys:
-#                 print('Interpolating TEMP:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='TEMP2')
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#         elif i == 'WD':
-#             if 'WDIR10' in model.keys:
-#                 print('Interpolating WD:')
-#                 df = g.get_group(i)
-#                 cmaq = model.get_var(lay=0, param='WDIR10')
-#                 df = interpo.interp_to_pt_obs(cmaq, df, model.latitude.values,
-#                                               model.longitude.values, radius=model.dset.XCELL, daily=True)
-#                 dfs.append(df)
-#     df = concat(dfs)
-#     df.loc[df.Obs < 0] = NaN
-#     return df
-#
-#
-# def combine_tolnet_model(model, obs, param='O3', resample=False, freq='H'):
-#     """Short summary.
-#
-#     Parameters
-#     ----------
-#     model : type
-#         Description of parameter `model`.
-#     obs : type
-#         Description of parameter `obs`.
-#     param : type
-#         Description of parameter `param` (the default is 'O3').
-#     resample : type
-#         Description of parameter `resample` (the default is False).
-#     freq : type
-#         Description of parameter `freq` (the default is 'H').
-#
-#     Returns
-#     -------
-#     type
-#         Description of returned object.
-#
-#     """
-#     # won't do too much.  just interpolate the model to observations in the x y space
-#     lat = obs.dset.Latitude
-#     lon = obs.dset.Longitude
-#     dset = find_nearest_latlon_xarray(model.dset[param], lat=lat, lon=lon, radius=model.dset.XCELL)
-#     if resample:
-#         dset = dset.resample(time=freq).mean()
-#         tolnet = obs.dset.resample(time=freq).mean()
-#     return dset, tolnet
+    Deprecated as ESMF dependency is removed.
+    """
+    raise NotImplementedError("This function relies on ESMF which has been removed.")

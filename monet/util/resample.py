@@ -1,175 +1,151 @@
+import typing as t
+
+import numpy as np
+import xarray as xr
+
+# Check for xregrid and esmpy at module level for better mockability and performance
 try:
-    from pyresample.geometry import AreaDefinition, SwathDefinition
-    from pyresample.kd_tree import XArrayResamplerNN  # noqa: F401
+    import esmpy  # noqa: F401
+    from xregrid import Regridder
 
-    has_pyresample = True
+    has_xregrid = True
 except ImportError:
-    print("PyResample not installed.  Some functionality will be lost")
-    has_pyresample = False
-try:
-    import xesmf  # noqa: F401
-
-    has_xesmf = True
-except ImportError:
-    has_xesmf = False
-
-
-def _ensure_swathdef_compatability(defn):
-    """Ensures the SwathDefinition is compatible with XArrayResamplerNN.
-
-    Converts longitude and latitude arrays in the SwathDefinition to xarray
-    DataArrays if they aren't already, which is required for XArrayResamplerNN.
-
-    Parameters
-    ----------
-    defn : pyresample.geometry.SwathDefinition
-        A :class:`pyresample.geometry.SwathDefinition` instance.
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition
-        A compatible SwathDefinition with xarray DataArrays for lons and lats.
-    """
-    import xarray as xr
-
-    if isinstance(defn.lons, xr.DataArray):
-        return defn  # do nothing
-    else:
-        defn.lons = xr.DataArray(defn.lons, dims=["y", "x"]).chunk()
-        defn.lats = xr.DataArray(defn.lons, dims=["y", "x"]).chunk()
-        return defn
-
-
-def _check_swath_or_area(defn):
-    """Checks for a SwathDefinition or AreaDefinition. If AreaDefinition do
-    nothing else ensure compatibility with XArrayResamplerNN.
-
-    Parameters
-    ----------
-    defn : pyresample.geometry.SwathDefinition or pyresample.geometry.AreaDefinition
-        The grid definition to check and potentially convert.
-
-    Returns
-    -------
-    pyresample.geometry.SwathDefinition or pyresample.geometry.AreaDefinition
-        The (potentially modified) grid definition ensuring compatibility
-        with XArrayResamplerNN.
-    """
     try:
-        if isinstance(defn, SwathDefinition):
-            newswath = _ensure_swathdef_compatability(defn)
-        elif isinstance(defn, AreaDefinition):
-            newswath = defn
-        else:
-            raise RuntimeError
-    except RuntimeError:
-        print("grid definition must be a pyresample SwathDefinition or AreaDefinition")
-        return
-    return newswath
+        import ESMF as esmpy  # noqa: F401
+        from xregrid import Regridder
+
+        has_xregrid = True
+    except ImportError:
+        has_xregrid = False
 
 
-def _reformat_resampled_data(orig, new, target_grid):
-    """Reformats the resampled data array filling in coords, name and attrs.
-
-    After resampling, this function ensures the new DataArray has proper
-    coordinates, name, and attributes from the original.
+def resample(
+    source_data: xr.DataArray | xr.Dataset,
+    target_grid: xr.DataArray | xr.Dataset,
+    method: str = "nearest",
+    **kwargs: t.Any,
+) -> xr.DataArray | xr.Dataset:
+    """Resample data using xregrid.
 
     Parameters
     ----------
-    orig : xarray.DataArray
-        Original input DataArray.
-    new : xarray.DataArray
-        Resampled xarray.DataArray
-    target_grid : pyresample.geometry
-        Target grid is the target SwathDefinition or AreaDefinition
-
-    Returns
-    -------
-    xarray.DataArray
-        Reformatted xarray.DataArray with proper coordinates and attributes.
-    """
-    target_lon, target_lat = target_grid.get_lonlats_dask()
-    new.name = orig.name
-    new["latitude"] = (("y", "x"), target_lat)
-    new["longitude"] = (("y", "x"), target_lon)
-    new.attrs["area"] = target_grid
-    return new
-
-
-def resample_stratify(da, levels, vertical, axis=1):
-    """Vertically interpolate data to specified levels.
-
-    Uses stratify package to interpolate a DataArray to new vertical levels.
-
-    Parameters
-    ----------
-    da : xarray.DataArray
-        The data to interpolate. Must have a vertical dimension.
-    levels : array-like
-        The target vertical levels to interpolate to.
-    vertical : array-like
-        The current vertical coordinate values.
-    axis : int, default 1
-        The axis representing the vertical dimension.
-
-    Returns
-    -------
-    xarray.DataArray
-        Data interpolated to the new vertical levels, preserving attributes
-        and other coordinates.
-    """
-    import stratify
-    import xarray as xr
-
-    result = stratify.interpolate(levels, vertical.chunk().data, da.chunk().data, axis=axis)
-    dims = da.dims
-    out = xr.DataArray(result, dims=dims, name=da.name)
-    out.attrs = da.attrs.copy()
-    if len(da.coords) > 0:
-        for vn in da.coords:
-            if vn != "z" and "z" not in da[vn].dims:
-                out[vn] = da[vn].copy()
-    return out
-
-
-def resample_xesmf(source_da, target_da, cleanup=False, **kwargs):
-    """Resample data from one grid to another using xESMF.
-
-    Uses xESMF to perform regridding between different coordinate systems and grids.
-
-    Parameters
-    ----------
-    source_da : xarray.DataArray or xarray.Dataset
-        The source data to regrid.
-    target_da : xarray.DataArray or xarray.Dataset
-        The target grid to regrid onto.
-    cleanup : bool, default False
-        Whether to remove the temporary weight file after regridding.
-    **kwargs
-        Additional keyword arguments passed to xesmf.Regridder constructor.
-        Common options include 'method' and 'locstream_out'.
+    source_data : xarray.DataArray or xarray.Dataset
+        Source data to be regridded (Backend-agnostic: supports NumPy or Dask).
+    target_grid : xarray.DataArray or xarray.Dataset
+        Target grid definition.
+    method : str, default: 'nearest'
+        Resampling method. Options include 'bilinear', 'nearest', 'conservative', etc.
+    **kwargs : dict
+        Additional keyword arguments passed to the regridder.
 
     Returns
     -------
     xarray.DataArray or xarray.Dataset
-        The regridded data with the same type as source_da.
-    """
-    if has_xesmf:
-        import xarray as xr
-        import xesmf as xe
+        Regridded data on the target grid.
 
-        regridder = xe.Regridder(source_da, target_da, **kwargs)
-        if cleanup:
-            regridder.clean_weight_file()
-        if isinstance(source_da, xr.Dataset):
-            das = {}
-            for name, i in source_da.data_vars.items():
-                das[name] = regridder(i)
-            ds = xr.Dataset(das)
-            ds.attrs = source_da.attrs
-            return ds
-        else:
-            da = regridder(source_da)
-            if da.name is None:
-                da.name = source_da.name
-            return da
+    Examples
+    --------
+    >>> out = resample(source, target, method='bilinear')
+    """
+
+    # Map method names
+    method_map = {
+        "linear": "bilinear",
+        "bilinear": "bilinear",
+        "nearest": "nearest_s2d",
+        "conservative": "conservative",
+        "nearest_s2d": "nearest_s2d",
+        "nearest_d2s": "nearest_d2s",
+    }
+    real_method = method_map.get(method, method)
+
+    # Ensure target_grid is a Dataset
+    if isinstance(target_grid, xr.DataArray):
+        target_grid = target_grid.to_dataset()
+
+    if not has_xregrid:
+        raise ImportError(
+            "xregrid (with esmpy/ESMF) is required for regridding. "
+            "Install it with: pip install xregrid\n"
+            "  or: conda install -c conda-forge esmpy xregrid"
+        )
+
+    # xregrid.Regridder detection logic works better with Datasets.
+    # If source_data is a DataArray, we pass a temporary Dataset for detection and application.
+    was_da = isinstance(source_data, xr.DataArray)
+    src_for_regrid = source_data
+    if was_da:
+        da_name = source_data.name or "data"
+        src_for_regrid = source_data.to_dataset(name=da_name)
+
+    # Create regridder and apply
+    regridder = Regridder(src_for_regrid, target_grid, method=real_method, **kwargs)
+    out = regridder(src_for_regrid)
+
+    # Convert back to DataArray if necessary
+    if was_da:
+        out = out[da_name]
+
+    # Update history for provenance
+    from .conventions import update_history
+
+    update_history(out, f"Resampled via monet.util.resample (method={real_method})")
+
+    return out
+
+
+def resample_stratify(
+    da: xr.DataArray,
+    levels,
+    vertical: xr.DataArray | str,
+    axis: int = 1,
+    tension: float = 0.0,
+) -> xr.DataArray:
+    """Deprecated: use ``pytspack.interpolate_vertical`` directly.
+
+    Parameters
+    ----------
+    da : xarray.DataArray
+        The data to interpolate.
+    levels : array-like
+        Target vertical level values.
+    vertical : xarray.DataArray or str
+        Vertical coordinate DataArray or coordinate name.
+    axis : int, default 1
+        Axis index used only to infer ``level_dim`` when ``vertical`` is a DataArray
+        without a name.
+    tension : float, default 0.0
+        Tension factor for the spline interpolation.
+
+    Returns
+    -------
+    xarray.DataArray
+        Data interpolated to the new vertical levels.
+    """
+    import warnings
+
+    from pytspack import interpolate_vertical
+
+    warnings.warn(
+        "resample_stratify() is deprecated. Use pytspack.interpolate_vertical() directly.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
+    if isinstance(vertical, str):
+        level_dim = vertical
+    elif isinstance(vertical, xr.DataArray) and vertical.name:
+        level_dim = vertical.name
+    else:
+        level_dim = da.dims[axis]
+        if not isinstance(vertical, str) and isinstance(vertical, xr.DataArray):
+            da = da.assign_coords({level_dim: vertical})
+
+    if isinstance(levels, xr.DataArray):
+        levels = levels.values
+
+    # pytspack requires a single chunk along the core (vertical) dimension
+    if hasattr(da.data, "chunks") and level_dim in da.dims:
+        da = da.chunk({level_dim: -1})
+
+    return interpolate_vertical(da, np.asarray(levels), level_dim=level_dim, tension=tension)

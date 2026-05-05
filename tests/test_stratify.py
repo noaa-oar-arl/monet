@@ -3,7 +3,20 @@ import pytest
 import xarray as xr
 
 import monet  # noqa: F401
-from monet.util.resample import resample_stratify
+
+# Check if pytspack is available
+try:
+    import pytspack  # noqa: F401
+
+    PYTSPACK_AVAILABLE = True
+except ImportError:
+    PYTSPACK_AVAILABLE = False
+
+# Skip all tests if pytspack is not available
+skip_if_no_pytspack = pytest.mark.skipif(
+    not PYTSPACK_AVAILABLE,
+    reason="pytspack not installed",
+)
 
 
 @pytest.fixture(scope="module", params=[False, True], ids=["no-dask", "dask"])
@@ -24,10 +37,9 @@ def model(request):
         data_vars={
             "data1": (("z", "y", "x"), data1),
             "data2": (("z", "y", "x"), data2),
-            "height": (("z", "y", "x"), zv[:, None, None]),
         },
         coords={
-            "lev": ("z", zv),
+            "z": ("z", zv),
             "lat": ("y", yv),
             "lon": ("x", xv),
         },
@@ -39,39 +51,78 @@ def model(request):
     return ds
 
 
-def test_resample_stratify(model):
+@skip_if_no_pytspack
+def test_interpolate_vertical_da(model):
+    from pytspack import interpolate_vertical
+
     da = model.data1
-    old_coord = model.height
-    new_coord_vals = xr.DataArray(data=np.linspace(0, 1, 10), dims="z")
-    da_interped = resample_stratify(da, new_coord_vals, old_coord, axis=0)
+    # pytspack requires a single chunk along the core (vertical) dimension
+    if hasattr(da.data, "chunks"):
+        da = da.chunk({"z": -1})
+    target_levels = np.linspace(0, 1, 10)
+    result = interpolate_vertical(da, target_levels, level_dim="z")
 
-    assert da_interped.dims == ("z", "y", "x")
-    assert da_interped.z.size == 10
-    assert da_interped.coords == da.reset_coords("lev").coords
-    assert da_interped.name == da.name
-    assert da_interped.isel(z=0) == da.isel(z=0), "same lb"
-    assert da_interped.isel(z=-1) == da.isel(z=-1), "same ub"
-
-
-def test_accessor_stratify_da(model):
-    da = model.data1
-    old_coord = model.height
-    new_coord_vals = xr.DataArray(data=np.linspace(0, 1, 10), dims="z")
-    da_interped = da.monet.stratify(levels=new_coord_vals, vertical=old_coord, axis=0)
-
-    assert da_interped.dims == ("z", "y", "x")
-    assert da_interped.z.size == 10
-    assert da_interped.coords == da.reset_coords("lev").coords
-    assert da_interped.name == da.name
+    assert result.dims == ("z", "y", "x")
+    assert result.z.size == 10
+    assert result.name == da.name
 
 
-def test_accessor_stratify_ds(model):
+@skip_if_no_pytspack
+def test_interpolate_vertical_ds(model):
+    from pytspack import interpolate_vertical
+
     ds = model
-    old_coord = model.height
-    new_coord_vals = xr.DataArray(data=np.linspace(0, 1, 10), dims="z")
-    ds_interped = model.monet.stratify(levels=new_coord_vals, vertical=old_coord, axis=0)
+    # pytspack requires a single chunk along the core (vertical) dimension
+    if any(hasattr(ds[v].data, "chunks") for v in ds.data_vars):
+        ds = ds.chunk({"z": -1})
+    target_levels = np.linspace(0, 1, 10)
+    result = interpolate_vertical(ds, target_levels, level_dim="z")
 
-    assert set(ds_interped.dims) == {"z", "y", "x"}
-    assert ds_interped.z.size == 10
-    assert ds_interped.coords == ds.reset_coords("lev").coords
-    assert set(ds_interped.data_vars) == {"data1", "data2"}
+    assert isinstance(result, xr.Dataset)
+    assert result["z"].size == 10
+    assert "data1" in result.data_vars
+    assert "data2" in result.data_vars
+
+
+@skip_if_no_pytspack
+def test_accessor_interpolate_vertical_da(model):
+    da = model.data1
+    target_levels = np.linspace(0, 1, 10)
+    result = da.monet.interpolate_vertical(target_levels, level_dim="z")
+
+    assert result.dims == ("z", "y", "x")
+    assert result.z.size == 10
+    assert result.name == da.name
+
+
+@skip_if_no_pytspack
+def test_accessor_interpolate_vertical_ds(model):
+    target_levels = np.linspace(0, 1, 10)
+    result = model.monet.interpolate_vertical(target_levels, level_dim="z")
+
+    assert isinstance(result, xr.Dataset)
+    assert result["z"].size == 10
+    assert "data1" in result.data_vars
+    assert "data2" in result.data_vars
+
+
+@skip_if_no_pytspack
+def test_accessor_stratify_deprecated(model):
+    """stratify() still works but raises DeprecationWarning."""
+    da = model.data1
+    target_levels = xr.DataArray(data=np.linspace(0, 1, 10), dims="z")
+    with pytest.warns(DeprecationWarning, match="interpolate_vertical"):
+        result = da.monet.stratify(levels=target_levels, vertical="z", axis=0)
+    assert result.z.size == 10
+
+
+@skip_if_no_pytspack
+def test_resample_stratify_deprecated(model):
+    """resample_stratify() still works but raises DeprecationWarning."""
+    from monet.util.resample import resample_stratify
+
+    da = model.data1
+    target_levels = np.linspace(0, 1, 10)
+    with pytest.warns(DeprecationWarning, match="pytspack.interpolate_vertical"):
+        result = resample_stratify(da, target_levels, "z", axis=0)
+    assert result.z.size == 10

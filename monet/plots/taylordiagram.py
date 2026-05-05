@@ -11,7 +11,6 @@ performance, including:
 Reference:
 Taylor, K.E., 2001. Summarizing multiple aspects of model performance in a
 single diagram. Journal of Geophysical Research, 106(D7), 7183-7192.
-http://www-pcmdi.llnl.gov/about/staff/Taylor/CV/Taylor_diagram_primer.htm
 """
 
 import functools
@@ -104,9 +103,10 @@ class TaylorDiagram:
 
         if fig is None:
             fig = plt.figure()
+        self.fig = fig
 
-        ax = FA.FloatingSubplot(fig, rect, grid_helper=ghelper)
-        fig.add_subplot(ax)
+        ax = FA.FloatingSubplot(self.fig, rect, grid_helper=ghelper)
+        self.fig.add_subplot(ax)
 
         # Adjust axes
         ax.axis["top"].set_axis_direction("bottom")  # "Angle axis"
@@ -132,13 +132,13 @@ class TaylorDiagram:
 
         # Add reference point and stddev contour
         print("Reference std:", self.refstd)
-        (l,) = self.ax.plot([0], self.refstd, "r*", ls="", ms=14, label=label, zorder=10)
+        (line,) = self.ax.plot([0], self.refstd, "r*", ls="", ms=14, label=label, zorder=10)
         t = np.linspace(0, np.pi / 2)
         r = np.zeros_like(t) + self.refstd
         self.ax.plot(t, r, "k--", label="_")
 
         # Collect sample points for latter use (e.g. legend)
-        self.samplePoints = [l]
+        self.samplePoints = [line]
 
     @_sns_context
     def add_sample(self, stddev, corrcoef, *args, **kwargs):
@@ -166,10 +166,10 @@ class TaylorDiagram:
         Points closer to the reference point indicate better agreement with
         the reference dataset.
         """
-        (l,) = self.ax.plot(np.arccos(corrcoef), stddev, *args, **kwargs)  # (theta,radius)
-        self.samplePoints.append(l)
+        (line,) = self.ax.plot(np.arccos(corrcoef), stddev, *args, **kwargs)  # (theta,radius)
+        self.samplePoints.append(line)
 
-        return l
+        return line
 
     @_sns_context
     def add_contours(self, levels=5, **kwargs):
@@ -229,13 +229,18 @@ if __name__ == "__main__":
         ax1 = fig.add_subplot(1, 2, 1, xlabel="X", ylabel="Y")
         ax1.plot(x, data, "ko", label="Data")
         for i, m in enumerate([m1, m2, m3]):
-            ax1.plot(x, m, c=colors_[i], label="Model %d" % (i + 1))
+            ax1.plot(x, m, c=colors_[i], label=f"Model {i + 1}")
     ax1.legend(numpoints=1, prop=dict(size="small"), loc="best")
 
     # Add samples to Taylor diagram
     for i, (stddev, corrcoef) in enumerate(samples):
         dia.add_sample(
-            stddev, corrcoef, marker="s", ls="", c=colors_[i], label="Model %d" % (i + 1)
+            stddev,
+            corrcoef,
+            marker="s",
+            ls="",
+            c=colors_[i],
+            label=f"Model {i + 1}",
         )
 
     # Add RMS contours, and label them

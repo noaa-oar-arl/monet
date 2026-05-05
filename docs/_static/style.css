@@ -1,23 +1,18 @@
-@import url("theme.css");
-
-.wy-side-nav-search > a img.logo,
-.wy-side-nav-search .wy-dropdown > a img.logo {
-  width: 12rem;
+/* Material theme overrides for MONET */
+:root {
+  --md-primary-fg-color: #00467f;
+  --md-primary-fg-color--light: #0085ca;
+  --md-primary-fg-color--dark: #003058;
+  --md-accent-fg-color: #0085ca;
 }
 
-.wy-side-nav-search {
-  background-color: #eee;
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #00467f;
+  --md-accent-fg-color: #0085ca;
 }
 
-.wy-side-nav-search > div.version {
-  display: none;
-}
-
-.wy-nav-top {
-  background-color: #eee;
-}
-
-nav.wy-nav-top > a,
-i.fa-bars {
-  color: #404040; /* this is the body text color */
+/* Adjust logo size in search/sidebar */
+.md-logo img {
+  height: 2rem;
+  width: auto;
 }

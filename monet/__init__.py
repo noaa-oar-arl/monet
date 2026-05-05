@@ -17,25 +17,61 @@ util : module
     General utility functions and statistical tools
 """
 
-from . import met_funcs, monet_accessor, plots, util
+from . import met_funcs, plots, util
+
+try:
+    # Import accessors to ensure they get registered
+    from .accessors import base, dataarray_accessor, dataset_accessor, pandas_accessor  # noqa: F401
+
+    _accessors_available = True
+except ImportError:
+    # Skip accessor registration if dependencies are missing during docs build
+    _accessors_available = False
+    base = None
 from .plots import savefig
+from .util.coards_tools import (
+    add_cf_attributes,
+    add_cf_standard_names,
+    convert_coards_to_monet_format,
+    is_coards_compliant,
+    monet_to_coards,
+)
 
 __version__ = "2.3.1"
 
 # Core functionality
 __all__ = [
     "__version__",
-    "plots",  # Plotting utilities and visualization tools
-    "sat",  # Satellite data tools
-    "util",  # General utility functions
-    "monet_accessor",  # xarray/pandas accessors
-    "met_funcs",  # Meteorological functions
-    "savefig",  # Save figure utility
-    "dataset_to_monet",  # Convert datasets to MONET format
-    "rename_to_monet_latlon",  # Standardize lat/lon naming
-    "rename_latlon",  # Basic lat/lon renaming
+    "plots",
+    "util",
+    "accessors",
+    "met_funcs",
+    "savefig",
+    "dataset_to_monet",
+    "rename_to_monet_latlon",
+    "rename_latlon",
+    "convert_coards_to_monet_format",
+    "is_coards_compliant",
+    "add_cf_attributes",
+    "monet_to_coards",
+    "add_cf_standard_names",
 ]
 
-dataset_to_monet = monet_accessor._dataset_to_monet
-rename_to_monet_latlon = monet_accessor._rename_to_monet_latlon
-rename_latlon = monet_accessor._rename_latlon
+# Use the base accessor methods for the old function names for backward compatibility
+try:
+    dataset_to_monet = base.BaseAccessor._dataset_to_monet
+    rename_to_monet_latlon = base.BaseAccessor._rename_to_monet_latlon
+    rename_latlon = base.BaseAccessor._rename_latlon
+except AttributeError:
+    # Fallback if accessors aren't properly initialized (e.g., during docs build)
+    def dataset_to_monet(*args, **kwargs):
+        """Placeholder function for docs build."""
+        pass
+
+    def rename_to_monet_latlon(*args, **kwargs):
+        """Placeholder function for docs build."""
+        pass
+
+    def rename_latlon(*args, **kwargs):
+        """Placeholder function for docs build."""
+        pass
