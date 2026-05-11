@@ -6,6 +6,22 @@ import xarray as xr
 
 from .base import BaseAccessor, has_xregrid
 
+try:
+    import dask.dataframe as dd
+
+    @dd.extensions.register_dataframe_accessor("monet")
+    class MONETAccessorDask(BaseAccessor):
+        def __init__(self, dask_obj):
+            self._obj = dask_obj
+
+        def pair(self, model, **kwargs):
+            from ..util.combinetool import pair
+
+            return pair(model, self._obj, **kwargs)
+
+except ImportError:
+    pass
+
 
 @pd.api.extensions.register_dataframe_accessor("monet")
 class MONETAccessorPandas(BaseAccessor):

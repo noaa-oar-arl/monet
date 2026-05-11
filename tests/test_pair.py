@@ -196,6 +196,8 @@ def test_pair_gridded_to_gridded(sample_model):
 
 
 def test_pair_pandas_obs_lazy_model(sample_model, sample_obs_df):
+    if not has_dask:
+        pytest.skip("dask not installed")
     # Make model lazy
     sample_model = sample_model.chunk({"time": 6})
 

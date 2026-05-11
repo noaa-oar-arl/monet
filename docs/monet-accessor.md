@@ -50,6 +50,18 @@ Create a grid of map plots for each time slice of a variable.
 fig, axes = ds.O3.monet.quick_facet_time_map(ncols=4)
 ```
 
+### Pairing Data
+
+The `.pair()` method provides a high-level interface for matching model data with observations. It is available on all MONET accessors (DataArray, Dataset, and DataFrame).
+
+```python
+# Pair model Dataset with observation DataFrame
+paired = ds.monet.pair(obs_df)
+
+# Pair model DataArray with observation Dataset (e.g. for trajectory)
+paired_traj = ds.O3.monet.pair(obs_ds, interp_time=True)
+```
+
 ## Convention-Aware Coordinate Detection
 
 MONET is designed to work with various data conventions without requiring destructive renaming of dimensions or coordinates. The accessor automatically detects latitude and longitude based on common naming patterns, CF standard names, units, and UGRID mesh topologies.

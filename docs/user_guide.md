@@ -53,6 +53,44 @@ ugrid_paired = ugrid_ds.monet.remap(obs_points, method="nearest")
 
 Methods include `"bilinear"`, `"nearest"`, `"conservative"`, etc.
 
+### Pairing Model and Observations
+
+The `pair` utility is the primary way to match model data (usually gridded) with observations (usually points). It supports Xarray and Pandas/Dask DataFrames.
+
+#### Pairing with DataFrames (Fixed Sites)
+
+When pairing with a DataFrame, MONET automatically detects latitude, longitude, and site ID columns.
+
+```python
+import monet
+
+# Pair model Dataset with observation DataFrame
+paired_df = monet.pair(model_ds, obs_df, method="bilinear")
+
+# Also available via accessor
+paired_df = model_ds.monet.pair(obs_df)
+# or
+paired_df = obs_df.monet.pair(model_ds)
+```
+
+#### Trajectory Pairing (Moving Platforms)
+
+For moving platforms (like aircraft or ships) where coordinates vary with time, MONET aligns the time dimension before spatial remapping.
+
+```python
+# model_ds: (time, y, x)
+# obs_ds: (time,) with time-varying 'latitude' and 'longitude' coordinates
+paired_traj = monet.pair(model_ds, obs_ds, interp_time=True)
+```
+
+#### Gridded-to-Gridded Pairing
+
+You can also pair two gridded datasets. The model will be remapped to the observation grid.
+
+```python
+paired_grid = monet.pair(model_ds, obs_gridded_ds)
+```
+
 ### Plotting Data on a Map
 
 ```python
