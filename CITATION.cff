@@ -1,5 +1,6 @@
 cff-version: "1.2.0"
-title: monetio
+title: monet
+version: "2.3.1"
 type: software
 message: If you use this software, please cite it using the metadata from this file.
 authors:

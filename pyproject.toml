@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "monet"
-version = "2.2.12"
+version = "2.3.1"
 description = "The Model and Observation Evaluation Toolkit (MONET)"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -51,7 +51,9 @@ regions = [
     "rasterio",
     "shapely",
 ]
-obs = []
+obs = [
+    "monetio @ git+https://github.com/noaa-oar-arl/monetio",
+]
 
 
 [tool.setuptools]
