@@ -5,3 +5,7 @@ updates:
     schedule:
       interval: "monthly"
     target-branch: "develop"
+    groups:
+      gha-workflow-deps:
+        patterns:
+          - "*"
