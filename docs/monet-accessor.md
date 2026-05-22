@@ -1,6 +1,6 @@
-# MONET Xarray Accessor
+# MONET Accessors
 
-MONET adds georeferencing and analysis tools to xarray's data structures through [their accessor mechanism](https://docs.xarray.dev/en/stable/internals/extending-xarray.html). These tools can be accessed via a special `.monet` attribute, available for both `xarray.DataArray` and `xarray.Dataset` objects after importing `monet`.
+MONET adds georeferencing and analysis tools to xarray and pandas data structures through [accessor mechanisms](https://docs.xarray.dev/en/stable/internals/extending-xarray.html). These tools can be accessed via a special `.monet` attribute, available for `xarray.DataArray`, `xarray.Dataset`, and `pandas.DataFrame` objects after importing `monet`.
 
 ## Initializing the Accessor
 
@@ -40,6 +40,20 @@ If you wanted to only find the nearest location for a single variable, you can u
 ```python
 ds.O3.monet.nearest_latlon(lat=20.5, lon=-157.4)
 ```
+
+### Comparison and Statistics
+
+The `compare` method allows for quick comparison between two `DataArray` objects. It automatically aligns the data and can compute various statistics or a simple difference.
+
+```python
+# Compute difference (da1 - da2) and plot automatically
+ds.O3.monet.compare(obs.O3, stat='diff', plot=True)
+
+# Compute RMSE and return a DataArray (lazily if using Dask)
+rmse_da = ds.O3.monet.compare(obs.O3, stat='RMSE', plot=False)
+```
+
+Supported statistics include metrics from `monet-stats` (e.g., `RMSE`, `MB`, `MAE`, `NMB`, `IOA`).
 
 ### Faceted Time Map
 
@@ -126,20 +140,6 @@ ds_tidied = ds.monet.tidy()
 ```
 
 ## Comparison and Analysis
-
-### Difference and Statistics
-
-The `compare` method allows for quick comparison between two `DataArray` objects. It automatically aligns the data and can compute various statistics or a simple difference.
-
-```python
-# Compute difference (da1 - da2) and plot automatically
-ds.O3.monet.compare(obs.O3, stat='diff', plot=True)
-
-# Compute RMSE and return a DataArray (lazily if using Dask)
-rmse_da = ds.O3.monet.compare(obs.O3, stat='RMSE', plot=False)
-```
-
-Supported statistics include metrics from `monet-stats` (e.g., `RMSE`, `MB`, `MAE`, `NMB`, `IOA`).
 
 ### Vertical Interpolation
 

@@ -116,6 +116,7 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - findclosest
         - kolmogorov_zurbenko_filter
         - wsdir2uv
+        - get_relhum
         - long_to_wide
         - calc_8hr_rolling_max
         - calc_24hr_ave
@@ -123,7 +124,33 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - calc_annual_ave
         - get_giorgi_region_bounds
         - get_giorgi_region_df
+        - get_epa_region_bounds
+        - get_epa_region_df
+        - add_mask
         - calc_13_category_usda_soil_type
+
+### Meteorological Functions
+
+::: monet.met_funcs
+    options:
+      members:
+        - calc_pressure
+        - calc_rho
+        - calc_vapor_pressure
+        - calc_mixing_ratio
+        - calc_sun_angles
+        - calc_L
+        - calc_u_star
+        - calc_Psi_H
+        - calc_Psi_M
+
+### Vertical Coordinate Utilities
+
+::: monet.util.vertical
+    options:
+      members:
+        - calc_fv3_pressure
+        - calc_fv3_height
 
 ### Combine Tool
 
@@ -133,6 +160,7 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - pair
         - combine_da_to_df
         - combine_da_to_da
+        - combine_da_to_height_profile
         - combine_point
 
 ### Error Metrics

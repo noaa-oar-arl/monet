@@ -29,6 +29,15 @@ from monet.plots.plots import spatial_bias_scatter
 fig, ax = spatial_bias_scatter(ds, cmap='RdBu_r')
 ```
 
+### Point Scatter Bias
+Create a spatial scatter plot showing the bias between two columns in a DataFrame.
+
+```python
+from monet.plots import sp_scatter_bias
+
+ax = sp_scatter_bias(df, col1='obs', col2='mod')
+```
+
 ## Statistical Plots
 
 ### Time Series with Error Shading
@@ -52,13 +61,13 @@ ax = kdeplot(df['obs'], title='Distribution of Observations')
 Taylor diagrams are used to concisely summarize multiple aspects of model performance (correlation, RMS error, and standard deviation) in a single plot.
 
 ```python
-from monet.plots.plots import create_taylor_diagram
+from monet.plots import taylordiagram_function
 
 # Create a Taylor diagram for a model
-dia = create_taylor_diagram(obs_series, model_series, model_label='Model 1')
+dia = taylordiagram_function(obs_series, model_series, model_label='Model 1')
 
 # Add a second model to the same diagram
-create_taylor_diagram(obs_series, model2_series, model_label='Model 2', dia=dia)
+taylordiagram_function(obs_series, model2_series, model_label='Model 2', dia=dia)
 ```
 
 ## Plot Customization
@@ -69,4 +78,15 @@ Many MONET plotting functions return Matplotlib `Figure` and `Axes` objects, all
 fig, ax = ds.O3.monet.quick_map()
 ax.set_extent([-130, -60, 20, 50]) # Zoom to CONUS
 fig.set_size_inches(12, 6)
+```
+
+## Saving Figures with Logos
+
+MONET provides a `savefig` utility that can automatically add the MONET logo (or a custom logo) to your plots.
+
+```python
+from monet.plots import savefig
+
+fig, ax = ds.O3.monet.quick_map()
+savefig("my_plot.png", fig=fig, loc=1) # loc=1 is bottom left
 ```

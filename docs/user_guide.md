@@ -14,6 +14,12 @@ The recommended way to install MONET is via conda/mamba:
 conda install -c conda-forge monet
 ```
 
+Or using pip:
+
+```bash
+pip install monet
+```
+
 For development:
 
 ```bash
@@ -188,10 +194,16 @@ MONET integrates with `monet-stats` for comprehensive metrics:
 - **IOA**: Index of Agreement
 - **NMB**: Normalized Mean Bias
 
+Most statistical functions are backend-agnostic and will maintain Dask laziness if the input DataArrays are Dask-backed.
+
 ```python
 from monet.util import stats
 import numpy as np
 
+# Compute metrics (lazily if using Dask)
 mb = stats.MB(obs, mod)
 rmse = stats.RMSE(obs, mod)
+
+# For Dask-backed results, use .compute() when you need the value
+# print(rmse.compute())
 ```

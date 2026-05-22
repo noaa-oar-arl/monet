@@ -2,7 +2,7 @@
 
 ## Required Dependencies
 
-- Python 3.10 or later
+- Python 3.11 or later
 - [numpy](https://numpy.org)
 - [pandas](https://pandas.pydata.org)
 - [xarray](https://docs.xarray.dev)

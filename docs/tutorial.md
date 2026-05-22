@@ -19,14 +19,14 @@ ds['air'].monet.quick_map()
 # Find the nearest point to a location
 nearest = ds['air'].monet.nearest_latlon(lat=40.0, lon=-100.0)
 
-# Regrid to a coarser grid (for demonstration) using nearest neighbor
+# Regrid to a coarser grid (for demonstration)
 coarse = ds['air'].coarsen(time=1, lat=2, lon=2, boundary='trim').mean()
-regridded = ds['air'].monet.remap_nearest(coarse)
+regridded = ds['air'].monet.remap(coarse, method='bilinear')
 
 # Calculate statistics
 from monet.util import stats
 rmse = stats.RMSE(ds['air'], regridded)
-print(f"RMSE: {rmse}")
+print(f"RMSE: {rmse.values}")
 ```
 
 ## MONET Accessor Overview
@@ -65,10 +65,10 @@ df = pd.read_csv('obs_points.csv')
 ### 2. Regridding and Interpolation
 ```python
 # Regrid model to obs grid using ESMF (via xregrid)
-regridded = ds.monet.remap(obs)
+regridded = ds.monet.remap(obs, method='bilinear')
 
 # Nearest neighbor regridding
-regridded_nn = ds.monet.remap_nearest(obs)
+regridded_nn = ds.monet.remap(obs, method='nearest')
 
 # Interpolate to a constant latitude or longitude
 lat_slice = ds['O3'].monet.interp_constant_lat(lat=40.0)
