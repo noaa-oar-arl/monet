@@ -39,7 +39,7 @@ def test_quick_with_cartopy_ax(which):
         pytest.skip("Cartopy is not installed")
 
     proj = tran = ccrs.PlateCarree()
-    _, ax = plt.subplots(subplot_kw=dict(projection=proj))
+    fig, ax = plt.subplots(subplot_kw=dict(projection=proj))
     getattr(da.monet, f"quick_{which}")(ax=ax, transform=tran)
 
 

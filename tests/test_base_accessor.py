@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 import xarray as xr
 
 from monet.accessors.base import BaseAccessor
@@ -70,12 +69,3 @@ def test_dataarray_coards_to_netcdf():
     result = BaseAccessor._dataarray_coards_to_netcdf(da)
     assert "latitude" in result.coords and "longitude" in result.coords
     assert result["latitude"].ndim == 2 and result["longitude"].ndim == 2
-
-
-@pytest.mark.xfail(reason="BaseAccessor._get_CoordinateDefinition does not exist")
-def test_get_CoordinateDefinition():
-    da = make_da()
-    monet_da = BaseAccessor._dataset_to_monet(da)
-    if BaseAccessor._get_CoordinateDefinition:
-        coord_def = BaseAccessor._get_CoordinateDefinition(monet_da)
-        assert hasattr(coord_def, "lats") and hasattr(coord_def, "lons")
