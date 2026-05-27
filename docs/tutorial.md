@@ -14,7 +14,7 @@ import xarray as xr
 ds = xr.tutorial.load_dataset('air_temperature')
 
 # Use MONET accessors for quick visualization
-ds['air'].monet.quick_map()
+ds['air'].isel(time=1).monet.quick_map()
 
 # Find the nearest point to a location
 nearest = ds['air'].monet.nearest_latlon(lat=40.0, lon=-100.0)

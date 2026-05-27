@@ -28,6 +28,11 @@ cd monet
 pip install -e .
 ```
 
+
+## Note on Efficient Dask Computation
+
+When working with Dask arrays, you can compute multiple results efficiently by calling `dask.compute(a, b, ...)` instead of computing each separately. This allows Dask to share common computations, which is especially useful for related calculations like climatology/anomaly or mean/standard deviation.
+
 ## Quickstart
 
 ### Regridding Model Output

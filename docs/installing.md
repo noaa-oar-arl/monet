@@ -50,6 +50,11 @@ cd monet
 pip install .
 ```
 
+
+### Python 3.11 Notes
+
+Developers may be interested in the [Python 3.11 release notes](https://docs.python.org/3/whatsnew/3.11.html). The most relevant change for MONET is a general speedup, but review the summary for other potential impacts.
+
 ### Development Environment
 
 For developers, you can create a dedicated environment using the provided `environment-dev.yml` file:

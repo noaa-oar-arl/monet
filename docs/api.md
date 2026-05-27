@@ -1,4 +1,7 @@
+
 # API Reference
+#
+# Note: The triple colon (`:::`) syntax below is used by mkdocstrings for API auto-documentation. If your documentation build does not support mkdocstrings, replace these with standard markdown/code blocks as needed.
 
 ## Top-level Functions
 
