@@ -56,7 +56,7 @@ class TestPairTrajectory(unittest.TestCase):
 
         # Check if model_passed time matches obs time (10 steps)
         # Fixed code should pass model aligned to obs (10 steps) using reindex.
-        self.assertEqual(model_passed.dims["time"], 10)
+        self.assertEqual(model_passed.sizes["time"], 10)
         xr.testing.assert_equal(model_passed.time, self.obs.time)
 
     @patch("monet.accessors.base.BaseAccessor.remap")
@@ -70,7 +70,7 @@ class TestPairTrajectory(unittest.TestCase):
         args, kwargs = mock_remap.call_args
         model_passed = args[0]
 
-        self.assertEqual(model_passed.dims["time"], 10)
+        self.assertEqual(model_passed.sizes["time"], 10)
         xr.testing.assert_equal(model_passed.time, self.obs.time)
 
 

@@ -83,7 +83,7 @@ class TaylorDiagram:
 
         self.refstd = refstd  # Reference standard deviation
 
-        tr = PolarAxes.PolarTransform()
+        tr = PolarAxes.PolarTransform(apply_theta_transforms=False)
 
         # Correlation labels
         rlocs = np.concatenate((np.arange(10) / 10.0, [0.95, 0.99]))

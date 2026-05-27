@@ -111,8 +111,8 @@ def test_dataarray_accessor_basic(sample_dataarray):
         pass
     # Remapping structure test
     try:
-        # Just check that remap_nearest exists and can be called
-        sample_dataarray.monet.remap_nearest(sample_dataarray)
+        # Just check that remap with nearest method works
+        sample_dataarray.monet.remap(sample_dataarray, method="nearest")
     except Exception:
         pass
     try:
@@ -138,10 +138,6 @@ def test_dataarray_accessor_basic(sample_dataarray):
         assert isinstance(strat, xr.DataArray)
     except Exception:
         pass
-    # Test structure_for_monet with return_obj=False
-    da2 = sample_dataarray.copy()
-    da2.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=False)
-    assert isinstance(da2, xr.DataArray)
     da = sample_dataarray
     # Test wrap_longitudes
     da2 = da.monet.wrap_longitudes(lon_name="longitude")
@@ -149,9 +145,6 @@ def test_dataarray_accessor_basic(sample_dataarray):
     # Test tidy
     tidy = da.monet.tidy(lon_name="longitude")
     assert np.all(np.diff(tidy.longitude.values) >= 0)
-    # Test structure_for_monet
-    out = da.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=True)
-    assert isinstance(out, xr.DataArray)
     # Test cftime_to_datetime64 (should be a no-op for normal datetime)
     da2 = da.copy()
     # Add a time coordinate with correct shape (length 5, matching one dimension)
@@ -218,7 +211,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         pass
     # Remapping structure test
     try:
-        sample_dataarray_dask.monet.remap_nearest(sample_dataarray_dask)
+        sample_dataarray_dask.monet.remap(sample_dataarray_dask, method="nearest")
     except Exception:
         pass
     try:
@@ -243,10 +236,6 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         assert isinstance(strat, xr.DataArray)
     except Exception:
         pass
-    # Test structure_for_monet with return_obj=False
-    da2 = sample_dataarray_dask.copy()
-    da2.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=False)
-    assert isinstance(da2, xr.DataArray)
     da = sample_dataarray_dask
     # Test wrap_longitudes
     da2 = da.monet.wrap_longitudes(lon_name="longitude")
@@ -254,9 +243,6 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
     # Test tidy
     tidy = da.monet.tidy(lon_name="longitude")
     assert np.all(np.diff(tidy.longitude.values) >= 0)
-    # Test structure_for_monet
-    out = da.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=True)
-    assert isinstance(out, xr.DataArray)
     # Test cftime_to_datetime64 (should be a no-op for normal datetime)
     da2 = da.copy()
     da2 = da2.assign_coords(time=("latitude", pd.date_range("2020-01-01", periods=5)))
@@ -295,7 +281,7 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         pass
     # Remapping structure test
     try:
-        sample_dataarray_dask.monet.remap_nearest(sample_dataarray_dask)
+        sample_dataarray_dask.monet.remap(sample_dataarray_dask, method="nearest")
     except Exception:
         pass
     try:
@@ -320,10 +306,6 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
         assert isinstance(strat, xr.DataArray)
     except Exception:
         pass
-    # Test structure_for_monet with return_obj=False
-    da2 = sample_dataarray_dask.copy()
-    da2.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=False)
-    assert isinstance(da2, xr.DataArray)
     da = sample_dataarray_dask
     # Test wrap_longitudes
     da2 = da.monet.wrap_longitudes(lon_name="longitude")
@@ -331,9 +313,6 @@ def test_dataarray_accessor_dask(sample_dataarray_dask):
     # Test tidy
     tidy = da.monet.tidy(lon_name="longitude")
     assert np.all(np.diff(tidy.longitude.values) >= 0)
-    # Test structure_for_monet
-    out = da.monet.structure_for_monet(lat_name="latitude", lon_name="longitude", return_obj=True)
-    assert isinstance(out, xr.DataArray)
     # Test cftime_to_datetime64 (should be a no-op for normal datetime)
     da2 = da.copy()
     da2 = da2.assign_coords(time=("latitude", pd.date_range("2020-01-01", periods=5)))
@@ -431,7 +410,7 @@ def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
         pass
     # Remapping structure test
     try:
-        sample_dataset_dask.monet.remap_nearest(sample_dataset_dask)
+        sample_dataset_dask.monet.remap(sample_dataset_dask, method="nearest")
     except Exception:
         pass
     try:
@@ -448,15 +427,7 @@ def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
         pass
     except Exception:
         pass
-    # Test structure_for_monet with return_obj=False
-    ds2 = sample_dataset_dask.copy()
-    DS_Monet(ds2).structure_for_monet(lat_name="lat", lon_name="lon", return_obj=False)
-    assert isinstance(ds2, xr.Dataset)
     ds = sample_dataset_dask
-    # Test structure_for_monet via DataArray
-    da = ds["var"]
-    out = da.monet.structure_for_monet(lat_name="lat", lon_name="lon", return_obj=True)
-    assert isinstance(out, xr.DataArray)
     # Test cftime_to_datetime64 (should be a no-op for normal datetime)
     ds2 = ds.copy()
     ds2 = ds2.assign_coords(time=("lat", pd.date_range("2020-01-01", periods=5)))
@@ -489,7 +460,7 @@ def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
         pass
     # Remapping structure test
     try:
-        sample_dataset.monet.remap_nearest(sample_dataset)
+        sample_dataset.monet.remap(sample_dataset, method="nearest")
     except Exception:
         pass
     try:
@@ -506,15 +477,7 @@ def test_dataset_accessor_dask(sample_dataset_dask, sample_dataset):
         pass
     except Exception:
         pass
-    # Test structure_for_monet with return_obj=False
-    ds2 = sample_dataset.copy()
-    DS_Monet(ds2).structure_for_monet(lat_name="lat", lon_name="lon", return_obj=False)
-    assert isinstance(ds2, xr.Dataset)
     ds = sample_dataset
-    # Test structure_for_monet via DataArray
-    da = ds["var"]
-    out = da.monet.structure_for_monet(lat_name="lat", lon_name="lon", return_obj=True)
-    assert isinstance(out, xr.DataArray)
     # Test cftime_to_datetime64 (should be a no-op for normal datetime)
     ds2 = ds.copy()
     # Add a time coordinate with correct shape (length 5, matching one dimension)

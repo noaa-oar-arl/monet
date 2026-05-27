@@ -1,4 +1,7 @@
+
 # API Reference
+#
+# Note: The triple colon (`:::`) syntax below is used by mkdocstrings for API auto-documentation. If your documentation build does not support mkdocstrings, replace these with standard markdown/code blocks as needed.
 
 ## Top-level Functions
 
@@ -55,9 +58,9 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - interp_constant_lon
         - nearest_ij
         - nearest_latlon
-        - remap_nearest
+        - remap
+        - pair
         - combine_point
-        - remap_nearest_parallel
         - quick_facet_time_map
         - to_area_def
         - to_swath_def
@@ -80,9 +83,9 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - interp_constant_lon
         - nearest_ij
         - nearest_latlon
-        - remap_nearest
+        - remap
+        - pair
         - combine_point
-        - remap_nearest_parallel
         - quick_facet_time_map
         - to_area_def
         - to_swath_def
@@ -97,6 +100,7 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - to_ascii2nc_list
         - rename_for_monet
         - remap_nearest
+        - pair
         - cftime_to_datetime64
         - plot_points_map
         - plot_lines_map
@@ -115,6 +119,7 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - findclosest
         - kolmogorov_zurbenko_filter
         - wsdir2uv
+        - get_relhum
         - long_to_wide
         - calc_8hr_rolling_max
         - calc_24hr_ave
@@ -122,16 +127,44 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - calc_annual_ave
         - get_giorgi_region_bounds
         - get_giorgi_region_df
+        - get_epa_region_bounds
+        - get_epa_region_df
+        - add_mask
         - calc_13_category_usda_soil_type
+
+### Meteorological Functions
+
+::: monet.met_funcs
+    options:
+      members:
+        - calc_pressure
+        - calc_rho
+        - calc_vapor_pressure
+        - calc_mixing_ratio
+        - calc_sun_angles
+        - calc_L
+        - calc_u_star
+        - calc_Psi_H
+        - calc_Psi_M
+
+### Vertical Coordinate Utilities
+
+::: monet.util.vertical
+    options:
+      members:
+        - calc_fv3_pressure
+        - calc_fv3_height
 
 ### Combine Tool
 
 ::: monet.util.combinetool
     options:
       members:
+        - pair
         - combine_da_to_df
+        - combine_da_to_da
+        - combine_da_to_height_profile
         - combine_point
-        - combine_point_esmf
 
 ### Error Metrics
 

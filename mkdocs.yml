@@ -65,10 +65,9 @@ nav:
   - Getting Started:
     - Why MONET?: why-monet.md
     - Installing: installing.md
-    - MONET Xarray Accessor: monet-accessor.md
+    - MONET Accessors: monet-accessor.md
     - Visualization: visualization.md
     - Utility Tools: utility_tools.md
-    - MONET on WCOSS: monet_wcoss.md
     - Tutorial: tutorial.md
     - Developer Guide: developer_guide.md
     - User Guide: user_guide.md

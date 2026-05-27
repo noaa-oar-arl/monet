@@ -141,17 +141,23 @@ def _pair_dataframe(
     **kwargs: t.Any,
 ) -> pd.DataFrame | t.Any:
     """Pair xarray model with pandas or dask DataFrame observations."""
-    # Detect spatial columns in DataFrame
-    lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
-    lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
-    lat_col = next((c for c in lat_names if c in obs.columns), None)
-    lon_col = next((c for c in lon_names if c in obs.columns), None)
+    # Ensure time column exists
+    if "time" not in obs.columns:
+        raise AttributeError("Could not detect 'time' column in observation DataFrame.")
 
-    if lat_col is None or lon_col is None:
-        raise AttributeError("Could not detect latitude and longitude columns in observation DataFrame.")
+    # Detect spatial columns in DataFrame using accessor
+    lat_da = obs.monet.lat
+    lon_da = obs.monet.lon
+
+    if lat_da is None or lon_da is None:
+        raise AttributeError(
+            f"Could not detect latitude and longitude columns in observation DataFrame. Found: {list(obs.columns)}"
+        )
+
+    lat_col = lat_da.name
+    lon_col = lon_da.name
 
     # Extract unique locations to minimize remapping work
-    # siteid is expected. If not present, we use lat/lon.
     loc_cols = [lat_col, lon_col]
     if "siteid" in obs.columns:
         loc_cols.append("siteid")
@@ -178,9 +184,6 @@ def _pair_dataframe(
     if "siteid" in unique_locs_p.columns:
         # Add siteid as a coordinate so it is preserved during remap and conversion back to DF
         point_ds = point_ds.assign_coords(siteid=(("x"), unique_locs_p.siteid.values))
-
-    # Ensure model standard names match point_ds for xregrid if needed,
-    # but remap is already convention-aware.
 
     # Remap model to points
     paired_da = point_ds.monet.remap(model, method=method, **kwargs)
@@ -229,13 +232,16 @@ def _pair_dataframe(
 
     # Handle suffixes and variable names
     if isinstance(model, xr.DataArray):
-        model_name = model.name or "model_data"
-        if model_name in obs.columns:
-            paired_df = paired_df.rename(columns={model_name: model_name + suffix})
-    else:  # Dataset
-        for var in model.data_vars:
-            if var in obs.columns:
-                paired_df = paired_df.rename(columns={var: var + suffix})
+        model_vars = [model.name or "model_data"]
+        # If the DataArray was nameless, it will have the default name in the DataFrame
+        if model.name is None and "model_data" in paired_df.columns:
+            pass  # already named model_data
+    else:
+        model_vars = list(model.data_vars)
+
+    for var in model_vars:
+        if var in obs.columns:
+            paired_df = paired_df.rename(columns={var: var + suffix})
 
     if merge:
         # Perform join

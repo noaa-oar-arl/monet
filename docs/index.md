@@ -16,7 +16,7 @@ Please [cite](#reference) our work.
 
 ## What's New
 
-MONET v2.2.0 has been released. MONET has re-engineered the way it deals with multidimensional observations or model output by using an [xarray accessor](https://docs.xarray.dev/en/stable/internals/extending-xarray.html) giving MONET a flexible and intuitive way of expanding [xarray](https://docs.xarray.dev) for multidimensional geospatial information commonly used in meteorology, climate and air quality all while making it easier on the user to use MONET and add to it.
+MONET v2.3.1 has been released. MONET has re-engineered the way it deals with multidimensional observations or model output by using an [xarray accessor](https://docs.xarray.dev/en/stable/internals/extending-xarray.html) giving MONET a flexible and intuitive way of expanding [xarray](https://docs.xarray.dev) for multidimensional geospatial information commonly used in meteorology, climate and air quality all while making it easier on the user to use MONET and add to it.
 
 !!! important
     MONET also underwent a major restructure with v2.2.0. All I/O functions have been moved to a sister project: [MONETIO](https://github.com/noaa-oar-arl/monetio).

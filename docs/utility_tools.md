@@ -59,6 +59,10 @@ ds_with_regions = get_giorgi_region_df(ds)
 
 # Add EPA region info (Regions 1-10)
 df_with_epa = get_epa_region_df(df)
+
+# Masking based on shapes
+from monet.util.tools import add_mask
+masked_ds = add_mask(ds, "US_States")
 ```
 
 These functions are convention-aware and will automatically find latitude and longitude coordinates in your data.
@@ -89,4 +93,26 @@ The `monet.util.vertical` module provides tools for working with various vertica
 *   `calc_fv3_pressure(ak, bk, ps)`: Calculates 3D pressure from hybrid coefficients.
 *   `calc_fv3_height(temp, phalf, hsfc)`: Calculates geopotential height at layer interfaces using the hypsometric equation.
 
-These functions support both NumPy and Dask-backed arrays and maintain data provenance in the `history` attribute.
+## Backend-Agnostic Computation
+
+Most utility and meteorological functions in MONET utilize a centralized `_apply_vectorized` helper, ensuring they:
+1. Work seamlessly with both NumPy and Dask-backed arrays.
+2. Maintain computational laziness for large-scale datasets.
+3. Automatically update the dataset's `history` attribute for provenance.
+
+Example:
+```python
+import xarray as xr
+import dask.array as da
+from monet.met_funcs import calc_pressure
+
+# Create a Dask-backed DataArray
+z = xr.DataArray(da.from_array([0, 1000, 5000], chunks=3), dims="z")
+
+# Calculation is lazy
+p = calc_pressure(z)
+print(p.data) # dask.array<...>
+
+# Provenance is tracked
+print(p.attrs['history'])
+```

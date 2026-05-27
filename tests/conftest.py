@@ -2,6 +2,9 @@ import importlib.machinery
 import sys
 from unittest.mock import MagicMock
 
+import matplotlib.pyplot as plt
+import pytest
+
 
 def mock_if_missing(module_names):
     for name in module_names:
@@ -18,6 +21,13 @@ def mock_if_missing(module_names):
                 if name == "cartopy":
                     m.__version__ = "0.22.0"
                 sys.modules[name] = m
+
+
+@pytest.fixture(autouse=True)
+def close_all_figures():
+    """Ensure all matplotlib figures are closed after each test."""
+    yield
+    plt.close("all")
 
 
 # Only mock truly optional dependencies.

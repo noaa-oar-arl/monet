@@ -17,9 +17,9 @@ This guide is for contributors and maintainers of MONET. It covers project struc
 - **Extensibility:** Use accessors to add methods to xarray and pandas objects without modifying their core classes.
 - **Modularity:** Keep plotting, regridding, and utility code in separate modules.
 - **Interoperability:** Support common data formats and conventions (e.g., CF, COARDS).
-- **Performance:** Adhere to the **Aero Protocol**: ensure pipelines support both Eager (NumPy) and Lazy (Dask) evaluation, prioritize vectorization, and never force computation within processing functions.
+- **Performance:** Adhere to **backend-agnostic vectorized computation principles**: ensure pipelines support both Eager (NumPy) and Lazy (Dask) evaluation, prioritize vectorization, and never force computation within processing functions.
 
-## The Aero Protocol 🍃⚡
+## The Aero Protocol (Backend-Agnostic Principles) 🍃⚡
 
 MONET adheres to the **Aero Protocol** for architecting scientific pipelines that balance flexibility, maintainability, and provenance.
 
@@ -36,7 +36,15 @@ MONET adheres to the **Aero Protocol** for architecting scientific pipelines tha
 - **Type Hinting**: Use `xarray.DataArray` or `xarray.Dataset` types, never specific backend types like `dask.array`.
 - **Scientific Hygiene**: Update `ds.attrs['history']` when transforming data. Never drop coordinates.
 
-### 3. Quality & Validation (The "Pre-Commit" Rule)
+### 3. Versioning (The SemVer Rule)
+
+- **Semantic Versioning**: MONET follows [Semantic Versioning (SemVer)](https://semver.org/).
+    - **MAJOR** version for incompatible API changes.
+    - **MINOR** version for functionality added in a backward compatible manner.
+    - **PATCH** version for backward compatible bug fixes.
+- **Syncing**: Ensure the version is consistent across `pyproject.toml`, `monet/__init__.py`, and `CITATION.cff`.
+
+### 4. Quality & Validation (The "Pre-Commit" Rule)
 
 - **Zero-Trust Coding**: Do not trust your own code until it is tested.
 - **Enforcement**: Use `pre-commit run --all-files` before every commit.

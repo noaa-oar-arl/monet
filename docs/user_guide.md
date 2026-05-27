@@ -14,6 +14,12 @@ The recommended way to install MONET is via conda/mamba:
 conda install -c conda-forge monet
 ```
 
+Or using pip:
+
+```bash
+pip install monet
+```
+
 For development:
 
 ```bash
@@ -21,6 +27,11 @@ git clone https://github.com/noaa-oar-arl/monet.git
 cd monet
 pip install -e .
 ```
+
+
+## Note on Efficient Dask Computation
+
+When working with Dask arrays, you can compute multiple results efficiently by calling `dask.compute(a, b, ...)` instead of computing each separately. This allows Dask to share common computations, which is especially useful for related calculations like climatology/anomaly or mean/standard deviation.
 
 ## Quickstart
 
@@ -52,6 +63,44 @@ ugrid_paired = ugrid_ds.monet.remap(obs_points, method="nearest")
 ```
 
 Methods include `"bilinear"`, `"nearest"`, `"conservative"`, etc.
+
+### Pairing Model and Observations
+
+The `pair` utility is the primary way to match model data (usually gridded) with observations (usually points). It supports Xarray and Pandas/Dask DataFrames.
+
+#### Pairing with DataFrames (Fixed Sites)
+
+When pairing with a DataFrame, MONET automatically detects latitude, longitude, and site ID columns.
+
+```python
+import monet
+
+# Pair model Dataset with observation DataFrame
+paired_df = monet.pair(model_ds, obs_df, method="bilinear")
+
+# Also available via accessor
+paired_df = model_ds.monet.pair(obs_df)
+# or
+paired_df = obs_df.monet.pair(model_ds)
+```
+
+#### Trajectory Pairing (Moving Platforms)
+
+For moving platforms (like aircraft or ships) where coordinates vary with time, MONET aligns the time dimension before spatial remapping.
+
+```python
+# model_ds: (time, y, x)
+# obs_ds: (time,) with time-varying 'latitude' and 'longitude' coordinates
+paired_traj = monet.pair(model_ds, obs_ds, interp_time=True)
+```
+
+#### Gridded-to-Gridded Pairing
+
+You can also pair two gridded datasets. The model will be remapped to the observation grid.
+
+```python
+paired_grid = monet.pair(model_ds, obs_gridded_ds)
+```
 
 ### Plotting Data on a Map
 
@@ -150,10 +199,16 @@ MONET integrates with `monet-stats` for comprehensive metrics:
 - **IOA**: Index of Agreement
 - **NMB**: Normalized Mean Bias
 
+Most statistical functions are backend-agnostic and will maintain Dask laziness if the input DataArrays are Dask-backed.
+
 ```python
 from monet.util import stats
 import numpy as np
 
+# Compute metrics (lazily if using Dask)
 mb = stats.MB(obs, mod)
 rmse = stats.RMSE(obs, mod)
+
+# For Dask-backed results, use .compute() when you need the value
+# print(rmse.compute())
 ```
