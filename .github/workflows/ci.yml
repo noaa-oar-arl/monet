@@ -22,7 +22,7 @@ jobs:
         shell: bash -l {0}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Python (micromamba)
         uses: mamba-org/setup-micromamba@v3
@@ -47,7 +47,7 @@ jobs:
         shell: bash -l {0}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Python (micromamba)
         uses: mamba-org/setup-micromamba@v3
