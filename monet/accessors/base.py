@@ -4,7 +4,7 @@ import typing as t
 
 import xarray as xr
 
-from ..util.resample import has_xregrid
+from ..util.resample import has_axis
 
 
 def wrap_longitudes(lons):
@@ -1052,7 +1052,7 @@ class BaseAccessor:
 
         obj = self._obj.copy()
 
-        # Use xregrid via resample
+        # Use the AXIS backend via resample
         from ..util.interp_util import points_to_dataset
         from ..util.resample import resample
 
@@ -1076,7 +1076,7 @@ class BaseAccessor:
         radius_of_influence: float = 1e6,
         **kwargs: t.Any,
     ) -> xr.DataArray | xr.Dataset:
-        """Remap data using xregrid.
+        """Remap data using the AXIS backend.
         Supports both CF/COARDS and UGRID conventions.
 
         Parameters
@@ -1086,7 +1086,7 @@ class BaseAccessor:
         method : str, default: 'nearest'
             Resampling method: 'nearest', 'bilinear', or others supported by backends.
         radius_of_influence : float, default: 1e6
-            Search radius in meters (unused in xregrid).
+            Search radius in meters (unused in the AXIS backend).
         **kwargs : dict
             Additional keyword arguments for the resampler.
 
@@ -1095,8 +1095,10 @@ class BaseAccessor:
         xarray.DataArray or xarray.Dataset
             Remapped data.
         """
-        if not has_xregrid:
-            raise ImportError("xregrid (with esmpy) is required for this functionality")
+        if not has_axis:
+            from ..util.resample import AXIS_INSTALL_MESSAGE
+
+            raise ImportError(AXIS_INSTALL_MESSAGE)
 
         from ..util.resample import resample
 
@@ -1110,7 +1112,7 @@ class BaseAccessor:
         # Update history
         from ..util.conventions import update_history
 
-        update_history(out, f"Remapped via monet.remap (method={method})")
+        update_history(out, f"Remapped via monet.remap (backend=AXIS, method={method})")
 
         return out
 
@@ -1153,3 +1155,12 @@ class BaseAccessor:
             Combined data.
         """
         return self.pair(data, suffix=suffix, **kwargs)
+
+
+def __getattr__(name):
+    if name == "has_xregrid":
+        import warnings
+
+        warnings.warn("has_xregrid is deprecated; use has_axis instead.", DeprecationWarning, stacklevel=2)
+        return has_axis
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

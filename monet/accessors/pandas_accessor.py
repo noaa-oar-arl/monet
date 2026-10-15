@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from .base import BaseAccessor, has_xregrid
+from .base import BaseAccessor, has_axis
 
 try:
     import dask.dataframe as dd
@@ -317,14 +317,14 @@ class MONETAccessorPandas(BaseAccessor):
         radius_of_influence: float = 1e5,
         combine: bool = False,
     ) -> pd.DataFrame:
-        """Remap data using nearest neighbor interpolation (xregrid).
+        """Remap data using nearest neighbor interpolation (the AXIS backend).
 
         Parameters
         ----------
         df : pandas.DataFrame
             DataFrame to remap.
         radius_of_influence : float, default: 1e5
-            Search radius in meters (unused in xregrid).
+            Search radius in meters (unused in the AXIS backend).
         combine : bool, default: False
             Whether to combine the remapped data with the original data.
 
@@ -333,8 +333,10 @@ class MONETAccessorPandas(BaseAccessor):
         pandas.DataFrame
             Remapped DataFrame.
         """
-        if not has_xregrid:
-            raise ImportError("xregrid (with esmpy) is required for this functionality")
+        if not has_axis:
+            from ..util.resample import AXIS_INSTALL_MESSAGE
+
+            raise ImportError(AXIS_INSTALL_MESSAGE)
 
         from ..util.resample import resample
 
@@ -346,7 +348,7 @@ class MONETAccessorPandas(BaseAccessor):
         source_data_da = self._df_to_da(source_data)
         target_data_da = self._df_to_da(target_data)
 
-        # Use xregrid to resample
+        # Use the AXIS backend to resample
         da_source = source_data_da["monet_fake_index"]
         res = resample(da_source, target_data_da, method="nearest")
 

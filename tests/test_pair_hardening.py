@@ -14,8 +14,8 @@ def mock_regridding_available(monkeypatch):
     import monet.accessors.base
     import monet.util.resample
 
-    monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
-    monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
+    monkeypatch.setattr(monet.accessors.base, "has_axis", True)
+    monkeypatch.setattr(monet.util.resample, "has_axis", True)
 
 
 @pytest.fixture
@@ -107,7 +107,7 @@ def test_pair_empty_df(sample_model):
     # if we try to remap to zero points.
     with patch("monet.util.resample.resample") as mock_resample:
         mock_resample.return_value = xr.Dataset()
-        # ESMF/xregrid might raise ValueError for empty target coordinates
+        # ESMF/AXIS might raise ValueError for empty target coordinates
         with pytest.raises((ValueError, IndexError, AttributeError)):
             pair(sample_model, df)
 

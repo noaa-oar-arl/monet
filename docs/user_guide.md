@@ -37,7 +37,7 @@ When working with Dask arrays, you can compute multiple results efficiently by c
 
 ### Regridding Model Output
 
-MONET uses `xregrid` (based on ESMF/ESMPy) for spatial remapping.
+MONET uses AXIS for spatial remapping.
 
 ```python
 import monet
@@ -46,8 +46,8 @@ import xarray as xr
 ds = xr.open_dataset('model_output.nc')
 obs = xr.open_dataset('obs_data.nc')
 
-# Remap model to obs grid using ESMF (via xregrid)
-regridded = ds.monet.remap(obs)
+# Remap model to obs grid using AXIS
+regridded = obs.monet.remap(ds)
 ```
 
 ### Regridding and UGRID Support
@@ -56,7 +56,7 @@ MONET supports both standard gridded data (CF/COARDS) and unstructured grids (UG
 
 ```python
 # Remap gridded data to target points or grid
-regridded = ds.monet.remap(obs, method="bilinear")
+regridded = obs.monet.remap(ds, method="bilinear")
 
 # UGRID support: Unstructured grids are automatically detected
 ugrid_paired = ugrid_ds.monet.remap(obs_points, method="nearest")
@@ -168,7 +168,7 @@ ds_std = ds.monet.structure_for_monet()
 
 ### UGRID Support
 
-MONET's `remap` and `pair` routines are fully UGRID-compliant when using the `xregrid` backend.
+MONET's `remap` and `pair` routines are fully UGRID-compliant when using the AXIS backend.
 
 ```python
 # UGRID datasets are automatically recognized if they have a mesh topology variable
@@ -212,3 +212,47 @@ rmse = stats.RMSE(obs, mod)
 # For Dask-backed results, use .compute() when you need the value
 # print(rmse.compute())
 ```
+
+
+## Reusing AXIS weights
+
+```python
+from monet.util.resample import create_regridder
+
+regridder = create_regridder(model, observations, method="conservative")
+out = regridder(model)
+regridder.to_file("weights.bin")
+loaded = create_regridder(model, observations, method="conservative", weights_file="weights.bin")
+out_again = loaded(model)
+```
+
+Reuse a weight file only with the same source grid, target grid, and method; the binary
+file does not validate grid identity. Dask fields remain lazy while mesh coordinates
+and weights are constructed eagerly. Use `skipna=True` for NaN-aware weight
+renormalization; unmapped cells follow AXIS's `unmapped` policy.
+
+`linear` maps to `bilinear`. Both legacy `nearest_s2d` and `nearest_d2s` map to AXIS's
+nearest source-to-target lookup; the historical destination-to-source accumulation
+semantics are not provided. Additional methods are `bicubic`, `patch`, and
+`conservative2nd`. Legacy `radius_of_influence` and `n_processes` kwargs are ignored.
+
+## AXIS advanced grids
+
+Pass a full Dataset for UGRID/MPAS so AXIS receives its topology, connectivity,
+coordinate metadata, and bounds. UGRID meshes use `cf_role="mesh_topology"`,
+`node_coordinates`, `face_node_connectivity`, and connectivity `start_index` metadata.
+MPAS datasets include `latVertex`, `lonVertex`, `verticesOnCell`, and cell coordinates.
+Cubed-sphere latitude/longitude arrays use `(tile, y, x)` dimensions. Keep the full
+mesh Dataset when constructing a persistent regridder, then apply it to its fields.
+Periodic/dateline cases can use `periodic=True`.
+
+## Vertical interpolation
+
+```python
+profile = model.monet.interpolate_vertical([850, 700, 500], level_dim="pressure", tension=0.0)
+```
+
+Vertical interpolation retains pytspack tension splines. AXIS vertical migration is
+deferred because the pinned solver fails numerical parity, including a linear-profile
+check. Existing `interpolate_vertical`, `stratify`, and `resample_stratify` behavior
+continues to use pytspack.

@@ -1,0 +1,11 @@
+{
+  "generator": "xregrid.Regridder(source, target, method=...)",
+  "versions": {
+    "xregrid": "0.1.0",
+    "esmpy": "8.9.1",
+    "xarray": "2026.9.0",
+    "numpy": "2.4.6"
+  },
+  "source_url": "https://github.com/bbakernoaa/xregrid.git",
+  "source_commit": "ec8df15322cccb3cb47f310afff0a8cf4d156fba"
+}

@@ -24,7 +24,7 @@ The MONET accessor provides several useful interpolation routines including:
 - Finding the nearest point to a given latitude and longitude
 - Interpolating to a constant latitude or longitude
 - Vertical interpolation (stratification)
-- Remapping entire 2D `DataArray` or `Dataset` using `xregrid`.
+- Remapping entire 2D `DataArray` or `Dataset` using AXIS.
 
 ### Find Nearest Point
 
@@ -143,7 +143,7 @@ ds_tidied = ds.monet.tidy()
 
 ### Vertical Interpolation
 
-The `interpolate_vertical` method provides vertical interpolation using pytspack tension splines, following the same API as `pytspack.interpolate_vertical`.
+The `interpolate_vertical` method provides vertical interpolation using pytspack tension splines, through the existing MONET accessors.
 
 ```python
 # Interpolate O3 to specific altitude levels
@@ -172,3 +172,10 @@ is_land = ds.monet.is_land()
 # Return the dataset masked by ocean (preserving only ocean points)
 ds_ocean = ds.monet.is_ocean(return_xarray=True)
 ```
+
+
+Horizontal remapping uses AXIS and supports `linear`/`bilinear`, `nearest`,
+`conservative`, `bicubic`, `patch`, and `conservative2nd`. Pass full grid Datasets to
+retain UGRID/MPAS connectivity and cubed-sphere metadata. See the user guide for
+reusable weights and Dask execution. Vertical interpolation continues to use
+pytspack until AXIS passes the vertical reference checks.

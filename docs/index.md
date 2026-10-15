@@ -30,7 +30,7 @@ MONET features include:
     * Nearest neighbor finder
     * Constant latitude interpolation
     * Constant longitude interpolation
-    * Remap DataArray to current grid using `xregrid` (ESMF/ESMPy based)
+    * Remap DataArray to current grid using AXIS
     * Find nearest i,j or lat,lon
 * Simplified [combine tool](api.md#monet.util.combinetool) to combine point source data with multidimensional xarray objects
 

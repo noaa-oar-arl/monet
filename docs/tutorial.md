@@ -47,7 +47,7 @@ df = pd.read_csv('obs_points.csv')
 ### Key Accessor Features
 
 - **Plotting:** `quick_map`, `quick_imshow`, `quick_contourf`, `quick_facet_time_map`, `plot_points_map`, `plot_lines_map`
-- **Regridding/Interpolation:** `remap` (via xregrid), `remap_nearest`, `interp_constant_lat`, `interp_constant_lon`, `interpolate_vertical`
+- **Regridding/Interpolation:** `remap` (via AXIS), `remap_nearest`, `interp_constant_lat`, `interp_constant_lon`, `interpolate_vertical`
 - **Geospatial utilities:** `nearest_latlon`, `window`, `is_land`, `is_ocean`, `wrap_longitudes`, `tidy`, `structure_for_monet`
 - **Combining data:** `combine_point`, `combine_point_esmf`, `combine_da_to_df`
 
@@ -64,7 +64,7 @@ df = pd.read_csv('obs_points.csv')
 
 ### 2. Regridding and Interpolation
 ```python
-# Regrid model to obs grid using ESMF (via xregrid)
+# Regrid model to obs grid using AXIS
 regridded = ds.monet.remap(obs, method='bilinear')
 
 # Nearest neighbor regridding

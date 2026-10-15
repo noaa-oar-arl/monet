@@ -25,7 +25,7 @@ class MONETAccessorDataset(BaseAccessor):
     def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
         """Deprecated: Remap data using nearest neighbor interpolation with parallel processing."""
         warnings.warn(
-            "remap_nearest_parallel is deprecated. xregrid uses dask for parallelization.",
+            "remap_nearest_parallel is deprecated. the AXIS backend uses dask for parallelization.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -58,7 +58,7 @@ class MONETAccessorDataset(BaseAccessor):
         tuple
             (i, j) indices of nearest point(s).
         """
-        raise NotImplementedError("nearest_ij is not yet implemented with xregrid")
+        raise NotImplementedError("nearest_ij is not yet implemented with the AXIS backend")
 
     def stratify(self, levels, vertical, axis=1, tension=0.0):
         """Deprecated: use ``interpolate_vertical`` instead."""

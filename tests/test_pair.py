@@ -22,8 +22,8 @@ def mock_regridding_available(monkeypatch):
     import monet.accessors.base
     import monet.util.resample
 
-    monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
-    monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
+    monkeypatch.setattr(monet.accessors.base, "has_axis", True)
+    monkeypatch.setattr(monet.util.resample, "has_axis", True)
 
 
 @pytest.fixture
@@ -75,6 +75,7 @@ def test_pair_xarray_eager(sample_model, sample_obs_ds):
             coords={"time": sample_obs_ds.time, "x": [0, 1], "siteid": (("x"), ["A", "B"])},
         )
 
+        mock_resample.return_value = mock_resample.return_value.rename({"time": "valid_time"})
         result = pair(sample_model, sample_obs_ds)
 
         assert isinstance(result, xr.Dataset)
@@ -96,6 +97,7 @@ def test_pair_xarray_lazy(sample_model, sample_obs_ds):
             data_vars={"ozone": (("time", "x"), dummy_data)}, coords={"time": sample_obs_ds.time, "x": [0, 1]}
         )
 
+        mock_resample.return_value = mock_resample.return_value.rename({"time": "valid_time"})
         result = pair(sample_model, sample_obs_ds)
 
         assert isinstance(result, xr.Dataset)

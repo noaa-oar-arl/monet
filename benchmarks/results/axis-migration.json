@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-15",
+  "thread_settings": {
+    "OMP_NUM_THREADS": 2,
+    "OMP_PROC_BIND": "false"
+  },
+  "measurement": "Sequential runs; build weights, apply and compute; imports and input generation excluded",
+  "caveats": [
+    "Legacy uses its declared engine directly; AXIS run includes the MONET adapter.",
+    "Python and xarray versions differ across isolated environments.",
+    "Single-machine smoke measurement; not a portable performance guarantee."
+  ],
+  "legacy": {
+    "engine": "legacy",
+    "method": "conservative",
+    "resolution": 0.5,
+    "lazy": true,
+    "seconds": [
+      12.082496292001451,
+      14.295800749998307,
+      16.79555216699373
+    ],
+    "median_seconds": 14.295800749998307,
+    "peak_rss_bytes": 628277248,
+    "platform": "macOS-26.3.1-arm64-arm-64bit",
+    "python": "3.11.17",
+    "dependency_version": "0.1.0",
+    "monet_path": null,
+    "source_url": "https://github.com/bbakernoaa/xregrid.git",
+    "source_commit": "ec8df15322cccb3cb47f310afff0a8cf4d156fba"
+  },
+  "axis": {
+    "engine": "axis",
+    "method": "conservative",
+    "resolution": 0.5,
+    "lazy": true,
+    "seconds": [
+      0.6133247079997091,
+      0.06357641599606723,
+      0.06192287500016391
+    ],
+    "median_seconds": 0.06357641599606723,
+    "peak_rss_bytes": 444071936,
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.7",
+    "dependency_version": "0.1.0",
+    "monet_path": ".",
+    "speedup": 224.86012345965887,
+    "speedup_target_met": true,
+    "peak_memory_target_met": true,
+    "source_url": "https://github.com/NOAA-EMC/HELM.git",
+    "source_commit": "a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d"
+  }
+}

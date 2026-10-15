@@ -1,4 +1,4 @@
-# Mocking xregrid/pytspack if not present to test logic flow
+# Mocking AXIS if not present to test logic flow
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -10,11 +10,11 @@ from monet.util.combinetool import pair
 from monet.util.resample import resample
 
 try:
-    import xregrid  # noqa: F401
+    import axis  # noqa: F401
 
-    has_xregrid = True
+    has_axis = True
 except ImportError:
-    has_xregrid = False
+    has_axis = False
 
 try:
     import dask.array as da
@@ -33,8 +33,8 @@ def test_resample_vectorized_protocol(monkeypatch):
     mock_regridder = MagicMock()
     mock_regridder.side_effect = lambda x: x  # Identity for testing
     monkeypatch.setattr(monet.util.resample, "Regridder", MagicMock(return_value=mock_regridder), raising=False)
-    monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
-    monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
+    monkeypatch.setattr(monet.util.resample, "has_axis", True)
+    monkeypatch.setattr(monet.accessors.base, "has_axis", True)
 
     """Verify resample follows Vectorized Protocol: NumPy and Dask consistency."""
     # Create source data
@@ -74,8 +74,8 @@ def test_pair_vectorized_protocol(monkeypatch):
 
     mock_regridder_cls = MagicMock()
     monkeypatch.setattr(monet.util.resample, "Regridder", mock_regridder_cls, raising=False)
-    monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
-    monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
+    monkeypatch.setattr(monet.util.resample, "has_axis", True)
+    monkeypatch.setattr(monet.accessors.base, "has_axis", True)
 
     mock_regridder = MagicMock()
     mock_regridder_cls.return_value = mock_regridder
@@ -171,8 +171,8 @@ def test_ugrid_pairing_smoke(monkeypatch):
 
     mock_regridder_cls = MagicMock()
     monkeypatch.setattr(monet.util.resample, "Regridder", mock_regridder_cls, raising=False)
-    monkeypatch.setattr(monet.util.resample, "has_xregrid", True)
-    monkeypatch.setattr(monet.accessors.base, "has_xregrid", True)
+    monkeypatch.setattr(monet.util.resample, "has_axis", True)
+    monkeypatch.setattr(monet.accessors.base, "has_axis", True)
 
     mock_regridder = MagicMock()
     mock_regridder_cls.return_value = mock_regridder

@@ -74,6 +74,7 @@ def _pair_xarray(
     **kwargs: t.Any,
 ) -> xr.Dataset | xr.DataArray:
     """Pair xarray model with xarray observations."""
+
     def _ensure_lat_lon_aliases(ds: xr.Dataset | xr.DataArray) -> xr.Dataset | xr.DataArray:
         """Add `lat`/`lon` coordinate aliases when only `latitude`/`longitude` exist."""
         out = ds
@@ -207,7 +208,7 @@ def _pair_dataframe(
 
     # Convert unique locations to xarray (lazily if obs is dask)
     if has_dask_df and isinstance(obs, dd.DataFrame):
-        # ESMF/xregrid requires eager coordinate arrays to build weights.
+        # AXIS requires eager coordinate arrays to build meshes and weights.
         # We compute only the unique locations (usually small).
         unique_locs_p = unique_locs.compute()
     else:
