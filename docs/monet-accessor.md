@@ -143,7 +143,7 @@ ds_tidied = ds.monet.tidy()
 
 ### Vertical Interpolation
 
-The `interpolate_vertical` method provides vertical interpolation using pytspack tension splines, through the existing MONET accessors.
+The `interpolate_vertical` method provides vertical interpolation using AXIS's TSPACK tension spline solver through the MONET accessors. Dask-backed inputs stay lazy, with complete vertical columns supplied to each interpolation task.
 
 ```python
 # Interpolate O3 to specific altitude levels
@@ -151,7 +151,7 @@ The `interpolate_vertical` method provides vertical interpolation using pytspack
 interped = ds.O3.monet.interpolate_vertical([100, 500, 1000], level_dim='altitude')
 ```
 
-For `Dataset` objects, `interpolate_vertical` will interpolate all variables that have the specified vertical dimension.
+For `Dataset` objects, `interpolate_vertical` interpolates variables that have the specified vertical dimension.
 
 ```python
 # Interpolate entire dataset to pressure levels
@@ -160,6 +160,19 @@ ds_interp = ds.monet.interpolate_vertical([850, 700, 500], level_dim='pres')
 
 !!! note
     `stratify()` is still available as a deprecated backward-compatibility alias.
+
+### Vector Regridding
+
+Use `remap_vector` on the target grid to remap both components together. AXIS
+applies vector grid-frame rotation; for rotated grids, pass angle arrays in
+radians as `src_alpha` and `dst_alpha`.
+
+```python
+u_out, v_out = target_grid.monet.remap_vector(u, v, method="bilinear")
+```
+
+Vector regridding supports `bilinear` and `nearest` methods and keeps Dask-backed
+components lazy.
 
 ## Land and Ocean Masking
 
@@ -202,5 +215,6 @@ scheduler, or a Dask Distributed `Client` when AXIS is installed with distribute
 support. For repeated fields on the same grids, use
 [`create_regridder`](user_guide.md#reusing-axis-weights) to build weights once.
 
-Vertical interpolation continues to use pytspack until AXIS passes the vertical
-reference checks.
+Vertical interpolation now uses AXIS's TSPACK solver. The pinned AXIS version's
+parity with MONET's stored pytspack reference is still tracked in
+`tests/test_axis_vertical_pending.py`.

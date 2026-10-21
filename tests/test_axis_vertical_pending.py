@@ -1,7 +1,7 @@
-"""Upstream blockers for the deferred AXIS vertical migration.
+"""Parity probes for AXIS vertical interpolation against stored references.
 
-Keep pytspack in production until these strict probes pass. An XPASS means the
-pinned AXIS engine can be reconsidered; do not relax tolerances to hide the defect.
+The strict expected failures record known differences in the pinned AXIS
+solver. Keep the numerical tolerance explicit; do not relax it to hide defects.
 """
 
 import json

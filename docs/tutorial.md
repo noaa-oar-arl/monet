@@ -73,7 +73,7 @@ regridded_nn = ds.monet.remap(obs, method='nearest')
 # Interpolate to a constant latitude or longitude
 lat_slice = ds['O3'].monet.interp_constant_lat(lat=40.0)
 
-# Interpolate O3 to pressure levels using pytspack tension splines
+# Interpolate O3 to pressure levels using AXIS TSPACK tension splines
 interped = ds['O3'].monet.interpolate_vertical([850, 700, 500], level_dim='level')
 ```
 

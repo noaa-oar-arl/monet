@@ -1,4 +1,4 @@
-"""MONET horizontal regridding with AXIS; vertical interpolation uses pytspack."""
+"""MONET horizontal and vertical regridding with AXIS."""
 
 import typing as t
 import warnings
@@ -257,6 +257,170 @@ def resample(
     return out
 
 
+def interpolate_vertical(
+    data: xr.DataArray | xr.Dataset,
+    target_levels,
+    level_dim: str = "level",
+    tension: float = 0.0,
+) -> xr.DataArray | xr.Dataset:
+    """Interpolate vertical profiles with AXIS's TSPACK spline solver.
+
+    The complete vertical column is passed to each AXIS task; independent
+    dimensions remain available for Dask parallelism.
+    """
+    _require_axis()
+    if level_dim not in data.dims:
+        raise ValueError(f"Vertical dimension {level_dim!r} is not present in the input")
+
+    regridder = axis.VerticalRegridder(tension=tension)
+
+    def _interpolate(da: xr.DataArray) -> xr.DataArray:
+        if level_dim not in da.dims:
+            return da
+        if level_dim not in da.coords:
+            raise ValueError(f"Input must provide source vertical levels as coordinate {level_dim!r}")
+
+        original_dims = da.dims
+        other_dims = tuple(dim for dim in original_dims if dim != level_dim)
+        ordered = da.transpose(*other_dims, level_dim)
+        source_levels = da[level_dim]
+        # AXIS expects the vertical core dimension last, including for hybrid
+        # coordinates that vary across horizontal columns.
+        if level_dim in source_levels.dims:
+            source_levels = source_levels.transpose(
+                *(dim for dim in other_dims if dim in source_levels.dims), level_dim
+            )
+
+        target_dim = f"_monet_axis_target_{level_dim}"
+        while target_dim in da.dims or target_dim in da.coords:
+            target_dim = f"_{target_dim}"
+        if isinstance(target_levels, xr.DataArray):
+            target = target_levels
+            if level_dim in target.dims:
+                target = target.rename({level_dim: target_dim})
+            elif target.ndim == 1:
+                target = target.rename({target.dims[0]: target_dim})
+            else:
+                raise ValueError("target_levels must be one-dimensional or use level_dim as its vertical dimension")
+        else:
+            target_values = np.asarray(target_levels)
+            if target_values.ndim != 1:
+                raise ValueError("target_levels must be one-dimensional or an xarray DataArray")
+            target = xr.DataArray(target_values, dims=(target_dim,))
+
+        result = regridder.interpolate(ordered, source_levels, target)
+        if target_dim in result.dims:
+            result = result.rename({target_dim: level_dim})
+        return result.transpose(*original_dims)
+
+    if isinstance(data, xr.DataArray):
+        return _interpolate(data)
+
+    variables = {
+        name: _interpolate(variable) if level_dim in variable.dims else variable
+        for name, variable in data.data_vars.items()
+    }
+    coords = {name: coord for name, coord in data.coords.items() if level_dim not in coord.dims}
+    return xr.Dataset(variables, coords=coords, attrs=dict(data.attrs))
+
+
+def _horizontal_dims(obj: xr.DataArray | xr.Dataset) -> tuple[str, ...]:
+    """Return spatial core dimensions in AXIS's latitude-then-longitude order."""
+    from .conventions import find_coords
+
+    lat = find_coords(obj, "latitude")
+    lon = find_coords(obj, "longitude")
+    if lat is None or lon is None:
+        raise KeyError("AXIS could not detect latitude and longitude coordinates")
+    dims = tuple(dict.fromkeys((*lat.dims, *lon.dims)))
+    if not dims:
+        raise ValueError("Grid coordinates must have at least one dimension")
+    return dims
+
+
+def resample_vector(
+    u: xr.DataArray,
+    v: xr.DataArray,
+    target_grid: xr.DataArray | xr.Dataset,
+    method: str = "bilinear",
+    *,
+    src_alpha=None,
+    dst_alpha=None,
+    **kwargs: t.Any,
+) -> tuple[xr.DataArray, xr.DataArray]:
+    """Remap a paired vector field with AXIS, including grid-frame rotation.
+
+    Dask-backed vector components remain lazy. Horizontal source dimensions are
+    core dimensions and are rechunked together as needed by the vector solver.
+    """
+    _require_axis()
+    if not isinstance(u, xr.DataArray) or not isinstance(v, xr.DataArray):
+        raise TypeError("Vector components u and v must be xarray.DataArray objects")
+    if u.dims != v.dims or u.shape != v.shape:
+        raise ValueError("Vector components u and v must have matching dimensions and shapes")
+    if method.lower() not in {"bilinear", "nearest"}:
+        raise ValueError("AXIS vector regridding supports only 'bilinear' and 'nearest'")
+
+    source_dims = _horizontal_dims(u)
+    target_dims = _horizontal_dims(target_grid)
+    if not set(source_dims).issubset(u.dims):
+        raise ValueError("Source grid coordinate dimensions must be present in both vector components")
+    dst_spatial_shape = tuple(target_grid.sizes[dim] for dim in target_dims)
+    internal_dst_dims = tuple(f"_axis_vector_dst_{i}" for i in range(len(target_dims)))
+
+    options = dict(kwargs)
+    vector_regridder = axis.VectorRegridder(
+        u,
+        target_grid,
+        method=method,
+        src_alpha=src_alpha,
+        dst_alpha=dst_alpha,
+        **options,
+    )
+
+    def _transform(u_block, v_block):
+        return vector_regridder.transform(u_block, v_block)
+
+    u_out, v_out = xr.apply_ufunc(
+        _transform,
+        u,
+        v,
+        input_core_dims=[list(source_dims), list(source_dims)],
+        output_core_dims=[list(internal_dst_dims), list(internal_dst_dims)],
+        dask="parallelized",
+        vectorize=False,
+        output_dtypes=[np.float64, np.float64],
+        dask_gufunc_kwargs={
+            "output_sizes": dict(zip(internal_dst_dims, dst_spatial_shape)),
+            "allow_rechunk": True,
+        },
+    )
+
+    rename = dict(zip(internal_dst_dims, target_dims))
+    u_out = u_out.rename(rename)
+    v_out = v_out.rename(rename)
+    target_coords = {
+        name: coord
+        for name, coord in target_grid.coords.items()
+        if set(coord.dims).issubset(set(target_dims))
+    }
+    from .conventions import find_coords
+
+    for key in ("latitude", "longitude"):
+        coord = find_coords(target_grid, key)
+        if coord is not None and coord.name is not None:
+            target_coords[coord.name] = coord
+    u_out = u_out.assign_coords(target_coords)
+    v_out = v_out.assign_coords(target_coords)
+    u_out.name, v_out.name = u.name, v.name
+    u_out.attrs, v_out.attrs = dict(u.attrs), dict(v.attrs)
+    from .conventions import update_history
+
+    update_history(u_out, f"Vector regridded via AXIS (method={method.lower()})")
+    update_history(v_out, f"Vector regridded via AXIS (method={method.lower()})")
+    return u_out, v_out
+
+
 def resample_stratify(
     da: xr.DataArray,
     levels,
@@ -264,7 +428,7 @@ def resample_stratify(
     axis: int = 1,
     tension: float = 0.0,
 ) -> xr.DataArray:
-    """Deprecated: use ``pytspack.interpolate_vertical`` directly.
+    """Deprecated: use the xarray accessor's ``interpolate_vertical`` method.
 
     Parameters
     ----------
@@ -287,10 +451,9 @@ def resample_stratify(
     """
     import warnings
 
-    from pytspack import interpolate_vertical
-
     warnings.warn(
-        "resample_stratify() is deprecated. Use pytspack.interpolate_vertical() directly.",
+        "resample_stratify() is deprecated. Use .monet.interpolate_vertical() "
+        "instead of pytspack.interpolate_vertical() directly.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -304,11 +467,4 @@ def resample_stratify(
         if not isinstance(vertical, str) and isinstance(vertical, xr.DataArray):
             da = da.assign_coords({level_dim: vertical})
 
-    if isinstance(levels, xr.DataArray):
-        levels = levels.values
-
-    # pytspack requires a single chunk along the core (vertical) dimension
-    if hasattr(da.data, "chunks") and level_dim in da.dims:
-        da = da.chunk({level_dim: -1})
-
-    return interpolate_vertical(da, np.asarray(levels), level_dim=level_dim, tension=tension)
+    return interpolate_vertical(da, levels, level_dim=level_dim, tension=tension)

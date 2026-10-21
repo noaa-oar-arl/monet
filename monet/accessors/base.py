@@ -1116,6 +1116,52 @@ class BaseAccessor:
 
         return out
 
+    def remap_vector(
+        self,
+        u: xr.DataArray,
+        v: xr.DataArray,
+        method: str = "bilinear",
+        *,
+        src_alpha=None,
+        dst_alpha=None,
+        **kwargs: t.Any,
+    ) -> tuple[xr.DataArray, xr.DataArray]:
+        """Remap paired vector components to this object's grid with AXIS.
+
+        AXIS remaps both components together and rotates them between source
+        and destination grid frames. For rotated grids, provide source and
+        destination grid-angle arrays in radians as ``src_alpha`` and
+        ``dst_alpha``.
+
+        Parameters
+        ----------
+        u, v : xarray.DataArray
+            Paired vector components on the same source grid.
+        method : {"bilinear", "nearest"}, default: "bilinear"
+            Horizontal interpolation method supported by AXIS vector weights.
+        src_alpha, dst_alpha : array-like, optional
+            Source and destination grid rotation angles in radians.
+        **kwargs
+            Additional AXIS vector options, including ``periodic`` and
+            ``line_type``.
+
+        Returns
+        -------
+        tuple of xarray.DataArray
+            Regridded ``(u, v)`` components on this object's grid.
+        """
+        from ..util.resample import resample_vector
+
+        return resample_vector(
+            u,
+            v,
+            self._obj,
+            method=method,
+            src_alpha=src_alpha,
+            dst_alpha=dst_alpha,
+            **kwargs,
+        )
+
     def pair(self, obs: t.Any, **kwargs: t.Any) -> t.Any:
         """Pair this object with observation data.
 

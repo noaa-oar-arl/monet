@@ -26,7 +26,8 @@ Some features require additional dependencies:
 
 ## Instructions
 
-MONET uses AXIS for horizontal remapping and retains pytspack for vertical tension splines. AXIS is
+MONET uses AXIS for horizontal and vertical regridding. The `pytspack` dependency
+is retained for other existing utilities. AXIS is
 installed from the pinned HELM commit
 `a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d`; the distribution is `axis-regrid`
 and the Python import is `axis`.

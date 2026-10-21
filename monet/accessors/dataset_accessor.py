@@ -90,7 +90,7 @@ class MONETAccessorDataset(BaseAccessor):
         level_dim: str = "level",
         tension: float = 0.0,
     ) -> xr.Dataset:
-        """Vertically interpolate all variables in the Dataset to new levels using pytspack tension splines.
+        """Vertically interpolate variables with AXIS TSPACK splines.
 
         Parameters
         ----------
@@ -110,12 +110,9 @@ class MONETAccessorDataset(BaseAccessor):
         --------
         >>> ds.monet.interpolate_vertical([850, 700, 500], level_dim='pressure')
         """
-        from pytspack import interpolate_vertical
+        from ..util.resample import interpolate_vertical
 
-        ds = self._obj
-        if any(hasattr(ds[v].data, "chunks") for v in ds.data_vars) and level_dim in ds.dims:
-            ds = ds.chunk({level_dim: -1})
-        return interpolate_vertical(ds, target_levels, level_dim=level_dim, tension=tension)
+        return interpolate_vertical(self._obj, target_levels, level_dim=level_dim, tension=tension)
 
     def quick_facet_time_map(
         self,

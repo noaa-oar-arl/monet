@@ -46,7 +46,7 @@ class MONETAccessor(BaseAccessor):
         return self.interpolate_vertical(np.asarray(levels), level_dim=level_dim, tension=tension)
 
     def interpolate_vertical(self, target_levels, level_dim: str = "level", tension: float = 0.0):
-        """Vertically interpolate data to new levels using pytspack tension splines.
+        """Vertically interpolate data to new levels using AXIS TSPACK splines.
 
         Parameters
         ----------
@@ -66,12 +66,9 @@ class MONETAccessor(BaseAccessor):
         --------
         >>> da.monet.interpolate_vertical([850, 700, 500], level_dim='pressure')
         """
-        from pytspack import interpolate_vertical
+        from ..util.resample import interpolate_vertical
 
-        da = self._obj
-        if hasattr(da.data, "chunks") and level_dim in da.dims:
-            da = da.chunk({level_dim: -1})
-        return interpolate_vertical(da, target_levels, level_dim=level_dim, tension=tension)
+        return interpolate_vertical(self._obj, target_levels, level_dim=level_dim, tension=tension)
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Find the nearest grid indices to given lat/lon point(s).

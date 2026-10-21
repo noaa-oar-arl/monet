@@ -252,7 +252,15 @@ Periodic/dateline cases can use `periodic=True`.
 profile = model.monet.interpolate_vertical([850, 700, 500], level_dim="pressure", tension=0.0)
 ```
 
-Vertical interpolation retains pytspack tension splines. AXIS vertical migration is
-deferred because the pinned solver fails numerical parity, including a linear-profile
-check. Existing `interpolate_vertical`, `stratify`, and `resample_stratify` behavior
-continues to use pytspack.
+Vertical interpolation uses AXIS's TSPACK tension spline solver. Dask-backed data
+remains lazy, with the complete vertical column evaluated in each task.
+
+Paired horizontal vector components can be regridded together so AXIS can apply
+grid-frame rotation:
+
+```python
+u_out, v_out = target_grid.monet.remap_vector(u, v, method="bilinear")
+```
+
+For rotated grids, pass source and destination angle arrays in radians as
+`src_alpha` and `dst_alpha`. Vector regridding supports `bilinear` and `nearest`.
