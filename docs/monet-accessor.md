@@ -47,10 +47,10 @@ The `compare` method allows for quick comparison between two `DataArray` objects
 
 ```python
 # Compute difference (da1 - da2) and plot automatically
-ds.O3.monet.compare(obs.O3, stat='diff', plot=True)
+ds.O3.monet.compare(obs.O3, stat="diff", plot=True)
 
 # Compute RMSE and return a DataArray (lazily if using Dask)
-rmse_da = ds.O3.monet.compare(obs.O3, stat='RMSE', plot=False)
+rmse_da = ds.O3.monet.compare(obs.O3, stat="RMSE", plot=False)
 ```
 
 Supported statistics include metrics from `monet-stats` (e.g., `RMSE`, `MB`, `MAE`, `NMB`, `IOA`).
@@ -148,14 +148,14 @@ The `interpolate_vertical` method provides vertical interpolation using AXIS's T
 ```python
 # Interpolate O3 to specific altitude levels
 # 'altitude' is the name of the vertical dimension in the dataset
-interped = ds.O3.monet.interpolate_vertical([100, 500, 1000], level_dim='altitude')
+interped = ds.O3.monet.interpolate_vertical([100, 500, 1000], level_dim="altitude")
 ```
 
 For `Dataset` objects, `interpolate_vertical` interpolates variables that have the specified vertical dimension.
 
 ```python
 # Interpolate entire dataset to pressure levels
-ds_interp = ds.monet.interpolate_vertical([850, 700, 500], level_dim='pres')
+ds_interp = ds.monet.interpolate_vertical([850, 700, 500], level_dim="pres")
 ```
 
 !!! note

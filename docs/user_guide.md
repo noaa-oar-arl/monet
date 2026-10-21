@@ -43,8 +43,8 @@ MONET uses AXIS for spatial remapping.
 import monet
 import xarray as xr
 
-ds = xr.open_dataset('model_output.nc')
-obs = xr.open_dataset('obs_data.nc')
+ds = xr.open_dataset("model_output.nc")
+obs = xr.open_dataset("obs_data.nc")
 
 # Remap model to obs grid using AXIS
 regridded = obs.monet.remap(ds)
@@ -108,13 +108,13 @@ paired_grid = monet.pair(model_ds, obs_gridded_ds)
 import monet
 import xarray as xr
 
-ds = xr.open_dataset('model_output.nc')
-ds['O3'].monet.quick_map()
+ds = xr.open_dataset("model_output.nc")
+ds["O3"].monet.quick_map()
 
 # Other plotting options:
-ds['O3'].monet.quick_imshow()
-ds['O3'].monet.quick_contourf(levels=10)
-ds['O3'].monet.quick_facet_time_map(time_dim='time', ncols=4)
+ds["O3"].monet.quick_imshow()
+ds["O3"].monet.quick_contourf(levels=10)
+ds["O3"].monet.quick_facet_time_map(time_dim="time", ncols=4)
 ```
 
 ### Working with Pandas DataFrames
@@ -123,7 +123,7 @@ ds['O3'].monet.quick_facet_time_map(time_dim='time', ncols=4)
 import monet
 import pandas as pd
 
-df = pd.read_csv('obs_points.csv')
+df = pd.read_csv("obs_points.csv")
 df.monet.plot_points_map()
 ```
 
@@ -131,10 +131,10 @@ df.monet.plot_points_map()
 
 ```python
 # Compare two DataArrays
-diff = ds['O3'].monet.compare(obs['O3'], stat='diff', plot=True)
+diff = ds["O3"].monet.compare(obs["O3"], stat="diff", plot=True)
 
 # For Datasets
-ds.monet.compare(obs, stat='diff', plot=True)
+ds.monet.compare(obs, stat="diff", plot=True)
 ```
 
 ## COARDS/CF and UGRID Conventions
@@ -186,7 +186,7 @@ MONET is designed for high-performance scientific workflows:
 
 ```python
 # Check history to see transformations
-print(regridded.attrs['history'])
+print(regridded.attrs["history"])
 ```
 
 ## Statistics Utilities (monet-stats)

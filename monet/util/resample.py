@@ -445,8 +445,7 @@ def resample_stratify(
     import warnings
 
     warnings.warn(
-        "resample_stratify() is deprecated. Use .monet.interpolate_vertical() "
-        "instead of pytspack.interpolate_vertical() directly.",
+        "resample_stratify() is deprecated. Use .monet.interpolate_vertical() instead of pytspack.interpolate_vertical() directly.",
         DeprecationWarning,
         stacklevel=2,
     )

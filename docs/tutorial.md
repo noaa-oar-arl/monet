@@ -11,21 +11,22 @@ import monet
 import xarray as xr
 
 # Load a toy dataset
-ds = xr.tutorial.load_dataset('air_temperature')
+ds = xr.tutorial.load_dataset("air_temperature")
 
 # Use MONET accessors for quick visualization
-ds['air'].isel(time=1).monet.quick_map()
+ds["air"].isel(time=1).monet.quick_map()
 
 # Find the nearest point to a location
-nearest = ds['air'].monet.nearest_latlon(lat=40.0, lon=-100.0)
+nearest = ds["air"].monet.nearest_latlon(lat=40.0, lon=-100.0)
 
 # Regrid to a coarser grid (for demonstration)
-coarse = ds['air'].coarsen(time=1, lat=2, lon=2, boundary='trim').mean()
-regridded = ds['air'].monet.remap(coarse, method='bilinear')
+coarse = ds["air"].coarsen(time=1, lat=2, lon=2, boundary="trim").mean()
+regridded = ds["air"].monet.remap(coarse, method="bilinear")
 
 # Calculate statistics
 from monet.util import stats
-rmse = stats.RMSE(ds['air'], regridded)
+
+rmse = stats.RMSE(ds["air"], regridded)
 print(f"RMSE: {rmse.values}")
 ```
 
@@ -40,8 +41,8 @@ import monet
 import xarray as xr
 import pandas as pd
 
-ds = xr.open_dataset('model_output.nc')
-df = pd.read_csv('obs_points.csv')
+ds = xr.open_dataset("model_output.nc")
+df = pd.read_csv("obs_points.csv")
 ```
 
 ### Key Accessor Features
@@ -58,42 +59,44 @@ df = pd.read_csv('obs_points.csv')
 import monet
 import xarray as xr
 import pandas as pd
-ds = xr.open_dataset('model_output.nc')
-df = pd.read_csv('obs_points.csv')
+
+ds = xr.open_dataset("model_output.nc")
+df = pd.read_csv("obs_points.csv")
 ```
 
 ### 2. Regridding and Interpolation
 ```python
 # Regrid model to obs grid using AXIS
-regridded = ds.monet.remap(obs, method='bilinear')
+regridded = ds.monet.remap(obs, method="bilinear")
 
 # Nearest neighbor regridding
-regridded_nn = ds.monet.remap(obs, method='nearest')
+regridded_nn = ds.monet.remap(obs, method="nearest")
 
 # Interpolate to a constant latitude or longitude
-lat_slice = ds['O3'].monet.interp_constant_lat(lat=40.0)
+lat_slice = ds["O3"].monet.interp_constant_lat(lat=40.0)
 
 # Interpolate O3 to pressure levels using AXIS TSPACK tension splines
-interped = ds['O3'].monet.interpolate_vertical([850, 700, 500], level_dim='level')
+interped = ds["O3"].monet.interpolate_vertical([850, 700, 500], level_dim="level")
 ```
 
 ### 3. Quick Map and Faceted Plots
 ```python
 # Quick map for a single time
-ds['O3'].isel(time=0).monet.quick_map()
+ds["O3"].isel(time=0).monet.quick_map()
 
 # Faceted map by time
-ds['O3'].monet.quick_facet_time_map(time_dim='time', ncols=4)
+ds["O3"].monet.quick_facet_time_map(time_dim="time", ncols=4)
 ```
 
 ### 4. Taylor Diagram
 ```python
 import numpy as np
 from monet.plots.taylordiagram import TaylorDiagram
+
 ref = np.random.normal(0, 1, 100)
 model = ref + np.random.normal(0, 0.5, 100)
 fig = TaylorDiagram(ref.std())
-fig.add_sample(model.std(), np.corrcoef(ref, model)[0, 1], marker='o', label='Model')
+fig.add_sample(model.std(), np.corrcoef(ref, model)[0, 1], marker="o", label="Model")
 ```
 
 ### 5. Land/Ocean Masking
@@ -106,6 +109,7 @@ ds_land = ds.where(land_mask)
 ### 6. Combining Model and Observations
 ```python
 from monet.util.combinetool import combine_da_to_df
-combined = combine_da_to_df(ds['O3'], df)
+
+combined = combine_da_to_df(ds["O3"], df)
 # Now you can perform direct comparisons
 ```

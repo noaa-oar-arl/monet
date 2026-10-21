@@ -12,7 +12,7 @@ from monet.util.tools import kolmogorov_zurbenko_filter
 
 # Apply KZ filter to a DataFrame
 # window=29, iterations=3 is common for removing short-term fluctuations
-filtered_df = kolmogorov_zurbenko_filter(df, col='O3', window=29, iterations=3)
+filtered_df = kolmogorov_zurbenko_filter(df, col="O3", window=29, iterations=3)
 ```
 
 ## Meteorological Conversions
@@ -62,6 +62,7 @@ df_with_epa = get_epa_region_df(df)
 
 # Masking based on shapes
 from monet.util.tools import add_mask
+
 masked_ds = add_mask(ds, "US_States")
 ```
 
@@ -111,8 +112,8 @@ z = xr.DataArray(da.from_array([0, 1000, 5000], chunks=3), dims="z")
 
 # Calculation is lazy
 p = calc_pressure(z)
-print(p.data) # dask.array<...>
+print(p.data)  # dask.array<...>
 
 # Provenance is tracked
-print(p.attrs['history'])
+print(p.attrs["history"])
 ```
