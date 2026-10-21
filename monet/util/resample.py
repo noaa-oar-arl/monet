@@ -198,6 +198,10 @@ class PersistentRegridder:
         """Save binary AXIS weights; reuse with the same grids and method."""
         return self._engine.to_file(str(path))
 
+    def close(self):
+        """Release AXIS weights and any worker registrations owned by this regridder."""
+        self._engine.close()
+
 
 def create_regridder(
     source_grid: xr.DataArray | xr.Dataset,
@@ -235,10 +239,22 @@ def resample(
 
     Methods include nearest, bilinear (linear), conservative, bicubic, patch,
     and conservative2nd. Dask-backed fields stay lazy; grid coordinates and
-    interpolation weights are constructed eagerly. See :func:`create_regridder`
-    for options and reusable weights.
+    interpolation weights are constructed eagerly. For lazy output, the returned
+    xarray object retains the regridder until it is closed or garbage-collected.
+    See :func:`create_regridder` for options and reusable weights.
     """
-    return create_regridder(source_data, target_grid, method=method, **kwargs)(source_data)
+    regridder = create_regridder(source_data, target_grid, method=method, **kwargs)
+    out = regridder(source_data)
+    if isinstance(out, xr.DataArray):
+        is_dask = hasattr(out.data, "__dask_graph__")
+    else:
+        is_dask = any(hasattr(var.data, "__dask_graph__") for var in out.data_vars.values())
+    if is_dask:
+        # AXIS workers access weights through a worker-local cache. Keep their
+        # owner alive with the lazy xarray result; otherwise the temporary
+        # regridder is finalized before the graph computes and clears that cache.
+        out.set_close(regridder.close)
+    return out
 
 
 def resample_stratify(

@@ -24,7 +24,7 @@ classifiers = [
 dependencies = [
   "cartopy",
   "matplotlib",
-  "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d#subdirectory=libs/axis",
+  "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@feature/paper#subdirectory=libs/axis",
   "monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats.git",
   "netCDF4",
   "numpy",

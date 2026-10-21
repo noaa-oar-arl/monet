@@ -15,7 +15,9 @@ def make_test_data(nx=10, ny=10, dask=False):
         },
     )
     if dask:
-        ds = ds.chunk({"y": 5, "x": 5})
+        # AXIS treats horizontal dimensions as gufunc core dimensions; keep
+        # each whole while chunking independent dimensions when present.
+        ds = ds.chunk({"y": -1, "x": -1})
     return ds
 
 
@@ -180,7 +182,7 @@ def test_axis_lazy_values_and_attrs():
     source.var1.attrs["units"] = "K"
     source.attrs["history"] = "original"
     expected = resample(source, make_target_grid(), method="bilinear")
-    lazy = resample(source.chunk({"y": 5, "x": 5}), make_target_grid(), method="bilinear")
+    lazy = resample(source.chunk({"y": -1, "x": -1}), make_target_grid(), method="bilinear")
     assert hasattr(lazy.var1.data, "dask")
     xr.testing.assert_allclose(lazy.compute(), expected)
     assert lazy.var1.attrs["units"] == "K"
@@ -222,6 +224,6 @@ def test_axis_distributed_workers():
         n_workers=2, threads_per_worker=1, processes=True, dashboard_address=None, memory_limit=0
     ) as cluster:
         with distributed.Client(cluster):
-            actual = resample(source.chunk({"y": 5, "x": 5}), target, method="bilinear")
+            actual = resample(source.chunk({"y": -1, "x": -1}), target, method="bilinear")
             assert hasattr(actual.var1.data, "dask")
             xr.testing.assert_allclose(actual.compute(), expected)

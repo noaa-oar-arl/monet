@@ -1,45 +1,62 @@
+"""Plot a sample field before and after MONET horizontal regridding."""
+
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
+from monet.util.resample import resample
+
 
 def visualize_example():
-    """Demonstrate the Two-Track Rule for Visualization."""
-
-    # Create sample data
-    nx, ny = 100, 50
-    lon = np.linspace(-180, 180, nx)
-    lat = np.linspace(-90, 90, ny)
+    """Compare the original field with every supported regridding method."""
+    lon = np.linspace(-177.5, 177.5, 72)
+    lat = np.linspace(-87.5, 87.5, 36)
     lons, lats = np.meshgrid(lon, lat)
     data = np.sin(np.deg2rad(lons)) * np.cos(np.deg2rad(lats))
 
-    da = xr.DataArray(data, coords=[("lat", lat), ("lon", lon)], name="sample_data")
-    da.attrs["units"] = "dimensionless"
-
-    # Track A: Publication (Matplotlib + Cartopy)
-    fig = plt.figure(figsize=(10, 6))
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
-    da.plot(ax=ax, transform=ccrs.PlateCarree(), cbar_kwargs={"label": "Sample Units"})
-    ax.coastlines()
-    ax.set_title("Track A: Publication-Quality Map")
-    plt.savefig("track_a_publication.png")
-    print("Track A saved to track_a_publication.png")
-
-    # Track B: Exploration (HvPlot / Geoviews)
-    # Note: This is commented out as it requires a browser context,
-    # but provided as a code example.
-    """
-    import hvplot.xarray
-    plot = da.hvplot.quadmesh(
-        'lon', 'lat',
-        projection=ccrs.PlateCarree(),
-        rasterize=True,
-        cmap='viridis'
+    source = xr.DataArray(
+        data,
+        dims=("lat", "lon"),
+        coords={"lat": lat, "lon": lon},
+        name="sample_data",
+        attrs={"units": "dimensionless"},
     )
-    hvplot.save(plot, 'track_b_exploration.html')
-    """
-    print("Track B: Use hvplot for interactive exploration (e.g., da.hvplot.quadmesh(rasterize=True))")
+    target = xr.Dataset(coords={"lat": lat[::2], "lon": lon[::2]})
+    for grid in (source, target):
+        grid.lat.attrs.update(standard_name="latitude", units="degrees_north")
+        grid.lon.attrs.update(standard_name="longitude", units="degrees_east")
+
+    methods = ("nearest", "bilinear", "conservative", "bicubic", "patch", "conservative2nd")
+    fields = [("Initial field", source)]
+    fields.extend((method, resample(source, target, method=method)) for method in methods)
+
+    fig, axes = plt.subplots(
+        4,
+        2,
+        figsize=(14, 16),
+        subplot_kw={"projection": ccrs.PlateCarree()},
+        constrained_layout=True,
+    )
+    for ax, (title, field) in zip(axes.flat, fields):
+        field.plot.pcolormesh(
+            ax=ax,
+            transform=ccrs.PlateCarree(),
+            x="lon",
+            y="lat",
+            vmin=-1,
+            vmax=1,
+            cmap="coolwarm",
+            add_colorbar=True,
+            cbar_kwargs={"label": "Sample units"},
+        )
+        ax.coastlines()
+        ax.set_title(title)
+
+    # Hide the unused eighth panel.
+    axes.flat[-1].set_visible(False)
+    fig.savefig("regridding_methods.png", dpi=150)
+    print("Regridding comparison saved to regridding_methods.png")
 
 
 if __name__ == "__main__":
