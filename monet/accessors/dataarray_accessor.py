@@ -76,6 +76,12 @@ class MONETAccessor(BaseAccessor):
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Find the nearest grid indices to given lat/lon point(s).
 
+        .. warning::
+           Nearest-index lookup is not yet implemented with the AXIS backend.
+           In particular, curvilinear grids require a spatial search over their
+           two-dimensional latitude/longitude coordinates; xarray's ordinary
+           nearest label selection only covers indexed one-dimensional axes.
+
         Parameters
         ----------
         lat : float or array-like, optional
@@ -90,6 +96,12 @@ class MONETAccessor(BaseAccessor):
         tuple
             (i, j) indices of nearest point(s).
         """
+        warnings.warn(
+            "nearest_ij is not yet implemented with the AXIS backend; "
+            "curvilinear grids need nearest-neighbor lookup over 2D lat/lon coordinates.",
+            UserWarning,
+            stacklevel=2,
+        )
         raise NotImplementedError("nearest_ij is not yet implemented with the AXIS backend")
 
     def quick_imshow(
