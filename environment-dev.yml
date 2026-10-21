@@ -26,5 +26,5 @@ dependencies:
   - scipy
   - pip:
       - "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d#subdirectory=libs/axis"
-      - pytspack
+      - "pytspack @ git+https://github.com/noaa-oar-arl/pytspack.git"
       - monet-stats
