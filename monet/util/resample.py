@@ -287,9 +287,7 @@ def interpolate_vertical(
         # AXIS expects the vertical core dimension last, including for hybrid
         # coordinates that vary across horizontal columns.
         if level_dim in source_levels.dims:
-            source_levels = source_levels.transpose(
-                *(dim for dim in other_dims if dim in source_levels.dims), level_dim
-            )
+            source_levels = source_levels.transpose(*(dim for dim in other_dims if dim in source_levels.dims), level_dim)
 
         target_dim = f"_monet_axis_target_{level_dim}"
         while target_dim in da.dims or target_dim in da.coords:
@@ -317,8 +315,7 @@ def interpolate_vertical(
         return _interpolate(data)
 
     variables = {
-        name: _interpolate(variable) if level_dim in variable.dims else variable
-        for name, variable in data.data_vars.items()
+        name: _interpolate(variable) if level_dim in variable.dims else variable for name, variable in data.data_vars.items()
     }
     coords = {name: coord for name, coord in data.coords.items() if level_dim not in coord.dims}
     return xr.Dataset(variables, coords=coords, attrs=dict(data.attrs))
@@ -399,11 +396,7 @@ def resample_vector(
     rename = dict(zip(internal_dst_dims, target_dims))
     u_out = u_out.rename(rename)
     v_out = v_out.rename(rename)
-    target_coords = {
-        name: coord
-        for name, coord in target_grid.coords.items()
-        if set(coord.dims).issubset(set(target_dims))
-    }
+    target_coords = {name: coord for name, coord in target_grid.coords.items() if set(coord.dims).issubset(set(target_dims))}
     from .conventions import find_coords
 
     for key in ("latitude", "longitude"):
