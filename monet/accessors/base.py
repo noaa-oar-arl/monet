@@ -55,50 +55,37 @@ LON_NAMES = [
 class BaseAccessor:
     """Base class for MONET accessors with common utility methods."""
 
-    # Cached coordinate detection results — keyed by object id so that
-    # replacing the underlying object (rare) doesn't silently return stale data.
-    _lat_cache: dict = {}
-    _lon_cache: dict = {}
-
     @property
     def lat(self) -> t.Any:
         """Detected latitude coordinate or variable.
         Uses convention-aware detection without renaming.
-        Supports Xarray and Pandas. Result is cached after the first lookup.
+        Supports Xarray and Pandas.
         """
-        key = id(self._obj)
-        if key not in BaseAccessor._lat_cache:
-            if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-                from ..util.conventions import find_coords
+        if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
+            from ..util.conventions import find_coords
 
-                BaseAccessor._lat_cache[key] = find_coords(self._obj, "latitude")
-            elif hasattr(self._obj, "columns"):  # Pandas
-                lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
-                lat_col = next((c for c in lat_names if c in self._obj.columns), None)
-                BaseAccessor._lat_cache[key] = self._obj[lat_col] if lat_col else None
-            else:
-                BaseAccessor._lat_cache[key] = None
-        return BaseAccessor._lat_cache[key]
+            return find_coords(self._obj, "latitude")
+        if hasattr(self._obj, "columns"):  # Pandas
+            lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+            lat_col = next((c for c in lat_names if c in self._obj.columns), None)
+            return self._obj[lat_col] if lat_col else None
+        return None
 
     @property
     def lon(self) -> t.Any:
         """Detected longitude coordinate or variable.
         Uses convention-aware detection without renaming.
-        Supports Xarray and Pandas. Result is cached after the first lookup.
+        Supports Xarray and Pandas.
         """
-        key = id(self._obj)
-        if key not in BaseAccessor._lon_cache:
-            if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-                from ..util.conventions import find_coords
+        if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
+            from ..util.conventions import find_coords
 
-                BaseAccessor._lon_cache[key] = find_coords(self._obj, "longitude")
-            elif hasattr(self._obj, "columns"):  # Pandas
-                lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
-                lon_col = next((c for c in lon_names if c in self._obj.columns), None)
-                BaseAccessor._lon_cache[key] = self._obj[lon_col] if lon_col else None
-            else:
-                BaseAccessor._lon_cache[key] = None
-        return BaseAccessor._lon_cache[key]
+            return find_coords(self._obj, "longitude")
+        if hasattr(self._obj, "columns"):  # Pandas
+            lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+            lon_col = next((c for c in lon_names if c in self._obj.columns), None)
+            return self._obj[lon_col] if lon_col else None
+        return None
 
     @staticmethod
     def safe_import(module_name, error_msg=None):
