@@ -74,6 +74,39 @@ def test_cubed_sphere_tiles():
     np.testing.assert_allclose(out.field, 42.0)
 
 
+def test_xarray_accessor_remap_dataarray_dataset_and_dask():
+    """Both xarray accessor registrations route eager and lazy fields through AXIS."""
+    import dask.array as da
+
+    lat = np.linspace(-10.0, 10.0, 5)
+    lon = np.linspace(100.0, 120.0, 5)
+    target = xr.Dataset(coords={"lat": np.linspace(-8.0, 8.0, 3), "lon": np.linspace(102.0, 118.0, 3)})
+    values = np.full((2, lat.size, lon.size), 42.0)
+    source = xr.Dataset(
+        {"field": (("time", "lat", "lon"), da.from_array(values, chunks=(1, -1, -1)))},
+        coords={"time": [0, 1], "lat": lat, "lon": lon},
+    )
+
+    lazy = target.monet.remap(source, method="bilinear")
+    assert isinstance(lazy, xr.Dataset)
+    assert hasattr(lazy.field.data, "__dask_graph__")
+    computed = lazy.compute(scheduler="threads")
+    assert computed.field.dims == ("time", "lat", "lon")
+    np.testing.assert_allclose(computed.field, 42.0, atol=1e-10)
+
+    target_array = xr.DataArray(
+        np.zeros((3, 3)),
+        dims=("lat", "lon"),
+        coords={"lat": target.lat, "lon": target.lon},
+        name="target_template",
+    )
+    source_array = source.field.isel(time=0).compute()
+    mapped_array = target_array.monet.remap(source_array, method="bilinear")
+    assert isinstance(mapped_array, xr.DataArray)
+    assert mapped_array.shape == (3, 3)
+    np.testing.assert_allclose(mapped_array, 42.0, atol=1e-10)
+
+
 def test_dateline_nearest():
     src = xr.Dataset(
         {"field": (("lat", "lon"), [[1.0, 2.0, 3.0, 4.0], [1.0, 2.0, 3.0, 4.0]])},

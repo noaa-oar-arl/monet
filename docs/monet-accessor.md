@@ -174,8 +174,33 @@ ds_ocean = ds.monet.is_ocean(return_xarray=True)
 ```
 
 
-Horizontal remapping uses AXIS and supports `linear`/`bilinear`, `nearest`,
-`conservative`, `bicubic`, `patch`, and `conservative2nd`. Pass full grid Datasets to
-retain UGRID/MPAS connectivity and cubed-sphere metadata. See the user guide for
-reusable weights and Dask execution. Vertical interpolation continues to use
-pytspack until AXIS passes the vertical reference checks.
+## Horizontal Remapping with AXIS
+
+Call `.monet.remap()` on the **target grid** and pass the source field as its
+argument. This works on both `Dataset` and `DataArray` objects and returns the
+same xarray type as the source field.
+
+```python
+import monet
+
+# Remap model data onto the observation grid.
+mapped = observations.monet.remap(model, method="bilinear")
+
+# A DataArray carrying the target grid coordinates works the same way.
+target_field = observations["temperature"]
+mapped_field = target_field.monet.remap(model["temperature"], method="nearest")
+```
+
+Methods are `nearest`, `linear`/`bilinear`, `conservative`, `bicubic`, `patch`,
+and `conservative2nd`. Pass full source and target Datasets for UGRID/MPAS
+connectivity and cubed-sphere metadata.
+
+For Dask-backed fields, keep each horizontal source dimension in one chunk and
+split independent dimensions such as time. AXIS builds interpolation weights
+eagerly and applies them lazily. Compute with a supported threaded or synchronous
+scheduler, or a Dask Distributed `Client` when AXIS is installed with distributed
+support. For repeated fields on the same grids, use
+[`create_regridder`](user_guide.md#reusing-axis-weights) to build weights once.
+
+Vertical interpolation continues to use pytspack until AXIS passes the vertical
+reference checks.
