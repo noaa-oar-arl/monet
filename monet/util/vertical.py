@@ -115,7 +115,13 @@ def calc_fv3_height(
     # when ordered top-to-bottom.  Check the first slice to detect a
     # bottom-up array and raise early rather than produce a wrong result.
     if isinstance(phalf, xr.DataArray):
-        _p_check = phalf.isel({dim: slice(None, 2)}).values
+        # Checking Dask-backed values here would compute data during graph
+        # construction. Validate eagerly only when the values are already in
+        # memory; lazy inputs retain the documented ordering precondition.
+        if hasattr(phalf.data, "__dask_graph__"):
+            _p_check = None
+        else:
+            _p_check = phalf.isel({dim: slice(None, 2)}).data
     else:
         _p_check = np.asarray(phalf).flat[:2] if np.asarray(phalf).ndim >= 1 else None
     if _p_check is not None and len(_p_check) >= 2:

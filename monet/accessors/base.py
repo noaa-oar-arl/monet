@@ -4,7 +4,7 @@ import typing as t
 
 import xarray as xr
 
-from ..util.resample import has_xregrid
+from ..util.resample import has_axis
 
 
 def wrap_longitudes(lons):
@@ -55,50 +55,37 @@ LON_NAMES = [
 class BaseAccessor:
     """Base class for MONET accessors with common utility methods."""
 
-    # Cached coordinate detection results — keyed by object id so that
-    # replacing the underlying object (rare) doesn't silently return stale data.
-    _lat_cache: dict = {}
-    _lon_cache: dict = {}
-
     @property
     def lat(self) -> t.Any:
         """Detected latitude coordinate or variable.
         Uses convention-aware detection without renaming.
-        Supports Xarray and Pandas. Result is cached after the first lookup.
+        Supports Xarray and Pandas.
         """
-        key = id(self._obj)
-        if key not in BaseAccessor._lat_cache:
-            if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-                from ..util.conventions import find_coords
+        if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
+            from ..util.conventions import find_coords
 
-                BaseAccessor._lat_cache[key] = find_coords(self._obj, "latitude")
-            elif hasattr(self._obj, "columns"):  # Pandas
-                lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
-                lat_col = next((c for c in lat_names if c in self._obj.columns), None)
-                BaseAccessor._lat_cache[key] = self._obj[lat_col] if lat_col else None
-            else:
-                BaseAccessor._lat_cache[key] = None
-        return BaseAccessor._lat_cache[key]
+            return find_coords(self._obj, "latitude")
+        if hasattr(self._obj, "columns"):  # Pandas
+            lat_names = ["latitude", "lat", "Latitude", "Lat", "LAT"]
+            lat_col = next((c for c in lat_names if c in self._obj.columns), None)
+            return self._obj[lat_col] if lat_col else None
+        return None
 
     @property
     def lon(self) -> t.Any:
         """Detected longitude coordinate or variable.
         Uses convention-aware detection without renaming.
-        Supports Xarray and Pandas. Result is cached after the first lookup.
+        Supports Xarray and Pandas.
         """
-        key = id(self._obj)
-        if key not in BaseAccessor._lon_cache:
-            if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-                from ..util.conventions import find_coords
+        if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
+            from ..util.conventions import find_coords
 
-                BaseAccessor._lon_cache[key] = find_coords(self._obj, "longitude")
-            elif hasattr(self._obj, "columns"):  # Pandas
-                lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
-                lon_col = next((c for c in lon_names if c in self._obj.columns), None)
-                BaseAccessor._lon_cache[key] = self._obj[lon_col] if lon_col else None
-            else:
-                BaseAccessor._lon_cache[key] = None
-        return BaseAccessor._lon_cache[key]
+            return find_coords(self._obj, "longitude")
+        if hasattr(self._obj, "columns"):  # Pandas
+            lon_names = ["longitude", "lon", "Longitude", "Lon", "LON"]
+            lon_col = next((c for c in lon_names if c in self._obj.columns), None)
+            return self._obj[lon_col] if lon_col else None
+        return None
 
     @staticmethod
     def safe_import(module_name, error_msg=None):
@@ -738,16 +725,10 @@ class BaseAccessor:
             raise ValueError("Could not detect latitude and longitude coordinates.")
 
         if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-            # Use apply_ufunc to be backend-agnostic (handles Dask automatically if parallelized=True)
-            # We align inputs and use a template to preserve coordinates and dimensions
-            res = xr.apply_ufunc(
-                mask.query,
-                lat,
-                lon,
-                dask="parallelized",
-                output_dtypes=[object],
-                keep_attrs=True,
-            )
+            # EarthMask.query already uses apply_ufunc for xarray/Dask inputs.
+            # Wrapping it in another apply_ufunc can eagerly materialize its
+            # returned DataArray on some xarray versions.
+            res = mask.query(lat, lon, name=mask_type)
 
             # Ensure coordinates are preserved (xr.apply_ufunc with multiple inputs and different dims
             # might not automatically combine them into the result as we expect here)
@@ -1052,7 +1033,7 @@ class BaseAccessor:
 
         obj = self._obj.copy()
 
-        # Use xregrid via resample
+        # Use the AXIS backend via resample
         from ..util.interp_util import points_to_dataset
         from ..util.resample import resample
 
@@ -1076,7 +1057,7 @@ class BaseAccessor:
         radius_of_influence: float = 1e6,
         **kwargs: t.Any,
     ) -> xr.DataArray | xr.Dataset:
-        """Remap data using xregrid.
+        """Remap data using the AXIS backend.
         Supports both CF/COARDS and UGRID conventions.
 
         Parameters
@@ -1086,7 +1067,7 @@ class BaseAccessor:
         method : str, default: 'nearest'
             Resampling method: 'nearest', 'bilinear', or others supported by backends.
         radius_of_influence : float, default: 1e6
-            Search radius in meters (unused in xregrid).
+            Search radius in meters (unused in the AXIS backend).
         **kwargs : dict
             Additional keyword arguments for the resampler.
 
@@ -1095,8 +1076,10 @@ class BaseAccessor:
         xarray.DataArray or xarray.Dataset
             Remapped data.
         """
-        if not has_xregrid:
-            raise ImportError("xregrid (with esmpy) is required for this functionality")
+        if not has_axis:
+            from ..util.resample import AXIS_INSTALL_MESSAGE
+
+            raise ImportError(AXIS_INSTALL_MESSAGE)
 
         from ..util.resample import resample
 
@@ -1110,9 +1093,55 @@ class BaseAccessor:
         # Update history
         from ..util.conventions import update_history
 
-        update_history(out, f"Remapped via monet.remap (method={method})")
+        update_history(out, f"Remapped via monet.remap (backend=AXIS, method={method})")
 
         return out
+
+    def remap_vector(
+        self,
+        u: xr.DataArray,
+        v: xr.DataArray,
+        method: str = "bilinear",
+        *,
+        src_alpha=None,
+        dst_alpha=None,
+        **kwargs: t.Any,
+    ) -> tuple[xr.DataArray, xr.DataArray]:
+        """Remap paired vector components to this object's grid with AXIS.
+
+        AXIS remaps both components together and rotates them between source
+        and destination grid frames. For rotated grids, provide source and
+        destination grid-angle arrays in radians as ``src_alpha`` and
+        ``dst_alpha``.
+
+        Parameters
+        ----------
+        u, v : xarray.DataArray
+            Paired vector components on the same source grid.
+        method : {"bilinear", "nearest"}, default: "bilinear"
+            Horizontal interpolation method supported by AXIS vector weights.
+        src_alpha, dst_alpha : array-like, optional
+            Source and destination grid rotation angles in radians.
+        **kwargs
+            Additional AXIS vector options, including ``periodic`` and
+            ``line_type``.
+
+        Returns
+        -------
+        tuple of xarray.DataArray
+            Regridded ``(u, v)`` components on this object's grid.
+        """
+        from ..util.resample import resample_vector
+
+        return resample_vector(
+            u,
+            v,
+            self._obj,
+            method=method,
+            src_alpha=src_alpha,
+            dst_alpha=dst_alpha,
+            **kwargs,
+        )
 
     def pair(self, obs: t.Any, **kwargs: t.Any) -> t.Any:
         """Pair this object with observation data.
@@ -1153,3 +1182,12 @@ class BaseAccessor:
             Combined data.
         """
         return self.pair(data, suffix=suffix, **kwargs)
+
+
+def __getattr__(name):
+    if name == "has_xregrid":
+        import warnings
+
+        warnings.warn("has_xregrid is deprecated; use has_axis instead.", DeprecationWarning, stacklevel=2)
+        return has_axis
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

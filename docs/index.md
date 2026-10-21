@@ -25,12 +25,12 @@ MONET features include:
 
 * **xarray accessor** for both `xarray.DataArray` and `xarray.Dataset` using the `.monet` attribute
 * **pandas accessor** for `pandas.DataFrame` using the `.monet` attribute
-* Vertical interpolation using [pytspack](https://github.com/noaa-oar-arl/pytspack) via the `.monet.interpolate_vertical` function
+* Vertical interpolation using AXIS's TSPACK spline solver via `.monet.interpolate_vertical`
 * Spatial interpolation using `.monet.remap` including:
     * Nearest neighbor finder
     * Constant latitude interpolation
     * Constant longitude interpolation
-    * Remap DataArray to current grid using `xregrid` (ESMF/ESMPy based)
+    * Remap DataArray to current grid using AXIS
     * Find nearest i,j or lat,lon
 * Simplified [combine tool](api.md#monet.util.combinetool) to combine point source data with multidimensional xarray objects
 

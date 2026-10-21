@@ -10,17 +10,16 @@ try:
 except ImportError:
     pass
 
-# Check if xregrid and esmpy are available
+# Check if AXIS are available
 try:
-    import esmpy  # noqa: F401
-    import xregrid  # noqa: F401
+    import axis  # noqa: F401
 
-    has_xregrid = True
+    has_axis = True
 except ImportError:
-    has_xregrid = False
+    has_axis = False
 
 
-@pytest.mark.skipif(not has_xregrid, reason="xregrid not installed")
+@pytest.mark.skipif(not has_axis, reason="AXIS not installed")
 def test_remap_ds_ds():
     # Barry noted a problem with this
 
@@ -50,7 +49,7 @@ def test_remap_ds_ds():
     target.monet.remap(source, method="nearest_d2s")
 
 
-@pytest.mark.skipif(not has_xregrid, reason="xregrid not installed")
+@pytest.mark.skipif(not has_axis, reason="AXIS not installed")
 def test_combine_da_da():
     # This is used in MM aircraft branch
 
@@ -115,3 +114,33 @@ def test_combine_da_da():
     assert a.shape == (model.sizes["z"], n), "model levels but obs grid points"
     assert (np.diff(a.mean(axis=0)) >= 0).all(), "obs profile goes S"
     assert np.isclose(np.diff(a.mean(axis=1)), 1, atol=1e-15, rtol=0).all(), "obs profile goes U"
+
+
+@pytest.mark.skipif(not has_axis, reason="AXIS not installed")
+@pytest.mark.parametrize("method", ["nearest", "bilinear", "conservative"])
+def test_axis_legacy_parity(method):
+    """References captured with xregrid/ESMPy; see data/regrid_reference/provenance.json.
+
+    Conservative methods infer different edges, so compare correlation and
+    area-integrated mass to contract C10 instead of requiring pointwise equality.
+    """
+    from pathlib import Path
+
+    from monet.util.resample import resample
+
+    root = Path(__file__).parent / "data" / "regrid_reference"
+    with xr.open_dataset(root / f"{method}_source.nc") as ds:
+        source = ds.load()
+    with xr.open_dataset(root / f"{method}_target.nc") as ds:
+        target = ds.load()
+    with xr.open_dataset(root / f"{method}_expected.nc") as ds:
+        expected = ds.load()
+    actual = resample(source, target, method=method)
+    if method == "conservative":
+        assert np.corrcoef(actual.field.values.ravel(), expected.field.values.ravel())[0, 1] >= 0.999
+        area = np.cos(np.deg2rad(target.lat))
+        old_mass = float((expected.field * area).sum())
+        new_mass = float((actual.field * area).sum())
+        assert abs(new_mass / old_mass - 1) < 1e-3
+    else:
+        np.testing.assert_allclose(actual.field, expected.field, rtol=1e-6, atol=1e-8)

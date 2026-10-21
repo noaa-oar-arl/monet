@@ -26,7 +26,7 @@ Visualize the spatial distribution of model bias.
 from monet.plots.plots import spatial_bias_scatter
 
 # ds must contain 'obs' and 'model' variables
-fig, ax = spatial_bias_scatter(ds, cmap='RdBu_r')
+fig, ax = spatial_bias_scatter(ds, cmap="RdBu_r")
 ```
 
 ### Point Scatter Bias
@@ -35,7 +35,7 @@ Create a spatial scatter plot showing the bias between two columns in a DataFram
 ```python
 from monet.plots import sp_scatter_bias
 
-ax = sp_scatter_bias(df, col1='obs', col2='mod')
+ax = sp_scatter_bias(df, col1="obs", col2="mod")
 ```
 
 ## Statistical Plots
@@ -47,14 +47,14 @@ Plot time series from a DataFrame with automatic grouping and ±1 SD shading.
 from monet.plots.plots import timeseries
 
 # df should have 'time', 'obs', 'variable', and 'units'
-ax = timeseries(df, y='obs', title='Ozone Time Series')
+ax = timeseries(df, y="obs", title="Ozone Time Series")
 ```
 
 ### Kernel Density Estimate (KDE)
 ```python
 from monet.plots.plots import kdeplot
 
-ax = kdeplot(df['obs'], title='Distribution of Observations')
+ax = kdeplot(df["obs"], title="Distribution of Observations")
 ```
 
 ### Taylor Diagrams
@@ -64,10 +64,10 @@ Taylor diagrams are used to concisely summarize multiple aspects of model perfor
 from monet.plots import taylordiagram_function
 
 # Create a Taylor diagram for a model
-dia = taylordiagram_function(obs_series, model_series, model_label='Model 1')
+dia = taylordiagram_function(obs_series, model_series, model_label="Model 1")
 
 # Add a second model to the same diagram
-taylordiagram_function(obs_series, model2_series, model_label='Model 2', dia=dia)
+taylordiagram_function(obs_series, model2_series, model_label="Model 2", dia=dia)
 ```
 
 ## Plot Customization
@@ -76,7 +76,7 @@ Many MONET plotting functions return Matplotlib `Figure` and `Axes` objects, all
 
 ```python
 fig, ax = ds.O3.monet.quick_map()
-ax.set_extent([-130, -60, 20, 50]) # Zoom to CONUS
+ax.set_extent([-130, -60, 20, 50])  # Zoom to CONUS
 fig.set_size_inches(12, 6)
 ```
 
@@ -88,5 +88,5 @@ MONET provides a `savefig` utility that can automatically add the MONET logo (or
 from monet.plots import savefig
 
 fig, ax = ds.O3.monet.quick_map()
-savefig("my_plot.png", fig=fig, loc=1) # loc=1 is bottom left
+savefig("my_plot.png", fig=fig, loc=1)  # loc=1 is bottom left
 ```

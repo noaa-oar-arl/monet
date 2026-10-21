@@ -868,11 +868,13 @@ def get_giorgi_region_df(
             output_dtypes=[object],
             source="monet.util.tools",
         )
-        # Drop coords that already exist as data variables to avoid MergeError
-        conflict = [v for v in list(idx.coords) if v in dset.data_vars]
-        if conflict:
-            idx = idx.drop_vars(conflict)
-            acro = acro.drop_vars([v for v in conflict if v in acro.coords])
+        # Computed arrays may retain latitude/longitude as auxiliary coords.
+        # If the input stores those names as data variables, newer xarray
+        # versions consider them ambiguous during Dataset assignment. Preserve
+        # the lazy array and dimensions while leaving coordinate ownership to
+        # the input Dataset.
+        idx = xr.DataArray(idx.data, dims=idx.dims, attrs=dict(idx.attrs))
+        acro = xr.DataArray(acro.data, dims=acro.dims, attrs=dict(acro.attrs))
         dset["GIORGI_INDEX"] = idx
         dset["GIORGI_ACRO"] = acro
 

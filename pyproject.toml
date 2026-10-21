@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "monet"
-version = "2.3.1"
+version = "3.0.0"
 description = "The Model and Observation Evaluation Toolkit (MONET)"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -24,8 +24,8 @@ classifiers = [
 dependencies = [
   "cartopy",
   "matplotlib",
-  "xregrid @ git+https://github.com/bbakernoaa/xregrid",
-  "monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats",
+  "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@feature/paper#subdirectory=libs/axis",
+  "monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats.git",
   "netCDF4",
   "numpy",
   "pandas",
@@ -34,7 +34,7 @@ dependencies = [
   "pooch",
   "requests",
   "Pillow>=9.1.0",
-  "pytspack @ git+https://github.com/noaa-oar-arl/pytspack",
+  "pytspack @ git+https://github.com/noaa-oar-arl/pytspack.git",
   "dask",
   "scipy",
 ]

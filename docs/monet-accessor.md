@@ -24,7 +24,7 @@ The MONET accessor provides several useful interpolation routines including:
 - Finding the nearest point to a given latitude and longitude
 - Interpolating to a constant latitude or longitude
 - Vertical interpolation (stratification)
-- Remapping entire 2D `DataArray` or `Dataset` using `xregrid`.
+- Remapping entire 2D `DataArray` or `Dataset` using AXIS.
 
 ### Find Nearest Point
 
@@ -47,10 +47,10 @@ The `compare` method allows for quick comparison between two `DataArray` objects
 
 ```python
 # Compute difference (da1 - da2) and plot automatically
-ds.O3.monet.compare(obs.O3, stat='diff', plot=True)
+ds.O3.monet.compare(obs.O3, stat="diff", plot=True)
 
 # Compute RMSE and return a DataArray (lazily if using Dask)
-rmse_da = ds.O3.monet.compare(obs.O3, stat='RMSE', plot=False)
+rmse_da = ds.O3.monet.compare(obs.O3, stat="RMSE", plot=False)
 ```
 
 Supported statistics include metrics from `monet-stats` (e.g., `RMSE`, `MB`, `MAE`, `NMB`, `IOA`).
@@ -143,23 +143,36 @@ ds_tidied = ds.monet.tidy()
 
 ### Vertical Interpolation
 
-The `interpolate_vertical` method provides vertical interpolation using pytspack tension splines, following the same API as `pytspack.interpolate_vertical`.
+The `interpolate_vertical` method provides vertical interpolation using AXIS's TSPACK tension spline solver through the MONET accessors. Dask-backed inputs stay lazy, with complete vertical columns supplied to each interpolation task.
 
 ```python
 # Interpolate O3 to specific altitude levels
 # 'altitude' is the name of the vertical dimension in the dataset
-interped = ds.O3.monet.interpolate_vertical([100, 500, 1000], level_dim='altitude')
+interped = ds.O3.monet.interpolate_vertical([100, 500, 1000], level_dim="altitude")
 ```
 
-For `Dataset` objects, `interpolate_vertical` will interpolate all variables that have the specified vertical dimension.
+For `Dataset` objects, `interpolate_vertical` interpolates variables that have the specified vertical dimension.
 
 ```python
 # Interpolate entire dataset to pressure levels
-ds_interp = ds.monet.interpolate_vertical([850, 700, 500], level_dim='pres')
+ds_interp = ds.monet.interpolate_vertical([850, 700, 500], level_dim="pres")
 ```
 
 !!! note
     `stratify()` is still available as a deprecated backward-compatibility alias.
+
+### Vector Regridding
+
+Use `remap_vector` on the target grid to remap both components together. AXIS
+applies vector grid-frame rotation; for rotated grids, pass angle arrays in
+radians as `src_alpha` and `dst_alpha`.
+
+```python
+u_out, v_out = target_grid.monet.remap_vector(u, v, method="bilinear")
+```
+
+Vector regridding supports `bilinear` and `nearest` methods and keeps Dask-backed
+components lazy.
 
 ## Land and Ocean Masking
 
@@ -172,3 +185,36 @@ is_land = ds.monet.is_land()
 # Return the dataset masked by ocean (preserving only ocean points)
 ds_ocean = ds.monet.is_ocean(return_xarray=True)
 ```
+
+
+## Horizontal Remapping with AXIS
+
+Call `.monet.remap()` on the **target grid** and pass the source field as its
+argument. This works on both `Dataset` and `DataArray` objects and returns the
+same xarray type as the source field.
+
+```python
+import monet
+
+# Remap model data onto the observation grid.
+mapped = observations.monet.remap(model, method="bilinear")
+
+# A DataArray carrying the target grid coordinates works the same way.
+target_field = observations["temperature"]
+mapped_field = target_field.monet.remap(model["temperature"], method="nearest")
+```
+
+Methods are `nearest`, `linear`/`bilinear`, `conservative`, `bicubic`, `patch`,
+and `conservative2nd`. Pass full source and target Datasets for UGRID/MPAS
+connectivity and cubed-sphere metadata.
+
+For Dask-backed fields, keep each horizontal source dimension in one chunk and
+split independent dimensions such as time. AXIS builds interpolation weights
+eagerly and applies them lazily. Compute with a supported threaded or synchronous
+scheduler, or a Dask Distributed `Client` when AXIS is installed with distributed
+support. For repeated fields on the same grids, use
+[`create_regridder`](user_guide.md#reusing-axis-weights) to build weights once.
+
+Vertical interpolation now uses AXIS's TSPACK solver. The pinned AXIS version's
+parity with MONET's stored pytspack reference is still tracked in
+`tests/test_axis_vertical_pending.py`.

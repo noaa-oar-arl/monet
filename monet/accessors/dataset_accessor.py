@@ -25,7 +25,7 @@ class MONETAccessorDataset(BaseAccessor):
     def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
         """Deprecated: Remap data using nearest neighbor interpolation with parallel processing."""
         warnings.warn(
-            "remap_nearest_parallel is deprecated. xregrid uses dask for parallelization.",
+            "remap_nearest_parallel is deprecated. the AXIS backend uses dask for parallelization.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -44,6 +44,12 @@ class MONETAccessorDataset(BaseAccessor):
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Find the nearest grid indices to given lat/lon point(s).
 
+        .. warning::
+           Nearest-index lookup is not yet implemented with the AXIS backend.
+           In particular, curvilinear grids require a spatial search over their
+           two-dimensional latitude/longitude coordinates; xarray's ordinary
+           nearest label selection only covers indexed one-dimensional axes.
+
         Parameters
         ----------
         lat : float or array-like, optional
@@ -58,7 +64,13 @@ class MONETAccessorDataset(BaseAccessor):
         tuple
             (i, j) indices of nearest point(s).
         """
-        raise NotImplementedError("nearest_ij is not yet implemented with xregrid")
+        warnings.warn(
+            "nearest_ij is not yet implemented with the AXIS backend; "
+            "curvilinear grids need nearest-neighbor lookup over 2D lat/lon coordinates.",
+            UserWarning,
+            stacklevel=2,
+        )
+        raise NotImplementedError("nearest_ij is not yet implemented with the AXIS backend")
 
     def stratify(self, levels, vertical, axis=1, tension=0.0):
         """Deprecated: use ``interpolate_vertical`` instead."""
@@ -78,7 +90,7 @@ class MONETAccessorDataset(BaseAccessor):
         level_dim: str = "level",
         tension: float = 0.0,
     ) -> xr.Dataset:
-        """Vertically interpolate all variables in the Dataset to new levels using pytspack tension splines.
+        """Vertically interpolate variables with AXIS TSPACK splines.
 
         Parameters
         ----------
@@ -98,12 +110,9 @@ class MONETAccessorDataset(BaseAccessor):
         --------
         >>> ds.monet.interpolate_vertical([850, 700, 500], level_dim='pressure')
         """
-        from pytspack import interpolate_vertical
+        from ..util.resample import interpolate_vertical
 
-        ds = self._obj
-        if any(hasattr(ds[v].data, "chunks") for v in ds.data_vars) and level_dim in ds.dims:
-            ds = ds.chunk({level_dim: -1})
-        return interpolate_vertical(ds, target_levels, level_dim=level_dim, tension=tension)
+        return interpolate_vertical(self._obj, target_levels, level_dim=level_dim, tension=tension)
 
     def quick_facet_time_map(
         self,

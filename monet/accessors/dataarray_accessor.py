@@ -27,7 +27,7 @@ class MONETAccessor(BaseAccessor):
     def remap_nearest_parallel(self, data, radius_of_influence=1e6, n_processes=None, **kwargs):
         """Deprecated: Remap data using nearest neighbor interpolation with parallel processing."""
         warnings.warn(
-            "remap_nearest_parallel is deprecated. xregrid uses dask for parallelization.",
+            "remap_nearest_parallel is deprecated. the AXIS backend uses dask for parallelization.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -46,7 +46,7 @@ class MONETAccessor(BaseAccessor):
         return self.interpolate_vertical(np.asarray(levels), level_dim=level_dim, tension=tension)
 
     def interpolate_vertical(self, target_levels, level_dim: str = "level", tension: float = 0.0):
-        """Vertically interpolate data to new levels using pytspack tension splines.
+        """Vertically interpolate data to new levels using AXIS TSPACK splines.
 
         Parameters
         ----------
@@ -66,15 +66,18 @@ class MONETAccessor(BaseAccessor):
         --------
         >>> da.monet.interpolate_vertical([850, 700, 500], level_dim='pressure')
         """
-        from pytspack import interpolate_vertical
+        from ..util.resample import interpolate_vertical
 
-        da = self._obj
-        if hasattr(da.data, "chunks") and level_dim in da.dims:
-            da = da.chunk({level_dim: -1})
-        return interpolate_vertical(da, target_levels, level_dim=level_dim, tension=tension)
+        return interpolate_vertical(self._obj, target_levels, level_dim=level_dim, tension=tension)
 
     def nearest_ij(self, lat=None, lon=None, **kwargs):
         """Find the nearest grid indices to given lat/lon point(s).
+
+        .. warning::
+           Nearest-index lookup is not yet implemented with the AXIS backend.
+           In particular, curvilinear grids require a spatial search over their
+           two-dimensional latitude/longitude coordinates; xarray's ordinary
+           nearest label selection only covers indexed one-dimensional axes.
 
         Parameters
         ----------
@@ -90,7 +93,13 @@ class MONETAccessor(BaseAccessor):
         tuple
             (i, j) indices of nearest point(s).
         """
-        raise NotImplementedError("nearest_ij is not yet implemented with xregrid")
+        warnings.warn(
+            "nearest_ij is not yet implemented with the AXIS backend; "
+            "curvilinear grids need nearest-neighbor lookup over 2D lat/lon coordinates.",
+            UserWarning,
+            stacklevel=2,
+        )
+        raise NotImplementedError("nearest_ij is not yet implemented with the AXIS backend")
 
     def quick_imshow(
         self,

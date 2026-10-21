@@ -17,7 +17,10 @@ dependencies:
   - pillow>=9.1.0
   - seaborn
   - xarray
-  - esmpy
+  - cmake>=3.21
+  - kokkos>=5.1
+  - kokkos-kernels>=5.1
+  - openmpi
   #
   #
   - pip>=21.1

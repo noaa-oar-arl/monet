@@ -31,7 +31,7 @@ def close_all_figures():
 
 
 # Only mock truly optional dependencies.
-# Core dependencies like dask, xregrid, monet_stats, pytspack should NOT be mocked
+# Core dependencies like dask, axis, monet_stats, pytspack should NOT be mocked
 # so that Vectorized Protocol compliance and proper test skipping can be verified.
 mock_if_missing(
     [

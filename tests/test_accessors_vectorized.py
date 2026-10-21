@@ -99,7 +99,7 @@ def test_provenance_tidy():
     assert "Wrapped longitudes" in tidied.attrs["history"]
 
 
-@pytest.mark.skipif(not monet.accessors.base.has_xregrid, reason="xregrid not installed")
+@pytest.mark.skipif(not monet.accessors.base.has_axis, reason="AXIS not installed")
 def test_remap_no_rename():
     source = xr.Dataset(
         {"data": (("y", "x"), [[1, 2], [3, 4]])},
@@ -107,8 +107,8 @@ def test_remap_no_rename():
     )
     target = xr.Dataset(coords={"lat": (("y", "x"), [[40.5]]), "lon": (("y", "x"), [[-99.5]])})
 
-    # This might require actual xregrid installation to run
-    remapped = source.monet.remap(target, method="nearest")
+    # This might require actual AXIS installation to run
+    remapped = target.monet.remap(source, method="nearest")
     assert "lat" in remapped.coords
     assert "lon" in remapped.coords
     assert "latitude" not in remapped.coords
@@ -258,7 +258,7 @@ def test_is_land_pandas():
     assert np.isnan(masked_df.val[1])
 
 
-@pytest.mark.skipif(not monet.accessors.base.has_xregrid, reason="xregrid not installed")
+@pytest.mark.skipif(not monet.accessors.base.has_axis, reason="AXIS not installed")
 def test_interp_constant_lat_lon_da_ds():
     """Verify interp_constant_lat/lon works for both DataArray and Dataset."""
     # Setup

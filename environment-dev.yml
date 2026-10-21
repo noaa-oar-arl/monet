@@ -18,9 +18,13 @@ dependencies:
   - pytest
   - pytest-cov
   - pooch
-  - esmpy
+  # AXIS: C++20 compiler compatible with Kokkos, CMake >=3.21, MPI, Kokkos and KokkosKernels.
+  - cmake>=3.21
+  - kokkos>=5.1
+  - kokkos-kernels>=5.1
+  - openmpi
   - scipy
   - pip:
-      - xregrid @ git+https://github.com/bbakernoaa/xregrid
-      - pytspack @ git+https://github.com/noaa-oar-arl/pytspack
-      - monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats
+      - "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d#subdirectory=libs/axis"
+      - "pytspack @ git+https://github.com/noaa-oar-arl/pytspack.git"
+      - "monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats.git"

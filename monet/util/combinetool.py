@@ -74,6 +74,19 @@ def _pair_xarray(
     **kwargs: t.Any,
 ) -> xr.Dataset | xr.DataArray:
     """Pair xarray model with xarray observations."""
+
+    def _ensure_lat_lon_aliases(ds: xr.Dataset | xr.DataArray) -> xr.Dataset | xr.DataArray:
+        """Add `lat`/`lon` coordinate aliases when only `latitude`/`longitude` exist."""
+        out = ds
+        if "lat" not in out.coords and "latitude" in out.coords:
+            out = out.assign_coords(lat=out["latitude"])
+        if "lon" not in out.coords and "longitude" in out.coords:
+            out = out.assign_coords(lon=out["longitude"])
+        return out
+
+    model = _ensure_lat_lon_aliases(model)
+    obs = _ensure_lat_lon_aliases(obs)
+
     # Use remap via accessor - convention aware
 
     # Detect if we have a trajectory (time-varying coordinates)
@@ -85,21 +98,31 @@ def _pair_xarray(
         is_trajectory = True
 
     if is_trajectory:
-        # For moving platforms, we must align time before spatial remapping
-        # to ensure we sample at the right location for each time step.
-        if interp_time:
-            model = model.interp(time=obs.time)
-        else:
-            # If not interpolating, use nearest neighbor time alignment
-            # Use .values to avoid issues if obs.time is part of a MultiIndex (fixes CI failure)
-            model = model.reindex(time=obs.time.values, method="nearest")
+        # To avoid duplicate 'time' dimension conflicts and massive OOMs, we temporarily
+        # rename the model's 'time' dimension to 'valid_time' before remapping. We remap
+        # spatially first, and then perform nearest-neighbor or interpolation matching
+        # of 'valid_time' to the observation 'time' AFTER remapping. This is extremely
+        # fast and uses virtually zero memory.
+        time_renamed = False
+        if "time" in model.dims and "time" in obs.dims:
+            model = model.rename({"time": "valid_time"})
+            time_renamed = True
+        elif "valid_time" in model.dims and "time" in obs.dims:
+            time_renamed = True
 
         paired = obs.monet.remap(model, method=method, **kwargs)
+
+        if time_renamed:
+            if interp_time:
+                paired = paired.interp(valid_time=obs.time)
+            else:
+                paired = paired.sel(valid_time=obs.time, method="nearest")
+            paired = paired.drop_vars("valid_time", errors="ignore")
     elif not is_trajectory and "time" in obs.dims:
         # For fixed grids, use a single time slice as the target grid to avoid
         # AlignmentError if model and obs have different time dimension sizes.
         # Must drop 'time' coord to avoid conflict with model's time dimension in output
-        target_grid = obs.isel(time=0).drop_vars("time", errors="ignore")
+        target_grid = _ensure_lat_lon_aliases(obs.isel(time=0).drop_vars("time", errors="ignore"))
         paired = target_grid.monet.remap(model, method=method, **kwargs)
     else:
         # Default behavior: attempt direct remap
@@ -123,6 +146,25 @@ def _pair_xarray(
     update_history(paired, "Paired with observations via monet.pair")
 
     if merge:
+        # xr.merge aligns on shared dimensions before combining, which raises
+        # errors if coordinate variables have different values. We drop coordinate
+        # variables from paired that are already present in obs to prevent clashing.
+        if isinstance(obs, xr.Dataset):
+            coords_to_drop = [c for c in paired.coords if c in obs.coords and c != "time"]
+            paired = paired.drop_vars(coords_to_drop, errors="ignore")
+        # InvalidIndexError when the time coordinate contains duplicate labels
+        # (common for multi-site point observations stored in a flat xarray object).
+        # When duplicates are present, assign model variables directly to a copy
+        # of obs instead of relying on merge alignment.
+        has_dup_time = "time" in obs.coords and bool(pd.Index(obs["time"].values).duplicated().any())
+        if has_dup_time:
+            result = obs.copy()
+            if isinstance(paired, xr.Dataset):
+                for var in paired.data_vars:
+                    result[var] = paired[var]
+            else:  # DataArray
+                result[paired.name] = paired
+            return result
         # Use compat='override' to prefer obs coordinates if there are slight mismatches
         # (e.g. from regridding precision issues)
         return xr.merge([obs, paired], compat="override")
@@ -166,7 +208,7 @@ def _pair_dataframe(
 
     # Convert unique locations to xarray (lazily if obs is dask)
     if has_dask_df and isinstance(obs, dd.DataFrame):
-        # ESMF/xregrid requires eager coordinate arrays to build weights.
+        # AXIS requires eager coordinate arrays to build meshes and weights.
         # We compute only the unique locations (usually small).
         unique_locs_p = unique_locs.compute()
     else:
