@@ -738,16 +738,10 @@ class BaseAccessor:
             raise ValueError("Could not detect latitude and longitude coordinates.")
 
         if hasattr(self._obj, "coords") or hasattr(self._obj, "variables"):  # Xarray
-            # Use apply_ufunc to be backend-agnostic (handles Dask automatically if parallelized=True)
-            # We align inputs and use a template to preserve coordinates and dimensions
-            res = xr.apply_ufunc(
-                mask.query,
-                lat,
-                lon,
-                dask="parallelized",
-                output_dtypes=[object],
-                keep_attrs=True,
-            )
+            # EarthMask.query already uses apply_ufunc for xarray/Dask inputs.
+            # Wrapping it in another apply_ufunc can eagerly materialize its
+            # returned DataArray on some xarray versions.
+            res = mask.query(lat, lon, name=mask_type)
 
             # Ensure coordinates are preserved (xr.apply_ufunc with multiple inputs and different dims
             # might not automatically combine them into the result as we expect here)
