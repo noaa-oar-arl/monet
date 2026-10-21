@@ -10,19 +10,29 @@ from monet.util.resample import resample
 
 def visualize_example():
     """Compare the original field with every supported regridding method."""
-    lon = np.linspace(-177.5, 177.5, 72)
-    lat = np.linspace(-87.5, 87.5, 36)
-    lons, lats = np.meshgrid(lon, lat)
+    lon = np.linspace(-145.0, 145.0, 72)
+    lat = np.linspace(-60.0, 60.0, 36)
+    lon_regular, lat_regular = np.meshgrid(lon, lat)
+    # Use a gently warped 2D grid so conservative2nd sees great-circle cell
+    # edges. AXIS does not yet support its linear reconstruction on
+    # constant-latitude edges from a 1D rectilinear grid.
+    lons = lon_regular + 1.5 * np.sin(np.deg2rad(lat_regular))
+    lats = lat_regular + 0.75 * np.sin(np.deg2rad(lon_regular)) * np.cos(np.deg2rad(lat_regular))
     data = np.sin(np.deg2rad(lons)) * np.cos(np.deg2rad(lats))
 
     source = xr.DataArray(
         data,
         dims=("lat", "lon"),
-        coords={"lat": lat, "lon": lon},
+        coords={"lat": (("lat", "lon"), lats), "lon": (("lat", "lon"), lons)},
         name="sample_data",
         attrs={"units": "dimensionless"},
     )
-    target = xr.Dataset(coords={"lat": lat[::2], "lon": lon[::2]})
+    target = xr.Dataset(
+        coords={
+            "lat": (("lat", "lon"), lats[::2, ::2]),
+            "lon": (("lat", "lon"), lons[::2, ::2]),
+        }
+    )
     for grid in (source, target):
         grid.lat.attrs.update(standard_name="latitude", units="degrees_north")
         grid.lon.attrs.update(standard_name="longitude", units="degrees_east")
