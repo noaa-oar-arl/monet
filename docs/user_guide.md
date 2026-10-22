@@ -64,6 +64,25 @@ ugrid_paired = ugrid_ds.monet.remap(obs_points, method="nearest")
 
 Methods include `"bilinear"`, `"nearest"`, `"conservative"`, etc.
 
+### Named NCEP GRIB1 grids
+
+AXIS provides meshes for the NCEP named grids it supports. MONET exposes those
+meshes by Table B number:
+
+```python
+from monet.util import get_ncep_grid
+import axis
+
+target_mesh = get_ncep_grid("G003")
+source_mesh = axis.GridFactory.from_xarray(source)
+weights = axis.generate_weights(source_mesh.to_mesh(), target_mesh, axis.Method.Bilinear)
+```
+
+`get_ncep_grid` returns an `axis.Mesh` from AXIS's named-grid registry. It does
+not duplicate grid coordinates in MONET. For decoded xarray data, use its
+coordinates directly with the regular MONET regridding workflow. AXIS must
+support the requested named grid.
+
 ### Pairing Model and Observations
 
 The `pair` utility is the primary way to match model data (usually gridded) with observations (usually points). It supports Xarray and Pandas/Dask DataFrames.

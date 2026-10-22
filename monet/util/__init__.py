@@ -6,6 +6,7 @@ geospatial data, interpolation, and statistics.
 """
 
 from . import coards_tools, combinetool, interp_util, resample, tools, vertical
+from .ncep_grids import get_ncep_grid
 from .tools import (
     _force_forder,
     add_mask,
@@ -19,6 +20,7 @@ from .tools import (
     get_epa_region_df,
     get_giorgi_region_bounds,
     get_giorgi_region_df,
+    get_ncep_region_df,
     get_relhum,
     kolmogorov_zurbenko_filter,
     linregress,
@@ -59,6 +61,8 @@ __all__ = [
     "get_giorgi_region_df",
     "get_epa_region_bounds",
     "get_epa_region_df",
+    "get_ncep_grid",
+    "get_ncep_region_df",
     "add_mask",
     "calc_13_category_usda_soil_type",
 ]

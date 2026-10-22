@@ -68,6 +68,29 @@ masked_ds = add_mask(ds, "US_States")
 
 These functions are convention-aware and will automatically find latitude and longitude coordinates in your data.
 
+### NCEP Verification Regions
+
+`get_ncep_region_df` adds mutually exclusive NCEP base-region indices and
+acronyms to point DataFrames or gridded xarray Datasets. `ncep` through the
+`get_region` accessor adds a base-region label; locations outside every region
+receive a missing value. When polygons overlap, one label is selected using the
+stable order in the bundled MET source set.
+
+The CONUS, EAST, and WEST unions are available as explicit requests:
+
+```python
+from monet.util import get_ncep_region_df
+
+points = get_ncep_region_df(points)
+east = dataset.monet.get_region("ncep_east")
+west = dataset.monet.get_region("ncep_west")
+conus = dataset.monet.get_region("ncep_conus")
+```
+
+Region membership is evaluated directly from bundled MET `.poly` source files
+at the input coordinates. It does not depend on a fixed raster resolution or a
+MET installation.
+
 ## Meteorological Functions
 
 The `monet.met_funcs` module contains a collection of routines for estimating various atmospheric and surface variables, particularly those related to Monin-Obukhov Similarity Theory.
