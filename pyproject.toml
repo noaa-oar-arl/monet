@@ -61,7 +61,7 @@ include-package-data = true
 packages = ["monet", "monet.accessors", "monet.plots", "monet.util"]
 
 [tool.setuptools.package-data]
-"*" = ["data/*.png", "util/data/masks/*.npz"]
+"*" = ["data/*.png", "util/data/masks/*.npz", "util/data/ncep/regions/*"]
 
 [tool.black]
 line-length = 132

@@ -4,6 +4,7 @@ import io
 import os
 import typing as t
 import zipfile
+from pathlib import Path
 
 import numpy as np
 import requests
@@ -24,6 +25,134 @@ except ImportError:
 MONET_CACHE_DIR = os.path.join(os.path.expanduser("~"), ".monet", "masks")
 # Package data directory for masks
 PACKAGE_MASK_DIR = os.path.join(os.path.dirname(__file__), "data", "masks")
+NCEP_POLY_DIR = os.path.join(os.path.dirname(__file__), "data", "ncep", "regions")
+
+# Ordered for stable, exclusive assignment when source polygons overlap.
+NCEP_BASE_REGIONS = (
+    "APL",
+    "ATC",
+    "CAM",
+    "CAR",
+    "ECA",
+    "GAC",
+    "GLF",
+    "GRB",
+    "HWI",
+    "LMV",
+    "MDW",
+    "MEX",
+    "NAK",
+    "NAO",
+    "NEC",
+    "NMT",
+    "NPL",
+    "NSA",
+    "NWC",
+    "PRI",
+    "SAO",
+    "SEC",
+    "SMT",
+    "SPL",
+    "SWC",
+    "SWD",
+    "WCA",
+)
+NCEP_COMPOUNDS = {
+    "ncep_east": ("APL", "GAC", "LMV", "MDW", "NEC", "SEC"),
+    "ncep_west": ("GRB", "NMT", "NPL", "NWC", "SMT", "SPL", "SWC", "SWD"),
+    "ncep_conus": ("APL", "GAC", "LMV", "MDW", "NEC", "SEC", "GRB", "NMT", "NPL", "NWC", "SMT", "SPL", "SWC", "SWD"),
+}
+
+
+class NCEPPolylineMask:
+    """Evaluate MET NCEP polylines directly at requested coordinates."""
+
+    def __init__(self, mask_name: str):
+        self.mask_name = mask_name.lower()
+        self.compound = NCEP_COMPOUNDS.get(self.mask_name)
+        if self.mask_name != "ncep" and self.compound is None:
+            raise ValueError(f"Unknown NCEP region: {mask_name!r}")
+        acronyms = NCEP_BASE_REGIONS if self.mask_name == "ncep" or self.compound else ()
+        self.polygons = {}
+        for acronym in acronyms:
+            path = Path(NCEP_POLY_DIR, f"{acronym}.poly")
+            if not path.is_file():
+                raise FileNotFoundError(f"Bundled NCEP polyline is missing: {path}")
+            points = np.loadtxt(path, skiprows=1, dtype=np.float64)
+            if points.ndim != 2 or points.shape[1] != 2 or points.shape[0] < 4:
+                raise ValueError(f"Invalid MET polyline file: {path}")
+            # MET stores latitude then longitude; geometry math uses x=longitude.
+            self.polygons[acronym] = (points[:, 1], points[:, 0])
+
+    @staticmethod
+    def _contains(lon: np.ndarray, lat: np.ndarray, polygon: tuple[np.ndarray, np.ndarray]) -> np.ndarray:
+        """Boundary-inclusive vectorized point-in-polygon with dateline handling."""
+        px = np.asarray(lon, dtype=np.float64)
+        py = np.asarray(lat, dtype=np.float64)
+        vx, vy = polygon
+        vx = np.rad2deg(np.unwrap(np.deg2rad(vx)))
+        polygon_center = float(np.mean(vx))
+        inside = np.zeros(px.shape, dtype=bool)
+        boundary = np.zeros(px.shape, dtype=bool)
+        for i in range(len(vx) - 1):
+            shift = 360.0 * np.round((px - polygon_center) / 360.0)
+            x1 = vx[i] + shift
+            x2 = vx[i + 1] + shift
+            y1, y2 = vy[i], vy[i + 1]
+            cross = (px - x1) * (y2 - y1) - (py - y1) * (x2 - x1)
+            scale = max(1.0, abs(vx[i + 1] - vx[i]) + abs(y2 - y1))
+            on_edge = (
+                (np.abs(cross) <= 1.0e-10 * scale)
+                & (px >= np.minimum(x1, x2) - 1e-10)
+                & (px <= np.maximum(x1, x2) + 1e-10)
+                & (py >= min(y1, y2) - 1e-10)
+                & (py <= max(y1, y2) + 1e-10)
+            )
+            boundary |= on_edge
+            crosses = (y1 > py) != (y2 > py)
+            intersection_x = x1 + (py - y1) * (x2 - x1) / (y2 - y1 + np.finfo(float).tiny)
+            inside ^= crosses & (px < intersection_x)
+        return inside | boundary
+
+    def _logic(self, lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
+        lat, lon = np.broadcast_arrays(np.asarray(lat, dtype=float), np.asarray(lon, dtype=float))
+        flat_lat, flat_lon = lat.ravel(), (lon.ravel() + 180.0) % 360.0 - 180.0
+        result = np.full(flat_lon.shape, None, dtype=object)
+        valid = np.isfinite(flat_lat) & np.isfinite(flat_lon) & (flat_lat >= -90) & (flat_lat <= 90)
+        if self.compound:
+            components = self.compound
+            # Use the documented component polygons, assigning only a single
+            # compound label when any component contains the location.
+            matched = np.zeros(flat_lon.shape, dtype=bool)
+            for acronym in components:
+                found = valid & self._contains(flat_lon, flat_lat, self.polygons[acronym])
+                matched |= found
+            result[matched] = self.mask_name.removeprefix("ncep_").upper()
+        else:
+            for start in range(0, flat_lon.size, 65536):
+                stop = min(start + 65536, flat_lon.size)
+                chunk_valid = valid[start:stop]
+                chunk_result = result[start:stop]
+                for acronym, polygon in self.polygons.items():
+                    unresolved = chunk_valid & (chunk_result == None)  # noqa: E711
+                    if not unresolved.any():
+                        break
+                    indices = np.flatnonzero(unresolved)
+                    found = self._contains(flat_lon[start:stop][indices], flat_lat[start:stop][indices], polygon)
+                    chunk_result[indices[found]] = acronym
+        return result.reshape(lat.shape)
+
+    def query(self, lat: t.Any, lon: t.Any, name: str = "ncep") -> t.Any:
+        from .compute_utils import _apply_vectorized
+
+        return _apply_vectorized(
+            self._logic,
+            lat,
+            lon,
+            name=f"NCEP polyline query ({name})",
+            output_dtypes=[object],
+            source="monet.util.mask",
+        )
 
 
 class RegionDefinitions:
@@ -392,8 +521,8 @@ class EarthMask:
         )
 
 
-def get_mask(mask_name: str, resolution: float = 0.05) -> EarthMask:
-    """Get an EarthMask by name, building it if it doesn't exist.
+def get_mask(mask_name: str, resolution: float = 0.05) -> EarthMask | NCEPPolylineMask:
+    """Get a region mask by name, building it if it doesn't exist.
 
     Parameters
     ----------
@@ -404,9 +533,14 @@ def get_mask(mask_name: str, resolution: float = 0.05) -> EarthMask:
 
     Returns
     -------
-    EarthMask
-        The requested mask.
+    EarthMask or NCEPPolylineMask
+        The requested mask. NCEP queries evaluate bundled polylines directly;
+        ``resolution`` only applies to raster-backed masks.
     """
+    normalized_name = mask_name.lower()
+    if normalized_name == "ncep" or normalized_name in NCEP_COMPOUNDS:
+        return NCEPPolylineMask(normalized_name)
+
     # 1. Check in package data directory (shipped with the repository)
     mask_file = f"{mask_name}_{resolution}.npz"
     mask_path = os.path.join(PACKAGE_MASK_DIR, mask_file)

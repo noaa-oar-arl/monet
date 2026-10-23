@@ -21,6 +21,7 @@ dependencies:
   - kokkos>=5.1
   - kokkos-kernels>=5.1
   - openmpi
+  - fortran-compiler
   #
   #
   - pip>=21.1
