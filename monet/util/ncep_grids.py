@@ -64,17 +64,14 @@ def _mesh_to_xarray(axis, mesh, grid_id: int) -> xr.Dataset:
         ni, nj = layout.get("ni"), layout.get("nj")
     if not ni or not nj or ni * nj != len(face_nodes):
         raise ValueError(
-            f"AXIS does not expose a structured shape for NCEP grid {grid_id}; "
-            "use as_xarray=False to receive its native mesh"
+            f"AXIS does not expose a structured shape for NCEP grid {grid_id}; use as_xarray=False to receive its native mesh"
         )
 
     lon_2d = lon_cell.reshape(nj, ni)
     lat_2d = lat_cell.reshape(nj, ni)
     lon_axis = np.nanmean(lon_2d, axis=0)
     lat_axis = np.nanmean(lat_2d, axis=1)
-    rectilinear = np.allclose(lon_2d, lon_axis[None, :], atol=1.0e-7) and np.allclose(
-        lat_2d, lat_axis[:, None], atol=1.0e-7
-    )
+    rectilinear = np.allclose(lon_2d, lon_axis[None, :], atol=1.0e-7) and np.allclose(lat_2d, lat_axis[:, None], atol=1.0e-7)
     attrs = {"ncep_grib1_grid_id": grid_id, "grid_name": f"G{grid_id:03d}"}
     if rectilinear:
         result = xr.Dataset(
@@ -102,9 +99,7 @@ def _mesh_to_xarray(axis, mesh, grid_id: int) -> xr.Dataset:
     face_lat_bounds = np.full((len(face_nodes), max_nodes), np.nan, dtype=np.float64)
     for face_index, indices in enumerate(face_nodes):
         connectivity[face_index, : len(indices)] = indices
-        face_lon_bounds[face_index, : len(indices)] = np.rad2deg(
-            np.unwrap(np.deg2rad(node_coords[indices, 0]))
-        )
+        face_lon_bounds[face_index, : len(indices)] = np.rad2deg(np.unwrap(np.deg2rad(node_coords[indices, 0])))
         face_lat_bounds[face_index, : len(indices)] = node_coords[indices, 1]
     result = result.assign_coords(
         node=("node", np.arange(len(node_coords), dtype=np.int32)),
@@ -123,12 +118,8 @@ def _mesh_to_xarray(axis, mesh, grid_id: int) -> xr.Dataset:
         dims="face",
         attrs={"standard_name": "latitude", "units": "degrees_north", "bounds": "face_lat_bounds"},
     )
-    result["face_lon_bounds"] = xr.DataArray(
-        face_lon_bounds, dims=("face", "max_face_nodes"), attrs={"units": "degrees_east"}
-    )
-    result["face_lat_bounds"] = xr.DataArray(
-        face_lat_bounds, dims=("face", "max_face_nodes"), attrs={"units": "degrees_north"}
-    )
+    result["face_lon_bounds"] = xr.DataArray(face_lon_bounds, dims=("face", "max_face_nodes"), attrs={"units": "degrees_east"})
+    result["face_lat_bounds"] = xr.DataArray(face_lat_bounds, dims=("face", "max_face_nodes"), attrs={"units": "degrees_north"})
     result["face_node_connectivity"] = xr.DataArray(
         connectivity,
         dims=("face", "max_face_nodes"),

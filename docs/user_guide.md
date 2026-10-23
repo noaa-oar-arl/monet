@@ -72,6 +72,7 @@ target grid:
 
 ```python
 from monet.util import get_ncep_grid
+
 target_grid = get_ncep_grid("G003")
 regridded = target_grid.monet.remap(source, method="bilinear")
 ```

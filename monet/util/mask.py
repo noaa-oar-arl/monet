@@ -29,9 +29,33 @@ NCEP_POLY_DIR = os.path.join(os.path.dirname(__file__), "data", "ncep", "regions
 
 # Ordered for stable, exclusive assignment when source polygons overlap.
 NCEP_BASE_REGIONS = (
-    "APL", "ATC", "CAM", "CAR", "ECA", "GAC", "GLF", "GRB", "HWI", "LMV", "MDW", "MEX",
-    "NAK", "NAO", "NEC", "NMT", "NPL", "NSA", "NWC", "PRI", "SAO", "SEC", "SMT", "SPL", "SWC",
-    "SWD", "WCA",
+    "APL",
+    "ATC",
+    "CAM",
+    "CAR",
+    "ECA",
+    "GAC",
+    "GLF",
+    "GRB",
+    "HWI",
+    "LMV",
+    "MDW",
+    "MEX",
+    "NAK",
+    "NAO",
+    "NEC",
+    "NMT",
+    "NPL",
+    "NSA",
+    "NWC",
+    "PRI",
+    "SAO",
+    "SEC",
+    "SMT",
+    "SPL",
+    "SWC",
+    "SWD",
+    "WCA",
 )
 NCEP_COMPOUNDS = {
     "ncep_east": ("APL", "GAC", "LMV", "MDW", "NEC", "SEC"),
@@ -77,7 +101,13 @@ class NCEPPolylineMask:
             y1, y2 = vy[i], vy[i + 1]
             cross = (px - x1) * (y2 - y1) - (py - y1) * (x2 - x1)
             scale = max(1.0, abs(vx[i + 1] - vx[i]) + abs(y2 - y1))
-            on_edge = (np.abs(cross) <= 1.0e-10 * scale) & (px >= np.minimum(x1, x2) - 1e-10) & (px <= np.maximum(x1, x2) + 1e-10) & (py >= min(y1, y2) - 1e-10) & (py <= max(y1, y2) + 1e-10)
+            on_edge = (
+                (np.abs(cross) <= 1.0e-10 * scale)
+                & (px >= np.minimum(x1, x2) - 1e-10)
+                & (px <= np.maximum(x1, x2) + 1e-10)
+                & (py >= min(y1, y2) - 1e-10)
+                & (py <= max(y1, y2) + 1e-10)
+            )
             boundary |= on_edge
             crosses = (y1 > py) != (y2 > py)
             intersection_x = x1 + (py - y1) * (x2 - x1) / (y2 - y1 + np.finfo(float).tiny)
