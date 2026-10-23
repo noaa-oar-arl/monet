@@ -11,8 +11,17 @@
   --md-accent-fg-color: #0085ca;
 }
 
-/* Adjust logo size in search/sidebar */
+/* Keep the full logo in the drawer/sidebar. */
 .md-logo img {
   height: 2rem;
   width: auto;
+}
+
+/* The source logo is portrait-oriented; crop to its globe mark in the header. */
+.md-header .md-logo img {
+  width: 2.25rem;
+  height: 2.25rem;
+  object-fit: cover;
+  object-position: center 40%;
+  border-radius: 50%;
 }
