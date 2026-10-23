@@ -66,22 +66,22 @@ Methods include `"bilinear"`, `"nearest"`, `"conservative"`, etc.
 
 ### Named NCEP GRIB1 grids
 
-AXIS provides meshes for the NCEP named grids it supports. MONET exposes those
-meshes by Table B number:
+AXIS provides meshes for the NCEP named grids it supports. MONET exposes each
+as a coordinate-based xarray Dataset by Table B number, ready to use as a normal MONET
+target grid:
 
 ```python
 from monet.util import get_ncep_grid
-import axis
-
-target_mesh = get_ncep_grid("G003")
-source_mesh = axis.GridFactory.from_xarray(source)
-weights = axis.generate_weights(source_mesh.to_mesh(), target_mesh, axis.Method.Bilinear)
+target_grid = get_ncep_grid("G003")
+regridded = target_grid.monet.remap(source, method="bilinear")
 ```
 
-`get_ncep_grid` returns an `axis.Mesh` from AXIS's named-grid registry. It does
-not duplicate grid coordinates in MONET. For decoded xarray data, use its
-coordinates directly with the regular MONET regridding workflow. AXIS must
-support the requested named grid.
+`get_ncep_grid` exports AXIS mesh cell centers as xarray coordinates. Set
+`as_xarray=False` to get the native `axis.Mesh` for operations that need its
+exact cell topology. The xarray form is coordinate based, like other MONET
+grids; decoded xarray data continues to use its own coordinates. Coordinate
+export uses a temporary Gmsh file and may take extra memory for large grids.
+AXIS must support the requested named grid.
 
 ### Pairing Model and Observations
 
