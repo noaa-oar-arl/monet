@@ -274,3 +274,37 @@ def test_pair_xarray_duplicate_time_does_not_raise(sample_model):
     assert "ozone" in result.data_vars
     assert "obs_val" in result.data_vars
     assert result.sizes["points"] == n_pts
+
+
+def test_pair_fixed_point_matches_observation_times(sample_model, sample_obs_ds):
+    """Fixed-site point observations are matched on time after spatial remapping."""
+    obs = sample_obs_ds.isel(time=[1, 4, 9])
+    model = sample_model.rename({"time": "valid_time"})
+    values = np.broadcast_to(np.arange(24)[:, None], (24, 2)).astype(float)
+    remapped = xr.Dataset(
+        {"ozone": (("valid_time", "siteid"), values)},
+        coords={"valid_time": model.valid_time, "siteid": obs.siteid},
+    )
+
+    with patch("monet.util.resample.resample", return_value=remapped):
+        result = pair(model, obs)
+
+    assert result.sizes["time"] == 3
+    np.testing.assert_array_equal(result.ozone.isel(siteid=0).values, [1.0, 4.0, 9.0])
+    np.testing.assert_array_equal(result.time.values, obs.time.values)
+
+
+def test_pair_preserves_remap_close_callback(sample_model, sample_obs_ds):
+    """The final paired dataset retains remap cleanup after xarray operations."""
+    closed = []
+    remapped = xr.Dataset(
+        {"ozone": (("valid_time", "siteid"), np.ones((24, 2)))},
+        coords={"valid_time": sample_model.time.values, "siteid": sample_obs_ds.siteid},
+    )
+    remapped.set_close(lambda: closed.append(True))
+
+    with patch("monet.util.resample.resample", return_value=remapped):
+        result = pair(sample_model, sample_obs_ds)
+
+    result.close()
+    assert closed == [True]

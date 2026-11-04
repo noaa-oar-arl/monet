@@ -1,7 +1,8 @@
 """Parity probes for AXIS vertical interpolation against stored references.
 
-The strict expected failures record known differences in the pinned AXIS
-solver. Keep the numerical tolerance explicit; do not relax it to hide defects.
+The pinned AXIS solver now matches pytspack parity (verified at the engine
+pin recorded in docs/installing.md), so these probes run as regular tests.
+Keep the numerical tolerance explicit; do not relax it to hide defects.
 """
 
 import json
@@ -12,10 +13,7 @@ import pytest
 
 from monet.util.resample import has_axis
 
-pytestmark = [
-    pytest.mark.skipif(not has_axis, reason="AXIS not available"),
-    pytest.mark.xfail(strict=True, reason="Pinned AXIS vertical solver fails pytspack parity; see feature research addendum"),
-]
+pytestmark = pytest.mark.skipif(not has_axis, reason="AXIS not available")
 
 
 def test_axis_vertical_linear_profile():
@@ -36,7 +34,11 @@ def test_axis_vertical_pytspack_reference(descending, lazy):
     if not descending:
         data = data.isel(pressure=slice(None, None, -1))
     if lazy:
-        data = data.chunk({"pressure": 2})
+        # AXIS's vertical solver treats ``pressure`` as the core dimension and
+        # requires each solved column to live in a single chunk; the caller's
+        # batch dimensions can stay dask-backed. MONET's ``interpolate_vertical``
+        # rechunks accordingly before delegating here.
+        data = data.chunk({"pressure": -1})
     actual = axis.VerticalRegridder(tension=case["tension"]).interpolate(data, data.pressure, np.array(case["targets"]))
     assert (actual.chunks is not None) == lazy
     np.testing.assert_allclose(actual, case["expected"], rtol=3e-2)

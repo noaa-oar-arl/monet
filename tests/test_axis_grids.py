@@ -115,3 +115,76 @@ def test_dateline_nearest():
     dst = xr.Dataset(coords={"lat": [0.0], "lon": [179.1, -179.1]})
     out = dst.monet.remap(src, periodic=True)
     np.testing.assert_allclose(out.field, [[2.0, 4.0]])
+
+
+def test_gefs_float32_to_airnow_node_points():
+    """A GEFS-like float32 grid remaps to AirNow's node-only UGRID layout."""
+    ny, nx = 5, 8
+    lon_1d = np.arange(nx, dtype=np.float64) * 45.0
+    lat_1d = np.linspace(-80.0, 80.0, ny)
+    longitude, latitude = np.meshgrid(lon_1d, lat_1d)
+    model = xr.Dataset(
+        {
+            "mslp": (
+                ("time", "y", "x"),
+                np.arange(2 * ny * nx, dtype=np.float32).reshape(2, ny, nx),
+            )
+        },
+        coords={
+            "latitude": (("y", "x"), latitude, {"standard_name": "latitude", "units": "degrees_north"}),
+            "longitude": (("y", "x"), longitude, {"standard_name": "longitude", "units": "degrees_east"}),
+            "validDate": np.datetime64("2026-05-01T00:00:00"),
+        },
+    )
+    npoints = 4
+    observations = xr.Dataset(
+        {
+            "PM25": (
+                ("time", "node"),
+                np.tile(np.array([1, 2, 3, 4], dtype=np.float32), (64, 1)),
+            ),
+            "state_name": (("time", "node"), np.tile(["CA", "NY", "TX", "WA"], (64, 1))),
+            "epa_region": (("time", "node"), np.tile(["9", "2", "6", "10"], (64, 1))),
+            "mesh": ((), np.int32(0)),
+        },
+        coords={
+            "node": np.arange(npoints),
+            "time": (
+                "time",
+                np.array(
+                    [f"2026-05-01T{i % 24:02}:00" for i in range(64)],
+                    dtype="datetime64[h]",
+                ),
+            ),
+            "siteid": ("node", ["a", "b", "c", "d"]),
+            "latitude": ("node", [34.0, 41.0, 30.0, 47.0]),
+            "longitude": ("node", [-118.0, -74.0, -97.0, -122.0]),
+        },
+    )
+    observations.mesh.attrs.update(cf_role="mesh_topology", topology_dimension=0, node_coordinates="longitude latitude")
+    observations.latitude.attrs.update(standard_name="latitude", units="degrees_north")
+    observations.longitude.attrs.update(standard_name="longitude", units="degrees_east")
+    for name in ("PM25", "state_name", "epa_region"):
+        observations[name].attrs.update(mesh="mesh", location="node")
+
+    sampled_model = observations.monet.remap(model, method="nearest")
+    assert sampled_model.mslp.dims == ("time", "node")
+    assert sampled_model.mslp.dtype == np.float32
+    assert sampled_model.sizes["time"] == 2
+    np.testing.assert_array_equal(sampled_model.siteid, observations.siteid)
+    np.testing.assert_array_equal(sampled_model.longitude, observations.longitude)
+
+    # Retain the opposite accessor orientation as a supported point-to-grid case.
+    mapped_observations = model.monet.remap(observations, method="nearest")
+    assert mapped_observations.PM25.dims == ("time", "y", "x")
+    assert mapped_observations.sizes["time"] == 64
+    assert mapped_observations.PM25.dtype == np.float32
+    assert "state_name" not in mapped_observations.data_vars
+    assert observations.PM25.dtype == np.float32
+
+    mapped_array = model.monet.remap(observations["PM25"], method="nearest")
+    assert mapped_array.dims == ("time", "y", "x")
+    assert mapped_array.shape == (64, ny, nx)
+    assert mapped_array.dtype == np.float32
+    np.testing.assert_array_equal(mapped_array.latitude, model.latitude)
+    np.testing.assert_array_equal(mapped_array.longitude, model.longitude)

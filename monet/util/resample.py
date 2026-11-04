@@ -1,10 +1,16 @@
 """MONET horizontal and vertical regridding with AXIS."""
 
+import atexit
+import logging
 import typing as t
 import warnings
+import weakref
 
 import numpy as np
 import xarray as xr
+
+logger = logging.getLogger(__name__)
+_LIVE_REGRIDDERS = weakref.WeakSet()
 
 try:
     import axis
@@ -18,10 +24,21 @@ except (ImportError, OSError) as exc:
     has_axis = False
     _axis_import_error = exc
 
+
+@atexit.register
+def _close_regridders():
+    """Release MONET-owned native matrices before Python modules are torn down."""
+    for regridder in list(_LIVE_REGRIDDERS):
+        try:
+            regridder.close()
+        except Exception:  # cleanup must not mask interpreter shutdown
+            logger.debug("Could not close MONET's AXIS regridder", exc_info=True)
+
+
 AXIS_INSTALL_MESSAGE = (
     "AXIS (axis-regrid) is required for horizontal regridding. "
     "Install with: pip install 'git+https://github.com/NOAA-EMC/HELM.git@"
-    "a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d#subdirectory=libs/axis'. "
+    "dda4cb5cb2b05f082c8637c4ad594fb74d8f8671#subdirectory=libs/axis'. "
     "Requires a C++20 compiler, CMake, MPI and Kokkos/KokkosKernels; see docs/installing.md."
 )
 
@@ -82,9 +99,169 @@ def _mesh_variables(ds):
     return names
 
 
-def _prepare_grid(obj, side):
+def _degenerate_point_coord_pair(ds):
+    """Return (lat, lon) when 2-D coordinates collapse through a size-1 dimension.
+
+    Single cells or trajectory lists stored as shapes such as (1, 1) or (N, 1)
+    build zero-area curvilinear cells, which AXIS's strict mesh validation
+    rejects. Treat them as point lists so the node-triangle adapter applies.
+    """
+
+    def _find(standard_name, axis, names):
+        coord = next((ds[c] for c in ds.coords if ds[c].attrs.get("standard_name") == standard_name), None)
+        if coord is None:
+            coord = next((ds[c] for c in ds.coords if ds[c].attrs.get("axis") == axis), None)
+        if coord is None:
+            coord = next((ds[c] for c in ds.coords if c in names), None)
+        return coord
+
+    lat = _find("latitude", "Y", ("lat", "latitude"))
+    lon = _find("longitude", "X", ("lon", "longitude"))
+    if lat is None or lon is None or lat.dims != lon.dims or lat.ndim != 2:
+        return None, None
+    if 1 not in lat.shape:
+        return None, None
+    return lat, lon
+
+
+def _prepare_grid(obj, side, method):
     """Keep full mesh metadata and normalize rectilinear dimension aliases only."""
     ds = _as_dataset(obj)
+    target_point_coords = {}
+    point_mesh_adapter = False
+    has_topology = any(ds[name].attrs.get("cf_role") == "mesh_topology" for name in ds.variables)
+    if not has_topology:
+        point_lat, point_lon = _degenerate_point_coord_pair(ds)
+        if point_lat is not None:
+            point_dim = (
+                next(dim for dim, size in point_lat.sizes.items() if size > 1)
+                if max(point_lat.sizes.values()) > 1
+                else point_lat.dims[1]
+            )
+            flat_lon = point_lon.isel({dim: 0 for dim, size in point_lon.sizes.items() if dim != point_dim}).values
+            flat_lat = point_lat.isel({dim: 0 for dim, size in point_lat.sizes.items() if dim != point_dim}).values
+            ds = ds.copy()
+            ds = ds.drop_vars([point_lon.name, point_lat.name])
+            ds = ds.assign_coords(
+                {
+                    point_lon.name: (point_dim, flat_lon, {"standard_name": "longitude", "units": "degrees_east"}),
+                    point_lat.name: (point_dim, flat_lat, {"standard_name": "latitude", "units": "degrees_north"}),
+                }
+            )
+            ds["_monet_point_mesh"] = xr.DataArray(
+                np.int32(0),
+                attrs={
+                    "cf_role": "mesh_topology",
+                    "topology_dimension": 0,
+                    "node_coordinates": f"{point_lon.name} {point_lat.name}",
+                },
+            )
+            has_topology = True
+    if not has_topology:
+        # Selecting a field from a node-based UGRID Dataset drops its sibling
+        # mesh-topology variable, while the field retains mesh/location attrs.
+        # Recreate the node-only topology from those attrs and its coordinates.
+        point_field = next(
+            (ds[name] for name in ds.data_vars if ds[name].attrs.get("location") == "node" and ds[name].attrs.get("mesh")),
+            None,
+        )
+        if point_field is not None:
+            point_coords = {}
+            for standard, names in (
+                ("longitude", ("longitude", "lon", "lon_node")),
+                ("latitude", ("latitude", "lat", "lat_node")),
+            ):
+                coord = next(
+                    (ds[name] for name in ds.coords if ds[name].attrs.get("standard_name") == standard),
+                    None,
+                )
+                if coord is None:
+                    coord = next((ds[name] for name in names if name in ds), None)
+                if coord is not None:
+                    point_coords[standard] = coord
+            if (
+                len(point_coords) == 2
+                and point_coords["longitude"].ndim == 1
+                and point_coords["latitude"].dims == point_coords["longitude"].dims
+            ):
+                mesh_name = str(point_field.attrs["mesh"])
+                if mesh_name not in ds:
+                    ds[mesh_name] = xr.DataArray(
+                        np.int32(0),
+                        attrs={
+                            "cf_role": "mesh_topology",
+                            "topology_dimension": 0,
+                            "node_coordinates": (f"{point_coords['longitude'].name} {point_coords['latitude'].name}"),
+                        },
+                    )
+    for name in ds.variables:
+        if ds[name].attrs.get("cf_role") != "mesh_topology":
+            continue
+        attrs = ds[name].attrs
+        node_names = attrs.get("node_coordinates", "").split()
+        if attrs.get("face_node_connectivity"):
+            continue
+        if len(node_names) < 2 or any(coord not in ds for coord in node_names[:2]):
+            continue
+        node_lon, node_lat = ds[node_names[0]], ds[node_names[1]]
+        if node_lon.ndim != 1 or node_lat.dims != node_lon.dims:
+            continue
+        if method in {"conservative", "conservative2nd"}:
+            raise ValueError("Node-only UGRID point data cannot be used with conservative remapping methods")
+
+        # AXIS consumes cell meshes. Represent each point as a zero-area
+        # triangle so its interpolation weights land exactly at the station.
+        # This is only a geometry adapter; the caller's node dimension is kept
+        # as the output cell dimension, and the original point metadata remains.
+        point_dim = node_lon.dims[0]
+        point_count = node_lon.size
+        original_point_coords = {coord_name: coord for coord_name, coord in ds.coords.items() if point_dim in coord.dims}
+        node_dim = "_monet_point_mesh_node"
+        vertex_dim = "_monet_point_mesh_vertex"
+        face_lon_name, face_lat_name = "_monet_point_lon", "_monet_point_lat"
+        conn_name = "_monet_point_face_nodes"
+        ds = ds.copy()
+        for coord in (node_lon.name, node_lat.name):
+            if coord in ds.coords:
+                ds[coord].attrs = {
+                    key: value for key, value in ds[coord].attrs.items() if key not in {"standard_name", "axis", "mesh", "location"}
+                }
+        # Use separate node variables, with each node repeated three times.
+        ds["_monet_point_node_lon"] = xr.DataArray(
+            np.repeat(node_lon.values, 3),
+            dims=node_dim,
+            attrs={"standard_name": "longitude", "units": node_lon.attrs.get("units", "degrees_east")},
+        )
+        ds["_monet_point_node_lat"] = (node_dim, np.repeat(node_lat.values, 3))
+        ds[face_lon_name] = xr.DataArray(
+            np.asarray(node_lon.values),
+            dims=point_dim,
+            attrs={"standard_name": "longitude", "units": node_lon.attrs.get("units", "degrees_east")},
+        )
+        ds[face_lat_name] = xr.DataArray(
+            np.asarray(node_lat.values),
+            dims=point_dim,
+            attrs={"standard_name": "latitude", "units": node_lat.attrs.get("units", "degrees_north")},
+        )
+        ds = ds.set_coords([face_lon_name, face_lat_name])
+        ds[conn_name] = xr.DataArray(
+            np.arange(point_count * 3, dtype=np.int64).reshape(point_count, 3),
+            dims=(point_dim, vertex_dim),
+            attrs={"cf_role": "face_node_connectivity", "start_index": 0},
+        )
+        ds[name].attrs = {
+            "cf_role": "mesh_topology",
+            "topology_dimension": 2,
+            "node_coordinates": "_monet_point_node_lon _monet_point_node_lat",
+            "face_node_connectivity": conn_name,
+            "face_coordinates": f"{face_lon_name} {face_lat_name}",
+        }
+        point_mesh_adapter = True
+        if side == "target":
+            target_point_coords = original_point_coords
+        else:
+            target_point_coords = {}
+
     coords = []
     for standard, names in (
         ("latitude", ("lat", "latCell", "lat_face", "lat_node", "latitude")),
@@ -103,6 +280,9 @@ def _prepare_grid(obj, side):
     lat, lon = coords
     restore = {}
     restore_coords = {}
+    restore_coords.update(target_point_coords)
+    if point_mesh_adapter:
+        ds.attrs["_monet_point_mesh_adapter"] = True
     # AXIS uses coordinate names as rectilinear dimensions. Swap dimensions in a
     # shallow view when callers use latitude(y)/longitude(x); restore them on return.
     is_mesh = any(v.attrs.get("cf_role") == "mesh_topology" for v in ds.variables.values())
@@ -132,11 +312,54 @@ def _prepare_grid(obj, side):
     return ds, restore, restore_coords
 
 
+def _longitude_coord(ds):
+    for name in ds.coords:
+        if ds[name].attrs.get("standard_name") == "longitude":
+            return ds[name]
+    for name in ("lon", "longitude", "lonCell", "lon_face", "lon_node"):
+        if name in ds:
+            return ds[name]
+    return None
+
+
+def _shift_point_longitudes(points, grid):
+    """Move point longitudes by a whole turn when a target grid uses another convention."""
+    point_lon = _longitude_coord(points)
+    grid_lon = _longitude_coord(grid)
+    if point_lon is None or grid_lon is None:
+        return points
+    point_values = np.asarray(point_lon.values, dtype=np.float64)
+    grid_values = np.asarray(grid_lon.values, dtype=np.float64)
+    point_values = point_values[np.isfinite(point_values)]
+    grid_values = grid_values[np.isfinite(grid_values)]
+    if not point_values.size or not grid_values.size:
+        return points
+    point_center = (point_values.min() + point_values.max()) / 2.0
+    grid_center = (grid_values.min() + grid_values.max()) / 2.0
+    offset = 360.0 * round((grid_center - point_center) / 360.0)
+    if not offset:
+        return points
+    shifted_min = point_values.min() + offset
+    shifted_max = point_values.max() + offset
+    if shifted_max < grid_values.min() or shifted_min > grid_values.max():
+        return points
+
+    points = points.copy()
+    for name in points.variables:
+        variable = points[name]
+        if variable.attrs.get("standard_name") == "longitude":
+            points[name] = variable.copy(data=np.asarray(variable.values, dtype=np.float64) + offset)
+            points[name].attrs = dict(variable.attrs)
+    return points
+
+
 class PersistentRegridder:
     """Reusable AXIS weights with MONET type, dimension, and history conventions.
 
     Construct with :func:`create_regridder`. Only apply to fields on the same
     source grid; weight files do not encode or validate the grid/method identity.
+    Closing releases the engine and makes this regridder unusable. Any owners
+    still alive at Python shutdown are closed before native module teardown.
     """
 
     def __init__(self, engine, source_grid, target_grid, method, source_dims, target_dims, target_coords):
@@ -147,24 +370,60 @@ class PersistentRegridder:
         self.method = method
         self.source_grid_ds = source_grid
         self.target_grid_ds = target_grid
+        _LIVE_REGRIDDERS.add(self)
 
     def __call__(self, obj):
         from .conventions import update_history
 
+        if self._engine is None:
+            raise RuntimeError("This MONET regridder is closed. Create a new regridder before applying weights.")
         src = _as_dataset(obj)
         for new, old in self._source_dims.items():
             if old in src.dims:
                 if new not in src.coords:
                     src = src.assign_coords({new: self.source_grid_ds[new].rename({new: old})})
                 src = src.swap_dims({old: new}) if new in src.coords else src.rename_dims({old: new})
+        # Keep dtype promotion and dimension normalization local to this call.
+        src = src.copy()
         was_da = isinstance(obj, xr.DataArray)
         field_name = next(iter(src.data_vars)) if was_da else None
-        out = self._engine(src)
+        # AXIS's native batch_apply kernels accept float64 arrays only. Promote
+        # spatial numeric fields before passing them through the backend; retain
+        # the original precision for floating-point outputs and leave integer
+        # interpolation results as float64 to avoid truncating weighted values.
+        spatial_dims = tuple(self._engine._dims_source)
+        source_dtypes = {}
+        non_numeric_spatial_vars = []
+        for name, variable in src.data_vars.items():
+            if not all(dim in variable.dims for dim in spatial_dims):
+                continue
+            dtype = variable.dtype
+            if np.issubdtype(dtype, np.number) or np.issubdtype(dtype, np.bool_):
+                source_dtypes[name] = dtype
+                if dtype != np.dtype(np.float64):
+                    src[name] = variable.astype(np.float64)
+            else:
+                # Point observations often include station labels on the same
+                # node dimension as measured values. They are target metadata,
+                # not interpolated fields, and AXIS's sparse kernels accept
+                # numeric arrays only.
+                non_numeric_spatial_vars.append(name)
+        engine_input = src.drop_vars(non_numeric_spatial_vars) if non_numeric_spatial_vars else src
+        out = self._engine(engine_input)
+        for name, dtype in source_dtypes.items():
+            if name in out and np.issubdtype(dtype, np.floating) and dtype != np.dtype(np.float64):
+                out[name] = out[name].astype(dtype)
         # AXIS carries non-spatial variables through. Source topology describes
         # the old grid and must be replaced before the output can be remapped again.
         source_mesh = _mesh_variables(self.source_grid_ds)
-        target_mesh = _mesh_variables(self.target_grid_ds)
+        point_target = self.target_grid_ds.attrs.get("_monet_point_mesh_adapter", False)
+        target_mesh = set() if point_target else _mesh_variables(self.target_grid_ds)
         out = out.drop_vars(list(source_mesh - target_mesh), errors="ignore")
+        if point_target:
+            out = out.drop_vars(
+                [name for name in out.variables if name.startswith("_monet_point_")],
+                errors="ignore",
+            )
         for name in target_mesh:
             if name in self.target_grid_ds.coords:
                 out = out.assign_coords({name: self.target_grid_ds[name]})
@@ -196,11 +455,21 @@ class PersistentRegridder:
 
     def to_file(self, path):
         """Save binary AXIS weights; reuse with the same grids and method."""
+        if self._engine is None:
+            raise RuntimeError("This MONET regridder is closed. Create a new regridder before saving weights.")
         return self._engine.to_file(str(path))
 
     def close(self):
-        """Release AXIS weights and any worker registrations owned by this regridder."""
-        self._engine.close()
+        """Release this owner's engine, native weights, and worker registrations."""
+        if self._engine is not None:
+            try:
+                self._engine.close()
+            finally:
+                # AXIS.close() clears worker caches but retains its Matrix.
+                # Drop our engine reference even when the wrapper remains
+                # reachable through an xarray close callback at shutdown.
+                self._engine = None
+                _LIVE_REGRIDDERS.discard(self)
 
 
 def create_regridder(
@@ -219,8 +488,12 @@ def create_regridder(
     """
     real_method = _method(method)
     _require_axis()
-    src, source_dims, _ = _prepare_grid(source_grid, "source")
-    dst, target_dims, target_coords = _prepare_grid(target_grid, "target")
+    src, source_dims, _ = _prepare_grid(source_grid, "source", real_method)
+    dst, target_dims, target_coords = _prepare_grid(target_grid, "target", real_method)
+    if src.attrs.get("_monet_point_mesh_adapter"):
+        src = _shift_point_longitudes(src, dst)
+    if dst.attrs.get("_monet_point_mesh_adapter"):
+        dst = _shift_point_longitudes(dst, src)
     engine_options.pop("radius_of_influence", None)
     engine_options.pop("n_processes", None)
     if weights_file is not None:
@@ -241,10 +514,19 @@ def resample(
     and conservative2nd. Dask-backed fields stay lazy; grid coordinates and
     interpolation weights are constructed eagerly. For lazy output, the returned
     xarray object retains the regridder until it is closed or garbage-collected.
+    Close the result after its lazy work finishes to release weights promptly;
+    MONET also releases its remaining regridders at Python shutdown.
     See :func:`create_regridder` for options and reusable weights.
     """
     regridder = create_regridder(source_data, target_grid, method=method, **kwargs)
-    out = regridder(source_data)
+    try:
+        out = regridder(source_data)
+    except BaseException:
+        try:
+            regridder.close()
+        except Exception:
+            logger.debug("Could not close MONET's AXIS regridder after failure", exc_info=True)
+        raise
     if isinstance(out, xr.DataArray):
         is_dask = hasattr(out.data, "__dask_graph__")
     else:
@@ -254,6 +536,8 @@ def resample(
         # owner alive with the lazy xarray result; otherwise the temporary
         # regridder is finalized before the graph computes and clears that cache.
         out.set_close(regridder.close)
+    else:
+        regridder.close()
     return out
 
 
@@ -284,9 +568,16 @@ def interpolate_vertical(
         other_dims = tuple(dim for dim in original_dims if dim != level_dim)
         ordered = da.transpose(*other_dims, level_dim)
         source_levels = da[level_dim]
-        # AXIS expects the vertical core dimension last, including for hybrid
-        # coordinates that vary across horizontal columns.
+        # AXIS solves whole vertical columns per task: the vertical core
+        # dimension must be a single chunk, in both the field and any hybrid
+        # level coordinate. Batch dimensions keep their own chunking.
+        if hasattr(ordered.data, "__dask_graph__") and len(ordered.chunks[ordered.dims.index(level_dim)]) > 1:
+            ordered = ordered.chunk({level_dim: -1})
         if level_dim in source_levels.dims:
+            if hasattr(source_levels.data, "__dask_graph__") and len(source_levels.chunks[source_levels.dims.index(level_dim)]) > 1:
+                source_levels = source_levels.chunk({level_dim: -1})
+            # AXIS expects the vertical core dimension last, including for hybrid
+            # coordinates that vary across horizontal columns.
             source_levels = source_levels.transpose(*(dim for dim in other_dims if dim in source_levels.dims), level_dim)
 
         target_dim = f"_monet_axis_target_{level_dim}"

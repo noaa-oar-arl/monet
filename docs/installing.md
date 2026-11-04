@@ -29,7 +29,7 @@ Some features require additional dependencies:
 MONET uses AXIS for horizontal and vertical regridding. The `pytspack` dependency
 is retained for other existing utilities. AXIS is
 installed from the pinned HELM commit
-`a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d`; the distribution is `axis-regrid`
+`dda4cb5cb2b05f082c8637c4ad594fb74d8f8671`; the distribution is `axis-regrid`
 and the Python import is `axis`.
 
 ### Native prerequisites
@@ -53,12 +53,33 @@ pip install \
   -Ccmake.define.OpenMP_CXX_LIB_NAMES=omp \
   -Ccmake.define.OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.dylib" \
   -Ccmake.define.KokkosKernels_ADD_DEFAULT_ETI=OFF \
-  "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d#subdirectory=libs/axis"
+  "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@dda4cb5cb2b05f082c8637c4ad594fb74d8f8671#subdirectory=libs/axis"
 ```
 
 The `-include bit` flag works around a missing C++20 header in fetched KokkosKernels
 5.1.1. Loading two different OpenMP runtime libraries into one process can crash;
 use one matching compiler/runtime throughout the native dependencies.
+
+When combining AXIS with packages such as Numba and `monetio`'s `grib2io`, inspect
+all of their OpenMP dependencies with `otool -L` and choose one runtime for the
+whole process. For example, Numba may use Homebrew's `libomp`; in that case,
+build AXIS with `-Ccmake.define.OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.dylib"`.
+Matching only AXIS and `grib2io` is not sufficient if another imported package
+uses a different runtime.
+
+Also inspect `grib2io/iplib` and its `libip_d` dependency. An `iplib` extension
+that resolves `libip_d` from a different Conda environment can load yet another
+OpenMP runtime. If grib2io's own interpolation functions are not needed, rebuild
+grib2io without that optional component; MONET's AXIS regridding does not use it:
+
+```bash
+python -m pip install --force-reinstall --no-deps \
+  --config-settings=cmake.define.GRIB2IO_WITH_IP=OFF \
+  "grib2io @ git+https://github.com/NOAA-MDL/grib2io.git@b9bc80b0c7d950d1f955fe96a97d965198ad57a1"
+```
+
+If CMake cannot find `grib2.h`, set `G2C_INCDIR` and `G2C_LIBDIR` to the
+NCEPLIBS-g2c `include` and `lib` directories before running the install command.
 
 ### Installing from source
 
@@ -73,7 +94,7 @@ pip install .
 `pyproject.toml` declares the exact AXIS git URL. For a standalone AXIS installation:
 
 ```bash
-pip install "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d#subdirectory=libs/axis"
+pip install "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@dda4cb5cb2b05f082c8637c4ad594fb74d8f8671#subdirectory=libs/axis"
 ```
 
 To verify the engine is available:

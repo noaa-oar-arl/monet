@@ -24,7 +24,7 @@ classifiers = [
 dependencies = [
   "cartopy",
   "matplotlib",
-  "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@feature/paper#subdirectory=libs/axis",
+  "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@dda4cb5cb2b05f082c8637c4ad594fb74d8f8671#subdirectory=libs/axis",
   "monet-stats @ git+https://github.com/noaa-oar-arl/monet-stats.git",
   "netCDF4",
   "numpy",
@@ -61,7 +61,7 @@ include-package-data = true
 packages = ["monet", "monet.accessors", "monet.plots", "monet.util"]
 
 [tool.setuptools.package-data]
-"*" = ["data/*.png", "util/data/masks/*.npz"]
+"*" = ["data/*.png", "util/data/masks/*.npz", "util/data/ncep/regions/*"]
 
 [tool.black]
 line-length = 132

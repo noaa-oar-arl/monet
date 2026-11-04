@@ -883,6 +883,54 @@ def get_giorgi_region_df(
         raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")
 
 
+def get_ncep_region_df(dset: pd.DataFrame | xr.Dataset) -> pd.DataFrame | xr.Dataset:
+    """Add mutually exclusive NCEP base-region index and acronym fields.
+
+    Locations outside the bundled MET NCEP polylines receive a missing index
+    and a ``None`` acronym. If source polygons overlap, the first match in
+    ``NCEP_BASE_REGIONS`` order is used consistently.
+    """
+    if not isinstance(dset, pd.DataFrame | xr.Dataset):
+        raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")
+    from .mask import NCEP_BASE_REGIONS, NCEPPolylineMask
+
+    lat = dset.monet.lat
+    lon = dset.monet.lon
+    if lat is None or lon is None:
+        raise ValueError("Could not detect latitude and longitude coordinates.")
+
+    region_mask = NCEPPolylineMask("ncep")
+    index_by_acro = {acronym: float(i) for i, acronym in enumerate(NCEP_BASE_REGIONS, start=1)}
+
+    def index_from_acro(acronyms: np.ndarray) -> np.ndarray:
+        values = np.asarray(acronyms, dtype=object)
+        out = np.full(values.shape, np.nan, dtype=np.float64)
+        for acronym, index in index_by_acro.items():
+            out[values == acronym] = index
+        return out
+
+    if isinstance(dset, pd.DataFrame):
+        acronyms = region_mask._logic(np.asarray(lat), np.asarray(lon))
+        dset["NCEP_INDEX"] = index_from_acro(acronyms)
+        dset["NCEP_ACRO"] = acronyms
+        return dset
+    if isinstance(dset, xr.Dataset):
+        lat, lon = xr.broadcast(lat, lon)
+        acronyms = region_mask.query(lat, lon)
+        indices = _apply_vectorized(
+            index_from_acro,
+            acronyms,
+            name="NCEP region indices",
+            source="monet.util.tools",
+        )
+        # Avoid auxiliary-coordinate ambiguity when latitude/longitude are
+        # stored as data variables rather than coordinates.
+        dset["NCEP_INDEX"] = xr.DataArray(indices.data, dims=indices.dims, attrs={"long_name": "NCEP region index"})
+        dset["NCEP_ACRO"] = xr.DataArray(acronyms.data, dims=acronyms.dims, attrs={"long_name": "NCEP region acronym"})
+        return dset
+    raise TypeError("dset must be a pandas.DataFrame or xarray.Dataset")
+
+
 def add_mask(
     dset: pd.DataFrame | xr.Dataset, mask_name: str, resolution: float = 0.05, new_var: str | None = None
 ) -> pd.DataFrame | xr.Dataset:

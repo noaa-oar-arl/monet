@@ -96,11 +96,13 @@ def test_axis_method_contract(monkeypatch, alias, expected):
     source = make_test_data()
     original = source.copy(deep=True)
     engine = Mock(side_effect=lambda obj: obj.copy(deep=False))
+    engine._dims_source = ("y", "x")
     constructor = Mock(return_value=engine)
     monkeypatch.setattr(backend, "has_axis", True)
     monkeypatch.setattr(backend, "Regridder", constructor, raising=False)
     out = backend.resample(source, source, method=alias, radius_of_influence=1, n_processes=2, periodic=True)
     assert constructor.call_args.kwargs == {"method": expected, "periodic": True}
+    engine.close.assert_called_once_with()
     assert "backend=AXIS" in out.attrs["history"]
     xr.testing.assert_identical(source, original)
 

@@ -108,6 +108,13 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
 
 ## Utility Functions
 
+### NCEP Grids
+
+::: monet.util.ncep_grids
+    options:
+      members:
+        - get_ncep_grid
+
 ### General Utilities
 
 ::: monet.util.tools
@@ -129,6 +136,7 @@ MONET extends xarray and pandas objects via accessors. These methods are availab
         - get_giorgi_region_df
         - get_epa_region_bounds
         - get_epa_region_df
+        - get_ncep_region_df
         - add_mask
         - calc_13_category_usda_soil_type
 
