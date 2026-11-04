@@ -29,7 +29,7 @@ Some features require additional dependencies:
 MONET uses AXIS for horizontal and vertical regridding. The `pytspack` dependency
 is retained for other existing utilities. AXIS is
 installed from the pinned HELM commit
-`a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d`; the distribution is `axis-regrid`
+`dda4cb5cb2b05f082c8637c4ad594fb74d8f8671`; the distribution is `axis-regrid`
 and the Python import is `axis`.
 
 ### Native prerequisites
@@ -53,7 +53,7 @@ pip install \
   -Ccmake.define.OpenMP_CXX_LIB_NAMES=omp \
   -Ccmake.define.OpenMP_omp_LIBRARY="$(brew --prefix libomp)/lib/libomp.dylib" \
   -Ccmake.define.KokkosKernels_ADD_DEFAULT_ETI=OFF \
-  "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d#subdirectory=libs/axis"
+  "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@dda4cb5cb2b05f082c8637c4ad594fb74d8f8671#subdirectory=libs/axis"
 ```
 
 The `-include bit` flag works around a missing C++20 header in fetched KokkosKernels
@@ -94,7 +94,7 @@ pip install .
 `pyproject.toml` declares the exact AXIS git URL. For a standalone AXIS installation:
 
 ```bash
-pip install "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d#subdirectory=libs/axis"
+pip install "axis-regrid @ git+https://github.com/NOAA-EMC/HELM.git@dda4cb5cb2b05f082c8637c4ad594fb74d8f8671#subdirectory=libs/axis"
 ```
 
 To verify the engine is available:

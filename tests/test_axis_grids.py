@@ -161,9 +161,7 @@ def test_gefs_float32_to_airnow_node_points():
             "longitude": ("node", [-118.0, -74.0, -97.0, -122.0]),
         },
     )
-    observations.mesh.attrs.update(
-        cf_role="mesh_topology", topology_dimension=0, node_coordinates="longitude latitude"
-    )
+    observations.mesh.attrs.update(cf_role="mesh_topology", topology_dimension=0, node_coordinates="longitude latitude")
     observations.latitude.attrs.update(standard_name="latitude", units="degrees_north")
     observations.longitude.attrs.update(standard_name="longitude", units="degrees_east")
     for name in ("PM25", "state_name", "epa_region"):

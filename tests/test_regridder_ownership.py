@@ -134,8 +134,6 @@ owner = PersistentRegridder(engine, None, None, 'nearest', {}, {}, {})
 del engine
 assert reference() is not None
 """
-    result = subprocess.run(
-        [sys.executable, "-c", code], capture_output=True, text=True, timeout=30, check=False
-    )
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=30, check=False)
     assert result.returncode == 0, result.stderr
     assert "engine released before module teardown" in result.stdout

@@ -84,8 +84,12 @@ def test_pair_vectorized_protocol(monkeypatch):
     def mock_apply(source):
         # Target was passed to Regridder(source, target, ...)
         target = mock_regridder_cls.call_args[0][1]
+        # Restrict to the caller's layout: MONET's node-triangle point-mesh
+        # adapter adds private ``_monet_point_*`` topology variables that AXIS
+        # consumes to build face cells but never carries through to its output.
+        public_coords = {name: coord for name, coord in target.coords.items() if not name.startswith("_monet_point_")}
         # Create a result dataset with target's structure
-        res = xr.Dataset(coords=target.coords)
+        res = xr.Dataset(coords=public_coords)
         for var in source.data_vars:
             if not source[var].dims:
                 res[var] = source[var]
@@ -98,7 +102,7 @@ def test_pair_vectorized_protocol(monkeypatch):
             indexers = {d: 0 for d in spatial_dims if d in source[var].dims}
             data = source[var].isel(indexers)
             # Now broadcast preserved dims with target
-            res[var] = data.broadcast_like(target)
+            res[var] = data.broadcast_like(res)
         return res
 
     mock_regridder.side_effect = mock_apply
@@ -179,7 +183,10 @@ def test_ugrid_pairing_smoke(monkeypatch):
 
     def mock_apply(source):
         target = mock_regridder_cls.call_args[0][1]
-        res = xr.Dataset(coords=target.coords)
+        # Drop MONET's private point-mesh adapter topology so the mock mirrors
+        # the regridded cell layout AXIS and ``PersistentRegridder`` return.
+        public_coords = {name: coord for name, coord in target.coords.items() if not name.startswith("_monet_point_")}
+        res = xr.Dataset(coords=public_coords)
         for var in source.data_vars:
             if not source[var].dims:
                 res[var] = source[var]
@@ -188,7 +195,7 @@ def test_ugrid_pairing_smoke(monkeypatch):
             spatial_dims = [d for d in source[var].dims if d not in preserved_dims]
             indexers = {d: 0 for d in spatial_dims if d in source[var].dims}
             data = source[var].isel(indexers)
-            res[var] = data.broadcast_like(target)
+            res[var] = data.broadcast_like(res)
         return res
 
     mock_regridder.side_effect = mock_apply

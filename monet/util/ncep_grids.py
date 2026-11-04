@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from itertools import islice
 import numbers
 import tempfile
+from itertools import islice
 from pathlib import Path
 
 import numpy as np

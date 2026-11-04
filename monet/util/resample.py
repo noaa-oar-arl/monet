@@ -38,7 +38,7 @@ def _close_regridders():
 AXIS_INSTALL_MESSAGE = (
     "AXIS (axis-regrid) is required for horizontal regridding. "
     "Install with: pip install 'git+https://github.com/NOAA-EMC/HELM.git@"
-    "a3e36e69e4d2c4426a21a11bde2d1cd2a8a70e0d#subdirectory=libs/axis'. "
+    "dda4cb5cb2b05f082c8637c4ad594fb74d8f8671#subdirectory=libs/axis'. "
     "Requires a C++20 compiler, CMake, MPI and Kokkos/KokkosKernels; see docs/installing.md."
 )
 
@@ -99,6 +99,31 @@ def _mesh_variables(ds):
     return names
 
 
+def _degenerate_point_coord_pair(ds):
+    """Return (lat, lon) when 2-D coordinates collapse through a size-1 dimension.
+
+    Single cells or trajectory lists stored as shapes such as (1, 1) or (N, 1)
+    build zero-area curvilinear cells, which AXIS's strict mesh validation
+    rejects. Treat them as point lists so the node-triangle adapter applies.
+    """
+
+    def _find(standard_name, axis, names):
+        coord = next((ds[c] for c in ds.coords if ds[c].attrs.get("standard_name") == standard_name), None)
+        if coord is None:
+            coord = next((ds[c] for c in ds.coords if ds[c].attrs.get("axis") == axis), None)
+        if coord is None:
+            coord = next((ds[c] for c in ds.coords if c in names), None)
+        return coord
+
+    lat = _find("latitude", "Y", ("lat", "latitude"))
+    lon = _find("longitude", "X", ("lon", "longitude"))
+    if lat is None or lon is None or lat.dims != lon.dims or lat.ndim != 2:
+        return None, None
+    if 1 not in lat.shape:
+        return None, None
+    return lat, lon
+
+
 def _prepare_grid(obj, side, method):
     """Keep full mesh metadata and normalize rectilinear dimension aliases only."""
     ds = _as_dataset(obj)
@@ -106,15 +131,38 @@ def _prepare_grid(obj, side, method):
     point_mesh_adapter = False
     has_topology = any(ds[name].attrs.get("cf_role") == "mesh_topology" for name in ds.variables)
     if not has_topology:
+        point_lat, point_lon = _degenerate_point_coord_pair(ds)
+        if point_lat is not None:
+            point_dim = (
+                next(dim for dim, size in point_lat.sizes.items() if size > 1)
+                if max(point_lat.sizes.values()) > 1
+                else point_lat.dims[1]
+            )
+            flat_lon = point_lon.isel({dim: 0 for dim, size in point_lon.sizes.items() if dim != point_dim}).values
+            flat_lat = point_lat.isel({dim: 0 for dim, size in point_lat.sizes.items() if dim != point_dim}).values
+            ds = ds.copy()
+            ds = ds.drop_vars([point_lon.name, point_lat.name])
+            ds = ds.assign_coords(
+                {
+                    point_lon.name: (point_dim, flat_lon, {"standard_name": "longitude", "units": "degrees_east"}),
+                    point_lat.name: (point_dim, flat_lat, {"standard_name": "latitude", "units": "degrees_north"}),
+                }
+            )
+            ds["_monet_point_mesh"] = xr.DataArray(
+                np.int32(0),
+                attrs={
+                    "cf_role": "mesh_topology",
+                    "topology_dimension": 0,
+                    "node_coordinates": f"{point_lon.name} {point_lat.name}",
+                },
+            )
+            has_topology = True
+    if not has_topology:
         # Selecting a field from a node-based UGRID Dataset drops its sibling
         # mesh-topology variable, while the field retains mesh/location attrs.
         # Recreate the node-only topology from those attrs and its coordinates.
         point_field = next(
-            (
-                ds[name]
-                for name in ds.data_vars
-                if ds[name].attrs.get("location") == "node" and ds[name].attrs.get("mesh")
-            ),
+            (ds[name] for name in ds.data_vars if ds[name].attrs.get("location") == "node" and ds[name].attrs.get("mesh")),
             None,
         )
         if point_field is not None:
@@ -143,9 +191,7 @@ def _prepare_grid(obj, side, method):
                         attrs={
                             "cf_role": "mesh_topology",
                             "topology_dimension": 0,
-                            "node_coordinates": (
-                                f"{point_coords['longitude'].name} {point_coords['latitude'].name}"
-                            ),
+                            "node_coordinates": (f"{point_coords['longitude'].name} {point_coords['latitude'].name}"),
                         },
                     )
     for name in ds.variables:
@@ -169,11 +215,7 @@ def _prepare_grid(obj, side, method):
         # as the output cell dimension, and the original point metadata remains.
         point_dim = node_lon.dims[0]
         point_count = node_lon.size
-        original_point_coords = {
-            coord_name: coord
-            for coord_name, coord in ds.coords.items()
-            if point_dim in coord.dims
-        }
+        original_point_coords = {coord_name: coord for coord_name, coord in ds.coords.items() if point_dim in coord.dims}
         node_dim = "_monet_point_mesh_node"
         vertex_dim = "_monet_point_mesh_vertex"
         face_lon_name, face_lat_name = "_monet_point_lon", "_monet_point_lat"
@@ -182,9 +224,7 @@ def _prepare_grid(obj, side, method):
         for coord in (node_lon.name, node_lat.name):
             if coord in ds.coords:
                 ds[coord].attrs = {
-                    key: value
-                    for key, value in ds[coord].attrs.items()
-                    if key not in {"standard_name", "axis", "mesh", "location"}
+                    key: value for key, value in ds[coord].attrs.items() if key not in {"standard_name", "axis", "mesh", "location"}
                 }
         # Use separate node variables, with each node repeated three times.
         ds["_monet_point_node_lon"] = xr.DataArray(
@@ -528,9 +568,16 @@ def interpolate_vertical(
         other_dims = tuple(dim for dim in original_dims if dim != level_dim)
         ordered = da.transpose(*other_dims, level_dim)
         source_levels = da[level_dim]
-        # AXIS expects the vertical core dimension last, including for hybrid
-        # coordinates that vary across horizontal columns.
+        # AXIS solves whole vertical columns per task: the vertical core
+        # dimension must be a single chunk, in both the field and any hybrid
+        # level coordinate. Batch dimensions keep their own chunking.
+        if hasattr(ordered.data, "__dask_graph__") and len(ordered.chunks[ordered.dims.index(level_dim)]) > 1:
+            ordered = ordered.chunk({level_dim: -1})
         if level_dim in source_levels.dims:
+            if hasattr(source_levels.data, "__dask_graph__") and len(source_levels.chunks[source_levels.dims.index(level_dim)]) > 1:
+                source_levels = source_levels.chunk({level_dim: -1})
+            # AXIS expects the vertical core dimension last, including for hybrid
+            # coordinates that vary across horizontal columns.
             source_levels = source_levels.transpose(*(dim for dim in other_dims if dim in source_levels.dims), level_dim)
 
         target_dim = f"_monet_axis_target_{level_dim}"
